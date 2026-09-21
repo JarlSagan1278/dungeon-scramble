@@ -1,0 +1,14 @@
+{
+  "name": "dungeon-scramble",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dungeon Scramble digital prototype (dice-path dungeon crawler)",
+  "scripts": {
+    "build": "node build.js",
+    "sim": "npm run build && node sim.js",
+    "sim:quick": "npm run build && node sim.js --turns=500"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.0"
+  }
+}
