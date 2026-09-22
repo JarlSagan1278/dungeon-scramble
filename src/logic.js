@@ -157,9 +157,12 @@ function buildRoute(){
   return ['camp','enc','enc','enc','camp','enc','enc','boss'];
 }
 
-function logMsg(cls,text){
+function logMsg(cls,text,toastKind){
   S.log.push({cls,text});
   if(S.log.length>200) S.log.shift();
+  if(toastKind!==undefined && typeof showToast==='function'){
+    showToast(text, toastKind===true ? null : toastKind);
+  }
 }
 
 /* ---- Encounter drawing ---- */
@@ -228,7 +231,7 @@ function advanceRoute(){
       S.floorIdx++;
       S.routeStep = 0;
       S.route = buildRoute();
-      logMsg('sys', `— Floor ${S.floorIdx+1} —`);
+      logMsg('sys', `— Floor ${S.floorIdx+1} —`, true);
     } else {
       S.screen='victory';
       return;
@@ -470,15 +473,15 @@ function applyNullify(){
   if(e.minionsSpawned>0){
     e.minionsSpawned = 0;
     S.tray.forEach(cell=>{ if(cell.minion){ cell.minion=false; cell.die=cell.coveredDie; cell.coveredDie=null; } });
-    logMsg('sys','Nullify: minions cleared.');
+    logMsg('sys','Nullify: minions cleared.', 'good');
   } else if(S.playerDOT>0){
     S.playerDOT = 0;
-    logMsg('sys','Nullify: your D.O.T. cleared.');
+    logMsg('sys','Nullify: your D.O.T. cleared.', 'good');
   } else if(e.curHOT>0){
     e.curHOT = 0;
-    logMsg('sys','Nullify: encounter H.O.T. cleared.');
+    logMsg('sys','Nullify: encounter H.O.T. cleared.', 'good');
   } else {
-    logMsg('sys','Nullify: nothing to clear.');
+    logMsg('sys','Nullify: nothing to clear.', true);
   }
 }
 
@@ -511,7 +514,7 @@ function checkQuests(e, ctx){
     if(done){
       e.questsDone[i] = true;
       applyQuestReward(e, rewardText);
-      logMsg('sys', `Quest complete: "${q}"`);
+      logMsg('sys', `Quest complete: "${q}"`, 'good');
     }
   });
 }
@@ -860,7 +863,7 @@ function swapInLootDie(trayIdx){
   cell.faceIdx = 0;
   S.pendingLootDie = null;
   S.screen = 'game';
-  logMsg('sys', `Equipped ${cell.die.name}.`);
+  logMsg('sys', `Equipped ${cell.die.name}.`, 'good');
   S.stats.lootCollected++;
   finishStep();
   render();
@@ -873,10 +876,10 @@ function onPlayerDefeated(){
     const f = d.faces[rand(6)];
     if(f.type!=='blank'){
       S.health = 5;
-      logMsg('heal', `Desperate roll from the Back Pocket saves you! (+5 health)`);
+      logMsg('heal', `Desperate roll from the Back Pocket saves you! (+5 health)`, 'good');
       render();
     } else {
-      logMsg('sys', `A die from the Back Pocket comes up blank and is lost.`);
+      logMsg('sys', `A die from the Back Pocket comes up blank and is lost.`, 'bad');
       onPlayerDefeated();
     }
   } else {
@@ -918,7 +921,7 @@ function canUpgrade(cat, level){
 function campUpgrade(cat, level){
   if(S.campUpgrades[cat]) return;
   if(!canUpgrade(cat, level)){
-    logMsg('sys', `Not enough spare dice to fully back that upgrade — nothing changed.`);
+    logMsg('sys', `Not enough spare dice to fully back that upgrade — nothing changed.`, 'bad');
     render();
     return;
   }
@@ -950,7 +953,7 @@ function campUpgrade(cat, level){
   }
   S.campUpgrades[cat] = true;
   const label = cat.charAt(0).toUpperCase()+cat.slice(1);
-  logMsg('sys', `Upgraded 3 ${label} Die ${ROMAN[level]} into one ${newDie.name}.`);
+  logMsg('sys', `Upgraded 3 ${label} Die ${ROMAN[level]} into one ${newDie.name}.`, 'good');
   render();
 }
 
@@ -968,7 +971,7 @@ function selectOrganize(type, idx){
   S.backPocket[bpIdx] = trayCell.die;
   trayCell.die = bpDie;
   trayCell.faceIdx = 0;
-  logMsg('sys', `Swapped ${bpDie.name} into your Tray for ${S.backPocket[bpIdx].name}.`);
+  logMsg('sys', `Swapped ${bpDie.name} into your Tray for ${S.backPocket[bpIdx].name}.`, true);
   S.organizeSelection = null;
   render();
 }
@@ -989,7 +992,7 @@ function campRest(){
   const heal = Math.ceil(count/2);
   S.health = cap(S.health+heal, S.maxHealth);
   S.campRested = true;
-  logMsg('heal', `Rested: scrambled ${count} actions, healed ${heal}.`);
+  logMsg('heal', `Rested: scrambled ${count} actions, healed ${heal}.`, 'good');
   render();
 }
 function campLeave(){

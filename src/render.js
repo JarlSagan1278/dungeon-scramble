@@ -408,6 +408,26 @@ function pickPreviewFace(faces){
   return nonBlank.reduce((best,f)=> (f.value||0) > (best.value||0) ? f : best, nonBlank[0]);
 }
 
+function ensureToastStack(){
+  let stack = document.getElementById('toast-stack');
+  if(!stack){
+    stack = el(`<div id="toast-stack"></div>`);
+    document.body.appendChild(stack);
+  }
+  return stack;
+}
+
+function showToast(text, kind){
+  const stack = ensureToastStack();
+  const toast = el(`<div class="toast${kind ? ' toast-'+kind : ''}">${text}</div>`);
+  stack.appendChild(toast);
+  requestAnimationFrame(()=> toast.classList.add('show'));
+  setTimeout(()=>{
+    toast.classList.remove('show');
+    setTimeout(()=>{ if(toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
+  }, 2600);
+}
+
 function openInfoModal(title, bodyHTML){
   const overlay = el(`<div class="modal-overlay"><div class="modal">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -563,7 +583,6 @@ function renderShrineEncounter(){
         <div class="enc-card-body">
           <div class="enc-flavor" style="border-top:none; padding-top:0;">${e.boon}</div>
           ${!S.shrineResult && !S.shrineChoice ? '<p class="hint">Revealing the shrine\'s boon...</p>' : ''}
-          <div class="mini-log-line">${S.log.length ? S.log[S.log.length-1].text : ''}</div>
         </div>
       </div>
     </div>
