@@ -19,8 +19,26 @@ function updateHeaderMeta(){
   el.textContent = (S && S.origin && S.klass) ? `${S.origin.name} ${S.klass.name} · Floor ${S.floorIdx+1}` : 'digital prototype';
 }
 
+// Low-health danger cue: a fixed, full-viewport pulsing red vignette --
+// entirely decorative, position:fixed and pointer-events:none, so it can
+// never affect layout height or block a tap. Lives once in document.body
+// (like the toast stack/modals) and its visibility is just toggled per
+// render rather than being rebuilt into app.innerHTML each time.
+const LOW_HEALTH_PCT = 0.25;
+function updateLowHealthVignette(){
+  let vig = document.getElementById('low-health-vignette');
+  if(!vig){
+    vig = el(`<div id="low-health-vignette"></div>`);
+    document.body.appendChild(vig);
+  }
+  const danger = S && S.maxHealth>0 && (S.health/S.maxHealth) <= LOW_HEALTH_PCT && (S.health>0)
+    && S.screen!=='victory' && S.screen!=='gameover';
+  vig.classList.toggle('active', !!danger);
+}
+
 function render(){
   updateHeaderMeta();
+  updateLowHealthVignette();
   if(!S){ renderSetup(); return; }
   if(S.screen==='victory'){ renderVictory(); return; }
   if(S.screen==='gameover'){ renderGameOver(); return; }
