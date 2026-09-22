@@ -16,6 +16,19 @@ function face(str){
   const key = nameMap[m[1].toLowerCase()];
   if(!key) return {type:'blank'};
   const val = m[2]?parseFloat(m[2]):1;
+  // Boost is a multiplier, and the source mechanics doc's dice never use a
+  // literal x1 (that would be a no-op) -- "BoostN" is a tier label, not the
+  // multiplier itself. Cross-referencing every Boost-face die in
+  // DS_-_Mechanics_Document.xlsx against its actual "x" column: tier 1 -> x2
+  // (Dwarven Doohickie, Mushroom Cap, Bonus Breakfast, Longbow, Crossbow,
+  // Tarot Deck, Unlabelled Mixture all agree), tier 2 -> x3 (Blunderbuss,
+  // Triage Turret), tier 3 -> x4 (Maximum Capacitor), tier 4 -> x8 (Warp
+  // Crossbow, the one card that uses it). Applied uniformly here so the
+  // displayed number on the die and the actual multiplier always match.
+  if(key==='boost'){
+    const BOOST_TIER_MULT = {1:2, 2:3, 3:4, 4:8};
+    return {type:key, value: BOOST_TIER_MULT[val] || val};
+  }
   return {type:key, value:val};
 }
 function faces(arr){ return arr.map(face); }

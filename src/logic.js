@@ -381,10 +381,7 @@ function computePathEffects(path){
       case 'leech': dotToEncounter += val*boostMult; hotToPlayer += val*boostMult; break;
       case 'heal': supportCount++; healCount++; healGain += val*boostMult; break;
       case 'hot': supportCount++; hotToPlayer += val*boostMult; break;
-      // Block is a Support Action for quest-counting purposes, but it isn't
-      // damage or healing, so it doesn't consume/benefit from a pending
-      // Boost -- a Boost immediately before a Block just dissipates unused.
-      case 'block': supportCount++; blockCount++; blockGain += val; break;
+      case 'block': supportCount++; blockCount++; blockGain += val*boostMult; break;
       case 'boost': boostCount++; boostMult *= val; break;
       case 'fumble': selfDot += val; break;
       case 'nullify': nullifyCount++; break;
