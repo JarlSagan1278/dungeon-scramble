@@ -33,6 +33,9 @@
   .title-bar h1{ font-size: 30px; -webkit-text-stroke: 1px #1c140c; text-shadow: 2px 2px 0 rgba(0,0,0,0.4); }
   .title-bar .sub{ color: var(--parchment-dim); font-size:13px; font-style:italic; }
   .logo-img{ display:block; height:38px; width:auto; }
+  .title-bar-right{ display:flex; align-items:center; gap:8px; }
+  .settings-btn{ flex:0 0 auto; width:28px; height:28px; border-radius:50%; background:var(--panel2); border:2px solid var(--stone); color:var(--parchment); font-size:14px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }
+  .settings-btn:hover{ border-color:var(--gold); }
   button{
     font-family: inherit; cursor:pointer; border:none; border-radius:4px;
     background: var(--stone); color: var(--parchment); padding:8px 16px; font-size:14px;
@@ -154,6 +157,7 @@
      this gold slice layered on the HP bar, flush against the current
      health level -- the amount a completed quest could still shave off. */
   .bar-fill.quest-hp{ position:absolute; top:0; background: linear-gradient(90deg,#a3812f,var(--gold)); }
+  .bar-fill.dmg-preview{ position:absolute; top:0; z-index:2; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.5) 0 3px, rgba(255,255,255,0.15) 3px 6px); border-right:2px solid #fff; }
   @keyframes flash-bar{
     0%{ box-shadow: 0 0 0 0 rgba(255,255,255,0); }
     15%{ box-shadow: 0 0 14px 4px var(--flash-color); }

@@ -156,6 +156,16 @@ function renderEncounterCard(e){
     questSegWidthPct = questAmt/e.maxHealth*100;
     questSegLeftPct = hpPct - questSegWidthPct;
   }
+  // Live preview of the currently-built (not-yet-committed) path's damage:
+  // a hatched ghost slice at the leading edge of the health bar, so the
+  // player can see the projected outcome before tapping Go.
+  let dmgPreviewLeftPct = 0, dmgPreviewWidthPct = 0;
+  if(e.maxHealth && S.path && S.path.length && S.encounter===e && !S.transitioning){
+    const pathPreview = computePathEffects(S.path);
+    const dmgAmt = Math.min(pathPreview.totalDamage, curHealthClamped);
+    dmgPreviewWidthPct = dmgAmt/e.maxHealth*100;
+    dmgPreviewLeftPct = hpPct - dmgPreviewWidthPct;
+  }
   const fx = healthFX(curHealthClamped, e._lastHealth);
   e._lastHealth = curHealthClamped;
   let statuses = '';
@@ -207,6 +217,7 @@ function renderEncounterCard(e){
             <div class="bar-row" style="position:relative;"><span>${iconSpan('heal')}</span><div class="bar ${fx.cls}">
                 <div class="bar-fill hp" style="width:${hpPct}%"></div>
                 ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
+                ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
               </div><span>${curHealthClamped.toFixed(0)}/${e.maxHealth}</span>${fx.deltaHTML}</div>
             ${isBoss ? bossCycle : `
             <div class="bar-row">
@@ -426,6 +437,39 @@ function showToast(text, kind){
     toast.classList.remove('show');
     setTimeout(()=>{ if(toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
   }, 2600);
+}
+
+function openSettingsModal(){
+  const inRun = !!S;
+  const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:340px;">
+      <h2 style="margin-top:0;">Settings</h2>
+      ${inRun ? `<p class="hint">${S.origin.name} ${S.klass.name} · Floor ${S.floorIdx+1}</p>` : ''}
+      <div class="small-btn-row" style="justify-content:center; flex-direction:column;">
+        ${inRun ? '<button id="settings-restart-btn" class="danger">Restart Run</button>' : ''}
+        <button id="settings-close-btn">Close</button>
+      </div>
+    </div></div>`);
+  document.body.appendChild(overlay);
+  const close = ()=>{ if(overlay.parentNode) document.body.removeChild(overlay); };
+  overlay.querySelector('#settings-close-btn').onclick = close;
+  overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
+  const restartBtn = overlay.querySelector('#settings-restart-btn');
+  if(restartBtn) restartBtn.onclick = ()=>{
+    close();
+    const confirmOverlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
+        <h2>Restart Run?</h2>
+        <p>Your current run (Floor ${S.floorIdx+1}, ${S.health}/${S.maxHealth} HP) will be lost.</p>
+        <div class="small-btn-row" style="justify-content:center;">
+          <button id="confirm-restart-cancel">Keep Playing</button>
+          <button class="danger" id="confirm-restart-go">Restart Run</button>
+        </div>
+      </div></div>`);
+    document.body.appendChild(confirmOverlay);
+    confirmOverlay.querySelector('#confirm-restart-cancel').onclick = ()=> document.body.removeChild(confirmOverlay);
+    confirmOverlay.querySelector('#confirm-restart-go').onclick = ()=>{ clearSave(); location.reload(); };
+    confirmOverlay.onclick = (ev)=>{ if(ev.target===confirmOverlay) document.body.removeChild(confirmOverlay); };
+  };
+  return overlay;
 }
 
 function openInfoModal(title, bodyHTML){
