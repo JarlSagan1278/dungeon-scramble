@@ -122,15 +122,16 @@
     box-shadow: 3px 3px 0 rgba(0,0,0,0.35); }
   .enc-header{ background: var(--stone); border-bottom:2px solid #000;
     padding:6px 8px; display:flex; align-items:center; gap:6px; }
-  .enc-type-badge{ flex:0 0 auto; width:22px; height:22px; border-radius:50%; background: var(--gold); color:#241c10;
-    display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; }
   .enc-name-txt{ margin:0; font-size:14px; color: var(--parchment); font-weight:800; line-height:1.15; flex:1; }
   .enc-type{ font-size:8px; text-transform:uppercase; letter-spacing:1px; color: var(--parchment-dim); font-weight:bold; white-space:nowrap; }
-  /* Portrait sits beside the vitals (HP bar / turn stats) instead of on top
-     of them -- keeps the whole card noticeably shorter than stacking a full-
-     width portrait above everything else. */
-  .enc-top-row{ display:flex; gap:8px; align-items:flex-start; }
-  .enc-portrait{ flex:0 0 auto; width:52px; height:52px; position:relative; }
+  /* Portrait sits beside the vitals (HP bar / turn stats / quests) instead
+     of on top of them -- keeps the whole card noticeably shorter than
+     stacking a full-width portrait above everything else. The portrait is
+     given a fixed width and stretched to the row's own height (rather than
+     forced 1:1) so it can grow into whatever space the narrower bar/quest
+     column frees up without the row itself getting any taller. */
+  .enc-top-row{ display:flex; gap:8px; align-items:stretch; }
+  .enc-portrait{ flex:0 0 auto; width:68px; position:relative; }
   .enc-art{ display:block; width:100%; height:100%; object-fit:contain; }
   .enc-art-wrap{ position:relative; width:100%; height:100%; display:flex; justify-content:center; align-items:center; }
   .enc-art-wrap .portrait-watermark{ top:38%; left:-15%; width:130%; font-size:7px; padding:1px 0; }
@@ -139,10 +140,14 @@
   .enc-flavor{ font-style:italic; font-size:10.5px; color:#d8cfc0; border-top:2px solid var(--gold); padding-top:3px; margin:4px 0 4px;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .bar-row{ display:flex; align-items:center; gap:6px; margin:2px 0; font-size:12px; color: var(--parchment); }
-  .bar{ flex:1; height:11px; background:#2a2420; border-radius:6px; border:1px solid #000; }
+  .bar{ flex:1; height:11px; background:#2a2420; border-radius:6px; border:1px solid #000; position:relative; overflow:hidden; }
   .bar-fill{ height:100%; border-radius:7px; }
   .bar-fill.hp{ background: linear-gradient(90deg,#7a1f1f,#c0392b); }
   .bar-fill.hp.player{ background: linear-gradient(90deg,#1f5a2a,#3fae54); }
+  /* Quest Health used to be a separate "X/Y remaining" text line; it's now
+     this gold slice layered on the HP bar, flush against the current
+     health level -- the amount a completed quest could still shave off. */
+  .bar-fill.quest-hp{ position:absolute; top:0; background: linear-gradient(90deg,#a3812f,var(--gold)); }
   @keyframes flash-bar{
     0%{ box-shadow: 0 0 0 0 rgba(255,255,255,0); }
     15%{ box-shadow: 0 0 14px 4px var(--flash-color); }

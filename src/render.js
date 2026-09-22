@@ -131,9 +131,22 @@ function healthFX(current, last){
 }
 
 function renderEncounterCard(e){
-  const hpPct = e.maxHealth? Math.max(0,e.curHealth)/e.maxHealth*100 : 0;
-  const fx = healthFX(Math.max(0,e.curHealth), e._lastHealth);
-  e._lastHealth = Math.max(0,e.curHealth);
+  const curHealthClamped = Math.max(0,e.curHealth);
+  const hpPct = e.maxHealth? curHealthClamped/e.maxHealth*100 : 0;
+  // Quest Health used to be spelled out as its own "X/Y remaining" line.
+  // Now it's just a differently-colored slice of the health bar itself: the
+  // outstanding amount a quest could still shave off, shown flush against
+  // the current health level (since that's where the next point of damage,
+  // quest or otherwise, would land).
+  let questSegLeftPct = 0, questSegWidthPct = 0;
+  if(e.maxHealth && e.questHealth!=null){
+    const qhRemaining = Math.max(0, e.questHealth-(e.questDamageDealt||0));
+    const questAmt = Math.min(qhRemaining, curHealthClamped);
+    questSegWidthPct = questAmt/e.maxHealth*100;
+    questSegLeftPct = hpPct - questSegWidthPct;
+  }
+  const fx = healthFX(curHealthClamped, e._lastHealth);
+  e._lastHealth = curHealthClamped;
   let statuses = '';
   if(e.curDOT) statuses += `<span class="status-chip">${iconSpan('dot', e.curDOT)} DOT</span>`;
   if(e.curHOT) statuses += `<span class="status-chip">${iconSpan('hot', e.curHOT)} HOT</span>`;
@@ -141,12 +154,11 @@ function renderEncounterCard(e){
   if(e.minionsSpawned) statuses += `<span class="status-chip">👹 Minions ${e.minionsSpawned}</span>`;
   let quests = '';
   if(e.quests && e.quests.length){
-    const qhNote = e.questHealth!=null ? `<div class="hint" style="margin:4px 0 0;">Quest Health: ${Math.max(0,e.questHealth-(e.questDamageDealt||0))}/${e.questHealth} remaining</div>` : '';
     quests = '<div class="quest-list">' + e.quests.map((q,i)=>`
       <div class="quest ${e.questsDone[i]?'complete':''}">
         <span class="quest-mark">${e.questsDone[i]?'✔':'○'}</span>
         <span>${q}</span>
-      </div>`).join('') + qhNote + '</div>';
+      </div>`).join('') + '</div>';
   }
   const isBoss = e.type==='Boss' || e.type==='Big Boss';
   const extraStats = [];
@@ -157,7 +169,6 @@ function renderEncounterCard(e){
     if(e.hot) extraStats.push(`+${e.hot} HOT/turn`);
     if(e.dot) extraStats.push(`+${e.dot} DOT/turn`);
   }
-  const typeIcon = {Enemy:'E', Trap:'T', Shrine:'S', Boss:'B', 'Big Boss':'B'}[e.type] || '?';
   const art = MONSTER_ART[e.name];
   const bossCycle = (isBoss && e.actionCycle && e.actionCycle.length) ? (()=>{
     const labels = {dmg:'Hit', minion:'Minion', shield:'Shield', heal:'Heal', hot:'H.O.T.', dot:'D.O.T.'};
@@ -172,7 +183,6 @@ function renderEncounterCard(e){
   return `
     <div class="enc-card">
       <div class="enc-header">
-        <span class="enc-type-badge">${typeIcon}</span>
         <h3 class="enc-name-txt">${e.name}</h3>
         <span class="enc-type">${e.type}</span>
       </div>
@@ -183,18 +193,20 @@ function renderEncounterCard(e){
               : (e.type!=='Shrine' ? `<div class="enc-art-wrap"><span class="portrait-watermark">PLACEHOLDER</span><img class="enc-art" src="${CAT_SILHOUETTE}" alt=""/></div>` : '')}
           </div>
           <div class="enc-vitals">
-            <div class="bar-row" style="position:relative;"><span>${iconSpan('heal')}</span><div class="bar ${fx.cls}"><div class="bar-fill hp" style="width:${hpPct}%"></div></div><span>${Math.max(0,e.curHealth).toFixed(0)}/${e.maxHealth}</span>${fx.deltaHTML}</div>
+            <div class="bar-row" style="position:relative;"><span>${iconSpan('heal')}</span><div class="bar ${fx.cls}">
+                <div class="bar-fill hp" style="width:${hpPct}%"></div>
+                ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
+              </div><span>${curHealthClamped.toFixed(0)}/${e.maxHealth}</span>${fx.deltaHTML}</div>
             ${isBoss ? bossCycle : `
             <div class="bar-row">
               ${e.dmg?`<span class="dmg-burst">${e.dmg}/turn</span>`:''}
               <span style="font-size:11px; color:var(--parchment-dim);">${extraStats.join(' · ')}</span>
             </div>`}
             <div class="statuses">${statuses}</div>
+            ${quests}
           </div>
         </div>
-        ${quests}
         ${e.flavor?`<div class="enc-flavor">${e.flavor}</div>`:''}
-        <div class="mini-log-line">${S.log.length ? S.log[S.log.length-1].text : 'The dungeon awaits...'}</div>
       </div>
     </div>`;
 }
@@ -294,7 +306,7 @@ function renderGame(){
           <div class="tray-wrap tray-wrap-full">
             <span class="round-badge">Round ${S.turnNumber+1}</span>
             ${pathCounterHTML()}
-            ${!S.firstDiePicked ? '<div class="first-tip">👆 Tap a die to start your path</div>' : ''}
+            ${!S.firstDiePicked ? '<div class="first-tip">Tap a die to start your path</div>' : ''}
             <div class="tray" id="tray"></div>
           </div>
           <div class="path-strip" id="path-strip" style="margin-top:6px;"></div>
@@ -522,7 +534,6 @@ function renderShrineEncounter(){
     <div class="panel">
       <div class="enc-card">
         <div class="enc-header">
-          <span class="enc-type-badge">S</span>
           <h3 class="enc-name-txt">${e.name}</h3>
           <span class="enc-type">Shrine</span>
         </div>
