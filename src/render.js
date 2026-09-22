@@ -177,15 +177,21 @@ function renderEncounterCard(e){
         <span class="enc-type">${e.type}</span>
       </div>
       <div class="enc-card-body">
-        ${art?`<img class="enc-art" src="${art}" alt="${e.name}"/>`
-          : (e.type!=='Shrine' ? `<div class="enc-art-wrap"><span class="portrait-watermark">PLACEHOLDER</span><img class="enc-art" src="${CAT_SILHOUETTE}" alt=""/></div>` : '')}
-        <div class="bar-row" style="position:relative; margin-top:8px;"><span>${iconSpan('heal')}</span><div class="bar ${fx.cls}"><div class="bar-fill hp" style="width:${hpPct}%"></div></div><span>${Math.max(0,e.curHealth).toFixed(0)}/${e.maxHealth}</span>${fx.deltaHTML}</div>
-        ${isBoss ? bossCycle : `
-        <div class="bar-row">
-          ${e.dmg?`<span class="dmg-burst">${e.dmg}/turn</span>`:''}
-          <span style="font-size:11px; color:var(--parchment-dim);">${extraStats.join(' · ')}</span>
-        </div>`}
-        <div class="statuses">${statuses}</div>
+        <div class="enc-top-row">
+          <div class="enc-portrait">
+            ${art?`<img class="enc-art" src="${art}" alt="${e.name}"/>`
+              : (e.type!=='Shrine' ? `<div class="enc-art-wrap"><span class="portrait-watermark">PLACEHOLDER</span><img class="enc-art" src="${CAT_SILHOUETTE}" alt=""/></div>` : '')}
+          </div>
+          <div class="enc-vitals">
+            <div class="bar-row" style="position:relative;"><span>${iconSpan('heal')}</span><div class="bar ${fx.cls}"><div class="bar-fill hp" style="width:${hpPct}%"></div></div><span>${Math.max(0,e.curHealth).toFixed(0)}/${e.maxHealth}</span>${fx.deltaHTML}</div>
+            ${isBoss ? bossCycle : `
+            <div class="bar-row">
+              ${e.dmg?`<span class="dmg-burst">${e.dmg}/turn</span>`:''}
+              <span style="font-size:11px; color:var(--parchment-dim);">${extraStats.join(' · ')}</span>
+            </div>`}
+            <div class="statuses">${statuses}</div>
+          </div>
+        </div>
         ${quests}
         ${e.flavor?`<div class="enc-flavor">${e.flavor}</div>`:''}
         <div class="mini-log-line">${S.log.length ? S.log[S.log.length-1].text : 'The dungeon awaits...'}</div>
@@ -296,7 +302,7 @@ function renderGame(){
         <div class="util-rail">
           <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning)?'disabled':''} ${emphasizeResolve?'pulse':''}" id="resolve-btn">▶<span>Go</span></div>
           <div class="util-btn danger-accent rail-clear ${S.transitioning?'disabled':''}" id="clear-path-btn">${iconSpan('fumble')}<span>Clear</span></div>
-          ${S.klass.convertTo ? `<div class="util-btn ${(S.classAbilityUsed||S.transitioning)?'disabled':''}" id="ability-btn">✦<span>${S.classAbilityUsed?'Used':'Skill'}</span></div>` : ''}
+          ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''}" id="ability-btn">✦<span>${S.classAbilityUsed?'Used':'Skill'}</span></div>` : ''}
         </div>
       </div>
     </div>
