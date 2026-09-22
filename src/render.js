@@ -3,6 +3,16 @@
    ========================================================================= */
 const app = document.getElementById('app');
 
+// Clear-button confirm-arm state. Pure UI/interaction state (not game
+// state), so it lives here rather than on S -- clearing a path you spent a
+// few taps building shouldn't be a single accidental tap away.
+let clearConfirmArmed = false;
+let clearConfirmTimeout = null;
+function disarmClearConfirm(){
+  if(clearConfirmTimeout){ clearTimeout(clearConfirmTimeout); clearConfirmTimeout = null; }
+  clearConfirmArmed = false;
+}
+
 function updateHeaderMeta(){
   const el = document.getElementById('header-meta');
   if(!el) return;
@@ -24,9 +34,10 @@ function render(){
 function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
 
 function renderSetup(){
-  const continueRow = hasSave() ? `
+  const saved = hasSave() ? peekSave() : null;
+  const continueRow = saved ? `
       <div class="panel" style="margin-bottom:12px; text-align:center;">
-        <p style="margin:0 0 8px;">A saved run was found.</p>
+        <p style="margin:0 0 8px;">A saved run was found: <strong>${saved.originName} ${saved.className}</strong>, Floor ${saved.floorIdx+1}, ${saved.health}/${saved.maxHealth} HP.</p>
         <div class="small-btn-row" style="justify-content:center;">
           <button class="primary" id="continue-btn">Continue Saved Game</button>
           <button class="danger" id="discard-save-btn">Discard &amp; Start Fresh</button>
@@ -287,6 +298,8 @@ function renderGame(){
         ${S.playerHOT?`<span class="status-chip">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}
         ${S.playerBlock?`<span class="status-chip">${iconSpan('block', S.playerBlock)} Block</span>`:''}
         ${S.pendingFreeBoost?`<span class="status-chip" style="background:var(--gold);color:#241c10;">${iconSpan('boost')} Boost x${S.pendingFreeBoost} armed</span>`:''}
+        <span class="status-chip" style="opacity:${S.segmentShrineUsed?0.4:1};" title="At most one Shrine per segment">Shrine ${S.segmentShrineUsed?'used':'available'}</span>
+        <span class="status-chip" style="opacity:${S.segmentTrapUsed?0.4:1};" title="At most one Trap per segment">Trap ${S.segmentTrapUsed?'used':'available'}</span>
       </div>
     </div>
     <div class="panel" style="margin-bottom:8px;">
@@ -313,7 +326,7 @@ function renderGame(){
         </div>
         <div class="util-rail">
           <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning)?'disabled':''} ${emphasizeResolve?'pulse':''}" id="resolve-btn">▶<span>Go</span></div>
-          <div class="util-btn danger-accent rail-clear ${S.transitioning?'disabled':''}" id="clear-path-btn">${iconSpan('fumble')}<span>Clear</span></div>
+          <div class="util-btn danger-accent rail-clear ${S.transitioning?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
           ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''}" id="ability-btn">✦<span>${S.classAbilityUsed?'Used':'Skill'}</span></div>` : ''}
         </div>
       </div>
@@ -338,6 +351,16 @@ function renderGame(){
   });
   document.getElementById('clear-path-btn').onclick = ()=>{
     if(S.transitioning) return;
+    // A built-up path is a few taps of work -- require a confirming second
+    // tap before discarding it, rather than wiping it on one accidental tap.
+    // Nothing to lose (empty path) clears immediately, same as before.
+    if(S.path.length>0 && !clearConfirmArmed){
+      clearConfirmArmed = true;
+      clearConfirmTimeout = setTimeout(()=>{ disarmClearConfirm(); render(); }, 2500);
+      render();
+      return;
+    }
+    disarmClearConfirm();
     S.path=[];
     S.tray.forEach(c=>delete c.forcedFace);
     S.classAbilityUsed = false;
@@ -589,7 +612,20 @@ function renderCamp(){
       <div class="log" id="log"></div>
     </div>`;
   document.getElementById('rest-btn').onclick = campRest;
-  document.getElementById('leave-btn').onclick = campLeave;
+  document.getElementById('leave-btn').onclick = ()=>{
+    const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
+        <h2>Break Camp?</h2>
+        <p>You can't come back to rest or upgrade dice until the next Camp.</p>
+        <div class="small-btn-row" style="justify-content:center;">
+          <button id="confirm-leave-cancel">Stay a Moment</button>
+          <button class="primary" id="confirm-leave-go">Break Camp</button>
+        </div>
+      </div></div>`);
+    document.body.appendChild(overlay);
+    overlay.querySelector('#confirm-leave-cancel').onclick = ()=> document.body.removeChild(overlay);
+    overlay.querySelector('#confirm-leave-go').onclick = ()=>{ document.body.removeChild(overlay); campLeave(); };
+    overlay.onclick = (ev)=>{ if(ev.target===overlay) document.body.removeChild(overlay); };
+  };
   ['attack','maneuver'].forEach(cat=>{
     [1,2].forEach(level=>{
       const btn = document.getElementById(`upgrade-${cat}-${level}`);

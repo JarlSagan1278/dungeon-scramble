@@ -27,6 +27,25 @@ function clearSave(){
   try{ localStorage.removeItem(SAVE_KEY); } catch(e){}
 }
 
+// A lightweight look at the saved run for the setup screen's "Continue"
+// button, without actually loading it into S -- so the player can see what
+// they'd be resuming (who, where, how hurt) before committing to it.
+function peekSave(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return null;
+    const data = JSON.parse(raw);
+    const origin = ORIGINS.find(o=>o.id===data.originId);
+    const klass = CLASSES.find(c=>c.id===data.classId);
+    if(!origin || !klass) return null;
+    return {
+      originName: origin.name, className: klass.name,
+      floorIdx: data.floorIdx||0, health: data.health, maxHealth: data.maxHealth,
+      turnsTaken: (data.stats&&data.stats.turnsTaken)||0,
+    };
+  }catch(e){ return null; }
+}
+
 function loadGame(){
   try{
     const raw = localStorage.getItem(SAVE_KEY);

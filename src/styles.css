@@ -97,6 +97,12 @@
   .die.dietype-gilded{ background:#d4af52; color:#241c10; }
   .die.dietype-magic{ background:#8a5fb0; color:#f5eaff; }
   .die.used{ opacity:0.32; cursor:default; }
+  /* A subtle, always-on cue for any die that's currently a legal next move
+     -- not just on :hover, which never fires on a touch device, so a phone
+     player previously had no way to see which dice were tappable next
+     without trial and error. :hover still layers a stronger highlight for
+     pointer devices. */
+  .die.selectable{ box-shadow:0 0 0 2px rgba(212,175,82,0.5); }
   .die.selectable:hover{ box-shadow:0 0 0 3px var(--gold); }
   .die.in-path{ box-shadow:0 0 0 3px #fff, 0 0 12px 2px var(--gold); }
   .die.minion{ background:#4a4038 !important; color:#8f8471 !important; }
