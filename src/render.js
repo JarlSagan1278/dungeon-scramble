@@ -98,6 +98,20 @@ function renderRoute(){
   return html;
 }
 
+// Which path index (if any) a currently-armed free Boost token will land
+// on: it compounds through any leading Boost faces already in the path,
+// then is spent (used or wasted) by the very next non-Boost action --
+// mirrors the boostMult bookkeeping in computePathEffects().
+function boostTargetIdx(){
+  if(!(S.pendingFreeBoost>0)) return -1;
+  for(const idx of S.path){
+    const f = getFaceForIdx(idx);
+    if(f.type==='boost') continue;
+    return idx;
+  }
+  return -1;
+}
+
 function renderDie(cell, idx){
   const f = cell.forcedFace || currentFace(cell);
   const isBlank = f.type==='blank';
@@ -119,9 +133,15 @@ function renderDie(cell, idx){
   // color so it reads as a label rather than competing with the face symbol.
   const isNonStarter = !cell.minion && cell.die.cat!=='attack' && cell.die.cat!=='maneuver';
   const nameTag = isNonStarter ? `<div class="name-tag">${cell.die.name}</div>` : '';
-  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls}"
+  const forcedCls = cell.forcedFace ? 'forced-face' : '';
+  const boostTargetCls = boostTargetIdx()===idx ? 'boost-target' : '';
+  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${forcedCls} ${boostTargetCls}"
             data-idx="${idx}" title="${isLastMove?'Click to undo this move':cell.die.name}" ${shakeDelay}>
             ${num?`<div class="pathnum">${num}</div>`:''}
+            ${(cell.forcedFace || boostTargetCls) ? `<div class="corner-badges">
+              ${cell.forcedFace?`<span class="forced-badge" title="Converted by a class ability">✦</span>`:''}
+              ${boostTargetCls?`<span class="boost-target-badge" title="Your armed Boost token will apply to this action">${iconSpan('boost')}</span>`:''}
+            </div>` : ''}
             ${nameTag}
             ${label}
           </div>`;
@@ -354,10 +374,33 @@ function renderGame(){
   document.getElementById('tray').innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join('');
   S.justScrambled = false;
   [...document.getElementById('tray').children].forEach(node=>{
+    const idx = parseInt(node.dataset.idx);
+    let pressTimer = null;
+    let longPressed = false;
+    const cancelPress = ()=>{
+      if(pressTimer){ clearTimeout(pressTimer); pressTimer = null; }
+      hideFaceTooltip();
+      // Leave `longPressed` as-is here: pointerup fires just before the
+      // synthetic click, and the click handler is what needs to see it was
+      // a long-press (to swallow the click) before it gets cleared.
+    };
+    node.addEventListener('pointerdown', (ev)=>{
+      if(S.transitioning) return;
+      longPressed = false;
+      const rect = node.getBoundingClientRect();
+      pressTimer = setTimeout(()=>{
+        longPressed = true;
+        const cell = S.tray[idx];
+        const f = cell.forcedFace || currentFace(cell);
+        showFaceTooltip(rect, `<strong>${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</strong> — ${FACE_DESC[f.type]||''}`);
+      }, 420);
+    });
+    ['pointerup','pointerleave','pointercancel'].forEach(evt=> node.addEventListener(evt, cancelPress));
     node.onclick = ()=> {
       if(S.transitioning) return;
+      if(longPressed){ longPressed = false; return; } // long-press consumed this interaction
       if(node.classList.contains('used') && !node.classList.contains('undoable')) return;
-      toggleSelect(parseInt(node.dataset.idx));
+      toggleSelect(idx);
     };
   });
   document.getElementById('clear-path-btn').onclick = ()=>{
@@ -417,6 +460,29 @@ function pickPreviewFace(faces){
   const nonBlank = faces.filter(f=>f.type!=='blank');
   if(!nonBlank.length) return {type:'blank'};
   return nonBlank.reduce((best,f)=> (f.value||0) > (best.value||0) ? f : best, nonBlank[0]);
+}
+
+// Long-press die-face tooltip. A fixed-position bubble anchored to the
+// pressed die's on-screen position, so it never participates in layout
+// (no height impact) and works on touch, unlike a native `title` attribute.
+let faceTooltipEl = null;
+function showFaceTooltip(anchorRect, text){
+  hideFaceTooltip();
+  const bubble = el(`<div class="face-tooltip">${text}</div>`);
+  document.body.appendChild(bubble);
+  const bw = bubble.offsetWidth, bh = bubble.offsetHeight;
+  let left = anchorRect.left + anchorRect.width/2 - bw/2;
+  left = Math.max(6, Math.min(left, window.innerWidth - bw - 6));
+  let top = anchorRect.top - bh - 8;
+  if(top < 6) top = anchorRect.bottom + 8;
+  bubble.style.left = `${left}px`;
+  bubble.style.top = `${top}px`;
+  requestAnimationFrame(()=> bubble.classList.add('show'));
+  faceTooltipEl = bubble;
+}
+function hideFaceTooltip(){
+  if(faceTooltipEl && faceTooltipEl.parentNode) faceTooltipEl.parentNode.removeChild(faceTooltipEl);
+  faceTooltipEl = null;
 }
 
 function ensureToastStack(){

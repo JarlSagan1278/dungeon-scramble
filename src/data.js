@@ -43,6 +43,27 @@ const ICON = { hit:'⚔', combo:'✹', boost:'⬆', dot:'☠', leech:'🩸', fum
 const LABEL = { hit:'Hit', combo:'Combo', boost:'Boost', dot:'D.O.T.', leech:'Leech', fumble:'Fumble',
   dodge:'Dodge', leap:'Leap', pivot:'Pivot', freeze:'Freeze', heal:'Heal', hot:'H.O.T.', block:'Block', nullify:'Nullify', blank:'—'};
 
+// One-line, player-facing descriptions of what each face actually does when
+// it resolves -- shown on long-press so new players can learn the icon
+// language without needing a separate how-to-play primer.
+const FACE_DESC = {
+  hit: 'Deals damage equal to its value.',
+  combo: 'Deals damage that grows with each Attack die next to it in your path.',
+  boost: "Multiplies the value of the very next action in your path (even across several Boosts in a row).",
+  dot: "Applies stacking damage-over-time to the enemy.",
+  leech: "Damages the enemy and heals you the same amount, over time.",
+  fumble: "Backfires: applies damage-over-time to you.",
+  dodge: "A Maneuver action -- no direct effect, but some quests ask for these.",
+  leap: "A Maneuver action that lets your path jump to a non-adjacent die.",
+  pivot: "A Maneuver action that lets your path change direction.",
+  freeze: "The enemy skips its next action.",
+  heal: "Restores your health immediately.",
+  hot: "Heals you over time.",
+  block: "Gains Block, reducing the next hit you take.",
+  nullify: "Cancels one active effect -- Minions, your D.O.T., or the enemy's H.O.T.",
+  blank: "No effect this turn.",
+};
+
 // Icon set: the 14 action icons, Door, and Boss/skull are vector-traced
 // directly from the user's own Action Key Sticker and board art (via
 // contour detection on the source pixels, not hand-redrawn approximations).
