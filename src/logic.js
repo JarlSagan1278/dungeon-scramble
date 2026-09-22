@@ -558,7 +558,28 @@ function endTurnButton(){
 // tray. ----
 function startTurnTransition(){
   S.transitioning = true;
+  // For a multi-die path, step through each die's contribution one at a
+  // time (with a running total) before the real "Mathing" step actually
+  // applies everything -- makes a combo read as a sequence of beats
+  // instead of one instant number. This is pure preview: it recomputes
+  // computePathEffects() on successive prefixes of the path (a pure,
+  // read-only function of S.tray/S.pendingFreeBoost) without mutating any
+  // game state, so the real resolution below is completely unchanged.
+  // Skipped for a 0- or 1-die path, where there's nothing to sequence.
+  const pathRevealSteps = S.path.length > 1 ? S.path.map((idx,i) => () => {
+    const f = getFaceForIdx(idx);
+    const faceLabel = LABEL[f.type] + ((f.value && !ICON_VALUE_SLOT.has(f.type)) ? ' '+f.value : '');
+    const cumulative = computePathEffects(S.path.slice(0,i+1));
+    const bits = [];
+    if(cumulative.totalDamage) bits.push(`${cumulative.totalDamage%1?cumulative.totalDamage.toFixed(1):cumulative.totalDamage} damage so far`);
+    if(cumulative.healGain) bits.push(`+${cumulative.healGain} heal so far`);
+    if(cumulative.blockGain) bits.push(`+${cumulative.blockGain} block so far`);
+    if(cumulative.dotToEncounter) bits.push(`+${cumulative.dotToEncounter} D.O.T. so far`);
+    if(cumulative.hotToPlayer) bits.push(`+${cumulative.hotToPlayer} H.O.T. so far`);
+    return { title: `Path ${i+1}/${S.path.length}: ${faceLabel}`, text: bits.length ? bits.join(', ')+'.' : 'No effect yet.', delay: 550 };
+  }) : [];
   const steps = [
+    ...pathRevealSteps,
     () => {
       const effects = resolvePath();
       S.pendingFreeBoost = 0; // a free Boost token is spent by end of turn whether or not it landed on anything
@@ -633,7 +654,7 @@ function runTransitionSteps(steps, i){
     runTransitionSteps(steps, i+1);
   };
   S._advance = advance;
-  S._pendingTimeout = setTimeout(advance, 1000);
+  S._pendingTimeout = setTimeout(advance, result.delay || 1000);
 }
 
 function skipTransition(){
