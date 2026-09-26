@@ -246,7 +246,12 @@
   .log .sys{ color:#8fa8c9; }
 
   .path-strip-col{ max-width:300px; margin:0 auto; }
-  .path-strip{ display:flex; gap:4px; flex-wrap:wrap; min-height:28px; margin:8px 0; }
+  /* No min-height/fixed margin here -- when the path is empty the strip
+     renders no children and its wrapper's inline margin-top is set to 0
+     (see render.js), so the panel hugs the tray instead of reserving a
+     tall empty gutter below it. Margin only appears once there's a chip
+     to separate from the tray above it. */
+  .path-strip{ display:flex; gap:4px; flex-wrap:wrap; }
   .round-badge{ position:absolute; top:-6px; left:8px; background:var(--stone); border:2px solid #000; border-radius:8px;
     padding:2px 6px; font-size:9px; color:var(--parchment-dim); z-index:2; }
   .path-counter-float{ position:absolute; top:-8px; right:4px; background:var(--gold); color:#241c10; border:2px solid #000;

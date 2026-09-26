@@ -140,25 +140,26 @@ function boostTargetIdx(){
 
 // Renders a die's name as text arced along the top edge of the tile (like a
 // coin legend), so longer names get more usable width than a single straight
-// line would allow. The viewBox height (20) is set to match the name-tag's
-// actual CSS height (20px) so font-size units here translate 1:1 to on-screen
-// px, keeping the name legible relative to the face-word text below it (9px):
-// the size floor never drops more than a size or two under that. Names long
-// enough to still overflow the arc at their tier's size fall back to SVG
-// textLength compression (squeezing glyph width/spacing, not font-size) so
-// even the longest names stay at a readable height instead of shrinking.
+// line would allow. The viewBox is sized to roughly match the name-tag's
+// actual on-screen box (63x20 CSS px) instead of an arbitrary 100-wide unit
+// space, so font-size units here map ~1:1 to real px without the extra
+// horizontal squish a wider viewBox would otherwise bake into every glyph --
+// that squish was making the text read as smaller than its font-size implied.
+// Names long enough to still overflow the arc at their tier's size fall back
+// to SVG textLength compression (squeezing glyph width/spacing, not
+// font-size) so even the longest names stay at a readable height.
 function nameTagSVG(name, idx){
   const len = name.length;
   let fs;
-  if(len<=8) fs=8;
-  else if(len<=16) fs=7.5;
-  else fs=7; // floor -- never smaller than this, however long the name
-  const budget = 88; // usable arc length in viewBox units
-  const estWidth = len * fs * 0.58; // rough average glyph-width heuristic
+  if(len<=8) fs=9;
+  else if(len<=14) fs=8.3;
+  else fs=7.6; // floor -- close to the face-word text's own 9px, however long the name
+  const budget = 52; // usable arc length in viewBox units
+  const estWidth = len * fs * 0.52; // rough average glyph-width heuristic
   const compress = estWidth > budget;
   const pathId = `nametag-arc-${idx}`;
-  return `<svg class="name-tag-svg" viewBox="0 0 100 20" preserveAspectRatio="none">
-    <defs><path id="${pathId}" d="M 6,19 Q 50,3 94,19"/></defs>
+  return `<svg class="name-tag-svg" viewBox="0 0 63 20" preserveAspectRatio="none">
+    <defs><path id="${pathId}" d="M 4,19 Q 31.5,3 59,19"/></defs>
     <text font-size="${fs}"${compress ? ` textLength="${budget}" lengthAdjust="spacingAndGlyphs"` : ''}>
       <textPath href="#${pathId}" startOffset="50%" text-anchor="middle">${name}</textPath>
     </text>
@@ -431,7 +432,7 @@ function renderGame(){
         </div>
       </div>
       <div class="path-strip-col">
-        <div class="path-strip" id="path-strip" style="margin-top:6px;"></div>
+        <div class="path-strip" id="path-strip" style="margin-top:${S.path.length?6:0}px;"></div>
       </div>
     </div>
     ${S.transitioning && S.transitionLog && S.transitionLog.length ? `
