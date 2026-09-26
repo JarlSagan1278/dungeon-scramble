@@ -603,12 +603,12 @@ function startTurnTransition(){
     const faceLabel = LABEL[f.type] + ((f.value && !ICON_VALUE_SLOT.has(f.type)) ? ' '+f.value : '');
     const cumulative = computePathEffects(S.path.slice(0,i+1));
     const bits = [];
-    if(cumulative.totalDamage) bits.push(`${cumulative.totalDamage%1?cumulative.totalDamage.toFixed(1):cumulative.totalDamage} damage so far`);
-    if(cumulative.healGain) bits.push(`+${cumulative.healGain} heal so far`);
-    if(cumulative.blockGain) bits.push(`+${cumulative.blockGain} block so far`);
-    if(cumulative.dotToEncounter) bits.push(`+${cumulative.dotToEncounter} D.O.T. so far`);
-    if(cumulative.hotToPlayer) bits.push(`+${cumulative.hotToPlayer} H.O.T. so far`);
-    return { title: `Path ${i+1}/${S.path.length}: ${faceLabel}`, text: bits.length ? bits.join(', ')+'.' : 'No effect yet.', delay: 550 };
+    if(cumulative.totalDamage) bits.push(`${cumulative.totalDamage%1?cumulative.totalDamage.toFixed(1):cumulative.totalDamage} dmg`);
+    if(cumulative.healGain) bits.push(`+${cumulative.healGain} heal`);
+    if(cumulative.blockGain) bits.push(`+${cumulative.blockGain} block`);
+    if(cumulative.dotToEncounter) bits.push(`+${cumulative.dotToEncounter} dot`);
+    if(cumulative.hotToPlayer) bits.push(`+${cumulative.hotToPlayer} hot`);
+    return { title: `${i+1}/${S.path.length} · ${faceLabel}`, text: bits.length ? bits.join(' · ') : '—', delay: 550 };
   }) : [];
   const steps = [
     ...pathRevealSteps,
@@ -619,43 +619,43 @@ function startTurnTransition(){
       const e = S.encounter;
       const parts = [];
       if(effects){
-        if(effects.totalDamage>0) parts.push(`Dealt ${effects.totalDamage%1?effects.totalDamage.toFixed(1):effects.totalDamage} damage.`);
-        if(effects.healGain) parts.push(`Healed ${effects.healGain}.`);
-        if(effects.blockGain) parts.push(`+${effects.blockGain} Block.`);
-        if(effects.dotToEncounter) parts.push(`+${effects.dotToEncounter} D.O.T. on ${e.name}.`);
-        if(effects.hotToPlayer) parts.push(`+${effects.hotToPlayer} H.O.T. on you.`);
-        if(effects.selfDot) parts.push(`+${effects.selfDot} D.O.T. on you (Fumble).`);
-        if(effects.nullifyCount) parts.push(`Nullify triggered.`);
-        if(effects.freeze) parts.push(`${e.name} will be frozen next turn.`);
+        if(effects.totalDamage>0) parts.push(`${effects.totalDamage%1?effects.totalDamage.toFixed(1):effects.totalDamage} dmg`);
+        if(effects.healGain) parts.push(`+${effects.healGain} heal`);
+        if(effects.blockGain) parts.push(`+${effects.blockGain} block`);
+        if(effects.dotToEncounter) parts.push(`+${effects.dotToEncounter} dot`);
+        if(effects.hotToPlayer) parts.push(`+${effects.hotToPlayer} hot`);
+        if(effects.selfDot) parts.push(`+${effects.selfDot} dot (fumble)`);
+        if(effects.nullifyCount) parts.push(`Nullify`);
+        if(effects.freeze) parts.push(`Freeze`);
       }
-      let text = parts.length ? parts.join(' ') : 'No actions to resolve this turn.';
-      const step = {title:'Mathing', text};
-      if(e.curHealth<=0){ step.text += ` ${e.name} is defeated!`; step.stop = 'encounterDefeated'; }
+      let text = parts.length ? parts.join(' · ') : 'No effect';
+      const step = {title:'Result', text};
+      if(e.curHealth<=0){ step.text += ' — Defeated!'; step.stop = 'encounterDefeated'; }
       return step;
     },
     () => {
       const e = S.encounter;
-      let text = 'No status effects to resolve.';
+      let text = '—';
       if(e.curDOT>0){
         e.curHealth = capUpper(e.curHealth-e.curDOT, e.maxHealth);
-        text = `${e.name} takes ${e.curDOT} D.O.T. damage.`;
-        logMsg('dmg', text);
+        text = `-${e.curDOT} dot`;
+        logMsg('dmg', `${e.name} takes ${e.curDOT} D.O.T. damage.`);
         S.stats.damageDealt += e.curDOT;
       }
       if(e.curHOT>0) e.curHealth = cap(e.curHealth+e.curHOT, e.maxHealth);
-      const step = {title:'Encounter Upkeep', text};
+      const step = {title:'Enemy Upkeep', text};
       if(e.curHealth<=0) step.stop = 'encounterDefeated';
       return step;
     },
     () => {
       const e = S.encounter;
       const text = runEncounterAction();
-      const step = {title:`${e.name}'s Turn`, text};
+      const step = {title:'Enemy Turn', text};
       if(S.health<=0) step.stop = 'playerDefeated';
       return step;
     },
     () => {
-      const text = runPlayerUpkeep() || 'Nothing to resolve.';
+      const text = runPlayerUpkeep() || '—';
       const step = {title:'Your Upkeep', text};
       if(S.health<=0) step.stop = 'playerDefeated';
       return step;
