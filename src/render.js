@@ -138,6 +138,33 @@ function boostTargetIdx(){
   return -1;
 }
 
+// Renders a die's name as text arced along the top edge of the tile (like a
+// coin legend), so longer names get more usable width than a single straight
+// line would allow. Font-size is tiered down as the name gets longer; only
+// names estimated to still overflow the arc at their tier's size fall back to
+// SVG textLength compression (squeezing glyph spacing) as a last resort, so
+// short/medium names keep natural, un-squished letterforms.
+function nameTagSVG(name, idx){
+  const len = name.length;
+  let fs;
+  if(len<=6) fs=7.5;
+  else if(len<=10) fs=6.6;
+  else if(len<=14) fs=5.8;
+  else if(len<=18) fs=5.1;
+  else if(len<=22) fs=4.5;
+  else fs=4.0;
+  const budget = 86; // usable arc length in viewBox units
+  const estWidth = len * fs * 0.62; // rough average glyph-width heuristic
+  const compress = estWidth > budget;
+  const pathId = `nametag-arc-${idx}`;
+  return `<svg class="name-tag-svg" viewBox="0 0 100 22" preserveAspectRatio="none">
+    <defs><path id="${pathId}" d="M 6,20 Q 50,2 94,20"/></defs>
+    <text font-size="${fs}"${compress ? ` textLength="${budget}" lengthAdjust="spacingAndGlyphs"` : ''}>
+      <textPath href="#${pathId}" startOffset="50%" text-anchor="middle">${name}</textPath>
+    </text>
+  </svg>`;
+}
+
 function renderDie(cell, idx){
   const f = cell.forcedFace || currentFace(cell);
   const isBlank = f.type==='blank';
@@ -158,7 +185,7 @@ function renderDie(cell, idx){
   // Attack/Maneuver die) show their own name, faded toward the die's own
   // color so it reads as a label rather than competing with the face symbol.
   const isNonStarter = !cell.minion && cell.die.cat!=='attack' && cell.die.cat!=='maneuver';
-  const nameTag = isNonStarter ? `<div class="name-tag">${cell.die.name}</div>` : '';
+  const nameTag = isNonStarter ? `<div class="name-tag">${nameTagSVG(cell.die.name, idx)}</div>` : '';
   const forcedCls = cell.forcedFace ? 'forced-face' : '';
   const boostTargetCls = boostTargetIdx()===idx ? 'boost-target' : '';
   return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${forcedCls} ${boostTargetCls}"
