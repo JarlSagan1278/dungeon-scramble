@@ -140,25 +140,25 @@ function boostTargetIdx(){
 
 // Renders a die's name as text arced along the top edge of the tile (like a
 // coin legend), so longer names get more usable width than a single straight
-// line would allow. Font-size is tiered down as the name gets longer; only
-// names estimated to still overflow the arc at their tier's size fall back to
-// SVG textLength compression (squeezing glyph spacing) as a last resort, so
-// short/medium names keep natural, un-squished letterforms.
+// line would allow. The viewBox height (20) is set to match the name-tag's
+// actual CSS height (20px) so font-size units here translate 1:1 to on-screen
+// px, keeping the name legible relative to the face-word text below it (9px):
+// the size floor never drops more than a size or two under that. Names long
+// enough to still overflow the arc at their tier's size fall back to SVG
+// textLength compression (squeezing glyph width/spacing, not font-size) so
+// even the longest names stay at a readable height instead of shrinking.
 function nameTagSVG(name, idx){
   const len = name.length;
   let fs;
-  if(len<=6) fs=7.5;
-  else if(len<=10) fs=6.6;
-  else if(len<=14) fs=5.8;
-  else if(len<=18) fs=5.1;
-  else if(len<=22) fs=4.5;
-  else fs=4.0;
-  const budget = 86; // usable arc length in viewBox units
-  const estWidth = len * fs * 0.62; // rough average glyph-width heuristic
+  if(len<=8) fs=8;
+  else if(len<=16) fs=7.5;
+  else fs=7; // floor -- never smaller than this, however long the name
+  const budget = 88; // usable arc length in viewBox units
+  const estWidth = len * fs * 0.58; // rough average glyph-width heuristic
   const compress = estWidth > budget;
   const pathId = `nametag-arc-${idx}`;
-  return `<svg class="name-tag-svg" viewBox="0 0 100 22" preserveAspectRatio="none">
-    <defs><path id="${pathId}" d="M 6,20 Q 50,2 94,20"/></defs>
+  return `<svg class="name-tag-svg" viewBox="0 0 100 20" preserveAspectRatio="none">
+    <defs><path id="${pathId}" d="M 6,19 Q 50,3 94,19"/></defs>
     <text font-size="${fs}"${compress ? ` textLength="${budget}" lengthAdjust="spacingAndGlyphs"` : ''}>
       <textPath href="#${pathId}" startOffset="50%" text-anchor="middle">${name}</textPath>
     </text>
@@ -418,7 +418,6 @@ function renderGame(){
             ${!S.firstDiePicked ? '<div class="first-tip">Tap a die to start your path</div>' : ''}
             <div class="tray" id="tray"></div>
           </div>
-          <div class="path-strip" id="path-strip" style="margin-top:6px;"></div>
         </div>
         <div class="util-rail">
           <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning)?'disabled':''} ${emphasizeResolve?'pulse':''}" id="resolve-btn">▶<span>Go</span></div>
@@ -430,6 +429,9 @@ function renderGame(){
             return `${wm}<img class="char-icon-img" src="${portrait.img}" alt="${S.origin.name}">`;
           })()}</div>
         </div>
+      </div>
+      <div class="path-strip-col">
+        <div class="path-strip" id="path-strip" style="margin-top:6px;"></div>
       </div>
     </div>
     ${S.transitioning && S.transitionMsg ? `
