@@ -254,6 +254,16 @@ function renderEncounterCard(e){
   if(e.curHOT) statuses += `<span class="status-chip">${iconSpan('hot', e.curHOT)} HOT</span>`;
   if(e.curShield) statuses += `<span class="status-chip">${iconSpan('block', e.curShield)} Shield</span>`;
   if(e.minionsSpawned) statuses += `<span class="status-chip">👹 Minions ${e.minionsSpawned}</span>`;
+  // One combined mouseover/long-press tooltip on the health bar itself,
+  // listing every status currently affecting this encounter -- so a player
+  // can see what Block/D.O.T./H.O.T./etc. actually do without needing a
+  // separate hover per status chip.
+  const statusTipLines = [];
+  if(e.curDOT) statusTipLines.push(`D.O.T. ${e.curDOT}: ${STATUS_DESC.dot}`);
+  if(e.curHOT) statusTipLines.push(`H.O.T. ${e.curHOT}: ${STATUS_DESC.hot}`);
+  if(e.curShield) statusTipLines.push(`Shield ${e.curShield}: ${STATUS_DESC.shield}`);
+  if(e.minionsSpawned) statusTipLines.push(`Minions ${e.minionsSpawned}: ${STATUS_DESC.minions}`);
+  const statusTip = statusTipLines.join('\n');
   let quests = '';
   if(e.quests && e.quests.length){
     quests = '<div class="quest-list">' + e.quests.map((q,i)=>`
@@ -305,7 +315,7 @@ function renderEncounterCard(e){
               : (e.type!=='Shrine' ? `<div class="enc-art-wrap"><span class="portrait-watermark">PLACEHOLDER</span><img class="enc-art" src="${CAT_SILHOUETTE}" alt=""/></div>` : '')}
           </div>
           <div class="enc-vitals">
-            <div class="bar-row" style="position:relative;"><span>${iconSpan('heal')}</span><div class="bar ${fx.cls}">
+            <div class="bar-row status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;"><span>${iconSpan('heal')}</span><div class="bar ${fx.cls}">
                 <div class="bar-fill hp" style="width:${hpPct}%"></div>
                 ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
                 ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
@@ -388,10 +398,19 @@ function renderGame(){
   if(playerFx.cls==='flash-damage') vibrate(40);
   S._lastPlayerHealth = S.health;
   const totalTokens = S.nullifyTokens + S.freezeTokens + S.boostTokenCharges;
+  // One combined mouseover/long-press tooltip on the health bar, listing
+  // every status currently affecting the player -- same idea as the
+  // encounter card's health-bar tooltip.
+  const playerStatusTipLines = [];
+  if(S.playerDOT) playerStatusTipLines.push(`D.O.T. ${S.playerDOT}: ${STATUS_DESC.dot}`);
+  if(S.playerHOT) playerStatusTipLines.push(`H.O.T. ${S.playerHOT}: ${STATUS_DESC.hot}`);
+  if(S.playerBlock) playerStatusTipLines.push(`Block ${S.playerBlock}: ${STATUS_DESC.block}`);
+  if(S.pendingFreeBoost) playerStatusTipLines.push(`Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}`);
+  const playerStatusTip = playerStatusTipLines.join('\n');
   app.innerHTML = `
     <div class="panel" style="margin-bottom:8px;">
       ${renderRoute()}
-      <div class="bar-row" style="position:relative;"><span style="width:70px;">Health</span><div class="bar ${playerFx.cls}"><div class="bar-fill hp player" style="width:${hpPct}%"></div></div><span>${S.health}/${S.maxHealth}</span>${playerFx.deltaHTML}</div>
+      <div class="bar-row status-tooltip-target" ${playerStatusTip?`title="${playerStatusTip}"`:''} style="position:relative;"><span style="width:70px;">Health</span><div class="bar ${playerFx.cls}"><div class="bar-fill hp player" style="width:${hpPct}%"></div></div><span>${S.health}/${S.maxHealth}</span>${playerFx.deltaHTML}</div>
       <div class="statuses">
         ${S.playerDOT?`<span class="status-chip">${iconSpan('dot', S.playerDOT)} DOT</span>`:''}
         ${S.playerHOT?`<span class="status-chip">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}
@@ -500,6 +519,7 @@ function renderGame(){
     endTurnButton();
   };
   attachLongPressTooltips('.enemy-action-badge');
+  attachLongPressTooltips('.status-tooltip-target');
   document.getElementById('open-key-btn').onclick = ()=> openInfoModal('Action Key', keyCardHTML());
   document.getElementById('open-backpocket-btn').onclick = ()=> openInfoModal('Back Pocket', backPocketViewHTML());
   document.getElementById('open-log-btn').onclick = ()=> openInfoModal('Log', logViewHTML());

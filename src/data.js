@@ -77,6 +77,19 @@ const ENEMY_ACTION_DESC = {
   dot: "Applies stacking damage-over-time (D.O.T.) to you.",
 };
 
+// Descriptions for a CURRENTLY ACTIVE status effect, shown together in one
+// mouseover/long-press tooltip on a health bar (player's or an encounter's)
+// listing every status currently in effect on it -- Block/D.O.T./H.O.T. and
+// anything else -- rather than requiring a separate hover per status chip.
+const STATUS_DESC = {
+  dot: "Deals damage at the start of each upkeep, then wears off.",
+  hot: "Heals over time at the start of each upkeep.",
+  block: "Absorbs the next hit(s) taken before health is touched.",
+  shield: "Absorbs the next hit(s) the enemy takes before its health is touched.",
+  minions: "Minion dice are clogging the tray until enough Hits clear them.",
+  boost: "Your next played action's value will be multiplied.",
+};
+
 // Icon set: the 14 action icons, Door, and Boss/skull are vector-traced
 // directly from the user's own Action Key Sticker and board art (via
 // contour detection on the source pixels, not hand-redrawn approximations).
