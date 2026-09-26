@@ -116,6 +116,10 @@ function renderRoute(){
     html += `<div class="node ${floorCls} ${cls}">${icon}</div>`;
   });
   html += '</div>';
+  const leftPct = ((Math.min(S.routeStep, n-1) + 0.5) / n * 100).toFixed(2);
+  const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
+  const wm = portrait.placeholder ? `<span class="mascot-watermark">PLACEHOLDER</span>` : '';
+  html += `<span class="mascot-wrap" style="left:${leftPct}%;">${wm}<img class="mascot-marker" src="${portrait.img}" alt=""></span>`;
   html += '</div>';
   return html;
 }
