@@ -271,12 +271,15 @@
   .transition-overlay{ background: rgba(10,7,5,0.55); }
   .transition-banner{
     background: linear-gradient(160deg,#241c14,#181109); border:2px solid var(--gold); border-radius:10px;
-    padding:20px 24px; max-width:420px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.6);
-    animation: banner-in .25s ease-out;
+    padding:20px 24px; max-width:420px; width:100%; text-align:left; box-shadow:0 10px 40px rgba(0,0,0,0.6);
+    display:flex; flex-direction:column; max-height:70vh;
   }
-  @keyframes banner-in{ from{ opacity:0; transform:translateY(8px) scale(0.97);} to{ opacity:1; transform:translateY(0) scale(1);} }
-  .transition-banner h3{ margin:0 0 10px; font-size:16px; }
-  .transition-banner p{ margin:0 0 16px; font-size:14px; color:var(--parchment); min-height:40px; }
+  @keyframes banner-in{ from{ opacity:0; transform:translateY(4px);} to{ opacity:1; transform:translateY(0);} }
+  .transition-log{ overflow-y:auto; margin:0 0 16px; }
+  .transition-entry{ padding-bottom:10px; margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1); animation: banner-in .2s ease-out; }
+  .transition-entry:last-child{ padding-bottom:0; margin-bottom:0; border-bottom:none; }
+  .transition-entry h4{ margin:0 0 4px; font-size:13px; color:var(--gold); text-align:center; }
+  .transition-entry p{ margin:0; font-size:14px; color:var(--parchment); text-align:center; }
   .path-chip{ background: var(--stone); border-radius:4px; padding:2px 6px; font-size:12px; }
 
   .key-card{ background: var(--panel2); border:3px solid var(--stone); border-radius:10px; padding:12px 12px 8px; margin-top:16px; }

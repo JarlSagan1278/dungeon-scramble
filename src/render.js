@@ -434,11 +434,12 @@ function renderGame(){
         <div class="path-strip" id="path-strip" style="margin-top:6px;"></div>
       </div>
     </div>
-    ${S.transitioning && S.transitionMsg ? `
+    ${S.transitioning && S.transitionLog && S.transitionLog.length ? `
     <div class="modal-overlay transition-overlay">
       <div class="transition-banner">
-        <h3>${S.transitionMsg.title}</h3>
-        <p>${S.transitionMsg.text}</p>
+        <div class="transition-log" id="transition-log">
+          ${S.transitionLog.map(step => `<div class="transition-entry"><h4>${step.title}</h4><p>${step.text}</p></div>`).join('')}
+        </div>
         <button id="skip-transition-btn">Skip ▶</button>
       </div>
     </div>` : ''}
@@ -527,6 +528,8 @@ function renderGame(){
   if(S.transitioning){
     const skipBtn = document.getElementById('skip-transition-btn');
     if(skipBtn) skipBtn.onclick = skipTransition;
+    const log = document.getElementById('transition-log');
+    if(log) log.scrollTop = log.scrollHeight;
   }
 
   if(S.lootChoice) renderLootModal();

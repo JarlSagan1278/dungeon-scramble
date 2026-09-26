@@ -585,6 +585,11 @@ function endTurnButton(){
 // tray. ----
 function startTurnTransition(){
   S.transitioning = true;
+  // All of this turn's beats append into one running log (rendered as a
+  // single growing popup) instead of each beat popping up its own little
+  // modal -- the pacing/effects/timing below are unchanged, only the
+  // display is consolidated.
+  S.transitionLog = [];
   // For a multi-die path, step through each die's contribution one at a
   // time (with a running total) before the real "Mathing" step actually
   // applies everything -- makes a combo read as a sequence of beats
@@ -662,7 +667,7 @@ function startTurnTransition(){
 function runTransitionSteps(steps, i){
   if(i>=steps.length){
     S.transitioning = false;
-    S.transitionMsg = null;
+    S.transitionLog = null;
     S.turnNumber++;
     S.path=[];
     S.classAbilityUsed=false;
@@ -672,12 +677,12 @@ function runTransitionSteps(steps, i){
     return;
   }
   const result = steps[i]();
-  S.transitionMsg = {title: result.title, text: result.text};
+  S.transitionLog.push({title: result.title, text: result.text});
   render();
   const advance = () => {
     S._pendingTimeout = null;
-    if(result.stop==='encounterDefeated'){ S.transitioning=false; S.transitionMsg=null; onEncounterDefeated(); return; }
-    if(result.stop==='playerDefeated'){ S.transitioning=false; S.transitionMsg=null; onPlayerDefeated(); return; }
+    if(result.stop==='encounterDefeated'){ S.transitioning=false; S.transitionLog=null; onEncounterDefeated(); return; }
+    if(result.stop==='playerDefeated'){ S.transitioning=false; S.transitionLog=null; onPlayerDefeated(); return; }
     runTransitionSteps(steps, i+1);
   };
   S._advance = advance;
