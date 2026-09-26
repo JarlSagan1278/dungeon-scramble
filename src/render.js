@@ -834,7 +834,10 @@ function renderCamp(){
       const eligible = canUpgrade(cat, level) && !S.campUpgrades[cat];
       const disabled = !eligible;
       const note = (count>=3 && !canUpgrade(cat,level)) ? ' <span class="token-count">needs more spare dice to backfill</span>' : '';
-      upgradeRows.push(`<button id="upgrade-${cat}-${level}" ${disabled?'disabled':''}>Combine 3 ${label} ${ROMAN[level]} → 1 ${label} ${ROMAN[level+1]} <span class="token-count">${count} available</span></button>${note}`);
+      upgradeRows.push(`<div class="upgrade-row">
+          <button id="upgrade-${cat}-${level}" ${disabled?'disabled':''}>Combine 3 ${label} ${ROMAN[level]} → 1 ${label} ${ROMAN[level+1]} <span class="token-count">${count} available</span></button>
+          <button id="preview-${cat}-${level}" class="upgrade-preview-btn" title="Preview the resulting die's faces">?</button>
+        </div>${note}`);
     });
   });
   app.innerHTML = `
@@ -879,6 +882,13 @@ function renderCamp(){
     [1,2].forEach(level=>{
       const btn = document.getElementById(`upgrade-${cat}-${level}`);
       if(btn) btn.onclick = ()=> campUpgrade(cat, level);
+      const previewBtn = document.getElementById(`preview-${cat}-${level}`);
+      if(previewBtn) previewBtn.onclick = ()=>{
+        const resultDie = basic(cat, level+1);
+        const label = cat.charAt(0).toUpperCase()+cat.slice(1);
+        const facesHTML = resultDie.faces.map(f=>`<span>${iconSpan(f.type, f.value)}${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?f.value:''}</span>`).join('');
+        openInfoModal(`${label} ${ROMAN[level+1]}: ${resultDie.name}`, `<div class="faces">${facesHTML}</div>`);
+      };
     });
   });
   document.getElementById('organize-tray').innerHTML = S.tray.map((c,i)=>campDieTileHTML(c.die,'tray',i)).join('');

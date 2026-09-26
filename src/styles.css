@@ -306,8 +306,12 @@
   .loot-opt h4{ margin:0 0 8px; color: var(--cream); font-size:13px; font-family:'Baloo 2',Georgia,serif; text-align:center; }
   .loot-preview{ width:50px; height:50px; border-radius:10px; margin:0 auto 8px; display:flex; align-items:center; justify-content:center;
     font-size:22px; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.2), 2px 2px 0 rgba(0,0,0,0.3); }
-  .loot-opt .faces{ display:flex; gap:3px; flex-wrap:nowrap; overflow-x:auto; font-size:9px; }
-  .loot-opt .faces span{ background:var(--stone); color: var(--parchment); border-radius:3px; padding:2px 2px; white-space:nowrap; flex:0 0 auto; }
+  .faces{ display:flex; gap:3px; flex-wrap:wrap; font-size:9px; }
+  .loot-opt .faces{ flex-wrap:nowrap; overflow-x:auto; }
+  .faces span{ background:var(--stone); color: var(--parchment); border-radius:3px; padding:3px 5px; white-space:nowrap; flex:0 0 auto; }
+  .upgrade-row{ display:flex; align-items:stretch; gap:6px; }
+  .upgrade-row button:first-child{ flex:1; }
+  .upgrade-preview-btn{ flex:0 0 auto; width:32px; font-weight:bold; }
   .swap-list{ display:flex; flex-direction:column; gap:4px; max-height:220px; overflow-y:auto; margin:8px 0; }
   .swap-item{ background:var(--panel2); border:1px solid var(--stone); border-radius:4px; padding:6px 8px; cursor:pointer; font-size:12px; display:flex; justify-content:space-between; }
   .swap-item:hover{ border-color: var(--gold); }
