@@ -830,6 +830,7 @@ function renderCamp(){
     [1,2].forEach(level=>{
       const count = upgradeAvailability(cat, level);
       if(count<3 && S.campUpgrades[cat]) return; // hide impossible/irrelevant rows once used, keep list short
+      if(count===0) return; // nothing of this tier exists yet -- would-be-empty row, pure clutter
       const label = cat.charAt(0).toUpperCase()+cat.slice(1);
       const eligible = canUpgrade(cat, level) && !S.campUpgrades[cat];
       const disabled = !eligible;
@@ -849,6 +850,7 @@ function renderCamp(){
       <div class="small-btn-row">
         <button id="rest-btn" ${S.campRested?'disabled':''}>${S.campRested?'Already Rested This Camp':'Rest (scramble tray, heal half actions shown)'}</button>
         <button id="leave-btn" class="primary">Break Camp &amp; Continue</button>
+        <button id="camp-log-btn">${iconSpan('log')} Log</button>
       </div>
 
       <h3 class="camp-section-title">Upgrade Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(1 Attack + 1 Maneuver per Camp)</span></h3>
@@ -858,12 +860,11 @@ function renderCamp(){
       <div class="hint" style="margin-top:0;">Tray</div>
       <div class="camp-dice-grid" id="organize-tray"></div>
       <div class="hint">Back Pocket <span style="color:var(--parchment-dim);">(${S.backPocket.length} dice)</span></div>
-      <div class="camp-dice-grid" id="organize-bp">${S.backPocket.length? '' : '<span class="hint">Empty — dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one.</span>'}</div>
-
-      <h3 style="font-size:13px; margin-top:16px;">Log</h3>
-      <div class="log" id="log"></div>
+      ${S.backPocket.length ? '' : '<p class="hint camp-empty-hint">Empty — dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one.</p>'}
+      <div class="camp-dice-grid" id="organize-bp"></div>
     </div>`;
   document.getElementById('rest-btn').onclick = campRest;
+  document.getElementById('camp-log-btn').onclick = ()=> openInfoModal('Log', logViewHTML());
   document.getElementById('leave-btn').onclick = ()=>{
     const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
         <h2>Break Camp?</h2>
@@ -896,9 +897,6 @@ function renderCamp(){
   [...document.querySelectorAll('.camp-die-tile')].forEach(el=>{
     el.onclick = ()=> selectOrganize(el.dataset.campType, parseInt(el.dataset.campIdx));
   });
-  const logEl = document.getElementById('log');
-  logEl.innerHTML = S.log.slice(-60).map(l=>`<div class="${l.cls}">${l.text}</div>`).join('');
-  logEl.scrollTop = logEl.scrollHeight;
 }
 
 function summaryStatsHTML(){
