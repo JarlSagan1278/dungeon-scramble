@@ -116,10 +116,6 @@ function renderRoute(){
     html += `<div class="node ${floorCls} ${cls}">${icon}</div>`;
   });
   html += '</div>';
-  const leftPct = ((Math.min(S.routeStep, n-1) + 0.5) / n * 100).toFixed(2);
-  const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
-  const wm = portrait.placeholder ? `<span class="mascot-watermark">PLACEHOLDER</span>` : '';
-  html += `<span class="mascot-wrap" style="left:${leftPct}%;">${wm}<img class="mascot-marker" src="${portrait.img}" alt=""></span>`;
   html += '</div>';
   return html;
 }
@@ -250,7 +246,7 @@ function renderEncounterCard(e){
     if(e.hot) items.push({type:'hot', label:'H.O.T.', val:e.hot});
     if(e.dot) items.push({type:'dot', label:'D.O.T.', val:e.dot});
     if(!items.length) return '';
-    const chips = items.map(it=>`<span class="boss-cycle-item next">${iconSpan(it.type, ICON_VALUE_SLOT.has(it.type)?it.val:null)} ${it.label}${!ICON_VALUE_SLOT.has(it.type)?' '+it.val:''}</span>`).join('');
+    const chips = items.map(it=>`<span class="boss-cycle-item next enemy-action-badge" title="${ENEMY_ACTION_DESC[it.type]||''}">${iconSpan(it.type, ICON_VALUE_SLOT.has(it.type)?it.val:null)} ${it.label}${!ICON_VALUE_SLOT.has(it.type)?' '+it.val:''}</span>`).join('');
     return `<div class="boss-cycle-row"><span class="hint" style="margin:0;">Each turn:</span>${chips}</div>`;
   })() : '';
   const art = MONSTER_ART[e.name];
@@ -260,7 +256,7 @@ function renderEncounterCard(e){
     const items = e.actionCycle.map((a,i)=>{
       const isNext = i === (e.cycleIndex % e.actionCycle.length);
       const showVal = ICON_VALUE_SLOT.has(iconKey[a.type]) ? null : a.value;
-    return `<span class="boss-cycle-item ${isNext?'next':''}">${iconSpan(iconKey[a.type], ICON_VALUE_SLOT.has(iconKey[a.type])?a.value:null)} ${labels[a.type]}${showVal!=null?' '+showVal:''}</span>`;
+    return `<span class="boss-cycle-item ${isNext?'next':''} enemy-action-badge" title="${ENEMY_ACTION_DESC[iconKey[a.type]]||''}">${iconSpan(iconKey[a.type], ICON_VALUE_SLOT.has(iconKey[a.type])?a.value:null)} ${labels[a.type]}${showVal!=null?' '+showVal:''}</span>`;
     }).join('');
     return `<div class="boss-cycle-row"><span class="hint" style="margin:0;">Cycles through:</span>${items}</div>`;
   })() : '';
@@ -369,8 +365,6 @@ function renderGame(){
         ${S.playerHOT?`<span class="status-chip">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}
         ${S.playerBlock?`<span class="status-chip">${iconSpan('block', S.playerBlock)} Block</span>`:''}
         ${S.pendingFreeBoost?`<span class="status-chip" style="background:var(--gold);color:#241c10;">${iconSpan('boost')} Boost x${S.pendingFreeBoost} armed</span>`:''}
-        <span class="status-chip" style="opacity:${S.segmentShrineUsed?0.4:1};" title="At most one Shrine per segment">Shrine ${S.segmentShrineUsed?'used':'available'}</span>
-        <span class="status-chip" style="opacity:${S.segmentTrapUsed?0.4:1};" title="At most one Trap per segment">Trap ${S.segmentTrapUsed?'used':'available'}</span>
       </div>
     </div>
     <div class="panel" style="margin-bottom:8px;">
@@ -399,6 +393,11 @@ function renderGame(){
           <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning)?'disabled':''} ${emphasizeResolve?'pulse':''}" id="resolve-btn">▶<span>Go</span></div>
           <div class="util-btn danger-accent rail-clear ${S.transitioning?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
           ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''}" id="ability-btn">✦<span>${S.classAbilityUsed?'Used':'Skill'}</span></div>` : ''}
+          <div class="char-icon-wrap" title="${S.origin.name} ${S.klass.name}">${(()=>{
+            const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
+            const wm = portrait.placeholder ? `<span class="char-icon-watermark">PLACEHOLDER</span>` : '';
+            return `${wm}<img class="char-icon-img" src="${portrait.img}" alt="${S.origin.name}">`;
+          })()}</div>
         </div>
       </div>
     </div>
@@ -465,6 +464,7 @@ function renderGame(){
     getAudioCtx(); // warm up/unlock audio inside this user gesture; later queued tones (from setTimeout-driven transition steps) then play fine
     endTurnButton();
   };
+  attachLongPressTooltips('.enemy-action-badge');
   document.getElementById('open-key-btn').onclick = ()=> openInfoModal('Action Key', keyCardHTML());
   document.getElementById('open-backpocket-btn').onclick = ()=> openInfoModal('Back Pocket', backPocketViewHTML());
   document.getElementById('open-log-btn').onclick = ()=> openInfoModal('Log', logViewHTML());
@@ -527,6 +527,26 @@ function showFaceTooltip(anchorRect, text){
 function hideFaceTooltip(){
   if(faceTooltipEl && faceTooltipEl.parentNode) faceTooltipEl.parentNode.removeChild(faceTooltipEl);
   faceTooltipEl = null;
+}
+
+// Long-press support for any small info badge that already carries a
+// native `title` (desktop hover already works for free via the browser's
+// own tooltip -- this just adds the touch equivalent, reusing the same
+// fixed-position bubble as the die-face tooltip). Call after the elements
+// matching `selector` exist in the DOM.
+function attachLongPressTooltips(selector){
+  document.querySelectorAll(selector).forEach(node=>{
+    if(!node.title) return;
+    let pressTimer = null;
+    const start = ()=>{
+      const rect = node.getBoundingClientRect();
+      const text = node.title;
+      pressTimer = setTimeout(()=> showFaceTooltip(rect, text), 420);
+    };
+    const cancel = ()=>{ if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; } hideFaceTooltip(); };
+    node.addEventListener('pointerdown', start);
+    ['pointerup','pointerleave','pointercancel'].forEach(evt=> node.addEventListener(evt, cancel));
+  });
 }
 
 function ensureToastStack(){
@@ -851,6 +871,11 @@ function renderCamp(){
         <button id="rest-btn" ${S.campRested?'disabled':''}>${S.campRested?'Already Rested This Camp':'Rest (scramble tray, heal half actions shown)'}</button>
         <button id="leave-btn" class="primary">Break Camp &amp; Continue</button>
         <button id="camp-log-btn">${iconSpan('log')} Log</button>
+      </div>
+
+      <div class="camp-fire-wrap">
+        <span class="portrait-watermark">PLACEHOLDER</span>
+        <img class="camp-fire-img" src="${CAT_SILHOUETTE}" alt="Campfire (placeholder)">
       </div>
 
       <h3 class="camp-section-title">Upgrade Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(1 Attack + 1 Maneuver per Camp)</span></h3>

@@ -64,6 +64,19 @@ const FACE_DESC = {
   blank: "No effect this turn.",
 };
 
+// Descriptions for an ENCOUNTER's own actions (the boss "cycles through" row
+// and a regular enemy's "Each turn:" badges) -- same idea as FACE_DESC but
+// phrased from the enemy's side, since these are things it does to you, not
+// dice you're playing.
+const ENEMY_ACTION_DESC = {
+  hit: "Deals damage to you.",
+  minion: "Summons Minion dice that clog your Tray until you deal enough Hits to clear them.",
+  block: "The enemy gains Shield, which absorbs damage before its health does.",
+  heal: "The enemy restores its own health.",
+  hot: "The enemy gains healing over time (H.O.T.).",
+  dot: "Applies stacking damage-over-time (D.O.T.) to you.",
+};
+
 // Icon set: the 14 action icons, Door, and Boss/skull are vector-traced
 // directly from the user's own Action Key Sticker and board art (via
 // contour detection on the source pixels, not hand-redrawn approximations).
