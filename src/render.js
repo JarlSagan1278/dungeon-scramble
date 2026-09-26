@@ -25,6 +25,7 @@ function updateHeaderMeta(){
 // (like the toast stack/modals) and its visibility is just toggled per
 // render rather than being rebuilt into app.innerHTML each time.
 const LOW_HEALTH_PCT = 0.25;
+let lowHealthAlerted = false; // fires the heartbeat cue once per drop into danger, not every render
 function updateLowHealthVignette(){
   let vig = document.getElementById('low-health-vignette');
   if(!vig){
@@ -33,6 +34,13 @@ function updateLowHealthVignette(){
   }
   const danger = S && S.maxHealth>0 && (S.health/S.maxHealth) <= LOW_HEALTH_PCT && (S.health>0)
     && S.screen!=='victory' && S.screen!=='gameover';
+  if(danger && !lowHealthAlerted){
+    playTone('heartbeat');
+    vibrate([80,60,80]);
+    lowHealthAlerted = true;
+  } else if(!danger){
+    lowHealthAlerted = false;
+  }
   vig.classList.toggle('active', !!danger);
 }
 
@@ -172,10 +180,17 @@ function healthFX(current, last){
   const delta = current - (last===undefined ? current : last);
   if(!delta) return {cls:'', deltaHTML:''};
   const isHeal = delta > 0;
-  const shown = Math.abs(delta)%1 ? Math.abs(delta).toFixed(1) : Math.abs(delta);
+  const mag = Math.abs(delta);
+  const shown = mag%1 ? mag.toFixed(1) : mag;
+  // Bigger hits/heals get a visibly bigger, punchier number instead of a
+  // uniform-size float, so a 1-damage tick and a 10-damage combo don't read
+  // the same. Scales the font-size and adds a stronger "big" bounce past a
+  // threshold, both purely cosmetic (position:absolute, no layout impact).
+  const fontSize = Math.round(Math.min(34, 14 + mag*1.8));
+  const bigCls = mag>=6 ? 'big' : '';
   return {
     cls: isHeal ? 'flash-heal' : 'flash-damage',
-    deltaHTML: `<span class="delta-float ${isHeal?'heal':'damage'}">${isHeal?'+':'-'}${shown}</span>`
+    deltaHTML: `<span class="delta-float ${isHeal?'heal':'damage'} ${bigCls}" style="font-size:${fontSize}px;">${isHeal?'+':'-'}${shown}</span>`
   };
 }
 
@@ -220,14 +235,24 @@ function renderEncounterCard(e){
       </div>`).join('') + '</div>';
   }
   const isBoss = e.type==='Boss' || e.type==='Big Boss';
-  const extraStats = [];
-  if(!isBoss){
-    if(e.minion) extraStats.push(`summons ${e.minion}/turn`);
-    if(e.shield) extraStats.push(`+${e.shield} shield/turn`);
-    if(e.heal) extraStats.push(`heals ${e.heal}/turn`);
-    if(e.hot) extraStats.push(`+${e.hot} HOT/turn`);
-    if(e.dot) extraStats.push(`+${e.dot} DOT/turn`);
-  }
+  // Regular (non-boss) encounters don't cycle through one action at a time
+  // like bosses do -- every listed effect fires every turn, all at once.
+  // So rather than a plain gray stats line, give them the same icon-badge
+  // treatment as the boss cycle row (all badges "active", since none of
+  // them are held back for a future turn) -- easier to read at a glance,
+  // and visually consistent between boss and regular encounter cards.
+  const regularActionsRow = (!isBoss) ? (()=>{
+    const items = [];
+    if(e.dmg) items.push({type:'hit', label:'Hit', val:e.dmg});
+    if(e.minion) items.push({type:'minion', label:'Minion', val:e.minion});
+    if(e.shield) items.push({type:'block', label:'Shield', val:e.shield});
+    if(e.heal) items.push({type:'heal', label:'Heal', val:e.heal});
+    if(e.hot) items.push({type:'hot', label:'H.O.T.', val:e.hot});
+    if(e.dot) items.push({type:'dot', label:'D.O.T.', val:e.dot});
+    if(!items.length) return '';
+    const chips = items.map(it=>`<span class="boss-cycle-item next">${iconSpan(it.type, ICON_VALUE_SLOT.has(it.type)?it.val:null)} ${it.label}${!ICON_VALUE_SLOT.has(it.type)?' '+it.val:''}</span>`).join('');
+    return `<div class="boss-cycle-row"><span class="hint" style="margin:0;">Each turn:</span>${chips}</div>`;
+  })() : '';
   const art = MONSTER_ART[e.name];
   const bossCycle = (isBoss && e.actionCycle && e.actionCycle.length) ? (()=>{
     const labels = {dmg:'Hit', minion:'Minion', shield:'Shield', heal:'Heal', hot:'H.O.T.', dot:'D.O.T.'};
@@ -257,11 +282,7 @@ function renderEncounterCard(e){
                 ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
                 ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
               </div><span>${curHealthClamped.toFixed(0)}/${e.maxHealth}</span>${fx.deltaHTML}</div>
-            ${isBoss ? bossCycle : `
-            <div class="bar-row">
-              ${e.dmg?`<span class="dmg-burst">${e.dmg}/turn</span>`:''}
-              <span style="font-size:11px; color:var(--parchment-dim);">${extraStats.join(' · ')}</span>
-            </div>`}
+            ${isBoss ? bossCycle : regularActionsRow}
             <div class="statuses">${statuses}</div>
             ${quests}
           </div>
@@ -336,6 +357,7 @@ function renderGame(){
   const resolveDisabled = S.path.length===0 && canExtend;
   const emphasizeResolve = !resolveDisabled && !canExtend;
   const playerFx = healthFX(S.health, S._lastPlayerHealth);
+  if(playerFx.cls==='flash-damage') vibrate(40);
   S._lastPlayerHealth = S.health;
   const totalTokens = S.nullifyTokens + S.freezeTokens + S.boostTokenCharges;
   app.innerHTML = `
@@ -438,7 +460,11 @@ function renderGame(){
     S.classAbilityUsed = false;
     render();
   };
-  document.getElementById('resolve-btn').onclick = ()=>{ if(resolveDisabled||S.transitioning) return; endTurnButton(); };
+  document.getElementById('resolve-btn').onclick = ()=>{
+    if(resolveDisabled||S.transitioning) return;
+    getAudioCtx(); // warm up/unlock audio inside this user gesture; later queued tones (from setTimeout-driven transition steps) then play fine
+    endTurnButton();
+  };
   document.getElementById('open-key-btn').onclick = ()=> openInfoModal('Action Key', keyCardHTML());
   document.getElementById('open-backpocket-btn').onclick = ()=> openInfoModal('Back Pocket', backPocketViewHTML());
   document.getElementById('open-log-btn').onclick = ()=> openInfoModal('Log', logViewHTML());
@@ -523,11 +549,85 @@ function showToast(text, kind){
   }, 2600);
 }
 
+// ---- Sound effects: short generated tones via Web Audio, no external
+// audio assets. The AudioContext is created lazily and only ever actually
+// started from inside a real user-gesture handler (the resolve-btn click,
+// or toggling the Sound checkbox itself) to satisfy browser autoplay
+// policies; once created it stays alive for the rest of the session, so
+// later tones queued from setTimeout-driven turn-transition steps still
+// play fine. ----
+let audioCtx = null;
+function getAudioCtx(){
+  if(!PREFS.sound) return null;
+  if(!audioCtx){
+    const Ctor = window.AudioContext || window.webkitAudioContext;
+    if(!Ctor) return null;
+    try{ audioCtx = new Ctor(); }catch(e){ return null; }
+  }
+  if(audioCtx.state==='suspended') audioCtx.resume().catch(()=>{});
+  return audioCtx;
+}
+const TONE_SEQUENCES = {
+  hit:       [{freq:180, start:0,    dur:0.09, type:'square',   gain:0.18}],
+  heal:      [{freq:520, start:0,    dur:0.12, type:'sine',     gain:0.14},
+              {freq:660, start:0.09, dur:0.16, type:'sine',     gain:0.14}],
+  victory:   [{freq:392, start:0,    dur:0.14, type:'triangle', gain:0.2},
+              {freq:494, start:0.13, dur:0.14, type:'triangle', gain:0.2},
+              {freq:587, start:0.26, dur:0.14, type:'triangle', gain:0.2},
+              {freq:784, start:0.39, dur:0.32, type:'triangle', gain:0.22}],
+  defeat:    [{freq:220, start:0,    dur:0.2,  type:'sawtooth', gain:0.16},
+              {freq:160, start:0.18, dur:0.34, type:'sawtooth', gain:0.16}],
+  heartbeat: [{freq:80,  start:0,    dur:0.1,  type:'sine',     gain:0.24},
+              {freq:70,  start:0.16, dur:0.12, type:'sine',     gain:0.2}],
+};
+function playTone(kind){
+  if(!PREFS.sound) return;
+  const ctx = getAudioCtx();
+  if(!ctx) return;
+  const notes = TONE_SEQUENCES[kind];
+  if(!notes) return;
+  const now = ctx.currentTime;
+  notes.forEach(n=>{
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = n.type;
+    osc.frequency.setValueAtTime(n.freq, now+n.start);
+    gain.gain.setValueAtTime(0.0001, now+n.start);
+    gain.gain.linearRampToValueAtTime(n.gain, now+n.start+0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now+n.start+n.dur);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now+n.start);
+    osc.stop(now+n.start+n.dur+0.02);
+  });
+}
+
+// ---- Haptics: a short vibrate on mobile when taking damage or crossing
+// into the low-health danger zone. Silently no-ops where unsupported. ----
+function vibrate(pattern){
+  try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){}
+}
+
+function applyReducedMotionClass(){
+  document.body.classList.toggle('reduced-motion', !!PREFS.reducedMotion);
+}
+
+function settingsToggleRowHTML(id, label, checked){
+  return `<label class="settings-toggle-row" for="${id}">
+      <span>${label}</span>
+      <input type="checkbox" id="${id}" ${checked?'checked':''}>
+    </label>`;
+}
+
 function openSettingsModal(){
   const inRun = !!S;
   const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:340px;">
       <h2 style="margin-top:0;">Settings</h2>
       ${inRun ? `<p class="hint">${S.origin.name} ${S.klass.name} · Floor ${S.floorIdx+1}</p>` : ''}
+      <div class="settings-toggles">
+        ${settingsToggleRowHTML('pref-sound', 'Sound effects', PREFS.sound)}
+        ${settingsToggleRowHTML('pref-reduced-motion', 'Reduce motion', PREFS.reducedMotion)}
+      </div>
+      <p class="hint" style="text-align:left;">Keyboard: <strong>Enter</strong> Go &middot; <strong>Backspace</strong> Clear &middot; <strong>1234/qwer/asdf/zxcv</strong> tap a tray die (matches its grid position)</p>
       <div class="small-btn-row" style="justify-content:center; flex-direction:column;">
         ${inRun ? '<button id="settings-restart-btn" class="danger">Restart Run</button>' : ''}
         <button id="settings-close-btn">Close</button>
@@ -537,6 +637,8 @@ function openSettingsModal(){
   const close = ()=>{ if(overlay.parentNode) document.body.removeChild(overlay); };
   overlay.querySelector('#settings-close-btn').onclick = close;
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
+  overlay.querySelector('#pref-sound').onchange = (ev)=>{ setPref('sound', ev.target.checked); if(ev.target.checked) playTone('hit'); };
+  overlay.querySelector('#pref-reduced-motion').onchange = (ev)=> setPref('reducedMotion', ev.target.checked);
   const restartBtn = overlay.querySelector('#settings-restart-btn');
   if(restartBtn) restartBtn.onclick = ()=>{
     close();
@@ -808,12 +910,14 @@ function summaryStatsHTML(){
 
 function renderVictory(){
   clearSave();
+  playTone('victory');
   app.innerHTML = `<div class="panel"><h2>🏆 Dungeon Conquered!</h2><p>You defeated the Big Boss and cleared all three floors. Well fought, Adventurer.</p>
     ${summaryStatsHTML()}
     <button class="primary" style="margin-top:12px;" onclick="location.reload()">Play Again</button></div>`;
 }
 function renderGameOver(){
   clearSave();
+  playTone('defeat');
   app.innerHTML = `<div class="panel"><h2>💀 Defeated</h2><p>Your Adventurer retreats to town in temporary defeat...</p>
     ${summaryStatsHTML()}
     <button class="primary" style="margin-top:12px;" onclick="location.reload()">Try Again</button></div>`;

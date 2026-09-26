@@ -27,6 +27,29 @@ function clearSave(){
   try{ localStorage.removeItem(SAVE_KEY); } catch(e){}
 }
 
+// ---- Player prefs (sound / reduced-motion) -- small, separate from the
+// save file since they're device/player settings, not run state, and
+// should survive across runs (including after a run ends and the save is
+// cleared). ----
+const PREFS_KEY = 'dungeonScramblePrefs_v1';
+const DEFAULT_PREFS = { sound: true, reducedMotion: false };
+let PREFS = loadPrefs();
+function loadPrefs(){
+  try{
+    const raw = localStorage.getItem(PREFS_KEY);
+    if(!raw) return { ...DEFAULT_PREFS };
+    return { ...DEFAULT_PREFS, ...JSON.parse(raw) };
+  }catch(e){ return { ...DEFAULT_PREFS }; }
+}
+function savePrefs(){
+  try{ localStorage.setItem(PREFS_KEY, JSON.stringify(PREFS)); } catch(e){}
+}
+function setPref(key, val){
+  PREFS[key] = val;
+  savePrefs();
+  if(key==='reducedMotion' && typeof applyReducedMotionClass==='function') applyReducedMotionClass();
+}
+
 // A lightweight look at the saved run for the setup screen's "Continue"
 // button, without actually loading it into S -- so the player can see what
 // they'd be resuming (who, where, how hurt) before committing to it.
@@ -434,7 +457,10 @@ function applyPathEffects(effects){
   if(effects.dotToEncounter) e.curDOT += effects.dotToEncounter;
   if(effects.hotToPlayer) S.playerHOT += effects.hotToPlayer;
   if(effects.blockGain) S.playerBlock += effects.blockGain;
-  if(effects.healGain) S.health = cap(S.health+effects.healGain, S.maxHealth);
+  if(effects.healGain){
+    S.health = cap(S.health+effects.healGain, S.maxHealth);
+    if(typeof playTone==='function') playTone('heal');
+  }
   if(effects.selfDot) S.playerDOT += effects.selfDot;
   if(effects.freeze) S.freezeNext = true;
   for(let i=0;i<effects.nullifyCount;i++) applyNullify();
@@ -442,6 +468,7 @@ function applyPathEffects(effects){
   if(effects.totalDamage>0){
     logMsg('dmg', `Path dealt ${effects.totalDamage.toFixed(1)} damage.`);
     S.stats.damageDealt += effects.totalDamage;
+    if(typeof playTone==='function') playTone('hit');
   }
   e.curHealth = capUpper(e.curHealth-effects.totalDamage, e.maxHealth);
 
