@@ -708,6 +708,7 @@ function openSettingsModal(){
       </div>
       <p class="hint" style="text-align:left;">Keyboard: <strong>Enter</strong> Go &middot; <strong>Backspace</strong> Clear &middot; <strong>1234/qwer/asdf/zxcv</strong> tap a tray die (matches its grid position)</p>
       <div class="small-btn-row" style="justify-content:center; flex-direction:column;">
+        <button id="settings-how-to-play-btn">How to Play</button>
         ${inRun ? '<button id="settings-restart-btn" class="danger">Restart Run</button>' : ''}
         <button id="settings-close-btn">Close</button>
       </div>
@@ -715,6 +716,7 @@ function openSettingsModal(){
   document.body.appendChild(overlay);
   const close = ()=>{ if(overlay.parentNode) document.body.removeChild(overlay); };
   overlay.querySelector('#settings-close-btn').onclick = close;
+  overlay.querySelector('#settings-how-to-play-btn').onclick = ()=>{ close(); openTutorialModal(0); };
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
   overlay.querySelector('#pref-sound').onchange = (ev)=>{ setPref('sound', ev.target.checked); if(ev.target.checked) playTone('hit'); };
   overlay.querySelector('#pref-reduced-motion').onchange = (ev)=> setPref('reducedMotion', ev.target.checked);
@@ -735,6 +737,38 @@ function openSettingsModal(){
     confirmOverlay.onclick = (ev)=>{ if(ev.target===confirmOverlay) document.body.removeChild(confirmOverlay); };
   };
   return overlay;
+}
+
+// The first-run walkthrough (TUTORIAL_STEPS, data.js). Re-entrant: called
+// with a step index so "How to Play" in Settings can replay it any time,
+// not just on a new player's very first game. Re-renders in place (rather
+// than closing/reopening a new overlay) so Prev/Next feels like one modal
+// paging through, not a stack of separate popups.
+function openTutorialModal(stepIdx){
+  const existing = document.querySelector('[data-overlay-role="tutorial"]');
+  if(existing && existing.parentNode) existing.parentNode.removeChild(existing);
+  const n = TUTORIAL_STEPS.length;
+  const step = TUTORIAL_STEPS[stepIdx];
+  const dots = TUTORIAL_STEPS.map((_,i)=>`<span class="tutorial-dot ${i===stepIdx?'active':''}"></span>`).join('');
+  const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:360px;">
+      <h2 style="margin-top:0;">${step.title}</h2>
+      <p>${step.body}</p>
+      <div class="tutorial-dots">${dots}</div>
+      <div class="small-btn-row" style="justify-content:center;">
+        ${stepIdx>0 ? '<button id="tutorial-prev-btn">Back</button>' : ''}
+        <button class="primary" id="tutorial-next-btn">${stepIdx<n-1?'Next':'Got it'}</button>
+      </div>
+    </div></div>`);
+  overlay.dataset.overlayRole = 'tutorial';
+  document.body.appendChild(overlay);
+  const closeAndAdvance = (next)=>{
+    document.body.removeChild(overlay);
+    if(next!=null) openTutorialModal(next);
+  };
+  const prevBtn = overlay.querySelector('#tutorial-prev-btn');
+  if(prevBtn) prevBtn.onclick = ()=> closeAndAdvance(stepIdx-1);
+  overlay.querySelector('#tutorial-next-btn').onclick = ()=> closeAndAdvance(stepIdx<n-1 ? stepIdx+1 : null);
+  overlay.onclick = (ev)=>{ if(ev.target===overlay) closeAndAdvance(null); };
 }
 
 function openInfoModal(title, bodyHTML){

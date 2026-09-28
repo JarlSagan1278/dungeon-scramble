@@ -50,6 +50,18 @@ function setPref(key, val){
   if(key==='reducedMotion' && typeof applyReducedMotionClass==='function') applyReducedMotionClass();
 }
 
+// ---- First-run tutorial: shown once, ever, the first time a new game
+// starts. Marked seen the moment it's shown (not on dismiss), so it never
+// reappears uninvited even if the player closes the tab mid-tutorial -- the
+// Settings modal's "How to Play" button re-opens it on demand any time. ----
+const TUTORIAL_SEEN_KEY = 'dungeonScrambleTutorialSeen_v1';
+function hasSeenTutorial(){
+  try{ return !!localStorage.getItem(TUTORIAL_SEEN_KEY); } catch(e){ return true; } // fail open: don't nag if storage is broken
+}
+function markTutorialSeen(){
+  try{ localStorage.setItem(TUTORIAL_SEEN_KEY, '1'); } catch(e){}
+}
+
 // A lightweight look at the saved run for the setup screen's "Continue"
 // button, without actually loading it into S -- so the player can see what
 // they'd be resuming (who, where, how hurt) before committing to it.
@@ -172,6 +184,10 @@ function newGame(originId, classId){
   scrambleTray();
   advanceRoute(); // triggers first encounter
   render();
+  if(!hasSeenTutorial()){
+    markTutorialSeen();
+    if(typeof openTutorialModal==='function') openTutorialModal(0);
+  }
 }
 
 function buildRoute(){
