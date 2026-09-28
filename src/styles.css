@@ -328,9 +328,13 @@
   .loot-options{ display:flex; gap:10px; margin:12px 0; flex-wrap:nowrap; overflow-x:auto; padding-bottom:6px; }
   .loot-opt{ flex:1 1 0; min-width:140px; background: var(--panel2); border:2px solid var(--stone); border-radius:8px; padding:8px; cursor:pointer; transition: transform .08s; }
   .loot-opt:hover{ border-color: var(--gold); transform: translateY(-2px); }
-  .loot-opt h4{ margin:0 0 8px; color: var(--cream); font-size:13px; font-family:'Baloo 2',Georgia,serif; text-align:center; }
-  .loot-preview{ width:50px; height:50px; border-radius:10px; margin:0 auto 8px; display:flex; align-items:center; justify-content:center;
-    font-size:22px; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.2), 2px 2px 0 rgba(0,0,0,0.3); }
+  /* Sized like a real tray die (~72px) rather than the tray's own
+     container-query-relative sizing, since this tile lives outside a
+     .tray-wrap -- a fixed size keeps the icon/name-tag proportions the
+     same as in-tray without depending on a query container that isn't
+     there. */
+  .loot-preview-tile{ width:72px; height:72px; margin:0 auto 8px; cursor:default; }
+  .loot-preview-tile .face-val{ font-size:32px; }
   .faces{ display:flex; gap:3px; flex-wrap:wrap; font-size:9px; }
   .loot-opt .faces{ flex-wrap:nowrap; overflow-x:auto; }
   .faces span{ background:var(--stone); color: var(--parchment); border-radius:3px; padding:3px 5px; white-space:nowrap; flex:0 0 auto; }

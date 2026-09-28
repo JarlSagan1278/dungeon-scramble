@@ -792,22 +792,34 @@ function logViewHTML(){
   return `<div class="log" style="height:min(60vh,400px);">${S.log.slice(-150).map(l=>`<div class="${l.cls}">${l.text}</div>`).join('')}</div>`;
 }
 
+// A static (non-clickable) preview tile that looks like a real tray die --
+// same dietype background, the same arced name-tag, and a representative
+// face -- instead of the old plain icon-in-a-box preview, so a loot option
+// actually shows what the die will look like once it's in your tray.
+function lootPreviewTileHTML(opt, uniqueId){
+  const pf = pickPreviewFace(opt.faces);
+  const label = `<div class="face-val">${iconSpan(pf.type, pf.value)}</div><div class="face-word">${LABEL[pf.type]}${(pf.value && !ICON_VALUE_SLOT.has(pf.type))?(' '+pf.value):''}</div>`;
+  return `<div class="die loot-preview-tile dietype-${opt.cat}">
+      <div class="name-tag">${nameTagSVG(opt.name, uniqueId)}</div>
+      ${label}
+    </div>`;
+}
+
 function renderLootModal(){
   const {options, lootName, overkill, fromShrine} = S.lootChoice;
   const overlay = el(`<div class="modal-overlay"><div class="modal">
-      <h2>${fromShrine ? 'Shrine Boon' : 'Victory!'}</h2>
-      <p>Choose one ${lootName} Loot Die to add to your tray${overkill?' (Overkill! One extra option to choose from.)':''}:</p>
+      <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
+        <h2 style="margin:0;">${fromShrine ? 'Shrine Boon' : 'Victory!'}</h2>
+        ${overkill?'<span class="status-chip" style="background:var(--gold);color:#241c10;">Overkill! +1 option</span>':''}
+      </div>
+      <p>Choose one ${lootName} Loot Die to add to your tray:</p>
       <div class="loot-options" id="loot-options"></div>
     </div></div>`);
   document.body.appendChild(overlay);
   const container = overlay.querySelector('#loot-options');
-  options.forEach(opt=>{
-    const pf = pickPreviewFace(opt.faces);
+  options.forEach((opt,i)=>{
     const card = el(`<div class="loot-opt">
-        <div class="die loot-preview dietype-${opt.cat}" style="width:50px;height:50px;font-size:20px;margin:0 auto 8px;">
-          <div style="font-size:20px;">${iconSpan(pf.type, pf.value)}</div>
-        </div>
-        <h4>${opt.name}</h4>
+        ${lootPreviewTileHTML(opt, `loot-${i}`)}
         <div class="faces">${opt.faces.map(f=>`<span>${iconSpan(f.type, f.value)}${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?f.value:''}</span>`).join('')}</div>
       </div>`);
     card.onclick = ()=>{ document.body.removeChild(overlay); chooseLoot(opt); };
