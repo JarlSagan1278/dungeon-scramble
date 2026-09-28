@@ -333,6 +333,14 @@
   .run-history-who{ font-weight:700; font-size:13px; }
   .run-history-detail{ font-size:11px; color:var(--parchment-dim); }
   .run-history-date{ font-size:11px; color:var(--parchment-dim); flex:0 0 auto; white-space:nowrap; }
+  .compendium-tier{ margin-bottom:14px; text-align:left; }
+  .compendium-list{ display:flex; flex-direction:column; gap:5px; max-height:220px; overflow-y:auto; margin-top:6px; }
+  .compendium-row{ display:flex; align-items:center; gap:10px; background:var(--panel2); border:1px solid var(--stone); border-radius:6px; padding:5px 8px; }
+  .compendium-thumb{ width:34px; height:34px; object-fit:contain; flex:0 0 auto; }
+  .compendium-thumb-placeholder{ border-radius:5px; opacity:0.4; background:var(--stone); }
+  .compendium-main{ flex:1 1 auto; min-width:0; }
+  .compendium-faces{ display:flex; gap:4px; flex-wrap:wrap; opacity:0.85; }
+  .compendium-faces .icon-svg{ width:13px; height:13px; }
   .loot-options{ display:flex; gap:10px; margin:12px 0; flex-wrap:nowrap; overflow-x:auto; padding-bottom:6px; }
   .loot-opt{ flex:1 1 0; min-width:140px; background: var(--panel2); border:2px solid var(--stone); border-radius:8px; padding:8px; cursor:pointer; transition: transform .08s; }
   .loot-opt:hover{ border-color: var(--gold); transform: translateY(-2px); }
@@ -344,6 +352,7 @@
      there. */
   .loot-preview-tile{ width:72px; height:72px; margin:0 auto 8px; cursor:default; }
   .loot-preview-tile .face-val{ font-size:32px; }
+  .loot-art-thumb{ display:block; width:64px; height:64px; object-fit:contain; margin:0 auto 4px; }
   .faces{ display:flex; gap:3px; flex-wrap:wrap; font-size:9px; }
   .loot-opt .faces{ flex-wrap:nowrap; overflow-x:auto; }
   .faces span{ background:var(--stone); color: var(--parchment); border-radius:3px; padding:3px 5px; white-space:nowrap; flex:0 0 auto; }

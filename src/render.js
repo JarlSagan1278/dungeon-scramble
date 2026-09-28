@@ -710,6 +710,7 @@ function openSettingsModal(){
       <div class="small-btn-row" style="justify-content:center; flex-direction:column;">
         <button id="settings-how-to-play-btn">How to Play</button>
         <button id="settings-run-history-btn">Run History</button>
+        <button id="settings-dice-compendium-btn">Dice Compendium</button>
         ${inRun ? '<button id="settings-restart-btn" class="danger">Restart Run</button>' : ''}
         <button id="settings-close-btn">Close</button>
       </div>
@@ -719,6 +720,7 @@ function openSettingsModal(){
   overlay.querySelector('#settings-close-btn').onclick = close;
   overlay.querySelector('#settings-how-to-play-btn').onclick = ()=>{ close(); openTutorialModal(0); };
   overlay.querySelector('#settings-run-history-btn').onclick = ()=>{ close(); openRunHistoryModal(); };
+  overlay.querySelector('#settings-dice-compendium-btn').onclick = ()=>{ close(); openDiceCompendiumModal(); };
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
   overlay.querySelector('#pref-sound').onchange = (ev)=>{ setPref('sound', ev.target.checked); if(ev.target.checked) playTone('hit'); };
   overlay.querySelector('#pref-reduced-motion').onchange = (ev)=> setPref('reducedMotion', ev.target.checked);
@@ -810,6 +812,54 @@ function openRunHistoryModal(){
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
   const clearBtn = overlay.querySelector('#run-history-clear-btn');
   if(clearBtn) clearBtn.onclick = ()=>{ clearRunHistory(); close(); openRunHistoryModal(); };
+}
+
+// A browsable library of every Loot Die in the game (Alloy/Gilded/Magic),
+// reachable from Settings. Illustrated dice (LOOT_ART, assets.js) show
+// their art; the rest just show their faces -- art coverage is being
+// filled in gradually, so no placeholder-watermark spam for the ones that
+// don't have it yet (unlike the encounter portraits, which are shown one
+// at a time and can afford a loud PLACEHOLDER banner).
+function openDiceCompendiumModal(){
+  const tiers = [
+    {label:'Alloy', pool:ALLOY},
+    {label:'Gilded', pool:GILDED},
+    {label:'Magic', pool:MAGIC},
+  ];
+  const totalArt = tiers.reduce((n,t)=>n + t.pool.filter(d=>LOOT_ART[d.name]).length, 0);
+  const totalDice = tiers.reduce((n,t)=>n + t.pool.length, 0);
+  const sections = tiers.map(t=>{
+    const rows = t.pool.map((d,i)=>{
+      const art = LOOT_ART[d.name];
+      const thumb = art
+        ? `<img class="compendium-thumb" src="${art}" alt="${d.name}"/>`
+        : `<div class="compendium-thumb compendium-thumb-placeholder"></div>`;
+      const faces = d.faces.map(f=>`<span>${iconSpan(f.type, f.value)}</span>`).join('');
+      return `<div class="compendium-row">
+          ${thumb}
+          <div class="compendium-main">
+            <div class="run-history-who">${d.name}</div>
+            <div class="compendium-faces">${faces}</div>
+          </div>
+        </div>`;
+    }).join('');
+    return `<div class="compendium-tier">
+        <div class="camp-section-title" style="font-weight:800;">${t.label} Dice</div>
+        <div class="compendium-list">${rows}</div>
+      </div>`;
+  }).join('');
+  const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:420px;">
+      <h2 style="margin-top:0;">Dice Compendium</h2>
+      <p class="hint">${totalArt}/${totalDice} illustrated so far -- more art is on the way.</p>
+      ${sections}
+      <div class="small-btn-row" style="justify-content:center;">
+        <button class="primary" id="compendium-close-btn">Close</button>
+      </div>
+    </div></div>`);
+  document.body.appendChild(overlay);
+  const close = ()=>{ if(overlay.parentNode) document.body.removeChild(overlay); };
+  overlay.querySelector('#compendium-close-btn').onclick = close;
+  overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
 }
 
 function openInfoModal(title, bodyHTML){
@@ -911,7 +961,9 @@ function renderLootModal(){
   openUniqueOverlay('loot', overlay);
   const container = overlay.querySelector('#loot-options');
   options.forEach((opt,i)=>{
+    const art = LOOT_ART[opt.name];
     const card = el(`<div class="loot-opt">
+        ${art?`<img class="loot-art-thumb" src="${art}" alt="${opt.name}"/>`:''}
         ${lootPreviewTileHTML(opt, `loot-${i}`)}
         <div class="faces">${opt.faces.map(f=>`<span>${iconSpan(f.type, f.value)}${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?f.value:''}</span>`).join('')}</div>
       </div>`);
