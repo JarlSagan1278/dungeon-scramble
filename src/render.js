@@ -805,6 +805,24 @@ function lootPreviewTileHTML(opt, uniqueId){
     </div>`;
 }
 
+// A state-driven modal (one whose content comes from S.lootChoice/
+// S.shrineChoice/S.shrineResult, rendered fresh inside a render() pass
+// rather than opened once by a direct user action) can end up rendered
+// twice in a row -- e.g. entering a Shrine auto-resolves and renders once
+// via applyShrineBoon, then the code path that led there (campLeave,
+// continueFromShrine) renders again right after -- and since these
+// overlays are appended to document.body rather than being cleared by the
+// normal app.innerHTML re-render, a second call would stack a duplicate
+// popup on top of the first instead of replacing it. Tagging each with a
+// role and removing any existing one with that role first makes them
+// idempotent: rendering the same state twice just replaces the popup.
+function openUniqueOverlay(role, overlay){
+  document.querySelectorAll(`[data-overlay-role="${role}"]`).forEach(n=>{ if(n.parentNode) n.parentNode.removeChild(n); });
+  overlay.dataset.overlayRole = role;
+  document.body.appendChild(overlay);
+  return overlay;
+}
+
 function renderLootModal(){
   const {options, lootName, overkill, fromShrine} = S.lootChoice;
   const overlay = el(`<div class="modal-overlay"><div class="modal">
@@ -815,7 +833,7 @@ function renderLootModal(){
       <p>Choose one ${lootName} Loot Die to add to your tray:</p>
       <div class="loot-options" id="loot-options"></div>
     </div></div>`);
-  document.body.appendChild(overlay);
+  openUniqueOverlay('loot', overlay);
   const container = overlay.querySelector('#loot-options');
   options.forEach((opt,i)=>{
     const card = el(`<div class="loot-opt">
@@ -834,7 +852,7 @@ function renderShrineChoiceModal(){
       <p>Choose one boon:</p>
       <div class="loot-options" id="shrine-options"></div>
     </div></div>`);
-  document.body.appendChild(overlay);
+  openUniqueOverlay('shrine-choice', overlay);
   const container = overlay.querySelector('#shrine-options');
   options.forEach(opt=>{
     const card = el(`<div class="loot-opt"><h4>${opt.label}</h4></div>`);
@@ -852,7 +870,7 @@ function renderShrineResultModal(){
       <p>${text}</p>
       <button class="primary" id="shrine-result-continue">Continue</button>
     </div></div>`);
-  document.body.appendChild(overlay);
+  openUniqueOverlay('shrine-result', overlay);
   overlay.querySelector('#shrine-result-continue').onclick = ()=>{
     document.body.removeChild(overlay);
     continueFromShrine();
