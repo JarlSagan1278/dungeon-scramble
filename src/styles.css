@@ -208,8 +208,6 @@
   .delta-float.big{ animation: float-delta-big 1.05s ease-out forwards; font-weight:800; }
   .delta-float.heal{ color:#5fe37a; }
   .delta-float.damage{ color:#ff6b6b; }
-  .dmg-burst{ display:inline-flex; align-items:center; justify-content:center; background:#e2472e; color:#fff;
-    font-weight:800; font-size:11px; padding:2px 8px; border-radius:10px; border:2px solid #000; }
   .boss-cycle-row{ display:flex; align-items:center; flex-wrap:wrap; gap:5px; margin:6px 0; }
   .boss-cycle-item{ display:inline-flex; align-items:center; gap:3px; background:rgba(255,255,255,0.08); border-radius:10px; padding:2px 6px; font-size:11px; opacity:0.5; color:var(--parchment); }
   .boss-cycle-item .icon-svg{ width:12px; height:12px; }
@@ -241,7 +239,6 @@
   .util-btn.rail-go{ flex:0 0 auto; height:46px; font-size:18px; }
   .util-btn.rail-clear{ flex:0 0 auto; height:32px; font-size:12px; }
   .util-btn.rail-ability{ flex:0 0 auto; height:32px; font-size:12px; }
-  .mini-log-line{ font-size:10px; color:var(--parchment-dim); font-style:italic; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .log div{ margin-bottom:2px; }
   .log .dmg{ color:#e6a9a9; }
   .log .heal{ color:#a9e6b8; }
@@ -331,6 +328,7 @@
   .loot-options{ display:flex; gap:10px; margin:12px 0; flex-wrap:nowrap; overflow-x:auto; padding-bottom:6px; }
   .loot-opt{ flex:1 1 0; min-width:140px; background: var(--panel2); border:2px solid var(--stone); border-radius:8px; padding:8px; cursor:pointer; transition: transform .08s; }
   .loot-opt:hover{ border-color: var(--gold); transform: translateY(-2px); }
+  .loot-opt h4{ margin:4px 0 0; font-size:13px; color:var(--parchment); text-align:center; }
   /* Sized like a real tray die (~72px) rather than the tray's own
      container-query-relative sizing, since this tile lives outside a
      .tray-wrap -- a fixed size keeps the icon/name-tag proportions the

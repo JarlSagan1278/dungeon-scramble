@@ -33,12 +33,6 @@ function face(str){
 }
 function faces(arr){ return arr.map(face); }
 
-const CATEGORY = { hit:'attack', combo:'attack', boost:'other', dot:'other', leech:'other',
-  fumble:'maneuver', dodge:'maneuver', leap:'maneuver', pivot:'maneuver', freeze:'other',
-  heal:'heal', hot:'heal', block:'heal', nullify:'other', blank:'blank' };
-
-const ICON = { hit:'⚔', combo:'✹', boost:'⬆', dot:'☠', leech:'🩸', fumble:'✖', dodge:'↗', leap:'⤼', pivot:'✛',
-  freeze:'❄', heal:'♥', hot:'♻', block:'🛡', nullify:'∅', blank:'' };
 
 const LABEL = { hit:'Hit', combo:'Combo', boost:'Boost', dot:'D.O.T.', leech:'Leech', fumble:'Fumble',
   dodge:'Dodge', leap:'Leap', pivot:'Pivot', freeze:'Freeze', heal:'Heal', hot:'H.O.T.', block:'Block', nullify:'Nullify', blank:'—'};

@@ -173,7 +173,7 @@ function renderDie(cell, idx){
   const isBlank = f.type==='blank';
   const inPath = S.path.includes(idx);
   const isLastMove = S.path.length && S.path[S.path.length-1]===idx;
-  const selectable = !S.gameOverText && canSelect(idx);
+  const selectable = canSelect(idx);
   const clickable = selectable || isLastMove;
   const num = inPath ? S.path.indexOf(idx)+1 : null;
   const zoneCls = inZone(idx) ? 'zone-cell' : '';
@@ -745,8 +745,6 @@ function openSettingsModal(){
 // than closing/reopening a new overlay) so Prev/Next feels like one modal
 // paging through, not a stack of separate popups.
 function openTutorialModal(stepIdx){
-  const existing = document.querySelector('[data-overlay-role="tutorial"]');
-  if(existing && existing.parentNode) existing.parentNode.removeChild(existing);
   const n = TUTORIAL_STEPS.length;
   const step = TUTORIAL_STEPS[stepIdx];
   const dots = TUTORIAL_STEPS.map((_,i)=>`<span class="tutorial-dot ${i===stepIdx?'active':''}"></span>`).join('');
@@ -759,8 +757,7 @@ function openTutorialModal(stepIdx){
         <button class="primary" id="tutorial-next-btn">${stepIdx<n-1?'Next':'Got it'}</button>
       </div>
     </div></div>`);
-  overlay.dataset.overlayRole = 'tutorial';
-  document.body.appendChild(overlay);
+  openUniqueOverlay('tutorial', overlay);
   const closeAndAdvance = (next)=>{
     document.body.removeChild(overlay);
     if(next!=null) openTutorialModal(next);

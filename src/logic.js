@@ -164,7 +164,6 @@ function newGame(originId, classId){
     log:[],
     lootChoice:null,
     campOpen:false,
-    gameOverText:null,
     freezeNext:false,
     nullifyTokens:0,
     freezeTokens:0,
