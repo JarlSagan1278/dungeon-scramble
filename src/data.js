@@ -299,8 +299,8 @@ const FLOOR1_SHRINES = [
   enc('Scroll Dispenser: CLEAR','Shrine',0,{boon:'Gain a one-use Nullify token (x3).', effect:{type:'grantToken', token:'nullify', charges:3}}),
 ];
 const FLOOR1_BOSSES = [
-  enc('Rogue Golemancer','Boss',24,{dmg:1.5,minion:1,flavor:'"You cannot handle my golems, adventurer."'}),
-  enc('Heating Elemental','Boss',40,{questHealth:25,dmg:2.5,hot:1,quests:['35 damage: survive to turn 5'],flavor:'"Anyone know the average melting point on the Plane of Immolation?"'}),
+  enc('Rogue Golemancer','Boss',24,{dmg:2,minion:1,flavor:'"You cannot handle my golems, adventurer."'}),
+  enc('Heating Elemental','Boss',40,{questHealth:25,dmg:3,hot:1,quests:['35 damage: survive to turn 5'],flavor:'"Anyone know the average melting point on the Plane of Immolation?"'}),
   enc('Grosteque Grafter','Boss',50,{questHealth:30,dmg:2,shield:2,quests:['8 dot: deal 10+ damage in a single round'],flavor:'Oft criticized for reusing parts of other bosses.'}),
 ];
 
@@ -333,9 +333,9 @@ const FLOOR2_SHRINES = [
   enc('Scroll Dispenser: BIG','Shrine',0,{boon:'Gain a one-use x4 Boost token (x2).', effect:{type:'grantToken', token:'boost', value:4, charges:2}}),
 ];
 const FLOOR2_BOSSES = [
-  enc('The Necrorancher','Boss',35,{dmg:2,minion:1.5,quests:['nullify: deal 12 damage in a single turn'],flavor:'Herder of the haunted, granger of the ghoulish, planter of the parasitic.'}),
-  enc('Bellicose Biomancer','Boss',50,{questHealth:25,dmg:3.5,hot:1.5,quests:['20 damage: 3 hot','20 damage: 5 dot'],flavor:'Not content with creating life, this relentless innovator seeks new ways to destroy it.'}),
-  enc('Ceramic Golem','Boss',70,{questHealth:40,dmg:3,shield:2.5,quests:['8 dot: deal 15+ damage in a single round','30 damage: 5 maneuvers'],flavor:'The bespoke sommelier of the Co-Consul, now cracked and seeping with drink.'}),
+  enc('The Necrorancher','Boss',35,{dmg:2,minion:2,quests:['nullify: deal 12 damage in a single turn'],flavor:'Herder of the haunted, granger of the ghoulish, planter of the parasitic.'}),
+  enc('Bellicose Biomancer','Boss',50,{questHealth:25,dmg:4,hot:2,quests:['20 damage: 3 hot','20 damage: 5 dot'],flavor:'Not content with creating life, this relentless innovator seeks new ways to destroy it.'}),
+  enc('Ceramic Golem','Boss',70,{questHealth:40,dmg:3,shield:3,quests:['8 dot: deal 15+ damage in a single round','30 damage: 5 maneuvers'],flavor:'The bespoke sommelier of the Co-Consul, now cracked and seeping with drink.'}),
 ];
 
 const FLOOR3_ENEMIES = [
