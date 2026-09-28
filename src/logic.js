@@ -27,6 +27,45 @@ function clearSave(){
   try{ localStorage.removeItem(SAVE_KEY); } catch(e){}
 }
 
+// ---- Run history -- a small persisted log of finished runs (win or lose),
+// separate from the save file (which only tracks the CURRENT in-progress
+// run and is cleared the moment a run ends). Survives across runs so a
+// player can see how past attempts went. ----
+const RUN_HISTORY_KEY = 'dungeonScrambleRunHistory_v1';
+const MAX_RUN_HISTORY = 20;
+
+function getRunHistory(){
+  try{ return JSON.parse(localStorage.getItem(RUN_HISTORY_KEY)) || []; }
+  catch(e){ return []; }
+}
+
+// Called once when a run ends (victory or defeat), before the save file is
+// cleared, so it can pull the run's final stats off S.
+function recordRunHistory(outcome){
+  try{
+    const list = getRunHistory();
+    list.unshift({
+      date: Date.now(),
+      origin: S.origin.name,
+      klass: S.klass.name,
+      outcome, // 'victory' | 'defeat'
+      floorReached: S.floorIdx+1,
+      turnsTaken: S.stats.turnsTaken,
+      damageDealt: Math.round(S.stats.damageDealt),
+      encountersDefeated: S.stats.encountersDefeated,
+      shrinesVisited: S.stats.shrinesVisited,
+      overkills: S.stats.overkills,
+      lootCollected: S.stats.lootCollected,
+    });
+    if(list.length > MAX_RUN_HISTORY) list.length = MAX_RUN_HISTORY;
+    localStorage.setItem(RUN_HISTORY_KEY, JSON.stringify(list));
+  } catch(e){ /* storage unavailable/full -- history is a bonus, fail silently */ }
+}
+
+function clearRunHistory(){
+  try{ localStorage.removeItem(RUN_HISTORY_KEY); } catch(e){}
+}
+
 // ---- Player prefs (sound / reduced-motion) -- small, separate from the
 // save file since they're device/player settings, not run state, and
 // should survive across runs (including after a run ends and the save is

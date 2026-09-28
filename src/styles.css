@@ -325,6 +325,14 @@
   .tutorial-dots{ display:flex; justify-content:center; gap:6px; margin:14px 0; }
   .tutorial-dot{ width:7px; height:7px; border-radius:50%; background:var(--stone); }
   .tutorial-dot.active{ background:var(--gold); }
+  .run-history-list{ display:flex; flex-direction:column; gap:6px; max-height:320px; overflow-y:auto; margin:4px 0 14px; text-align:left; }
+  .run-history-row{ display:flex; align-items:center; gap:10px; background:var(--panel2); border:1px solid var(--stone); border-radius:6px; padding:7px 10px; }
+  .run-history-row.defeat{ opacity:0.75; }
+  .run-history-outcome{ font-size:18px; flex:0 0 auto; }
+  .run-history-main{ flex:1 1 auto; min-width:0; }
+  .run-history-who{ font-weight:700; font-size:13px; }
+  .run-history-detail{ font-size:11px; color:var(--parchment-dim); }
+  .run-history-date{ font-size:11px; color:var(--parchment-dim); flex:0 0 auto; white-space:nowrap; }
   .loot-options{ display:flex; gap:10px; margin:12px 0; flex-wrap:nowrap; overflow-x:auto; padding-bottom:6px; }
   .loot-opt{ flex:1 1 0; min-width:140px; background: var(--panel2); border:2px solid var(--stone); border-radius:8px; padding:8px; cursor:pointer; transition: transform .08s; }
   .loot-opt:hover{ border-color: var(--gold); transform: translateY(-2px); }

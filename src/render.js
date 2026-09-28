@@ -709,6 +709,7 @@ function openSettingsModal(){
       <p class="hint" style="text-align:left;">Keyboard: <strong>Enter</strong> Go &middot; <strong>Backspace</strong> Clear &middot; <strong>1234/qwer/asdf/zxcv</strong> tap a tray die (matches its grid position)</p>
       <div class="small-btn-row" style="justify-content:center; flex-direction:column;">
         <button id="settings-how-to-play-btn">How to Play</button>
+        <button id="settings-run-history-btn">Run History</button>
         ${inRun ? '<button id="settings-restart-btn" class="danger">Restart Run</button>' : ''}
         <button id="settings-close-btn">Close</button>
       </div>
@@ -717,6 +718,7 @@ function openSettingsModal(){
   const close = ()=>{ if(overlay.parentNode) document.body.removeChild(overlay); };
   overlay.querySelector('#settings-close-btn').onclick = close;
   overlay.querySelector('#settings-how-to-play-btn').onclick = ()=>{ close(); openTutorialModal(0); };
+  overlay.querySelector('#settings-run-history-btn').onclick = ()=>{ close(); openRunHistoryModal(); };
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
   overlay.querySelector('#pref-sound').onchange = (ev)=>{ setPref('sound', ev.target.checked); if(ev.target.checked) playTone('hit'); };
   overlay.querySelector('#pref-reduced-motion').onchange = (ev)=> setPref('reducedMotion', ev.target.checked);
@@ -766,6 +768,48 @@ function openTutorialModal(stepIdx){
   if(prevBtn) prevBtn.onclick = ()=> closeAndAdvance(stepIdx-1);
   overlay.querySelector('#tutorial-next-btn').onclick = ()=> closeAndAdvance(stepIdx<n-1 ? stepIdx+1 : null);
   overlay.onclick = (ev)=>{ if(ev.target===overlay) closeAndAdvance(null); };
+}
+
+// A persisted log of past runs (see recordRunHistory/getRunHistory in
+// logic.js), reachable any time from Settings -- including from the
+// Victory/Game Over screens, since the settings gear lives outside #app.
+function openRunHistoryModal(){
+  const history = getRunHistory();
+  const victories = history.filter(r=>r.outcome==='victory');
+  const fastest = victories.length ? Math.min(...victories.map(r=>r.turnsTaken)) : null;
+  const summary = history.length
+    ? `<div class="statuses" style="justify-content:center; margin-bottom:10px;">
+        <span class="status-chip">Runs: ${history.length}</span>
+        <span class="status-chip">Victories: ${victories.length}</span>
+        ${fastest!=null ? `<span class="status-chip">Fastest clear: ${fastest} turns</span>` : ''}
+      </div>`
+    : '';
+  const rows = history.length ? history.map(r=>{
+    const dateStr = new Date(r.date).toLocaleDateString(undefined, {month:'short', day:'numeric'});
+    return `<div class="run-history-row ${r.outcome}">
+        <span class="run-history-outcome">${r.outcome==='victory' ? '🏆' : '💀'}</span>
+        <div class="run-history-main">
+          <div class="run-history-who">${r.origin} ${r.klass}</div>
+          <div class="run-history-detail">Floor ${r.floorReached}/3 &middot; ${r.turnsTaken} turns &middot; ${r.damageDealt} dmg &middot; ${r.overkills} overkill${r.overkills===1?'':'s'}</div>
+        </div>
+        <span class="run-history-date">${dateStr}</span>
+      </div>`;
+  }).join('') : `<p class="hint">No runs recorded yet -- finish a run to see it here.</p>`;
+  const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:400px;">
+      <h2 style="margin-top:0;">Run History</h2>
+      ${summary}
+      <div class="run-history-list">${rows}</div>
+      <div class="small-btn-row" style="justify-content:center;">
+        ${history.length ? '<button id="run-history-clear-btn" class="danger">Clear History</button>' : ''}
+        <button class="primary" id="run-history-close-btn">Close</button>
+      </div>
+    </div></div>`);
+  document.body.appendChild(overlay);
+  const close = ()=>{ if(overlay.parentNode) document.body.removeChild(overlay); };
+  overlay.querySelector('#run-history-close-btn').onclick = close;
+  overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
+  const clearBtn = overlay.querySelector('#run-history-clear-btn');
+  if(clearBtn) clearBtn.onclick = ()=>{ clearRunHistory(); close(); openRunHistoryModal(); };
 }
 
 function openInfoModal(title, bodyHTML){
@@ -1064,6 +1108,7 @@ function summaryStatsHTML(){
 }
 
 function renderVictory(){
+  recordRunHistory('victory');
   clearSave();
   playTone('victory');
   app.innerHTML = `<div class="panel"><h2>🏆 Dungeon Conquered!</h2><p>You defeated the Big Boss and cleared all three floors. Well fought, Adventurer.</p>
@@ -1071,6 +1116,7 @@ function renderVictory(){
     <button class="primary" style="margin-top:12px;" onclick="location.reload()">Play Again</button></div>`;
 }
 function renderGameOver(){
+  recordRunHistory('defeat');
   clearSave();
   playTone('defeat');
   app.innerHTML = `<div class="panel"><h2>💀 Defeated</h2><p>Your Adventurer retreats to town in temporary defeat...</p>
