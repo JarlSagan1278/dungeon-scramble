@@ -165,7 +165,6 @@ function newGame(originId, classId){
     stats: { turnsTaken:0, damageDealt:0, encountersDefeated:0, shrinesVisited:0, overkills:0, lootCollected:0 },
     campRested: false,
     shrineResult: null,
-    firstDiePicked: false,
     segmentShrineUsed: false,
     segmentTrapUsed: false,
   };
@@ -373,7 +372,6 @@ function toggleSelect(idx){
   if(S.path.includes(idx)) return; // only the last move can be undone this way
   if(!canSelect(idx)) return;
   S.path.push(idx);
-  S.firstDiePicked = true;
   render();
 }
 

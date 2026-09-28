@@ -113,7 +113,9 @@ function renderRoute(){
   S.route.forEach((step,i)=>{
     const cls = i<S.routeStep?'done':(i===S.routeStep?'current':'');
     const icon = iconSpan(step==='camp'?'camp':(step==='boss'?'boss':'door'));
-    html += `<div class="node ${floorCls} ${cls}">${icon}</div>`;
+    const statusSuffix = cls==='done' ? ' (cleared)' : (cls==='current' ? ' (current)' : ' (ahead)');
+    const tip = (ROUTE_STEP_DESC[step]||'') + statusSuffix;
+    html += `<div class="node ${floorCls} ${cls} route-tooltip-target" title="${tip}">${icon}</div>`;
   });
   html += '</div>';
   const leftPct = ((Math.min(S.routeStep, n-1) + 0.5) / n * 100).toFixed(2);
@@ -435,7 +437,6 @@ function renderGame(){
           <div class="tray-wrap tray-wrap-full">
             <span class="round-badge">Round ${S.turnNumber+1}</span>
             ${pathCounterHTML()}
-            ${!S.firstDiePicked ? '<div class="first-tip">Tap a die to start your path</div>' : ''}
             <div class="tray" id="tray"></div>
           </div>
         </div>
@@ -520,6 +521,7 @@ function renderGame(){
   };
   attachLongPressTooltips('.enemy-action-badge');
   attachLongPressTooltips('.status-tooltip-target');
+  attachLongPressTooltips('.route-tooltip-target');
   document.getElementById('open-key-btn').onclick = ()=> openInfoModal('Action Key', keyCardHTML());
   document.getElementById('open-backpocket-btn').onclick = ()=> openInfoModal('Back Pocket', backPocketViewHTML());
   document.getElementById('open-log-btn').onclick = ()=> openInfoModal('Log', logViewHTML());
@@ -897,6 +899,7 @@ function renderShrineEncounter(){
   if(S.lootChoice) renderLootModal();
   if(S.shrineChoice) renderShrineChoiceModal();
   if(S.shrineResult) renderShrineResultModal();
+  attachLongPressTooltips('.route-tooltip-target');
 }
 
 function renderCamp(){
@@ -979,6 +982,7 @@ function renderCamp(){
   [...document.querySelectorAll('.camp-die-tile')].forEach(el=>{
     el.onclick = ()=> selectOrganize(el.dataset.campType, parseInt(el.dataset.campIdx));
   });
+  attachLongPressTooltips('.route-tooltip-target');
 }
 
 function summaryStatsHTML(){

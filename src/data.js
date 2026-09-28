@@ -90,6 +90,40 @@ const STATUS_DESC = {
   boost: "Your next played action's value will be multiplied.",
 };
 
+// Plain-language descriptions for each kind of route-bar node, shown on
+// mouseover/long-press so it's clear what's ahead before you get there.
+// "enc" nodes cover monster/trap/shrine encounters -- which one it'll
+// actually be isn't decided until you reach it, so the tooltip says so.
+const ROUTE_STEP_DESC = {
+  camp: "Camp -- rest, reroll your tray, and spend upgrades.",
+  enc: "Encounter -- a monster, trap, or shrine (which one isn't revealed until you arrive).",
+  boss: "Boss -- the floor's final, toughest fight.",
+};
+
+// A short, dismissible first-run walkthrough shown once (before the very
+// first game screen a new player sees) covering the parts of the UI that
+// aren't self-explanatory from tooltips alone -- the actual icon-by-icon
+// glossary lives in the always-available "Key" reference card instead of
+// being repeated here.
+const TUTORIAL_STEPS = [
+  {
+    title: "Welcome, Adventurer",
+    body: "Build a path across your dice tray each turn to fight, heal, and move. Clear all three floors -- and their Boss -- to win.",
+  },
+  {
+    title: "Your Tray",
+    body: "Tap a die to start a path, then tap an adjacent die to extend it (some dice let you jump or change direction). Longer paths combo for bigger effects. Long-press any die to see what its face does.",
+  },
+  {
+    title: "The Route",
+    body: "The bar at the top shows what's ahead this floor: Camps to rest and upgrade, Encounters (monster/trap/shrine), and a Boss at the end. Long-press a node to see what it means.",
+  },
+  {
+    title: "One More Thing",
+    body: "The Key button (next to your Bag and Log) is a full glossary of every icon in the game -- check it any time you forget what something does. Good luck!",
+  },
+];
+
 // Icon set: the 14 action icons, Door, and Boss/skull are vector-traced
 // directly from the user's own Action Key Sticker and board art (via
 // contour detection on the source pixels, not hand-redrawn approximations).
