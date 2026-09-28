@@ -584,32 +584,14 @@ function endTurnButton(){
 function startTurnTransition(){
   S.transitioning = true;
   // All of this turn's beats append into one running log (rendered as a
-  // single growing popup) instead of each beat popping up its own little
-  // modal -- the pacing/effects/timing below are unchanged, only the
-  // display is consolidated.
+  // single growing popup). Deliberately kept to just two beats -- your
+  // result, then everything that happens back at you -- instead of a long
+  // chain of per-die/upkeep/enemy-turn steps: fewer beats reads faster and
+  // is far quicker to get through via Skip (see skipTransition below, which
+  // now resolves every remaining beat in one tap instead of one at a time).
   S.transitionLog = [];
-  // For a multi-die path, step through each die's contribution one at a
-  // time (with a running total) before the real "Mathing" step actually
-  // applies everything -- makes a combo read as a sequence of beats
-  // instead of one instant number. This is pure preview: it recomputes
-  // computePathEffects() on successive prefixes of the path (a pure,
-  // read-only function of S.tray/S.pendingFreeBoost) without mutating any
-  // game state, so the real resolution below is completely unchanged.
-  // Skipped for a 0- or 1-die path, where there's nothing to sequence.
-  const pathRevealSteps = S.path.length > 1 ? S.path.map((idx,i) => () => {
-    const f = getFaceForIdx(idx);
-    const faceLabel = LABEL[f.type] + ((f.value && !ICON_VALUE_SLOT.has(f.type)) ? ' '+f.value : '');
-    const cumulative = computePathEffects(S.path.slice(0,i+1));
-    const bits = [];
-    if(cumulative.totalDamage) bits.push(`${cumulative.totalDamage%1?cumulative.totalDamage.toFixed(1):cumulative.totalDamage} dmg`);
-    if(cumulative.healGain) bits.push(`+${cumulative.healGain} heal`);
-    if(cumulative.blockGain) bits.push(`+${cumulative.blockGain} block`);
-    if(cumulative.dotToEncounter) bits.push(`+${cumulative.dotToEncounter} dot`);
-    if(cumulative.hotToPlayer) bits.push(`+${cumulative.hotToPlayer} hot`);
-    return { title: `${i+1}/${S.path.length} · ${faceLabel}`, text: bits.length ? bits.join(' · ') : '—', delay: 550 };
-  }) : [];
+  S._skipAll = false;
   const steps = [
-    ...pathRevealSteps,
     () => {
       const effects = resolvePath();
       S.pendingFreeBoost = 0; // a free Boost token is spent by end of turn whether or not it landed on anything
@@ -627,34 +609,33 @@ function startTurnTransition(){
         if(effects.freeze) parts.push(`Freeze`);
       }
       let text = parts.length ? parts.join(' · ') : 'No effect';
-      const step = {title:'Result', text};
+      const step = {title:'Your Turn', text};
       if(e.curHealth<=0){ step.text += ' — Defeated!'; step.stop = 'encounterDefeated'; }
       return step;
     },
+    // Everything that happens back at you -- enemy upkeep tick, its action,
+    // then your own upkeep tick -- collapsed into one beat instead of three.
     () => {
       const e = S.encounter;
-      let text = '—';
+      const parts = [];
       if(e.curDOT>0){
         e.curHealth = capUpper(e.curHealth-e.curDOT, e.maxHealth);
-        text = `-${e.curDOT} dot`;
+        parts.push(`-${e.curDOT} dot`);
         logMsg('dmg', `${e.name} takes ${e.curDOT} D.O.T. damage.`);
         S.stats.damageDealt += e.curDOT;
       }
       if(e.curHOT>0) e.curHealth = cap(e.curHealth+e.curHOT, e.maxHealth);
-      const step = {title:'Enemy Upkeep', text};
-      if(e.curHealth<=0) step.stop = 'encounterDefeated';
-      return step;
-    },
-    () => {
-      const e = S.encounter;
-      const text = runEncounterAction();
-      const step = {title:'Enemy Turn', text};
-      if(S.health<=0) step.stop = 'playerDefeated';
-      return step;
-    },
-    () => {
-      const text = runPlayerUpkeep() || '—';
-      const step = {title:'Your Upkeep', text};
+      if(e.curHealth<=0){
+        return {title:'Enemy Turn', text: parts.length?parts.join(' · '):'—', stop:'encounterDefeated'};
+      }
+      const actionText = runEncounterAction();
+      if(actionText) parts.push(actionText);
+      if(S.health<=0){
+        return {title:'Enemy Turn', text: parts.join(' · '), stop:'playerDefeated'};
+      }
+      const upkeepText = runPlayerUpkeep();
+      if(upkeepText) parts.push(upkeepText);
+      const step = {title:'Enemy Turn', text: parts.length?parts.join(' · '):'—'};
       if(S.health<=0) step.stop = 'playerDefeated';
       return step;
     },
@@ -684,10 +665,20 @@ function runTransitionSteps(steps, i){
     runTransitionSteps(steps, i+1);
   };
   S._advance = advance;
-  S._pendingTimeout = setTimeout(advance, result.delay || 1000);
+  if(S._skipAll){
+    // Skip was hit: resolve every remaining beat immediately (no more
+    // waiting), instead of just jumping past this one step's own delay.
+    advance();
+  } else {
+    S._pendingTimeout = setTimeout(advance, result.delay || 1000);
+  }
 }
 
+// One tap resolves the ENTIRE remaining sequence, not just the current
+// beat -- flips a flag that makes every subsequent runTransitionSteps call
+// advance immediately instead of scheduling its usual delay.
 function skipTransition(){
+  S._skipAll = true;
   if(S._pendingTimeout){ clearTimeout(S._pendingTimeout); S._pendingTimeout=null; }
   if(S._advance) S._advance();
 }
