@@ -628,6 +628,22 @@ function showToast(text, kind){
   }, 2600);
 }
 
+// ---- Kill callout: a brief big banner for the two kill moments worth
+// distinguishing from an ordinary win -- a Boss/Big Boss going down, and an
+// Overkill -- so they register as they happen instead of only as a status
+// chip on the loot screen afterward. `lines` is an array of {text, cls}
+// (cls picks the visual treatment: 'boss' or 'overkill', plus optional
+// 'sub' on a second line so it pops in slightly after the first). Purely
+// additive on top of whatever renders next (the loot modal, typically). ----
+function showKillCallout(lines){
+  const old = document.getElementById('kill-callout');
+  if(old && old.parentNode) old.parentNode.removeChild(old);
+  const node = el(`<div id="kill-callout">${lines.map(l=>
+    `<div class="kill-callout-line ${l.cls}">${l.text}</div>`).join('')}</div>`);
+  document.body.appendChild(node);
+  setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 1400);
+}
+
 // ---- Sound effects: short generated tones via Web Audio, no external
 // audio assets. The AudioContext is created lazily and only ever actually
 // started from inside a real user-gesture handler (the resolve-btn click,
@@ -658,6 +674,19 @@ const TONE_SEQUENCES = {
               {freq:160, start:0.18, dur:0.34, type:'sawtooth', gain:0.16}],
   heartbeat: [{freq:80,  start:0,    dur:0.1,  type:'sine',     gain:0.24},
               {freq:70,  start:0.16, dur:0.12, type:'sine',     gain:0.2}],
+  // A short rising fanfare for a Boss/Big Boss kill -- bigger than the flat
+  // one-note 'hit' tone every regular kill would otherwise share, but
+  // shorter than the full 4-note 'victory' sting reserved for winning the
+  // whole run.
+  bossKill:  [{freq:294, start:0,    dur:0.12, type:'triangle', gain:0.22},
+              {freq:392, start:0.11, dur:0.12, type:'triangle', gain:0.22},
+              {freq:523, start:0.22, dur:0.30, type:'triangle', gain:0.24}],
+  // A sharp thump+ding "crunch" for an Overkill -- distinct from a normal
+  // kill so the bonus-loot-option moment actually registers as it happens,
+  // not just as a chip on the next screen.
+  overkill:  [{freq:150, start:0,    dur:0.08, type:'sawtooth', gain:0.22},
+              {freq:900, start:0.02, dur:0.06, type:'square',   gain:0.16},
+              {freq:1300,start:0.09, dur:0.14, type:'square',   gain:0.16}],
 };
 function playTone(kind){
   if(!PREFS.sound) return;

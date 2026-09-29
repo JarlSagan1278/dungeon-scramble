@@ -938,10 +938,25 @@ function onEncounterDefeated(){
   const floor = FLOORS[S.floorIdx];
   const overkill = e.curHealth < -9; // curHealth is allowed to go negative (see capUpper) so this is measurable
   if(overkill) S.stats.overkills++;
-  let drawCount = e.type==='Boss'||e.type==='Big Boss' ? 3 : 2;
+  const isBoss = e.type==='Boss' || e.type==='Big Boss';
+  let drawCount = isBoss ? 3 : 2;
   if(overkill) drawCount += 1;
   const options = pickN(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
   S.lootChoice = { options, lootName: floor.lootName, overkill };
+  // A Boss/Big Boss kill or an Overkill each get a distinct sound + a big
+  // callout banner, so the moment registers as it happens instead of only
+  // as a status chip on the loot screen that follows.
+  if(isBoss){
+    if(typeof playTone==='function') playTone('bossKill');
+    if(typeof vibrate==='function') vibrate([50,40,90]);
+    const lines = [{text:`${e.name} Defeated`, cls:'boss'}];
+    if(overkill) lines.push({text:'Overkill!', cls:'overkill sub'});
+    if(typeof showKillCallout==='function') showKillCallout(lines);
+  } else if(overkill){
+    if(typeof playTone==='function') playTone('overkill');
+    if(typeof vibrate==='function') vibrate([30,30,50]);
+    if(typeof showKillCallout==='function') showKillCallout([{text:'Overkill!', cls:'overkill'}]);
+  }
   render();
 }
 
