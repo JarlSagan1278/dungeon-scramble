@@ -766,8 +766,10 @@ function showRoomCallout(fx){
   const mainCls = fx.boss ? 'main boss' : 'main';
   const mainText = fx.boss ? '⚠ Boss Encounter' : 'A new room...';
   const node = el(`<div id="room-callout">
-      <div class="room-callout-line ${mainCls}">${mainText}</div>
-      <div class="room-callout-line sub">${fx.name} · ${fx.type}</div>
+      <div class="room-callout-box">
+        <div class="room-callout-line ${mainCls}">${mainText}</div>
+        <div class="room-callout-line sub">${fx.name} · ${fx.type}</div>
+      </div>
     </div>`);
   document.body.appendChild(node);
   setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 1700);
