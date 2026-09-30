@@ -181,9 +181,9 @@
      class is simply gone on the next render. */
   .enc-portrait.dmg-flash, .char-icon-wrap.dmg-flash{ animation: portrait-shake 0.4s ease; }
   .enc-portrait.dmg-flash::after, .char-icon-wrap.dmg-flash::after{ content:''; position:absolute; inset:0;
-    background:rgba(192,57,43,0.5); border-radius:6px; animation: portrait-flash 0.4s ease; pointer-events:none; }
+    background:rgba(192,57,43,0.5); border-radius:6px; animation: portrait-flash 0.4s ease forwards; pointer-events:none; }
   .enc-portrait.heal-flash::after, .char-icon-wrap.heal-flash::after{ content:''; position:absolute; inset:0;
-    background:rgba(63,174,84,0.4); border-radius:6px; animation: portrait-flash 0.5s ease; pointer-events:none; }
+    background:rgba(63,174,84,0.4); border-radius:6px; animation: portrait-flash 0.5s ease forwards; pointer-events:none; }
   @keyframes portrait-shake{
     0%,100%{ transform:translateX(0) rotate(0); }
     15%{ transform:translateX(-5px) rotate(-3deg); }
