@@ -444,6 +444,7 @@ function useClassAbility(idx){
   const cell = S.tray[idx];
   cell.forcedFace = clone(S.klass.convertTo);
   S.classAbilityUsed = true;
+  S.justConvertedIdx = idx; // one-shot: a conversion flourish on this tile for the very next render only, see renderDie()/renderGame()
   logMsg('sys', `${S.klass.name} ability used: converted a die in the zone to ${LABEL[S.klass.convertTo.type]} ${S.klass.convertTo.value}.`);
   render();
 }

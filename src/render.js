@@ -270,6 +270,8 @@ function renderDie(cell, idx){
   const shakeCls = S.justScrambled ? 'shaking' : '';
   const rippleEntry = S.lastComboRipple && S.lastComboRipple.find(r=>r.idx===idx);
   const rippleCls = rippleEntry ? 'combo-ripple' : '';
+  const justConverted = S.justConvertedIdx===idx;
+  const convertCls = justConverted ? 'ability-convert' : '';
   const extraStyle = S.justScrambled ? `animation-delay:${idx*18}ms`
     : rippleEntry ? `animation-delay:${rippleEntry.order*90}ms` : '';
   const shakeDelay = extraStyle ? `style="${extraStyle}"` : '';
@@ -285,11 +287,11 @@ function renderDie(cell, idx){
   const nameTag = isNonStarter ? `<div class="name-tag">${nameTagSVG(cell.die.name, idx)}</div>` : '';
   const forcedCls = cell.forcedFace ? 'forced-face' : '';
   const boostTargetCls = boostTargetIdx()===idx ? 'boost-target' : '';
-  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${rippleCls} ${forcedCls} ${boostTargetCls}"
+  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls}"
             data-idx="${idx}" title="${isLastMove?'Click to undo this move':cell.die.name}" ${shakeDelay}>
             ${num?`<div class="pathnum">${num}</div>`:''}
             ${(cell.forcedFace || boostTargetCls) ? `<div class="corner-badges">
-              ${cell.forcedFace?`<span class="forced-badge" title="Converted by a class ability">✦</span>`:''}
+              ${cell.forcedFace?`<span class="forced-badge ${justConverted?'badge-pop-in':''}" title="Converted by a class ability">✦</span>`:''}
               ${boostTargetCls?`<span class="boost-target-badge" title="Your armed Boost token will apply to this action">${iconSpan('boost')}</span>`:''}
             </div>` : ''}
             ${nameTag}
@@ -562,6 +564,7 @@ function renderGame(){
   document.getElementById('tray').innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join('');
   S.justScrambled = false;
   S.lastComboRipple = null; // consumed -- plays once, on the render right after resolvePath() set it
+  S.justConvertedIdx = null; // consumed -- plays once, on the render right after useClassAbility() set it
   [...document.getElementById('tray').children].forEach(node=>{
     const idx = parseInt(node.dataset.idx);
     let pressTimer = null;
