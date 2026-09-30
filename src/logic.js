@@ -338,10 +338,19 @@ function advanceRoute(){
       applyShrineBoon(drawn);
       return;
     }
+    // A fresh room gets a fresh roll -- without this the tray would still
+    // be showing whatever was left over from the moment the last encounter
+    // died (the turn-transition sequence stops early on a kill, before it
+    // ever reaches its normal end-of-turn scrambleTray() call), so you'd
+    // open a brand new fight with dice you'd already half-used against the
+    // last one. campRest() already does this after a Camp; this covers
+    // every enc-to-enc and enc-to-boss transition within a segment.
+    scrambleTray();
     S.screen='game';
     logMsg('sys', `A door creaks open: ${drawn.name} (${drawn.type})`);
   } else if(step==='boss'){
     S.encounter = drawEncounter('boss');
+    scrambleTray();
     S.screen='game';
     logMsg('sys', `⚠ Boss Encounter: ${S.encounter.name}`);
   }
