@@ -382,7 +382,7 @@ function renderEncounterCard(e){
       </div>
       <div class="enc-card-body">
         <div class="enc-top-row">
-          <div class="enc-portrait">
+          <div class="enc-portrait ${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}">
             ${art?`<img class="enc-art" src="${art}" alt="${e.name}"/>`
               : (e.type!=='Shrine' ? `<div class="enc-art-wrap"><span class="portrait-watermark">PLACEHOLDER</span><img class="enc-art" src="${CAT_SILHOUETTE}" alt=""/></div>` : '')}
           </div>
@@ -514,7 +514,7 @@ function renderGame(){
           <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning)?'disabled':''} ${emphasizeResolve?'pulse':''}" id="resolve-btn">▶<span>Go</span></div>
           <div class="util-btn danger-accent rail-clear ${S.transitioning?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
           ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''}" id="ability-btn">✦<span>${S.classAbilityUsed?'Used':'Skill'}</span></div>` : ''}
-          <div class="char-icon-wrap" title="${S.origin.name} ${S.klass.name}">${(()=>{
+          <div class="char-icon-wrap ${playerFx.cls==='flash-damage'?'dmg-flash':playerFx.cls==='flash-heal'?'heal-flash':''}" title="${S.origin.name} ${S.klass.name}">${(()=>{
             const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
             const wm = portrait.placeholder ? `<span class="char-icon-watermark">PLACEHOLDER</span>` : '';
             return `${wm}<img class="char-icon-img" src="${portrait.img}" alt="${S.origin.name}">`;
