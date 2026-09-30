@@ -105,7 +105,7 @@
   .tray-wrap{ background: linear-gradient(160deg,#3a2f22,#241c14); border:4px solid #4c3d2a; border-radius:10px; padding:8px; max-width:300px; margin:0 auto; position:relative;
     container-type: inline-size; container-name: tray; }
   .tray-wrap.tray-wrap-full{ max-width:300px; margin:0 auto; }
-  .tray{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:5px; }
+  .tray{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:5px; perspective:500px; }
   .die{
     aspect-ratio:1/1; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
     background: #cbbf9e; color:#241c10; font-weight:bold; font-size:11px; cursor:pointer;
@@ -287,15 +287,21 @@
   .pcf-num{ font-weight:800; line-height:1; font-variant-numeric:tabular-nums; }
   .pcf-extra{ font-size:10px; font-weight:bold; display:flex; align-items:center; gap:2px; }
   @keyframes pop-in{ from{ transform:scale(0.4); opacity:0;} to{ transform:scale(1); opacity:1;} }
-  @keyframes shake-tile{
-    0%{ transform:translate(0,0) rotate(0); }
-    20%{ transform:translate(-2px,2px) rotate(-4deg); }
-    40%{ transform:translate(2px,-2px) rotate(3deg); }
-    60%{ transform:translate(-2px,-1px) rotate(-3deg); }
-    80%{ transform:translate(2px,1px) rotate(2deg); }
-    100%{ transform:translate(0,0) rotate(0); }
+  /* Dice reroll: a per-tile flip (rotateX through 90deg, where the tile
+     reads as edge-on and briefly disappears) rather than a jitter-shake --
+     the new face value is already the one rendered, so rotating through
+     that edge-on midpoint is what sells "this tile was just rerolled"
+     instead of "this tile is vibrating and its label instantly changed."
+     Each tile's animation-delay is staggered by idx (see shakeDelay in
+     render.js), so the flip sweeps across the tray in a wave rather than
+     all 16 dice flipping in a flat, robotic unison. */
+  @keyframes flip-tile{
+    0%{ transform:rotateX(0deg); }
+    45%{ transform:rotateX(94deg); }
+    55%{ transform:rotateX(94deg); }
+    100%{ transform:rotateX(0deg); }
   }
-  .die.shaking{ animation: shake-tile 0.4s ease; }
+  .die.shaking{ animation: flip-tile 0.42s cubic-bezier(.3,.1,.3,1); transform-style:preserve-3d; backface-visibility:hidden; }
   .die.undoable{ box-shadow:0 0 0 3px #e05a5a, 0 0 10px 2px rgba(224,90,90,0.6) !important; cursor:pointer; }
   .transition-overlay{ background: rgba(10,7,5,0.55); }
   .transition-banner{
