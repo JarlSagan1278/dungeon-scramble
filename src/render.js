@@ -370,6 +370,10 @@ function renderEncounterCard(e){
         <span>${q}</span>
       </div>`).join('') + '</div>';
   }
+  // A brand-new room gets a one-shot entrance flourish (see advanceRoute()
+  // in logic.js) so stepping into it actually registers, instead of the
+  // card just silently having different stats than a moment ago.
+  const roomEnterCls = S.newRoomFx ? (S.newRoomFx.boss ? 'room-enter room-enter-boss' : 'room-enter') : '';
   const isBoss = e.type==='Boss' || e.type==='Big Boss';
   // Regular (non-boss) encounters don't cycle through one action at a time
   // like bosses do -- every listed effect fires every turn, all at once.
@@ -401,7 +405,7 @@ function renderEncounterCard(e){
     return `<div class="boss-cycle-row"><span class="hint" style="margin:0;">Cycles through:</span>${items}</div>`;
   })() : '';
   return `
-    <div class="enc-card">
+    <div class="enc-card ${roomEnterCls}">
       <div class="enc-header">
         <h3 class="enc-name-txt">${e.name}</h3>
         <span class="enc-type">${e.type}</span>
@@ -562,6 +566,12 @@ function renderGame(){
     </div>` : ''}
   `;
   document.getElementById('tray').innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join('');
+  if(S.newRoomFx){
+    showRoomCallout(S.newRoomFx);
+    playTone(S.newRoomFx.boss ? 'bossRoomEnter' : 'roomEnter');
+    if(S.newRoomFx.boss) vibrate([30,40,30]);
+    S.newRoomFx = null; // consumed -- plays once, on the render right after advanceRoute() set it
+  }
   S.justScrambled = false;
   S.lastComboRipple = null; // consumed -- plays once, on the render right after resolvePath() set it
   S.justConvertedIdx = null; // consumed -- plays once, on the render right after useClassAbility() set it
@@ -743,6 +753,26 @@ function showKillCallout(lines){
   setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 1400);
 }
 
+// ---- Room callout: a brief banner naming whatever's just been stepped
+// into (a regular encounter or a boss), so a new room reads as an event
+// rather than just different numbers appearing on the same card. Slides
+// in from the top -- deliberately a different spot/shape than the
+// dead-center kill callout above, so the two never look like the same
+// kind of moment. Triggered once per room by renderGame() off the
+// one-shot S.newRoomFx flag set in advanceRoute() (logic.js). ----
+function showRoomCallout(fx){
+  const old = document.getElementById('room-callout');
+  if(old && old.parentNode) old.parentNode.removeChild(old);
+  const mainCls = fx.boss ? 'main boss' : 'main';
+  const mainText = fx.boss ? '⚠ Boss Encounter' : 'A new room...';
+  const node = el(`<div id="room-callout">
+      <div class="room-callout-line ${mainCls}">${mainText}</div>
+      <div class="room-callout-line sub">${fx.name} · ${fx.type}</div>
+    </div>`);
+  document.body.appendChild(node);
+  setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 1700);
+}
+
 // ---- Sound effects: short generated tones via Web Audio, no external
 // audio assets. The AudioContext is created lazily and only ever actually
 // started from inside a real user-gesture handler (the resolve-btn click,
@@ -786,6 +816,16 @@ const TONE_SEQUENCES = {
   overkill:  [{freq:150, start:0,    dur:0.08, type:'sawtooth', gain:0.22},
               {freq:900, start:0.02, dur:0.06, type:'square',   gain:0.16},
               {freq:1300,start:0.09, dur:0.14, type:'square',   gain:0.16}],
+  // A short "door creaks open" cue for stepping into a new room -- a soft
+  // rising two-note knock, quieter and gentler than any combat tone so it
+  // doesn't compete with the hit/heal sounds that start firing a moment
+  // later once the fight actually begins.
+  roomEnter: [{freq:246, start:0,    dur:0.1,  type:'sine',     gain:0.14},
+              {freq:330, start:0.09, dur:0.16, type:'sine',     gain:0.16}],
+  // A heavier, ominous version for a Boss room -- lower and a touch longer,
+  // so it reads as a step up in stakes rather than just another door.
+  bossRoomEnter: [{freq:110, start:0,    dur:0.16, type:'sawtooth', gain:0.18},
+                  {freq:147, start:0.14, dur:0.28, type:'sawtooth', gain:0.2}],
 };
 function playTone(kind){
   if(!PREFS.sound) return;

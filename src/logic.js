@@ -348,11 +348,16 @@ function advanceRoute(){
     scrambleTray();
     S.screen='game';
     logMsg('sys', `A door creaks open: ${drawn.name} (${drawn.type})`);
+    // One-shot "new room" flourish -- read by renderGame()/renderEncounterCard()
+    // on the very next render (a card entrance animation + a banner callout +
+    // a distinct tone), then cleared, so it plays exactly once per room.
+    S.newRoomFx = {name: drawn.name, type: drawn.type, boss:false};
   } else if(step==='boss'){
     S.encounter = drawEncounter('boss');
     scrambleTray();
     S.screen='game';
     logMsg('sys', `⚠ Boss Encounter: ${S.encounter.name}`);
+    S.newRoomFx = {name: S.encounter.name, type: S.encounter.type, boss:true};
   }
 }
 
