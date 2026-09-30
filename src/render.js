@@ -268,7 +268,11 @@ function renderDie(cell, idx){
   const num = inPath ? S.path.indexOf(idx)+1 : null;
   const zoneCls = inZone(idx) ? 'zone-cell' : '';
   const shakeCls = S.justScrambled ? 'shaking' : '';
-  const shakeDelay = S.justScrambled ? `style="animation-delay:${idx*18}ms"` : '';
+  const rippleEntry = S.lastComboRipple && S.lastComboRipple.find(r=>r.idx===idx);
+  const rippleCls = rippleEntry ? 'combo-ripple' : '';
+  const extraStyle = S.justScrambled ? `animation-delay:${idx*18}ms`
+    : rippleEntry ? `animation-delay:${rippleEntry.order*90}ms` : '';
+  const shakeDelay = extraStyle ? `style="${extraStyle}"` : '';
   // The die's own color is fixed by what it physically IS (dietype-attack/
   // maneuver/origin/alloy/gilded/magic) -- it never changes with the face
   // showing. A blank face just shows that color with no symbol on it.
@@ -281,7 +285,7 @@ function renderDie(cell, idx){
   const nameTag = isNonStarter ? `<div class="name-tag">${nameTagSVG(cell.die.name, idx)}</div>` : '';
   const forcedCls = cell.forcedFace ? 'forced-face' : '';
   const boostTargetCls = boostTargetIdx()===idx ? 'boost-target' : '';
-  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${forcedCls} ${boostTargetCls}"
+  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${rippleCls} ${forcedCls} ${boostTargetCls}"
             data-idx="${idx}" title="${isLastMove?'Click to undo this move':cell.die.name}" ${shakeDelay}>
             ${num?`<div class="pathnum">${num}</div>`:''}
             ${(cell.forcedFace || boostTargetCls) ? `<div class="corner-badges">
@@ -557,6 +561,7 @@ function renderGame(){
   `;
   document.getElementById('tray').innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join('');
   S.justScrambled = false;
+  S.lastComboRipple = null; // consumed -- plays once, on the render right after resolvePath() set it
   [...document.getElementById('tray').children].forEach(node=>{
     const idx = parseInt(node.dataset.idx);
     let pressTimer = null;

@@ -302,6 +302,19 @@
     100%{ transform:rotateX(0deg); }
   }
   .die.shaking{ animation: flip-tile 0.42s cubic-bezier(.3,.1,.3,1); transform-style:preserve-3d; backface-visibility:hidden; }
+
+  /* Combo chain ripple: when a Path resolves, each Combo die's damage
+     scales off its neighboring Hit/Combo tiles -- a real spatial/board
+     bonus that otherwise resolved as one silent number. Combo die and its
+     contributing neighbors each get a staggered gold pulse (order set via
+     animation-delay in renderDie()) so the chain actually reads as a chain
+     reaction sweeping outward, not just a bigger number in the log. */
+  @keyframes combo-ripple-pulse{
+    0%{ box-shadow:0 0 0 0 rgba(212,175,82,0); transform:scale(1); }
+    35%{ box-shadow:0 0 0 7px rgba(212,175,82,0.55); transform:scale(1.1); }
+    100%{ box-shadow:0 0 0 0 rgba(212,175,82,0); transform:scale(1); }
+  }
+  .die.combo-ripple{ animation: combo-ripple-pulse 0.5s ease-out; z-index:1; }
   .die.undoable{ box-shadow:0 0 0 3px #e05a5a, 0 0 10px 2px rgba(224,90,90,0.6) !important; cursor:pointer; }
   .transition-overlay{ background: rgba(10,7,5,0.55); }
   .transition-banner{

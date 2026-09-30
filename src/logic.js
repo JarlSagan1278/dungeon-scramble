@@ -451,17 +451,41 @@ function useClassAbility(idx){
 /* =========================================================================
    MATHING (resolve a path)
    ========================================================================= */
-function attackNeighborsCount(idx){
+function attackNeighborIndices(idx){
   const {r,c} = trayRC(idx);
-  let n=0;
+  const out = [];
   [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([rr,cc])=>{
     if(inBounds(rr,cc)){
       const j = trayIdx(rr,cc);
       const f = getFaceForIdx(j);
-      if(f.type==='hit'||f.type==='combo') n++;
+      if(f.type==='hit'||f.type==='combo') out.push(j);
     }
   });
-  return n;
+  return out;
+}
+function attackNeighborsCount(idx){ return attackNeighborIndices(idx).length; }
+
+// Builds the tile-by-tile "ripple" order for the Combo-chain visual: each
+// Combo die in the path, immediately followed by the neighboring Hit/Combo
+// tiles that scaled its damage (the same set attackNeighborsCount() counts)
+// -- so the one mechanic that's actually a spatial/board-state bonus gets a
+// visible chain-reaction pulse instead of resolving as a single silent
+// number, same as every other path action. Consumed (read once, then
+// cleared) by the very next render -- see renderDie()/renderGame(). Not
+// folded into computePathEffects() since that's a pure, side-effect-free
+// calculator reused for the live path preview too, where nothing should
+// animate yet.
+function buildComboRipple(path){
+  const ripple = [];
+  let order = 0;
+  path.forEach(idx=>{
+    if(getFaceForIdx(idx).type!=='combo') return;
+    ripple.push({idx, order});
+    order++;
+    attackNeighborIndices(idx).forEach(nIdx=>{ ripple.push({idx:nIdx, order}); });
+    order++;
+  });
+  return ripple.length ? ripple : null;
 }
 function getFaceForIdx(idx){
   const cell = S.tray[idx];
@@ -551,6 +575,7 @@ function applyPathEffects(effects){
 
 function resolvePath(){
   if(S.path.length===0) return null;
+  S.lastComboRipple = buildComboRipple(S.path);
   const effects = computePathEffects(S.path);
   applyPathEffects(effects);
   return effects;
