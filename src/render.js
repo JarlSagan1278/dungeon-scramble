@@ -530,7 +530,7 @@ function renderGame(){
     <div class="panel">
       <div class="enc-rail-row">
         <div class="enc-card-col">
-          <div class="tray-wrap tray-wrap-full">
+          <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
             <span class="round-badge">Round ${S.turnNumber+1}</span>
             ${pathCounterHTML()}
             <div class="tray" id="tray"></div>
