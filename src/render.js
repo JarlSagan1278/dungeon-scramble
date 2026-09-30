@@ -14,9 +14,9 @@ function disarmClearConfirm(){
 }
 
 function updateHeaderMeta(){
-  const el = document.getElementById('header-meta');
-  if(!el) return;
-  el.textContent = (S && S.origin && S.klass) ? `${S.origin.name} ${S.klass.name} · Floor ${S.floorIdx+1}` : 'digital prototype';
+  const headerEl = document.getElementById('header-meta');
+  if(!headerEl) return;
+  headerEl.textContent = (S && S.origin && S.klass) ? `${S.origin.name} ${S.klass.name} · Floor ${S.floorIdx+1}` : 'digital prototype';
 }
 
 // Low-health danger cue: a fixed, full-viewport pulsing red vignette --
@@ -658,8 +658,8 @@ function renderGame(){
   if(S.shrineChoice) renderShrineChoiceModal();
 }
 
-function pickPreviewFace(faces){
-  const nonBlank = faces.filter(f=>f.type!=='blank');
+function pickPreviewFace(dieFaces){
+  const nonBlank = dieFaces.filter(f=>f.type!=='blank');
   if(!nonBlank.length) return {type:'blank'};
   return nonBlank.reduce((best,f)=> (f.value||0) > (best.value||0) ? f : best, nonBlank[0]);
 }
@@ -962,12 +962,12 @@ function openDiceCompendiumModal(){
       const thumb = art
         ? `<img class="compendium-thumb" src="${art}" alt="${d.name}"/>`
         : `<div class="compendium-thumb compendium-thumb-placeholder"></div>`;
-      const faces = d.faces.map(f=>`<span>${iconSpan(f.type, f.value)}</span>`).join('');
+      const facesHTML = d.faces.map(f=>`<span>${iconSpan(f.type, f.value)}</span>`).join('');
       return `<div class="compendium-row">
           ${thumb}
           <div class="compendium-main">
             <div class="run-history-who">${d.name}</div>
-            <div class="compendium-faces">${faces}</div>
+            <div class="compendium-faces">${facesHTML}</div>
           </div>
         </div>`;
     }).join('');
@@ -1264,8 +1264,8 @@ function renderCamp(){
   });
   document.getElementById('organize-tray').innerHTML = S.tray.map((c,i)=>campDieTileHTML(c.die,'tray',i)).join('');
   if(S.backPocket.length) document.getElementById('organize-bp').innerHTML = S.backPocket.map((d,i)=>campDieTileHTML(d,'bp',i)).join('');
-  [...document.querySelectorAll('.camp-die-tile')].forEach(el=>{
-    el.onclick = ()=> selectOrganize(el.dataset.campType, parseInt(el.dataset.campIdx));
+  [...document.querySelectorAll('.camp-die-tile')].forEach(tile=>{
+    tile.onclick = ()=> selectOrganize(tile.dataset.campType, parseInt(tile.dataset.campIdx));
   });
   attachLongPressTooltips('.route-tooltip-target');
 }

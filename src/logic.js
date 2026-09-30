@@ -645,9 +645,9 @@ function applyQuestReward(e, rewardText){
     // questHealth is the total health this encounter can lose from quest
     // bonuses specifically, across the whole fight -- it caps the sum of
     // every quest's flat-damage reward, not any single quest's damage alone.
-    const cap = e.questHealth!=null ? e.questHealth : Infinity;
+    const questCap = e.questHealth!=null ? e.questHealth : Infinity;
     const already = e.questDamageDealt||0;
-    const applied = Math.max(0, Math.min(amt, cap-already));
+    const applied = Math.max(0, Math.min(amt, questCap-already));
     if(applied>0){
       e.curHealth = capUpper(e.curHealth-applied, e.maxHealth);
       e.questDamageDealt = already+applied;
@@ -1002,8 +1002,8 @@ function chooseLoot(dieOption){
   render();
 }
 
-function swapInLootDie(trayIdx){
-  const cell = S.tray[trayIdx];
+function swapInLootDie(trayIndex){
+  const cell = S.tray[trayIndex];
   S.backPocket.push(cell.die);
   cell.die = { name: S.pendingLootDie.name, faces: S.pendingLootDie.faces, cat: S.pendingLootDie.cat || 'loot' };
   cell.faceIdx = 0;
@@ -1110,9 +1110,9 @@ function selectOrganize(type, idx){
   if(!S.organizeSelection){ S.organizeSelection = {type, idx}; render(); return; }
   const sel = S.organizeSelection;
   if(sel.type===type){ S.organizeSelection = {type, idx}; render(); return; }
-  const trayIdx = type==='tray' ? idx : sel.idx;
+  const trayIndex = type==='tray' ? idx : sel.idx;
   const bpIdx = type==='bp' ? idx : sel.idx;
-  const trayCell = S.tray[trayIdx];
+  const trayCell = S.tray[trayIndex];
   const bpDie = S.backPocket[bpIdx];
   S.backPocket[bpIdx] = trayCell.die;
   trayCell.die = bpDie;
