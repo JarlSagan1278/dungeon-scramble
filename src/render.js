@@ -779,16 +779,18 @@ function showKillCallout(lines){
 }
 
 // ---- Room callout: a banner naming whatever's just been stepped into (a
-// regular encounter or a boss), so a new room reads as an event rather
-// than just different numbers appearing on the same card. Slides in from
-// the top -- deliberately a different spot/shape than the dead-center
-// kill callout above, so the two never look like the same kind of moment.
-// Stays up until tapped (rather than timing itself out), so it can't slip
-// by unread. Triggered once per room by renderGame() off the one-shot
-// S.newRoomFx flag set in advanceRoute() (logic.js). ----
+// regular encounter or a boss), overlaid right on the dice tray -- the
+// thing the player's about to start using -- rather than floating
+// somewhere else on screen. Deliberately a different spot/shape than the
+// dead-center kill callout above, so the two never look like the same
+// kind of moment. Stays up until tapped (rather than timing itself out),
+// so it can't slip by unread. Triggered once per room by renderGame() off
+// the one-shot S.newRoomFx flag set in advanceRoute() (logic.js). ----
 function showRoomCallout(fx){
   const old = document.getElementById('room-callout');
   if(old && old.parentNode) old.parentNode.removeChild(old);
+  const trayWrap = document.querySelector('.tray-wrap');
+  if(!trayWrap) return; // shouldn't happen -- renderGame() always renders the tray first
   const mainCls = fx.boss ? 'main boss' : 'main';
   const mainText = fx.boss ? '⚠ Boss Encounter' : 'A new room...';
   const node = el(`<div id="room-callout">
@@ -798,10 +800,9 @@ function showRoomCallout(fx){
         <div class="room-callout-line hint">Tap to continue</div>
       </div>
     </div>`);
-  document.body.appendChild(node);
-  const box = node.querySelector('.room-callout-box');
-  box.addEventListener('click', ()=>{
-    box.classList.add('dismissing');
+  trayWrap.appendChild(node);
+  node.addEventListener('click', ()=>{
+    node.classList.add('dismissing');
     setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 200);
   });
 }

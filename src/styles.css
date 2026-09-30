@@ -468,31 +468,35 @@
   }
   .reduced-motion .kill-callout-line{ animation:none; opacity:1; transform:scale(1); transition:opacity 1s ease 0.4s; }
 
-  /* Room callout: a banner slid in from the top naming whatever's just
-     been stepped into. Deliberately placed and shaped differently from
-     #kill-callout (top strip vs. dead-center) so the two events never
-     read as the same kind of moment. Stays up (rather than fading out on
-     its own) until the player taps it -- see the click handler and
-     .dismissing in showRoomCallout() (render.js). */
-  #room-callout{ position:fixed; top:10%; left:0; right:0; z-index:94; display:flex;
-    flex-direction:column; align-items:center; pointer-events:none; text-align:center; padding:0 20px; }
-  .room-callout-box{ background:rgba(10,7,5,0.82); border:1px solid rgba(212,175,100,0.5);
-    border-radius:10px; padding:10px 22px; display:flex; flex-direction:column; gap:2px;
-    opacity:0; animation: room-callout-slide 0.4s cubic-bezier(.22,1,.36,1) forwards;
-    pointer-events:auto; cursor:pointer; transition:opacity .2s ease, transform .2s ease; }
-  .room-callout-box.dismissing{ opacity:0 !important; transform:translateY(-8px) !important; animation:none; }
+  /* Room callout: a banner naming whatever's just been stepped into,
+     overlaid right on the dice tray (the thing the player's about to
+     start using) rather than floating somewhere else on screen --
+     appended into .tray-wrap by showRoomCallout() (render.js), which is
+     already position:relative. A dark scrim over the tray both makes the
+     text readable over the dice and hints that the tray isn't usable
+     until this is dismissed. Deliberately shaped differently from
+     #kill-callout (a panel over the tray vs. dead-center) so the two
+     events never read as the same kind of moment. Stays up until tapped
+     anywhere over it, rather than timing itself out, so it can't slip by
+     unread -- see the click handler and .dismissing below. */
+  #room-callout{ position:absolute; inset:0; z-index:15; display:flex; align-items:center;
+    justify-content:center; padding:10px; border-radius:8px; text-align:center; cursor:pointer;
+    background:rgba(10,7,5,0.6); opacity:0; animation: room-callout-fade 0.25s ease-out forwards; }
+  #room-callout.dismissing{ opacity:0 !important; transition:opacity .2s ease; animation:none; }
+  .room-callout-box{ background:rgba(10,7,5,0.9); border:1px solid rgba(212,175,100,0.6);
+    border-radius:10px; padding:10px 20px; display:flex; flex-direction:column; gap:2px; max-width:90%;
+    transform:translateY(-10px); animation: room-callout-slide 0.4s cubic-bezier(.22,1,.36,1) forwards; }
   .room-callout-line{ font-family:'Baloo 2','Trajan Pro',Cambria,Georgia,serif; font-weight:800;
     letter-spacing:1px; }
-  .room-callout-line.main{ font-size:20px; text-transform:uppercase; color:var(--cream); }
-  .room-callout-line.main.boss{ font-size:24px; color:#ff8a3d; }
-  .room-callout-line.sub{ font-size:14px; color:var(--gold); }
+  .room-callout-line.main{ font-size:18px; text-transform:uppercase; color:var(--cream); }
+  .room-callout-line.main.boss{ font-size:22px; color:#ff8a3d; }
+  .room-callout-line.sub{ font-size:13px; color:var(--gold); }
   .room-callout-line.hint{ font-size:10px; text-transform:none; letter-spacing:0; font-weight:600;
     color:var(--parchment-dim); margin-top:2px; }
-  @keyframes room-callout-slide{
-    0%{ opacity:0; transform:translateY(-16px); }
-    100%{ opacity:1; transform:translateY(0); }
-  }
-  .reduced-motion .room-callout-box{ animation:none; opacity:1; transform:none; }
+  @keyframes room-callout-fade{ from{ opacity:0; } to{ opacity:1; } }
+  @keyframes room-callout-slide{ from{ transform:translateY(-10px); } to{ transform:translateY(0); } }
+  .reduced-motion #room-callout{ animation:none; opacity:1; }
+  .reduced-motion .room-callout-box{ animation:none; transform:none; }
 
   .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.72); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px;}
   .modal{ background: var(--panel); border:2px solid var(--gold); border-radius:8px; padding:20px; max-width:520px; width:100%; max-height:85vh; overflow-y:auto; }
