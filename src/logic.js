@@ -1000,6 +1000,18 @@ function onEncounterDefeated(){
   render();
 }
 
+// Debug-only: instantly clears the current encounter without playing it
+// out, for quickly testing later floors/rooms/loot without grinding
+// through fights. Only ever wired to a button when S.klass.debug (see
+// renderGame() in render.js). Deliberately doesn't set curHealth low
+// enough to count as an Overkill -- this is a skip, not a combat result.
+function debugWinEncounter(){
+  if(!S.klass.debug || !S.encounter || S.transitioning) return;
+  S.encounter.curHealth = 0;
+  logMsg('sys', `[Debug] ${S.encounter.name} auto-defeated.`);
+  onEncounterDefeated();
+}
+
 function chooseLoot(dieOption){
   S.pendingLootDie = dieOption;
   S.lootChoice = null;

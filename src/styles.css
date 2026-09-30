@@ -468,27 +468,31 @@
   }
   .reduced-motion .kill-callout-line{ animation:none; opacity:1; transform:scale(1); transition:opacity 1s ease 0.4s; }
 
-  /* Room callout: a brief banner slid in from the top naming whatever's
-     just been stepped into. Deliberately placed and shaped differently
-     from #kill-callout (top strip vs. dead-center) so the two events never
-     read as the same kind of moment. See showRoomCallout() in render.js. */
+  /* Room callout: a banner slid in from the top naming whatever's just
+     been stepped into. Deliberately placed and shaped differently from
+     #kill-callout (top strip vs. dead-center) so the two events never
+     read as the same kind of moment. Stays up (rather than fading out on
+     its own) until the player taps it -- see the click handler and
+     .dismissing in showRoomCallout() (render.js). */
   #room-callout{ position:fixed; top:10%; left:0; right:0; z-index:94; display:flex;
     flex-direction:column; align-items:center; pointer-events:none; text-align:center; padding:0 20px; }
   .room-callout-box{ background:rgba(10,7,5,0.82); border:1px solid rgba(212,175,100,0.5);
     border-radius:10px; padding:10px 22px; display:flex; flex-direction:column; gap:2px;
-    opacity:0; animation: room-callout-slide 1.7s cubic-bezier(.22,1,.36,1) forwards; }
+    opacity:0; animation: room-callout-slide 0.4s cubic-bezier(.22,1,.36,1) forwards;
+    pointer-events:auto; cursor:pointer; transition:opacity .2s ease, transform .2s ease; }
+  .room-callout-box.dismissing{ opacity:0 !important; transform:translateY(-8px) !important; animation:none; }
   .room-callout-line{ font-family:'Baloo 2','Trajan Pro',Cambria,Georgia,serif; font-weight:800;
     letter-spacing:1px; }
   .room-callout-line.main{ font-size:20px; text-transform:uppercase; color:var(--cream); }
   .room-callout-line.main.boss{ font-size:24px; color:#ff8a3d; }
   .room-callout-line.sub{ font-size:14px; color:var(--gold); }
+  .room-callout-line.hint{ font-size:10px; text-transform:none; letter-spacing:0; font-weight:600;
+    color:var(--parchment-dim); margin-top:2px; }
   @keyframes room-callout-slide{
     0%{ opacity:0; transform:translateY(-16px); }
-    14%{ opacity:1; transform:translateY(0); }
-    78%{ opacity:1; transform:translateY(0); }
-    100%{ opacity:0; transform:translateY(-8px); }
+    100%{ opacity:1; transform:translateY(0); }
   }
-  .reduced-motion .room-callout-box{ animation:none; opacity:1; transform:none; transition:opacity 1s ease 0.6s; }
+  .reduced-motion .room-callout-box{ animation:none; opacity:1; transform:none; }
 
   .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.72); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px;}
   .modal{ background: var(--panel); border:2px solid var(--gold); border-radius:8px; padding:20px; max-width:520px; width:100%; max-height:85vh; overflow-y:auto; }

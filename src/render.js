@@ -165,7 +165,7 @@ function renderSetup(){
       <h2>Create Your Adventurer</h2>
       <h3 style="font-size:14px;color:var(--cream);">Choose Your Origin</h3>
       <div class="choice-grid" id="origin-grid"></div>
-      <h3 style="font-size:14px;color:var(--cream);">Choose Your Class</h3>
+      <h3 style="font-size:14px;color:var(--cream);user-select:none;" id="class-header">Choose Your Class</h3>
       <div class="choice-grid" id="class-grid"></div>
       <button class="primary" id="start-btn" disabled>Enter the Dungeon</button>
     </div>
@@ -186,13 +186,32 @@ function renderSetup(){
     og.appendChild(c);
   });
   const cg = document.getElementById('class-grid');
-  CLASSES.forEach(k=>{
+  // Debug class has no card of its own -- it's a testing tool, not a real
+  // choice -- and is instead armed by rapid-clicking the section header
+  // (see the class-header handler below).
+  CLASSES.filter(k=>!k.debug).forEach(k=>{
     const c = el(`<div class="choice-card"><h4>${k.name}</h4><p>${k.ability}</p></div>`);
     c.onclick=()=>{ chosenClass=k.id; [...cg.children].forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); checkReady(); };
     cg.appendChild(c);
   });
   function checkReady(){ document.getElementById('start-btn').disabled = !(chosenOrigin&&chosenClass); }
   document.getElementById('start-btn').onclick=()=>{ newGame(chosenOrigin, chosenClass); };
+  // Secret debug-class trigger: 5 clicks on "Choose Your Class" within a
+  // short window. No visible button, so it can't be stumbled into by a
+  // normal player, but stays quick to reach for testing.
+  let classHeaderClicks = [];
+  document.getElementById('class-header').onclick = ()=>{
+    const now = Date.now();
+    classHeaderClicks = classHeaderClicks.filter(t=>now-t<1200);
+    classHeaderClicks.push(now);
+    if(classHeaderClicks.length>=5){
+      classHeaderClicks = [];
+      chosenClass = 'debug';
+      [...cg.children].forEach(x=>x.classList.remove('selected'));
+      checkReady();
+      if(typeof showToast==='function') showToast('Debug class armed', 'good');
+    }
+  };
 }
 
 function renderRoute(){
@@ -543,7 +562,8 @@ function renderGame(){
         <div class="util-rail">
           <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning)?'disabled':''} ${emphasizeResolve?'pulse':''}" id="resolve-btn">▶<span>Go</span></div>
           <div class="util-btn danger-accent rail-clear ${S.transitioning?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
-          ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''}" id="ability-btn">✦<span>${S.classAbilityUsed?'Used':'Skill'}</span></div>` : ''}
+          ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''}" id="ability-btn">✦<span>${S.classAbilityUsed?'Used':'Skill'}</span></div>`
+            : S.klass.debug ? `<div class="util-btn rail-ability ${(!S.encounter||S.transitioning)?'disabled':''}" id="debug-win-btn">🏆<span>Win</span></div>` : ''}
           <div class="char-icon-wrap ${playerFx.cls==='flash-damage'?'dmg-flash':playerFx.cls==='flash-heal'?'heal-flash':''}" title="${S.origin.name} ${S.klass.name}">${(()=>{
             const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
             const wm = portrait.placeholder ? `<span class="char-icon-watermark">PLACEHOLDER</span>` : '';
@@ -653,6 +673,11 @@ function renderGame(){
       }
     });
   };
+  const debugWinBtn = document.getElementById('debug-win-btn');
+  if(debugWinBtn) debugWinBtn.onclick = ()=>{
+    if(!S.encounter || S.transitioning) return;
+    debugWinEncounter();
+  };
   document.getElementById('path-strip').innerHTML = S.path.length ?
     S.path.map((idx,n)=>{ const f=getFaceForIdx(idx); return `<span class="path-chip">${n+1}. ${iconSpan(f.type, f.value)} ${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?(' '+f.value):''}</span>`; }).join('')
     : '';
@@ -753,13 +778,14 @@ function showKillCallout(lines){
   setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 1400);
 }
 
-// ---- Room callout: a brief banner naming whatever's just been stepped
-// into (a regular encounter or a boss), so a new room reads as an event
-// rather than just different numbers appearing on the same card. Slides
-// in from the top -- deliberately a different spot/shape than the
-// dead-center kill callout above, so the two never look like the same
-// kind of moment. Triggered once per room by renderGame() off the
-// one-shot S.newRoomFx flag set in advanceRoute() (logic.js). ----
+// ---- Room callout: a banner naming whatever's just been stepped into (a
+// regular encounter or a boss), so a new room reads as an event rather
+// than just different numbers appearing on the same card. Slides in from
+// the top -- deliberately a different spot/shape than the dead-center
+// kill callout above, so the two never look like the same kind of moment.
+// Stays up until tapped (rather than timing itself out), so it can't slip
+// by unread. Triggered once per room by renderGame() off the one-shot
+// S.newRoomFx flag set in advanceRoute() (logic.js). ----
 function showRoomCallout(fx){
   const old = document.getElementById('room-callout');
   if(old && old.parentNode) old.parentNode.removeChild(old);
@@ -769,10 +795,15 @@ function showRoomCallout(fx){
       <div class="room-callout-box">
         <div class="room-callout-line ${mainCls}">${mainText}</div>
         <div class="room-callout-line sub">${fx.name} · ${fx.type}</div>
+        <div class="room-callout-line hint">Tap to continue</div>
       </div>
     </div>`);
   document.body.appendChild(node);
-  setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 1700);
+  const box = node.querySelector('.room-callout-box');
+  box.addEventListener('click', ()=>{
+    box.classList.add('dismissing');
+    setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 200);
+  });
 }
 
 // ---- Sound effects: short generated tones via Web Audio, no external
