@@ -71,6 +71,24 @@ const ENEMY_ACTION_DESC = {
   dot: "Applies stacking damage-over-time (D.O.T.) to you.",
 };
 
+// Same descriptions as ENEMY_ACTION_DESC, but with this specific
+// encounter's actual number worked in -- so the tooltip says what THIS
+// enemy's Hit/Shield/D.O.T./etc. is actually worth, not just what the
+// mechanic does in the abstract. Falls back to the plain description if an
+// action type or value is missing.
+function enemyActionTooltip(type, val){
+  if(val==null) return ENEMY_ACTION_DESC[type]||'';
+  switch(type){
+    case 'hit': return `Deals ${val} damage to you.`;
+    case 'minion': return `Summons ${val} Minion ${val===1?'die that clogs':'dice that clog'} your Tray until you deal enough Hits to clear them.`;
+    case 'block': return `The enemy gains ${val} Shield, which absorbs damage before its health does.`;
+    case 'heal': return `The enemy restores ${val} of its own health.`;
+    case 'hot': return `The enemy gains ${val} healing over time (H.O.T.).`;
+    case 'dot': return `Applies ${val} stacking damage-over-time (D.O.T.) to you.`;
+    default: return ENEMY_ACTION_DESC[type]||'';
+  }
+}
+
 // Descriptions for a CURRENTLY ACTIVE status effect, shown together in one
 // mouseover/long-press tooltip on a health bar (player's or an encounter's)
 // listing every status currently in effect on it -- Block/D.O.T./H.O.T. and

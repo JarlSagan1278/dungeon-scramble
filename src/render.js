@@ -386,7 +386,7 @@ function renderEncounterCard(e){
     if(e.hot) items.push({type:'hot', label:'H.O.T.', val:e.hot});
     if(e.dot) items.push({type:'dot', label:'D.O.T.', val:e.dot});
     if(!items.length) return '';
-    const chips = items.map(it=>`<span class="boss-cycle-item next enemy-action-badge" title="${ENEMY_ACTION_DESC[it.type]||''}">${iconSpan(it.type, ICON_VALUE_SLOT.has(it.type)?it.val:null)} ${it.label}${!ICON_VALUE_SLOT.has(it.type)?' '+it.val:''}</span>`).join('');
+    const chips = items.map(it=>`<span class="boss-cycle-item next enemy-action-badge" title="${enemyActionTooltip(it.type, it.val)}">${iconSpan(it.type, ICON_VALUE_SLOT.has(it.type)?it.val:null)} ${it.label}${!ICON_VALUE_SLOT.has(it.type)?' '+it.val:''}</span>`).join('');
     return `<div class="boss-cycle-row"><span class="hint" style="margin:0;">Each turn:</span>${chips}</div>`;
   })() : '';
   const art = MONSTER_ART[e.name];
@@ -396,7 +396,7 @@ function renderEncounterCard(e){
     const items = e.actionCycle.map((a,i)=>{
       const isNext = i === (e.cycleIndex % e.actionCycle.length);
       const showVal = ICON_VALUE_SLOT.has(iconKey[a.type]) ? null : a.value;
-    return `<span class="boss-cycle-item ${isNext?'next':''} enemy-action-badge" title="${ENEMY_ACTION_DESC[iconKey[a.type]]||''}">${iconSpan(iconKey[a.type], ICON_VALUE_SLOT.has(iconKey[a.type])?a.value:null)} ${labels[a.type]}${showVal!=null?' '+showVal:''}</span>`;
+    return `<span class="boss-cycle-item ${isNext?'next':''} enemy-action-badge" title="${enemyActionTooltip(iconKey[a.type], a.value)}">${iconSpan(iconKey[a.type], ICON_VALUE_SLOT.has(iconKey[a.type])?a.value:null)} ${labels[a.type]}${showVal!=null?' '+showVal:''}</span>`;
     }).join('');
     return `<div class="boss-cycle-row"><span class="hint" style="margin:0;">Cycles through:</span>${items}</div>`;
   })() : '';
