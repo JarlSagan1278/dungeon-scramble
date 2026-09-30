@@ -114,17 +114,37 @@ function updatePathTrail(){
   trailLastPath = path.slice();
 }
 
+// ---- Screen transition: a quick fade+rise on #app whenever the top-level
+// screen actually changes (Setup -> Camp -> Encounter -> Loot/Swap ->
+// Victory, etc.), so moving through the dungeon reads as going somewhere
+// new rather than an instant snap. Deliberately keyed off S.screen (or
+// 'setup' pre-game) rather than firing on every render() -- renderGame()
+// alone is called every single turn, and re-fading the whole screen on
+// every hit/heal/tray update would be noisy, not a "screen transition."
+// #app itself survives the innerHTML rebuild each render does to its
+// children, so toggling a class on #app works the same way the path-trail
+// SVG and low-health vignette persist outside that rebuild. ----
+let lastScreenKey = null;
+function maybeScreenTransition(key){
+  if(key===lastScreenKey) return;
+  lastScreenKey = key;
+  app.classList.remove('screen-fade-in');
+  void app.offsetWidth; // force reflow so re-adding the class restarts the animation even on back-to-back changes
+  app.classList.add('screen-fade-in');
+}
+
 function render(){
   updateHeaderMeta();
   updateLowHealthVignette();
-  if(!S){ clearPathTrail(); renderSetup(); return; }
-  if(S.screen==='victory'){ clearPathTrail(); renderVictory(); return; }
-  if(S.screen==='gameover'){ clearPathTrail(); renderGameOver(); return; }
-  if(S.screen==='camp'){ clearPathTrail(); renderCamp(); maybeAutosave(); return; }
-  if(S.screen==='swap'){ clearPathTrail(); renderSwap(); maybeAutosave(); return; }
-  if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); maybeAutosave(); return; }
+  if(!S){ clearPathTrail(); renderSetup(); maybeScreenTransition('setup'); return; }
+  if(S.screen==='victory'){ clearPathTrail(); renderVictory(); maybeScreenTransition('victory'); return; }
+  if(S.screen==='gameover'){ clearPathTrail(); renderGameOver(); maybeScreenTransition('gameover'); return; }
+  if(S.screen==='camp'){ clearPathTrail(); renderCamp(); maybeAutosave(); maybeScreenTransition('camp'); return; }
+  if(S.screen==='swap'){ clearPathTrail(); renderSwap(); maybeAutosave(); maybeScreenTransition('swap'); return; }
+  if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); maybeAutosave(); maybeScreenTransition('shrine'); return; }
   renderGame();
   maybeAutosave();
+  maybeScreenTransition('game');
 }
 
 function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
