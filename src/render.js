@@ -44,15 +44,85 @@ function updateLowHealthVignette(){
   vig.classList.toggle('active', !!danger);
 }
 
+// ---- Path trail: a connecting line drawn between the dice you've tapped,
+// so building a Path actually reads as routing a line across the board --
+// the game's core Boggle-style mechanic -- instead of just lighting up
+// isolated tiles. Lives once in document.body as a position:fixed SVG (same
+// pattern as the low-health vignette/toast stack) since app.innerHTML gets
+// fully rebuilt on every render() and a DOM node can't animate a CSS
+// transition across being torn down and recreated. Only the newest segment
+// animates itself in (stroke-dashoffset draw-on); every other change
+// (undo, clear, a fresh scrambled tray) redraws instantly with no
+// animation, since those aren't "extending a path" moments. ----
+let trailLastPath = [];
+function clearPathTrail(){
+  const svg = document.getElementById('path-trail-svg');
+  if(svg) svg.innerHTML = '';
+  trailLastPath = [];
+}
+function pathTrailCenterOf(trayEl, idx){
+  const node = trayEl.querySelector(`.die[data-idx="${idx}"]`);
+  if(!node) return null;
+  const r = node.getBoundingClientRect();
+  return {x: r.left+r.width/2, y: r.top+r.height/2};
+}
+function pathTrailAppendSegment(svg, a, b, animate){
+  const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+  line.setAttribute('x1', a.x); line.setAttribute('y1', a.y);
+  line.setAttribute('x2', b.x); line.setAttribute('y2', b.y);
+  line.setAttribute('class', 'path-trail-line');
+  svg.appendChild(line);
+  if(animate && !PREFS.reducedMotion){
+    const len = Math.hypot(b.x-a.x, b.y-a.y) || 1;
+    line.style.strokeDasharray = String(len);
+    line.style.strokeDashoffset = String(len);
+    // eslint-disable-next-line no-unused-expressions
+    line.getBoundingClientRect(); // force layout so the transition below doesn't get coalesced with the dash-offset write above
+    requestAnimationFrame(()=>{
+      line.style.transition = 'stroke-dashoffset 0.22s ease-out';
+      line.style.strokeDashoffset = '0';
+    });
+  }
+}
+function updatePathTrail(){
+  const trayEl = document.getElementById('tray');
+  if(!trayEl || !S || !S.path || S.path.length<2){
+    clearPathTrail();
+    return;
+  }
+  let svg = document.getElementById('path-trail-svg');
+  if(!svg){
+    svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.id = 'path-trail-svg';
+    document.body.appendChild(svg);
+  }
+  const path = S.path;
+  const isIncrementalAdd = path.length===trailLastPath.length+1
+    && trailLastPath.every((v,i)=> v===path[i]);
+  if(!isIncrementalAdd){
+    svg.innerHTML = '';
+    for(let i=1;i<path.length;i++){
+      const a = pathTrailCenterOf(trayEl, path[i-1]);
+      const b = pathTrailCenterOf(trayEl, path[i]);
+      if(a && b) pathTrailAppendSegment(svg, a, b, false);
+    }
+  } else {
+    const a = pathTrailCenterOf(trayEl, path[path.length-2]);
+    const b = pathTrailCenterOf(trayEl, path[path.length-1]);
+    if(a && b) pathTrailAppendSegment(svg, a, b, true);
+  }
+  trailLastPath = path.slice();
+}
+
 function render(){
   updateHeaderMeta();
   updateLowHealthVignette();
-  if(!S){ renderSetup(); return; }
-  if(S.screen==='victory'){ renderVictory(); return; }
-  if(S.screen==='gameover'){ renderGameOver(); return; }
-  if(S.screen==='camp'){ renderCamp(); maybeAutosave(); return; }
-  if(S.screen==='swap'){ renderSwap(); maybeAutosave(); return; }
-  if(S.screen==='shrine'){ renderShrineEncounter(); maybeAutosave(); return; }
+  if(!S){ clearPathTrail(); renderSetup(); return; }
+  if(S.screen==='victory'){ clearPathTrail(); renderVictory(); return; }
+  if(S.screen==='gameover'){ clearPathTrail(); renderGameOver(); return; }
+  if(S.screen==='camp'){ clearPathTrail(); renderCamp(); maybeAutosave(); return; }
+  if(S.screen==='swap'){ clearPathTrail(); renderSwap(); maybeAutosave(); return; }
+  if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); maybeAutosave(); return; }
   renderGame();
   maybeAutosave();
 }
@@ -555,6 +625,7 @@ function renderGame(){
     if(log) log.scrollTop = log.scrollHeight;
   }
 
+  updatePathTrail();
   if(S.lootChoice) renderLootModal();
   if(S.shrineChoice) renderShrineChoiceModal();
 }
