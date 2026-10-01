@@ -1005,14 +1005,14 @@ function playDiceRollSound(){
   const ctx = getAudioCtx();
   if(!ctx) return;
   const now = ctx.currentTime;
-  playNoiseBurst(ctx, now, 0.3, 0.09, 'lowpass', 1200);
+  playNoiseBurst(ctx, now, 0.3, 0.13, 'lowpass', 1200);
   const hits = 11;
   let t = 0;
   for(let i=0;i<hits;i++){
     const progress = i/hits;
     t += 0.018 + Math.random()*0.03*(1-progress*0.5); // gaps tighten slightly as the dice settle
     const dur = 0.022 + Math.random()*0.025;
-    const g = 0.22 * (1-progress*0.65) * (0.75+Math.random()*0.5);
+    const g = 0.32 * (1-progress*0.65) * (0.75+Math.random()*0.5);
     playNoiseBurst(ctx, now+t, dur, g, 'bandpass', 900+Math.random()*1800, 1+Math.random()*0.8);
   }
 }
