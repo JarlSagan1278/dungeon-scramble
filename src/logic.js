@@ -27,6 +27,46 @@ function clearSave(){
   try{ localStorage.removeItem(SAVE_KEY); } catch(e){}
 }
 
+// ---- Carryover die -- on a true Game Over (see onPlayerDefeated()), the
+// player picks one of their current highest-tier dice to start their next
+// run with (see renderGameOver()'s choice screen). Stored separately from
+// SAVE_KEY since it needs to survive past this run actually ending, and
+// consumed (one-shot) the next time newGame() runs. ----
+const CARRYOVER_KEY = 'dungeonScrambleCarryover_v1';
+function saveCarryoverDie(die){
+  try{ localStorage.setItem(CARRYOVER_KEY, JSON.stringify({name:die.name, faces:die.faces, cat:die.cat, level:die.level})); }
+  catch(e){ /* storage unavailable/full -- fail silently, same as saveGame() */ }
+}
+function takeCarryoverDie(){
+  try{
+    const raw = localStorage.getItem(CARRYOVER_KEY);
+    if(!raw) return null;
+    localStorage.removeItem(CARRYOVER_KEY); // one-shot
+    return JSON.parse(raw);
+  } catch(e){ return null; }
+}
+// Basic < Origin < Alloy < Gilded < Magic, matching the floor loot
+// progression (see FLOORS in data.js) -- used to find a player's single
+// best-tier die at the moment they're defeated.
+const DIE_TIER_RANK = {attack:0, maneuver:0, origin:1, alloy:2, gilded:3, magic:4};
+function dieTierRank(die){ return DIE_TIER_RANK[die.cat] ?? 0; }
+// Every die currently in the tray at the highest tier present, collapsed to
+// one entry per distinct die name (same grouping idea as the swap screen) --
+// what the Game Over carryover choice offers.
+function highestTierTrayGroups(){
+  let maxRank = -1;
+  S.tray.forEach(c=>{ const r = dieTierRank(c.die); if(r>maxRank) maxRank=r; });
+  const groups = [];
+  const byName = new Map();
+  S.tray.forEach(c=>{
+    if(dieTierRank(c.die)!==maxRank) return;
+    const key = c.die.name;
+    if(!byName.has(key)){ const g = {die:c.die, count:0}; byName.set(key,g); groups.push(g); }
+    byName.get(key).count++;
+  });
+  return groups;
+}
+
 // ---- Run history -- a small persisted log of finished runs (win or lose),
 // separate from the save file (which only tracks the CURRENT in-progress
 // run and is cleared the moment a run ends). Survives across runs so a
@@ -165,6 +205,7 @@ function newGame(originId, classId){
   const originDie = {name: origin.die, faces: origin.faces};
 
   let shuffled;
+  let carryDie = null; // set below (non-debug only) if a die carried over from a previous run's defeat
   if(klass.debug){
     // Debug class: skip the normal starter loadout entirely and fill the
     // tray with a random sample across every die type in the game (Basic,
@@ -179,8 +220,14 @@ function newGame(originId, classId){
     const dice = [];
     for(let i=0;i<7;i++) dice.push({name:'Attack Die I', faces: basic('attack',1).faces, cat:'attack', level:1});
     for(let i=0;i<7;i++) dice.push({name:'Maneuver Die I', faces: basic('maneuver',1).faces, cat:'maneuver', level:1});
-    dice.push({name:'Attack Die I', faces: basic('attack',1).faces, cat:'attack', level:1}); // the "1 extra"
+    dice.push({name:'Attack Die I', faces: basic('attack',1).faces, cat:'attack', level:1}); // the "1 extra" -- replaced below if a die carried over from a previous defeat
     dice.push({name: originDie.name, faces: originDie.faces, cat:'origin'});
+    // A die chosen on a previous run's Game Over screen (see
+    // onPlayerDefeated()/saveCarryoverDie()) replaces the "1 extra" Attack
+    // die slot -- one-shot, consumed here regardless of whether this run
+    // then also ends in defeat with a new choice of its own.
+    carryDie = takeCarryoverDie();
+    if(carryDie) dice[dice.length-2] = carryDie;
     // shuffle into 4x4
     shuffled = pickN(dice, dice.length);
   }
@@ -219,6 +266,7 @@ function newGame(originId, classId){
     segmentTrapUsed: false,
   };
   logMsg('sys', `A ${origin.name} ${klass.name} descends into the dungeon...`);
+  if(carryDie) logMsg('sys', `${carryDie.name} joins your tray, carried over from your last run.`, 'good');
   scrambleTray();
   advanceRoute(); // triggers first encounter
   render();
@@ -1112,6 +1160,8 @@ function onPlayerDefeated(){
       onPlayerDefeated();
     }
   } else {
+    S.carryoverOptions = highestTierTrayGroups();
+    S.carryoverChosenName = null;
     S.screen='gameover';
     render();
   }

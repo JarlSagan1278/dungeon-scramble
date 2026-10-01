@@ -1552,10 +1552,39 @@ function renderVictory(){
     <button class="primary" style="margin-top:12px;" onclick="location.reload()">Play Again</button></div>`;
 }
 function renderGameOver(){
-  recordRunHistory('defeat');
-  clearSave();
-  playTone('defeat');
+  if(!S.gameOverRecorded){
+    S.gameOverRecorded = true;
+    recordRunHistory('defeat');
+    clearSave();
+    playTone('defeat');
+  }
+  // Before the usual defeat screen, let the player pick one of their
+  // current highest-tier dice (see highestTierTrayGroups() in logic.js) to
+  // carry into their next run -- a small consolation for a dead run, and a
+  // way for repeat attempts to compound a little rather than starting from
+  // zero every single time.
+  if(S.carryoverOptions && S.carryoverOptions.length && !S.carryoverChosenName){
+    app.innerHTML = `<div class="panel"><h2>💀 Defeated</h2>
+      <p>Your Adventurer retreats to town in temporary defeat... but gets to keep one die for next time. Choose a die to carry into your next run:</p>
+      <div class="swap-list" id="carryover-list"></div>
+      </div>`;
+    const list = document.getElementById('carryover-list');
+    S.carryoverOptions.forEach(g=>{
+      const countBadge = g.count>1 ? `<span class="token-count swap-count-badge">x${g.count}</span>` : '';
+      const item = el(`<div class="swap-item">${lootPreviewTileHTML(g.die, 'carryover-'+g.die.name)}${countBadge}<div class="swap-item-label">${g.die.name}</div></div>`);
+      item.onclick = ()=>{
+        S.carryoverChosenName = g.die.name;
+        saveCarryoverDie(g.die);
+        logMsg('sys', `${g.die.name} will carry over to your next run.`);
+        render();
+      };
+      list.appendChild(item);
+    });
+    return;
+  }
+  const carryNote = S.carryoverChosenName ? `<p class="hint">${S.carryoverChosenName} will join your tray at the start of your next run.</p>` : '';
   app.innerHTML = `<div class="panel"><h2>💀 Defeated</h2><p>Your Adventurer retreats to town in temporary defeat...</p>
+    ${carryNote}
     ${summaryStatsHTML()}
     <button class="primary" style="margin-top:12px;" onclick="location.reload()">Try Again</button></div>`;
 }
