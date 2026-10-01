@@ -917,6 +917,12 @@ const TONE_SEQUENCES = {
   // die reads as a different sound while a path plays back one at a time.
   block:  [{freq:200, start:0, dur:0.07, type:'square', gain:0.16}],
   status: [{freq:660, start:0, dur:0.08, type:'sine',   gain:0.14}],
+  // A dull low "thud" for the player taking damage -- a downward-sweeping
+  // triangle (the impact) layered with a short low sine (the body/weight
+  // of it), pitched well below the enemy-facing 'hit' sword-slash so the
+  // two never get confused about who just got hit.
+  playerHit: [{freq:180, freqTo:70, start:0,    dur:0.14, type:'triangle', gain:0.22},
+              {freq:90,              start:0.02, dur:0.1,  type:'sine',     gain:0.18}],
 };
 function playTone(kind, pitchStep){
   if(!PREFS.sound) return;

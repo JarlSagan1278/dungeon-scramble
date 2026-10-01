@@ -844,6 +844,7 @@ function runPlayerUpkeep(){
   const parts = [];
   if(S.playerDOT>0){
     S.health = cap(S.health-S.playerDOT, S.maxHealth);
+    if(typeof playTone==='function') playTone('playerHit');
     const t = `You take ${S.playerDOT} D.O.T. damage.`;
     logMsg('dmg', t); parts.push(t);
   }
@@ -860,6 +861,7 @@ function dealEncounterDamage(e, amount){
   S.playerBlock -= blocked;
   const dealt = amount-blocked;
   S.health = cap(S.health-dealt, S.maxHealth);
+  if(dealt>0 && typeof playTone==='function') playTone('playerHit');
   const t = `${e.name} hits you for ${dealt}${blocked?` (${blocked} blocked)`:''}.`;
   logMsg('dmg', t);
   return t;
