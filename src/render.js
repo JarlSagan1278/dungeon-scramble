@@ -232,9 +232,9 @@ function renderSetup(){
   ORIGINS.forEach(o=>{
     const portrait = pickPortrait(o.id);
     const wm = portrait.placeholder ? `<span class="portrait-watermark">PLACEHOLDER</span>` : '';
-    const c = el(`<div class="choice-card">
+    const c = el(`<div class="choice-card has-portrait">
         <div class="portrait-wrap">${wm}<img class="portrait-img" src="${portrait.img}" alt="${o.name}"></div>
-        <h4>${o.name}</h4><p><b>${o.die}</b><br>${o.blurb}</p></div>`);
+        <div class="choice-text"><h4>${o.name}</h4><p><b>${o.die}</b><br>${o.blurb}</p></div></div>`);
     c.onclick=()=>{ chosenOrigin=o.id; [...og.children].forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); checkReady(); };
     og.appendChild(c);
   });
@@ -935,12 +935,6 @@ const TONE_SEQUENCES = {
   // die reads as a different sound while a path plays back one at a time.
   block:  [{freq:200, start:0, dur:0.07, type:'square', gain:0.16}],
   status: [{freq:660, start:0, dur:0.08, type:'sine',   gain:0.14}],
-  // A dull low "thud" for the player taking damage -- a downward-sweeping
-  // triangle (the impact) layered with a short low sine (the body/weight
-  // of it), pitched well below the enemy-facing 'hit' sword-slash so the
-  // two never get confused about who just got hit.
-  playerHit: [{freq:180, freqTo:70, start:0,    dur:0.14, type:'triangle', gain:0.22},
-              {freq:90,              start:0.02, dur:0.1,  type:'sine',     gain:0.18}],
 };
 function playTone(kind, pitchStep){
   if(!PREFS.sound) return;
@@ -977,33 +971,73 @@ function playTone(kind, pitchStep){
 // noise bursts at randomized pitch/timing reads as actual dice tumbling and
 // knocking together, which a clean sine/square blip never could. Trails off
 // in both timing and volume like real dice settling after a throw.
+// Builds and schedules a single short decaying-noise burst through a
+// bandpass/lowpass/highpass filter -- the shared building block behind both
+// the dice-rattle and the player-hit crash below, since neither reads
+// convincingly from pure oscillator tones the way TONE_SEQUENCES handles
+// everything else.
+function playNoiseBurst(ctx, startTime, dur, gainPeak, filterType, filterFreq, filterQ){
+  const bufferSize = Math.max(1, Math.floor(ctx.sampleRate*dur));
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for(let j=0;j<bufferSize;j++) data[j] = (Math.random()*2-1) * Math.pow(1-j/bufferSize, 1.5);
+  const src = ctx.createBufferSource();
+  src.buffer = buffer;
+  const filter = ctx.createBiquadFilter();
+  filter.type = filterType;
+  filter.frequency.value = filterFreq;
+  if(filterQ!=null) filter.Q.value = filterQ;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(gainPeak, startTime);
+  gain.gain.exponentialRampToValueAtTime(0.0001, startTime+dur);
+  src.connect(filter).connect(gain).connect(ctx.destination);
+  src.start(startTime);
+  src.stop(startTime+dur+0.01);
+}
+
+// A handful of dice tumbling: a soft low rumble bed (several dice sliding/
+// knocking together) under a cluster of short, irregularly-timed knocks at
+// varied pitch -- irregular gaps and per-knock randomness read as several
+// loose objects colliding, where evenly-spaced identical clicks read as a
+// machine. Knocks taper off in both volume and spacing as they "settle".
 function playDiceRollSound(){
   if(!PREFS.sound) return;
   const ctx = getAudioCtx();
   if(!ctx) return;
   const now = ctx.currentTime;
-  const hits = 7;
+  playNoiseBurst(ctx, now, 0.3, 0.09, 'lowpass', 1200);
+  const hits = 11;
+  let t = 0;
   for(let i=0;i<hits;i++){
-    const t = now + i*0.045 + Math.random()*0.02;
-    const dur = 0.03 + Math.random()*0.02;
-    const bufferSize = Math.max(1, Math.floor(ctx.sampleRate*dur));
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for(let j=0;j<bufferSize;j++) data[j] = (Math.random()*2-1) * Math.pow(1-j/bufferSize, 2);
-    const src = ctx.createBufferSource();
-    src.buffer = buffer;
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.value = 800 + Math.random()*1600; // each knock a slightly different pitch, like different dice/faces
-    filter.Q.value = 1.2;
-    const gain = ctx.createGain();
-    const g = 0.2 * (1 - i/hits*0.55); // later knocks a bit quieter, like the dice settling
-    gain.gain.setValueAtTime(g, t);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t+dur);
-    src.connect(filter).connect(gain).connect(ctx.destination);
-    src.start(t);
-    src.stop(t+dur+0.01);
+    const progress = i/hits;
+    t += 0.018 + Math.random()*0.03*(1-progress*0.5); // gaps tighten slightly as the dice settle
+    const dur = 0.022 + Math.random()*0.025;
+    const g = 0.22 * (1-progress*0.65) * (0.75+Math.random()*0.5);
+    playNoiseBurst(ctx, now+t, dur, g, 'bandpass', 900+Math.random()*1800, 1+Math.random()*0.8);
   }
+}
+
+// A sharp, broadband noise "crash" (the breaking/clattering sound of a real
+// impact) layered over a low pitch-dropping thump for weight -- carries
+// more visceral punch than an oscillator tone alone, and stays pitched well
+// below the enemy-facing sword-slash 'hit' tone so the two don't blur.
+function playPlayerHitSound(){
+  if(!PREFS.sound) return;
+  const ctx = getAudioCtx();
+  if(!ctx) return;
+  const now = ctx.currentTime;
+  playNoiseBurst(ctx, now, 0.22, 0.38, 'highpass', 650);
+  const osc = ctx.createOscillator();
+  const oscGain = ctx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(150, now);
+  osc.frequency.exponentialRampToValueAtTime(55, now+0.16);
+  oscGain.gain.setValueAtTime(0.0001, now);
+  oscGain.gain.linearRampToValueAtTime(0.26, now+0.01);
+  oscGain.gain.exponentialRampToValueAtTime(0.0001, now+0.18);
+  osc.connect(oscGain).connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now+0.2);
 }
 
 // ---- Haptics: a short vibrate on mobile when taking damage or crossing
@@ -1355,7 +1389,7 @@ function renderSwap(){
   groups.forEach(g=>{
     const die = S.tray[g.indices[0]].die;
     const countBadge = g.indices.length>1 ? `<span class="token-count swap-count-badge">x${g.indices.length}</span>` : '';
-    const item = el(`<div class="swap-item">${lootPreviewTileHTML(die, 'swap-'+g.indices[0])}${countBadge}</div>`);
+    const item = el(`<div class="swap-item">${lootPreviewTileHTML(die, 'swap-'+g.indices[0])}${countBadge}<div class="swap-item-label">${die.name}</div></div>`);
     const isBasic = die.cat==='attack' || die.cat==='maneuver';
     item.onclick = () => {
       if(isBasic) swapInLootDie(g.indices[0]);
