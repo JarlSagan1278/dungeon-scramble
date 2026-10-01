@@ -113,15 +113,23 @@
   .route .node.route-tooltip-target{ cursor:help; }
 
   /* Tray */
-  .tray-wrap{ background: linear-gradient(160deg,#3a2f22,#241c14); border:4px solid #4c3d2a; border-radius:10px; padding:8px; max-width:300px; margin:0 auto; position:relative;
-    container-type: inline-size; container-name: tray; }
+  /* Each die keeps a 44px floor (roughly a comfortable touch target) no
+     matter how little room the layout actually has to give it -- without
+     this, minmax(0,1fr) let the enc-card-col/util-rail flex row squeeze the
+     tray arbitrarily thin, shrinking every die's text/icons into mush. If
+     the available width can't fit that floor, the tray grows wider than its
+     column and scrolls horizontally (tray-wrap below) rather than shrink
+     further; enc-rail-row's flex-wrap is a last-resort safety net for truly
+     tiny viewports, dropping the util-rail to its own row instead. */
+  .tray-wrap{ background: linear-gradient(160deg,#3a2f22,#241c14); border:4px solid #4c3d2a; border-radius:10px; padding:8px; max-width:300px; min-width:216px; margin:0 auto; position:relative;
+    overflow-x:auto; container-type: inline-size; container-name: tray; }
   .tray-wrap.tray-wrap-full{ max-width:300px; margin:0 auto; }
-  .tray{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:5px; perspective:500px; }
+  .tray{ display:grid; grid-template-columns: repeat(4, minmax(44px,1fr)); gap:5px; perspective:500px; }
   .die{
     aspect-ratio:1/1; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
     background: #cbbf9e; color:#241c10; font-weight:bold; font-size:11px; cursor:pointer;
     border:2px solid rgba(0,0,0,0.25); position:relative; user-select:none; text-align:center; padding:27px 2px 2px;
-    transition: transform .08s; min-width:0; min-height:0; overflow:hidden;
+    transition: transform .08s; min-width:44px; min-height:44px; overflow:hidden;
   }
   .die.dietype-attack{ background:#b33b3b; color:#fff3e6; }
   .die.dietype-maneuver{ background:#e4d7ad; color:#241c10; }
@@ -284,8 +292,8 @@
   .quest.complete .quest-mark{ color: var(--green); }
 
   .log{ background:#000; border-radius:6px; padding:6px 8px; height:64px; overflow-y:auto; font-size:11px; font-family: ui-monospace, monospace; color:#b8caa8; }
-  .enc-rail-row{ display:flex; gap:6px; align-items:stretch; }
-  .enc-card-col{ flex:1; min-width:0; max-width:300px; }
+  .enc-rail-row{ display:flex; gap:6px; align-items:stretch; flex-wrap:wrap; }
+  .enc-card-col{ flex:1; min-width:216px; max-width:300px; }
   .util-rail{ display:flex; flex-direction:column; gap:5px; width:68px; flex:0 0 auto; }
   .util-btn{ background:var(--stone); border:2px solid #000; border-radius:8px; padding:4px 2px; display:flex; flex-direction:column;
     align-items:center; justify-content:center; gap:2px; cursor:pointer; color:var(--parchment); font-size:8px; font-weight:bold;
