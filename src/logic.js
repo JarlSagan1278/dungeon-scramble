@@ -259,9 +259,17 @@ function drawEncounter(kind){
     // Camps, or between a Camp and the Boss) -- once a segment has drawn
     // one, further rooms in that same segment only draw Enemies (or the
     // other still-available type).
+    // The very first encounter of the whole run (Floor 1, right out of the
+    // starting Camp) is always a plain Enemy -- a Shrine or Trap as the
+    // player's first-ever room is a bad first impression (an anticlimax, or
+    // a punish before they've seen a single real fight), so Trap/Shrine are
+    // excluded here regardless of the segment's usual one-each allowance.
+    const isVeryFirstEncounter = S.floorIdx===0 && S.routeStep===1;
     const candidates = [{pool:floor.enemies}];
-    if(!S.segmentTrapUsed) candidates.push({pool:floor.traps});
-    if(!S.segmentShrineUsed) candidates.push({pool:floor.shrines});
+    if(!isVeryFirstEncounter){
+      if(!S.segmentTrapUsed) candidates.push({pool:floor.traps});
+      if(!S.segmentShrineUsed) candidates.push({pool:floor.shrines});
+    }
     const totalCards = candidates.reduce((sum,c)=>sum+c.pool.length, 0);
     let roll = rand(totalCards);
     let categoryPool = candidates[0].pool;
