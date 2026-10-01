@@ -1295,9 +1295,9 @@ function renderSwap(){
     byName.get(key).indices.push(i);
   });
   groups.forEach(g=>{
-    const countBadge = g.indices.length>1 ? `<span class="token-count">x${g.indices.length}</span>` : '';
-    const item = el(`<div class="swap-item"><span>${g.name}</span>${countBadge}</div>`);
     const die = S.tray[g.indices[0]].die;
+    const countBadge = g.indices.length>1 ? `<span class="token-count swap-count-badge">x${g.indices.length}</span>` : '';
+    const item = el(`<div class="swap-item">${lootPreviewTileHTML(die, 'swap-'+g.indices[0])}${countBadge}</div>`);
     const isBasic = die.cat==='attack' || die.cat==='maneuver';
     item.onclick = () => {
       if(isBasic) swapInLootDie(g.indices[0]);

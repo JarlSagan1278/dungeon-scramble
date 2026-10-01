@@ -557,9 +557,11 @@
   .upgrade-row{ display:flex; align-items:stretch; gap:6px; }
   .upgrade-row button:first-child{ flex:1; }
   .upgrade-preview-btn{ flex:0 0 auto; width:32px; font-weight:bold; }
-  .swap-list{ display:flex; flex-direction:column; gap:4px; max-height:440px; overflow-y:auto; margin:8px 0; }
-  .swap-item{ background:var(--panel2); border:1px solid var(--stone); border-radius:4px; padding:6px 8px; cursor:pointer; font-size:12px; display:flex; justify-content:space-between; }
-  .swap-item:hover{ border-color: var(--gold); }
+  .swap-list{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-height:440px; overflow-y:auto; margin:8px 0; padding:4px; }
+  .swap-item{ position:relative; background:var(--panel2); border:2px solid var(--stone); border-radius:8px; padding:8px; cursor:pointer; transition: transform .08s; width:88px; }
+  .swap-item:hover{ border-color: var(--gold); transform: translateY(-2px); }
+  .swap-item .loot-preview-tile{ margin-bottom:0; }
+  .swap-item .swap-count-badge{ position:absolute; top:-6px; right:-6px; }
   .small-btn-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
   .hint{ font-size:12px; color:var(--parchment-dim); margin:6px 0; }
   a{ color: var(--gold); }
