@@ -860,7 +860,12 @@ function getAudioCtx(){
   return audioCtx;
 }
 const TONE_SEQUENCES = {
-  hit:       [{freq:180, start:0,    dur:0.09, type:'square',   gain:0.18}],
+  // A sword-slash instead of a flat blip: a bright, fast downward sweep
+  // (the "swish" of the blade) with sharp metallic ping layered right on
+  // top of its tail (the "clang" of it landing) -- see playTone()'s
+  // freqTo handling for the sweep.
+  hit:       [{freq:1400, freqTo:140, start:0,    dur:0.1,  type:'sawtooth', gain:0.2},
+              {freq:1800,             start:0.045,dur:0.05, type:'square',   gain:0.14}],
   heal:      [{freq:520, start:0,    dur:0.12, type:'sine',     gain:0.14},
               {freq:660, start:0.09, dur:0.16, type:'sine',     gain:0.14}],
   victory:   [{freq:392, start:0,    dur:0.14, type:'triangle', gain:0.2},
@@ -913,6 +918,9 @@ function playTone(kind){
     const gain = ctx.createGain();
     osc.type = n.type;
     osc.frequency.setValueAtTime(n.freq, now+n.start);
+    // Optional downward/upward sweep (e.g. the sword-slash "swish" in
+    // 'hit') -- exponentialRamp can't target 0, so freqTo is assumed >0.
+    if(n.freqTo) osc.frequency.exponentialRampToValueAtTime(n.freqTo, now+n.start+n.dur);
     gain.gain.setValueAtTime(0.0001, now+n.start);
     gain.gain.linearRampToValueAtTime(n.gain, now+n.start+0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, now+n.start+n.dur);
