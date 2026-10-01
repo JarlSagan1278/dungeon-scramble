@@ -101,21 +101,38 @@ function pathTrailCenterOf(trayEl, idx){
   const r = node.getBoundingClientRect();
   return {x: r.left+r.width/2, y: r.top+r.height/2};
 }
-function pathTrailAppendSegment(svg, a, b, animate){
-  const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-  line.setAttribute('x1', a.x); line.setAttribute('y1', a.y);
-  line.setAttribute('x2', b.x); line.setAttribute('y2', b.y);
-  line.setAttribute('class', 'path-trail-line');
-  svg.appendChild(line);
+function pathTrailAppendSegment(svg, a, b, animate, curved){
+  // A Leap segment connects two tiles that are 2 apart in a straight line,
+  // passing directly over the skipped tile's center -- drawn as a straight
+  // line, that reads as crossing itself the moment a later segment of the
+  // same path also passes through that middle tile. Bowing it slightly to
+  // one side keeps the two visually distinct instead of overlapping.
+  let el;
+  if(curved){
+    const dx = b.x-a.x, dy = b.y-a.y;
+    const len = Math.hypot(dx,dy) || 1;
+    const ux = dx/len, uy = dy/len;
+    const px = -uy, py = ux; // perpendicular unit vector
+    const bow = Math.min(len*0.22, 20);
+    const mx = (a.x+b.x)/2 + px*bow, my = (a.y+b.y)/2 + py*bow;
+    el = document.createElementNS('http://www.w3.org/2000/svg','path');
+    el.setAttribute('d', `M ${a.x},${a.y} Q ${mx},${my} ${b.x},${b.y}`);
+  } else {
+    el = document.createElementNS('http://www.w3.org/2000/svg','line');
+    el.setAttribute('x1', a.x); el.setAttribute('y1', a.y);
+    el.setAttribute('x2', b.x); el.setAttribute('y2', b.y);
+  }
+  el.setAttribute('class', 'path-trail-line');
+  svg.appendChild(el);
   if(animate && !PREFS.reducedMotion){
-    const len = Math.hypot(b.x-a.x, b.y-a.y) || 1;
-    line.style.strokeDasharray = String(len);
-    line.style.strokeDashoffset = String(len);
+    const len = curved ? el.getTotalLength() : (Math.hypot(b.x-a.x, b.y-a.y) || 1);
+    el.style.strokeDasharray = String(len);
+    el.style.strokeDashoffset = String(len);
     // eslint-disable-next-line no-unused-expressions
-    line.getBoundingClientRect(); // force layout so the transition below doesn't get coalesced with the dash-offset write above
+    el.getBoundingClientRect(); // force layout so the transition below doesn't get coalesced with the dash-offset write above
     requestAnimationFrame(()=>{
-      line.style.transition = 'stroke-dashoffset 0.22s ease-out';
-      line.style.strokeDashoffset = '0';
+      el.style.transition = 'stroke-dashoffset 0.22s ease-out';
+      el.style.strokeDashoffset = '0';
     });
   }
 }
@@ -139,12 +156,13 @@ function updatePathTrail(){
     for(let i=1;i<path.length;i++){
       const a = pathTrailCenterOf(trayEl, path[i-1]);
       const b = pathTrailCenterOf(trayEl, path[i]);
-      if(a && b) pathTrailAppendSegment(svg, a, b, false);
+      if(a && b) pathTrailAppendSegment(svg, a, b, false, adjLeap(trayRC(path[i-1]), trayRC(path[i])));
     }
   } else {
-    const a = pathTrailCenterOf(trayEl, path[path.length-2]);
-    const b = pathTrailCenterOf(trayEl, path[path.length-1]);
-    if(a && b) pathTrailAppendSegment(svg, a, b, true);
+    const prevIdx = path[path.length-2], idx = path[path.length-1];
+    const a = pathTrailCenterOf(trayEl, prevIdx);
+    const b = pathTrailCenterOf(trayEl, idx);
+    if(a && b) pathTrailAppendSegment(svg, a, b, true, adjLeap(trayRC(prevIdx), trayRC(idx)));
   }
   trailLastPath = path.slice();
 }
@@ -952,6 +970,40 @@ function playTone(kind, pitchStep){
     osc.start(now+n.start);
     osc.stop(now+n.start+n.dur+0.02);
   });
+}
+
+// A tray scramble gets its own noise-based rattle rather than another
+// TONE_SEQUENCES oscillator entry -- a handful of short bandpass-filtered
+// noise bursts at randomized pitch/timing reads as actual dice tumbling and
+// knocking together, which a clean sine/square blip never could. Trails off
+// in both timing and volume like real dice settling after a throw.
+function playDiceRollSound(){
+  if(!PREFS.sound) return;
+  const ctx = getAudioCtx();
+  if(!ctx) return;
+  const now = ctx.currentTime;
+  const hits = 7;
+  for(let i=0;i<hits;i++){
+    const t = now + i*0.045 + Math.random()*0.02;
+    const dur = 0.03 + Math.random()*0.02;
+    const bufferSize = Math.max(1, Math.floor(ctx.sampleRate*dur));
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let j=0;j<bufferSize;j++) data[j] = (Math.random()*2-1) * Math.pow(1-j/bufferSize, 2);
+    const src = ctx.createBufferSource();
+    src.buffer = buffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 800 + Math.random()*1600; // each knock a slightly different pitch, like different dice/faces
+    filter.Q.value = 1.2;
+    const gain = ctx.createGain();
+    const g = 0.2 * (1 - i/hits*0.55); // later knocks a bit quieter, like the dice settling
+    gain.gain.setValueAtTime(g, t);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+    src.connect(filter).connect(gain).connect(ctx.destination);
+    src.start(t);
+    src.stop(t+dur+0.01);
+  }
 }
 
 // ---- Haptics: a short vibrate on mobile when taking damage or crossing

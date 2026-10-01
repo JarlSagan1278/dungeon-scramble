@@ -400,6 +400,7 @@ function scrambleTray(){
   S.path = [];
   S.classAbilityUsed = false;
   S.justScrambled = true;
+  if(typeof playDiceRollSound==='function') playDiceRollSound();
 }
 
 function inZone(idx){
