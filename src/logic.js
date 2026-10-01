@@ -199,6 +199,18 @@ function pickPortrait(originId){
   return { img: GNOME_SILHOUETTE, placeholder:true };
 }
 
+// The character-select screen shows a portrait per Origin card before a
+// game exists, and re-renders on every click (choosing a class, etc).
+// Without caching, each re-render would call pickPortrait() again and
+// swap in a different random portrait than what newGame() then actually
+// uses -- so the preview cache below is drawn once per Origin per page
+// load, and newGame() reuses that same cached pick for S.portrait.
+const setupPortraitCache = {};
+function getSetupPreviewPortrait(originId){
+  if(!setupPortraitCache[originId]) setupPortraitCache[originId] = pickPortrait(originId);
+  return setupPortraitCache[originId];
+}
+
 function newGame(originId, classId){
   const origin = ORIGINS.find(o=>o.id===originId);
   const klass = CLASSES.find(c=>c.id===classId);
@@ -235,7 +247,7 @@ function newGame(originId, classId){
   S = {
     screen:'game',
     origin, klass,
-    portrait: pickPortrait(origin.id),
+    portrait: getSetupPreviewPortrait(origin.id),
     maxHealth:20, health:20,
     playerDOT:0, playerHOT:0, playerBlock:0,
     tray: shuffled.map(d=>({die:d, faceIdx:0, minion:false, coveredDie:null})),

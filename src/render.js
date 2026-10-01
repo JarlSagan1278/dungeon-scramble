@@ -230,7 +230,7 @@ function renderSetup(){
   let chosenOrigin=null, chosenClass=null;
   const og = document.getElementById('origin-grid');
   ORIGINS.forEach(o=>{
-    const portrait = pickPortrait(o.id);
+    const portrait = getSetupPreviewPortrait(o.id);
     const wm = portrait.placeholder ? `<span class="portrait-watermark">PLACEHOLDER</span>` : '';
     const c = el(`<div class="choice-card has-portrait">
         <div class="portrait-wrap">${wm}<img class="portrait-img" src="${portrait.img}" alt="${o.name}"></div>
