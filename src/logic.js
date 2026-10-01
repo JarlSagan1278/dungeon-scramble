@@ -542,49 +542,63 @@ function computePathEffects(path){
     maneuverCount, supportCount, totalActions: path.length, blankCount };
 }
 
-// Applies a computed effects object to live game state (encounter + player).
-function applyPathEffects(effects){
-  const e = S.encounter;
-  if(effects.dotToEncounter) e.curDOT += effects.dotToEncounter;
-  if(effects.hotToPlayer) S.playerHOT += effects.hotToPlayer;
-  if(effects.blockGain) S.playerBlock += effects.blockGain;
-  if(effects.healGain){
-    S.health = cap(S.health+effects.healGain, S.maxHealth);
-    if(typeof playTone==='function') playTone('heal');
-  }
-  if(effects.selfDot) S.playerDOT += effects.selfDot;
-  if(effects.freeze) S.freezeNext = true;
-  for(let i=0;i<effects.nullifyCount;i++) applyNullify();
-
-  if(effects.totalDamage>0){
-    logMsg('dmg', `Path dealt ${effects.totalDamage.toFixed(1)} damage.`);
-    S.stats.damageDealt += effects.totalDamage;
-    if(typeof playTone==='function') playTone('hit');
-  }
-  e.curHealth = capUpper(e.curHealth-effects.totalDamage, e.maxHealth);
-
-  if(effects.hitCount>0){
-    let toKill = effects.hitCount;
-    S.tray.forEach(cell=>{
-      if(toKill>0 && cell.minion){ cell.minion=false; cell.die=cell.coveredDie; cell.coveredDie=null; toKill--; }
-    });
-  }
-
-  checkQuests(e, {
-    maneuverCount: effects.maneuverCount, totalActions: effects.totalActions, blankCount: effects.blankCount,
-    turnNumber:S.turnNumber, totalDamageThisRound: effects.totalDamage, hitCount:effects.hitCount,
-    comboCount:effects.comboCount, healCount:effects.healCount, blockCount:effects.blockCount,
-    boostCount:effects.boostCount, dodgeCount:effects.dodgeCount, leapCount:effects.leapCount,
-    pivotCount:effects.pivotCount, nullifyCount:effects.nullifyCount, supportCount:effects.supportCount
+// Mirrors computePathEffects()'s own loop (same math, same Boost-carry
+// rule) but keeps each die's individual contribution instead of only the
+// running totals -- so a path can be played back one die at a time
+// (see runPlayerPathSteps() below) instead of landing as one instant
+// lump sum. Pure -- no side effects, same as computePathEffects().
+function computePathSteps(path){
+  let boostMult = S.pendingFreeBoost>0 ? S.pendingFreeBoost : 1;
+  return path.map(idx=>{
+    const f = getFaceForIdx(idx);
+    const val = f.value||0;
+    const step = {idx, type:f.type, dmg:0, dotToEncounter:0, hotToPlayer:0, blockGain:0, healGain:0, selfDot:0, freeze:false, nullify:false, boostMultApplied:0};
+    switch(f.type){
+      case 'hit': step.dmg = val*boostMult; break;
+      case 'combo': step.dmg = val*(1+attackNeighborsCount(idx))*boostMult; break;
+      case 'dot': step.dotToEncounter = val*boostMult; break;
+      case 'leech': step.dotToEncounter = val*boostMult; step.hotToPlayer = val*boostMult; break;
+      case 'heal': step.healGain = val*boostMult; break;
+      case 'hot': step.hotToPlayer = val*boostMult; break;
+      case 'block': step.blockGain = val*boostMult; break;
+      case 'boost': step.boostMultApplied = val; boostMult *= val; break;
+      case 'fumble': step.selfDot = val; break;
+      case 'nullify': step.nullify = true; break;
+      case 'freeze': step.freeze = true; break;
+    }
+    if(f.type!=='boost') boostMult = 1;
+    return step;
   });
 }
 
-function resolvePath(){
-  if(S.path.length===0) return null;
-  S.lastComboRipple = buildComboRipple(S.path);
-  const effects = computePathEffects(S.path);
-  applyPathEffects(effects);
-  return effects;
+// Un-minions the first minion-covered tray cell found (tray order), same
+// selection order the old all-at-once clearing used. Called once per Hit
+// die as it resolves (see applyPathStep()) rather than all at once, so a
+// path with 2 Hits still clears exactly 2 minions, just spread across the
+// moment each Hit actually lands instead of after the fact.
+function clearOneMinion(){
+  const cell = S.tray.find(c=>c.minion);
+  if(cell){ cell.minion=false; cell.die=cell.coveredDie; cell.coveredDie=null; }
+}
+
+// Applies exactly one die's contribution (see computePathSteps()) to live
+// game state. Called once per die as runPlayerPathSteps() plays the path
+// back, so the encounter's/player's health bars drain and fill one die at
+// a time instead of jumping straight to the final total.
+function applyPathStep(step){
+  const e = S.encounter;
+  if(step.dmg>0){
+    e.curHealth = capUpper(e.curHealth-step.dmg, e.maxHealth);
+    S.stats.damageDealt += step.dmg;
+  }
+  if(step.dotToEncounter) e.curDOT += step.dotToEncounter;
+  if(step.hotToPlayer) S.playerHOT += step.hotToPlayer;
+  if(step.blockGain) S.playerBlock += step.blockGain;
+  if(step.healGain) S.health = cap(S.health+step.healGain, S.maxHealth);
+  if(step.selfDot) S.playerDOT += step.selfDot;
+  if(step.freeze) S.freezeNext = true;
+  if(step.nullify) applyNullify();
+  if(step.type==='hit') clearOneMinion();
 }
 
 function applyNullify(){
@@ -671,106 +685,132 @@ function endTurnButton(){
   startTurnTransition();
 }
 
-// ---- Turn transition: a short paced sequence (Mathing -> Encounter Upkeep
-// -> Encounter Turn -> Your Upkeep -> new Round) shown one step at a time so
-// each beat reads as a distinct moment rather than an instant snap to a new
-// tray. ----
+// ---- Turn transition: plays the path back one die at a time -- each die
+// pulses on the tray with its own popped-off number as it lands -- instead
+// of computing the whole path as one instant lump and describing it in a
+// text card. Once the path is spent, the encounter answers back in its own
+// few beats (DOT tick, its action, your upkeep), each with a toast instead
+// of a modal, so every step of a turn is something you actually watch
+// happen on the board rather than read about after the fact. Driven by the
+// same advance()/S._pendingTimeout/S._skipAll pattern throughout so Skip
+// (see skipTransition below) can fast-forward any point in the sequence. ----
 function startTurnTransition(){
+  // An empty path is a legal turn (e.g. the board is fully stuck and Go is
+  // the only way to pass) -- computePathSteps/computePathEffects on []
+  // just produce zero steps/all-zero effects, so this still flows straight
+  // through to the encounter's own beat instead of silently doing nothing.
   S.transitioning = true;
-  // All of this turn's beats append into one running log (rendered as a
-  // single growing popup). Deliberately kept to just two beats -- your
-  // result, then everything that happens back at you -- instead of a long
-  // chain of per-die/upkeep/enemy-turn steps: fewer beats reads faster and
-  // is far quicker to get through via Skip (see skipTransition below, which
-  // now resolves every remaining beat in one tap instead of one at a time).
-  S.transitionLog = [];
   S._skipAll = false;
-  const steps = [
-    () => {
-      const effects = resolvePath();
-      S.pendingFreeBoost = 0; // a free Boost token is spent by end of turn whether or not it landed on anything
-      S.stats.turnsTaken++;
-      const e = S.encounter;
-      const parts = [];
-      if(effects){
-        if(effects.totalDamage>0) parts.push(`${effects.totalDamage%1?effects.totalDamage.toFixed(1):effects.totalDamage} dmg`);
-        if(effects.healGain) parts.push(`+${effects.healGain} heal`);
-        if(effects.blockGain) parts.push(`+${effects.blockGain} block`);
-        if(effects.dotToEncounter) parts.push(`+${effects.dotToEncounter} dot`);
-        if(effects.hotToPlayer) parts.push(`+${effects.hotToPlayer} hot`);
-        if(effects.selfDot) parts.push(`+${effects.selfDot} dot (fumble)`);
-        if(effects.nullifyCount) parts.push(`Nullify`);
-        if(effects.freeze) parts.push(`Freeze`);
-      }
-      let text = parts.length ? parts.join(' · ') : 'No effect';
-      const step = {title:'Your Turn', text};
-      if(e.curHealth<=0){ step.text += ' — Defeated!'; step.stop = 'encounterDefeated'; }
-      return step;
-    },
-    // Everything that happens back at you -- enemy upkeep tick, its action,
-    // then your own upkeep tick -- collapsed into one beat instead of three.
-    () => {
-      const e = S.encounter;
-      const parts = [];
-      if(e.curDOT>0){
-        e.curHealth = capUpper(e.curHealth-e.curDOT, e.maxHealth);
-        parts.push(`-${e.curDOT} dot`);
-        logMsg('dmg', `${e.name} takes ${e.curDOT} D.O.T. damage.`);
-        S.stats.damageDealt += e.curDOT;
-      }
-      if(e.curHOT>0) e.curHealth = cap(e.curHealth+e.curHOT, e.maxHealth);
-      if(e.curHealth<=0){
-        return {title:'Enemy Turn', text: parts.length?parts.join(' · '):'—', stop:'encounterDefeated'};
-      }
-      const actionText = runEncounterAction();
-      if(actionText) parts.push(actionText);
-      if(S.health<=0){
-        return {title:'Enemy Turn', text: parts.join(' · '), stop:'playerDefeated'};
-      }
-      const upkeepText = runPlayerUpkeep();
-      if(upkeepText) parts.push(upkeepText);
-      const step = {title:'Enemy Turn', text: parts.length?parts.join(' · '):'—'};
-      if(S.health<=0) step.stop = 'playerDefeated';
-      return step;
-    },
-  ];
-  runTransitionSteps(steps, 0);
+  S.stats.turnsTaken++;
+  S.pendingFreeBoost = 0; // a free Boost token is spent by end of turn whether or not it landed on anything
+  const path = S.path.slice();
+  const steps = computePathSteps(path);
+  const effects = computePathEffects(path); // aggregate counts, for the quest check once the path finishes
+  runPlayerPathSteps(steps, 0, path, effects);
 }
 
-function runTransitionSteps(steps, i){
+// One beat per die in the path: apply that die's own contribution, flash it
+// on the tray (pulse + floating number, and -- for a Combo -- the same
+// neighbor ripple it always had, now timed to its own beat instead of
+// firing for the whole path at once), then move on.
+function runPlayerPathSteps(steps, i, path, effects){
   if(i>=steps.length){
-    S.transitioning = false;
-    S.transitionLog = null;
-    S.turnNumber++;
-    S.path=[];
-    S.classAbilityUsed=false;
-    S.tray.forEach(c=>delete c.forcedFace);
-    scrambleTray();
-    render();
+    S.resolvingIdx = null; S.resolvingFx = null; S.lastComboRipple = null;
+    finishPlayerPath(path, effects);
     return;
   }
-  const result = steps[i]();
-  S.transitionLog.push({title: result.title, text: result.text});
+  const step = steps[i];
+  applyPathStep(step);
+  S.resolvingIdx = step.idx;
+  S.resolvingFx = typeof describeStepFx==='function' ? describeStepFx(step) : null;
+  S.lastComboRipple = step.type==='combo' ? buildComboRipple([step.idx]) : null;
+  if(typeof playStepTone==='function') playStepTone(S.resolvingFx);
+  render();
+  const advance = () => { S._pendingTimeout=null; runPlayerPathSteps(steps, i+1, path, effects); };
+  S._advance = advance;
+  if(S._skipAll) advance();
+  else S._pendingTimeout = setTimeout(advance, 300);
+}
+
+// Once every die in the path has landed: the path's own damage already
+// took effect die-by-die (applyPathStep, above), so this is just the
+// bookkeeping that only makes sense in aggregate -- the damage log line,
+// quest checks (which can themselves land bonus damage), then either the
+// encounter's own reply or, if it's dead, straight to victory.
+function finishPlayerPath(path, effects){
+  const e = S.encounter;
+  if(effects.totalDamage>0) logMsg('dmg', `Path dealt ${effects.totalDamage.toFixed(1)} damage.`);
+  checkQuests(e, {
+    maneuverCount: effects.maneuverCount, totalActions: effects.totalActions, blankCount: effects.blankCount,
+    turnNumber:S.turnNumber, totalDamageThisRound: effects.totalDamage, hitCount:effects.hitCount,
+    comboCount:effects.comboCount, healCount:effects.healCount, blockCount:effects.blockCount,
+    boostCount:effects.boostCount, dodgeCount:effects.dodgeCount, leapCount:effects.leapCount,
+    pivotCount:effects.pivotCount, nullifyCount:effects.nullifyCount, supportCount:effects.supportCount
+  });
+  if(e.curHealth<=0){ S.transitioning=false; onEncounterDefeated(); return; }
+  runEnemyBeat(0);
+}
+
+// The encounter's reply, as up to 3 short beats -- its D.O.T. tick, its own
+// action, then your upkeep tick -- each landing as a toast + whatever
+// portrait/health-bar flash that beat's own state change naturally
+// triggers, instead of all three crammed into one text card.
+function runEnemyBeat(i){
+  const e = S.encounter;
+  const beats = [
+    () => {
+      if(!(e.curDOT>0)) return null;
+      e.curHealth = capUpper(e.curHealth-e.curDOT, e.maxHealth);
+      const t = `${e.name} takes ${e.curDOT} D.O.T. damage.`;
+      logMsg('dmg', t, 'bad');
+      S.stats.damageDealt += e.curDOT;
+      if(e.curHealth<=0) return {stop:'encounterDefeated'};
+      return null;
+    },
+    () => {
+      if(e.curHOT>0) e.curHealth = cap(e.curHealth+e.curHOT, e.maxHealth);
+      const t = runEncounterAction();
+      if(t) showToastIfAvailable(t, 'bad');
+      if(e.curHealth<=0) return {stop:'encounterDefeated'};
+      if(S.health<=0) return {stop:'playerDefeated'};
+      return null;
+    },
+    () => {
+      const t = runPlayerUpkeep();
+      if(t) showToastIfAvailable(t, S.health>=S.maxHealth?'good':null);
+      if(S.health<=0) return {stop:'playerDefeated'};
+      return null;
+    },
+  ];
+  if(i>=beats.length){ endTurn(); return; }
+  const result = beats[i]() || {};
   render();
   const advance = () => {
     S._pendingTimeout = null;
-    if(result.stop==='encounterDefeated'){ S.transitioning=false; S.transitionLog=null; onEncounterDefeated(); return; }
-    if(result.stop==='playerDefeated'){ S.transitioning=false; S.transitionLog=null; onPlayerDefeated(); return; }
-    runTransitionSteps(steps, i+1);
+    if(result.stop==='encounterDefeated'){ S.transitioning=false; onEncounterDefeated(); return; }
+    if(result.stop==='playerDefeated'){ S.transitioning=false; onPlayerDefeated(); return; }
+    runEnemyBeat(i+1);
   };
   S._advance = advance;
-  if(S._skipAll){
-    // Skip was hit: resolve every remaining beat immediately (no more
-    // waiting), instead of just jumping past this one step's own delay.
-    advance();
-  } else {
-    S._pendingTimeout = setTimeout(advance, result.delay || 1000);
-  }
+  if(S._skipAll) advance();
+  else S._pendingTimeout = setTimeout(advance, 550);
+}
+
+function showToastIfAvailable(text, kind){ if(typeof showToast==='function') showToast(text, kind); }
+
+function endTurn(){
+  S.transitioning = false;
+  S.turnNumber++;
+  S.path = [];
+  S.classAbilityUsed = false;
+  S.tray.forEach(c=>delete c.forcedFace);
+  scrambleTray();
+  render();
 }
 
 // One tap resolves the ENTIRE remaining sequence, not just the current
-// beat -- flips a flag that makes every subsequent runTransitionSteps call
-// advance immediately instead of scheduling its usual delay.
+// beat -- flips a flag that makes every subsequent step advance immediately
+// instead of scheduling its usual delay.
 function skipTransition(){
   S._skipAll = true;
   if(S._pendingTimeout){ clearTimeout(S._pendingTimeout); S._pendingTimeout=null; }

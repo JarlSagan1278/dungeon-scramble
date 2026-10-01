@@ -378,13 +378,6 @@
   }
   .forced-badge.badge-pop-in{ animation: badge-pop-in 0.4s cubic-bezier(.3,1.5,.4,1); }
   .die.undoable{ box-shadow:0 0 0 3px #e05a5a, 0 0 10px 2px rgba(224,90,90,0.6) !important; cursor:pointer; }
-  .transition-overlay{ background: rgba(10,7,5,0.55); }
-  .transition-banner{
-    background: linear-gradient(160deg,#241c14,#181109); border:2px solid var(--gold); border-radius:10px;
-    padding:20px 24px; max-width:420px; width:100%; text-align:left; box-shadow:0 10px 40px rgba(0,0,0,0.6);
-    display:flex; flex-direction:column; max-height:70vh;
-  }
-  @keyframes banner-in{ from{ opacity:0; transform:translateY(4px);} to{ opacity:1; transform:translateY(0);} }
 
   /* Screen transition: fires only when the top-level screen actually
      changes (see maybeScreenTransition() in render.js), not on every
@@ -392,11 +385,30 @@
      in instead of snapping to the new screen instantly. */
   #app.screen-fade-in{ animation: screen-fade-in 0.24s ease-out; }
   @keyframes screen-fade-in{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:translateY(0);} }
-  .transition-log{ overflow-y:auto; margin:0 0 16px; }
-  .transition-entry{ padding-bottom:10px; margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1); animation: banner-in .2s ease-out; }
-  .transition-entry:last-child{ padding-bottom:0; margin-bottom:0; border-bottom:none; }
-  .transition-entry h4{ margin:0 0 4px; font-size:13px; color:var(--gold); text-align:center; }
-  .transition-entry p{ margin:0; font-size:14px; color:var(--parchment); text-align:center; }
+
+  /* Turn resolution: each die in the played path gets its own brief pulse
+     (color keyed by what it did -- see --resolve-color, set inline by
+     renderDie()) plus a floating number, instead of a text popup
+     describing the whole path after the fact. See runPlayerPathSteps()
+     (logic.js) for the sequencing. */
+  @keyframes die-resolve-pulse{
+    0%{ box-shadow:0 0 0 0 var(--resolve-color, rgba(255,255,255,0)); transform:scale(1); filter:brightness(1); }
+    30%{ box-shadow:0 0 0 8px var(--resolve-color, rgba(255,255,255,0.6)); transform:scale(1.12); filter:brightness(1.25); }
+    100%{ box-shadow:0 0 0 0 var(--resolve-color, rgba(255,255,255,0)); transform:scale(1); filter:brightness(1); }
+  }
+  .die.resolving{ animation: die-resolve-pulse 0.32s ease-out; z-index:2; }
+  .reduced-motion .die.resolving{ animation:none; }
+  .delta-float.block{ color:#7fd1ff; }
+  .delta-float.status{ color:#e8cf7a; }
+
+  /* Skip button for the turn-resolution sequence above -- sits in the same
+     top-right corner the live path-total preview (.path-counter-float)
+     used while building the path, since that preview is hidden once
+     resolution starts (see pathCounterHTML()/renderGame() in render.js). */
+  .skip-turn-btn{ position:absolute; top:-8px; right:4px; background:var(--stone); color:var(--parchment);
+    border:2px solid #000; border-radius:14px; padding:3px 10px; font-size:11px; font-weight:bold; cursor:pointer;
+    z-index:3; box-shadow:0 2px 6px rgba(0,0,0,0.5); }
+  .skip-turn-btn:hover{ background:var(--gold); color:#241c10; }
   .path-chip{ background: var(--stone); border-radius:4px; padding:2px 6px; font-size:12px; }
 
   .key-card{ background: var(--panel2); border:3px solid var(--stone); border-radius:10px; padding:12px 12px 8px; margin-top:16px; }

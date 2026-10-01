@@ -13,6 +13,41 @@ function disarmClearConfirm(){
   clearConfirmArmed = false;
 }
 
+// Colors for the per-die resolve pulse (see .die.resolving in styles.css),
+// keyed by the same "what kind of thing just happened" bucket describeStepFx()
+// sorts every path step into.
+const RESOLVE_PULSE_COLORS = {
+  dmg: 'rgba(192,57,43,0.75)', heal: 'rgba(63,174,84,0.75)',
+  block: 'rgba(127,209,255,0.75)', status: 'rgba(212,175,82,0.75)',
+  move: 'rgba(255,255,255,0.45)',
+};
+
+// Turns one computePathSteps() entry (logic.js) into what its beat should
+// look/sound like: a pulse color/tone bucket, a CSS class for its floating
+// number's color, and the number's own text. A pure Dodge/Leap/Pivot step
+// has no numeric effect -- it still gets a pulse (movement, not impact) but
+// no popped-off number.
+function describeStepFx(step){
+  if(step.dmg>0) return {pulse:'dmg', cls:'damage', text:`-${step.dmg%1?step.dmg.toFixed(1):step.dmg}`};
+  if(step.healGain>0) return {pulse:'heal', cls:'heal', text:`+${step.healGain}`};
+  if(step.blockGain>0) return {pulse:'block', cls:'block', text:`+${step.blockGain}`};
+  if(step.hotToPlayer>0) return {pulse:'heal', cls:'heal', text:`+${step.hotToPlayer} HOT`};
+  if(step.dotToEncounter>0) return {pulse:'status', cls:'status', text:`+${step.dotToEncounter} DOT`};
+  if(step.selfDot>0) return {pulse:'status', cls:'status', text:`+${step.selfDot} DOT`};
+  if(step.nullify) return {pulse:'status', cls:'status', text:'Nullify'};
+  if(step.freeze) return {pulse:'status', cls:'status', text:'Freeze'};
+  if(step.boostMultApplied) return {pulse:'status', cls:'status', text:`x${step.boostMultApplied}`};
+  return {pulse:'move', cls:'', text:''};
+}
+
+// The sound half of describeStepFx()'s bucket -- silent for plain movement
+// so a long Dodge/Leap/Pivot chain doesn't turn into a rattle of blips.
+function playStepTone(fx){
+  if(!fx || fx.pulse==='move') return;
+  const kind = {dmg:'hit', heal:'heal', block:'block', status:'status'}[fx.pulse];
+  if(kind) playTone(kind);
+}
+
 function updateHeaderMeta(){
   const headerEl = document.getElementById('header-meta');
   if(!headerEl) return;
@@ -291,9 +326,18 @@ function renderDie(cell, idx){
   const rippleCls = rippleEntry ? 'combo-ripple' : '';
   const justConverted = S.justConvertedIdx===idx;
   const convertCls = justConverted ? 'ability-convert' : '';
-  const extraStyle = S.justScrambled ? `animation-delay:${idx*18}ms`
-    : rippleEntry ? `animation-delay:${rippleEntry.order*90}ms` : '';
-  const shakeDelay = extraStyle ? `style="${extraStyle}"` : '';
+  // Turn resolution: this die is the one currently playing back (see
+  // runPlayerPathSteps() in logic.js) -- pulses once, colored by what it
+  // did, with its own popped-off number rather than everything landing as
+  // one instant total.
+  const isResolving = S.resolvingIdx===idx;
+  const resolveCls = isResolving ? 'resolving' : '';
+  const resolveFx = isResolving ? S.resolvingFx : null;
+  const styleParts = [];
+  if(S.justScrambled) styleParts.push(`animation-delay:${idx*18}ms`);
+  else if(rippleEntry) styleParts.push(`animation-delay:${rippleEntry.order*90}ms`);
+  if(resolveFx) styleParts.push(`--resolve-color:${RESOLVE_PULSE_COLORS[resolveFx.pulse]||RESOLVE_PULSE_COLORS.move}`);
+  const shakeDelay = styleParts.length ? `style="${styleParts.join(';')}"` : '';
   // The die's own color is fixed by what it physically IS (dietype-attack/
   // maneuver/origin/alloy/gilded/magic) -- it never changes with the face
   // showing. A blank face just shows that color with no symbol on it.
@@ -306,7 +350,7 @@ function renderDie(cell, idx){
   const nameTag = isNonStarter ? `<div class="name-tag">${nameTagSVG(cell.die.name, idx)}</div>` : '';
   const forcedCls = cell.forcedFace ? 'forced-face' : '';
   const boostTargetCls = boostTargetIdx()===idx ? 'boost-target' : '';
-  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls}"
+  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${resolveCls}"
             data-idx="${idx}" title="${isLastMove?'Click to undo this move':cell.die.name}" ${shakeDelay}>
             ${num?`<div class="pathnum">${num}</div>`:''}
             ${(cell.forcedFace || boostTargetCls) ? `<div class="corner-badges">
@@ -315,6 +359,7 @@ function renderDie(cell, idx){
             </div>` : ''}
             ${nameTag}
             ${label}
+            ${resolveFx && resolveFx.text ? `<span class="delta-float ${resolveFx.cls}">${resolveFx.text}</span>` : ''}
           </div>`;
 }
 
@@ -555,7 +600,7 @@ function renderGame(){
         <div class="enc-card-col">
           <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
             <span class="round-badge">Round ${S.turnNumber+1}</span>
-            ${pathCounterHTML()}
+            ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip ▶</button>` : pathCounterHTML()}
             <div class="tray" id="tray"></div>
           </div>
         </div>
@@ -575,15 +620,6 @@ function renderGame(){
         <div class="path-strip" id="path-strip" style="margin-top:${S.path.length?6:0}px;"></div>
       </div>
     </div>
-    ${S.transitioning && S.transitionLog && S.transitionLog.length ? `
-    <div class="modal-overlay transition-overlay">
-      <div class="transition-banner">
-        <div class="transition-log" id="transition-log">
-          ${S.transitionLog.map(step => `<div class="transition-entry"><h4>${step.title}</h4><p>${step.text}</p></div>`).join('')}
-        </div>
-        <button id="skip-transition-btn">Skip ▶</button>
-      </div>
-    </div>` : ''}
   `;
   document.getElementById('tray').innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join('');
   if(S.newRoomFx){
@@ -593,7 +629,7 @@ function renderGame(){
     S.newRoomFx = null; // consumed -- plays once, on the render right after advanceRoute() set it
   }
   S.justScrambled = false;
-  S.lastComboRipple = null; // consumed -- plays once, on the render right after resolvePath() set it
+  S.lastComboRipple = null; // consumed -- plays once, on the render right after runPlayerPathSteps() set it
   S.justConvertedIdx = null; // consumed -- plays once, on the render right after useClassAbility() set it
   [...document.getElementById('tray').children].forEach(node=>{
     const idx = parseInt(node.dataset.idx);
@@ -684,8 +720,6 @@ function renderGame(){
   if(S.transitioning){
     const skipBtn = document.getElementById('skip-transition-btn');
     if(skipBtn) skipBtn.onclick = skipTransition;
-    const log = document.getElementById('transition-log');
-    if(log) log.scrollTop = log.scrollHeight;
   }
 
   updatePathTrail();
@@ -860,6 +894,12 @@ const TONE_SEQUENCES = {
   // so it reads as a step up in stakes rather than just another door.
   bossRoomEnter: [{freq:110, start:0,    dur:0.16, type:'sawtooth', gain:0.18},
                   {freq:147, start:0.14, dur:0.28, type:'sawtooth', gain:0.2}],
+  // Per-die turn-resolution tones (see describeStepFx()/playStepTone()) --
+  // a short clink for Block, a light ping for a status effect (D.O.T.,
+  // Nullify, Freeze, Boost) -- distinct from 'hit'/'heal' so each kind of
+  // die reads as a different sound while a path plays back one at a time.
+  block:  [{freq:200, start:0, dur:0.07, type:'square', gain:0.16}],
+  status: [{freq:660, start:0, dur:0.08, type:'sine',   gain:0.14}],
 };
 function playTone(kind){
   if(!PREFS.sound) return;
