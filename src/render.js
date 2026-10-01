@@ -42,10 +42,10 @@ function describeStepFx(step){
 
 // The sound half of describeStepFx()'s bucket -- silent for plain movement
 // so a long Dodge/Leap/Pivot chain doesn't turn into a rattle of blips.
-function playStepTone(fx){
+function playStepTone(fx, pitchStep){
   if(!fx || fx.pulse==='move') return;
   const kind = {dmg:'hit', heal:'heal', block:'block', status:'status'}[fx.pulse];
-  if(kind) playTone(kind);
+  if(kind) playTone(kind, kind==='hit' ? pitchStep : 0);
 }
 
 function updateHeaderMeta(){
@@ -351,7 +351,7 @@ function renderDie(cell, idx){
   const forcedCls = cell.forcedFace ? 'forced-face' : '';
   const boostTargetCls = boostTargetIdx()===idx ? 'boost-target' : '';
   return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${resolveCls}"
-            data-idx="${idx}" title="${isLastMove?'Click to undo this move':cell.die.name}" ${shakeDelay}>
+            data-idx="${idx}" title="${isLastMove?'Click to undo this move':(cell.minion?'Minion die':cell.die.name)}" ${shakeDelay}>
             ${num?`<div class="pathnum">${num}</div>`:''}
             ${(cell.forcedFace || boostTargetCls) ? `<div class="corner-badges">
               ${cell.forcedFace?`<span class="forced-badge ${justConverted?'badge-pop-in':''}" title="Converted by a class ability">✦</span>`:''}
@@ -412,10 +412,10 @@ function renderEncounterCard(e){
   const fx = healthFX(curHealthClamped, e._lastHealth);
   e._lastHealth = curHealthClamped;
   let statuses = '';
-  if(e.curDOT) statuses += `<span class="status-chip">${iconSpan('dot', e.curDOT)} DOT</span>`;
-  if(e.curHOT) statuses += `<span class="status-chip">${iconSpan('hot', e.curHOT)} HOT</span>`;
-  if(e.curShield) statuses += `<span class="status-chip">${iconSpan('block', e.curShield)} Shield</span>`;
-  if(e.minionsSpawned) statuses += `<span class="status-chip">👹 Minions ${e.minionsSpawned}</span>`;
+  if(e.curDOT) statuses += `<span class="status-chip status-tooltip-target" title="D.O.T. ${e.curDOT}: ${STATUS_DESC.dot}">${iconSpan('dot', e.curDOT)} DOT</span>`;
+  if(e.curHOT) statuses += `<span class="status-chip status-tooltip-target" title="H.O.T. ${e.curHOT}: ${STATUS_DESC.hot}">${iconSpan('hot', e.curHOT)} HOT</span>`;
+  if(e.curShield) statuses += `<span class="status-chip status-tooltip-target" title="Shield ${e.curShield}: ${STATUS_DESC.shield}">${iconSpan('block', e.curShield)} Shield</span>`;
+  if(e.minionsSpawned) statuses += `<span class="status-chip status-tooltip-target" title="Minions ${e.minionsSpawned}: ${STATUS_DESC.minions}">👹 Minions ${e.minionsSpawned}</span>`;
   // One combined mouseover/long-press tooltip on the health bar itself,
   // listing every status currently affecting this encounter -- so a player
   // can see what Block/D.O.T./H.O.T./etc. actually do without needing a
@@ -578,13 +578,13 @@ function renderGame(){
       ${renderRoute()}
       <div class="bar-row status-tooltip-target" ${playerStatusTip?`title="${playerStatusTip}"`:''} style="position:relative;"><span style="width:70px;">Health</span><div class="bar ${playerFx.cls}"><div class="bar-fill hp player" style="width:${hpPct}%"></div></div><span>${S.health}/${S.maxHealth}</span>${playerFx.deltaHTML}</div>
       <div class="statuses">
-        ${S.playerDOT?`<span class="status-chip">${iconSpan('dot', S.playerDOT)} DOT</span>`:''}
-        ${S.playerHOT?`<span class="status-chip">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}
-        ${S.playerBlock?`<span class="status-chip">${iconSpan('block', S.playerBlock)} Block</span>`:''}
-        ${S.pendingFreeBoost?`<span class="status-chip" style="background:var(--gold);color:#241c10;">${iconSpan('boost')} Boost x${S.pendingFreeBoost} armed</span>`:''}
+        ${S.playerDOT?`<span class="status-chip status-tooltip-target" title="D.O.T. ${S.playerDOT}: ${STATUS_DESC.dot}">${iconSpan('dot', S.playerDOT)} DOT</span>`:''}
+        ${S.playerHOT?`<span class="status-chip status-tooltip-target" title="H.O.T. ${S.playerHOT}: ${STATUS_DESC.hot}">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}
+        ${S.playerBlock?`<span class="status-chip status-tooltip-target" title="Block ${S.playerBlock}: ${STATUS_DESC.block}">${iconSpan('block', S.playerBlock)} Block</span>`:''}
+        ${S.pendingFreeBoost?`<span class="status-chip status-tooltip-target" style="background:var(--gold);color:#241c10;" title="Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}">${iconSpan('boost')} Boost x${S.pendingFreeBoost} armed</span>`:''}
       </div>
     </div>
-    <div class="panel" style="margin-bottom:8px;">
+    <div class="panel" id="enc-panel" style="margin-bottom:8px;">
       <div class="enc-rail-row">
         <div class="enc-card-col">${e?renderEncounterCard(e):'<p>No active encounter.</p>'}</div>
         <div class="util-rail">
@@ -649,6 +649,10 @@ function renderGame(){
       pressTimer = setTimeout(()=>{
         longPressed = true;
         const cell = S.tray[idx];
+        if(cell.minion){
+          showFaceTooltip(rect, `<strong>Minion die</strong> — clogs this space; land a Hit on it to clear.`);
+          return;
+        }
         const f = cell.forcedFace || currentFace(cell);
         showFaceTooltip(rect, `<strong>${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</strong> — ${FACE_DESC[f.type]||''}`);
       }, 420);
@@ -782,6 +786,14 @@ function ensureToastStack(){
     stack = el(`<div id="toast-stack"></div>`);
     document.body.appendChild(stack);
   }
+  // Anchored just below the enemy card/panel (rather than a fixed spot on
+  // the viewport) so it reads as "what the enemy/log just did" instead of
+  // floating in the middle of the dice tray. Recomputed on every call since
+  // the panel's own height changes (statuses, cycle rows, etc.) and this
+  // stack lives outside the templated app.innerHTML (so it survives the
+  // re-renders that happen between toasts during per-die playback).
+  const panel = document.getElementById('enc-panel');
+  if(panel) stack.style.top = `${panel.getBoundingClientRect().bottom + 8}px`;
   return stack;
 }
 
@@ -906,21 +918,27 @@ const TONE_SEQUENCES = {
   block:  [{freq:200, start:0, dur:0.07, type:'square', gain:0.16}],
   status: [{freq:660, start:0, dur:0.08, type:'sine',   gain:0.14}],
 };
-function playTone(kind){
+function playTone(kind, pitchStep){
   if(!PREFS.sound) return;
   const ctx = getAudioCtx();
   if(!ctx) return;
   const notes = TONE_SEQUENCES[kind];
   if(!notes) return;
   const now = ctx.currentTime;
+  // Each step raises the pitch by 1.5 semitones, capped at 10 steps so a
+  // long combo climbs noticeably without ever shrieking into ultrasonic
+  // territory. Used for the per-die 'hit' sword tone (see playStepTone()
+  // in logic.js) -- every other caller passes no step and plays at its
+  // normal fixed pitch.
+  const pitchMult = pitchStep ? Math.pow(2, Math.min(pitchStep,10)*1.5/12) : 1;
   notes.forEach(n=>{
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = n.type;
-    osc.frequency.setValueAtTime(n.freq, now+n.start);
+    osc.frequency.setValueAtTime(n.freq*pitchMult, now+n.start);
     // Optional downward/upward sweep (e.g. the sword-slash "swish" in
     // 'hit') -- exponentialRamp can't target 0, so freqTo is assumed >0.
-    if(n.freqTo) osc.frequency.exponentialRampToValueAtTime(n.freqTo, now+n.start+n.dur);
+    if(n.freqTo) osc.frequency.exponentialRampToValueAtTime(n.freqTo*pitchMult, now+n.start+n.dur);
     gain.gain.setValueAtTime(0.0001, now+n.start);
     gain.gain.linearRampToValueAtTime(n.gain, now+n.start+0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, now+n.start+n.dur);
@@ -1279,9 +1297,33 @@ function renderSwap(){
   groups.forEach(g=>{
     const countBadge = g.indices.length>1 ? `<span class="token-count">x${g.indices.length}</span>` : '';
     const item = el(`<div class="swap-item"><span>${g.name}</span>${countBadge}</div>`);
-    item.onclick = ()=> swapInLootDie(g.indices[0]);
+    const die = S.tray[g.indices[0]].die;
+    const isBasic = die.cat==='attack' || die.cat==='maneuver';
+    item.onclick = () => {
+      if(isBasic) swapInLootDie(g.indices[0]);
+      else confirmDieReplace(g.indices[0], die.name, S.pendingLootDie.name);
+    };
     list.appendChild(item);
   });
+}
+
+// A basic Attack/Maneuver die is easily replaced (there are plenty of
+// copies), but an Origin or Loot die in the tray is comparatively precious --
+// losing one to an absent-minded tap stings. Confirm before sending anything
+// other than a basic die to the Back Pocket.
+function confirmDieReplace(trayIndex, oldName, newName){
+  const overlay = openUniqueOverlay('confirm-swap', el(`<div class="modal-overlay"><div class="modal">
+      <h2 style="margin-top:0;">Replace ${oldName}?</h2>
+      <p>${oldName} will go to your Back Pocket, replaced in your Tray by ${newName}.</p>
+      <div class="small-btn-row">
+        <button class="danger" id="confirm-swap-yes">Replace it</button>
+        <button id="confirm-swap-no">Cancel</button>
+      </div>
+    </div></div>`));
+  const close = ()=>{ if(overlay.parentNode) overlay.parentNode.removeChild(overlay); };
+  overlay.querySelector('#confirm-swap-yes').onclick = ()=>{ close(); swapInLootDie(trayIndex); };
+  overlay.querySelector('#confirm-swap-no').onclick = close;
+  overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
 }
 
 function renderShrineEncounter(){

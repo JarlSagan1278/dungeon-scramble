@@ -309,6 +309,15 @@ function drawEncounter(kind){
 
 function advanceRoute(){
   S.path = []; S.classAbilityUsed=false; S.turnNumber=0;
+  // A class-ability conversion (forcedFace) is only ever meant to last the
+  // one turn it was used on -- normally cleared by endTurn() -- but when an
+  // encounter dies mid-turn (the kill happens during the path-resolution
+  // beats, before the turn ever reaches endTurn()), that cleanup is skipped
+  // entirely and the converted die's forced face would otherwise ride along
+  // into the next room, or even the next fight if that next step is a Camp.
+  // Clearing it here, on every room transition, closes that gap regardless
+  // of which path led here.
+  S.tray.forEach(c=>delete c.forcedFace);
   if(S.routeStep >= S.route.length){
     // move to next floor
     if(S.floorIdx < FLOORS.length-1){
@@ -709,6 +718,7 @@ function startTurnTransition(){
   // through to the encounter's own beat instead of silently doing nothing.
   S.transitioning = true;
   S._skipAll = false;
+  S._hitStreak = 0; // climbing pitch for consecutive damage-dealing dice this turn -- see playStepTone()
   S.stats.turnsTaken++;
   S.pendingFreeBoost = 0; // a free Boost token is spent by end of turn whether or not it landed on anything
   const path = S.path.slice();
@@ -732,7 +742,12 @@ function runPlayerPathSteps(steps, i, path, effects){
   S.resolvingIdx = step.idx;
   S.resolvingFx = typeof describeStepFx==='function' ? describeStepFx(step) : null;
   S.lastComboRipple = step.type==='combo' ? buildComboRipple([step.idx]) : null;
-  if(typeof playStepTone==='function') playStepTone(S.resolvingFx);
+  // Each die that actually deals damage plays a little higher than the
+  // last one this turn (first hit at base pitch, climbing from there),
+  // so a multi-hit path builds like a rising combo instead of every hit
+  // sounding identical.
+  const pitchStep = step.dmg>0 ? S._hitStreak++ : 0;
+  if(typeof playStepTone==='function') playStepTone(S.resolvingFx, pitchStep);
   render();
   const advance = () => { S._pendingTimeout=null; runPlayerPathSteps(steps, i+1, path, effects); };
   S._advance = advance;

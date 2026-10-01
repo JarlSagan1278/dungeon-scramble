@@ -459,7 +459,7 @@
      -50%) re-centers the whole stack as toasts are added/removed, so a
      2-toast stack and a 1-toast stack both sit centered on the same point
      instead of growing away from it. */
-  #toast-stack{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:80; display:flex; flex-direction:column; gap:6px; align-items:center; pointer-events:none; max-width:92vw; }
+  #toast-stack{ position:fixed; left:50%; top:40%; transform:translateX(-50%); z-index:80; display:flex; flex-direction:column; gap:6px; align-items:center; pointer-events:none; max-width:92vw; }
   .toast{ background:rgba(20,16,12,0.94); border:1px solid var(--gold); color:var(--cream); font-size:12.5px; font-weight:bold; padding:7px 14px; border-radius:20px; box-shadow:0 2px 8px rgba(0,0,0,0.4); opacity:0; transform:translateY(8px); transition:opacity .25s ease, transform .25s ease; white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis; }
   .toast.show{ opacity:1; transform:translateY(0); }
   .toast-good{ border-color:#7fd17f; }
@@ -557,7 +557,7 @@
   .upgrade-row{ display:flex; align-items:stretch; gap:6px; }
   .upgrade-row button:first-child{ flex:1; }
   .upgrade-preview-btn{ flex:0 0 auto; width:32px; font-weight:bold; }
-  .swap-list{ display:flex; flex-direction:column; gap:4px; max-height:220px; overflow-y:auto; margin:8px 0; }
+  .swap-list{ display:flex; flex-direction:column; gap:4px; max-height:440px; overflow-y:auto; margin:8px 0; }
   .swap-item{ background:var(--panel2); border:1px solid var(--stone); border-radius:4px; padding:6px 8px; cursor:pointer; font-size:12px; display:flex; justify-content:space-between; }
   .swap-item:hover{ border-color: var(--gold); }
   .small-btn-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
