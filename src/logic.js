@@ -398,7 +398,7 @@ function advanceRoute(){
       // Scramble/Path/Math loop for a "fight" that could never happen.
       S.screen = 'shrine';
       S.shrineResult = null;
-      logMsg('sys', `You find a Shrine: ${drawn.name}.`);
+      logMsg('sys', `A door creaks open: ${drawn.name} (${drawn.type})`);
       S.stats.shrinesVisited++;
       applyShrineBoon(drawn);
       return;
