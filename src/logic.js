@@ -752,7 +752,7 @@ function runPlayerPathSteps(steps, i, path, effects){
   const advance = () => { S._pendingTimeout=null; runPlayerPathSteps(steps, i+1, path, effects); };
   S._advance = advance;
   if(S._skipAll) advance();
-  else S._pendingTimeout = setTimeout(advance, 300);
+  else S._pendingTimeout = setTimeout(advance, 180);
 }
 
 // Once every die in the path has landed: the path's own damage already

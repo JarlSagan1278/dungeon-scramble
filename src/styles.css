@@ -539,8 +539,8 @@
   .compendium-main{ flex:1 1 auto; min-width:0; }
   .compendium-faces{ display:flex; gap:4px; flex-wrap:wrap; opacity:0.85; }
   .compendium-faces .icon-svg{ width:13px; height:13px; }
-  .loot-options{ display:flex; gap:10px; margin:12px 0; flex-wrap:nowrap; overflow-x:auto; padding-bottom:6px; }
-  .loot-opt{ flex:1 1 0; min-width:140px; background: var(--panel2); border:2px solid var(--stone); border-radius:8px; padding:8px; cursor:pointer; transition: transform .08s; }
+  .loot-options{ display:flex; gap:10px; margin:12px 0; flex-wrap:wrap; justify-content:center; }
+  .loot-opt{ flex:1 1 calc(50% - 10px); min-width:140px; max-width:220px; background: var(--panel2); border:2px solid var(--stone); border-radius:8px; padding:8px; cursor:pointer; transition: transform .08s; }
   .loot-opt:hover{ border-color: var(--gold); transform: translateY(-2px); }
   .loot-opt h4{ margin:4px 0 0; font-size:13px; color:var(--parchment); text-align:center; }
   /* Sized like a real tray die (~72px) rather than the tray's own
