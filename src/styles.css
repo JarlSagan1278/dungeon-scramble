@@ -71,23 +71,24 @@
      wrapping onto many lines and making the cards taller/messier than the
      same 2-up layout at a phone width -- fixing the column count avoids
      that entirely rather than fighting it with font-size/line clamps. */
-  .choice-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap:10px; margin:8px 0 18px; }
-  .choice-card{ background: var(--panel2); border:2px solid var(--stone); border-radius:6px; padding:12px; cursor:pointer; text-align:center; }
+  .choice-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap:8px; margin:6px 0 10px; }
+  .choice-card{ background: var(--panel2); border:2px solid var(--stone); border-radius:6px; padding:8px; cursor:pointer; text-align:center; }
   /* Origin cards additionally carry a portrait, shown beside the name/blurb
      (not stacked above it) so the card reads as one compact row instead of
      a tall column -- a plain class card (no portrait) keeps the original
-     centered layout untouched. */
-  .choice-card.has-portrait{ display:flex; align-items:center; gap:10px; text-align:left; }
+     centered layout untouched. Sized to fit the whole setup screen within
+     one phone-height viewport without scrolling. */
+  .choice-card.has-portrait{ display:flex; align-items:center; gap:8px; text-align:left; }
   .choice-card.has-portrait .choice-text{ min-width:0; }
   .portrait-wrap{ position:relative; width:64px; height:64px; margin:0 auto 6px; display:flex; align-items:flex-end; justify-content:center; flex:0 0 auto; }
-  .choice-card.has-portrait .portrait-wrap{ width:48px; height:48px; margin:0; }
+  .choice-card.has-portrait .portrait-wrap{ width:38px; height:38px; margin:0; }
   .portrait-img{ max-width:100%; max-height:100%; display:block; }
   .portrait-watermark{ position:absolute; top:38%; left:-12%; width:124%; text-align:center; background:rgba(200,30,30,0.8); color:#fff;
     font-size:8px; font-weight:800; letter-spacing:0.3px; transform:rotate(-16deg); padding:2px 0; z-index:2; pointer-events:none; }
   .choice-card.selected{ border-color: var(--gold); background:#33291a; }
-  .choice-card h4{ margin:0 0 6px; color:var(--cream); font-size:15px; }
-  .choice-card.has-portrait h4{ margin:0 0 3px; }
-  .choice-card p{ margin:0; font-size:12px; color:var(--parchment-dim); line-height:1.4; }
+  .choice-card h4{ margin:0 0 4px; color:var(--cream); font-size:13px; }
+  .choice-card.has-portrait h4{ margin:0 0 2px; }
+  .choice-card p{ margin:0; font-size:10.5px; color:var(--parchment-dim); line-height:1.25; }
 
   /* Route tracker */
   .route-wrap{ position:relative; margin-bottom:12px; }
