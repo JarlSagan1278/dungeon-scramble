@@ -601,6 +601,13 @@
     100%{ transform: translate(-50%,-50%) translate(var(--dx),var(--dy)) rotate(var(--rot)); opacity:0; }
   }
 
+  /* Title/landing screen (renderTitle(), render.js) -- the screen shown
+     before any game exists, ahead of character creation. */
+  .title-panel{ max-width:360px; margin:40px auto 0; }
+  .title-btn-col{ display:flex; flex-direction:column; gap:8px; }
+  .setup-back-btn{ background:none; border:none; color:var(--parchment-dim); font-size:12px; padding:0 0 10px; margin:0; cursor:pointer; }
+  .setup-back-btn:hover{ color:var(--cream); background:none; }
+
   .compendium-tier{ margin-bottom:14px; text-align:left; }
   .compendium-list{ display:flex; flex-direction:column; gap:5px; max-height:220px; overflow-y:auto; margin-top:6px; }
   .compendium-row{ display:flex; align-items:center; gap:10px; background:var(--panel2); border:1px solid var(--stone); border-radius:6px; padding:5px 8px; }

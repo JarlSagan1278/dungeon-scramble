@@ -186,10 +186,24 @@ function maybeScreenTransition(key){
   app.classList.add('screen-fade-in');
 }
 
+// Pre-game screen the player sees before S exists: 'title' is the landing
+// page (logo/tagline, Continue if a save exists, New Run, and quick links
+// to Achievements/Run History/How to Play); 'setup' is the actual Origin/
+// Class character-creation screen. Module-level rather than part of S since
+// S doesn't exist yet -- resets to 'title' on every full page load (a fresh
+// tab, or the location.reload() a run ends with), which is exactly the
+// "always land on the title screen" behavior wanted.
+let preGameScreen = 'title';
+
 function render(){
   updateHeaderMeta();
   updateLowHealthVignette();
-  if(!S){ clearPathTrail(); renderSetup(); maybeScreenTransition('setup'); return; }
+  if(!S){
+    clearPathTrail();
+    if(preGameScreen==='title'){ renderTitle(); maybeScreenTransition('title'); }
+    else { renderSetup(); maybeScreenTransition('setup'); }
+    return;
+  }
   if(S.screen==='victory'){ clearPathTrail(); renderVictory(); maybeScreenTransition('victory'); return; }
   if(S.screen==='gameover'){ clearPathTrail(); renderGameOver(); maybeScreenTransition('gameover'); return; }
   if(S.screen==='camp'){ clearPathTrail(); renderCamp(); maybeAutosave(); maybeScreenTransition('camp'); return; }
@@ -202,19 +216,60 @@ function render(){
 
 function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
 
-function renderSetup(){
+// The landing screen before any game exists: logo/tagline, a lifetime-stats
+// teaser once the player has history, Continue (if a save is sitting there),
+// New Run, and quick links to Achievements/Run History/How to Play. Setup
+// (Origin/Class picking) is one tap away via New Run, and the Settings gear
+// in the header works here too since it's always present in the title bar.
+function renderTitle(){
   const saved = hasSave() ? peekSave() : null;
-  const continueRow = saved ? `
-      <div class="panel" style="margin-bottom:12px; text-align:center;">
-        <p style="margin:0 0 8px;">A saved run was found: <strong>${saved.originName} ${saved.className}</strong>, Floor ${saved.floorIdx+1}, ${saved.health}/${saved.maxHealth} HP.</p>
-        <div class="small-btn-row" style="justify-content:center;">
-          <button class="primary" id="continue-btn">Continue Saved Game</button>
-          <button class="danger" id="discard-save-btn">Discard &amp; Start Fresh</button>
-        </div>
-      </div>` : '';
+  const L = META.lifetime;
+  const lifetimeLine = L.runsPlayed>0
+    ? `<p class="hint" style="text-align:center; margin:0 0 12px;">${L.runsPlayed} run${L.runsPlayed===1?'':'s'} played &middot; ${L.victories} victor${L.victories===1?'y':'ies'}</p>`
+    : '';
+  const continueBtn = saved ? `
+      <button class="primary" id="title-continue-btn">Continue Saved Game</button>
+      <p class="hint" style="text-align:center; margin:-6px 0 2px;">${saved.originName} ${saved.className} &middot; Floor ${saved.floorIdx+1} &middot; ${saved.health}/${saved.maxHealth} HP</p>`
+    : '';
   app.innerHTML = `
-    ${continueRow}
+    <div class="panel title-panel">
+      <h2 style="margin:4px 0 2px; text-align:center;">Dungeon Scramble</h2>
+      <p class="hint" style="margin:0 0 14px; text-align:center;">Boggle-style dice paths meet dungeon crawling.</p>
+      ${lifetimeLine}
+      <div class="title-btn-col">
+        ${continueBtn}
+        <button class="${saved?'':'primary'}" id="title-newrun-btn">${saved?'Start New Run':'New Run'}</button>
+        <button id="title-achievements-btn">Achievements</button>
+        <button id="title-history-btn">Run History</button>
+        <button id="title-howto-btn">How to Play</button>
+      </div>
+    </div>
+  `;
+  if(saved) document.getElementById('title-continue-btn').onclick = ()=>{ if(loadGame()) render(); };
+  document.getElementById('title-newrun-btn').onclick = ()=>{
+    if(!saved){ preGameScreen='setup'; render(); return; }
+    const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
+        <h2>Start a New Run?</h2>
+        <p>Your saved run (${saved.originName} ${saved.className}, Floor ${saved.floorIdx+1}) will be lost.</p>
+        <div class="small-btn-row" style="justify-content:center;">
+          <button id="title-newrun-cancel">Keep Saved Run</button>
+          <button class="danger" id="title-newrun-go">Start New Run</button>
+        </div>
+      </div></div>`);
+    document.body.appendChild(overlay);
+    overlay.querySelector('#title-newrun-cancel').onclick = ()=> document.body.removeChild(overlay);
+    overlay.querySelector('#title-newrun-go').onclick = ()=>{ clearSave(); document.body.removeChild(overlay); preGameScreen='setup'; render(); };
+    overlay.onclick = (ev)=>{ if(ev.target===overlay) document.body.removeChild(overlay); };
+  };
+  document.getElementById('title-achievements-btn').onclick = openAchievementsModal;
+  document.getElementById('title-history-btn').onclick = openRunHistoryModal;
+  document.getElementById('title-howto-btn').onclick = ()=> openTutorialModal(0);
+}
+
+function renderSetup(){
+  app.innerHTML = `
     <div class="panel">
+      <button id="setup-back-btn" class="setup-back-btn" title="Back to title">&larr; Back</button>
       <h2 style="margin:0 0 4px 0;">Create Your Adventurer</h2>
       <h3 style="font-size:14px;color:var(--cream);margin:0 0 4px 0;">Choose Your Origin</h3>
       <div class="choice-grid" id="origin-grid"></div>
@@ -223,10 +278,7 @@ function renderSetup(){
       <button class="primary" id="start-btn" disabled>Enter the Dungeon</button>
     </div>
   `;
-  if(hasSave()){
-    document.getElementById('continue-btn').onclick = ()=>{ if(loadGame()) render(); };
-    document.getElementById('discard-save-btn').onclick = ()=>{ clearSave(); render(); };
-  }
+  document.getElementById('setup-back-btn').onclick = ()=>{ preGameScreen='title'; render(); };
   let chosenOrigin=null, chosenClass=null;
   const og = document.getElementById('origin-grid');
   ORIGINS.forEach(o=>{
