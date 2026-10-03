@@ -998,6 +998,19 @@ const TONE_SEQUENCES = {
   floorUp: [{freq:392, start:0,    dur:0.12, type:'triangle', gain:0.2},
             {freq:523, start:0.1,  dur:0.12, type:'triangle', gain:0.2},
             {freq:659, start:0.2,  dur:0.26, type:'triangle', gain:0.22}],
+  // A soft magical chime for a Shrine actually granting its blessing --
+  // gentle high sine notes, deliberately quieter/softer than any combat or
+  // reward tone so a Shrine visit reads as a calm moment, not another hit.
+  blessing: [{freq:784,  start:0,    dur:0.18, type:'sine', gain:0.12},
+             {freq:988,  start:0.12, dur:0.18, type:'sine', gain:0.12},
+             {freq:1319, start:0.26, dur:0.3,  type:'sine', gain:0.14}],
+  // A bigger, grander flourish for clearing the whole dungeon, replacing
+  // the plain 'victory' sting -- plays alongside the new confetti burst as
+  // the Victory screen first appears.
+  grandVictory: [{freq:523, start:0,    dur:0.16, type:'triangle', gain:0.22},
+                 {freq:659, start:0.14, dur:0.16, type:'triangle', gain:0.22},
+                 {freq:784, start:0.28, dur:0.16, type:'triangle', gain:0.22},
+                 {freq:1047,start:0.42, dur:0.45, type:'triangle', gain:0.26}],
 };
 function playTone(kind, pitchStep){
   if(!PREFS.sound) return;
@@ -1175,6 +1188,35 @@ function spawnParticleBurstAtEl(selector, palette){
   const node = document.querySelector(selector);
   const r = node ? node.getBoundingClientRect() : {left:window.innerWidth/2, top:window.innerHeight/2, width:0, height:0};
   spawnParticleBurst(r.left+r.width/2, r.top+r.height/2, palette);
+}
+
+// ---- Confetti rain: a bigger, longer, whole-screen celebration reserved
+// for the one moment in the game that deserves it -- clearing the whole
+// dungeon. Pieces fall from above the viewport with random horizontal
+// drift/rotation/timing, over ~2-3s, vs. the quick radial burst used for
+// every other juice moment (equip, floor-up, Boss kill, Overkill).
+function spawnConfettiRain(){
+  if(PREFS.reducedMotion) return;
+  let layer = document.getElementById('particle-layer');
+  if(!layer){
+    layer = document.createElement('div');
+    layer.id = 'particle-layer';
+    document.body.appendChild(layer);
+  }
+  const palette = ['#ffd76a','#ff8a3d','#8fd0ff','#9affa0','#ff6ad5','#fff5d6'];
+  const n = 50;
+  for(let i=0;i<n;i++){
+    const chip = document.createElement('div');
+    chip.className = 'confetti-chip';
+    chip.style.left = (Math.random()*window.innerWidth)+'px';
+    chip.style.background = palette[i % palette.length];
+    chip.style.animationDelay = (Math.random()*0.6)+'s';
+    chip.style.animationDuration = (1.8 + Math.random()*1.2)+'s';
+    chip.style.setProperty('--drift', (Math.random()*160-80)+'px');
+    chip.style.setProperty('--rot', (Math.random()*720-360)+'deg');
+    layer.appendChild(chip);
+    chip.addEventListener('animationend', ()=> chip.remove());
+  }
 }
 
 function settingsToggleRowHTML(id, label, checked){
@@ -1712,7 +1754,8 @@ function renderVictory(){
     recordRunHistory('victory');
     S.newAchievements = recordMetaProgress('victory');
     clearSave();
-    playTone('victory');
+    playTone('grandVictory');
+    if(typeof spawnConfettiRain==='function') spawnConfettiRain();
   }
   app.innerHTML = `<div class="panel"><h2>🏆 Dungeon Conquered!</h2><p>You defeated the Big Boss and cleared all three floors. Well fought, Adventurer.</p>
     ${newAchievementsHTML(S.newAchievements)}

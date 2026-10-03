@@ -601,6 +601,15 @@
     100%{ transform: translate(-50%,-50%) translate(var(--dx),var(--dy)) rotate(var(--rot)); opacity:0; }
   }
 
+  /* Confetti rain (spawnConfettiRain(), render.js) -- Victory-only, bigger
+     and longer-lived than a regular particle burst. */
+  .confetti-chip{ position:absolute; top:-20px; width:8px; height:14px; opacity:0.95;
+    animation-name: confetti-fall; animation-timing-function: linear; animation-fill-mode: forwards; }
+  @keyframes confetti-fall{
+    0%{ transform: translate(0,0) rotate(0deg); opacity:1; }
+    100%{ transform: translate(var(--drift), 110vh) rotate(var(--rot)); opacity:0.85; }
+  }
+
   /* Title/landing screen (renderTitle(), render.js) -- the screen shown
      before any game exists, ahead of character creation. */
   .title-panel{ max-width:360px; margin:40px auto 0; }

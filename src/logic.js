@@ -1108,6 +1108,14 @@ function lootPoolByName(name){
 // screen -- none of them advance the route on their own anymore, since
 // Shrines have no combat turn to hang that on.
 function runShrineEffect(e, effect){
+  // 'choice' just presents the menu (the real grant happens recursively
+  // when an option is picked, via chooseShrineOption -> option.action() ->
+  // this same function with that option's effect) -- so the blessing cue
+  // plays for every other, actually-granting effect type only.
+  if(effect.type!=='choice'){
+    if(typeof playTone==='function') playTone('blessing');
+    if(typeof spawnParticleBurstAtEl==='function') spawnParticleBurstAtEl('.panel', ['#8fd0ff','#ffd76a','#fff5d6']);
+  }
   switch(effect.type){
     case 'maxHealthUp': {
       S.maxHealth += effect.amount;
