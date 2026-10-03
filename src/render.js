@@ -910,8 +910,10 @@ function showKillCallout(lines){
 function showRoomCallout(fx){
   const old = document.getElementById('room-callout');
   if(old && old.parentNode) old.parentNode.removeChild(old);
-  const trayWrap = document.querySelector('.tray-wrap');
-  if(!trayWrap) return; // shouldn't happen -- renderGame() always renders the tray first
+  // Regular encounters anchor the callout to the dice tray; Shrines have no
+  // tray at all, so fall back to the encounter card itself.
+  const trayWrap = document.querySelector('.tray-wrap') || document.querySelector('.enc-card');
+  if(!trayWrap) return; // shouldn't happen -- renderGame()/renderShrineEncounter() always render one of these first
   const mainCls = fx.boss ? 'main boss' : 'main';
   const mainText = fx.boss ? '⚠ Boss Encounter' : 'A new room...';
   const node = el(`<div id="room-callout">
@@ -1650,12 +1652,13 @@ function confirmDieReplace(trayIndex, oldName, newName){
 
 function renderShrineEncounter(){
   const e = S.encounter;
+  const roomEnterCls = S.newRoomFx ? 'room-enter' : '';
   app.innerHTML = `
     <div class="panel" style="margin-bottom:8px;">
       ${renderRoute()}
     </div>
     <div class="panel">
-      <div class="enc-card">
+      <div class="enc-card ${roomEnterCls}">
         <div class="enc-header">
           <h3 class="enc-name-txt">${e.name}</h3>
           <span class="enc-type">Shrine</span>
@@ -1671,6 +1674,11 @@ function renderShrineEncounter(){
   if(S.shrineChoice) renderShrineChoiceModal();
   if(S.shrineResult) renderShrineResultModal();
   attachLongPressTooltips('.route-tooltip-target');
+  if(S.newRoomFx){
+    showRoomCallout(S.newRoomFx);
+    if(typeof playTone==='function') playTone('roomEnter');
+    S.newRoomFx = null; // consumed -- plays once, on the render right after advanceRoute() set it
+  }
 }
 
 function renderCamp(){

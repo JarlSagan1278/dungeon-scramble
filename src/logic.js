@@ -391,8 +391,13 @@ function newGame(originId, classId){
   };
   logMsg('sys', `A ${origin.name} ${klass.name} descends into the dungeon...`);
   if(carryDie) logMsg('sys', `${carryDie.name} joins your tray, carried over from your last run.`, 'good');
-  scrambleTray();
-  advanceRoute(); // triggers first encounter
+  // No scrambleTray() here: a new run always opens on Camp, not combat, so
+  // there's nothing to roll yet -- playing the dice-roll sound here just
+  // fired it on the title->camp transition for no in-fiction reason. The
+  // tray starts faceIdx:0 (set above) and gets its first real scramble
+  // either from Rest or from advanceRoute()'s own scrambleTray() call when
+  // the player actually leaves Camp into the first encounter.
+  advanceRoute(); // triggers first encounter (or, since every route starts with Camp, just opens Camp)
   render();
   if(!hasSeenTutorial()){
     markTutorialSeen();
@@ -526,6 +531,11 @@ function advanceRoute(){
       S.shrineResult = null;
       logMsg('sys', `A door creaks open: ${drawn.name} (${drawn.type})`);
       S.stats.shrinesVisited++;
+      // Shrines skipped the same "A new room..." callout regular encounters
+      // get, so stepping into one gave no sense of having entered anything --
+      // one-shot flag consumed by renderShrineEncounter() (render.js), same
+      // as S.newRoomFx is for renderGame().
+      S.newRoomFx = {name: drawn.name, type: drawn.type, boss:false};
       applyShrineBoon(drawn);
       return;
     }
@@ -1204,7 +1214,10 @@ function runShrineEffect(e, effect){
 function continueFromShrine(){
   S.shrineResult = null;
   finishStep();
-  render();
+  // See the matching comment in swapInLootDie(): skip the redundant render
+  // when the next room is itself a Shrine, since advanceRoute() already
+  // rendered it (and its new-room callout) via applyShrineBoon().
+  if(S.screen !== 'shrine') render();
 }
 
 function applyShrineBoon(e){
@@ -1298,7 +1311,12 @@ function swapInLootDie(trayIndex){
   if(typeof playTone==='function') playTone('equip');
   if(typeof spawnParticleBurstAtEl==='function') spawnParticleBurstAtEl('.panel', ['#ffd76a','#8fd0ff','#fff5d6']);
   finishStep();
-  render();
+  // If the next room is a Shrine, advanceRoute() -> applyShrineBoon() already
+  // rendered it (so its one-shot "A new room..." callout shows) -- a second,
+  // redundant render() here would immediately overwrite app.innerHTML and
+  // wipe that callout node before anyone saw it. Every other next-step type
+  // still needs this render to paint at all.
+  if(S.screen !== 'shrine') render();
 }
 
 function onPlayerDefeated(){
@@ -1431,6 +1449,9 @@ function campRest(){
 }
 function campLeave(){
   finishStep();
-  render();
+  // See the matching comment in swapInLootDie(): skip the redundant render
+  // when the next room is itself a Shrine, since advanceRoute() already
+  // rendered it (and its new-room callout) via applyShrineBoon().
+  if(S.screen !== 'shrine') render();
 }
 
