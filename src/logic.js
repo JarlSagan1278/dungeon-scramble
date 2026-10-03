@@ -473,6 +473,8 @@ function advanceRoute(){
       S.routeStep = 0;
       S.route = buildRoute();
       logMsg('sys', `— Floor ${S.floorIdx+1} —`, true);
+      if(typeof playTone==='function') playTone('floorUp');
+      if(typeof spawnParticleBurstAtEl==='function') spawnParticleBurstAtEl('#app', ['#ffd76a','#8fd0ff','#9affa0','#fff5d6']);
     } else {
       S.screen='victory';
       return;
@@ -1011,6 +1013,11 @@ function dealEncounterDamage(e, amount){
   const dealt = amount-blocked;
   S.health = cap(S.health-dealt, S.maxHealth);
   if(dealt>0 && typeof playPlayerHitSound==='function') playPlayerHitSound();
+  // A big hit landing gets the same small screen-shake as an Overkill, on
+  // top of the existing portrait shake/flash -- a meaningful chunk of your
+  // own health bar deserves to register physically too, not just the
+  // damage you deal out.
+  if(dealt>=8 && typeof screenShake==='function') screenShake('small');
   const t = `${e.name} hits you for ${dealt}${blocked?` (${blocked} blocked)`:''}.`;
   logMsg('dmg', t);
   return t;
@@ -1246,6 +1253,8 @@ function swapInLootDie(trayIndex){
   S.screen = 'game';
   logMsg('sys', `Equipped ${cell.die.name}.`, 'good');
   S.stats.lootCollected++;
+  if(typeof playTone==='function') playTone('equip');
+  if(typeof spawnParticleBurstAtEl==='function') spawnParticleBurstAtEl('.panel', ['#ffd76a','#8fd0ff','#fff5d6']);
   finishStep();
   render();
 }

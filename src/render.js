@@ -987,6 +987,17 @@ const TONE_SEQUENCES = {
   // die reads as a different sound while a path plays back one at a time.
   block:  [{freq:200, start:0, dur:0.07, type:'square', gain:0.16}],
   status: [{freq:660, start:0, dur:0.08, type:'sine',   gain:0.14}],
+  // A bright little "ka-ching" for equipping a new Loot die into the tray
+  // (swapInLootDie(), logic.js) -- the moment a run's reward actually pays
+  // off, distinct from the plain 'hit'/'heal' combat tones.
+  equip:   [{freq:660, start:0,    dur:0.08, type:'square',   gain:0.16},
+            {freq:880, start:0.07, dur:0.1,  type:'square',   gain:0.18},
+            {freq:1175,start:0.16, dur:0.18, type:'triangle', gain:0.2}],
+  // A short ascending sparkle for reaching a new Floor -- celebratory, not
+  // combat-weighted, so it reads as "level up" rather than another kill.
+  floorUp: [{freq:392, start:0,    dur:0.12, type:'triangle', gain:0.2},
+            {freq:523, start:0.1,  dur:0.12, type:'triangle', gain:0.2},
+            {freq:659, start:0.2,  dur:0.26, type:'triangle', gain:0.22}],
 };
 function playTone(kind, pitchStep){
   if(!PREFS.sound) return;
@@ -1153,6 +1164,16 @@ function spawnParticleBurstAtPortrait(palette){
   const portrait = document.querySelector('.enc-portrait');
   if(!portrait) return;
   const r = portrait.getBoundingClientRect();
+  spawnParticleBurst(r.left+r.width/2, r.top+r.height/2, palette);
+}
+
+// Same idea, anchored to an arbitrary element's center -- for juice moments
+// that aren't tied to the encounter portrait (equipping a Loot die, a Floor
+// transition). Falls back to the viewport center if the element isn't
+// found, so a selector miss never throws.
+function spawnParticleBurstAtEl(selector, palette){
+  const node = document.querySelector(selector);
+  const r = node ? node.getBoundingClientRect() : {left:window.innerWidth/2, top:window.innerHeight/2, width:0, height:0};
   spawnParticleBurst(r.left+r.width/2, r.top+r.height/2, palette);
 }
 
