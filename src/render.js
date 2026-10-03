@@ -233,14 +233,18 @@ function renderTitle(){
     : '';
   app.innerHTML = `
     <div class="panel title-panel">
-      <img class="title-cover-art" src="${COVER_ART}" alt="Dungeon Scramble -- a dice-drafting, deck-builder">
-      ${lifetimeLine}
-      <div class="title-btn-col">
-        ${continueBtn}
-        <button class="${saved?'':'primary'}" id="title-newrun-btn">${saved?'Start New Run':'New Run'}</button>
-        <button id="title-achievements-btn">Achievements</button>
-        <button id="title-history-btn">Run History</button>
-        <button id="title-howto-btn">How to Play</button>
+      <div class="title-art-wrap">
+        <img class="title-cover-art" src="${COVER_ART}" alt="Dungeon Scramble -- a dice-drafting, deck-builder">
+        <div class="title-scrim">
+          ${lifetimeLine}
+          <div class="title-btn-col">
+            ${continueBtn}
+            <button class="${saved?'':'primary'}" id="title-newrun-btn">${saved?'Start New Run':'New Run'}</button>
+            <button id="title-achievements-btn">Achievements</button>
+            <button id="title-history-btn">Run History</button>
+            <button id="title-howto-btn">How to Play</button>
+          </div>
+        </div>
       </div>
     </div>
   `;
