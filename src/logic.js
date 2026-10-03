@@ -106,6 +106,94 @@ function clearRunHistory(){
   try{ localStorage.removeItem(RUN_HISTORY_KEY); } catch(e){}
 }
 
+// ---- Lifetime meta-progression: cumulative stats + unlockable Achievements
+// that persist across every run ever played (separate from RUN_HISTORY,
+// which only keeps the most recent MAX_RUN_HISTORY runs' details). Nothing
+// here is spendable/gameplay-affecting -- it's a record of what the player
+// has done, surfaced in the Achievements modal (see openAchievementsModal
+// in render.js).
+const META_KEY = 'dungeonScrambleMeta_v1';
+const DEFAULT_LIFETIME = {
+  runsPlayed:0, victories:0, bestFloorReached:0, totalDamageDealt:0,
+  totalEncountersDefeated:0, totalOverkills:0, totalShrinesVisited:0,
+  victoriesByOrigin:{}, victoriesByClass:{},
+};
+function loadMeta(){
+  try{
+    const raw = localStorage.getItem(META_KEY);
+    if(!raw) return { lifetime: {...DEFAULT_LIFETIME}, achievements: {} };
+    const parsed = JSON.parse(raw) || {};
+    return {
+      lifetime: {...DEFAULT_LIFETIME, ...(parsed.lifetime||{})},
+      achievements: parsed.achievements || {},
+    };
+  } catch(e){ return { lifetime: {...DEFAULT_LIFETIME}, achievements: {} }; }
+}
+let META = loadMeta();
+function saveMeta(){
+  try{ localStorage.setItem(META_KEY, JSON.stringify(META)); } catch(e){ /* best-effort, same as prefs/history */ }
+}
+
+// Each entry's check() runs against META.lifetime (the cumulative totals
+// below) every time recordMetaProgress() is called -- i.e. once per
+// finished run. Order here is also display order in the Achievements modal.
+const ACHIEVEMENTS = [
+  {id:'first_blood', name:'First Blood', desc:'Defeat your first encounter.',
+    check: L => L.totalEncountersDefeated>=1},
+  {id:'first_victory', name:'Dungeon Conqueror', desc:'Win a run.',
+    check: L => L.victories>=1},
+  {id:'all_origins', name:'Jack of All Trades', desc:'Win a run with every Origin.',
+    check: L => ['dwarf','gnome','halfling','pixie'].every(id=>(L.victoriesByOrigin[id]||0)>0)},
+  {id:'all_classes', name:'Master Tactician', desc:'Win a run with every Class.',
+    check: L => ['guard','armsmaster','dungeoneer','arcanist'].every(id=>(L.victoriesByClass[id]||0)>0)},
+  {id:'floor_3', name:'Into the Deep', desc:'Reach Floor 3 in a single run.',
+    check: L => L.bestFloorReached>=3},
+  {id:'overkill_10', name:'Overkill Enthusiast', desc:'Land 10 Overkills, lifetime.',
+    check: L => L.totalOverkills>=10},
+  {id:'shrines_25', name:'Shrine Seeker', desc:'Visit 25 Shrines, lifetime.',
+    check: L => L.totalShrinesVisited>=25},
+  {id:'monster_hunter_100', name:'Monster Hunter', desc:'Defeat 100 encounters, lifetime.',
+    check: L => L.totalEncountersDefeated>=100},
+  {id:'veteran_10', name:'Veteran Adventurer', desc:'Play 10 runs.',
+    check: L => L.runsPlayed>=10},
+  {id:'damage_1000', name:'Heavy Hitter', desc:'Deal 1,000 damage, lifetime.',
+    check: L => L.totalDamageDealt>=1000},
+];
+
+function checkAchievements(){
+  const newlyUnlocked = [];
+  ACHIEVEMENTS.forEach(a=>{
+    if(META.achievements[a.id]) return;
+    if(a.check(META.lifetime)){
+      META.achievements[a.id] = { date: Date.now() };
+      newlyUnlocked.push(a);
+    }
+  });
+  if(newlyUnlocked.length) saveMeta();
+  return newlyUnlocked;
+}
+
+// Called exactly once per finished run (from renderVictory/renderGameOver,
+// each already guarded against re-firing on re-render) with S still intact
+// (before clearSave() wipes the in-progress run). Returns any Achievements
+// newly unlocked by this run, for the caller to announce.
+function recordMetaProgress(outcome){
+  const L = META.lifetime;
+  L.runsPlayed++;
+  if(outcome==='victory') L.victories++;
+  L.bestFloorReached = Math.max(L.bestFloorReached, S.floorIdx+1);
+  L.totalDamageDealt += Math.round(S.stats.damageDealt);
+  L.totalEncountersDefeated += S.stats.encountersDefeated;
+  L.totalOverkills += S.stats.overkills;
+  L.totalShrinesVisited += S.stats.shrinesVisited;
+  if(outcome==='victory'){
+    L.victoriesByOrigin[S.origin.id] = (L.victoriesByOrigin[S.origin.id]||0)+1;
+    L.victoriesByClass[S.klass.id] = (L.victoriesByClass[S.klass.id]||0)+1;
+  }
+  saveMeta();
+  return checkAchievements();
+}
+
 // ---- Player prefs (sound / reduced-motion) -- small, separate from the
 // save file since they're device/player settings, not run state, and
 // should survive across runs (including after a run ends and the save is
@@ -1118,10 +1206,14 @@ function onEncounterDefeated(){
     const lines = [{text:`${e.name} Defeated`, cls:'boss'}];
     if(overkill) lines.push({text:'Overkill!', cls:'overkill sub'});
     if(typeof showKillCallout==='function') showKillCallout(lines);
+    if(typeof screenShake==='function') screenShake('big');
+    if(typeof spawnParticleBurstAtPortrait==='function') spawnParticleBurstAtPortrait(['#ffd76a','#ff8a3d','#fff5d6','#d4af64']);
   } else if(overkill){
     if(typeof playTone==='function') playTone('overkill');
     if(typeof vibrate==='function') vibrate([30,30,50]);
     if(typeof showKillCallout==='function') showKillCallout([{text:'Overkill!', cls:'overkill'}]);
+    if(typeof screenShake==='function') screenShake('small');
+    if(typeof spawnParticleBurstAtPortrait==='function') spawnParticleBurstAtPortrait(['#ff8a3d','#ffd76a']);
   }
   render();
 }

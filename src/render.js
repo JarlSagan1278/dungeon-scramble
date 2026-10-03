@@ -1050,6 +1050,60 @@ function applyReducedMotionClass(){
   document.body.classList.toggle('reduced-motion', !!PREFS.reducedMotion);
 }
 
+// ---- Screen shake: a brief full-viewport shake for the two biggest combat
+// moments (Boss kill, Overkill), layered on top of the existing kill-callout
+// banner/sound so the impact registers physically, not just visually.
+// Re-triggerable back-to-back (forced reflow) since a Boss kill that's also
+// an Overkill fires this once at 'big' only -- see onEncounterDefeated.
+function screenShake(intensity){
+  if(PREFS.reducedMotion) return;
+  const wrap = document.querySelector('.wrap');
+  if(!wrap) return;
+  wrap.classList.remove('screen-shake-big','screen-shake-small');
+  void wrap.offsetWidth; // force reflow so re-adding the class restarts the animation
+  wrap.classList.add(intensity==='big' ? 'screen-shake-big' : 'screen-shake-small');
+}
+
+// ---- Particle burst: a quick radial confetti-style burst of small colored
+// chips from a screen point. Pure CSS-transition driven -- each chip is a
+// positioned div given a random fly-out vector via custom properties, then
+// removed from the DOM once its animation ends.
+function spawnParticleBurst(x, y, palette){
+  if(PREFS.reducedMotion) return;
+  let layer = document.getElementById('particle-layer');
+  if(!layer){
+    layer = document.createElement('div');
+    layer.id = 'particle-layer';
+    document.body.appendChild(layer);
+  }
+  const n = 16;
+  for(let i=0;i<n;i++){
+    const chip = document.createElement('div');
+    chip.className = 'particle-chip';
+    const angle = (Math.PI*2*i/n) + Math.random()*0.4;
+    const dist = 40 + Math.random()*55;
+    const dx = Math.cos(angle)*dist, dy = Math.sin(angle)*dist;
+    chip.style.left = x+'px'; chip.style.top = y+'px';
+    chip.style.background = palette[i % palette.length];
+    chip.style.setProperty('--dx', dx+'px');
+    chip.style.setProperty('--dy', dy+'px');
+    chip.style.setProperty('--rot', (Math.random()*360-180)+'deg');
+    layer.appendChild(chip);
+    chip.addEventListener('animationend', ()=> chip.remove());
+  }
+}
+
+// Anchors a particle burst to wherever the encounter's portrait currently
+// sits on screen -- called from onEncounterDefeated (logic.js) before
+// render() swaps that portrait out for the loot screen, so the element is
+// still there to measure.
+function spawnParticleBurstAtPortrait(palette){
+  const portrait = document.querySelector('.enc-portrait');
+  if(!portrait) return;
+  const r = portrait.getBoundingClientRect();
+  spawnParticleBurst(r.left+r.width/2, r.top+r.height/2, palette);
+}
+
 function settingsToggleRowHTML(id, label, checked){
   return `<label class="settings-toggle-row" for="${id}">
       <span>${label}</span>
@@ -1070,6 +1124,7 @@ function openSettingsModal(){
       <div class="small-btn-row" style="justify-content:center; flex-direction:column;">
         <button id="settings-how-to-play-btn">How to Play</button>
         <button id="settings-run-history-btn">Run History</button>
+        <button id="settings-achievements-btn">Achievements</button>
         <button id="settings-dice-compendium-btn">Dice Compendium</button>
         ${inRun ? '<button id="settings-restart-btn" class="danger">Restart Run</button>' : ''}
         <button id="settings-close-btn">Close</button>
@@ -1080,6 +1135,7 @@ function openSettingsModal(){
   overlay.querySelector('#settings-close-btn').onclick = close;
   overlay.querySelector('#settings-how-to-play-btn').onclick = ()=>{ close(); openTutorialModal(0); };
   overlay.querySelector('#settings-run-history-btn').onclick = ()=>{ close(); openRunHistoryModal(); };
+  overlay.querySelector('#settings-achievements-btn').onclick = ()=>{ close(); openAchievementsModal(); };
   overlay.querySelector('#settings-dice-compendium-btn').onclick = ()=>{ close(); openDiceCompendiumModal(); };
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
   overlay.querySelector('#pref-sound').onchange = (ev)=>{ setPref('sound', ev.target.checked); if(ev.target.checked) playTone('hit'); };
@@ -1172,6 +1228,40 @@ function openRunHistoryModal(){
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
   const clearBtn = overlay.querySelector('#run-history-clear-btn');
   if(clearBtn) clearBtn.onclick = ()=>{ clearRunHistory(); close(); openRunHistoryModal(); };
+}
+
+// Lifetime Achievements (ACHIEVEMENTS, logic.js) -- locked entries show
+// greyed-out with just name+desc; unlocked entries show the date earned.
+// Reachable from Settings at any time (not just post-run), same as Run
+// History and the Dice Compendium.
+function openAchievementsModal(){
+  const unlockedCount = ACHIEVEMENTS.filter(a=>META.achievements[a.id]).length;
+  const rows = ACHIEVEMENTS.map(a=>{
+    const unlocked = META.achievements[a.id];
+    const dateStr = unlocked ? new Date(unlocked.date).toLocaleDateString(undefined, {month:'short', day:'numeric'}) : '';
+    return `<div class="achv-row ${unlocked?'unlocked':'locked'}">
+        <span class="achv-row-icon">${unlocked?'🏅':'🔒'}</span>
+        <div class="achv-row-main">
+          <div class="run-history-who">${a.name}</div>
+          <div class="run-history-detail">${a.desc}</div>
+        </div>
+        ${unlocked ? `<span class="run-history-date">${dateStr}</span>` : ''}
+      </div>`;
+  }).join('');
+  const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:400px;">
+      <h2 style="margin-top:0;">Achievements</h2>
+      <div class="statuses" style="justify-content:center; margin-bottom:10px;">
+        <span class="status-chip">${unlockedCount}/${ACHIEVEMENTS.length} unlocked</span>
+      </div>
+      <div class="run-history-list">${rows}</div>
+      <div class="small-btn-row" style="justify-content:center;">
+        <button class="primary" id="achv-close-btn">Close</button>
+      </div>
+    </div></div>`);
+  document.body.appendChild(overlay);
+  const close = ()=>{ if(overlay.parentNode) document.body.removeChild(overlay); };
+  overlay.querySelector('#achv-close-btn').onclick = close;
+  overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
 }
 
 // A browsable library of every Loot Die in the game (Alloy/Gilded/Magic),
@@ -1544,10 +1634,15 @@ function summaryStatsHTML(){
 }
 
 function renderVictory(){
-  recordRunHistory('victory');
-  clearSave();
-  playTone('victory');
+  if(!S.gameOverRecorded){
+    S.gameOverRecorded = true;
+    recordRunHistory('victory');
+    S.newAchievements = recordMetaProgress('victory');
+    clearSave();
+    playTone('victory');
+  }
   app.innerHTML = `<div class="panel"><h2>🏆 Dungeon Conquered!</h2><p>You defeated the Big Boss and cleared all three floors. Well fought, Adventurer.</p>
+    ${newAchievementsHTML(S.newAchievements)}
     ${summaryStatsHTML()}
     <button class="primary" style="margin-top:12px;" onclick="location.reload()">Play Again</button></div>`;
 }
@@ -1555,6 +1650,7 @@ function renderGameOver(){
   if(!S.gameOverRecorded){
     S.gameOverRecorded = true;
     recordRunHistory('defeat');
+    S.newAchievements = recordMetaProgress('defeat');
     clearSave();
     playTone('defeat');
   }
@@ -1585,6 +1681,25 @@ function renderGameOver(){
   const carryNote = S.carryoverChosenName ? `<p class="hint">${S.carryoverChosenName} will join your tray at the start of your next run.</p>` : '';
   app.innerHTML = `<div class="panel"><h2>💀 Defeated</h2><p>Your Adventurer retreats to town in temporary defeat...</p>
     ${carryNote}
+    ${newAchievementsHTML(S.newAchievements)}
     ${summaryStatsHTML()}
     <button class="primary" style="margin-top:12px;" onclick="location.reload()">Try Again</button></div>`;
+}
+
+// A short "New Achievement" callout block for the post-run screens (shown
+// once, right after recordMetaProgress() returns any newly-unlocked
+// entries). Plain inline HTML rather than a modal/toast -- the player is
+// already looking at a dedicated end-of-run screen, so this just adds to
+// it rather than interrupting with another popup.
+function newAchievementsHTML(newAchievements){
+  if(!newAchievements || !newAchievements.length) return '';
+  const rows = newAchievements.map(a=>
+    `<div class="achv-unlock-row"><span class="achv-unlock-icon">🏅</span><div>
+       <div class="achv-unlock-name">${a.name}</div>
+       <div class="achv-unlock-desc">${a.desc}</div>
+     </div></div>`).join('');
+  return `<div class="achv-unlock-box">
+      <div class="achv-unlock-title">New Achievement${newAchievements.length>1?'s':''}!</div>
+      ${rows}
+    </div>`;
 }
