@@ -1229,6 +1229,13 @@ function onEncounterDefeated(){
     if(typeof showKillCallout==='function') showKillCallout([{text:'Overkill!', cls:'overkill'}]);
     if(typeof screenShake==='function') screenShake('small');
     if(typeof spawnParticleBurstAtPortrait==='function') spawnParticleBurstAtPortrait(['#ff8a3d','#ffd76a']);
+  } else {
+    // A plain, non-Boss, non-Overkill win previously played no sound at
+    // all -- every other kill/combat moment has one, so this closes the
+    // gap with a light, satisfying chime of its own (quieter/shorter than
+    // Boss/Overkill, which stay the bigger moments).
+    if(typeof playTone==='function') playTone('encounterKill');
+    if(typeof spawnParticleBurstAtPortrait==='function') spawnParticleBurstAtPortrait(['#ffd76a','#fff5d6']);
   }
   render();
 }

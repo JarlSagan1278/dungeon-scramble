@@ -233,8 +233,7 @@ function renderTitle(){
     : '';
   app.innerHTML = `
     <div class="panel title-panel">
-      <h2 style="margin:4px 0 2px; text-align:center;">Dungeon Scramble</h2>
-      <p class="hint" style="margin:0 0 14px; text-align:center;">Boggle-style dice paths meet dungeon crawling.</p>
+      <img class="title-cover-art" src="${COVER_ART}" alt="Dungeon Scramble -- a dice-drafting, deck-builder">
       ${lifetimeLine}
       <div class="title-btn-col">
         ${continueBtn}
@@ -965,6 +964,12 @@ const TONE_SEQUENCES = {
   bossKill:  [{freq:294, start:0,    dur:0.12, type:'triangle', gain:0.22},
               {freq:392, start:0.11, dur:0.12, type:'triangle', gain:0.22},
               {freq:523, start:0.22, dur:0.30, type:'triangle', gain:0.24}],
+  // A light, bright two-note chime for winning a plain (non-Boss,
+  // non-Overkill) encounter -- every kill now gets a distinct "you won"
+  // cue of its own, instead of only the per-die 'hit' sound from whichever
+  // die happened to land the final blow.
+  encounterKill: [{freq:587, start:0,    dur:0.1,  type:'square',   gain:0.16},
+                  {freq:880, start:0.08, dur:0.16, type:'triangle', gain:0.18}],
   // A sharp thump+ding "crunch" for an Overkill -- distinct from a normal
   // kill so the bonus-loot-option moment actually registers as it happens,
   // not just as a chip on the next screen.
