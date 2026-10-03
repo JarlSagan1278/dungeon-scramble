@@ -194,6 +194,30 @@ function recordMetaProgress(outcome){
   return checkAchievements();
 }
 
+// ---- Discovered Loot dice -- which Alloy/Gilded/Magic dice (by name) the
+// player has actually encountered as a loot option in some playthrough,
+// persisted across runs. The Dice Compendium (openDiceCompendiumModal,
+// render.js) uses this to keep a die's faces/art spoiler-free until the
+// player has found it for themselves, rather than listing the whole game's
+// dice up front. Basic Attack/Maneuver/Origin dice are always known (every
+// run starts with them) and never gated this way. ----
+const DISCOVERED_DICE_KEY = 'dungeonScrambleDiscoveredDice_v1';
+function loadDiscoveredDice(){
+  try{ return new Set(JSON.parse(localStorage.getItem(DISCOVERED_DICE_KEY)) || []); }
+  catch(e){ return new Set(); }
+}
+let DISCOVERED_DICE = loadDiscoveredDice();
+function markDiceDiscovered(dice){
+  const list = Array.isArray(dice) ? dice : [dice];
+  let changed = false;
+  list.forEach(d=>{
+    if(d && d.name && !DISCOVERED_DICE.has(d.name)){ DISCOVERED_DICE.add(d.name); changed = true; }
+  });
+  if(changed){
+    try{ localStorage.setItem(DISCOVERED_DICE_KEY, JSON.stringify([...DISCOVERED_DICE])); } catch(e){}
+  }
+}
+
 // ---- Player prefs (sound / reduced-motion) -- small, separate from the
 // save file since they're device/player settings, not run state, and
 // should survive across runs (including after a run ends and the save is
@@ -1142,10 +1166,12 @@ function runShrineEffect(e, effect){
     }
     case 'tradeLoot': {
       S.lootChoice = { options: pickN(lootPoolByName(effect.pool), 3), lootName: effect.pool, overkill:false, fromShrine:true };
+      if(typeof markDiceDiscovered==='function') markDiceDiscovered(S.lootChoice.options);
       render(); return;
     }
     case 'randomDieReplace': {
       S.pendingLootDie = pick(lootPoolByName(effect.pool));
+      if(typeof markDiceDiscovered==='function') markDiceDiscovered(S.pendingLootDie);
       S.screen = 'swap';
       logMsg('sys', `${e.name}: choose a die to replace with a random ${effect.pool} die (${S.pendingLootDie.name}).`);
       render(); return;
@@ -1212,6 +1238,7 @@ function onEncounterDefeated(){
   if(overkill) drawCount += 1;
   const options = pickN(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
   S.lootChoice = { options, lootName: floor.lootName, overkill };
+  if(typeof markDiceDiscovered==='function') markDiceDiscovered(options);
   // A Boss/Big Boss kill or an Overkill each get a distinct sound + a big
   // callout banner, so the moment registers as it happens instead of only
   // as a status chip on the loot screen that follows.

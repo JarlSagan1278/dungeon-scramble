@@ -242,6 +242,7 @@ function renderTitle(){
             <button class="${saved?'':'primary'}" id="title-newrun-btn">${saved?'Start New Run':'New Run'}</button>
             <button id="title-achievements-btn">Achievements</button>
             <button id="title-history-btn">Run History</button>
+            <button id="title-compendium-btn">Dice Compendium</button>
             <button id="title-howto-btn">How to Play</button>
           </div>
         </div>
@@ -266,6 +267,7 @@ function renderTitle(){
   };
   document.getElementById('title-achievements-btn').onclick = openAchievementsModal;
   document.getElementById('title-history-btn').onclick = openRunHistoryModal;
+  document.getElementById('title-compendium-btn').onclick = openDiceCompendiumModal;
   document.getElementById('title-howto-btn').onclick = ()=> openTutorialModal(0);
 }
 
@@ -1402,8 +1404,22 @@ function openDiceCompendiumModal(){
   ];
   const totalArt = tiers.reduce((n,t)=>n + t.pool.filter(d=>LOOT_ART[d.name]).length, 0);
   const totalDice = tiers.reduce((n,t)=>n + t.pool.length, 0);
+  const discoveredCount = tiers.reduce((n,t)=>n + t.pool.filter(d=>DISCOVERED_DICE.has(d.name)).length, 0);
   const sections = tiers.map(t=>{
     const rows = t.pool.map((d,i)=>{
+      const discovered = DISCOVERED_DICE.has(d.name);
+      if(!discovered){
+        // Spoiler-free until the player has actually found this die in a
+        // playthrough -- show that an entry exists without giving away its
+        // name, art or faces.
+        return `<div class="compendium-row compendium-row-locked">
+            <div class="compendium-thumb compendium-thumb-placeholder">🔒</div>
+            <div class="compendium-main">
+              <div class="run-history-who">???</div>
+              <div class="compendium-faces hint">Find this die in a run to reveal it.</div>
+            </div>
+          </div>`;
+      }
       const art = LOOT_ART[d.name];
       const thumb = art
         ? `<img class="compendium-thumb" src="${art}" alt="${d.name}"/>`
@@ -1424,7 +1440,7 @@ function openDiceCompendiumModal(){
   }).join('');
   const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:420px;">
       <h2 style="margin-top:0;">Dice Compendium</h2>
-      <p class="hint">${totalArt}/${totalDice} illustrated so far -- more art is on the way.</p>
+      <p class="hint">${discoveredCount}/${totalDice} found &middot; ${totalArt}/${totalDice} illustrated so far -- more art is on the way.</p>
       ${sections}
       <div class="small-btn-row" style="justify-content:center;">
         <button class="primary" id="compendium-close-btn">Close</button>

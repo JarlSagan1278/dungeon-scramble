@@ -629,7 +629,10 @@
   .compendium-list{ display:flex; flex-direction:column; gap:5px; max-height:220px; overflow-y:auto; margin-top:6px; }
   .compendium-row{ display:flex; align-items:center; gap:10px; background:var(--panel2); border:1px solid var(--stone); border-radius:6px; padding:5px 8px; }
   .compendium-thumb{ width:34px; height:34px; object-fit:contain; flex:0 0 auto; }
-  .compendium-thumb-placeholder{ border-radius:5px; opacity:0.4; background:var(--stone); }
+  .compendium-thumb-placeholder{ border-radius:5px; opacity:0.4; background:var(--stone); display:flex; align-items:center; justify-content:center; font-size:15px; }
+  .compendium-row-locked{ opacity:0.6; }
+  .compendium-row-locked .compendium-thumb-placeholder{ opacity:0.7; }
+  .compendium-faces.hint{ margin:0; font-size:11px; }
   .compendium-main{ flex:1 1 auto; min-width:0; }
   .compendium-faces{ display:flex; gap:4px; flex-wrap:wrap; opacity:0.85; }
   .compendium-faces .icon-svg{ width:13px; height:13px; }
