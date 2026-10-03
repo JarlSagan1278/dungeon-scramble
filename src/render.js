@@ -237,7 +237,7 @@ function renderTitle(){
         <img class="title-cover-art" src="${COVER_ART}" alt="Dungeon Scramble -- a dice-drafting, deck-builder">
         <div class="title-scrim">
           ${lifetimeLine}
-          <div class="title-btn-col">
+          <div class="title-btn-col ${saved?'':'title-btn-col-shift'}">
             ${continueBtn}
             <button class="${saved?'':'primary'}" id="title-newrun-btn">${saved?'Start New Run':'New Run'}</button>
             <button id="title-achievements-btn">Achievements</button>
