@@ -1242,6 +1242,7 @@ function settingsToggleRowHTML(id, label, checked){
 function openSettingsModal(){
   const inRun = !!S;
   const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:340px;">
+      <button class="modal-x-btn" id="settings-x-btn" title="Close">✕</button>
       <h2 style="margin-top:0;">Settings</h2>
       ${inRun ? `<p class="hint">${S.origin.name} ${S.klass.name} · Floor ${S.floorIdx+1}</p>` : ''}
       <div class="settings-toggles">
@@ -1260,6 +1261,7 @@ function openSettingsModal(){
     </div></div>`);
   document.body.appendChild(overlay);
   const close = ()=>{ if(overlay.parentNode) document.body.removeChild(overlay); };
+  overlay.querySelector('#settings-x-btn').onclick = close;
   overlay.querySelector('#settings-close-btn').onclick = close;
   overlay.querySelector('#settings-how-to-play-btn').onclick = ()=>{ close(); openTutorialModal(0); };
   overlay.querySelector('#settings-run-history-btn').onclick = ()=>{ close(); openRunHistoryModal(); };
@@ -1342,6 +1344,7 @@ function openRunHistoryModal(){
       </div>`;
   }).join('') : `<p class="hint">No runs recorded yet -- finish a run to see it here.</p>`;
   const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:400px;">
+      <button class="modal-x-btn" id="run-history-x-btn" title="Close">✕</button>
       <h2 style="margin-top:0;">Run History</h2>
       ${summary}
       <div class="run-history-list">${rows}</div>
@@ -1352,6 +1355,7 @@ function openRunHistoryModal(){
     </div></div>`);
   document.body.appendChild(overlay);
   const close = ()=>{ if(overlay.parentNode) document.body.removeChild(overlay); };
+  overlay.querySelector('#run-history-x-btn').onclick = close;
   overlay.querySelector('#run-history-close-btn').onclick = close;
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
   const clearBtn = overlay.querySelector('#run-history-clear-btn');
@@ -1377,6 +1381,7 @@ function openAchievementsModal(){
       </div>`;
   }).join('');
   const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:400px;">
+      <button class="modal-x-btn" id="achv-x-btn" title="Close">✕</button>
       <h2 style="margin-top:0;">Achievements</h2>
       <div class="statuses" style="justify-content:center; margin-bottom:10px;">
         <span class="status-chip">${unlockedCount}/${ACHIEVEMENTS.length} unlocked</span>
@@ -1388,6 +1393,7 @@ function openAchievementsModal(){
     </div></div>`);
   document.body.appendChild(overlay);
   const close = ()=>{ if(overlay.parentNode) document.body.removeChild(overlay); };
+  overlay.querySelector('#achv-x-btn').onclick = close;
   overlay.querySelector('#achv-close-btn').onclick = close;
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
 }
@@ -1441,6 +1447,7 @@ function openDiceCompendiumModal(){
       </div>`;
   }).join('');
   const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:420px;">
+      <button class="modal-x-btn" id="compendium-x-btn" title="Close">✕</button>
       <h2 style="margin-top:0;">Dice Compendium</h2>
       <p class="hint">${discoveredCount}/${totalDice} found &middot; ${totalArt}/${totalDice} illustrated so far -- more art is on the way.</p>
       ${sections}
@@ -1450,16 +1457,15 @@ function openDiceCompendiumModal(){
     </div></div>`);
   document.body.appendChild(overlay);
   const close = ()=>{ if(overlay.parentNode) document.body.removeChild(overlay); };
+  overlay.querySelector('#compendium-x-btn').onclick = close;
   overlay.querySelector('#compendium-close-btn').onclick = close;
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
 }
 
 function openInfoModal(title, bodyHTML){
   const overlay = el(`<div class="modal-overlay"><div class="modal">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <h2 style="margin:0;">${title}</h2>
-        <button class="danger" id="close-info-modal">✕</button>
-      </div>
+      <button class="modal-x-btn" id="close-info-modal" title="Close">✕</button>
+      <h2>${title}</h2>
       <div id="info-modal-body">${bodyHTML}</div>
     </div></div>`);
   document.body.appendChild(overlay);
@@ -1705,27 +1711,37 @@ function renderCamp(){
       ${renderRoute()}
       <h2>Camp</h2>
       <p>Rest and prepare before pressing onward.</p>
-      <div class="bar-row" style="position:relative;"><span style="width:70px;">Health</span><div class="bar ${campFx.cls}"><div class="bar-fill hp player" style="width:${S.health/S.maxHealth*100}%"></div></div><span>${S.health}/${S.maxHealth}</span>${campFx.deltaHTML}</div>
-      <div class="small-btn-row">
-        <button id="rest-btn" ${S.campRested?'disabled':''}>${S.campRested?'Already Rested This Camp':'Rest (scramble tray, heal half actions shown)'}</button>
-        <button id="leave-btn" class="primary">Break Camp &amp; Continue</button>
-        <button id="camp-log-btn">${iconSpan('log')} Log</button>
+
+      <div class="camp-section camp-status-card">
+        <div class="bar-row" style="position:relative;"><span style="width:70px;">Health</span><div class="bar ${campFx.cls}"><div class="bar-fill hp player" style="width:${S.health/S.maxHealth*100}%"></div></div><span>${S.health}/${S.maxHealth}</span>${campFx.deltaHTML}</div>
+        <div class="camp-fire-wrap">
+          <div class="campfire-glow"></div>
+          <div class="campfire-logs"></div>
+          <div class="campfire-flame flame-back"></div>
+          <div class="campfire-flame flame-front"></div>
+        </div>
+        <div class="small-btn-row">
+          <button id="rest-btn" ${S.campRested?'disabled':''}>${S.campRested?'Already Rested This Camp':'Rest (scramble tray, heal half actions shown)'}</button>
+        </div>
+        <div class="small-btn-row">
+          <button id="leave-btn" class="primary">Break Camp &amp; Continue</button>
+          <button id="camp-log-btn">${iconSpan('log')} Log</button>
+        </div>
       </div>
 
-      <div class="camp-fire-wrap">
-        <span class="portrait-watermark">PLACEHOLDER</span>
-        <img class="camp-fire-img" src="${CAT_SILHOUETTE}" alt="Campfire (placeholder)">
+      <div class="camp-section">
+        <h3 class="camp-section-title">Upgrade Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(1 Attack + 1 Maneuver per Camp)</span></h3>
+        <div class="small-btn-row">${upgradeRows.length? upgradeRows.join('') : '<span class="hint">No matching sets of 3 Basic dice to combine right now.</span>'}</div>
       </div>
 
-      <h3 class="camp-section-title">Upgrade Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(1 Attack + 1 Maneuver per Camp)</span></h3>
-      <div class="small-btn-row">${upgradeRows.length? upgradeRows.join('') : '<span class="hint">No matching sets of 3 Basic dice to combine right now.</span>'}</div>
-
-      <h3 class="camp-section-title">Organize Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(click one in each list to swap)</span></h3>
-      <div class="hint" style="margin-top:0;">Tray</div>
-      <div class="camp-dice-grid" id="organize-tray"></div>
-      <div class="hint">Back Pocket <span style="color:var(--parchment-dim);">(${S.backPocket.length} dice)</span></div>
-      ${S.backPocket.length ? '' : '<p class="hint camp-empty-hint">Empty — dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one.</p>'}
-      <div class="camp-dice-grid" id="organize-bp"></div>
+      <div class="camp-section">
+        <h3 class="camp-section-title">Organize Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(click one in each list to swap)</span></h3>
+        <div class="hint" style="margin-top:0;">Tray</div>
+        <div class="camp-dice-grid" id="organize-tray"></div>
+        <div class="hint">Back Pocket <span style="color:var(--parchment-dim);">(${S.backPocket.length} dice)</span></div>
+        ${S.backPocket.length ? '' : '<p class="hint camp-empty-hint">Empty — dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one.</p>'}
+        <div class="camp-dice-grid" id="organize-bp"></div>
+      </div>
     </div>`;
   document.getElementById('rest-btn').onclick = campRest;
   document.getElementById('camp-log-btn').onclick = ()=> openInfoModal('Log', logViewHTML());
