@@ -166,6 +166,20 @@ function updatePathTrail(){
   }
   trailLastPath = path.slice();
 }
+// The trail SVG is position:fixed (viewport-anchored) so it draws above
+// everything regardless of where #tray ends up in the document, but that
+// means its already-drawn line/path coordinates -- captured once from
+// getBoundingClientRect() at draw time -- go stale the instant the page
+// scrolls (the dice tiles move within the viewport; the SVG's children
+// don't follow). Re-running the non-animated full-redraw branch on every
+// scroll/resize keeps the trail glued to the tray instead of drifting off
+// into empty space above/below it.
+window.addEventListener('scroll', ()=>{
+  if(trailLastPath.length>1) updatePathTrail();
+}, {passive:true});
+window.addEventListener('resize', ()=>{
+  if(trailLastPath.length>1) updatePathTrail();
+});
 
 // ---- Screen transition: a quick fade+rise on #app whenever the top-level
 // screen actually changes (Setup -> Camp -> Encounter -> Loot/Swap ->
@@ -302,9 +316,11 @@ function renderSetup(){
     const portraitHTML = portrait.placeholder
       ? mysteryFigureHTML('width:75%; aspect-ratio:1/1;')
       : `<img class="portrait-img" src="${portrait.img}" alt="${o.name}">`;
+    const dieArt = LOOT_ART[o.die];
+    const dieArtHTML = dieArt ? `<img class="origin-die-thumb" src="${dieArt}" alt="${o.die}">` : '';
     const c = el(`<div class="choice-card has-portrait">
         <div class="portrait-wrap">${portraitHTML}</div>
-        <div class="choice-text"><h4>${o.name}</h4><p><b>${o.die}</b><br>${o.blurb}</p></div></div>`);
+        <div class="choice-text"><h4>${o.name}</h4><p>${dieArtHTML}<b>${o.die}</b><br>${o.blurb}</p></div></div>`);
     c.onclick=()=>{ chosenOrigin=o.id; [...og.children].forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); checkReady(); };
     og.appendChild(c);
   });
