@@ -1,6 +1,12 @@
 /* =========================================================================
    DATA
    ========================================================================= */
+// Bump this with every change that ships -- patch (x.y.Z) for a small
+// tweak/fix like a wording or layout change, minor (x.Y.0) for a new
+// feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
+// so there's always a quick way to tell whether two builds differ.
+const GAME_VERSION = '1.0.1';
+
 function face(str){
   if(str==null) return {type:'blank'};
   const s = String(str).trim();

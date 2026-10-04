@@ -1300,6 +1300,7 @@ function openSettingsModal(){
         ${inRun ? '<button id="settings-restart-btn" class="danger">Restart Run</button>' : ''}
         <button id="settings-close-btn">Close</button>
       </div>
+      <p class="hint" style="margin:10px 0 0;">v${GAME_VERSION}</p>
     </div></div>`);
   openModal(overlay);
   const close = ()=> closeModal(overlay);
