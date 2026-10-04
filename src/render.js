@@ -1772,18 +1772,19 @@ function renderCamp(){
       const label = cat.charAt(0).toUpperCase()+cat.slice(1);
       const eligible = canUpgrade(cat, level) && !S.campUpgrades[cat];
       const disabled = !eligible;
-      const note = (count>=3 && !canUpgrade(cat,level)) ? ' <span class="token-count">needs more spare dice to backfill</span>' : '';
+      const needsBackfill = count>=3 && !canUpgrade(cat,level);
+      const upgradeTitle = needsBackfill ? 'Needs more spare dice to backfill' : `Combine 3 ${label} ${ROMAN[level]} into 1 ${label} ${ROMAN[level+1]}`;
       upgradeRows.push(`<div class="upgrade-row">
-          <button id="upgrade-${cat}-${level}" ${disabled?'disabled':''}>Combine 3 ${label} ${ROMAN[level]} → 1 ${label} ${ROMAN[level+1]} <span class="token-count">${count} available</span></button>
+          <button class="upgrade-btn" id="upgrade-${cat}-${level}" ${disabled?'disabled':''} title="${upgradeTitle}">${label} ${ROMAN[level]} → ${ROMAN[level+1]} <span class="token-count">${count}</span></button>
           <button id="preview-${cat}-${level}" class="upgrade-preview-btn" title="Preview the resulting die's faces">?</button>
-        </div>${note}`);
+        </div>`);
     });
   });
   app.innerHTML = `
     <div class="panel">
       ${renderRoute()}
-      <h2>Camp</h2>
-      <p>Rest and prepare before pressing onward.</p>
+      <h2 style="margin-bottom:4px;">Camp</h2>
+      <p class="hint" style="margin:0 0 6px;">Rest and prepare before pressing onward.</p>
 
       <div class="camp-section camp-status-card">
         <div class="bar-row" style="position:relative;"><span style="width:70px;">Health</span><div class="bar ${campFx.cls}"><div class="bar-fill hp player" style="width:${S.health/S.maxHealth*100}%"></div></div><span>${S.health}/${S.maxHealth}</span>${campFx.deltaHTML}</div>
@@ -1804,16 +1805,15 @@ function renderCamp(){
 
       <div class="camp-section">
         <h3 class="camp-section-title">⚒️ Upgrade Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(1 Attack + 1 Maneuver per Camp)</span></h3>
-        <div class="small-btn-row">${upgradeRows.length? upgradeRows.join('') : '<span class="hint">No matching sets of 3 Basic dice to combine right now.</span>'}</div>
+        <div class="upgrade-rows-col">${upgradeRows.length? upgradeRows.join('') : '<span class="hint">No matching sets of 3 Basic dice to combine right now.</span>'}</div>
       </div>
 
       <div class="camp-section">
         <h3 class="camp-section-title">🎒 Organize Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(click one in each list to swap)</span></h3>
-        <div class="hint" style="margin-top:0;">Tray</div>
+        <div class="hint camp-subhint" style="margin-top:0;">Tray</div>
         <div class="camp-dice-grid" id="organize-tray"></div>
-        <div class="hint">Back Pocket <span style="color:var(--parchment-dim);">(${S.backPocket.length} dice)</span></div>
-        ${S.backPocket.length ? '' : '<p class="hint camp-empty-hint">Empty — dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one.</p>'}
-        <div class="camp-dice-grid" id="organize-bp"></div>
+        <div class="hint camp-subhint">Back Pocket <span style="color:var(--parchment-dim);">(${S.backPocket.length} dice)</span></div>
+        ${S.backPocket.length ? '<div class="camp-dice-grid" id="organize-bp"></div>' : '<p class="hint camp-empty-hint">Empty — dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one.</p>'}
       </div>
     </div>`;
   document.getElementById('rest-btn').onclick = campRest;

@@ -456,33 +456,34 @@
      bordered panel2 card instead of floating directly on the page
      background, so Camp reads as a real game screen with distinct areas
      rather than a flat stack of controls. */
-  .camp-section{ background: var(--panel2); border:1px solid var(--stone); border-radius:8px; padding:10px 10px 12px; margin:10px 0; }
+  .camp-section{ background: var(--panel2); border:1px solid var(--stone); border-radius:8px; padding:8px 10px 9px; margin:7px 0; }
   .camp-status-card .bar-row{ margin-bottom:0; }
-  .camp-status-card .small-btn-row{ margin-top:8px; }
-  .camp-dice-grid{ display:grid; grid-template-columns: repeat(8,1fr); gap:4px; margin:8px 0; }
+  .camp-status-card .small-btn-row{ margin-top:6px; }
+  .camp-dice-grid{ display:grid; grid-template-columns: repeat(8,1fr); gap:3px; margin:3px 0; }
   .camp-die-tile{ aspect-ratio:1/1; padding:2px; cursor:pointer; display:flex; align-items:center; justify-content:center; text-align:center; }
   .camp-die-label{ font-size:6.5px; line-height:1.1; word-break:break-word; font-weight:bold; }
   .camp-die-tile.organize-selected{ box-shadow:0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
-  .camp-section-title{ font-size:13px; margin:10px 0 4px; }
+  .camp-section-title{ font-size:13px; margin:7px 0 3px; }
   .camp-section .camp-section-title:first-child{ margin-top:0; }
-  .camp-empty-hint{ margin:0 0 6px; }
+  .camp-subhint{ margin:5px 0 2px; }
+  .camp-empty-hint{ margin:0 0 2px; }
   /* A small CSS-only campfire (logs + two flickering flame blobs + a pulsing
      warm glow) as Camp's focal point -- no art asset needed, and it doubles
      as a bit of ambient motion/juice consistent with the rest of the game's
      feedback (screen shake, particle bursts, etc.). Respects the global
      reduced-motion rule at the top of this file like every other animation. */
-  .camp-fire-wrap{ position:relative; width:90px; height:62px; margin:12px auto 6px; display:flex; align-items:flex-end; justify-content:center; }
-  .campfire-glow{ position:absolute; bottom:4px; left:50%; transform:translateX(-50%); width:72px; height:72px; border-radius:50%;
+  .camp-fire-wrap{ position:relative; width:76px; height:50px; margin:7px auto 4px; display:flex; align-items:flex-end; justify-content:center; }
+  .campfire-glow{ position:absolute; bottom:3px; left:50%; transform:translateX(-50%); width:58px; height:58px; border-radius:50%;
     background: radial-gradient(circle, rgba(255,170,60,0.55) 0%, rgba(255,170,60,0) 70%);
     animation: campfire-glow-pulse 2.4s ease-in-out infinite; }
-  .campfire-logs{ position:relative; width:42px; height:9px; background:#5a3b22; border-radius:3px; z-index:1; }
-  .campfire-logs::before, .campfire-logs::after{ content:''; position:absolute; width:42px; height:8px; background:#6b4628; border-radius:3px; top:0; left:0; }
+  .campfire-logs{ position:relative; width:34px; height:7px; background:#5a3b22; border-radius:3px; z-index:1; }
+  .campfire-logs::before, .campfire-logs::after{ content:''; position:absolute; width:34px; height:6px; background:#6b4628; border-radius:3px; top:0; left:0; }
   .campfire-logs::before{ transform: rotate(22deg); }
   .campfire-logs::after{ transform: rotate(-22deg); }
-  .campfire-flame{ position:absolute; bottom:11px; left:50%; border-radius:50% 50% 50% 50% / 62% 62% 38% 38%; z-index:2; }
-  .campfire-flame.flame-back{ width:24px; height:36px; margin-left:-12px; background: linear-gradient(to top, #ff7a1a, #ffce54);
+  .campfire-flame{ position:absolute; bottom:9px; left:50%; border-radius:50% 50% 50% 50% / 62% 62% 38% 38%; z-index:2; }
+  .campfire-flame.flame-back{ width:19px; height:29px; margin-left:-9.5px; background: linear-gradient(to top, #ff7a1a, #ffce54);
     animation: campfire-flicker-a 1.1s ease-in-out infinite; }
-  .campfire-flame.flame-front{ width:14px; height:22px; margin-left:-7px; background: linear-gradient(to top, #ffb23d, #fff2b0);
+  .campfire-flame.flame-front{ width:11px; height:17px; margin-left:-5.5px; background: linear-gradient(to top, #ffb23d, #fff2b0);
     animation: campfire-flicker-b 0.9s ease-in-out infinite; }
   @keyframes campfire-glow-pulse{ 0%,100%{ opacity:0.75; transform:translateX(-50%) scale(1); } 50%{ opacity:1; transform:translateX(-50%) scale(1.08); } }
   @keyframes campfire-flicker-a{ 0%,100%{ transform:scaleY(1) scaleX(1); } 50%{ transform:scaleY(1.12) scaleX(0.92); } }
@@ -734,9 +735,17 @@
   .faces{ display:flex; gap:3px; flex-wrap:wrap; font-size:9px; }
   .loot-opt .faces{ flex-wrap:nowrap; overflow-x:auto; }
   .faces span{ background:var(--stone); color: var(--parchment); border-radius:3px; padding:3px 5px; white-space:nowrap; flex:0 0 auto; }
+  /* Upgrade Dice rows (renderCamp(), render.js) -- kept deliberately compact
+     (small font/padding, short "Attack I -> II" wording instead of a full
+     "Combine 3 ... into 1 ..." sentence) so this section doesn't blow out
+     the Camp screen's height; the old full-sentence buttons wrapped onto 2
+     lines and pushed the ineligible-row note onto its own separate pill
+     below, roughly doubling this section's height for no real benefit. */
+  .upgrade-rows-col{ display:flex; flex-direction:column; gap:5px; margin-top:6px; }
   .upgrade-row{ display:flex; align-items:stretch; gap:6px; }
   .upgrade-row button:first-child{ flex:1; }
-  .upgrade-preview-btn{ flex:0 0 auto; width:32px; font-weight:bold; }
+  .upgrade-btn{ font-size:12px; padding:6px 8px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .upgrade-preview-btn{ flex:0 0 auto; width:28px; font-weight:bold; font-size:12px; padding:6px 4px; }
   .swap-list{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-height:440px; overflow-y:auto; margin:8px 0; padding:4px; }
   .swap-item{ position:relative; background:var(--panel2); border:2px solid var(--stone); border-radius:8px; padding:8px; cursor:pointer; transition: transform .08s; width:88px; }
   .swap-item:hover{ border-color: var(--gold); transform: translateY(-2px); }
