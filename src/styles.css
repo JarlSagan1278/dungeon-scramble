@@ -681,31 +681,44 @@
 
   /* Title/landing screen (renderTitle(), render.js) -- the screen shown
      before any game exists, ahead of character creation. A phone screen is
-     usually much taller than the cover art needs at native proportions,
-     which used to leave a large dead strip of plain background below the
-     old fixed-height card. title-screen-fill stretches the whole title
-     screen to the actual viewport height (minus the body's own 8px
-     top/bottom padding); the art keeps its own aspect ratio (so nothing
-     about the cover gets cropped or distorted) and the button section below
-     it grows to fill whatever vertical room that leaves, with bigger
-     buttons and more breathing room between them rather than a cramped
-     stack hugging the art. */
-  .title-screen-fill{ display:flex; flex-direction:column; min-height: calc(100vh - 16px); }
+     usually much taller than the cover art needs at native proportions.
+     title-vcenter reserves the full viewport height (minus the body's own
+     8px top/bottom padding) and centers the actual title card inside it;
+     the card itself (title-screen-fill) only claims 80% of that height, so
+     it reads as a deliberately-sized, vertically-centered card with even
+     breathing room above and below rather than either a short card
+     stranded at the top or one stretched edge-to-edge. The art keeps its
+     own aspect ratio (so nothing about the cover gets cropped or
+     distorted) and the button section below it fills whatever room is left
+     within that 80%, with bigger buttons and more breathing room between
+     them than a cramped stack hugging the art. */
+  .title-vcenter{ display:flex; align-items:center; justify-content:center; min-height: calc(100vh - 16px); }
+  .title-screen-fill{ display:flex; flex-direction:column; height: calc((100vh - 16px) * 0.8); width:100%; }
   .title-panel{ max-width:360px; margin:0 auto; padding:0; overflow:hidden; flex:1; display:flex; flex-direction:column; width:100%; }
-  .title-art-wrap{ position:relative; width:100%; flex:0 0 auto; }
-  .title-cover-art{ display:block; width:100%; height:auto; }
+  /* The button column's own size is content-driven (title-content is
+     flex:0 0 auto below) rather than forced to split the card 50/50, so an
+     extra row -- the Continue Saved Game button + its status caption --
+     just makes the content section a bit taller instead of starting to
+     overlap the art above it. The art fills whatever's left of the 80%-tall
+     card (flex:1) and is letterboxed (object-fit:contain, not cover) rather
+     than cropped if that leaves less room than its native aspect ratio
+     wants -- a little empty margin beside the art reads far better than
+     clipping the logo or crushing the buttons. */
+  .title-art-wrap{ position:relative; width:100%; flex:1; min-height:0; overflow:hidden;
+    display:flex; align-items:center; justify-content:center; background: var(--panel); }
+  .title-cover-art{ display:block; max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; margin:auto; }
   /* A short fade at the bottom edge of the art into the panel's own
      background color, so the image doesn't end on a hard edge right above
      the button section. */
   .title-art-fade{ position:absolute; left:0; right:0; bottom:0; height:50px; pointer-events:none;
     background: linear-gradient(to bottom, rgba(31,26,21,0) 0%, var(--panel) 100%); }
-  .title-content{ flex:1; display:flex; flex-direction:column; justify-content:center; padding:14px 14px 22px; }
+  .title-content{ flex:0 0 auto; display:flex; flex-direction:column; justify-content:center; padding:12px 14px 18px; }
   /* Wider and roomier than before -- on a tall phone there's plenty of
      width and height to give each button real presence instead of a thin
      stack of default-sized buttons. */
-  .title-btn-col{ display:flex; flex-direction:column; gap:14px; width:84%; margin:0 auto; }
-  .title-btn-col button{ font-size:17px; padding:14px 18px; }
-  .title-btn-col .hint{ font-size:13px; }
+  .title-btn-col{ display:flex; flex-direction:column; gap:11px; width:84%; margin:0 auto; }
+  .title-btn-col button{ font-size:16px; padding:12px 18px; }
+  .title-btn-col .hint{ font-size:12.5px; }
   .setup-back-btn{ background:none; border:none; color:var(--parchment-dim); font-size:12px; padding:0 0 10px; margin:0; cursor:pointer; }
   .setup-back-btn:hover{ color:var(--cream); background:none; }
 
