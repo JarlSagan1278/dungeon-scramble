@@ -249,12 +249,15 @@ function renderTitle(){
       <p class="hint" style="text-align:center; margin:-6px 0 2px;">${saved.originName} ${saved.className} &middot; Floor ${saved.floorIdx+1} &middot; ${saved.health}/${saved.maxHealth} HP</p>`
     : '';
   app.innerHTML = `
-    <div class="panel title-panel">
-      <div class="title-art-wrap">
-        <img class="title-cover-art" src="${COVER_ART}" alt="Dungeon Scramble -- a dice-drafting, deck-builder">
-        <div class="title-scrim">
+    <div class="title-screen-fill">
+      <div class="panel title-panel">
+        <div class="title-art-wrap">
+          <img class="title-cover-art" src="${COVER_ART}" alt="Dungeon Scramble -- a dice-drafting, deck-builder">
+          <div class="title-art-fade"></div>
+        </div>
+        <div class="title-content">
           ${lifetimeLine}
-          <div class="title-btn-col ${saved?'':'title-btn-col-shift'}">
+          <div class="title-btn-col">
             ${continueBtn}
             <button class="${saved?'':'primary'}" id="title-newrun-btn">${saved?'Start New Run':'New Run'}</button>
             <button id="title-achievements-btn">Achievements</button>
