@@ -213,7 +213,7 @@
      forced 1:1) so it can grow into whatever space the narrower bar/quest
      column frees up without the row itself getting any taller. */
   .enc-top-row{ display:flex; gap:8px; align-items:stretch; }
-  .enc-portrait{ flex:0 0 auto; width:68px; position:relative; }
+  .enc-portrait{ flex:0 0 auto; width:68px; position:relative; background:var(--panel2); border:1px solid var(--stone); border-radius:8px; padding:4px; overflow:hidden; }
   .enc-art{ display:block; width:100%; height:100%; object-fit:contain; }
 
   /* Portrait hit/heal reaction: the health bar already flashes and floats a
@@ -303,10 +303,15 @@
   .util-rail{ display:flex; flex-direction:column; gap:5px; width:68px; flex:0 0 auto; }
   .util-btn{ background:var(--stone); border:2px solid #000; border-radius:8px; padding:4px 2px; display:flex; flex-direction:column;
     align-items:center; justify-content:center; gap:2px; cursor:pointer; color:var(--parchment); font-size:8px; font-weight:bold;
-    position:relative; flex:1; font-size:19px; }
+    position:relative; flex:1; font-size:19px; transition: transform .05s, box-shadow .1s, background .15s; }
   .util-btn span{ font-size:9.5px; }
   .util-btn .badge{ position:absolute; top:-5px; right:-5px; background:var(--gold); color:#241c10; font-size:8px; font-weight:800;
     border-radius:8px; padding:2px 4px; min-width:13px; text-align:center; line-height:1.3; }
+  /* Same tactile hover/press feedback as real <button>s elsewhere (these
+     are divs, so they don't pick that up automatically) -- keeps the util
+     rail buttons feeling like the same kind of control as everything else. */
+  .util-btn:not(.disabled):hover{ transform: translateY(-1px); box-shadow:0 2px 4px rgba(0,0,0,0.35); }
+  .util-btn:not(.disabled):active{ transform: translateY(1px); box-shadow:none; }
   .util-btn.disabled{ opacity:0.35; cursor:default; }
   .util-btn.danger-accent{ background: var(--red-dim); }
   .util-btn.primary-accent{ background: var(--gold); color:#241c10; }
