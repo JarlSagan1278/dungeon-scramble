@@ -302,12 +302,13 @@ function clone(o){ return JSON.parse(JSON.stringify(o)); }
 function cap(v,max){ return Math.max(0, Math.min(v,max)); }
 function capUpper(v,max){ return Math.min(v,max); } // no floor -- lets encounter health go negative so Overkill can be measured
 
-// Picks a race-correct portrait for a given Origin. Dwarf and Gnome have
-// real art recovered from the character sheet; Halfling and Pixie don't yet,
-// so they fall back to a random Gnome portrait flagged as a placeholder.
+// Picks a race-correct portrait for a given Origin. All four origins now
+// have real art recovered from the character sheet.
 function pickPortrait(originId){
   if(originId==='dwarf') return { img: DWARF_PORTRAITS[rand(DWARF_PORTRAITS.length)], placeholder:false };
   if(originId==='gnome') return { img: GNOME_PORTRAITS[rand(GNOME_PORTRAITS.length)], placeholder:false };
+  if(originId==='halfling') return { img: HALFLING_PORTRAITS[rand(HALFLING_PORTRAITS.length)], placeholder:false };
+  if(originId==='pixie') return { img: PIXIE_PORTRAITS[rand(PIXIE_PORTRAITS.length)], placeholder:false };
   return { img: GNOME_SILHOUETTE, placeholder:true };
 }
 
