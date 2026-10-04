@@ -195,8 +195,8 @@ function basic(cat, level){ return BASIC_DICE.find(d=>d.cat===cat && d.level===l
 const ORIGINS = [
   {id:'dwarf', name:'Dwarf', die:'Dwarven Doohickie', blurb:'Shield up, then pop it for a big Hit.', faces:faces(['Hit2','Boost1','Boost1','Pivot','Block2','Block2'])},
   {id:'gnome', name:'Gnome', die:'Gnomish Mushroom Cap', blurb:'Continuous damage and self-sustain over time.', faces:faces(['Combo1','Boost1','DOT1','DOT1','Leech1','Dodge'])},
-  {id:'halfling', name:'Halfling', die:'Bonus Breakfast', blurb:'Healing and utility to keep the party fed and fueled.', faces:faces(['Combo1','Boost1','Heal2','Heal2','HOT1','Nullify'])},
-  {id:'pixie', name:'Pixie', die:'Pixie Powder', blurb:'Tricky, mobile, and a bit of everything.', faces:faces(['Combo1','Boost1','DOT1','Dodge','Leap','Freeze'])},
+  {id:'halfling', name:'Halfling', die:'Bonus Breakfast', blurb:'Second breakfast and good cheer -- healing and buffs to keep the party going.', faces:faces(['Combo1','Boost1','Heal2','Heal2','HOT1','Nullify'])},
+  {id:'pixie', name:'Pixie', die:'Pixie Powder', blurb:'Blinks past trouble and leaves a little mischief behind.', faces:faces(['Combo1','Boost1','DOT1','Dodge','Leap','Freeze'])},
 ];
 
 // ---- Classes ----
