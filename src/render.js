@@ -271,6 +271,17 @@ function renderTitle(){
   document.getElementById('title-howto-btn').onclick = ()=> openTutorialModal(0);
 }
 
+// A generic "unknown" figure -- a dark hooded silhouette with two softly
+// glowing eyes -- standing in anywhere a real portrait isn't drawn yet
+// (Halfling/Pixie origins, and every un-illustrated monster). Pure CSS, no
+// image asset, and reads as an intentional "mystery" design on its own, so
+// it replaces the old placeholder art + loud red "PLACEHOLDER" banner
+// combo entirely (same idea as the Camp campfire). `sizeStyle` is an inline
+// width/aspect-ratio string sized to whatever box is hosting it.
+function mysteryFigureHTML(sizeStyle){
+  return `<div class="mystery-figure" style="${sizeStyle}"></div>`;
+}
+
 function renderSetup(){
   app.innerHTML = `
     <div class="panel">
@@ -288,9 +299,11 @@ function renderSetup(){
   const og = document.getElementById('origin-grid');
   ORIGINS.forEach(o=>{
     const portrait = getSetupPreviewPortrait(o.id);
-    const wm = portrait.placeholder ? `<span class="portrait-watermark">PLACEHOLDER</span>` : '';
+    const portraitHTML = portrait.placeholder
+      ? mysteryFigureHTML('width:75%; aspect-ratio:1/1;')
+      : `<img class="portrait-img" src="${portrait.img}" alt="${o.name}">`;
     const c = el(`<div class="choice-card has-portrait">
-        <div class="portrait-wrap">${wm}<img class="portrait-img" src="${portrait.img}" alt="${o.name}"></div>
+        <div class="portrait-wrap">${portraitHTML}</div>
         <div class="choice-text"><h4>${o.name}</h4><p><b>${o.die}</b><br>${o.blurb}</p></div></div>`);
     c.onclick=()=>{ chosenOrigin=o.id; [...og.children].forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); checkReady(); };
     og.appendChild(c);
@@ -339,8 +352,10 @@ function renderRoute(){
   html += '</div>';
   const leftPct = ((Math.min(S.routeStep, n-1) + 0.5) / n * 100).toFixed(2);
   const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
-  const wm = portrait.placeholder ? `<span class="mascot-watermark">PLACEHOLDER</span>` : '';
-  html += `<span class="mascot-wrap" style="left:${leftPct}%;">${wm}<img class="mascot-marker" src="${portrait.img}" alt=""></span>`;
+  const mascotHTML = portrait.placeholder
+    ? mysteryFigureHTML('width:26px; height:26px;')
+    : `<img class="mascot-marker" src="${portrait.img}" alt="">`;
+  html += `<span class="mascot-wrap" style="left:${leftPct}%;">${mascotHTML}</span>`;
   html += '</div>';
   return html;
 }
@@ -553,7 +568,7 @@ function renderEncounterCard(e){
         <div class="enc-top-row">
           <div class="enc-portrait ${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}">
             ${art?`<img class="enc-art" src="${art}" alt="${e.name}"/>`
-              : (e.type!=='Shrine' ? `<div class="enc-art-wrap"><span class="portrait-watermark">PLACEHOLDER</span><img class="enc-art" src="${CAT_SILHOUETTE}" alt=""/></div>` : '')}
+              : (e.type!=='Shrine' ? `<div class="enc-art-wrap">${mysteryFigureHTML('width:70%; aspect-ratio:1/1;')}</div>` : '')}
           </div>
           <div class="enc-vitals">
             <div class="bar-row status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;"><span>${iconSpan('heal')}</span><div class="bar ${fx.cls}">
@@ -686,8 +701,9 @@ function renderGame(){
             : S.klass.debug ? `<div class="util-btn rail-ability ${(!S.encounter||S.transitioning)?'disabled':''}" id="debug-win-btn">🏆<span>Win</span></div>` : ''}
           <div class="char-icon-wrap ${playerFx.cls==='flash-damage'?'dmg-flash':playerFx.cls==='flash-heal'?'heal-flash':''}" title="${S.origin.name} ${S.klass.name}">${(()=>{
             const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
-            const wm = portrait.placeholder ? `<span class="char-icon-watermark">PLACEHOLDER</span>` : '';
-            return `${wm}<img class="char-icon-img" src="${portrait.img}" alt="${S.origin.name}">`;
+            return portrait.placeholder
+              ? mysteryFigureHTML('width:48px; height:48px;')
+              : `<img class="char-icon-img" src="${portrait.img}" alt="${S.origin.name}">`;
           })()}</div>
         </div>
       </div>
