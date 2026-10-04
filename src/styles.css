@@ -298,7 +298,9 @@
   .boss-cycle-item .icon-value-overlay{ font-size:5px; }
   .boss-cycle-item.next{ opacity:1; background:var(--gold); color:#241c10; box-shadow:0 0 6px 1px rgba(212,175,82,0.7); font-weight:bold; }
   .statuses{ display:flex; gap:4px; flex-wrap:wrap; margin-top:3px; font-size:11px; }
-  .status-chip{ background: var(--stone); color: var(--parchment); border-radius:10px; padding:1px 7px; }
+  .status-chip{ background: linear-gradient(160deg, #3c3022, #221a12); border:1px solid rgba(0,0,0,0.6);
+    color: var(--parchment); border-radius:10px; padding:1px 7px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); }
   .token-count{ background:rgba(255,255,255,0.2); border-radius:8px; padding:0 6px; margin-left:4px; font-size:11px; }
   .quest-list{ margin-top:3px; font-size:10.5px; }
   .quest{ display:flex; gap:5px; align-items:flex-start; margin:1px 0; padding:1px 4px; border-radius:4px; background:rgba(255,255,255,0.06); color: var(--parchment); }
@@ -449,7 +451,22 @@
     border:2px solid #000; border-radius:14px; padding:3px 10px; font-size:11px; font-weight:bold; cursor:pointer;
     z-index:3; box-shadow:0 2px 6px rgba(0,0,0,0.5); }
   .skip-turn-btn:hover{ background:var(--gold); color:#241c10; }
-  .path-chip{ background: var(--stone); border-radius:4px; padding:2px 6px; font-size:12px; }
+  /* Played-path queue: small inked tokens (dark bevel + hard border + a
+     drop shadow) instead of flat grey pills with a plain "1." text prefix --
+     matches the dice tray's own tactile language rather than reading like a
+     default list/tag component. The step number is a little pressed-metal
+     coin instead of plain text, echoing the gold .pathnum badges already
+     used on the tray tiles themselves. */
+  .path-chip{ display:inline-flex; align-items:center; gap:5px;
+    background: linear-gradient(160deg, #3c3022, #221a12);
+    border:1px solid rgba(0,0,0,0.65); border-radius:7px; padding:3px 8px 3px 3px;
+    font-size:12px; color: var(--parchment);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08); }
+  .path-chip .chip-num{ display:flex; align-items:center; justify-content:center; flex:0 0 auto;
+    width:15px; height:15px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #f3dd98, var(--gold));
+    color:#241c10; font-weight:800; font-size:9px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.55); }
 
   .key-card{ background: var(--panel2); border:3px solid var(--stone); border-radius:10px; padding:12px 12px 8px; margin-top:16px; }
   .key-title{ font-weight:800; font-size:15px; color: var(--gold); text-align:center; font-family:'Baloo 2',Georgia,serif; white-space:nowrap; }
@@ -459,8 +476,15 @@
   .key-item .key-label{ font-size:10px; font-weight:800; color: var(--parchment); }
   .key-item.blk-maneuver{ background:#ffdeb7; }
   .key-item.blk-attack{ background:#ff7f7f; }
+  /* Boost/Block/Heal/Nullify/H.O.T./Freeze/Fumble previously had no tinted
+     card at all -- plain icon+label floating on the modal's background --
+     so the grid read as half game-piece, half bare app list. Giving this
+     third (support/utility) group its own tint finishes the set: every
+     tile in the key is now the same kind of object, just three colors. */
+  .key-item.blk-support{ background:#bcdcec; }
   .key-item.blk-maneuver .key-icon, .key-item.blk-maneuver .key-label,
-  .key-item.blk-attack .key-icon, .key-item.blk-attack .key-label{ color:#141414; }
+  .key-item.blk-attack .key-icon, .key-item.blk-attack .key-label,
+  .key-item.blk-support .key-icon, .key-item.blk-support .key-label{ color:#141414; }
   /* Camp screen section cards -- Status/Upgrade/Organize each get their own
      bordered panel2 card instead of floating directly on the page
      background, so Camp reads as a real game screen with distinct areas
@@ -764,7 +788,15 @@
      rendering noticeably bigger than its own box and bleeding into the
      label text right after it). */
   .loot-opt .faces .icon-svg{ width:11px; height:11px; }
-  .faces span{ background:var(--stone); color: var(--parchment); border-radius:3px; padding:3px 5px; white-space:nowrap; flex:0 0 auto; }
+  /* Same inked-token treatment as .path-chip (above) rather than a flat
+     solid-color tag -- these face previews (loot options, upgrade-dice
+     results) are "what's printed on this die", so they read better as a
+     tiny token than a generic UI label. */
+  .faces span{ display:inline-flex; align-items:center;
+    background: linear-gradient(160deg, #3c3022, #221a12);
+    border:1px solid rgba(0,0,0,0.65); color: var(--parchment);
+    border-radius:6px; padding:3px 6px; white-space:nowrap; flex:0 0 auto;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); }
   /* Upgrade Dice rows (renderCamp(), render.js) -- kept deliberately compact
      (small font/padding, short "Attack I -> II" wording instead of a full
      "Combine 3 ... into 1 ..." sentence) so this section doesn't blow out
