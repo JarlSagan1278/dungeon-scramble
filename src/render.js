@@ -52,6 +52,15 @@ function updateHeaderMeta(){
   const headerEl = document.getElementById('header-meta');
   if(!headerEl) return;
   headerEl.textContent = (S && S.origin && S.klass) ? `${S.origin.name} ${S.klass.name} · Floor ${S.floorIdx+1}` : 'digital prototype';
+  // The logo + "Origin Class - Floor N" text are pure branding/status --
+  // useful context on the title/setup screens and between-encounter
+  // screens, but just overhead once you're actually mid-encounter and
+  // already deep in the dice tray. Collapse the bar down to just the
+  // Settings gear (still needed -- it's the only way to reach Settings
+  // mid-run) on that one screen to free up vertical space on phone
+  // heights.
+  const titleBar = document.querySelector('.title-bar');
+  if(titleBar) titleBar.classList.toggle('compact', !!(S && S.screen==='game'));
 }
 
 // Low-health danger cue: a fixed, full-viewport pulsing red vignette --
