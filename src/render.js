@@ -923,7 +923,7 @@ function showKillCallout(lines){
 // kind of moment. Stays up until tapped (rather than timing itself out),
 // so it can't slip by unread. Triggered once per room by renderGame() off
 // the one-shot S.newRoomFx flag set in advanceRoute() (logic.js). ----
-function showRoomCallout(fx){
+function showRoomCallout(fx, onDismiss){
   const old = document.getElementById('room-callout');
   if(old && old.parentNode) old.parentNode.removeChild(old);
   // Regular encounters anchor the callout to the dice tray; Shrines have no
@@ -941,6 +941,11 @@ function showRoomCallout(fx){
     </div>`);
   trayWrap.appendChild(node);
   node.addEventListener('click', ()=>{
+    // When there's a follow-up (e.g. a Shrine revealing its boon), run it
+    // right away -- it calls render() itself, which rebuilds the whole panel
+    // and removes this node along with it, so the fade-out below is moot in
+    // that case and skipped.
+    if(onDismiss){ onDismiss(); return; }
     node.classList.add('dismissing');
     setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 200);
   });
@@ -1697,7 +1702,9 @@ function renderShrineEncounter(){
   if(S.shrineResult) renderShrineResultModal();
   attachLongPressTooltips('.route-tooltip-target');
   if(S.newRoomFx){
-    showRoomCallout(S.newRoomFx);
+    // Defer the boon reveal until the player taps past "A new room... Shrine"
+    // -- see the comment in advanceRoute()'s Shrine branch (logic.js).
+    showRoomCallout(S.newRoomFx, ()=> applyShrineBoon(S.encounter));
     if(typeof playTone==='function') playTone('roomEnter');
     S.newRoomFx = null; // consumed -- plays once, on the render right after advanceRoute() set it
   }

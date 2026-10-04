@@ -536,7 +536,14 @@ function advanceRoute(){
       // one-shot flag consumed by renderShrineEncounter() (render.js), same
       // as S.newRoomFx is for renderGame().
       S.newRoomFx = {name: drawn.name, type: drawn.type, boss:false};
-      applyShrineBoon(drawn);
+      // Deliberately NOT calling applyShrineBoon() here: that used to fire
+      // immediately, so the boon/loot result modal popped up in the very
+      // same render as the "A new room..." callout -- the modal's full-
+      // screen overlay sits on top of the callout, so the player saw their
+      // reward before they ever found out they were at a Shrine. It now
+      // runs once the player dismisses that callout instead (wired up in
+      // renderShrineEncounter()/showRoomCallout(), render.js), same beat as
+      // a regular encounter: see the room, then see what's in it.
       return;
     }
     // A fresh room gets a fresh roll -- without this the tray would still
@@ -1214,10 +1221,7 @@ function runShrineEffect(e, effect){
 function continueFromShrine(){
   S.shrineResult = null;
   finishStep();
-  // See the matching comment in swapInLootDie(): skip the redundant render
-  // when the next room is itself a Shrine, since advanceRoute() already
-  // rendered it (and its new-room callout) via applyShrineBoon().
-  if(S.screen !== 'shrine') render();
+  render();
 }
 
 function applyShrineBoon(e){
@@ -1311,12 +1315,7 @@ function swapInLootDie(trayIndex){
   if(typeof playTone==='function') playTone('equip');
   if(typeof spawnParticleBurstAtEl==='function') spawnParticleBurstAtEl('.panel', ['#ffd76a','#8fd0ff','#fff5d6']);
   finishStep();
-  // If the next room is a Shrine, advanceRoute() -> applyShrineBoon() already
-  // rendered it (so its one-shot "A new room..." callout shows) -- a second,
-  // redundant render() here would immediately overwrite app.innerHTML and
-  // wipe that callout node before anyone saw it. Every other next-step type
-  // still needs this render to paint at all.
-  if(S.screen !== 'shrine') render();
+  render();
 }
 
 function onPlayerDefeated(){
@@ -1449,9 +1448,6 @@ function campRest(){
 }
 function campLeave(){
   finishStep();
-  // See the matching comment in swapInLootDie(): skip the redundant render
-  // when the next room is itself a Shrine, since advanceRoute() already
-  // rendered it (and its new-room callout) via applyShrineBoon().
-  if(S.screen !== 'shrine') render();
+  render();
 }
 
