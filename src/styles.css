@@ -693,12 +693,14 @@
   .title-panel{ max-width:360px; margin:0 auto; padding:0; overflow:hidden; flex:1; display:flex; flex-direction:column; width:100%; }
   .title-art-wrap{ position:relative; width:100%; flex:0 0 auto; }
   .title-cover-art{ display:block; width:100%; height:auto; }
-  /* A short fade at the bottom edge of the art into the panel's own
-     background color, so the image doesn't end on a hard edge right above
-     the button section. */
-  .title-art-fade{ position:absolute; left:0; right:0; bottom:0; height:50px; pointer-events:none;
-    background: linear-gradient(to bottom, rgba(31,26,21,0) 0%, var(--panel) 100%); }
-  .title-content{ flex:1; display:flex; flex-direction:column; justify-content:center; padding:10px 14px 16px; }
+  /* Taller, darker fade at the bottom edge of the art -- the button column
+     below is pulled up to overlap this part of the image (title-content's
+     negative margin-top), so this now has to double as a readability scrim
+     behind the buttons, not just a soft transition into the panel color. */
+  .title-art-fade{ position:absolute; left:0; right:0; bottom:0; height:190px; pointer-events:none;
+    background: linear-gradient(to bottom, rgba(31,26,21,0) 0%, rgba(31,26,21,0.78) 45%, var(--panel) 100%); }
+  .title-content{ position:relative; flex:1; display:flex; flex-direction:column; justify-content:center;
+    padding:10px 14px 16px; margin-top:-130px; }
   .title-btn-col{ display:flex; flex-direction:column; gap:7px; width:66%; margin:0 auto; }
   .title-btn-col button{ font-size:13px; padding:9px 14px; }
   .title-btn-col .hint{ font-size:11px; }
