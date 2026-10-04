@@ -579,9 +579,20 @@
   .reduced-motion #room-callout{ animation:none; opacity:1; }
   .reduced-motion .room-callout-box{ animation:none; transform:none; }
 
-  .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.72); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px;}
+  .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.72); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px;
+    animation: modal-overlay-in 0.16s ease-out; }
   .modal{ position:relative; background: var(--panel); border:2px solid var(--gold); border-radius:8px; padding:20px; max-width:520px; width:100%; max-height:85vh; overflow-y:auto;
-    box-shadow: 0 8px 28px rgba(0,0,0,0.5); }
+    box-shadow: 0 8px 28px rgba(0,0,0,0.5); animation: modal-card-in 0.2s cubic-bezier(.25,1.4,.4,1); }
+  /* Mirrors the entrance on the way out -- openModal()/closeModal() in
+     render.js add/remove .modal-closing and wait for it to finish before the
+     node actually leaves the DOM, instead of every modal popping in and
+     being yanked out with a bare appendChild/removeChild. */
+  .modal-overlay.modal-closing{ animation: modal-overlay-out 0.14s ease-in forwards; }
+  .modal-overlay.modal-closing .modal{ animation: modal-card-out 0.14s ease-in forwards; }
+  @keyframes modal-overlay-in{ from{ opacity:0; } to{ opacity:1; } }
+  @keyframes modal-overlay-out{ from{ opacity:1; } to{ opacity:0; } }
+  @keyframes modal-card-in{ from{ opacity:0; transform:scale(0.92) translateY(10px); } to{ opacity:1; transform:scale(1) translateY(0); } }
+  @keyframes modal-card-out{ from{ opacity:1; transform:scale(1) translateY(0); } to{ opacity:0.4; transform:scale(0.95) translateY(6px); } }
   /* A gold rule under every modal's title -- a small, consistent "this is a
      crafted panel" touch instead of a title floating directly above body
      text with nothing to separate them. */

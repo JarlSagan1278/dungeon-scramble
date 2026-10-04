@@ -260,10 +260,10 @@ function renderTitle(){
           <button class="danger" id="title-newrun-go">Start New Run</button>
         </div>
       </div></div>`);
-    document.body.appendChild(overlay);
-    overlay.querySelector('#title-newrun-cancel').onclick = ()=> document.body.removeChild(overlay);
-    overlay.querySelector('#title-newrun-go').onclick = ()=>{ clearSave(); document.body.removeChild(overlay); preGameScreen='setup'; render(); };
-    overlay.onclick = (ev)=>{ if(ev.target===overlay) document.body.removeChild(overlay); };
+    openModal(overlay);
+    overlay.querySelector('#title-newrun-cancel').onclick = ()=> closeModal(overlay);
+    overlay.querySelector('#title-newrun-go').onclick = ()=> closeModal(overlay, ()=>{ clearSave(); preGameScreen='setup'; render(); });
+    overlay.onclick = (ev)=>{ if(ev.target===overlay) closeModal(overlay); };
   };
   document.getElementById('title-achievements-btn').onclick = openAchievementsModal;
   document.getElementById('title-history-btn').onclick = openRunHistoryModal;
@@ -621,8 +621,7 @@ function openTokensModal(){
     if(S.transitioning || !S.encounter || S.nullifyTokens<=0) return;
     S.nullifyTokens--;
     applyNullify();
-    document.body.removeChild(overlay);
-    render();
+    closeModal(overlay, render);
   };
   const freezeBtn = overlay.querySelector('#use-freeze-token');
   if(freezeBtn) freezeBtn.onclick = ()=>{
@@ -630,8 +629,7 @@ function openTokensModal(){
     S.freezeTokens--;
     S.freezeNext = true;
     logMsg('sys', 'Freeze token used — the encounter will skip its next action.');
-    document.body.removeChild(overlay);
-    render();
+    closeModal(overlay, render);
   };
   const boostBtn = overlay.querySelector('#use-boost-token');
   if(boostBtn) boostBtn.onclick = ()=>{
@@ -639,8 +637,7 @@ function openTokensModal(){
     S.boostTokenCharges--;
     S.pendingFreeBoost = S.boostTokenValue;
     logMsg('sys', `Boost token armed — your next path action gets x${S.boostTokenValue}.`);
-    document.body.removeChild(overlay);
-    render();
+    closeModal(overlay, render);
   };
 }
 
@@ -1280,8 +1277,8 @@ function openSettingsModal(){
         <button id="settings-close-btn">Close</button>
       </div>
     </div></div>`);
-  document.body.appendChild(overlay);
-  const close = ()=>{ if(overlay.parentNode) document.body.removeChild(overlay); };
+  openModal(overlay);
+  const close = ()=> closeModal(overlay);
   overlay.querySelector('#settings-x-btn').onclick = close;
   overlay.querySelector('#settings-close-btn').onclick = close;
   overlay.querySelector('#settings-how-to-play-btn').onclick = ()=>{ close(); openTutorialModal(0); };
@@ -1302,10 +1299,10 @@ function openSettingsModal(){
           <button class="danger" id="confirm-restart-go">Restart Run</button>
         </div>
       </div></div>`);
-    document.body.appendChild(confirmOverlay);
-    confirmOverlay.querySelector('#confirm-restart-cancel').onclick = ()=> document.body.removeChild(confirmOverlay);
+    openModal(confirmOverlay);
+    confirmOverlay.querySelector('#confirm-restart-cancel').onclick = ()=> closeModal(confirmOverlay);
     confirmOverlay.querySelector('#confirm-restart-go').onclick = ()=>{ clearSave(); location.reload(); };
-    confirmOverlay.onclick = (ev)=>{ if(ev.target===confirmOverlay) document.body.removeChild(confirmOverlay); };
+    confirmOverlay.onclick = (ev)=>{ if(ev.target===confirmOverlay) closeModal(confirmOverlay); };
   };
   return overlay;
 }
@@ -1330,8 +1327,7 @@ function openTutorialModal(stepIdx){
     </div></div>`);
   openUniqueOverlay('tutorial', overlay);
   const closeAndAdvance = (next)=>{
-    document.body.removeChild(overlay);
-    if(next!=null) openTutorialModal(next);
+    closeModal(overlay, ()=>{ if(next!=null) openTutorialModal(next); });
   };
   const prevBtn = overlay.querySelector('#tutorial-prev-btn');
   if(prevBtn) prevBtn.onclick = ()=> closeAndAdvance(stepIdx-1);
@@ -1374,13 +1370,13 @@ function openRunHistoryModal(){
         <button class="primary" id="run-history-close-btn">Close</button>
       </div>
     </div></div>`);
-  document.body.appendChild(overlay);
-  const close = ()=>{ if(overlay.parentNode) document.body.removeChild(overlay); };
+  openModal(overlay);
+  const close = ()=> closeModal(overlay);
   overlay.querySelector('#run-history-x-btn').onclick = close;
   overlay.querySelector('#run-history-close-btn').onclick = close;
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
   const clearBtn = overlay.querySelector('#run-history-clear-btn');
-  if(clearBtn) clearBtn.onclick = ()=>{ clearRunHistory(); close(); openRunHistoryModal(); };
+  if(clearBtn) clearBtn.onclick = ()=>{ clearRunHistory(); closeModal(overlay, openRunHistoryModal); };
 }
 
 // Lifetime Achievements (ACHIEVEMENTS, logic.js) -- locked entries show
@@ -1412,8 +1408,8 @@ function openAchievementsModal(){
         <button class="primary" id="achv-close-btn">Close</button>
       </div>
     </div></div>`);
-  document.body.appendChild(overlay);
-  const close = ()=>{ if(overlay.parentNode) document.body.removeChild(overlay); };
+  openModal(overlay);
+  const close = ()=> closeModal(overlay);
   overlay.querySelector('#achv-x-btn').onclick = close;
   overlay.querySelector('#achv-close-btn').onclick = close;
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
@@ -1476,8 +1472,8 @@ function openDiceCompendiumModal(){
         <button class="primary" id="compendium-close-btn">Close</button>
       </div>
     </div></div>`);
-  document.body.appendChild(overlay);
-  const close = ()=>{ if(overlay.parentNode) document.body.removeChild(overlay); };
+  openModal(overlay);
+  const close = ()=> closeModal(overlay);
   overlay.querySelector('#compendium-x-btn').onclick = close;
   overlay.querySelector('#compendium-close-btn').onclick = close;
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
@@ -1489,9 +1485,9 @@ function openInfoModal(title, bodyHTML){
       <h2>${title}</h2>
       <div id="info-modal-body">${bodyHTML}</div>
     </div></div>`);
-  document.body.appendChild(overlay);
-  overlay.querySelector('#close-info-modal').onclick = ()=> document.body.removeChild(overlay);
-  overlay.onclick = (ev)=>{ if(ev.target===overlay) document.body.removeChild(overlay); };
+  openModal(overlay);
+  overlay.querySelector('#close-info-modal').onclick = ()=> closeModal(overlay);
+  overlay.onclick = (ev)=>{ if(ev.target===overlay) closeModal(overlay); };
   return overlay;
 }
 
@@ -1560,10 +1556,36 @@ function lootPreviewTileHTML(opt, uniqueId){
 // popup on top of the first instead of replacing it. Tagging each with a
 // role and removing any existing one with that role first makes them
 // idempotent: rendering the same state twice just replaces the popup.
+// Every modal mounts/unmounts through these two instead of a bare
+// appendChild/removeChild, so it fades+scales in and mirrors that on the way
+// out instead of popping into existence and getting yanked out instantly
+// (the actual animating is CSS -- modal-overlay/card-in/out, styles.css).
+// closeModal() races the CSS animationend against a timeout fallback so a
+// stuck or skipped animation (e.g. Reduce Motion, which disables animations
+// globally) never leaves the overlay stuck in the DOM.
+function openModal(overlay){
+  document.body.appendChild(overlay);
+  return overlay;
+}
+function closeModal(overlay, after){
+  if(!overlay || !overlay.parentNode){ if(after) after(); return; }
+  if(overlay.classList.contains('modal-closing')){ return; } // already closing
+  overlay.classList.add('modal-closing');
+  let done = false;
+  const finish = ()=>{
+    if(done) return;
+    done = true;
+    if(overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    if(after) after();
+  };
+  overlay.addEventListener('animationend', finish, { once:true });
+  setTimeout(finish, 200);
+}
+
 function openUniqueOverlay(role, overlay){
   document.querySelectorAll(`[data-overlay-role="${role}"]`).forEach(n=>{ if(n.parentNode) n.parentNode.removeChild(n); });
   overlay.dataset.overlayRole = role;
-  document.body.appendChild(overlay);
+  openModal(overlay);
   return overlay;
 }
 
@@ -1586,7 +1608,7 @@ function renderLootModal(){
         ${lootPreviewTileHTML(opt, `loot-${i}`)}
         <div class="faces">${opt.faces.map(f=>`<span>${iconSpan(f.type, f.value)}${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?f.value:''}</span>`).join('')}</div>
       </div>`);
-    card.onclick = ()=>{ document.body.removeChild(overlay); chooseLoot(opt); };
+    card.onclick = ()=> closeModal(overlay, ()=> chooseLoot(opt));
     container.appendChild(card);
   });
 }
@@ -1602,7 +1624,7 @@ function renderShrineChoiceModal(){
   const container = overlay.querySelector('#shrine-options');
   options.forEach(opt=>{
     const card = el(`<div class="loot-opt"><h4>${opt.label}</h4></div>`);
-    card.onclick = ()=>{ document.body.removeChild(overlay); chooseShrineOption(opt); };
+    card.onclick = ()=> closeModal(overlay, ()=> chooseShrineOption(opt));
     container.appendChild(card);
   });
 }
@@ -1617,10 +1639,7 @@ function renderShrineResultModal(){
       <button class="primary" id="shrine-result-continue">Continue</button>
     </div></div>`);
   openUniqueOverlay('shrine-result', overlay);
-  overlay.querySelector('#shrine-result-continue').onclick = ()=>{
-    document.body.removeChild(overlay);
-    continueFromShrine();
-  };
+  overlay.querySelector('#shrine-result-continue').onclick = ()=> closeModal(overlay, continueFromShrine);
 }
 
 function renderSwap(){
@@ -1671,8 +1690,8 @@ function confirmDieReplace(trayIndex, oldName, newName){
         <button id="confirm-swap-no">Cancel</button>
       </div>
     </div></div>`));
-  const close = ()=>{ if(overlay.parentNode) overlay.parentNode.removeChild(overlay); };
-  overlay.querySelector('#confirm-swap-yes').onclick = ()=>{ close(); swapInLootDie(trayIndex); };
+  const close = ()=> closeModal(overlay);
+  overlay.querySelector('#confirm-swap-yes').onclick = ()=> closeModal(overlay, ()=> swapInLootDie(trayIndex));
   overlay.querySelector('#confirm-swap-no').onclick = close;
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
 }
@@ -1777,10 +1796,10 @@ function renderCamp(){
           <button class="primary" id="confirm-leave-go">Break Camp</button>
         </div>
       </div></div>`);
-    document.body.appendChild(overlay);
-    overlay.querySelector('#confirm-leave-cancel').onclick = ()=> document.body.removeChild(overlay);
-    overlay.querySelector('#confirm-leave-go').onclick = ()=>{ document.body.removeChild(overlay); campLeave(); };
-    overlay.onclick = (ev)=>{ if(ev.target===overlay) document.body.removeChild(overlay); };
+    openModal(overlay);
+    overlay.querySelector('#confirm-leave-cancel').onclick = ()=> closeModal(overlay);
+    overlay.querySelector('#confirm-leave-go').onclick = ()=> closeModal(overlay, campLeave);
+    overlay.onclick = (ev)=>{ if(ev.target===overlay) closeModal(overlay); };
   };
   ['attack','maneuver'].forEach(cat=>{
     [1,2].forEach(level=>{
