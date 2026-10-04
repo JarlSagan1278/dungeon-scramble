@@ -1482,7 +1482,7 @@ function openDiceCompendiumModal(){
   const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:420px;">
       <button class="modal-x-btn" id="compendium-x-btn" title="Close">✕</button>
       <h2 style="margin-top:0;">Dice Compendium</h2>
-      <p class="hint">${discoveredCount}/${totalDice} found &middot; ${totalArt}/${totalDice} illustrated so far -- more art is on the way.</p>
+      <p class="hint">${discoveredCount}/${totalDice} found &middot; ${totalArt}/${totalDice} illustrated.</p>
       ${sections}
       <div class="small-btn-row" style="justify-content:center;">
         <button class="primary" id="compendium-close-btn">Close</button>
