@@ -620,7 +620,14 @@ function pathCounterHTML(){
   if(!S.path.length) return '';
   const preview = computePathEffects(S.path);
   const val = preview.totalDamage;
-  const size = Math.min(20 + val*3, 44).toFixed(0);
+  // No upper cap anymore -- now that this badge lives outside .tray-wrap's
+  // clipped box (see .tray-float-wrap, styles.css), it's free to keep
+  // growing and spill out over the tray/card edge as the total climbs,
+  // instead of maxing out small and getting visually capped at 44px.
+  // Growth tapers (sqrt) past the early numbers so a 30-damage path still
+  // reads big without the badge trying to outgrow the whole screen.
+  const size = Math.round(22 + Math.sqrt(Math.max(val,0))*11);
+  const big = val>=8;
   const extras = [];
   if(preview.healGain) extras.push(`+${preview.healGain}${iconSpan('heal')}`);
   if(preview.blockGain) extras.push(`+${preview.blockGain}${iconSpan('block')}`);
@@ -629,7 +636,7 @@ function pathCounterHTML(){
   if(preview.selfDot) extras.push(`+${preview.selfDot}${iconSpan('fumble')}`);
   if(preview.nullifyCount) extras.push(iconSpan('nullify'));
   if(preview.freeze) extras.push(iconSpan('freeze'));
-  return `<div class="path-counter-float">
+  return `<div class="path-counter-float ${big?'pcf-big':''}">
       <span class="pcf-num" style="font-size:${size}px;">${val%1?val.toFixed(1):val}</span>
       ${extras.length?`<span class="pcf-extra">${extras.join(' ')}</span>`:''}
     </div>`;
@@ -715,10 +722,12 @@ function renderGame(){
     <div class="panel">
       <div class="enc-rail-row">
         <div class="enc-card-col">
-          <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
-            <span class="round-badge">Round ${S.turnNumber+1}</span>
+          <div class="tray-float-wrap">
+            <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
+              <span class="round-badge">Round ${S.turnNumber+1}</span>
+              <div class="tray" id="tray"></div>
+            </div>
             ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip ▶</button>` : pathCounterHTML()}
-            <div class="tray" id="tray"></div>
           </div>
         </div>
         <div class="util-rail">
