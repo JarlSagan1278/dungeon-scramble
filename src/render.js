@@ -928,11 +928,10 @@ function showToast(text, kind){
   const stack = ensureToastStack();
   const toast = el(`<div class="toast${kind ? ' toast-'+kind : ''}">${text}</div>`);
   stack.appendChild(toast);
-  requestAnimationFrame(()=> toast.classList.add('show'));
-  setTimeout(()=>{
-    toast.classList.remove('show');
-    setTimeout(()=>{ if(toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
-  }, 2600);
+  // The sweep-in/hold/sweep-out is now all one CSS animation (toast-sweep,
+  // styles.css) instead of a separate fade-in then fade-out pair of timers,
+  // so this just needs to clean the node up once that animation has run.
+  setTimeout(()=>{ if(toast.parentNode) toast.parentNode.removeChild(toast); }, 1150);
 }
 
 // ---- Kill callout: a brief big banner for the two kill moments worth

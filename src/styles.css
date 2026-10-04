@@ -588,10 +588,38 @@
      2-toast stack and a 1-toast stack both sit centered on the same point
      instead of growing away from it. */
   #toast-stack{ position:fixed; left:50%; top:40%; transform:translateX(-50%); z-index:80; display:flex; flex-direction:column; gap:6px; align-items:center; pointer-events:none; max-width:92vw; }
-  .toast{ background:rgba(20,16,12,0.94); border:1px solid var(--gold); color:var(--cream); font-size:12.5px; font-weight:bold; padding:7px 14px; border-radius:20px; box-shadow:0 2px 8px rgba(0,0,0,0.4); opacity:0; transform:translateY(8px); transition:opacity .25s ease, transform .25s ease; white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis; }
-  .toast.show{ opacity:1; transform:translateY(0); }
-  .toast-good{ border-color:#7fd17f; }
-  .toast-bad{ border-color:#d17f7f; }
+  /* A quick banner sweep instead of a soft rounded bubble that fades in
+     place -- it used to sit on screen for a lazy 2.6s behind a plain
+     opacity/translateY fade (a generic "toast" component feel), which read
+     slow and app-ish next to the rest of the game's snappier, more
+     physical feedback (die flips, screen shake, the resolve pulses). The
+     whole thing is now one animation: it darts in from the left with a
+     touch of overshoot, holds just long enough to read, then is pulled on
+     off the right edge -- a single continuous crossing motion rather than
+     fade-in/pause/fade-out. The shape also moved from a rounded pill to a
+     hard-edged plaque (2px ink border, beveled gradient, drop shadow) to
+     match the dice tiles and token chips rather than a default notification
+     bubble. */
+  .toast{ background: linear-gradient(160deg, #3c3022, #201810); border:2px solid #000;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 4px 10px rgba(0,0,0,0.55);
+    color: var(--cream); font-size:12.5px; font-weight:bold; padding:7px 16px; border-radius:7px;
+    white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis;
+    animation: toast-sweep 1.15s cubic-bezier(.22,1,.36,1) forwards; }
+  @keyframes toast-sweep{
+    0%{ transform:translateX(-85%) rotate(-2deg); opacity:0; }
+    16%{ transform:translateX(3%) rotate(1deg); opacity:1; }
+    24%{ transform:translateX(0) rotate(0deg); opacity:1; }
+    80%{ transform:translateX(0) rotate(0deg); opacity:1; }
+    100%{ transform:translateX(85%) rotate(2deg); opacity:0; }
+  }
+  /* The global reduced-motion rule (top of file) already forces
+     animation:none on this, so it just appears/disappears with the JS
+     timeout below instead of sweeping -- this only needs to make sure it's
+     actually visible (not stuck at the keyframe's own 0% opacity:0) once
+     the animation is switched off. */
+  .reduced-motion .toast{ opacity:1; transform:none; }
+  .toast-good{ border-color:#2f5a33; box-shadow: 0 0 0 1px #7fd17f inset, 0 4px 10px rgba(0,0,0,0.55); }
+  .toast-bad{ border-color:#5a2f2f; box-shadow: 0 0 0 1px #d17f7f inset, 0 4px 10px rgba(0,0,0,0.55); }
 
   /* Kill callout: a brief, big centered banner for the two moments worth
      making feel different from an ordinary kill -- a Boss/Big Boss going
