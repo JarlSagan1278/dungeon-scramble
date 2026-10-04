@@ -301,9 +301,9 @@ function renderSetup(){
     <div class="panel">
       <button id="setup-back-btn" class="setup-back-btn" title="Back to title">&larr; Back</button>
       <h2 style="margin:0 0 4px 0;">Create Your Adventurer</h2>
-      <h3 style="font-size:14px;color:var(--cream);margin:0 0 4px 0;">🧭 Choose Your Origin</h3>
+      <h3 style="font-size:14px;color:var(--cream);margin:0 0 4px 0;">Choose Your Origin</h3>
       <div class="choice-grid" id="origin-grid"></div>
-      <h3 style="font-size:14px;color:var(--cream);user-select:none;margin:6px 0 4px 0;" id="class-header">⚔️ Choose Your Class</h3>
+      <h3 style="font-size:14px;color:var(--cream);user-select:none;margin:6px 0 4px 0;" id="class-header">Choose Your Class</h3>
       <div class="choice-grid" id="class-grid"></div>
       <button class="primary" id="start-btn" disabled>Enter the Dungeon</button>
     </div>
