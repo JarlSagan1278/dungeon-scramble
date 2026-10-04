@@ -319,43 +319,21 @@ function pickPortrait(originId){
 }
 
 // The character-select screen shows a portrait per Origin card before a
-// game exists, and re-renders on every click (choosing a class, etc), and
-// again whenever the player backs out to the title screen and returns.
-// Without caching, each of those re-renders would call pickPortrait()
+// game exists, and re-renders on every click (choosing a class, etc) --
+// without caching, each of those re-renders would call pickPortrait()
 // again and swap in a different random portrait than what newGame() then
-// actually uses -- so the preview pick below is made once per Origin and
-// reused by both the setup screen and newGame() (for S.portrait).
+// actually uses. So the preview pick below is made once per Origin and
+// reused by both the setup screen and newGame() (for S.portrait) for as
+// long as the player stays on that one visit to the setup screen.
 //
-// The *index* chosen (not the image data itself) is also persisted to
-// localStorage, so the preview survives a full page reload too -- e.g.
-// reopening the game rather than just navigating within one page load --
-// instead of silently re-randomizing on the player.
-const PORTRAIT_PREVIEW_KEY = 'dungeonScramblePortraitPreview_v1';
-function loadPortraitPreviewIndices(){
-  try{ return JSON.parse(localStorage.getItem(PORTRAIT_PREVIEW_KEY)) || {}; }
-  catch(e){ return {}; }
-}
-function savePortraitPreviewIndices(idx){
-  try{ localStorage.setItem(PORTRAIT_PREVIEW_KEY, JSON.stringify(idx)); }
-  catch(e){ /* best-effort, same as prefs/history */ }
-}
-const setupPortraitCache = {};
-const setupPortraitIndices = loadPortraitPreviewIndices();
+// Each fresh "New Run" (from the title screen) clears this cache via
+// resetSetupPortraitPreviews(), so the portraits shown are re-randomized
+// every time the player starts over from the title screen, rather than
+// staying fixed for the whole session.
+let setupPortraitCache = {};
+function resetSetupPortraitPreviews(){ setupPortraitCache = {}; }
 function getSetupPreviewPortrait(originId){
-  if(!setupPortraitCache[originId]){
-    const arr = originPortraitArray(originId);
-    if(!arr){
-      setupPortraitCache[originId] = { img: GNOME_SILHOUETTE, placeholder:true };
-    } else {
-      let idx = setupPortraitIndices[originId];
-      if(!(idx>=0 && idx<arr.length)){
-        idx = rand(arr.length);
-        setupPortraitIndices[originId] = idx;
-        savePortraitPreviewIndices(setupPortraitIndices);
-      }
-      setupPortraitCache[originId] = { img: arr[idx], placeholder:false };
-    }
-  }
+  if(!setupPortraitCache[originId]) setupPortraitCache[originId] = pickPortrait(originId);
   return setupPortraitCache[originId];
 }
 

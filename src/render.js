@@ -265,7 +265,7 @@ function renderTitle(){
   `;
   if(saved) document.getElementById('title-continue-btn').onclick = ()=>{ if(loadGame()) render(); };
   document.getElementById('title-newrun-btn').onclick = ()=>{
-    if(!saved){ preGameScreen='setup'; render(); return; }
+    if(!saved){ resetSetupPortraitPreviews(); preGameScreen='setup'; render(); return; }
     const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
         <h2>Start a New Run?</h2>
         <p>Your saved run (${saved.originName} ${saved.className}, Floor ${saved.floorIdx+1}) will be lost.</p>
@@ -276,7 +276,7 @@ function renderTitle(){
       </div></div>`);
     openModal(overlay);
     overlay.querySelector('#title-newrun-cancel').onclick = ()=> closeModal(overlay);
-    overlay.querySelector('#title-newrun-go').onclick = ()=> closeModal(overlay, ()=>{ clearSave(); preGameScreen='setup'; render(); });
+    overlay.querySelector('#title-newrun-go').onclick = ()=> closeModal(overlay, ()=>{ clearSave(); resetSetupPortraitPreviews(); preGameScreen='setup'; render(); });
     overlay.onclick = (ev)=>{ if(ev.target===overlay) closeModal(overlay); };
   };
   document.getElementById('title-achievements-btn').onclick = openAchievementsModal;
