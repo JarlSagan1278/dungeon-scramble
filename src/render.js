@@ -52,15 +52,15 @@ function updateHeaderMeta(){
   const headerEl = document.getElementById('header-meta');
   if(!headerEl) return;
   headerEl.textContent = (S && S.origin && S.klass) ? `${S.origin.name} ${S.klass.name} · Floor ${S.floorIdx+1}` : 'digital prototype';
-  // The logo + "Origin Class - Floor N" text are pure branding/status --
-  // useful context on the title/setup screens and between-encounter
-  // screens, but just overhead once you're actually mid-encounter and
-  // already deep in the dice tray. Collapse the bar down to just the
-  // Settings gear (still needed -- it's the only way to reach Settings
-  // mid-run) on that one screen to free up vertical space on phone
-  // heights.
+  // The whole top bar (logo, "Origin Class - Floor N" text, and the
+  // Settings gear) is pure chrome -- useful on title/setup and between
+  // encounters, but just overhead once you're actually mid-encounter and
+  // already deep in the dice tray on a phone-height screen. Hide it
+  // entirely on that one screen; Settings is reached instead from a
+  // button in the encounter util-rail (see renderGame), right alongside
+  // Key/Bag/Log/Use.
   const titleBar = document.querySelector('.title-bar');
-  if(titleBar) titleBar.classList.toggle('compact', !!(S && S.screen==='game'));
+  if(titleBar) titleBar.style.display = (S && S.screen==='game') ? 'none' : '';
 }
 
 // Low-health danger cue: a fixed, full-viewport pulsing red vignette --
@@ -712,6 +712,7 @@ function renderGame(){
           <div class="util-btn" id="open-backpocket-btn">${iconSpan('bag')}<span>Bag</span>${S.backPocket.length?`<span class="badge">${S.backPocket.length}</span>`:''}</div>
           <div class="util-btn" id="open-log-btn">${iconSpan('log')}<span>Log</span></div>
           <div class="util-btn ${totalTokens?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Use</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
+          <div class="util-btn" id="open-settings-btn" title="Settings">⚙<span>Settings</span></div>
         </div>
       </div>
     </div>
@@ -815,6 +816,7 @@ function renderGame(){
   document.getElementById('open-backpocket-btn').onclick = ()=> openInfoModal('Back Pocket', backPocketViewHTML());
   document.getElementById('open-log-btn').onclick = ()=> openInfoModal('Log', logViewHTML());
   document.getElementById('open-tokens-btn').onclick = ()=>{ if(totalTokens>0) openTokensModal(); };
+  document.getElementById('open-settings-btn').onclick = openSettingsModal;
   const abilityBtn = document.getElementById('ability-btn');
   if(abilityBtn) abilityBtn.onclick = ()=>{
     if(S.transitioning || S.classAbilityUsed) return;

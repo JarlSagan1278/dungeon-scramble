@@ -39,11 +39,6 @@
      right of the button rail on any viewport wide enough to hit that cap. */
   .wrap{ max-width: 390px; margin: 0 auto; }
   .title-bar{ display:flex; align-items:center; justify-content:space-between; border-bottom: 2px solid var(--stone); padding-bottom:6px; margin-bottom:8px; position:relative; overflow:hidden; }
-  /* Collapsed on the main encounter screen (see updateHeaderMeta) -- just
-     the Settings gear, no border/logo/status text, to reclaim vertical
-     space once the player is mid-dice-tray. */
-  .title-bar.compact{ border-bottom:none; padding-bottom:0; margin-bottom:4px; justify-content:flex-end; }
-  .title-bar.compact .logo-img, .title-bar.compact .sub{ display:none; }
   .title-bar h1{ font-size: 30px; -webkit-text-stroke: 1px #1c140c; text-shadow: 2px 2px 0 rgba(0,0,0,0.4); }
   .title-bar .sub{ color: var(--parchment-dim); font-size:13px; font-style:italic; }
   .logo-img{ display:block; height:38px; width:auto; }
