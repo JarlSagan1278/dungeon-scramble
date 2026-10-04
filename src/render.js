@@ -276,9 +276,9 @@ function renderSetup(){
     <div class="panel">
       <button id="setup-back-btn" class="setup-back-btn" title="Back to title">&larr; Back</button>
       <h2 style="margin:0 0 4px 0;">Create Your Adventurer</h2>
-      <h3 style="font-size:14px;color:var(--cream);margin:0 0 4px 0;">Choose Your Origin</h3>
+      <h3 style="font-size:14px;color:var(--cream);margin:0 0 4px 0;">🧭 Choose Your Origin</h3>
       <div class="choice-grid" id="origin-grid"></div>
-      <h3 style="font-size:14px;color:var(--cream);user-select:none;margin:6px 0 4px 0;" id="class-header">Choose Your Class</h3>
+      <h3 style="font-size:14px;color:var(--cream);user-select:none;margin:6px 0 4px 0;" id="class-header">⚔️ Choose Your Class</h3>
       <div class="choice-grid" id="class-grid"></div>
       <button class="primary" id="start-btn" disabled>Enter the Dungeon</button>
     </div>
@@ -1730,12 +1730,12 @@ function renderCamp(){
       </div>
 
       <div class="camp-section">
-        <h3 class="camp-section-title">Upgrade Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(1 Attack + 1 Maneuver per Camp)</span></h3>
+        <h3 class="camp-section-title">⚒️ Upgrade Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(1 Attack + 1 Maneuver per Camp)</span></h3>
         <div class="small-btn-row">${upgradeRows.length? upgradeRows.join('') : '<span class="hint">No matching sets of 3 Basic dice to combine right now.</span>'}</div>
       </div>
 
       <div class="camp-section">
-        <h3 class="camp-section-title">Organize Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(click one in each list to swap)</span></h3>
+        <h3 class="camp-section-title">🎒 Organize Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(click one in each list to swap)</span></h3>
         <div class="hint" style="margin-top:0;">Tray</div>
         <div class="camp-dice-grid" id="organize-tray"></div>
         <div class="hint">Back Pocket <span style="color:var(--parchment-dim);">(${S.backPocket.length} dice)</span></div>

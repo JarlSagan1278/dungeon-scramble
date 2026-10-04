@@ -53,8 +53,8 @@
     background: var(--stone); color: var(--parchment); padding:8px 16px; font-size:14px;
     transition: background .15s, transform .05s;
   }
-  button:hover:not(:disabled){ background:#4a3f32; }
-  button:active:not(:disabled){ transform: translateY(1px); }
+  button:hover:not(:disabled){ background:#4a3f32; transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  button:active:not(:disabled){ transform: translateY(1px); box-shadow:none; }
   button:disabled{ opacity:0.4; cursor:default; }
   button.primary{ background: var(--gold); color:#241c10; font-weight:bold; }
   button.primary:hover:not(:disabled){ background:#e6c265; }
@@ -72,7 +72,8 @@
      same 2-up layout at a phone width -- fixing the column count avoids
      that entirely rather than fighting it with font-size/line clamps. */
   .choice-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap:8px; margin:6px 0 10px; }
-  .choice-card{ background: var(--panel2); border:2px solid var(--stone); border-radius:6px; padding:8px; cursor:pointer; text-align:center; }
+  .choice-card{ background: var(--panel2); border:2px solid var(--stone); border-radius:6px; padding:8px; cursor:pointer; text-align:center; transition: transform .08s, border-color .1s; }
+  .choice-card:hover:not(.selected){ border-color:#6b5a3f; transform: translateY(-2px); }
   /* Origin cards additionally carry a portrait, shown beside the name/blurb
      (not stacked above it) so the card reads as one compact row instead of
      a tall column -- a plain class card (no portrait) keeps the original
