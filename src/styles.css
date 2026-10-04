@@ -85,8 +85,8 @@
      (no portrait) keeps the original centered layout untouched. Sized to
      fit the whole setup screen within one phone-height viewport without
      scrolling. */
-  .choice-card.has-portrait{ display:flex; flex-direction:column; gap:6px; text-align:left; }
-  .origin-header{ display:flex; align-items:center; gap:8px; }
+  .choice-card.has-portrait{ display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center; }
+  .origin-header{ display:flex; align-items:center; justify-content:center; gap:8px; }
   .portrait-wrap{ position:relative; width:64px; height:64px; margin:0 auto 6px; display:flex; align-items:flex-end; justify-content:center; flex:0 0 auto; }
   .choice-card.has-portrait .portrait-wrap{ width:34px; height:34px; margin:0; }
   .portrait-img{ max-width:100%; max-height:100%; display:block; }
