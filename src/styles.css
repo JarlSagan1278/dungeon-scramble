@@ -74,20 +74,25 @@
   .choice-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap:8px; margin:6px 0 10px; }
   .choice-card{ background: var(--panel2); border:2px solid var(--stone); border-radius:6px; padding:8px; cursor:pointer; text-align:center; transition: transform .08s, border-color .1s; }
   .choice-card:hover:not(.selected){ border-color:#6b5a3f; transform: translateY(-2px); }
-  /* Origin cards additionally carry a portrait, shown beside the name/blurb
-     (not stacked above it) so the card reads as one compact row instead of
-     a tall column -- a plain class card (no portrait) keeps the original
-     centered layout untouched. Sized to fit the whole setup screen within
-     one phone-height viewport without scrolling. */
-  .choice-card.has-portrait{ display:flex; align-items:center; gap:8px; text-align:left; }
+  /* Origin cards additionally carry a portrait, shown beside the die/blurb
+     column (not stacked above the whole card) so the card reads as one
+     compact row instead of a tall column -- a plain class card (no
+     portrait) keeps the original centered layout untouched. Each label
+     sits directly above the art it names (origin name above the portrait,
+     die name above the die icon) rather than beside it. Sized to fit the
+     whole setup screen within one phone-height viewport without scrolling. */
+  .choice-card.has-portrait{ display:flex; align-items:flex-start; gap:8px; text-align:left; }
   .choice-card.has-portrait .choice-text{ min-width:0; }
+  .portrait-col{ display:flex; flex-direction:column; align-items:center; gap:2px; flex:0 0 auto; }
   .portrait-wrap{ position:relative; width:64px; height:64px; margin:0 auto 6px; display:flex; align-items:flex-end; justify-content:center; flex:0 0 auto; }
   .choice-card.has-portrait .portrait-wrap{ width:38px; height:38px; margin:0; }
   .portrait-img{ max-width:100%; max-height:100%; display:block; }
   .choice-card.selected{ border-color: var(--gold); background:#33291a; }
   .choice-card h4{ margin:0 0 4px; color:var(--cream); font-size:13px; }
-  .choice-card.has-portrait h4{ margin:0 0 2px; }
+  .choice-card.has-portrait h4{ margin:0; text-align:center; white-space:nowrap; }
   .choice-card p{ margin:0; font-size:10.5px; color:var(--parchment-dim); line-height:1.25; }
+  .die-name-label{ font-size:10.5px; color:var(--parchment-dim); margin:0 0 2px; }
+  .choice-card.has-portrait .origin-die-thumb{ display:block; margin:0 0 3px; }
 
   /* Route tracker */
   .route-wrap{ position:relative; margin-bottom:12px; }

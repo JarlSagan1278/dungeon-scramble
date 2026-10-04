@@ -319,8 +319,15 @@ function renderSetup(){
     const dieArt = LOOT_ART[o.die];
     const dieArtHTML = dieArt ? `<img class="origin-die-thumb" src="${dieArt}" alt="${o.die}">` : '';
     const c = el(`<div class="choice-card has-portrait">
-        <div class="portrait-wrap">${portraitHTML}</div>
-        <div class="choice-text"><h4>${o.name}</h4><p>${dieArtHTML}<b>${o.die}</b><br>${o.blurb}</p></div></div>`);
+        <div class="portrait-col">
+          <h4>${o.name}</h4>
+          <div class="portrait-wrap">${portraitHTML}</div>
+        </div>
+        <div class="choice-text">
+          <div class="die-name-label"><b>${o.die}</b></div>
+          ${dieArtHTML}
+          <p>${o.blurb}</p>
+        </div></div>`);
     c.onclick=()=>{ chosenOrigin=o.id; [...og.children].forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); checkReady(); };
     og.appendChild(c);
   });
