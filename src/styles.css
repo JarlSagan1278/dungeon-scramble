@@ -101,7 +101,7 @@
      clear of the actual die tiles inside. */
   .char-icon-wrap{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; position:relative; min-height:0; padding-top:4px;
     margin-left:-10px; z-index:2; }
-  .char-icon-img{ display:block; max-height:100%; max-width:100%; width:auto; height:auto; object-fit:contain; filter: drop-shadow(1px 2px 0 rgba(0,0,0,0.4)); transform: scaleX(-1); }
+  .char-icon-img{ display:block; max-height:100%; max-width:100%; width:auto; height:auto; object-fit:contain; filter: drop-shadow(1px 2px 0 rgba(0,0,0,0.4)); transform: scaleX(-1.5) scaleY(1.5); }
   .route .node{ flex:1; display:flex; align-items:center; justify-content:center; position:relative;
     padding:6px 2px; font-size:32px; background: var(--floor1); border-right:2px solid rgba(0,0,0,0.25); color: var(--ink); }
   .route .node:last-child{ border-right:none; }
