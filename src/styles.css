@@ -169,9 +169,18 @@
      fit its die instead of overflowing the tile and spilling out of the
      tray's bounding box. clamp() keeps it sane at both extremes. */
   .die .face-val{ font-size: clamp(18px, 11.5cqw, 36px); }
-  .icon-svg{ display:inline-grid; width:1em; height:1em; vertical-align:-0.15em; }
-  .icon-svg svg{ grid-area: 1/1; width:100%; height:100%; display:block; }
-  .icon-value-overlay{ grid-area: 1/1; display:flex; align-items:center; justify-content:center;
+  /* Absolutely-positioned overlay instead of a CSS Grid area -- a grid
+     item's percentage width/height needs a "definite" track size to
+     resolve against, and a single-cell auto-track grid doesn't reliably
+     count as one everywhere, so the inner SVG could silently fall back to
+     its own intrinsic size instead of actually filling this box (most
+     visible at the small sizes used for the loot screen's face chips,
+     where the oversized artwork bled into the text right after it).
+     position:relative/absolute always has a definite box to resolve
+     against, so it doesn't have that failure mode. */
+  .icon-svg{ position:relative; display:inline-block; width:1em; height:1em; overflow:hidden; vertical-align:-0.15em; }
+  .icon-svg svg{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+  .icon-value-overlay{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
     font-family: Georgia, 'Times New Roman', serif; font-size:5px; font-weight:800; color:currentColor; line-height:1; pointer-events:none; }
   .face-val .icon-value-overlay{ font-size:0.35em; }
   .die .face-word{ font-size:9px; }
@@ -733,7 +742,28 @@
   .loot-art-thumb{ display:block; width:64px; height:64px; object-fit:contain; margin:0 auto 4px; }
   .origin-die-thumb{ display:inline-block; width:22px; height:22px; object-fit:contain; vertical-align:middle; margin-right:4px; }
   .faces{ display:flex; gap:3px; flex-wrap:wrap; font-size:9px; }
-  .loot-opt .faces{ flex-wrap:nowrap; overflow-x:auto; }
+  /* The loot screen's own face chips used to be forced onto one line
+     (nowrap + horizontal scroll) inside a narrow ~140-220px card, with no
+     visual hint that there was more to scroll to -- in practice the chips
+     just got clipped at the card edge, cutting words like "Hit2" down to
+     "t2". Wrapping onto two rows instead keeps every chip fully visible and
+     readable, so the bump in font size/padding below doesn't need to fight
+     a fixed single line to fit. */
+  .loot-opt .faces{ flex-wrap:wrap; justify-content:center; gap:4px; }
+  .loot-opt .faces span{ font-size:11px; padding:4px 7px; }
+  /* The icon and its label/value text are built with no space between them
+     in the template (e.g. iconSpan() + "Hit" + "2" -> "Hit2" is intentional),
+     but that also ran the icon itself flush against the very next letter
+     with no gap at all, reading like "⟡combo" squashed into one glyph.
+     A small margin after the icon fixes that without touching the many call
+     sites that build these chips. */
+  .faces span .icon-svg{ margin-right:3px; }
+  /* Pinned to an explicit pixel size rather than relying on the icon's
+     default 1em sizing -- at this span's bumped-up font-size, the 1em grid
+     box and the SVG inside it stopped agreeing on size (the artwork was
+     rendering noticeably bigger than its own box and bleeding into the
+     label text right after it). */
+  .loot-opt .faces .icon-svg{ width:11px; height:11px; }
   .faces span{ background:var(--stone); color: var(--parchment); border-radius:3px; padding:3px 5px; white-space:nowrap; flex:0 0 auto; }
   /* Upgrade Dice rows (renderCamp(), render.js) -- kept deliberately compact
      (small font/padding, short "Attack I -> II" wording instead of a full
