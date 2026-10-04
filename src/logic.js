@@ -302,25 +302,60 @@ function clone(o){ return JSON.parse(JSON.stringify(o)); }
 function cap(v,max){ return Math.max(0, Math.min(v,max)); }
 function capUpper(v,max){ return Math.min(v,max); } // no floor -- lets encounter health go negative so Overkill can be measured
 
+function originPortraitArray(originId){
+  if(originId==='dwarf') return DWARF_PORTRAITS;
+  if(originId==='gnome') return GNOME_PORTRAITS;
+  if(originId==='halfling') return HALFLING_PORTRAITS;
+  if(originId==='pixie') return PIXIE_PORTRAITS;
+  return null;
+}
+
 // Picks a race-correct portrait for a given Origin. All four origins now
 // have real art recovered from the character sheet.
 function pickPortrait(originId){
-  if(originId==='dwarf') return { img: DWARF_PORTRAITS[rand(DWARF_PORTRAITS.length)], placeholder:false };
-  if(originId==='gnome') return { img: GNOME_PORTRAITS[rand(GNOME_PORTRAITS.length)], placeholder:false };
-  if(originId==='halfling') return { img: HALFLING_PORTRAITS[rand(HALFLING_PORTRAITS.length)], placeholder:false };
-  if(originId==='pixie') return { img: PIXIE_PORTRAITS[rand(PIXIE_PORTRAITS.length)], placeholder:false };
-  return { img: GNOME_SILHOUETTE, placeholder:true };
+  const arr = originPortraitArray(originId);
+  if(!arr) return { img: GNOME_SILHOUETTE, placeholder:true };
+  return { img: arr[rand(arr.length)], placeholder:false };
 }
 
 // The character-select screen shows a portrait per Origin card before a
-// game exists, and re-renders on every click (choosing a class, etc).
-// Without caching, each re-render would call pickPortrait() again and
-// swap in a different random portrait than what newGame() then actually
-// uses -- so the preview cache below is drawn once per Origin per page
-// load, and newGame() reuses that same cached pick for S.portrait.
+// game exists, and re-renders on every click (choosing a class, etc), and
+// again whenever the player backs out to the title screen and returns.
+// Without caching, each of those re-renders would call pickPortrait()
+// again and swap in a different random portrait than what newGame() then
+// actually uses -- so the preview pick below is made once per Origin and
+// reused by both the setup screen and newGame() (for S.portrait).
+//
+// The *index* chosen (not the image data itself) is also persisted to
+// localStorage, so the preview survives a full page reload too -- e.g.
+// reopening the game rather than just navigating within one page load --
+// instead of silently re-randomizing on the player.
+const PORTRAIT_PREVIEW_KEY = 'dungeonScramblePortraitPreview_v1';
+function loadPortraitPreviewIndices(){
+  try{ return JSON.parse(localStorage.getItem(PORTRAIT_PREVIEW_KEY)) || {}; }
+  catch(e){ return {}; }
+}
+function savePortraitPreviewIndices(idx){
+  try{ localStorage.setItem(PORTRAIT_PREVIEW_KEY, JSON.stringify(idx)); }
+  catch(e){ /* best-effort, same as prefs/history */ }
+}
 const setupPortraitCache = {};
+const setupPortraitIndices = loadPortraitPreviewIndices();
 function getSetupPreviewPortrait(originId){
-  if(!setupPortraitCache[originId]) setupPortraitCache[originId] = pickPortrait(originId);
+  if(!setupPortraitCache[originId]){
+    const arr = originPortraitArray(originId);
+    if(!arr){
+      setupPortraitCache[originId] = { img: GNOME_SILHOUETTE, placeholder:true };
+    } else {
+      let idx = setupPortraitIndices[originId];
+      if(!(idx>=0 && idx<arr.length)){
+        idx = rand(arr.length);
+        setupPortraitIndices[originId] = idx;
+        savePortraitPreviewIndices(setupPortraitIndices);
+      }
+      setupPortraitCache[originId] = { img: arr[idx], placeholder:false };
+    }
+  }
   return setupPortraitCache[originId];
 }
 
