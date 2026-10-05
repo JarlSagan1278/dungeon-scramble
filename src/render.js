@@ -2143,11 +2143,15 @@ function renderLootModal(){
     const art = LOOT_ART[opt.name];
     const card = el(`<div class="loot-opt loot-opt-reveal" style="--loot-tier-color:${accent.color}; --loot-tier-glow:${accent.glow}; animation-delay:${(i*0.1).toFixed(2)}s;">
         <div class="loot-opt-streaks">${lootStreaksHTML(0.5+i*0.12)}</div>
+        <button type="button" class="loot-pick-btn" aria-label="Take ${opt.name}" title="Take ${opt.name}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5 10-11"/></svg></button>
         ${art?`<img class="loot-art-thumb" src="${art}" alt="${opt.name}"/>`:''}
         ${lootPreviewTileHTML(opt, `loot-${i}`)}
         <div class="faces">${opt.faces.map(f=>`<span>${iconSpan(f.type, f.value)}${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?f.value:''}</span>`).join('')}</div>
       </div>`);
-    card.onclick = ()=>{
+    // Picking is deliberate: only the little check button takes the die, so
+    // a stray tap on a card's art/faces while reading it can't commit.
+    card.querySelector('.loot-pick-btn').onclick = (ev)=>{
+      ev.stopPropagation();
       if(locked) return;
       locked = true;
       pickLootOption(overlay, container, card, opt);

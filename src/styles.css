@@ -1058,8 +1058,16 @@
   .compendium-faces{ display:flex; gap:4px; flex-wrap:wrap; opacity:0.85; }
   .compendium-faces .icon-svg{ width:13px; height:13px; }
   .loot-options{ display:flex; gap:10px; margin:12px 0; flex-wrap:wrap; justify-content:center; }
-  .loot-opt{ position:relative; flex:1 1 calc(50% - 10px); min-width:140px; max-width:220px; background: var(--panel2); border:2px solid var(--stone); border-radius:8px; padding:8px; cursor:pointer; transition: transform .08s; }
-  .loot-opt:hover{ border-color: var(--gold); transform: translateY(-2px); }
+  .loot-opt{ position:relative; flex:1 1 calc(50% - 10px); min-width:140px; max-width:220px; background: var(--panel2); border:2px solid var(--stone); border-radius:8px; padding:8px; transition: transform .08s; }
+  .loot-opt:hover{ border-color: var(--loot-tier-color, var(--gold)); transform: translateY(-2px); }
+  /* Check button: the one way to take a die on the loot screen. Sits in the
+     card's top-right corner above the streak layer. */
+  .loot-pick-btn{ position:absolute; top:6px; right:6px; z-index:4; width:34px; height:34px; padding:0; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    background:var(--loot-tier-color, var(--gold)); color:#241c10; border:2px solid #000;
+    box-shadow:0 2px 6px rgba(0,0,0,0.5); transition: transform .1s; }
+  .loot-pick-btn:hover{ transform:scale(1.12); }
+  .loot-pick-btn:active{ transform:scale(0.94); }
   .loot-opt h4{ margin:4px 0 0; font-size:13px; color:var(--parchment); text-align:center; }
   /* Reveal pop-in + ambient glow (mirrors dieSettle/glowPulse from the
      loot-reveal-animation mockup): each card springs in on its own short
