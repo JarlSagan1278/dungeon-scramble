@@ -443,8 +443,10 @@ let debugArmed = false;
 // .die.dietype-* colors so a die previewed here looks like itself in-tray).
 function dieFaceChipsHTML(faceArr, toneCls){
   return faceArr.map(f=>{
-    if(f.type==='blank') return `<div class="die-face-chip ${toneCls} blank"></div>`;
-    return `<div class="die-face-chip ${toneCls}">${iconSpan(f.type, f.value)}</div>`;
+    const label = `${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}`;
+    const tip = `${label} — ${FACE_DESC[f.type]||''}`;
+    if(f.type==='blank') return `<div class="die-face-chip ${toneCls} blank" title="${tip}"></div>`;
+    return `<div class="die-face-chip ${toneCls}" title="${tip}">${iconSpan(f.type, f.value)}</div>`;
   }).join('');
 }
 
@@ -1879,7 +1881,6 @@ function openDiceCompendiumModal(){
     {label:'Gilded', pool:GILDED},
     {label:'Magic', pool:MAGIC},
   ];
-  const totalArt = tiers.reduce((n,t)=>n + t.pool.filter(d=>LOOT_ART[d.name]).length, 0);
   const totalDice = tiers.reduce((n,t)=>n + t.pool.length, 0);
   const discoveredCount = tiers.reduce((n,t)=>n + t.pool.filter(d=>DISCOVERED_DICE.has(d.name)).length, 0);
   const sections = tiers.map(t=>{
@@ -1918,7 +1919,7 @@ function openDiceCompendiumModal(){
   const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:420px;">
       <button class="modal-x-btn" id="compendium-x-btn" title="Close">✕</button>
       <h2 style="margin-top:0;">Dice Compendium</h2>
-      <p class="hint">${discoveredCount}/${totalDice} found &middot; ${totalArt}/${totalDice} illustrated.</p>
+      <p class="hint">${discoveredCount}/${totalDice} found</p>
       ${sections}
       <div class="small-btn-row" style="justify-content:center;">
         <button class="primary" id="compendium-close-btn">Close</button>
