@@ -2119,45 +2119,68 @@ function renderLootModal(){
   // denser burst below -- reads as "bigger haul", not just a recolor.
   const big = options.length >= 3;
   const overlay = el(`<div class="modal-overlay">
-      <div class="loot-sunray-burst" style="--sunray-color:${accent.color};">
-        <div class="loot-sunray-wheel ${big?'loot-sunray-wheel-big':''}"></div>
-        ${big?'<div class="loot-sunray-wheel loot-sunray-wheel-2"></div>':''}
-      </div>
       <div class="modal">
       <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
         <h2 style="margin:0;">${fromShrine ? 'Shrine Boon' : 'Victory!'}</h2>
         ${overkill?'<span class="status-chip" style="background:var(--gold);color:#241c10;">Overkill! +1 option</span>':''}
       </div>
-      <p>Choose one ${lootName} Loot Die to add to your tray:</p>
-      <div class="loot-options" id="loot-options"></div>
+      <div id="loot-body"></div>
     </div></div>`);
   openUniqueOverlay('loot', overlay);
-  // The screen-wide "opening the box" beat: a shake alongside the sunray
-  // burst above, same screenShake() already used for Boss-kill/Overkill
-  // moments -- every loot reveal gets at least the small shake now, not
-  // just those two.
-  if(typeof screenShake==='function') screenShake(big ? 'big' : 'small');
-  const container = overlay.querySelector('#loot-options');
-  let locked = false; // guards against picking a second option once one's chosen
-  options.forEach((opt,i)=>{
-    const art = LOOT_ART[opt.name];
-    const card = el(`<div class="loot-opt loot-opt-reveal" style="--loot-tier-color:${accent.color}; --loot-tier-glow:${accent.glow}; animation-delay:${(i*0.1).toFixed(2)}s;">
-        <div class="loot-opt-streaks">${lootStreaksHTML(0.5+i*0.12)}</div>
-        <button type="button" class="loot-pick-btn" aria-label="Take ${opt.name}" title="Take ${opt.name}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5 10-11"/></svg></button>
-        ${art?`<img class="loot-art-thumb" src="${art}" alt="${opt.name}"/>`:''}
-        ${lootPreviewTileHTML(opt, `loot-${i}`)}
-        <div class="faces">${opt.faces.map(f=>`<span>${iconSpan(f.type, f.value)}${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?f.value:''}</span>`).join('')}</div>
-      </div>`);
-    // Picking is deliberate: only the little check button takes the die, so
-    // a stray tap on a card's art/faces while reading it can't commit.
-    card.querySelector('.loot-pick-btn').onclick = (ev)=>{
-      ev.stopPropagation();
-      if(locked) return;
-      locked = true;
-      pickLootOption(overlay, container, card, opt);
-    };
-    container.appendChild(card);
-  });
+  const body = overlay.querySelector('#loot-body');
+
+  // Phase 2: the dice themselves. `burst` is false when this is a re-render
+  // of an already-opened chest (render() can run again while the modal is
+  // up), so the shake + sunray only play on the actual opening.
+  function reveal(burst){
+    S.lootChoice.opened = true;
+    if(burst){
+      overlay.insertAdjacentHTML('afterbegin', `<div class="loot-sunray-burst" style="--sunray-color:${accent.color};">
+          <div class="loot-sunray-wheel ${big?'loot-sunray-wheel-big':''}"></div>
+          ${big?'<div class="loot-sunray-wheel loot-sunray-wheel-2"></div>':''}
+        </div>`);
+      if(typeof screenShake==='function') screenShake(big ? 'big' : 'small');
+    }
+    body.innerHTML = `<p>Choose one ${lootName} Loot Die to add to your tray:</p><div class="loot-options" id="loot-options"></div>`;
+    const container = body.querySelector('#loot-options');
+    let locked = false; // guards against picking a second option once one's chosen
+    options.forEach((opt,i)=>{
+      const art = LOOT_ART[opt.name];
+      const card = el(`<div class="loot-opt loot-opt-reveal" style="--loot-tier-color:${accent.color}; --loot-tier-glow:${accent.glow}; animation-delay:${(i*0.1).toFixed(2)}s;">
+          <div class="loot-opt-streaks">${lootStreaksHTML(0.5+i*0.12)}</div>
+          <button type="button" class="loot-pick-btn" aria-label="Take ${opt.name}" title="Take ${opt.name}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5 10-11"/></svg></button>
+          ${art?`<img class="loot-art-thumb" src="${art}" alt="${opt.name}"/>`:''}
+          ${lootPreviewTileHTML(opt, `loot-${i}`)}
+          <div class="faces">${opt.faces.map(f=>`<span>${iconSpan(f.type, f.value)}${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?f.value:''}</span>`).join('')}</div>
+        </div>`);
+      // Picking is deliberate: only the little check button takes the die, so
+      // a stray tap on a card's art/faces while reading it can't commit.
+      card.querySelector('.loot-pick-btn').onclick = (ev)=>{
+        ev.stopPropagation();
+        if(locked) return;
+        locked = true;
+        pickLootOption(overlay, container, card, opt);
+      };
+      container.appendChild(card);
+    });
+  }
+
+  if(S.lootChoice.opened){ reveal(false); return; }
+
+  // Phase 1: a closed chest to tap. Its glow is the loot's tier color, so the
+  // rarity is hinted before it opens. Tapping flips it, then bursts + reveals.
+  body.innerHTML = `<button type="button" class="loot-chest-btn" style="--loot-tier-color:${accent.color}; --loot-tier-glow:${accent.glow};">
+      <div class="loot-chest"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8Z"/><path d="M3 10V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3"/><path d="M12 10v10"/><circle cx="12" cy="12.5" r="1.4" fill="currentColor" stroke="none"/></svg></div>
+      <div class="loot-chest-label">Tap to open your loot</div>
+    </button>`;
+  const chestBtn = body.querySelector('.loot-chest-btn');
+  chestBtn.onclick = ()=>{
+    if(chestBtn.dataset.opening) return;
+    chestBtn.dataset.opening = '1';
+    chestBtn.classList.add('opening');
+    const reduced = typeof PREFS!=='undefined' && PREFS.reducedMotion;
+    setTimeout(()=> reveal(true), reduced ? 0 : 480);
+  };
 }
 
 // Fires the Zelda-style "item get" fanfare over the chosen card, fades the

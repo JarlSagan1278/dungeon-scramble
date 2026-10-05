@@ -1057,6 +1057,19 @@
   .compendium-main{ flex:1 1 auto; min-width:0; }
   .compendium-faces{ display:flex; gap:4px; flex-wrap:wrap; opacity:0.85; }
   .compendium-faces .icon-svg{ width:13px; height:13px; }
+  /* Closed chest shown first on the loot screen (renderLootModal(), render.js):
+     bobs and pulses in the loot's tier color, flips edge-on when tapped. */
+  .loot-chest-btn{ display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; padding:18px 0 8px; background:transparent; border:none; box-shadow:none; border-radius:0; cursor:pointer; color:var(--loot-tier-color, var(--gold)); }
+  .loot-chest-btn:hover:not(:disabled), .loot-chest-btn:active:not(:disabled){ background:transparent; box-shadow:none; transform:none; }
+  .loot-pick-btn:hover:not(:disabled){ background:var(--loot-tier-color, var(--gold)); transform:scale(1.12); box-shadow:0 2px 6px rgba(0,0,0,0.5); }
+  .loot-chest{ width:120px; height:104px; border-radius:16px; background:var(--panel2); border:2.5px solid var(--loot-tier-color, var(--gold));
+    display:flex; align-items:center; justify-content:center;
+    animation: loot-chest-glow 1.6s ease-in-out infinite, loot-chest-bob 1.6s ease-in-out infinite; }
+  .loot-chest-btn.opening .loot-chest{ animation: loot-chest-flip 0.48s ease-in-out both; }
+  .loot-chest-label{ font-size:14px; font-weight:700; color:var(--cream); letter-spacing:0.3px; }
+  @keyframes loot-chest-glow{ 0%,100%{ box-shadow:0 0 0 0 var(--loot-tier-glow, rgba(212,175,82,0.5)); } 50%{ box-shadow:0 0 0 14px transparent; } }
+  @keyframes loot-chest-bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
+  @keyframes loot-chest-flip{ 0%{ transform:rotateY(0) scale(1); } 45%,55%{ transform:rotateY(90deg) scale(1.08); } 100%{ transform:rotateY(180deg) scale(1); } }
   .loot-options{ display:flex; gap:10px; margin:12px 0; flex-wrap:wrap; justify-content:center; }
   .loot-opt{ position:relative; flex:1 1 calc(50% - 10px); min-width:140px; max-width:220px; background: var(--panel2); border:2px solid var(--stone); border-radius:8px; padding:8px; transition: transform .08s; }
   .loot-opt:hover{ border-color: var(--loot-tier-color, var(--gold)); transform: translateY(-2px); }
