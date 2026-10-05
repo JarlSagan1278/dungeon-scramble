@@ -302,6 +302,22 @@ function mysteryFigureHTML(sizeStyle){
   return `<div class="mystery-figure" style="${sizeStyle}"></div>`;
 }
 
+// Locked Origin card preview (Setup screen): the real portrait art for that
+// Origin, run through a brightness(0) CSS filter (.silhouette-img) so only
+// its shape shows through, in solid dark silhouette. Deliberately a
+// character-specific silhouette -- a stocky Halfling reads as a Halfling, a
+// winged Pixie as a Pixie -- rather than reusing the single generic
+// mysteryFigureHTML() blob every un-illustrated monster shares: that blob
+// is for art that doesn't exist yet, but Halfling/Pixie's art exists, it's
+// just not revealed until the Origin is unlocked. Always picks the array's
+// first portrait (arbitrary but deterministic) since which exact pose
+// shows doesn't matter for a silhouette.
+function lockedOriginPortraitHTML(originId){
+  const arr = originPortraitArray(originId);
+  if(!arr || !arr.length) return mysteryFigureHTML('width:75%; aspect-ratio:1/1;');
+  return `<img class="portrait-img silhouette-img" src="${arr[0]}" alt="">`;
+}
+
 // Unlock-condition copy for a locked Origin card (Dwarf/Gnome are always
 // unlocked -- see isOriginUnlocked(), logic.js -- so only these two need an
 // entry here).
@@ -359,8 +375,8 @@ function renderSetup(){
     } else {
       c = el(`<div class="choice-card has-portrait locked" title="Locked">
           <div class="origin-header">
-            <div class="portrait-wrap">${mysteryFigureHTML('width:75%; aspect-ratio:1/1;')}</div>
-            <h4>${o.name} <span class="lock-icon">🔒</span></h4>
+            <div class="portrait-wrap">${lockedOriginPortraitHTML(o.id)}</div>
+            <h4>${o.name}</h4>
           </div>
           <p>${ORIGIN_UNLOCK_HINT[o.id]||'Locked.'}</p>
         </div>`);
@@ -980,8 +996,11 @@ function ensureFxStack(){
     stack = el(`<div id="fx-stack"></div>`);
     document.body.appendChild(stack);
   }
+  // Pulled up to slightly overlap the bottom edge of the enemy panel
+  // (rather than sitting clear below it) so it reads as closer to "right
+  // there" in the gap instead of floating further down toward the tray.
   const anchor = document.getElementById('enc-panel') || document.querySelector('.enc-card');
-  if(anchor) stack.style.top = `${anchor.getBoundingClientRect().bottom + 8}px`;
+  if(anchor) stack.style.top = `${anchor.getBoundingClientRect().bottom - 14}px`;
   return stack;
 }
 

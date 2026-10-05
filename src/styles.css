@@ -97,15 +97,16 @@
   .die-callout b{ font-size:10.5px; color:var(--parchment-dim); text-align:center; }
   .choice-card.has-portrait .origin-die-thumb{ margin:0; flex:0 0 auto; }
   /* Locked Origin card (Halfling/Pixie before their unlock condition is
-     met, see isOriginUnlocked()/ORIGIN_UNLOCK_HINT, render.js) -- same
-     mystery-figure silhouette already used for an undiscovered portrait
-     elsewhere, dimmed and non-interactive-looking, with the unlock
-     condition standing in for the normal flavor blurb. Tapping it still
-     shows a toast with that same condition rather than doing nothing. */
+     met, see isOriginUnlocked()/ORIGIN_UNLOCK_HINT, render.js) -- dimmed
+     and non-interactive-looking, with the unlock condition standing in for
+     the normal flavor blurb. Tapping it still shows a toast with that same
+     condition rather than doing nothing. */
   .choice-card.locked{ opacity:0.55; cursor:default; }
   .choice-card.locked:hover{ transform:none; border-color: var(--stone); }
   .choice-card.locked h4{ display:flex; align-items:center; justify-content:center; gap:4px; }
-  .lock-icon{ font-size:11px; }
+  /* That character's real portrait art, run through brightness(0) so only
+     its silhouette shows -- see lockedOriginPortraitHTML(), render.js. */
+  .silhouette-img{ filter: brightness(0); opacity:0.8; }
   .choice-card.debug-unlocked{ opacity:1; cursor:pointer; border-style:dashed; }
 
   /* Route tracker */
