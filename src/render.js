@@ -597,7 +597,8 @@ function renderSetup(){
     originTabRow.innerHTML = '';
     ORIGINS.forEach(o=>{
       const unlocked = isOriginUnlocked(o.id);
-      const c = el(`<button type="button" class="class-tab-btn ${o.id===chosenOrigin?'selected':''} ${unlocked?'':'locked'}">${unlocked?'':lockSVG(10)+' '}${o.name}</button>`);
+      const previewing = (o.id===previewedOriginId && o.id!==chosenOrigin);
+      const c = el(`<button type="button" class="class-tab-btn ${o.id===chosenOrigin?'selected':''} ${previewing?'previewing':''} ${unlocked?'':'locked'}">${unlocked?'':lockSVG(10)+' '}${o.name}</button>`);
       c.onclick = ()=>{
         previewedOriginId = o.id;
         if(unlocked){ chosenOrigin = o.id; } else if(typeof showToast==='function') showToast(ORIGIN_UNLOCK_HINT[o.id]||'Locked', null);

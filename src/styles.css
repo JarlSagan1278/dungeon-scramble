@@ -135,6 +135,12 @@
      default since tapping it still previews rather than selects. */
   .class-tab-btn.locked{ color: var(--parchment-dim); cursor:default; }
   .class-tab-btn.locked svg{ vertical-align:-1px; margin-right:1px; }
+  /* A locked (or otherwise not-yet-chosen) Origin tab that's just been tapped
+     to preview its info below -- distinct from .selected's gold ring so it
+     never claims to be the actual pick, but still gives that specific tab
+     visible feedback instead of leaving an unrelated tab looking "chosen"
+     while this one's info is what's showing. */
+  .class-tab-btn.previewing{ border-color: var(--parchment-dim); box-shadow: 0 0 0 2px rgba(224,214,188,0.2); }
   .class-showcase{ display:flex; gap:10px; align-items:center; padding:9px; height:64px; box-sizing:border-box; }
   .class-action-icon{ width:36px; height:36px; border-radius:8px; background:var(--panel2); border:1.5px solid var(--class-color, var(--gold));
     color:var(--class-color, var(--gold)); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:20px; }
