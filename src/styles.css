@@ -631,6 +631,7 @@
   .camp-section{ background: var(--panel2); border:1px solid var(--stone); border-radius:8px; padding:8px 10px 9px; margin:7px 0; }
   .camp-status-card .bar-row{ margin-bottom:0; }
   .camp-status-card .small-btn-row{ margin-top:6px; }
+  .camp-status-card .small-btn-row button{ flex:1 1 0; }
   /* Square tiles again, in a responsive grid -- but each one now stands for
      every identical copy of that die (buildDieStacks(), render.js), so a
      tray of sixteen Basic dice collapses to a handful of tiles instead of
