@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.2.0';
+const GAME_VERSION = '1.3.0';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -100,8 +100,8 @@ function enemyActionTooltip(type, val){
 // listing every status currently in effect on it -- Block/D.O.T./H.O.T. and
 // anything else -- rather than requiring a separate hover per status chip.
 const STATUS_DESC = {
-  dot: "Deals damage at the start of each upkeep, then wears off.",
-  hot: "Heals over time at the start of each upkeep.",
+  dot: "Deals its current value as damage each upkeep, then drops by 1 -- a 3 hits for 3, then 2, then 1, then it's gone.",
+  hot: "Heals its current value each upkeep, then drops by 1 -- a 3 heals for 3, then 2, then 1, then it's gone.",
   block: "Absorbs the next hit(s) taken before health is touched.",
   shield: "Absorbs the next hit(s) the enemy takes before its health is touched.",
   minions: "Minion dice are clogging the tray until Hits -- or a Leap clean over one -- clear them.",

@@ -604,6 +604,11 @@ function drawEncounter(kind){
   S.usedCards.add(e.name);
   e.curHealth = e.health;
   e.curDOT = 0; e.curHOT = 0; e.curShield = 0; e.turn = 0;
+  // Your own D.O.T./H.O.T. don't carry from one encounter into the next
+  // either -- a fresh room is a clean slate for both sides, same as the
+  // enemy's own stacks just above. (Mid-fight, a Nullify is still the only
+  // way to clear it early.)
+  S.playerDOT = 0; S.playerHOT = 0;
   e.questsDone = (e.quests||[]).map(()=>false);
   e.questDamageDealt = 0;
   e.minionsSpawned = 0;
@@ -1143,11 +1148,19 @@ function runEnemyBeat(i){
       const t = `${e.name} takes ${e.curDOT} D.O.T. damage.`;
       logMsg('dmg', t, 'bad');
       S.stats.damageDealt += e.curDOT;
+      // D.O.T./H.O.T. are a depleting stack, not a flat standing effect --
+      // each tick burns off 1 stack after applying, so a 3-stack ticks for
+      // 3, then 2, then 1, then nothing, rather than hitting for 3 forever
+      // until something else clears it.
+      e.curDOT = Math.max(0, e.curDOT-1);
       if(e.curHealth<=0) return {stop:'encounterDefeated'};
       return null;
     },
     () => {
-      if(e.curHOT>0) e.curHealth = cap(e.curHealth+e.curHOT, e.maxHealth);
+      if(e.curHOT>0){
+        e.curHealth = cap(e.curHealth+e.curHOT, e.maxHealth);
+        e.curHOT = Math.max(0, e.curHOT-1);
+      }
       const t = runEncounterAction();
       if(t) showToastIfAvailable(t, 'bad');
       if(e.curHealth<=0) return {stop:'encounterDefeated'};
@@ -1203,11 +1216,16 @@ function runPlayerUpkeep(){
     if(typeof playPlayerHitSound==='function') playPlayerHitSound();
     const t = `You take ${S.playerDOT} D.O.T. damage.`;
     logMsg('dmg', t); parts.push(t);
+    // Depleting stack, same as the encounter's own D.O.T./H.O.T. (see
+    // runEnemyBeat()) -- burns off 1 after each tick rather than hitting
+    // for the same amount indefinitely.
+    S.playerDOT = Math.max(0, S.playerDOT-1);
   }
   if(S.playerHOT>0){
     S.health = cap(S.health+S.playerHOT, S.maxHealth);
     const t = `You recover ${S.playerHOT} from H.O.T.`;
     logMsg('heal', t); parts.push(t);
+    S.playerHOT = Math.max(0, S.playerHOT-1);
   }
   return parts.join(' ');
 }
