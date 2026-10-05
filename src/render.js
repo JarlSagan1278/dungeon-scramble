@@ -240,6 +240,68 @@ function lockSVG(size){
   return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>`;
 }
 
+// 3-small-dice-converge-into-1-bigger-die glyph (Camp's Upgrade Dice rows)
+// -- reads as "combine" at a glance in place of the plain "I -> II" arrow it
+// replaces. Three single-pip dice fan out on the left, an arrow, then one
+// bigger five-pip die on the right stands in for the stronger result.
+function mergeGlyphSVG(h){
+  const w = h*2.45;
+  return `<svg class="merge-glyph" viewBox="0 0 54 22" width="${w}" height="${h}" fill="none" stroke="currentColor" stroke-width="1.6">
+      <rect x="1" y="2" width="9" height="9" rx="2" transform="rotate(-12 5.5 6.5)"></rect>
+      <circle cx="5.5" cy="6.5" r="1" fill="currentColor" stroke="none" transform="rotate(-12 5.5 6.5)"></circle>
+      <rect x="6" y="9.5" width="9" height="9" rx="2"></rect>
+      <circle cx="10.5" cy="14" r="1" fill="currentColor" stroke="none"></circle>
+      <rect x="1" y="14.5" width="9" height="9" rx="2" transform="rotate(10 5.5 19)"></rect>
+      <circle cx="5.5" cy="19" r="1" fill="currentColor" stroke="none" transform="rotate(10 5.5 19)"></circle>
+      <path d="M19 11 H29" stroke-width="2"></path>
+      <path d="M25 7 L30 11 L25 15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+      <rect x="35" y="2" width="17" height="17" rx="3" stroke-width="2"></rect>
+      <circle cx="39.6" cy="6.6" r="1.3" fill="currentColor" stroke="none"></circle>
+      <circle cx="47.4" cy="6.6" r="1.3" fill="currentColor" stroke="none"></circle>
+      <circle cx="43.5" cy="10.5" r="1.3" fill="currentColor" stroke="none"></circle>
+      <circle cx="39.6" cy="14.4" r="1.3" fill="currentColor" stroke="none"></circle>
+      <circle cx="47.4" cy="14.4" r="1.3" fill="currentColor" stroke="none"></circle>
+    </svg>`;
+}
+
+// Plain chevron, used as the bouncing "tap here next" cue between Camp's
+// Organize Dice lists (see groupedCampTilesHTML()/organizeSwapArrowHTML()
+// below) -- points down when the next tap belongs in Back Pocket, up when
+// it belongs in Tray, by rotating the same glyph via CSS rather than
+// drawing two separate icons.
+function chevronSVG(size){
+  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>`;
+}
+
+const CAMP_CAT_ORDER = ['origin','attack','maneuver','alloy','gilded','magic'];
+const CAMP_CAT_LABEL = {origin:'Origin', attack:'Attack', maneuver:'Maneuver', alloy:'Alloy', gilded:'Gilded', magic:'Magic'};
+// Groups a Tray/Back Pocket list by die category for Organize Dice (Camp),
+// so a crowded Back Pocket reads as sorted piles instead of one shuffled
+// wall of chips. `items` is [{die, idx}], idx being that die's real
+// position in S.tray/S.backPocket -- grouping only changes display order,
+// never the idx each tile carries, so selectOrganize()'s swap-by-index
+// still targets the right die regardless of where it landed visually.
+function groupedCampTilesHTML(items, type){
+  const groups = CAMP_CAT_ORDER
+    .map(cat=>({cat, items: items.filter(it=>it.die.cat===cat)}))
+    .filter(g=>g.items.length);
+  return groups.map(g=>
+    `<div class="camp-group-label">${CAMP_CAT_LABEL[g.cat]}</div>${g.items.map(it=>campDieTileHTML(it.die, type, it.idx)).join('')}`
+  ).join('');
+}
+
+// The bouncing arrow between Tray and Back Pocket in Organize Dice, shown
+// only once a die is selected -- points at whichever list the player needs
+// to tap next to complete the swap, so the two taps read as one connected
+// gesture instead of two disconnected clicks into generically-labeled
+// lists. Hidden entirely (returns '') with nothing selected.
+function organizeSwapArrowHTML(){
+  const sel = S.organizeSelection;
+  if(!sel) return '';
+  const dir = sel.type==='tray' ? 'down' : 'up';
+  return `<div class="organize-swap-arrow ${dir}">${chevronSVG(16)}</div>`;
+}
+
 // The landing screen before any game exists: logo/tagline, a lifetime-stats
 // teaser once the player has history, Continue (if a save is sitting there),
 // New Run, and quick links to Achievements/Run History/How to Play. Setup
@@ -2090,6 +2152,7 @@ function renderShrineEncounter(){
 function renderCamp(){
   const campFx = healthFX(S.health, S._lastPlayerHealth);
   S._lastPlayerHealth = S.health;
+  const organizeSel = S.organizeSelection;
   const upgradeRows = [];
   ['attack','maneuver'].forEach(cat=>{
     [1,2].forEach(level=>{
@@ -2102,7 +2165,7 @@ function renderCamp(){
       const needsBackfill = count>=3 && !canUpgrade(cat,level);
       const upgradeTitle = needsBackfill ? 'Needs more spare dice to backfill' : `Combine 3 ${label} ${ROMAN[level]} into 1 ${label} ${ROMAN[level+1]}`;
       upgradeRows.push(`<div class="upgrade-row">
-          <button class="upgrade-btn" id="upgrade-${cat}-${level}" ${disabled?'disabled':''} title="${upgradeTitle}">${label} ${ROMAN[level]} → ${ROMAN[level+1]} <span class="token-count">${count}</span></button>
+          <button class="upgrade-btn" id="upgrade-${cat}-${level}" ${disabled?'disabled':''} title="${upgradeTitle}">${label} ${ROMAN[level]} ${mergeGlyphSVG(16)} ${ROMAN[level+1]} <span class="token-count">${count}</span></button>
           <button id="preview-${cat}-${level}" class="upgrade-preview-btn" title="Preview the resulting die's faces">?</button>
         </div>`);
     });
@@ -2137,10 +2200,11 @@ function renderCamp(){
 
       <div class="camp-section">
         <h3 class="camp-section-title">Organize Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(click one in each list to swap)</span></h3>
-        <div class="hint camp-subhint" style="margin-top:0;">Tray</div>
-        <div class="camp-dice-grid" id="organize-tray"></div>
-        <div class="hint camp-subhint">Back Pocket <span style="color:var(--parchment-dim);">(${S.backPocket.length} dice)</span></div>
-        ${S.backPocket.length ? '<div class="camp-dice-grid" id="organize-bp"></div>' : '<p class="hint camp-empty-hint">Empty — dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one.</p>'}
+        <div class="hint camp-subhint ${organizeSel && organizeSel.type==='bp' ? 'organize-target-label':''}" style="margin-top:0;">Tray</div>
+        <div class="camp-dice-grid ${organizeSel && organizeSel.type==='bp' ? 'organize-target':''} ${organizeSel && organizeSel.type==='tray' ? 'organize-source':''}" id="organize-tray"></div>
+        ${organizeSwapArrowHTML()}
+        <div class="hint camp-subhint ${organizeSel && organizeSel.type==='tray' ? 'organize-target-label':''}">Back Pocket <span style="color:var(--parchment-dim);">(${S.backPocket.length} dice)</span></div>
+        ${S.backPocket.length ? `<div class="camp-dice-grid ${organizeSel && organizeSel.type==='tray' ? 'organize-target':''} ${organizeSel && organizeSel.type==='bp' ? 'organize-source':''}" id="organize-bp"></div>` : '<p class="hint camp-empty-hint">Empty — dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one.</p>'}
       </div>
     </div>`;
   document.getElementById('rest-btn').onclick = campRest;
@@ -2172,8 +2236,8 @@ function renderCamp(){
       };
     });
   });
-  document.getElementById('organize-tray').innerHTML = S.tray.map((c,i)=>campDieTileHTML(c.die,'tray',i)).join('');
-  if(S.backPocket.length) document.getElementById('organize-bp').innerHTML = S.backPocket.map((d,i)=>campDieTileHTML(d,'bp',i)).join('');
+  document.getElementById('organize-tray').innerHTML = groupedCampTilesHTML(S.tray.map((c,i)=>({die:c.die, idx:i})), 'tray');
+  if(S.backPocket.length) document.getElementById('organize-bp').innerHTML = groupedCampTilesHTML(S.backPocket.map((d,i)=>({die:d, idx:i})), 'bp');
   [...document.querySelectorAll('.camp-die-tile')].forEach(tile=>{
     tile.onclick = ()=> selectOrganize(tile.dataset.campType, parseInt(tile.dataset.campIdx));
   });
