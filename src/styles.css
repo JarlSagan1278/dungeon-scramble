@@ -482,6 +482,34 @@
   }
   .die.combo-ripple{ animation: combo-ripple-pulse 0.5s ease-out; z-index:1; }
 
+  /* Live "activated combo" glow: unlike the one-shot ripple above (which
+     only fires once a path resolves), this is a standing cue that shows
+     BEFORE the player commits to anything -- any Combo die currently
+     touching one or more Hit/Combo neighbors is already worth more than its
+     printed value, so its icon gets a soft gold halo that pulses, growing
+     brighter/bigger/faster across three tiers as the neighbor count (and
+     so the eventual damage multiplier) climbs. Scoped to .face-val so the
+     glow hugs the icon itself rather than the whole tile. */
+  .die.combo-active .face-val{ border-radius:50%; }
+  .die.combo-active-1 .face-val{ animation: combo-active-glow-1 2.2s ease-in-out infinite; }
+  .die.combo-active-2 .face-val{ animation: combo-active-glow-2 1.7s ease-in-out infinite; }
+  .die.combo-active-3 .face-val{ animation: combo-active-glow-3 1.3s ease-in-out infinite; }
+  @keyframes combo-active-glow-1{
+    0%,100%{ box-shadow:0 0 0 0 rgba(212,175,82,0.35); }
+    50%{ box-shadow:0 0 5px 3px rgba(212,175,82,0.45); }
+  }
+  @keyframes combo-active-glow-2{
+    0%,100%{ box-shadow:0 0 0 0 rgba(212,175,82,0.45); }
+    50%{ box-shadow:0 0 9px 5px rgba(212,175,82,0.65); }
+  }
+  @keyframes combo-active-glow-3{
+    0%,100%{ box-shadow:0 0 0 0 rgba(255,140,40,0.5); }
+    50%{ box-shadow:0 0 14px 7px rgba(255,140,40,0.85); }
+  }
+  .reduced-motion .die.combo-active-1 .face-val{ animation:none; box-shadow:0 0 5px 2px rgba(212,175,82,0.4); }
+  .reduced-motion .die.combo-active-2 .face-val{ animation:none; box-shadow:0 0 8px 3px rgba(212,175,82,0.55); }
+  .reduced-motion .die.combo-active-3 .face-val{ animation:none; box-shadow:0 0 11px 4px rgba(255,140,40,0.7); }
+
   /* Skill (class ability) conversion flourish: forcing a die's face used to
      be an invisible data mutation -- the tile just showed its new forced
      face on the next render with no acknowledgment that this was your one
@@ -603,26 +631,34 @@
   .camp-die-tile img{ width:100%; height:100%; object-fit:cover; display:block; border-radius:6px; }
   .camp-die-basic-label{ font-size:11px; line-height:1.3; font-weight:800; }
   .camp-die-tile.organize-selected{ box-shadow:0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
-  /* Card-stack look for more than one copy: two faux layers peeking out
+  /* Card-stack look for more than one copy: three faux layers fan out
      bottom-right via box-shadow (it follows the tile's own border-radius,
-     so the peeking edges stay rounded too), plus a count badge -- reads as
-     "a pile of these" instead of a single die with a number stapled to it. */
-  .camp-die-tile.stacked{ box-shadow: 3px 3px 0 0 rgba(0,0,0,0.5), 6px 6px 0 0 rgba(0,0,0,0.3); margin:0 6px 6px 0; }
-  .camp-die-tile.stacked.organize-selected{ box-shadow: 3px 3px 0 0 rgba(0,0,0,0.5), 6px 6px 0 0 rgba(0,0,0,0.3), 0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
-  .camp-stack-badge{ position:absolute; bottom:-5px; right:-5px; background:var(--gold); color:#241c10;
+     so the peeking edges stay rounded too), plus a slight tilt on the top
+     tile itself -- the combination reads as a fanned deck of cards rather
+     than a single die with a number stapled to it. Selecting it squares the
+     tilt back to 0 so the active tile doesn't look askew mid-swap. */
+  .camp-die-tile.stacked{ transform: rotate(-3deg);
+    box-shadow: 2px 3px 0 0 rgba(0,0,0,0.55), 4px 6px 0 0 rgba(0,0,0,0.4), 6px 9px 0 0 rgba(0,0,0,0.25);
+    margin:0 9px 9px 2px; }
+  .camp-die-tile.stacked.organize-selected{ transform:none;
+    box-shadow: 2px 3px 0 0 rgba(0,0,0,0.55), 4px 6px 0 0 rgba(0,0,0,0.4), 6px 9px 0 0 rgba(0,0,0,0.25), 0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
+  .camp-stack-badge{ position:absolute; bottom:-6px; right:-7px; background:var(--gold); color:#241c10;
     font-size:9px; font-weight:800; border-radius:8px; padding:1px 5px; min-width:13px; text-align:center;
-    border:1.5px solid var(--bg); line-height:1.3; }
+    border:1.5px solid var(--bg); line-height:1.3; transform: rotate(3deg); }
   /* Back Pocket as a visibly different, darker storage area rather than a
      second list that only a text heading told apart from Tray -- a sunken
      pouch shape (inset shadow, darker fill, bottom corners rounder than the
      top like a drawn drawstring bag) reads as "this is where things are
-     kept" on its own. */
+     kept" on its own. Deliberately smaller than the Tray above it (tighter
+     padding, smaller tiles via its own grid rule below) -- it's a side
+     pocket for spares, not a second equal-weight tray. */
   .camp-pocket{ position:relative; background:#0d0a07; border:1px solid #000;
-    border-radius:10px 10px 22px 22px; padding:14px 8px 10px; margin-top:4px;
+    border-radius:8px 8px 16px 16px; padding:11px 7px 7px; margin-top:4px;
     box-shadow: inset 0 3px 10px rgba(0,0,0,0.6); }
-  .camp-pocket-count{ position:absolute; top:-9px; left:50%; transform:translateX(-50%);
+  .camp-pocket .camp-dice-grid{ grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap:6px; }
+  .camp-pocket-count{ position:absolute; top:-8px; left:50%; transform:translateX(-50%);
     background:var(--stone); border:1.5px solid var(--bg); color:var(--parchment-dim);
-    font-size:10px; font-weight:800; border-radius:9px; padding:1px 8px; }
+    font-size:9px; font-weight:800; border-radius:8px; padding:1px 7px; }
   /* Connected swap cue: once a die is picked, the area it came FROM dims
      (everything but the selection itself) and the area it's going INTO
      gets a pulsing gold outline -- so the two taps a swap takes read as one

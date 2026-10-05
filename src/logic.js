@@ -806,6 +806,12 @@ function useClassAbility(idx){
 /* =========================================================================
    MATHING (resolve a path)
    ========================================================================= */
+// What counts as a neighbor that feeds a Combo die's growing bonus. Started
+// as Hit/Combo only ("an Attack die next to it"); now Block, H.O.T. and
+// D.O.T. count too, since those are just as much "something is happening on
+// this board" as a Hit is -- a Combo surrounded by support/status dice grows
+// the same as one surrounded by other Attack dice.
+const COMBO_NEIGHBOR_TYPES = new Set(['hit','combo','block','hot','dot']);
 function attackNeighborIndices(idx){
   const {r,c} = trayRC(idx);
   const out = [];
@@ -813,7 +819,7 @@ function attackNeighborIndices(idx){
     if(inBounds(rr,cc)){
       const j = trayIdx(rr,cc);
       const f = getFaceForIdx(j);
-      if(f.type==='hit'||f.type==='combo') out.push(j);
+      if(COMBO_NEIGHBOR_TYPES.has(f.type)) out.push(j);
     }
   });
   return out;
@@ -821,8 +827,9 @@ function attackNeighborIndices(idx){
 function attackNeighborsCount(idx){ return attackNeighborIndices(idx).length; }
 
 // Builds the tile-by-tile "ripple" order for the Combo-chain visual: each
-// Combo die in the path, immediately followed by the neighboring Hit/Combo
-// tiles that scaled its damage (the same set attackNeighborsCount() counts)
+// Combo die in the path, immediately followed by the neighboring tiles that
+// scaled its damage (the same COMBO_NEIGHBOR_TYPES set attackNeighborsCount()
+// counts -- Hit, Combo, Shield, H.O.T. and D.O.T.)
 // -- so the one mechanic that's actually a spatial/board-state bonus gets a
 // visible chain-reaction pulse instead of resolving as a single silent
 // number, same as every other path action. Consumed (read once, then

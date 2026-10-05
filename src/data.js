@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.5.0';
+const GAME_VERSION = '1.6.0';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -48,7 +48,7 @@ const LABEL = { hit:'Hit', combo:'Combo', boost:'Boost', dot:'D.O.T.', leech:'Le
 // language without needing a separate how-to-play primer.
 const FACE_DESC = {
   hit: 'Deals damage equal to its value.',
-  combo: 'Deals damage that grows with each Attack die next to it in your path.',
+  combo: 'Deals damage that grows with each Hit, Combo, Shield, H.O.T. or D.O.T. die next to it on the board.',
   boost: "Multiplies the value of the very next action in your path (even across several Boosts in a row).",
   dot: "Applies stacking damage-over-time to the enemy.",
   leech: "Damages the enemy and heals you the same amount, over time.",
