@@ -8,10 +8,10 @@ const SAVE_KEY = 'dungeonScrambleSave_v1';
 
 // Builds a plain, JSON-safe snapshot of S. klass/origin are stored as ids
 // (they carry a live zone() function that can't survive JSON) and rebuilt
-// on load; usedCards (a Set) is stored as an array.
+// on load; usedCards/usedLootNames (both Sets) are stored as arrays.
 function serializeState(){
   const { klass, origin, _advance, _pendingTimeout, ...rest } = S;
-  return { ...rest, classId: klass.id, originId: origin.id, usedCards: [...S.usedCards] };
+  return { ...rest, classId: klass.id, originId: origin.id, usedCards: [...S.usedCards], usedLootNames: [...S.usedLootNames] };
 }
 
 function saveGame(){
@@ -383,6 +383,8 @@ function loadGame(){
     data.klass = CLASSES.find(c=>c.id===data.classId);
     data.origin = ORIGINS.find(o=>o.id===data.originId);
     data.usedCards = new Set(data.usedCards||[]);
+    // ||[] also covers loading a save written before this field existed.
+    data.usedLootNames = new Set(data.usedLootNames||[]);
     delete data.classId; delete data.originId;
     S = data;
     return true;
@@ -452,6 +454,7 @@ function newGame(originId, classId, boonDieName, charName){
 
   let shuffled;
   let carryDie = null; // set below (non-debug only) if a die carried over from a previous run's defeat
+  let appliedBoonName = null; // set below (non-debug only) if a Starting Boon die was actually applied
   if(klass.debug){
     // Debug class: skip the normal starter loadout entirely and fill the
     // tray with a random sample across every die type in the game (Basic,
@@ -480,7 +483,7 @@ function newGame(originId, classId, boonDieName, charName){
     // collide if a player somehow has both available in the same run.
     if(boonDieName){
       const boonDie = findLootDieByName(boonDieName);
-      if(boonDie) dice[7] = boonDie;
+      if(boonDie){ dice[7] = boonDie; appliedBoonName = boonDie.name; }
     }
     // shuffle into 4x4
     shuffled = pickN(dice, dice.length);
@@ -516,6 +519,14 @@ function newGame(originId, classId, boonDieName, charName){
     pendingFreeBoost:0,
     shrineChoice:null,
     usedCards: new Set(),
+    // Same "no repeats until the whole pool's been seen" idea as usedCards
+    // above, but for Loot dice actually acquired this run (floor drops,
+    // Shrine trades/random-replaces, a Starting Boon, or a carried-over
+    // die) -- see pickLootUnused()/pickLootNUnused() below. Seeded here
+    // with whatever the player already starts the run holding, so a loot
+    // drop can't immediately hand them a second copy of their own Boon or
+    // carryover die.
+    usedLootNames: new Set([carryDie && carryDie.name, appliedBoonName].filter(Boolean)),
     _lastPlayerHealth: 20, // for the heal/damage flash effect on the health bar
     stats: { turnsTaken:0, damageDealt:0, encountersDefeated:0, shrinesVisited:0, overkills:0, lootCollected:0 },
     campRested: false,
@@ -557,6 +568,26 @@ function logMsg(cls,text,toastKind){
 function pickUnused(pool){
   const avail = pool.filter(c=>!S.usedCards.has(c.name));
   return avail.length ? pick(avail) : pick(pool); // fall back to a repeat only if a whole pool is exhausted
+}
+
+/* ---- Loot drawing: same "no repeats until the pool runs dry" idea as
+   pickUnused() above, applied to S.usedLootNames (dice actually acquired
+   this run -- see newGame()/swapInLootDie()) instead of S.usedCards, so a
+   run never hands the player a second copy of a Loot die it already gave
+   them, until every design in that tier has been seen at least once. ---- */
+function pickLootUnused(pool){
+  const avail = pool.filter(d=>!S.usedLootNames.has(d.name));
+  return avail.length ? pick(avail) : pick(pool); // fall back to a repeat only if the whole tier is exhausted
+}
+function pickLootNUnused(pool, n){
+  const avail = pool.filter(d=>!S.usedLootNames.has(d.name));
+  if(avail.length>=n) return pickN(avail, n);
+  // Not enough never-seen designs left to fill the request -- offer all of
+  // them, then pad the rest with repeats (never a repeat OF each other
+  // within this same draw, since that padding is itself drawn without
+  // replacement from what's left).
+  const repeats = pickN(pool.filter(d=>!avail.includes(d)), n-avail.length);
+  return avail.concat(repeats);
 }
 
 function drawEncounter(kind){
@@ -1371,7 +1402,7 @@ function runShrineEffect(e, effect){
       render(); return;
     }
     case 'tradeLoot': {
-      S.lootChoice = { options: pickN(lootPoolByName(effect.pool), 3), lootName: effect.pool, overkill:false, fromShrine:true };
+      S.lootChoice = { options: pickLootNUnused(lootPoolByName(effect.pool), 3), lootName: effect.pool, overkill:false, fromShrine:true };
       if(typeof markDiceDiscovered==='function') markDiceDiscovered(S.lootChoice.options);
       render(); return;
     }
@@ -1381,7 +1412,7 @@ function runShrineEffect(e, effect){
       // already showing, see renderSwapModal()/render() in render.js), not
       // a dedicated S.screen value, so the Shrine screen stays visible
       // underneath it.
-      S.pendingLootDie = pick(lootPoolByName(effect.pool));
+      S.pendingLootDie = pickLootUnused(lootPoolByName(effect.pool));
       if(typeof markDiceDiscovered==='function') markDiceDiscovered(S.pendingLootDie);
       logMsg('sys', `${e.name}: choose a die to replace with a random ${effect.pool} die (${S.pendingLootDie.name}).`);
       render(); return;
@@ -1446,7 +1477,7 @@ function onEncounterDefeated(){
   const isBoss = e.type==='Boss' || e.type==='Big Boss';
   let drawCount = isBoss ? 3 : 2;
   if(overkill) drawCount += 1;
-  const options = pickN(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
+  const options = pickLootNUnused(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
   S.lootChoice = { options, lootName: floor.lootName, overkill };
   if(typeof markDiceDiscovered==='function') markDiceDiscovered(options);
   // A Boss/Big Boss kill or an Overkill each get a distinct sound + a big
@@ -1504,6 +1535,12 @@ function swapInLootDie(trayIndex){
   S.backPocket.push(cell.die);
   cell.die = { name: S.pendingLootDie.name, faces: S.pendingLootDie.faces, cat: S.pendingLootDie.cat || 'loot' };
   cell.faceIdx = 0;
+  // Single chokepoint for every way a Loot die actually gets equipped
+  // (a floor drop, a Shrine trade, or a Shrine's random-replace all set
+  // S.pendingLootDie and funnel through here) -- recording it here, rather
+  // than at each call site, is what lets pickLootUnused()/pickLootNUnused()
+  // keep a future draw from handing the player a second copy.
+  S.usedLootNames.add(cell.die.name);
   S.pendingLootDie = null;
   logMsg('sys', `Equipped ${cell.die.name}.`, 'good');
   S.stats.lootCollected++;
