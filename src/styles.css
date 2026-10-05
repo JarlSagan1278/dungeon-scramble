@@ -499,12 +499,15 @@
      icon's charge/level ring rather than a glow -- tier 2 and 3 add a
      second concentric ring for a "banded" badge look, stepping up through
      gold and finally orange as the neighbor count (and so the eventual
-     damage multiplier) climbs. Scoped to .face-val so the rings hug the
-     icon itself rather than the whole tile. */
-  .die.combo-active .face-val{ border-radius:50%; }
-  .die.combo-active-1 .face-val{ animation: combo-active-ring-1 1.8s ease-in-out infinite; }
-  .die.combo-active-2 .face-val{ animation: combo-active-ring-2 1.5s ease-in-out infinite; }
-  .die.combo-active-3 .face-val{ animation: combo-active-ring-3 1.1s ease-in-out infinite; }
+     damage multiplier) climbs. Scoped to .face-val .icon-svg rather than
+     .face-val itself -- .face-val is a full-width block (its own text-align
+     just centers the icon inside it), so a ring on .face-val would follow
+     that wide box and come out an oval; .icon-svg is the actual icon glyph,
+     always a tight 1em-square box, so a ring on it comes out a true circle. */
+  .die.combo-active .face-val .icon-svg{ border-radius:50%; }
+  .die.combo-active-1 .face-val .icon-svg{ animation: combo-active-ring-1 1.8s ease-in-out infinite; }
+  .die.combo-active-2 .face-val .icon-svg{ animation: combo-active-ring-2 1.5s ease-in-out infinite; }
+  .die.combo-active-3 .face-val .icon-svg{ animation: combo-active-ring-3 1.1s ease-in-out infinite; }
   @keyframes combo-active-ring-1{
     0%,100%{ box-shadow: 0 0 0 1.5px rgba(212,175,82,0.85); }
     50%{ box-shadow: 0 0 0 3px rgba(212,175,82,1); }
@@ -517,9 +520,9 @@
     0%,100%{ box-shadow: 0 0 0 2.5px rgba(255,140,40,0.95), 0 0 0 5.5px rgba(255,140,40,0.45); }
     50%{ box-shadow: 0 0 0 3px rgba(255,140,40,1), 0 0 0 7px rgba(255,140,40,0.7); }
   }
-  .reduced-motion .die.combo-active-1 .face-val{ animation:none; box-shadow: 0 0 0 2px rgba(212,175,82,0.9); }
-  .reduced-motion .die.combo-active-2 .face-val{ animation:none; box-shadow: 0 0 0 2px rgba(212,175,82,0.95), 0 0 0 5px rgba(212,175,82,0.5); }
-  .reduced-motion .die.combo-active-3 .face-val{ animation:none; box-shadow: 0 0 0 2.5px rgba(255,140,40,1), 0 0 0 6px rgba(255,140,40,0.6); }
+  .reduced-motion .die.combo-active-1 .face-val .icon-svg{ animation:none; box-shadow: 0 0 0 2px rgba(212,175,82,0.9); }
+  .reduced-motion .die.combo-active-2 .face-val .icon-svg{ animation:none; box-shadow: 0 0 0 2px rgba(212,175,82,0.95), 0 0 0 5px rgba(212,175,82,0.5); }
+  .reduced-motion .die.combo-active-3 .face-val .icon-svg{ animation:none; box-shadow: 0 0 0 2.5px rgba(255,140,40,1), 0 0 0 6px rgba(255,140,40,0.6); }
 
   /* Skill (class ability) conversion flourish: forcing a die's face used to
      be an invisible data mutation -- the tile just showed its new forced
