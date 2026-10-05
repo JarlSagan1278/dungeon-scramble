@@ -215,6 +215,37 @@ function findLootDieByName(name){
   return ALLOY.find(d=>d.name===name) || GILDED.find(d=>d.name===name) || MAGIC.find(d=>d.name===name) || null;
 }
 
+// ---- Debug-mode unlock-everything: fires once when the Setup screen's
+// secret debug-class trigger (5 clicks on "Choose Your Class") is armed --
+// see render.js. Drives every Origin-unlock/Boon-tier gate through its own
+// real META.lifetime thresholds (rather than only flipping achievement
+// flags) so the unlocked state stays internally consistent with everything
+// else that reads META.lifetime -- isOriginUnlocked() and
+// unlockedBoonTiers() need no changes of their own to see it. Also marks
+// every Loot die as discovered so the Dice Compendium shows it all. This
+// DOES persist to the real save (localStorage, same as any other lifetime
+// progress) -- debug mode is a developer/testing tool reached only by the
+// secret click sequence, not something a normal player can stumble into.
+function debugUnlockEverything(){
+  const L = META.lifetime;
+  L.runsPlayed = Math.max(L.runsPlayed, 10);
+  L.victories = Math.max(L.victories, 10);
+  L.bestFloorReached = 3;
+  L.totalDamageDealt = Math.max(L.totalDamageDealt, 1000);
+  L.totalEncountersDefeated = Math.max(L.totalEncountersDefeated, 100);
+  L.totalOverkills = Math.max(L.totalOverkills, 10);
+  L.totalShrinesVisited = Math.max(L.totalShrinesVisited, 25);
+  ['dwarf','gnome','halfling','pixie'].forEach(id=>{ L.victoriesByOrigin[id] = Math.max(L.victoriesByOrigin[id]||0, 1); });
+  ['guard','armsmaster','dungeoneer','arcanist'].forEach(id=>{ L.victoriesByClass[id] = Math.max(L.victoriesByClass[id]||0, 1); });
+  checkAchievements();
+  // Belt-and-suspenders: flag every achievement directly too, in case a
+  // future achievement's check() doesn't line up with the thresholds above
+  // (so "unlock everything" never silently misses one).
+  ACHIEVEMENTS.forEach(a=>{ if(!META.achievements[a.id]) META.achievements[a.id] = { date: Date.now() }; });
+  markDiceDiscovered([...ALLOY, ...GILDED, ...MAGIC]);
+  saveMeta();
+}
+
 // Called exactly once per finished run (from renderVictory/renderGameOver,
 // each already guarded against re-firing on re-render) with S still intact
 // (before clearSave() wipes the in-progress run). Returns any Achievements

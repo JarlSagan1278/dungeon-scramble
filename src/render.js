@@ -411,10 +411,14 @@ function renderSetup(){
   document.getElementById('start-btn').onclick=()=>{ newGame(chosenOrigin, chosenClass, chosenBoonName); };
   // Secret debug-class trigger: 5 clicks on "Choose Your Class" within a
   // short window. No visible button, so it can't be stumbled into by a
-  // normal player, but stays quick to reach for testing. Also temporarily
-  // unlocks every Origin card for this screen (UI-only -- doesn't touch
-  // META/isOriginUnlocked) so testing isn't blocked on grinding out real
-  // unlocks first.
+  // normal player, but stays quick to reach for testing. Also unlocks
+  // every Origin, Achievement, and Dice Compendium entry for real (see
+  // debugUnlockEverything(), logic.js) -- it drives the same META.lifetime
+  // thresholds normal play would, so every other unlock check (Starting
+  // Boon tiers, isOriginUnlocked()) just sees it as already-earned progress
+  // rather than needing its own debug-only bypass. The Origin cards here
+  // are still patched in place (rather than a full re-render) purely so
+  // the in-progress Origin/Class selection on this screen survives.
   let classHeaderClicks = [];
   document.getElementById('class-header').onclick = ()=>{
     const now = Date.now();
@@ -427,13 +431,14 @@ function renderSetup(){
       checkReady();
       if(!debugArmed){
         debugArmed = true;
+        if(typeof debugUnlockEverything==='function') debugUnlockEverything();
         originCards.filter(oc=>!oc.unlocked).forEach(oc=>{
           oc.node.classList.remove('locked');
           oc.node.classList.add('debug-unlocked');
           oc.node.onclick = ()=>{ chosenOrigin=oc.id; [...og.children].forEach(x=>x.classList.remove('selected')); oc.node.classList.add('selected'); checkReady(); };
         });
       }
-      if(typeof showToast==='function') showToast('Debug class armed (Origins unlocked for testing)', 'good');
+      if(typeof showToast==='function') showToast('Debug: Origins, Achievements & Dice Compendium all unlocked', 'good');
     }
   };
 }
