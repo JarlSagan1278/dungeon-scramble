@@ -1348,12 +1348,14 @@ function showRoomCallout(fx, onDismiss){
   const oldScrim = document.getElementById('room-callout-scrim');
   if(oldScrim && oldScrim.parentNode) oldScrim.parentNode.removeChild(oldScrim);
   const stack = ensureFxStack();
-  const mainCls = fx.boss ? 'main boss' : 'main';
-  const mainText = fx.boss ? 'Boss Encounter' : 'A new room...';
+  const introCls = fx.boss ? 'intro boss' : 'intro';
+  const introText = fx.boss ? 'Boss Encounter' : 'A new room...';
+  const nameCls = fx.boss ? 'name boss' : 'name';
   const node = el(`<div id="room-callout">
       <div class="room-callout-box">
-        <div class="room-callout-line ${mainCls}">${mainText}</div>
-        <div class="room-callout-line sub">${fx.name} · ${fx.type}</div>
+        <div class="room-callout-line ${introCls}">${introText}</div>
+        <div class="room-callout-line ${nameCls}">${fx.name}</div>
+        <div class="room-callout-line sub">${fx.type}</div>
         <div class="room-callout-line hint">Tap to continue</div>
       </div>
     </div>`);

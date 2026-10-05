@@ -856,8 +856,10 @@
     transform:translateY(-10px); animation: room-callout-slide 0.4s cubic-bezier(.22,1,.36,1) forwards; }
   .room-callout-line{ font-family:'Baloo 2','Trajan Pro',Cambria,Georgia,serif; font-weight:800;
     letter-spacing:1.5px; }
-  .room-callout-line.main{ font-size:27px; text-transform:uppercase; color:var(--cream); }
-  .room-callout-line.main.boss{ font-size:32px; color:#ff8a3d; }
+  .room-callout-line.intro{ font-size:18px; color:var(--gold); }
+  .room-callout-line.intro.boss{ color:#ff8a3d; }
+  .room-callout-line.name{ font-size:27px; color:var(--cream); }
+  .room-callout-line.name.boss{ font-size:32px; color:#ff8a3d; }
   .room-callout-line.sub{ font-size:18px; color:var(--gold); }
   .room-callout-line.hint{ font-size:12px; text-transform:none; letter-spacing:0; font-weight:600;
     color:var(--parchment-dim); margin-top:6px; }
