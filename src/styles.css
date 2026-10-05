@@ -456,6 +456,21 @@
     100%{ transform:scale(1) rotate(0deg); opacity:1; }
   }
   .forced-badge.badge-pop-in{ animation: badge-pop-in 0.4s cubic-bezier(.3,1.5,.4,1); }
+
+  /* Minion knocked out by a Leap jumping clean over it (see
+     step.leapClearIdx, computePathSteps()/runPlayerPathSteps(), logic.js) --
+     a bright, icy-white burst rather than the warm gold of the Combo ripple
+     or Skill conversion above, so "a Minion just got cleared" reads as its
+     own distinct kind of moment (closer to a little poof than a pulse). The
+     die underneath is already showing by the time this plays (the Minion
+     flag is cleared before this render), so the burst reads as having just
+     revealed it. */
+  @keyframes minion-clear-pop{
+    0%{ box-shadow:0 0 0 0 rgba(220,240,255,0); transform:scale(1); filter:brightness(1); }
+    35%{ box-shadow:0 0 0 10px rgba(220,240,255,0.75); transform:scale(1.18); filter:brightness(1.5); }
+    100%{ box-shadow:0 0 0 0 rgba(220,240,255,0); transform:scale(1); filter:brightness(1); }
+  }
+  .die.minion-cleared{ animation: minion-clear-pop 0.5s cubic-bezier(.2,1.4,.4,1); z-index:2; }
   .die.undoable{ box-shadow:0 0 0 3px #e05a5a, 0 0 10px 2px rgba(224,90,90,0.6) !important; cursor:pointer; }
 
   /* Screen transition: fires only when the top-level screen actually

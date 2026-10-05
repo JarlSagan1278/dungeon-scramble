@@ -828,10 +828,23 @@ function computePathEffects(path){
 // lump sum. Pure -- no side effects, same as computePathEffects().
 function computePathSteps(path){
   let boostMult = S.pendingFreeBoost>0 ? S.pendingFreeBoost : 1;
-  return path.map(idx=>{
+  return path.map((idx,i)=>{
     const f = getFaceForIdx(idx);
     const val = f.value||0;
-    const step = {idx, type:f.type, dmg:0, dotToEncounter:0, hotToPlayer:0, blockGain:0, healGain:0, selfDot:0, freeze:false, nullify:false, boostMultApplied:0};
+    const step = {idx, type:f.type, dmg:0, dotToEncounter:0, hotToPlayer:0, blockGain:0, healGain:0, selfDot:0, freeze:false, nullify:false, boostMultApplied:0, leapClearIdx:null};
+    // A Leap jumps clean over the cell between its start and end (the
+    // move's actual midpoint, see adjLeap()) rather than landing on it --
+    // if a Minion happens to be sitting in that gap, leaping over it
+    // knocks it out on the spot, a second, more deliberate way to clear
+    // Minions alongside just racking up Hits (see clearMinionAt() below).
+    // The move's TYPE is decided by the die you're leaving, i.e. the
+    // previous step in the path (same rule canSelect() uses), so this only
+    // applies from the 2nd die on.
+    if(i>0 && getFaceForIdx(path[i-1]).type==='leap'){
+      const a = trayRC(path[i-1]), b = trayRC(idx);
+      const overIdx = trayIdx((a.r+b.r)/2, (a.c+b.c)/2);
+      if(S.tray[overIdx] && S.tray[overIdx].minion) step.leapClearIdx = overIdx;
+    }
     switch(f.type){
       case 'hit': step.dmg = val*boostMult; break;
       case 'combo': step.dmg = val*(1+attackNeighborsCount(idx))*boostMult; break;
@@ -860,6 +873,14 @@ function clearOneMinion(){
   if(cell){ cell.minion=false; cell.die=cell.coveredDie; cell.coveredDie=null; }
 }
 
+// Clears one SPECIFIC Minion-covered cell -- as opposed to clearOneMinion()'s
+// "first minion found in tray order" -- used when a Leap jumps clean over
+// it (see computePathSteps()'s step.leapClearIdx, above).
+function clearMinionAt(idx){
+  const cell = S.tray[idx];
+  if(cell && cell.minion){ cell.minion=false; cell.die=cell.coveredDie; cell.coveredDie=null; }
+}
+
 // Applies exactly one die's contribution (see computePathSteps()) to live
 // game state. Called once per die as runPlayerPathSteps() plays the path
 // back, so the encounter's/player's health bars drain and fill one die at
@@ -878,6 +899,10 @@ function applyPathStep(step){
   if(step.freeze) S.freezeNext = true;
   if(step.nullify) applyNullify();
   if(step.type==='hit') clearOneMinion();
+  if(step.leapClearIdx!=null){
+    clearMinionAt(step.leapClearIdx);
+    logMsg('sys', 'Leaped clean over a Minion -- cleared it!', 'good');
+  }
 }
 
 function applyNullify(){
@@ -995,7 +1020,7 @@ function startTurnTransition(){
 // firing for the whole path at once), then move on.
 function runPlayerPathSteps(steps, i, path, effects){
   if(i>=steps.length){
-    S.resolvingIdx = null; S.resolvingFx = null; S.lastComboRipple = null;
+    S.resolvingIdx = null; S.resolvingFx = null; S.lastComboRipple = null; S.lastMinionClearIdx = null;
     finishPlayerPath(path, effects);
     return;
   }
@@ -1004,6 +1029,10 @@ function runPlayerPathSteps(steps, i, path, effects){
   S.resolvingIdx = step.idx;
   S.resolvingFx = typeof describeStepFx==='function' ? describeStepFx(step) : null;
   S.lastComboRipple = step.type==='combo' ? buildComboRipple([step.idx]) : null;
+  // One-shot flag so renderGame()/renderDie() can flash the specific cell a
+  // Leap just cleared (a different tile than the one resolving above --
+  // see step.leapClearIdx, computePathSteps()).
+  S.lastMinionClearIdx = step.leapClearIdx;
   // Each die that actually deals damage plays a little higher than the
   // last one this turn (first hit at base pitch, climbing from there),
   // so a multi-hit path builds like a rising combo instead of every hit

@@ -518,6 +518,11 @@ function renderDie(cell, idx){
   const rippleCls = rippleEntry ? 'combo-ripple' : '';
   const justConverted = S.justConvertedIdx===idx;
   const convertCls = justConverted ? 'ability-convert' : '';
+  // A Leap that just jumped clean over this specific cell's Minion, clearing
+  // it on the spot (see step.leapClearIdx, computePathSteps(), logic.js) --
+  // a bright one-shot burst, distinct from the gold Combo ripple above,
+  // since a Minion is being knocked out rather than a chain extending.
+  const minionClearCls = S.lastMinionClearIdx===idx ? 'minion-cleared' : '';
   // Turn resolution: this die is the one currently playing back (see
   // runPlayerPathSteps() in logic.js) -- pulses once, colored by what it
   // did, with its own popped-off number rather than everything landing as
@@ -542,7 +547,7 @@ function renderDie(cell, idx){
   const nameTag = isNonStarter ? `<div class="name-tag">${nameTagSVG(cell.die.name, idx)}</div>` : '';
   const forcedCls = cell.forcedFace ? 'forced-face' : '';
   const boostTargetCls = boostTargetIdx()===idx ? 'boost-target' : '';
-  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${resolveCls}"
+  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${resolveCls} ${minionClearCls}"
             data-idx="${idx}" title="${isLastMove?'Click to undo this move':(cell.minion?'Minion die':cell.die.name)}" ${shakeDelay}>
             ${num?`<div class="pathnum">${num}</div>`:''}
             ${(cell.forcedFace || boostTargetCls) ? `<div class="corner-badges">
@@ -829,6 +834,7 @@ function renderGame(){
   }
   S.justScrambled = false;
   S.lastComboRipple = null; // consumed -- plays once, on the render right after runPlayerPathSteps() set it
+  S.lastMinionClearIdx = null; // consumed -- plays once, on the render right after runPlayerPathSteps() set it
   S.justConvertedIdx = null; // consumed -- plays once, on the render right after useClassAbility() set it
   [...document.getElementById('tray').children].forEach(node=>{
     const idx = parseInt(node.dataset.idx);
@@ -849,7 +855,7 @@ function renderGame(){
         longPressed = true;
         const cell = S.tray[idx];
         if(cell.minion){
-          showFaceTooltip(rect, `<strong>Minion die</strong> — clogs this space; land a Hit on it to clear.`);
+          showFaceTooltip(rect, `<strong>Minion die</strong> — clogs this space; land a Hit on it, or Leap clean over it, to clear.`);
           return;
         }
         const f = cell.forcedFace || currentFace(cell);
@@ -1627,7 +1633,7 @@ function keyCardHTML(){
     <div class="key-card" style="margin-top:0;">
       <div class="key-grid">
         <div class="key-item blk-maneuver" style="grid-column:1;grid-row:1;" title="Next move: diagonal only"><span class="key-icon">${iconSpan('dodge')}</span><span class="key-label">Dodge</span></div>
-        <div class="key-item blk-maneuver" style="grid-column:1;grid-row:2;" title="Next move: skip one, same direction"><span class="key-icon">${iconSpan('leap')}</span><span class="key-label">Leap</span></div>
+        <div class="key-item blk-maneuver" style="grid-column:1;grid-row:2;" title="Next move: skip one, same direction -- clears a Minion jumped clean over"><span class="key-icon">${iconSpan('leap')}</span><span class="key-label">Leap</span></div>
         <div class="key-item blk-maneuver" style="grid-column:1;grid-row:3;" title="Next move: adjacent or diagonal"><span class="key-icon">${iconSpan('pivot')}</span><span class="key-label">Pivot</span></div>
 
         <div class="key-item blk-attack" style="grid-column:2;grid-row:1;" title="Deal damage equal to the Action Value"><span class="key-icon">${iconSpan('hit')}</span><span class="key-label">Hit</span></div>
