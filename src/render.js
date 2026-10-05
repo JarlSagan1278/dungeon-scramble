@@ -560,14 +560,18 @@ function renderSetup(){
   `;
   document.getElementById('setup-back-btn').onclick = ()=>{ preGameScreen='title'; render(); };
 
-  // chosenOrigin/chosenClass only ever hold a value the player actually
-  // tapped (and, for Origin, one that's genuinely unlocked) -- what
+  // chosenOrigin/chosenClass hold whatever is actually selected -- what
   // #start-btn ends up using. previewedOriginId/previewedClassId drive the
   // showcase panels and can point at something merely being looked at (a
   // still-locked Origin, previewed with its lock hint) without that
-  // counting as a selection.
-  let chosenOrigin=null, chosenClass=null, chosenBoonName=null, charName='';
-  let previewedOriginId = 'dwarf', previewedClassId = CLASSES.find(k=>!k.debug).id;
+  // counting as a selection. Dwarf/the first Class are both shown AND
+  // selected by default (rather than shown-but-unselected) so a new player
+  // isn't looking at a fully-filled-in showcase with no visible selection
+  // ring anywhere and wondering what, if anything, is actually chosen --
+  // tapping a different Origin or Class still overrides this as normal.
+  const defaultClassId = CLASSES.find(k=>!k.debug).id;
+  let chosenOrigin='dwarf', chosenClass=defaultClassId, chosenBoonName=null, charName='';
+  let previewedOriginId = 'dwarf', previewedClassId = defaultClassId;
 
   const nameInput = document.getElementById('char-name-input');
   nameInput.oninput = ()=>{ charName = nameInput.value; };
@@ -627,6 +631,7 @@ function renderSetup(){
   }
   renderClassTabs();
   renderClassShowcaseNow();
+  checkReady();
 
   const boonScroll = document.getElementById('boon-scroll');
   const boonShowcase = document.getElementById('boon-showcase');
