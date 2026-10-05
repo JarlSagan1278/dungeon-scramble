@@ -589,9 +589,16 @@
   .camp-section{ background: var(--panel2); border:1px solid var(--stone); border-radius:8px; padding:8px 10px 9px; margin:7px 0; }
   .camp-status-card .bar-row{ margin-bottom:0; }
   .camp-status-card .small-btn-row{ margin-top:6px; }
-  .camp-dice-grid{ display:grid; grid-template-columns: repeat(8,1fr); gap:3px; margin:3px 0; }
-  .camp-die-tile{ aspect-ratio:1/1; padding:2px; cursor:pointer; display:flex; align-items:center; justify-content:center; text-align:center; }
-  .camp-die-label{ font-size:6.5px; line-height:1.1; word-break:break-word; font-weight:bold; }
+  /* Chips that size to their own die name instead of a fixed 8-column grid
+     of tiny squares -- a full name like "Dwarven Doohickie" or "Self-
+     Replicating Forge" has no hope of reading cleanly jammed into a ~34px
+     square at 6.5px type, so this wraps a flexible row of pill-shaped tiles
+     instead, each as wide as its own label needs and no narrower. */
+  .camp-dice-grid{ display:flex; flex-wrap:wrap; gap:6px; margin:3px 0; }
+  .camp-die-tile{ aspect-ratio:unset; width:auto; height:auto; min-width:0; min-height:0;
+    flex:0 0 auto; max-width:100%; border-radius:7px; padding:7px 10px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; text-align:center; }
+  .camp-die-label{ font-size:11px; line-height:1.2; word-break:normal; white-space:normal; font-weight:bold; }
   .camp-die-tile.organize-selected{ box-shadow:0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
   .camp-section-title{ font-size:13px; margin:7px 0 3px; }
   .camp-section .camp-section-title:first-child{ margin-top:0; }
@@ -738,16 +745,16 @@
   #room-callout{ pointer-events:auto; cursor:pointer; text-align:center;
     opacity:0; animation: room-callout-fade 0.25s ease-out forwards; }
   #room-callout.dismissing{ opacity:0 !important; transition:opacity .2s ease; animation:none; }
-  .room-callout-box{ background:rgba(10,7,5,0.9); border:1px solid rgba(212,175,100,0.6);
-    border-radius:10px; padding:10px 20px; display:flex; flex-direction:column; gap:2px; max-width:90%;
+  .room-callout-box{ background:rgba(10,7,5,0.93); border:2px solid rgba(212,175,100,0.6);
+    box-shadow:0 8px 28px rgba(0,0,0,0.6); border-radius:14px; padding:20px 30px; display:flex; flex-direction:column; gap:6px; max-width:92%; min-width:260px;
     transform:translateY(-10px); animation: room-callout-slide 0.4s cubic-bezier(.22,1,.36,1) forwards; }
   .room-callout-line{ font-family:'Baloo 2','Trajan Pro',Cambria,Georgia,serif; font-weight:800;
-    letter-spacing:1px; }
-  .room-callout-line.main{ font-size:18px; text-transform:uppercase; color:var(--cream); }
-  .room-callout-line.main.boss{ font-size:22px; color:#ff8a3d; }
-  .room-callout-line.sub{ font-size:13px; color:var(--gold); }
-  .room-callout-line.hint{ font-size:10px; text-transform:none; letter-spacing:0; font-weight:600;
-    color:var(--parchment-dim); margin-top:2px; }
+    letter-spacing:1.5px; }
+  .room-callout-line.main{ font-size:27px; text-transform:uppercase; color:var(--cream); }
+  .room-callout-line.main.boss{ font-size:32px; color:#ff8a3d; }
+  .room-callout-line.sub{ font-size:18px; color:var(--gold); }
+  .room-callout-line.hint{ font-size:12px; text-transform:none; letter-spacing:0; font-weight:600;
+    color:var(--parchment-dim); margin-top:6px; }
   @keyframes room-callout-fade{ from{ opacity:0; } to{ opacity:1; } }
   @keyframes room-callout-slide{ from{ transform:translateY(-10px); } to{ transform:translateY(0); } }
   .reduced-motion #room-callout{ animation:none; opacity:1; }
