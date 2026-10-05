@@ -252,6 +252,10 @@ function lockSVG(size){
 // -- reads as "combine" at a glance in place of the plain "I -> II" arrow it
 // replaces. Three single-pip dice fan out on the left, an arrow, then one
 // bigger five-pip die on the right stands in for the stronger result.
+// The bottom (third) small die sits lowest in the fan -- its box used to run
+// to y=23.5 against a viewBox only 22 tall, so its bottom edge was silently
+// clipped by the SVG viewport and that one die read as open-bottomed instead
+// of a closed square. Shifted up so its box stays inside the viewBox.
 function mergeGlyphSVG(h){
   const w = h*2.45;
   return `<svg class="merge-glyph" viewBox="0 0 54 22" width="${w}" height="${h}" fill="none" stroke="currentColor" stroke-width="1.6">
@@ -259,8 +263,8 @@ function mergeGlyphSVG(h){
       <circle cx="5.5" cy="6.5" r="1" fill="currentColor" stroke="none" transform="rotate(-12 5.5 6.5)"></circle>
       <rect x="6" y="9.5" width="9" height="9" rx="2"></rect>
       <circle cx="10.5" cy="14" r="1" fill="currentColor" stroke="none"></circle>
-      <rect x="1" y="14.5" width="9" height="9" rx="2" transform="rotate(10 5.5 19)"></rect>
-      <circle cx="5.5" cy="19" r="1" fill="currentColor" stroke="none" transform="rotate(10 5.5 19)"></circle>
+      <rect x="1" y="12" width="9" height="9" rx="2" transform="rotate(10 5.5 16.5)"></rect>
+      <circle cx="5.5" cy="16.5" r="1" fill="currentColor" stroke="none" transform="rotate(10 5.5 16.5)"></circle>
       <path d="M19 11 H29" stroke-width="2"></path>
       <path d="M25 7 L30 11 L25 15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
       <rect x="35" y="2" width="17" height="17" rx="3" stroke-width="2"></rect>
