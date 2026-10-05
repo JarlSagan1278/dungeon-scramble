@@ -428,8 +428,14 @@
      top/right stay fixed as anchors, so growth (via the pcf-num font-size
      set inline per render) pushes the badge's other two edges outward over
      the card instead of being squeezed inside it. */
+  /* z-index:13, not some smaller in-subtree value -- #app has no position/
+     z-index of its own, so it never opens a stacking context, and this badge
+     ends up compared directly against #path-trail-svg (a body-level sibling
+     of #app, z-index:12) at the document root. Anything lower than 12 here
+     let the gold path line paint right across the number instead of running
+     behind the badge like it's meant to. */
   .path-counter-float{ position:absolute; top:-10px; right:0px; background: radial-gradient(circle at 32% 28%, #f3dd98, var(--gold) 60%); color:#241c10; border:3px solid #000;
-    border-radius:999px; padding:2px 10px; z-index:8; display:flex; align-items:baseline; gap:4px;
+    border-radius:999px; padding:2px 10px; z-index:13; display:flex; align-items:baseline; gap:4px;
     box-shadow:0 3px 8px rgba(0,0,0,0.55); animation: pop-in 0.2s ease-out;
     transition: font-size .15s cubic-bezier(.3,1.4,.4,1); }
   /* A bigger total gets a louder badge, not just a bigger one -- a warm
