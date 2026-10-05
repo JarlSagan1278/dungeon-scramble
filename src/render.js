@@ -588,7 +588,7 @@ function renderSetup(){
         : lockedOriginPortraitHTML(o.id);
       const c = el(`<button type="button" class="origin-icon-btn ${o.id===chosenOrigin?'selected':''} ${unlocked?'':'locked'}" aria-label="${o.name}" title="${o.name}">
           ${portraitHTML}
-          ${unlocked?'':`<span class="origin-lock-badge">${lockSVG(13)}</span>`}
+          ${unlocked?'':`<span class="origin-lock-badge">${lockSVG(17)}</span>`}
         </button>`);
       c.onclick = ()=>{
         previewedOriginId = o.id;
@@ -1081,7 +1081,6 @@ function renderGame(){
         <div class="util-rail">
           <div class="util-btn" id="open-key-btn">${iconSpan('key')}<span>Key</span></div>
           <div class="util-btn" id="open-backpocket-btn">${iconSpan('bag')}<span>Bag</span>${S.backPocket.length?`<span class="badge">${S.backPocket.length}</span>`:''}</div>
-          <div class="util-btn" id="open-log-btn">${iconSpan('log')}<span>Log</span></div>
           <div class="util-btn ${totalTokens?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Use</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
         </div>
       </div>
@@ -1187,7 +1186,6 @@ function renderGame(){
   attachLongPressTooltips('.route-tooltip-target');
   document.getElementById('open-key-btn').onclick = ()=> openInfoModal('Action Key', keyCardHTML());
   document.getElementById('open-backpocket-btn').onclick = ()=> openInfoModal('Back Pocket', backPocketViewHTML());
-  document.getElementById('open-log-btn').onclick = ()=> openInfoModal('Log', logViewHTML());
   document.getElementById('open-tokens-btn').onclick = ()=>{ if(totalTokens>0) openTokensModal(); };
   const abilityBtn = document.getElementById('ability-btn');
   if(abilityBtn) abilityBtn.onclick = ()=>{
@@ -1698,6 +1696,7 @@ function openSettingsModal(){
       </div>
       <p class="hint" style="text-align:left;">Keyboard: <strong>Enter</strong> Go &middot; <strong>Backspace</strong> Clear &middot; <strong>1234/qwer/asdf/zxcv</strong> tap a tray die (matches its grid position)</p>
       <div class="small-btn-row" style="justify-content:center; flex-direction:column;">
+        ${inRun ? '<button id="settings-log-btn">Log</button>' : ''}
         <button id="settings-how-to-play-btn">How to Play</button>
         <button id="settings-run-history-btn">Run History</button>
         <button id="settings-achievements-btn">Achievements</button>
@@ -1712,6 +1711,8 @@ function openSettingsModal(){
   const close = ()=> closeModal(overlay);
   overlay.querySelector('#settings-x-btn').onclick = close;
   overlay.querySelector('#settings-close-btn').onclick = close;
+  const logBtn = overlay.querySelector('#settings-log-btn');
+  if(logBtn) logBtn.onclick = ()=>{ close(); openInfoModal('Log', logViewHTML()); };
   overlay.querySelector('#settings-how-to-play-btn').onclick = ()=>{ close(); openTutorialModal(0); };
   overlay.querySelector('#settings-run-history-btn').onclick = ()=>{ close(); openRunHistoryModal(); };
   overlay.querySelector('#settings-achievements-btn').onclick = ()=>{ close(); openAchievementsModal(); };
@@ -2234,10 +2235,7 @@ function renderCamp(){
         </div>
         <div class="small-btn-row">
           <button id="rest-btn" ${S.campRested?'disabled':''} title="Scramble your Tray's faces, then heal for half the non-blank faces showing">${S.campRested?'Rested':'Rest'}</button>
-        </div>
-        <div class="small-btn-row">
           <button id="leave-btn" class="primary">Break Camp &amp; Continue</button>
-          <button id="camp-log-btn">${iconSpan('log')} Log</button>
         </div>
       </div>
 
@@ -2256,7 +2254,6 @@ function renderCamp(){
       </div>
     </div>`;
   document.getElementById('rest-btn').onclick = campRest;
-  document.getElementById('camp-log-btn').onclick = ()=> openInfoModal('Log', logViewHTML());
   document.getElementById('leave-btn').onclick = ()=>{
     const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
         <h2>Break Camp?</h2>
