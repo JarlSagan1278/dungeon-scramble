@@ -224,7 +224,6 @@ function render(){
   if(S.screen==='victory'){ clearPathTrail(); renderVictory(); maybeScreenTransition('victory'); return; }
   if(S.screen==='gameover'){ clearPathTrail(); renderGameOver(); maybeScreenTransition('gameover'); return; }
   if(S.screen==='camp'){ clearPathTrail(); renderCamp(); maybeAutosave(); maybeScreenTransition('camp'); return; }
-  if(S.screen==='swap'){ clearPathTrail(); renderSwap(); maybeAutosave(); maybeScreenTransition('swap'); return; }
   if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); maybeAutosave(); maybeScreenTransition('shrine'); return; }
   renderGame();
   maybeAutosave();
@@ -934,6 +933,7 @@ function renderGame(){
   updatePathTrail();
   if(S.lootChoice) renderLootModal();
   if(S.shrineChoice) renderShrineChoiceModal();
+  if(S.pendingLootDie) renderSwapModal();
 }
 
 function pickPreviewFace(dieFaces){
@@ -1779,14 +1779,24 @@ function renderShrineResultModal(){
   overlay.querySelector('#shrine-result-continue').onclick = ()=> closeModal(overlay, continueFromShrine);
 }
 
-function renderSwap(){
-  app.innerHTML = `
-    <div class="panel">
+// A pop-up over whatever screen is already showing (the game board, or the
+// Shrine card) rather than a full screen of its own -- picking a die to
+// replace is a quick, single decision, so swapping away the entire board to
+// ask it read as a bigger interruption than it is, and lost the context of
+// what tray you were looking at. modal-bottom (styles.css) anchors it near
+// the bottom of the viewport instead of the usual vertical-center, since
+// this is the one modal a player reaches for mid-run, often one-handed --
+// closer to the thumb than requiring a reach up the screen. Triggered
+// whenever S.pendingLootDie is set, same pattern as the lootChoice/
+// shrineChoice/shrineResult modals (see renderGame()/renderShrineEncounter()).
+function renderSwapModal(){
+  const overlay = el(`<div class="modal-overlay modal-bottom"><div class="modal">
       <h2>Equip ${S.pendingLootDie.name}</h2>
       <p>Choose which die in your tray to replace. The replaced die goes to your Back Pocket.</p>
       <div class="swap-list" id="swap-list"></div>
-    </div>`;
-  const list = document.getElementById('swap-list');
+    </div></div>`);
+  openUniqueOverlay('swap', overlay);
+  const list = overlay.querySelector('#swap-list');
   // Group tray slots by die name -- identical dice show as one entry with a
   // count instead of listing every individual slot; which specific slot
   // gets replaced doesn't matter when they're the same die.
@@ -1807,8 +1817,8 @@ function renderSwap(){
     const item = el(`<div class="swap-item">${lootPreviewTileHTML(die, 'swap-'+g.indices[0])}${countBadge}<div class="swap-item-label">${die.name}</div></div>`);
     const isBasic = die.cat==='attack' || die.cat==='maneuver';
     item.onclick = () => {
-      if(isBasic) swapInLootDie(g.indices[0]);
-      else confirmDieReplace(g.indices[0], die.name, S.pendingLootDie.name);
+      if(isBasic) closeModal(overlay, ()=> swapInLootDie(g.indices[0]));
+      else confirmDieReplace(g.indices[0], die.name, S.pendingLootDie.name, overlay);
     };
     list.appendChild(item);
   });
@@ -1818,8 +1828,8 @@ function renderSwap(){
 // copies), but an Origin or Loot die in the tray is comparatively precious --
 // losing one to an absent-minded tap stings. Confirm before sending anything
 // other than a basic die to the Back Pocket.
-function confirmDieReplace(trayIndex, oldName, newName){
-  const overlay = openUniqueOverlay('confirm-swap', el(`<div class="modal-overlay"><div class="modal">
+function confirmDieReplace(trayIndex, oldName, newName, swapOverlay){
+  const overlay = openUniqueOverlay('confirm-swap', el(`<div class="modal-overlay modal-bottom"><div class="modal">
       <h2 style="margin-top:0;">Replace ${oldName}?</h2>
       <p>${oldName} will go to your Back Pocket, replaced in your Tray by ${newName}.</p>
       <div class="small-btn-row">
@@ -1828,7 +1838,13 @@ function confirmDieReplace(trayIndex, oldName, newName){
       </div>
     </div></div>`));
   const close = ()=> closeModal(overlay);
-  overlay.querySelector('#confirm-swap-yes').onclick = ()=> closeModal(overlay, ()=> swapInLootDie(trayIndex));
+  // Confirming closes both this confirmation and the swap picker underneath
+  // it (swapOverlay) before actually swapping -- otherwise the swap picker,
+  // which lives outside the templated app.innerHTML like every modal, would
+  // be left stranded in the DOM once S.pendingLootDie is cleared and no
+  // longer tells render() to draw it. Canceling only closes this
+  // confirmation, leaving the swap picker up so another die can be picked.
+  overlay.querySelector('#confirm-swap-yes').onclick = ()=> closeModal(overlay, ()=> closeModal(swapOverlay, ()=> swapInLootDie(trayIndex)));
   overlay.querySelector('#confirm-swap-no').onclick = close;
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
 }
@@ -1856,6 +1872,7 @@ function renderShrineEncounter(){
   if(S.lootChoice) renderLootModal();
   if(S.shrineChoice) renderShrineChoiceModal();
   if(S.shrineResult) renderShrineResultModal();
+  if(S.pendingLootDie) renderSwapModal();
   attachLongPressTooltips('.route-tooltip-target');
   if(S.newRoomFx){
     // Defer the boon reveal until the player taps past "A new room... Shrine"

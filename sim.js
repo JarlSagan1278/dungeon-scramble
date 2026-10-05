@@ -53,8 +53,11 @@ const TICK_FN = () => {
     continueFromShrine();
     return { done: false, note: 'shrine-continue' };
   }
-  if (S.screen === 'swap') {
-    // swapInLootDie replaces a random tray slot with the pending loot die
+  if (S.pendingLootDie) {
+    // The swap picker is now a pop-up over whatever screen is showing
+    // (see renderSwapModal(), render.js) rather than its own S.screen
+    // value, so this checks the die itself instead of S.screen === 'swap'.
+    // swapInLootDie replaces a random tray slot with the pending loot die.
     swapInLootDie(Math.floor(Math.random() * 16));
     return { done: false, note: 'swap' };
   }

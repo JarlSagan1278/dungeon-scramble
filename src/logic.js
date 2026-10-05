@@ -332,8 +332,8 @@ function loadGame(){
 // mid-transition or mid-modal, since a Shrine choice's callback can't
 // survive being written to JSON (see serializeState).
 function maybeAutosave(){
-  if(!S || S.transitioning || S.lootChoice || S.shrineChoice) return;
-  if(S.screen!=='game' && S.screen!=='camp' && S.screen!=='swap' && S.screen!=='shrine') return;
+  if(!S || S.transitioning || S.lootChoice || S.shrineChoice || S.pendingLootDie) return;
+  if(S.screen!=='game' && S.screen!=='camp' && S.screen!=='shrine') return;
   saveGame();
 }
 
@@ -1286,9 +1286,13 @@ function runShrineEffect(e, effect){
       render(); return;
     }
     case 'randomDieReplace': {
+      // Setting S.pendingLootDie is what draws the swap picker now (a
+      // pop-up over whichever screen -- here, the Shrine card -- is
+      // already showing, see renderSwapModal()/render() in render.js), not
+      // a dedicated S.screen value, so the Shrine screen stays visible
+      // underneath it.
       S.pendingLootDie = pick(lootPoolByName(effect.pool));
       if(typeof markDiceDiscovered==='function') markDiceDiscovered(S.pendingLootDie);
-      S.screen = 'swap';
       logMsg('sys', `${e.name}: choose a die to replace with a random ${effect.pool} die (${S.pendingLootDie.name}).`);
       render(); return;
     }
@@ -1396,9 +1400,12 @@ function debugWinEncounter(){
 }
 
 function chooseLoot(dieOption){
+  // Setting S.pendingLootDie is what draws the swap picker (a pop-up over
+  // the current screen, see renderSwapModal()/render() in render.js) --
+  // there's no dedicated S.screen value for it, so whatever screen was
+  // showing (normally 'game') just stays put underneath.
   S.pendingLootDie = dieOption;
   S.lootChoice = null;
-  S.screen = 'swap';
   render();
 }
 
@@ -1408,7 +1415,6 @@ function swapInLootDie(trayIndex){
   cell.die = { name: S.pendingLootDie.name, faces: S.pendingLootDie.faces, cat: S.pendingLootDie.cat || 'loot' };
   cell.faceIdx = 0;
   S.pendingLootDie = null;
-  S.screen = 'game';
   logMsg('sys', `Equipped ${cell.die.name}.`, 'good');
   S.stats.lootCollected++;
   if(typeof playTone==='function') playTone('equip');
