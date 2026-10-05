@@ -491,7 +491,7 @@ function renderSetup(){
         : lockedOriginPortraitHTML(o.id);
       const c = el(`<button type="button" class="origin-icon-btn ${o.id===chosenOrigin?'selected':''} ${unlocked?'':'locked'}" aria-label="${o.name}" title="${o.name}">
           ${portraitHTML}
-          ${unlocked?'':`<span class="origin-lock-badge">${lockSVG(9)}</span>`}
+          ${unlocked?'':`<span class="origin-lock-badge">${lockSVG(13)}</span>`}
         </button>`);
       c.onclick = ()=>{
         previewedOriginId = o.id;
