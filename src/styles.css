@@ -107,7 +107,6 @@
   /* That character's real portrait art, run through brightness(0) so only
      its silhouette shows -- see lockedOriginPortraitHTML(), render.js. */
   .silhouette-img{ filter: brightness(0); opacity:0.8; }
-  .choice-card.debug-unlocked{ opacity:1; cursor:pointer; border-style:dashed; }
 
   /* Route tracker */
   .route-wrap{ position:relative; margin-bottom:12px; }

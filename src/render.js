@@ -325,6 +325,14 @@ const ORIGIN_UNLOCK_HINT = {
   pixie: 'Win a run with 2 different Origins to unlock.',
 };
 
+// Module-level (not a renderSetup() local) because arming it triggers a
+// full render() to pick up the real unlock everywhere else it matters --
+// see the class-header handler below -- which tears down and rebuilds this
+// whole screen, including every local closure renderSetup() would
+// otherwise keep this in. A plain local would forget it was armed the
+// moment that re-render happened.
+let debugArmed = false;
+
 function renderSetup(){
   const boonTiers = unlockedBoonTiers();
   const boonDice = boonTiers.flatMap(t=>BOON_TIER_POOLS[t].filter(d=>DISCOVERED_DICE.has(d.name)).map(d=>({...d, tier:t})));
@@ -346,9 +354,7 @@ function renderSetup(){
   `;
   document.getElementById('setup-back-btn').onclick = ()=>{ preGameScreen='title'; render(); };
   let chosenOrigin=null, chosenClass=null, chosenBoonName=null;
-  let debugArmed = false;
   const og = document.getElementById('origin-grid');
-  const originCards = [];
   ORIGINS.forEach(o=>{
     const unlocked = isOriginUnlocked(o.id);
     let c;
@@ -382,7 +388,6 @@ function renderSetup(){
       c.dataset.originId = o.id;
       c.onclick = ()=>{ if(typeof showToast==='function') showToast(ORIGIN_UNLOCK_HINT[o.id]||'Locked', null); };
     }
-    originCards.push({id:o.id, node:c, unlocked});
     og.appendChild(c);
   });
   const cg = document.getElementById('class-grid');
@@ -409,16 +414,26 @@ function renderSetup(){
   }
   function checkReady(){ document.getElementById('start-btn').disabled = !(chosenOrigin&&chosenClass); }
   document.getElementById('start-btn').onclick=()=>{ newGame(chosenOrigin, chosenClass, chosenBoonName); };
-  // Secret debug-class trigger: 5 clicks on "Choose Your Class" within a
-  // short window. No visible button, so it can't be stumbled into by a
-  // normal player, but stays quick to reach for testing. Also unlocks
-  // every Origin, Achievement, and Dice Compendium entry for real (see
-  // debugUnlockEverything(), logic.js) -- it drives the same META.lifetime
-  // thresholds normal play would, so every other unlock check (Starting
-  // Boon tiers, isOriginUnlocked()) just sees it as already-earned progress
-  // rather than needing its own debug-only bypass. The Origin cards here
-  // are still patched in place (rather than a full re-render) purely so
-  // the in-progress Origin/Class selection on this screen survives.
+  // Secret debug trigger: 5 clicks on "Choose Your Class" within a short
+  // window. No visible button, so it can't be stumbled into by a normal
+  // player, but stays quick to reach for testing. Two-step, since it does
+  // two different jobs:
+  //   1st time: unlocks every Origin, Achievement, and Dice Compendium
+  //      entry for REAL (debugUnlockEverything(), logic.js) -- it drives
+  //      the same META.lifetime thresholds normal play would, so every
+  //      other unlock check (Starting Boon tiers, isOriginUnlocked()) just
+  //      sees it as already-earned progress. That changes what this very
+  //      screen should show (real portraits instead of locked silhouettes,
+  //      a newly-unlocked Starting Boon section) -- patching individual
+  //      DOM nodes in place can't pick all of that up, so this re-renders
+  //      the whole Setup screen via render() instead, the same render path
+  //      a genuinely-unlocked player would get. debugArmed is module-level
+  //      (not a local here) so it survives that rebuild.
+  //   2nd time (on the now-rebuilt screen): arms the hidden Debug class
+  //      for this run (fills the tray with one of every die type, adds a
+  //      one-tap Win button) -- a separate concern from the unlock above,
+  //      kept as a quick in-place selection so it doesn't cost a 3rd
+  //      re-render.
   let classHeaderClicks = [];
   document.getElementById('class-header').onclick = ()=>{
     const now = Date.now();
@@ -426,19 +441,17 @@ function renderSetup(){
     classHeaderClicks.push(now);
     if(classHeaderClicks.length>=5){
       classHeaderClicks = [];
-      chosenClass = 'debug';
-      [...cg.children].forEach(x=>x.classList.remove('selected'));
-      checkReady();
       if(!debugArmed){
         debugArmed = true;
         if(typeof debugUnlockEverything==='function') debugUnlockEverything();
-        originCards.filter(oc=>!oc.unlocked).forEach(oc=>{
-          oc.node.classList.remove('locked');
-          oc.node.classList.add('debug-unlocked');
-          oc.node.onclick = ()=>{ chosenOrigin=oc.id; [...og.children].forEach(x=>x.classList.remove('selected')); oc.node.classList.add('selected'); checkReady(); };
-        });
+        if(typeof showToast==='function') showToast('Debug: Origins, Achievements & Dice Compendium all unlocked', 'good');
+        render();
+        return;
       }
-      if(typeof showToast==='function') showToast('Debug: Origins, Achievements & Dice Compendium all unlocked', 'good');
+      chosenClass = 'debug';
+      [...cg.children].forEach(x=>x.classList.remove('selected'));
+      checkReady();
+      if(typeof showToast==='function') showToast('Debug class armed', 'good');
     }
   };
 }
