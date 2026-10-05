@@ -605,6 +605,7 @@ function renderSetup(){
   function renderOriginShowcaseNow(){
     const o = ORIGINS.find(x=>x.id===previewedOriginId);
     originShowcase.innerHTML = originShowcaseHTML(o, isOriginUnlocked(o.id));
+    attachLongPressTooltips('#origin-showcase .die-face-chip');
   }
   renderOriginIcons();
   renderOriginShowcaseNow();
@@ -672,6 +673,7 @@ function renderSetup(){
     }
     function renderBoonShowcaseNow(){
       boonShowcase.innerHTML = boonShowcaseHTML(chosenBoonName ? boonDice.find(d=>d.name===chosenBoonName) : null);
+      attachLongPressTooltips('#boon-showcase .die-face-chip');
     }
     renderBoonScroll();
     renderBoonShowcaseNow();
