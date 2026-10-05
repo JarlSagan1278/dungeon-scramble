@@ -913,6 +913,31 @@
   @keyframes modal-overlay-out{ from{ opacity:1; } to{ opacity:0; } }
   @keyframes modal-card-in{ from{ opacity:0; transform:scale(0.92) translateY(10px); } to{ opacity:1; transform:scale(1) translateY(0); } }
   @keyframes modal-card-out{ from{ opacity:1; transform:scale(1) translateY(0); } to{ opacity:0.4; transform:scale(0.95) translateY(6px); } }
+  /* Loot reveal "opening the box" burst (renderLootModal(), render.js): a
+     big, screen-wide flat sunray wheel blasting out from center, colored to
+     the loot's own tier (silver/gold/purple, --sunray-color set inline) --
+     ported from the loot-reveal-animation mockup. Placed as the FIRST child
+     of .modal-overlay, before .modal, so plain DOM order (neither element
+     sets z-index) keeps it painting behind the modal card while still
+     covering the whole darkened backdrop around it. Sized in vmax rather
+     than a fixed pixel size so it always reaches past the screen's corners
+     regardless of device. screenShake() (render.js) fires alongside it for
+     the physical half of the same beat. */
+  .loot-sunray-burst{ position:absolute; inset:0; overflow:hidden; pointer-events:none; display:flex; align-items:center; justify-content:center; }
+  .loot-sunray-wheel{ position:absolute; width:220vmax; height:220vmax;
+    background: repeating-conic-gradient(var(--sunray-color, var(--gold)) 0deg 9deg, transparent 9deg 27deg);
+    animation: loot-sunray-kf 0.6s ease-out both; }
+  /* Overkill (or a Boss's 3-option draw) gets a denser wheel (narrower
+     wedges) plus this second, slightly delayed layer underneath -- reads as
+     a bigger burst for a bigger haul, not just a recolored one. */
+  .loot-sunray-wheel.loot-sunray-wheel-big{ background: repeating-conic-gradient(var(--sunray-color, var(--gold)) 0deg 7deg, transparent 7deg 21deg); }
+  .loot-sunray-wheel.loot-sunray-wheel-2{ opacity:0.6; animation: loot-sunray-kf 0.7s ease-out 0.12s both; }
+  @keyframes loot-sunray-kf{
+    0%{ opacity:0; transform: scale(0.2) rotate(0deg); }
+    18%{ opacity:0.8; }
+    55%{ opacity:0.6; }
+    100%{ opacity:0; transform: scale(1.1) rotate(16deg); }
+  }
   /* A gold rule under every modal's title -- a small, consistent "this is a
      crafted panel" touch instead of a title floating directly above body
      text with nothing to separate them. */
@@ -1033,9 +1058,64 @@
   .compendium-faces{ display:flex; gap:4px; flex-wrap:wrap; opacity:0.85; }
   .compendium-faces .icon-svg{ width:13px; height:13px; }
   .loot-options{ display:flex; gap:10px; margin:12px 0; flex-wrap:wrap; justify-content:center; }
-  .loot-opt{ flex:1 1 calc(50% - 10px); min-width:140px; max-width:220px; background: var(--panel2); border:2px solid var(--stone); border-radius:8px; padding:8px; cursor:pointer; transition: transform .08s; }
+  .loot-opt{ position:relative; flex:1 1 calc(50% - 10px); min-width:140px; max-width:220px; background: var(--panel2); border:2px solid var(--stone); border-radius:8px; padding:8px; cursor:pointer; transition: transform .08s; }
   .loot-opt:hover{ border-color: var(--gold); transform: translateY(-2px); }
   .loot-opt h4{ margin:4px 0 0; font-size:13px; color:var(--parchment); text-align:center; }
+  /* Reveal pop-in + ambient glow (mirrors dieSettle/glowPulse from the
+     loot-reveal-animation mockup): each card springs in on its own short
+     stagger (animation-delay set inline per card index in renderLootModal())
+     instead of all appearing at once, and its ambient glow pulses in the
+     loot's own tier color (--loot-tier-color/--loot-tier-glow, set inline)
+     for as long as it's on screen. */
+  .loot-opt-reveal{ animation: loot-opt-settle 0.4s cubic-bezier(.34,1.56,.64,1) both, loot-opt-glow 1.8s ease-in-out infinite; }
+  @keyframes loot-opt-settle{
+    0%{ transform:scale(0.5) rotate(-6deg); opacity:0; }
+    55%{ transform:scale(1.06) rotate(2deg); opacity:1; }
+    100%{ transform:scale(1) rotate(0deg); opacity:1; }
+  }
+  @keyframes loot-opt-glow{
+    0%,100%{ box-shadow:0 0 0 0 transparent; }
+    50%{ box-shadow:0 0 14px 3px var(--loot-tier-glow, rgba(212,175,82,0.4)); }
+  }
+  /* Ball x Pit-style comet streaks whooshing outward from each card's
+     center as it settles in -- the single most-liked effect from the
+     mockup this was prototyped in. See lootStreaksHTML()/render.js. */
+  .loot-opt-streaks{ position:absolute; left:50%; top:42%; width:0; height:0; pointer-events:none; z-index:0; }
+  .loot-streak-wrap{ position:absolute; left:0; top:0; width:0; height:0; }
+  .loot-streak{ position:absolute; left:0; top:-1px; width:46px; height:2px; transform-origin:0 50%;
+    background:linear-gradient(90deg, var(--loot-tier-color, var(--gold)), transparent);
+    opacity:0; animation: loot-streak-kf 0.5s ease-out both; }
+  @keyframes loot-streak-kf{
+    0%{ opacity:0; transform: scaleX(0); }
+    22%{ opacity:1; }
+    60%{ opacity:0.85; }
+    100%{ opacity:0; transform: scaleX(1.3); }
+  }
+  /* The moment a card is actually picked (pickLootOption(), render.js): the
+     chosen card scales up with a tier-colored glow and sits still, every
+     other option fades away, and the Zelda-style fanfare below plays over
+     the chosen one. */
+  .loot-opt.loot-chosen{ animation:none; transform:scale(1.08); box-shadow:0 0 22px 6px var(--loot-tier-glow, rgba(212,175,82,0.5)); pointer-events:none; z-index:2; }
+  .loot-opt.loot-faded{ animation:none; opacity:0.18; transform:scale(0.86); pointer-events:none; transition: opacity .2s, transform .2s; }
+  .loot-fanfare{ position:absolute; left:50%; top:50%; width:0; height:0; pointer-events:none; z-index:3; }
+  .loot-fanfare-beam{ position:absolute; left:50%; bottom:0; width:20px; height:170px; margin-left:-10px; transform-origin:bottom;
+    background:linear-gradient(to top, var(--loot-tier-color, var(--gold)), transparent); opacity:0.6; filter:blur(1px);
+    animation: loot-beam-rise 0.9s ease-out both; }
+  .loot-fanfare-ray-wrap{ position:absolute; left:0; top:0; width:0; height:0; }
+  .loot-fanfare-ray{ position:absolute; left:0; top:-1.5px; width:46px; height:3px; transform-origin:0 50%;
+    background:linear-gradient(90deg, var(--loot-tier-color, var(--gold)), transparent);
+    animation: loot-ray-flare 0.7s ease-out 0.05s both; }
+  .loot-fanfare-ring{ position:absolute; left:-34px; top:-34px; width:68px; height:68px; margin-top:-16px; border-radius:50%;
+    border:2px solid var(--loot-tier-color, var(--gold)); animation: loot-chime-ring 0.8s ease-out both; }
+  @keyframes loot-beam-rise{ 0%{ opacity:0; transform:scaleY(0.15); } 30%{ opacity:0.85; } 100%{ opacity:0; transform:scaleY(1); } }
+  @keyframes loot-ray-flare{ 0%{ opacity:0; transform:scaleX(0); } 30%{ opacity:0.9; } 100%{ opacity:0; transform:scaleX(1.3); } }
+  @keyframes loot-chime-ring{ 0%{ opacity:0.85; transform:scale(0.3); } 100%{ opacity:0; transform:scale(2.4); } }
+  .reduced-motion .loot-opt-reveal{ animation:none; opacity:1; }
+  .reduced-motion .loot-sunray-burst,
+  .reduced-motion .loot-streak,
+  .reduced-motion .loot-fanfare-beam,
+  .reduced-motion .loot-fanfare-ray,
+  .reduced-motion .loot-fanfare-ring{ display:none; }
   /* Sized like a real tray die (~72px) rather than the tray's own
      container-query-relative sizing, since this tile lives outside a
      .tray-wrap -- a fixed size keeps the icon/name-tag proportions the

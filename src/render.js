@@ -1488,6 +1488,13 @@ const TONE_SEQUENCES = {
                  {freq:659, start:0.14, dur:0.16, type:'triangle', gain:0.22},
                  {freq:784, start:0.28, dur:0.16, type:'triangle', gain:0.22},
                  {freq:1047,start:0.42, dur:0.45, type:'triangle', gain:0.26}],
+  // A bright ascending "item get" twinkle for the instant a Loot die is
+  // actually picked on the loot-reveal screen (renderLootModal/
+  // pickLootOption) -- a Zelda-ish sparkle, distinct from the later 'equip'
+  // ka-ching that plays once the die is actually slotted into the tray.
+  lootPick: [{freq:659,  start:0,    dur:0.1,  type:'sine',     gain:0.18},
+             {freq:988,  start:0.08, dur:0.12, type:'sine',     gain:0.18},
+             {freq:1319, start:0.16, dur:0.24, type:'triangle', gain:0.2}],
 };
 function playTone(kind, pitchStep){
   if(!PREFS.sound) return;
@@ -2059,9 +2066,64 @@ function openUniqueOverlay(role, overlay){
   return overlay;
 }
 
+// Tier accent colors for the loot-reveal screen (silver/gold/purple, keyed
+// by the die's own `cat`, same id the ALLOY/GILDED/MAGIC pools are tagged
+// with in data.js) -- drives the sunray burst, each card's ambient glow,
+// and the Zelda-style pick fanfare below. -color is the solid accent,
+// -glow its translucent form for box-shadow/background use (avoids relying
+// on CSS color-mix() for browser-safety, matching how --class-color etc.
+// are already passed in as plain hex/rgba strings elsewhere).
+const LOOT_TIER_ACCENT = {
+  alloy:  { color:'#9aa3ab', glow:'rgba(154,163,171,0.5)' },
+  gilded: { color:'#d4af52', glow:'rgba(212,175,82,0.55)' },
+  magic:  { color:'#8a5fb0', glow:'rgba(138,95,176,0.55)' },
+};
+
+// 8 thin comet-style streak lines whooshing outward from a point, each in
+// its own static-rotation wrapper around an animated (scaleX) inner div --
+// ported from the loot-reveal-animation mockup, which found this read much
+// better than round sparkle dots. `delayBase` staggers one card's streaks
+// a touch behind the previous card's so a multi-option reveal doesn't pop
+// all 16-24 streak lines in the same instant.
+function lootStreaksHTML(delayBase){
+  let html = '';
+  for(let i=0;i<8;i++){
+    const rot = Math.round((360/8)*i);
+    const delay = (delayBase + i*0.02).toFixed(3)+'s';
+    html += `<div class="loot-streak-wrap" style="transform:rotate(${rot}deg);"><div class="loot-streak" style="animation-delay:${delay};"></div></div>`;
+  }
+  return html;
+}
+
+// 8 radiating "ray flare" lines + a beam + a chime ring -- the Zelda
+// "item get" fanfare that plays over whichever card was just picked (see
+// pickLootOption below), ported from the same mockup.
+function lootFanfareHTML(){
+  let rays = '';
+  for(let i=0;i<8;i++){
+    const rot = Math.round((360/8)*i);
+    rays += `<div class="loot-fanfare-ray-wrap" style="transform:rotate(${rot}deg);"><div class="loot-fanfare-ray"></div></div>`;
+  }
+  return `<div class="loot-fanfare">
+      <div class="loot-fanfare-beam"></div>
+      ${rays}
+      <div class="loot-fanfare-ring"></div>
+    </div>`;
+}
+
 function renderLootModal(){
   const {options, lootName, overkill, fromShrine} = S.lootChoice;
-  const overlay = el(`<div class="modal-overlay"><div class="modal">
+  const tier = (options[0] && options[0].cat) || 'alloy';
+  const accent = LOOT_TIER_ACCENT[tier] || LOOT_TIER_ACCENT.alloy;
+  // Overkill's 3rd option (or a Boss's 3-option draw) gets the bigger,
+  // denser burst below -- reads as "bigger haul", not just a recolor.
+  const big = options.length >= 3;
+  const overlay = el(`<div class="modal-overlay">
+      <div class="loot-sunray-burst" style="--sunray-color:${accent.color};">
+        <div class="loot-sunray-wheel ${big?'loot-sunray-wheel-big':''}"></div>
+        ${big?'<div class="loot-sunray-wheel loot-sunray-wheel-2"></div>':''}
+      </div>
+      <div class="modal">
       <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
         <h2 style="margin:0;">${fromShrine ? 'Shrine Boon' : 'Victory!'}</h2>
         ${overkill?'<span class="status-chip" style="background:var(--gold);color:#241c10;">Overkill! +1 option</span>':''}
@@ -2070,17 +2132,48 @@ function renderLootModal(){
       <div class="loot-options" id="loot-options"></div>
     </div></div>`);
   openUniqueOverlay('loot', overlay);
+  // The screen-wide "opening the box" beat: a shake alongside the sunray
+  // burst above, same screenShake() already used for Boss-kill/Overkill
+  // moments -- every loot reveal gets at least the small shake now, not
+  // just those two.
+  if(typeof screenShake==='function') screenShake(big ? 'big' : 'small');
   const container = overlay.querySelector('#loot-options');
+  let locked = false; // guards against picking a second option once one's chosen
   options.forEach((opt,i)=>{
     const art = LOOT_ART[opt.name];
-    const card = el(`<div class="loot-opt">
+    const card = el(`<div class="loot-opt loot-opt-reveal" style="--loot-tier-color:${accent.color}; --loot-tier-glow:${accent.glow}; animation-delay:${(i*0.1).toFixed(2)}s;">
+        <div class="loot-opt-streaks">${lootStreaksHTML(0.5+i*0.12)}</div>
         ${art?`<img class="loot-art-thumb" src="${art}" alt="${opt.name}"/>`:''}
         ${lootPreviewTileHTML(opt, `loot-${i}`)}
         <div class="faces">${opt.faces.map(f=>`<span>${iconSpan(f.type, f.value)}${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?f.value:''}</span>`).join('')}</div>
       </div>`);
-    card.onclick = ()=> closeModal(overlay, ()=> chooseLoot(opt));
+    card.onclick = ()=>{
+      if(locked) return;
+      locked = true;
+      pickLootOption(overlay, container, card, opt);
+    };
     container.appendChild(card);
   });
+}
+
+// Fires the Zelda-style "item get" fanfare over the chosen card, fades the
+// others out, then hands off to chooseLoot() (which opens the swap picker)
+// once the beat's had a moment to land -- rather than closing the loot
+// modal the instant a card is tapped. Ported from the loot-reveal-animation
+// mockup; the brief delay here is that mockup's 'chosen' phase.
+function pickLootOption(overlay, container, chosenCard, opt){
+  Array.from(container.children).forEach(card=>{
+    if(card === chosenCard) card.classList.add('loot-chosen');
+    else card.classList.add('loot-faded');
+  });
+  chosenCard.insertAdjacentHTML('beforeend', lootFanfareHTML());
+  if(typeof playTone==='function') playTone('lootPick');
+  // The 550ms beat lets the fanfare actually land before the modal closes;
+  // under Reduce Motion (which skips the fanfare's animations entirely via
+  // the CSS above) there's nothing to wait for, so cut it down to just
+  // enough to register the pick happened.
+  const delay = (typeof PREFS!=='undefined' && PREFS.reducedMotion) ? 120 : 550;
+  setTimeout(()=> closeModal(overlay, ()=> chooseLoot(opt)), delay);
 }
 
 function renderShrineChoiceModal(){
