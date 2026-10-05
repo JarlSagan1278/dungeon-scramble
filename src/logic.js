@@ -86,6 +86,7 @@ function recordRunHistory(outcome){
     const list = getRunHistory();
     list.unshift({
       date: Date.now(),
+      charName: S.charName || '',
       origin: S.origin.name,
       klass: S.klass.name,
       outcome, // 'victory' | 'defeat'
@@ -121,13 +122,14 @@ const DEFAULT_LIFETIME = {
 function loadMeta(){
   try{
     const raw = localStorage.getItem(META_KEY);
-    if(!raw) return { lifetime: {...DEFAULT_LIFETIME}, achievements: {} };
+    if(!raw) return { lifetime: {...DEFAULT_LIFETIME}, achievements: {}, favoriteBoons: [] };
     const parsed = JSON.parse(raw) || {};
     return {
       lifetime: {...DEFAULT_LIFETIME, ...(parsed.lifetime||{})},
       achievements: parsed.achievements || {},
+      favoriteBoons: Array.isArray(parsed.favoriteBoons) ? parsed.favoriteBoons : [],
     };
-  } catch(e){ return { lifetime: {...DEFAULT_LIFETIME}, achievements: {} }; }
+  } catch(e){ return { lifetime: {...DEFAULT_LIFETIME}, achievements: {}, favoriteBoons: [] }; }
 }
 let META = loadMeta();
 function saveMeta(){
@@ -211,6 +213,18 @@ function unlockedBoonTiers(){
 }
 const BOON_TIER_POOLS = {alloy:ALLOY, gilded:GILDED, magic:MAGIC};
 const BOON_TIER_LABELS = {alloy:'Alloy', gilded:'Gilded', magic:'Magic'};
+// ---- Starting Boon favorites (Setup screen's runic carousel) -- purely a
+// browsing convenience (favorited dice float to the front so a returning
+// player doesn't have to scroll past the rest of their discovered pool to
+// find a go-to pick again), not a gameplay unlock -- so it lives as its own
+// top-level META list rather than under META.lifetime, which only tracks
+// earned progress feeding the real unlock checks above.
+function isFavoriteBoon(name){ return META.favoriteBoons.includes(name); }
+function toggleFavoriteBoon(name){
+  const i = META.favoriteBoons.indexOf(name);
+  if(i>=0) META.favoriteBoons.splice(i,1); else META.favoriteBoons.push(name);
+  saveMeta();
+}
 function findLootDieByName(name){
   return ALLOY.find(d=>d.name===name) || GILDED.find(d=>d.name===name) || MAGIC.find(d=>d.name===name) || null;
 }
@@ -410,7 +424,7 @@ function getSetupPreviewPortrait(originId){
   return setupPortraitCache[originId];
 }
 
-function newGame(originId, classId, boonDieName){
+function newGame(originId, classId, boonDieName, charName){
   // Defense in depth: the Setup screen is the only place that offers an
   // Origin choice, and it already refuses to let a locked one be selected,
   // but falling back here too means a stale/tampered call can't bypass the
@@ -458,6 +472,10 @@ function newGame(originId, classId, boonDieName){
 
   S = {
     screen:'game',
+    // Purely cosmetic (shown in Run History) -- never read by any gameplay
+    // logic, so an empty/whitespace-only entry is just as valid as a real
+    // name and needs no fallback anywhere else.
+    charName: (charName||'').trim().slice(0,24),
     origin, klass,
     portrait: getSetupPreviewPortrait(origin.id),
     maxHealth:20, health:20,

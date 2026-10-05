@@ -333,87 +333,244 @@ const ORIGIN_UNLOCK_HINT = {
 // moment that re-render happened.
 let debugArmed = false;
 
+// Compact "sides of this die" preview row -- reused for both the Origin
+// showcase and the Starting Boon showcase below, since both are just a
+// `faces` array rendered with the exact same icon language the in-run tray
+// already uses (iconSpan/LABEL, data.js) at a smaller, non-interactive size.
+// `toneCls` picks which die-type color the chips take (origin-tone/
+// alloy-tone/gilded-tone/magic-tone, styles.css -- matching the real
+// .die.dietype-* colors so a die previewed here looks like itself in-tray).
+function dieFaceChipsHTML(faceArr, toneCls){
+  return faceArr.map(f=>{
+    if(f.type==='blank') return `<div class="die-face-chip ${toneCls} blank"></div>`;
+    return `<div class="die-face-chip ${toneCls}">${iconSpan(f.type, f.value)}</div>`;
+  }).join('');
+}
+
+// A Class's ability resolves to one concrete action on the tray -- shown as
+// a small icon next to its ability text so the Class showcase reads at a
+// glance the same way the Origin die's faces do. Dungeoneer's path-wrapping
+// rule has no equivalent die-face icon, so it gets its own distinct glyph
+// instead of being stretched onto an unrelated one.
+const CLASS_ACTION_ICON = { guard:'block', armsmaster:'hit', arcanist:'dodge' };
+const CLASS_WRAP_ICON_SVG = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path><path d="M3 21v-5h5"></path></svg>`;
+function classActionIconHTML(k){
+  if(k.id==='dungeoneer') return CLASS_WRAP_ICON_SVG;
+  const t = CLASS_ACTION_ICON[k.id];
+  return t ? iconSpan(t) : '';
+}
+
+// Origin showcase: the selected (or previewed-while-locked) Origin's
+// portrait + name, then its own die -- item art, name plate, one-line
+// blurb, and its 6 real faces -- all in one panel, filled in by the Origin
+// icon row above it (WoW-style icon-picker -> detail-panel pattern).
+function originShowcaseHTML(o, unlocked){
+  const portrait = unlocked ? getSetupPreviewPortrait(o.id) : null;
+  const portraitHTML = unlocked
+    ? (portrait.placeholder ? mysteryFigureHTML('width:100%;height:100%;') : `<img class="portrait-img" src="${portrait.img}" alt="${o.name}">`)
+    : lockedOriginPortraitHTML(o.id);
+  const dieArt = LOOT_ART[o.die];
+  return `
+    <div class="origin-showcase-top">
+      <div class="origin-showcase-portrait ${unlocked?'':'dim'}">${portraitHTML}</div>
+      <div class="origin-showcase-name-col">
+        <div class="origin-showcase-name">${o.name}</div>
+        ${unlocked?'':`<div class="origin-lock-hint">🔒 ${ORIGIN_UNLOCK_HINT[o.id]||'Locked.'}</div>`}
+      </div>
+    </div>
+    <div class="origin-die-block ${unlocked?'':'dim'}">
+      <div class="origin-die-head">
+        ${dieArt?`<div class="die-art-wrap origin-tone"><img class="die-art" src="${dieArt}" alt="${o.die}"></div>`:''}
+        <div class="origin-die-name-col">
+          <div class="die-plate origin-tone">${o.die}</div>
+          <div class="die-blurb">${o.blurb}</div>
+        </div>
+      </div>
+      <div class="die-face-row">${dieFaceChipsHTML(o.faces, 'origin-tone')}</div>
+    </div>
+  `;
+}
+
+// Class showcase: the selected Class's name, ability text, and its action
+// icon (or Dungeoneer's own wrap glyph), in a fixed-height panel so nothing
+// reflows as the player taps between the 4 tabs above it.
+function classShowcaseHTML(k){
+  return `
+    <div class="class-action-icon">${classActionIconHTML(k)}</div>
+    <div class="class-showcase-text">
+      <div class="class-showcase-name">${k.name}</div>
+      <div class="class-showcase-ability">${k.ability}</div>
+    </div>
+  `;
+}
+
+// Starting Boon showcase: the currently-picked die's own item art, name
+// plate (colored by its real tier), and its 6 faces -- the same treatment
+// as the Origin die above, shown under the runic carousel once something
+// other than "None" is picked.
+function boonShowcaseHTML(d){
+  if(!d) return `<div class="boon-showcase-empty">No Starting Boon selected -- you'll begin with just the standard tray.</div>`;
+  const dieArt = LOOT_ART[d.name];
+  const tone = `${d.tier}-tone`;
+  return `
+    <div class="origin-die-head">
+      ${dieArt?`<div class="die-art-wrap ${tone}"><img class="die-art" src="${dieArt}" alt="${d.name}"></div>`:''}
+      <div class="die-plate ${tone}">${d.name}</div>
+    </div>
+    <div class="die-face-row">${dieFaceChipsHTML(d.faces, tone)}</div>
+  `;
+}
+
 function renderSetup(){
   const boonTiers = unlockedBoonTiers();
   const boonDice = boonTiers.flatMap(t=>BOON_TIER_POOLS[t].filter(d=>DISCOVERED_DICE.has(d.name)).map(d=>({...d, tier:t})));
   app.innerHTML = `
-    <div class="panel">
+    <div class="panel setup-panel">
       <button id="setup-back-btn" class="setup-back-btn" title="Back to title">&larr; Back</button>
-      <h2 style="margin:0 0 4px 0;">Create Your Adventurer</h2>
-      <h3 style="font-size:14px;color:var(--cream);margin:0 0 4px 0;">Choose Your Origin</h3>
-      <div class="choice-grid" id="origin-grid"></div>
-      <h3 style="font-size:14px;color:var(--cream);user-select:none;margin:6px 0 4px 0;" id="class-header">Choose Your Class</h3>
-      <div class="choice-grid" id="class-grid"></div>
+
+      <div class="setup-name-row">
+        <input id="char-name-input" class="char-name-input" type="text" maxlength="24" placeholder="New Character" autocomplete="off">
+        <svg class="char-name-pencil" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+      </div>
+
+      <div class="setup-section">
+        <div class="setup-label">Origin</div>
+        <div class="origin-icon-row" id="origin-icon-row"></div>
+        <div class="origin-showcase" id="origin-showcase"></div>
+      </div>
+
+      <div class="setup-section">
+        <div class="setup-label" id="class-header" title="Choose Your Class">Class</div>
+        <div class="class-tab-row" id="class-tab-row"></div>
+        <div class="class-showcase" id="class-showcase"></div>
+      </div>
+
       ${boonTiers.length ? `
-        <h3 style="font-size:14px;color:var(--cream);margin:10px 0 4px 0;">Starting Boon <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(optional)</span></h3>
-        ${boonDice.length ? `<div class="swap-list" id="boon-list"></div>`
-          : `<p class="hint">You've unlocked Starting Boon tier${boonTiers.length>1?'s':''} (${boonTiers.map(t=>BOON_TIER_LABELS[t]).join(', ')}), but haven't discovered a die from ${boonTiers.length>1?'them':'it'} yet -- find one as loot in a run to make it pickable here.</p>`}
-      ` : ''}
+      <div class="setup-section">
+        <div class="setup-label">Starting Boon <span class="setup-label-sub">(optional)</span></div>
+        ${boonDice.length ? `
+          <div class="boon-scroll" id="boon-scroll"></div>
+          <div class="boon-showcase" id="boon-showcase"></div>
+        ` : `<p class="hint">You've unlocked Starting Boon tier${boonTiers.length>1?'s':''} (${boonTiers.map(t=>BOON_TIER_LABELS[t]).join(', ')}), but haven't discovered a die from ${boonTiers.length>1?'them':'it'} yet -- find one as loot in a run to make it pickable here.</p>`}
+      </div>` : ''}
+
       <button class="primary" id="start-btn" disabled>Enter the Dungeon</button>
     </div>
   `;
   document.getElementById('setup-back-btn').onclick = ()=>{ preGameScreen='title'; render(); };
-  let chosenOrigin=null, chosenClass=null, chosenBoonName=null;
-  const og = document.getElementById('origin-grid');
-  ORIGINS.forEach(o=>{
-    const unlocked = isOriginUnlocked(o.id);
-    let c;
-    if(unlocked){
-      const portrait = getSetupPreviewPortrait(o.id);
-      const portraitHTML = portrait.placeholder
-        ? mysteryFigureHTML('width:75%; aspect-ratio:1/1;')
-        : `<img class="portrait-img" src="${portrait.img}" alt="${o.name}">`;
-      const dieArt = LOOT_ART[o.die];
-      const dieArtHTML = dieArt ? `<img class="origin-die-thumb" src="${dieArt}" alt="${o.die}">` : '';
-      c = el(`<div class="choice-card has-portrait">
-          <div class="origin-header">
-            <div class="portrait-wrap">${portraitHTML}</div>
-            <h4>${o.name}</h4>
-          </div>
-          <div class="die-callout">
-            ${dieArtHTML}
-            <b>${o.die}</b>
-          </div>
-          <p>${o.blurb}</p>
-        </div>`);
-      c.onclick=()=>{ chosenOrigin=o.id; [...og.children].forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); checkReady(); };
-    } else {
-      c = el(`<div class="choice-card has-portrait locked" title="Locked">
-          <div class="origin-header">
-            <div class="portrait-wrap">${lockedOriginPortraitHTML(o.id)}</div>
-            <h4>${o.name}</h4>
-          </div>
-          <p>${ORIGIN_UNLOCK_HINT[o.id]||'Locked.'}</p>
-        </div>`);
-      c.dataset.originId = o.id;
-      c.onclick = ()=>{ if(typeof showToast==='function') showToast(ORIGIN_UNLOCK_HINT[o.id]||'Locked', null); };
-    }
-    og.appendChild(c);
-  });
-  const cg = document.getElementById('class-grid');
-  // Debug class has no card of its own -- it's a testing tool, not a real
-  // choice -- and is instead armed by rapid-clicking the section header
-  // (see the class-header handler below).
-  CLASSES.filter(k=>!k.debug).forEach(k=>{
-    const c = el(`<div class="choice-card"><h4>${k.name}</h4><p>${k.ability}</p></div>`);
-    c.onclick=()=>{ chosenClass=k.id; [...cg.children].forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); checkReady(); };
-    cg.appendChild(c);
-  });
-  const boonList = document.getElementById('boon-list');
-  if(boonList){
-    let selectedBoonItem = null;
-    const noneItem = el(`<div class="swap-item boon-none-item selected"><div class="swap-item-label">None</div></div>`);
-    noneItem.onclick = ()=>{ chosenBoonName=null; if(selectedBoonItem) selectedBoonItem.classList.remove('selected'); selectedBoonItem=noneItem; noneItem.classList.add('selected'); };
-    selectedBoonItem = noneItem;
-    boonList.appendChild(noneItem);
-    boonDice.forEach(d=>{
-      const item = el(`<div class="swap-item">${lootPreviewTileHTML(d, 'boon-'+d.name)}<div class="swap-item-label">${d.name}<br><span style="color:var(--parchment-dim);">${BOON_TIER_LABELS[d.tier]}</span></div></div>`);
-      item.onclick = ()=>{ chosenBoonName=d.name; if(selectedBoonItem) selectedBoonItem.classList.remove('selected'); selectedBoonItem=item; item.classList.add('selected'); };
-      boonList.appendChild(item);
+
+  // chosenOrigin/chosenClass only ever hold a value the player actually
+  // tapped (and, for Origin, one that's genuinely unlocked) -- what
+  // #start-btn ends up using. previewedOriginId/previewedClassId drive the
+  // showcase panels and can point at something merely being looked at (a
+  // still-locked Origin, previewed with its lock hint) without that
+  // counting as a selection.
+  let chosenOrigin=null, chosenClass=null, chosenBoonName=null, charName='';
+  let previewedOriginId = 'dwarf', previewedClassId = CLASSES.find(k=>!k.debug).id;
+
+  const nameInput = document.getElementById('char-name-input');
+  nameInput.oninput = ()=>{ charName = nameInput.value; };
+
+  const originIconRow = document.getElementById('origin-icon-row');
+  const originShowcase = document.getElementById('origin-showcase');
+  function renderOriginIcons(){
+    originIconRow.innerHTML = '';
+    ORIGINS.forEach(o=>{
+      const unlocked = isOriginUnlocked(o.id);
+      const portrait = unlocked ? getSetupPreviewPortrait(o.id) : null;
+      const portraitHTML = unlocked
+        ? (portrait.placeholder ? mysteryFigureHTML('width:100%;height:100%;') : `<img class="portrait-img" src="${portrait.img}" alt="${o.name}">`)
+        : lockedOriginPortraitHTML(o.id);
+      const c = el(`<button type="button" class="origin-icon-btn ${o.id===chosenOrigin?'selected':''} ${unlocked?'':'locked'}" aria-label="${o.name}" title="${o.name}">
+          ${portraitHTML}
+          ${unlocked?'':`<span class="origin-lock-badge"><svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg></span>`}
+        </button>`);
+      c.onclick = ()=>{
+        previewedOriginId = o.id;
+        if(unlocked){ chosenOrigin = o.id; } else if(typeof showToast==='function') showToast(ORIGIN_UNLOCK_HINT[o.id]||'Locked', null);
+        renderOriginIcons();
+        renderOriginShowcaseNow();
+        checkReady();
+      };
+      originIconRow.appendChild(c);
     });
   }
+  function renderOriginShowcaseNow(){
+    const o = ORIGINS.find(x=>x.id===previewedOriginId);
+    originShowcase.innerHTML = originShowcaseHTML(o, isOriginUnlocked(o.id));
+  }
+  renderOriginIcons();
+  renderOriginShowcaseNow();
+
+  const classTabRow = document.getElementById('class-tab-row');
+  const classShowcase = document.getElementById('class-showcase');
+  // Debug class has no tab of its own -- it's a testing tool, not a real
+  // choice -- and is instead armed by rapid-clicking the section label
+  // (see the class-header handler below).
+  const realClasses = CLASSES.filter(k=>!k.debug);
+  function renderClassTabs(){
+    classTabRow.innerHTML = '';
+    realClasses.forEach(k=>{
+      const c = el(`<button type="button" class="class-tab-btn ${k.id===chosenClass?'selected':''}">${k.name}</button>`);
+      c.onclick = ()=>{
+        previewedClassId = k.id; chosenClass = k.id;
+        renderClassTabs();
+        renderClassShowcaseNow();
+        checkReady();
+      };
+      classTabRow.appendChild(c);
+    });
+  }
+  function renderClassShowcaseNow(){
+    classShowcase.innerHTML = classShowcaseHTML(realClasses.find(k=>k.id===previewedClassId));
+  }
+  renderClassTabs();
+  renderClassShowcaseNow();
+
+  const boonScroll = document.getElementById('boon-scroll');
+  const boonShowcase = document.getElementById('boon-showcase');
+  if(boonScroll){
+    function renderBoonScroll(){
+      // Favorited dice float to the front -- re-sorted live as the player
+      // taps a star, same carousel behavior the mockup demoed (sort is
+      // stable, so otherwise-equal dice keep their tier order).
+      const sorted = [...boonDice].sort((a,b)=>(isFavoriteBoon(b.name)?1:0)-(isFavoriteBoon(a.name)?1:0));
+      boonScroll.innerHTML = '';
+      const noneTile = el(`<button type="button" class="boon-tile ${chosenBoonName===null?'selected':''}">
+          <div class="boon-tile-circle none-tone">—</div>
+          <div class="boon-tile-label">None</div>
+        </button>`);
+      noneTile.onclick = ()=>{ chosenBoonName=null; renderBoonScroll(); renderBoonShowcaseNow(); };
+      boonScroll.appendChild(noneTile);
+      sorted.forEach(d=>{
+        const art = LOOT_ART[d.name];
+        const fav = isFavoriteBoon(d.name);
+        const tile = el(`<button type="button" class="boon-tile ${d.name===chosenBoonName?'selected':''}">
+            <div class="boon-tile-circle ${d.tier}-tone">${art?`<img src="${art}" alt="">`:''}</div>
+            <div class="boon-tile-label">${d.name}</div>
+            <span class="boon-fav-btn ${fav?'active':''}" title="Favorite">
+              <svg viewBox="0 0 24 24" width="10" height="10" fill="${fav?'currentColor':'none'}" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 2.5l2.9 6.3 6.9.7-5.2 4.7 1.5 6.8-6.1-3.6-6.1 3.6 1.5-6.8-5.2-4.7 6.9-.7z"></path>
+              </svg>
+            </span>
+          </button>`);
+        tile.onclick = (e)=>{
+          const favBtn = e.target.closest('.boon-fav-btn');
+          if(favBtn){ e.stopPropagation(); toggleFavoriteBoon(d.name); renderBoonScroll(); return; }
+          chosenBoonName = d.name; renderBoonScroll(); renderBoonShowcaseNow();
+        };
+        boonScroll.appendChild(tile);
+      });
+    }
+    function renderBoonShowcaseNow(){
+      boonShowcase.innerHTML = boonShowcaseHTML(chosenBoonName ? boonDice.find(d=>d.name===chosenBoonName) : null);
+    }
+    renderBoonScroll();
+    renderBoonShowcaseNow();
+  }
+
   function checkReady(){ document.getElementById('start-btn').disabled = !(chosenOrigin&&chosenClass); }
-  document.getElementById('start-btn').onclick=()=>{ newGame(chosenOrigin, chosenClass, chosenBoonName); };
+  document.getElementById('start-btn').onclick=()=>{ newGame(chosenOrigin, chosenClass, chosenBoonName, charName); };
   // Secret debug trigger: 5 clicks on "Choose Your Class" within a short
   // window. No visible button, so it can't be stumbled into by a normal
   // player, but stays quick to reach for testing. Two-step, since it does
@@ -449,7 +606,7 @@ function renderSetup(){
         return;
       }
       chosenClass = 'debug';
-      [...cg.children].forEach(x=>x.classList.remove('selected'));
+      [...classTabRow.children].forEach(x=>x.classList.remove('selected'));
       checkReady();
       if(typeof showToast==='function') showToast('Debug class armed', 'good');
     }
@@ -1509,7 +1666,7 @@ function openRunHistoryModal(){
     return `<div class="run-history-row ${r.outcome}">
         <span class="run-history-outcome">${r.outcome==='victory' ? '🏆' : '💀'}</span>
         <div class="run-history-main">
-          <div class="run-history-who">${r.origin} ${r.klass}</div>
+          <div class="run-history-who">${r.charName?`${r.charName} the `:''}${r.origin} ${r.klass}</div>
           <div class="run-history-detail">Floor ${r.floorReached}/3 &middot; ${r.turnsTaken} turns &middot; ${r.damageDealt} dmg &middot; ${r.overkills} overkill${r.overkills===1?'':'s'}</div>
         </div>
         <span class="run-history-date">${dateStr}</span>
