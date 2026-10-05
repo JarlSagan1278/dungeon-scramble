@@ -546,7 +546,7 @@ function renderSetup(){
 
       <div class="setup-section">
         <div class="setup-label">Origin</div>
-        <div class="origin-icon-row" id="origin-icon-row"></div>
+        <div class="class-tab-row" id="origin-tab-row"></div>
         <div class="origin-showcase" id="origin-showcase"></div>
       </div>
 
@@ -586,28 +586,26 @@ function renderSetup(){
   const nameInput = document.getElementById('char-name-input');
   nameInput.oninput = ()=>{ charName = nameInput.value; };
 
-  const originIconRow = document.getElementById('origin-icon-row');
+  const originTabRow = document.getElementById('origin-tab-row');
   const originShowcase = document.getElementById('origin-showcase');
-  function renderOriginIcons(){
-    originIconRow.innerHTML = '';
+  // Text tabs, same component as the Class row right below -- uniform
+  // picker language across both sections instead of Origin getting its own
+  // circular face-icon treatment. A locked Origin still gets a small lock
+  // glyph inline (rather than a fully separate locked style) so the row
+  // stays visually consistent whether or not every slot is unlocked yet.
+  function renderOriginTabs(){
+    originTabRow.innerHTML = '';
     ORIGINS.forEach(o=>{
       const unlocked = isOriginUnlocked(o.id);
-      const portrait = unlocked ? getSetupPreviewPortrait(o.id) : null;
-      const portraitHTML = unlocked
-        ? (portrait.placeholder ? mysteryFigureHTML('width:100%;height:100%;') : `<img class="portrait-img" src="${portrait.img}" alt="${o.name}">`)
-        : lockedOriginPortraitHTML(o.id);
-      const c = el(`<button type="button" class="origin-icon-btn ${o.id===chosenOrigin?'selected':''} ${unlocked?'':'locked'}" aria-label="${o.name}" title="${o.name}">
-          ${portraitHTML}
-          ${unlocked?'':`<span class="origin-lock-badge">${lockSVG(17)}</span>`}
-        </button>`);
+      const c = el(`<button type="button" class="class-tab-btn ${o.id===chosenOrigin?'selected':''} ${unlocked?'':'locked'}">${unlocked?'':lockSVG(10)+' '}${o.name}</button>`);
       c.onclick = ()=>{
         previewedOriginId = o.id;
         if(unlocked){ chosenOrigin = o.id; } else if(typeof showToast==='function') showToast(ORIGIN_UNLOCK_HINT[o.id]||'Locked', null);
-        renderOriginIcons();
+        renderOriginTabs();
         renderOriginShowcaseNow();
         checkReady();
       };
-      originIconRow.appendChild(c);
+      originTabRow.appendChild(c);
     });
   }
   function renderOriginShowcaseNow(){
@@ -615,7 +613,7 @@ function renderSetup(){
     originShowcase.innerHTML = originShowcaseHTML(o, isOriginUnlocked(o.id));
     attachLongPressTooltips('#origin-showcase .die-face-chip');
   }
-  renderOriginIcons();
+  renderOriginTabs();
   renderOriginShowcaseNow();
 
   const classTabRow = document.getElementById('class-tab-row');
