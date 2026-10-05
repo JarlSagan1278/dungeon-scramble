@@ -302,7 +302,17 @@ function mysteryFigureHTML(sizeStyle){
   return `<div class="mystery-figure" style="${sizeStyle}"></div>`;
 }
 
+// Unlock-condition copy for a locked Origin card (Dwarf/Gnome are always
+// unlocked -- see isOriginUnlocked(), logic.js -- so only these two need an
+// entry here).
+const ORIGIN_UNLOCK_HINT = {
+  halfling: 'Win a run to unlock.',
+  pixie: 'Win a run with 2 different Origins to unlock.',
+};
+
 function renderSetup(){
+  const boonTiers = unlockedBoonTiers();
+  const boonDice = boonTiers.flatMap(t=>BOON_TIER_POOLS[t].filter(d=>DISCOVERED_DICE.has(d.name)).map(d=>({...d, tier:t})));
   app.innerHTML = `
     <div class="panel">
       <button id="setup-back-btn" class="setup-back-btn" title="Back to title">&larr; Back</button>
@@ -311,31 +321,53 @@ function renderSetup(){
       <div class="choice-grid" id="origin-grid"></div>
       <h3 style="font-size:14px;color:var(--cream);user-select:none;margin:6px 0 4px 0;" id="class-header">Choose Your Class</h3>
       <div class="choice-grid" id="class-grid"></div>
+      ${boonTiers.length ? `
+        <h3 style="font-size:14px;color:var(--cream);margin:10px 0 4px 0;">Starting Boon <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(optional)</span></h3>
+        ${boonDice.length ? `<div class="swap-list" id="boon-list"></div>`
+          : `<p class="hint">You've unlocked Starting Boon tier${boonTiers.length>1?'s':''} (${boonTiers.map(t=>BOON_TIER_LABELS[t]).join(', ')}), but haven't discovered a die from ${boonTiers.length>1?'them':'it'} yet -- find one as loot in a run to make it pickable here.</p>`}
+      ` : ''}
       <button class="primary" id="start-btn" disabled>Enter the Dungeon</button>
     </div>
   `;
   document.getElementById('setup-back-btn').onclick = ()=>{ preGameScreen='title'; render(); };
-  let chosenOrigin=null, chosenClass=null;
+  let chosenOrigin=null, chosenClass=null, chosenBoonName=null;
+  let debugArmed = false;
   const og = document.getElementById('origin-grid');
+  const originCards = [];
   ORIGINS.forEach(o=>{
-    const portrait = getSetupPreviewPortrait(o.id);
-    const portraitHTML = portrait.placeholder
-      ? mysteryFigureHTML('width:75%; aspect-ratio:1/1;')
-      : `<img class="portrait-img" src="${portrait.img}" alt="${o.name}">`;
-    const dieArt = LOOT_ART[o.die];
-    const dieArtHTML = dieArt ? `<img class="origin-die-thumb" src="${dieArt}" alt="${o.die}">` : '';
-    const c = el(`<div class="choice-card has-portrait">
-        <div class="origin-header">
-          <div class="portrait-wrap">${portraitHTML}</div>
-          <h4>${o.name}</h4>
-        </div>
-        <div class="die-callout">
-          ${dieArtHTML}
-          <b>${o.die}</b>
-        </div>
-        <p>${o.blurb}</p>
-      </div>`);
-    c.onclick=()=>{ chosenOrigin=o.id; [...og.children].forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); checkReady(); };
+    const unlocked = isOriginUnlocked(o.id);
+    let c;
+    if(unlocked){
+      const portrait = getSetupPreviewPortrait(o.id);
+      const portraitHTML = portrait.placeholder
+        ? mysteryFigureHTML('width:75%; aspect-ratio:1/1;')
+        : `<img class="portrait-img" src="${portrait.img}" alt="${o.name}">`;
+      const dieArt = LOOT_ART[o.die];
+      const dieArtHTML = dieArt ? `<img class="origin-die-thumb" src="${dieArt}" alt="${o.die}">` : '';
+      c = el(`<div class="choice-card has-portrait">
+          <div class="origin-header">
+            <div class="portrait-wrap">${portraitHTML}</div>
+            <h4>${o.name}</h4>
+          </div>
+          <div class="die-callout">
+            ${dieArtHTML}
+            <b>${o.die}</b>
+          </div>
+          <p>${o.blurb}</p>
+        </div>`);
+      c.onclick=()=>{ chosenOrigin=o.id; [...og.children].forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); checkReady(); };
+    } else {
+      c = el(`<div class="choice-card has-portrait locked" title="Locked">
+          <div class="origin-header">
+            <div class="portrait-wrap">${mysteryFigureHTML('width:75%; aspect-ratio:1/1;')}</div>
+            <h4>${o.name} <span class="lock-icon">🔒</span></h4>
+          </div>
+          <p>${ORIGIN_UNLOCK_HINT[o.id]||'Locked.'}</p>
+        </div>`);
+      c.dataset.originId = o.id;
+      c.onclick = ()=>{ if(typeof showToast==='function') showToast(ORIGIN_UNLOCK_HINT[o.id]||'Locked', null); };
+    }
+    originCards.push({id:o.id, node:c, unlocked});
     og.appendChild(c);
   });
   const cg = document.getElementById('class-grid');
@@ -347,11 +379,27 @@ function renderSetup(){
     c.onclick=()=>{ chosenClass=k.id; [...cg.children].forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); checkReady(); };
     cg.appendChild(c);
   });
+  const boonList = document.getElementById('boon-list');
+  if(boonList){
+    let selectedBoonItem = null;
+    const noneItem = el(`<div class="swap-item boon-none-item selected"><div class="swap-item-label">None</div></div>`);
+    noneItem.onclick = ()=>{ chosenBoonName=null; if(selectedBoonItem) selectedBoonItem.classList.remove('selected'); selectedBoonItem=noneItem; noneItem.classList.add('selected'); };
+    selectedBoonItem = noneItem;
+    boonList.appendChild(noneItem);
+    boonDice.forEach(d=>{
+      const item = el(`<div class="swap-item">${lootPreviewTileHTML(d, 'boon-'+d.name)}<div class="swap-item-label">${d.name}<br><span style="color:var(--parchment-dim);">${BOON_TIER_LABELS[d.tier]}</span></div></div>`);
+      item.onclick = ()=>{ chosenBoonName=d.name; if(selectedBoonItem) selectedBoonItem.classList.remove('selected'); selectedBoonItem=item; item.classList.add('selected'); };
+      boonList.appendChild(item);
+    });
+  }
   function checkReady(){ document.getElementById('start-btn').disabled = !(chosenOrigin&&chosenClass); }
-  document.getElementById('start-btn').onclick=()=>{ newGame(chosenOrigin, chosenClass); };
+  document.getElementById('start-btn').onclick=()=>{ newGame(chosenOrigin, chosenClass, chosenBoonName); };
   // Secret debug-class trigger: 5 clicks on "Choose Your Class" within a
   // short window. No visible button, so it can't be stumbled into by a
-  // normal player, but stays quick to reach for testing.
+  // normal player, but stays quick to reach for testing. Also temporarily
+  // unlocks every Origin card for this screen (UI-only -- doesn't touch
+  // META/isOriginUnlocked) so testing isn't blocked on grinding out real
+  // unlocks first.
   let classHeaderClicks = [];
   document.getElementById('class-header').onclick = ()=>{
     const now = Date.now();
@@ -362,7 +410,15 @@ function renderSetup(){
       chosenClass = 'debug';
       [...cg.children].forEach(x=>x.classList.remove('selected'));
       checkReady();
-      if(typeof showToast==='function') showToast('Debug class armed', 'good');
+      if(!debugArmed){
+        debugArmed = true;
+        originCards.filter(oc=>!oc.unlocked).forEach(oc=>{
+          oc.node.classList.remove('locked');
+          oc.node.classList.add('debug-unlocked');
+          oc.node.onclick = ()=>{ chosenOrigin=oc.id; [...og.children].forEach(x=>x.classList.remove('selected')); oc.node.classList.add('selected'); checkReady(); };
+        });
+      }
+      if(typeof showToast==='function') showToast('Debug class armed (Origins unlocked for testing)', 'good');
     }
   };
 }

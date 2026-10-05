@@ -107,8 +107,22 @@ async function runOne(browser, originId, classId, label) {
   page.on('pageerror', e => pageErrors.push(e.message));
   await page.goto('file://' + FILE);
   await page.evaluate(({ originId, classId }) => {
+    // Pre-unlock every Origin (Halfling/Pixie are achievement-gated in the
+    // real game, see isOriginUnlocked()/newGame() in logic.js) so the sim
+    // actually exercises the requested origin instead of silently falling
+    // back to Dwarf -- each page starts with fresh/empty META, so without
+    // this, newGame()'s own lock-enforcement fallback would quietly swap
+    // the combo under test.
+    META.lifetime.victories = 1;
+    META.lifetime.bestFloorReached = 3;
+    META.achievements['origin_duo'] = { date: Date.now() };
     newGame(originId, classId);
   }, { originId, classId });
+
+  const actualOriginId = await page.evaluate(() => S.origin.id);
+  if (actualOriginId !== originId) {
+    pageErrors.push(`newGame('${originId}', ...) actually started as origin '${actualOriginId}' -- an unlock-gate regression, not a real game error, but it means this combo wasn't tested.`);
+  }
 
   let result = 'TIMEOUT';
   const notes = {};

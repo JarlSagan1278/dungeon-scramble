@@ -158,6 +158,14 @@ const ACHIEVEMENTS = [
     check: L => L.runsPlayed>=10},
   {id:'damage_1000', name:'Heavy Hitter', desc:'Deal 1,000 damage, lifetime.',
     check: L => L.totalDamageDealt>=1000},
+  // Deliberately requires 2 victories (with different Origins), not just
+  // one -- floor_3 above is reached on the way to *any* win (and even by
+  // dying on Floor 3 without winning), so it's actually easier than
+  // first_victory, not harder. This is the one that's genuinely a step up
+  // from "win a run," which is what lets it gate Pixie behind something
+  // that unlocks strictly after Halfling (see isOriginUnlocked() below).
+  {id:'origin_duo', name:'Two Roads', desc:'Win a run with 2 different Origins.',
+    check: L => Object.values(L.victoriesByOrigin||{}).filter(n=>n>0).length>=2},
 ];
 
 function checkAchievements(){
@@ -171,6 +179,40 @@ function checkAchievements(){
   });
   if(newlyUnlocked.length) saveMeta();
   return newlyUnlocked;
+}
+
+// ---- Origin unlocks + Starting Boon tiers -- both derived live from
+// META.lifetime/META.achievements rather than their own stored flag, so
+// there's nothing to migrate: a player who already has e.g. a recorded
+// victory from before this existed is unlocked immediately, no reset.
+// Dwarf/Gnome stay available from the very first run (a new player still
+// gets 2 Origins x 4 Classes = 8 starting combos); Halfling and Pixie are
+// the unlockable ones, in escalating order (see the origin_duo comment
+// above for why Pixie isn't gated on floor_3). ----
+function isOriginUnlocked(originId){
+  if(originId==='dwarf' || originId==='gnome') return true;
+  if(originId==='halfling') return META.lifetime.victories>=1;
+  if(originId==='pixie') return !!META.achievements['origin_duo'];
+  return true;
+}
+// Which Loot Dice tiers a player may pick a Starting Boon from (Setup
+// screen) -- reuses the same milestones as 3 existing Achievements
+// (first_victory, floor_3, all_origins) rather than inventing new ones, so
+// the tiers unlock on a curve that's already been designed/tuned: Alloy
+// after your first win, Gilded once you've seen Floor 3, Magic only once
+// you've won with every Origin (hard -- intentionally the capstone).
+function unlockedBoonTiers(){
+  const L = META.lifetime;
+  const tiers = [];
+  if(L.victories>=1) tiers.push('alloy');
+  if(L.bestFloorReached>=3) tiers.push('gilded');
+  if(['dwarf','gnome','halfling','pixie'].every(id=>(L.victoriesByOrigin[id]||0)>0)) tiers.push('magic');
+  return tiers;
+}
+const BOON_TIER_POOLS = {alloy:ALLOY, gilded:GILDED, magic:MAGIC};
+const BOON_TIER_LABELS = {alloy:'Alloy', gilded:'Gilded', magic:'Magic'};
+function findLootDieByName(name){
+  return ALLOY.find(d=>d.name===name) || GILDED.find(d=>d.name===name) || MAGIC.find(d=>d.name===name) || null;
 }
 
 // Called exactly once per finished run (from renderVictory/renderGameOver,
@@ -337,7 +379,12 @@ function getSetupPreviewPortrait(originId){
   return setupPortraitCache[originId];
 }
 
-function newGame(originId, classId){
+function newGame(originId, classId, boonDieName){
+  // Defense in depth: the Setup screen is the only place that offers an
+  // Origin choice, and it already refuses to let a locked one be selected,
+  // but falling back here too means a stale/tampered call can't bypass the
+  // unlock (e.g. a saved bookmark from before Halfling was unlocked).
+  if(!isOriginUnlocked(originId)) originId = 'dwarf';
   const origin = ORIGINS.find(o=>o.id===originId);
   const klass = CLASSES.find(c=>c.id===classId);
   const originDie = {name: origin.die, faces: origin.faces};
@@ -366,6 +413,14 @@ function newGame(originId, classId){
     // then also ends in defeat with a new choice of its own.
     carryDie = takeCarryoverDie();
     if(carryDie) dice[dice.length-2] = carryDie;
+    // Starting Boon (Setup screen, unlocked via unlockedBoonTiers()): takes
+    // the first Maneuver Die I slot (index 7) -- a different slot from the
+    // carryover die above (index 14) so the two one-shot bonuses never
+    // collide if a player somehow has both available in the same run.
+    if(boonDieName){
+      const boonDie = findLootDieByName(boonDieName);
+      if(boonDie) dice[7] = boonDie;
+    }
     // shuffle into 4x4
     shuffled = pickN(dice, dice.length);
   }
@@ -405,6 +460,7 @@ function newGame(originId, classId){
   };
   logMsg('sys', `A ${origin.name} ${klass.name} descends into the dungeon...`);
   if(carryDie) logMsg('sys', `${carryDie.name} joins your tray, carried over from your last run.`, 'good');
+  if(boonDieName && !klass.debug && findLootDieByName(boonDieName)) logMsg('sys', `${boonDieName} joins your tray as your Starting Boon.`, 'good');
   // No scrambleTray() here: a new run always opens on Camp, not combat, so
   // there's nothing to roll yet -- playing the dice-roll sound here just
   // fired it on the title->camp transition for no in-fiction reason. The

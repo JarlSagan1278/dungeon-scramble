@@ -96,6 +96,17 @@
   .die-callout{ display:flex; align-items:center; justify-content:center; gap:5px; background:rgba(0,0,0,0.18); border-radius:4px; padding:4px 6px; }
   .die-callout b{ font-size:10.5px; color:var(--parchment-dim); text-align:center; }
   .choice-card.has-portrait .origin-die-thumb{ margin:0; flex:0 0 auto; }
+  /* Locked Origin card (Halfling/Pixie before their unlock condition is
+     met, see isOriginUnlocked()/ORIGIN_UNLOCK_HINT, render.js) -- same
+     mystery-figure silhouette already used for an undiscovered portrait
+     elsewhere, dimmed and non-interactive-looking, with the unlock
+     condition standing in for the normal flavor blurb. Tapping it still
+     shows a toast with that same condition rather than doing nothing. */
+  .choice-card.locked{ opacity:0.55; cursor:default; }
+  .choice-card.locked:hover{ transform:none; border-color: var(--stone); }
+  .choice-card.locked h4{ display:flex; align-items:center; justify-content:center; gap:4px; }
+  .lock-icon{ font-size:11px; }
+  .choice-card.debug-unlocked{ opacity:1; cursor:pointer; border-style:dashed; }
 
   /* Route tracker */
   .route-wrap{ position:relative; margin-bottom:12px; }
@@ -867,6 +878,13 @@
   .swap-item .loot-preview-tile{ margin-bottom:0; }
   .swap-item .swap-count-badge{ position:absolute; top:-6px; right:-6px; }
   .swap-item-label{ margin-top:6px; font-size:10px; line-height:1.25; text-align:center; color:var(--parchment-dim); word-break:break-word; }
+  /* Used by the Starting Boon picker (Setup screen) -- its "None" option
+     and whichever die is currently picked get a highlighted border/glow so
+     the choice (unlike the carryover list above, which is a one-time pick
+     with no way back) is clearly a toggle you can change your mind on. */
+  .swap-item.selected{ border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold), 0 0 8px 1px rgba(212,175,82,0.5); }
+  .boon-none-item{ display:flex; align-items:center; justify-content:center; min-height:56px; }
+  .boon-none-item .swap-item-label{ margin-top:0; font-weight:bold; color:var(--parchment); }
   .small-btn-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
   .hint{ font-size:12px; color:var(--parchment-dim); margin:6px 0; }
   a{ color: var(--gold); }
