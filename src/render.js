@@ -2125,7 +2125,7 @@ function renderSwapModal(){
   });
   groups.forEach(g=>{
     const die = S.tray[g.indices[0]].die;
-    const countBadge = g.indices.length>1 ? `<span class="token-count swap-count-badge">x${g.indices.length}</span>` : '';
+    const countBadge = g.indices.length>1 ? `<span class="swap-count-badge">${g.indices.length}</span>` : '';
     const item = el(`<div class="swap-item">${lootPreviewTileHTML(die, 'swap-'+g.indices[0])}${countBadge}<div class="swap-item-label">${die.name}</div></div>`);
     const isBasic = die.cat==='attack' || die.cat==='maneuver';
     item.onclick = () => {
@@ -2341,7 +2341,7 @@ function renderGameOver(){
       </div>`;
     const list = document.getElementById('carryover-list');
     S.carryoverOptions.forEach(g=>{
-      const countBadge = g.count>1 ? `<span class="token-count swap-count-badge">x${g.count}</span>` : '';
+      const countBadge = g.count>1 ? `<span class="swap-count-badge">${g.count}</span>` : '';
       const item = el(`<div class="swap-item">${lootPreviewTileHTML(g.die, 'carryover-'+g.die.name)}${countBadge}<div class="swap-item-label">${g.die.name}</div></div>`);
       item.onclick = ()=>{
         S.carryoverChosenName = g.die.name;

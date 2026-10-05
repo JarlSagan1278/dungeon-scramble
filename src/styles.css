@@ -639,7 +639,7 @@
      moved to text pills), but it has no trouble with one piece of art or a
      short "Atk/Man + tier" label, and there are far fewer of them to fit. */
   .camp-dice-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap:7px; margin:3px 0; }
-  .camp-die-tile{ position:relative; aspect-ratio:1/1; width:auto; height:auto; min-width:0; min-height:0;
+  .camp-die-tile{ position:relative; z-index:0; aspect-ratio:1/1; width:auto; height:auto; min-width:0; min-height:0;
     padding:0; border-radius:8px; cursor:pointer;
     display:flex; align-items:center; justify-content:center; text-align:center; }
   .camp-die-tile img{ width:100%; height:100%; object-fit:cover; display:block; border-radius:6px; }
@@ -650,15 +650,23 @@
      so the peeking edges stay rounded too), plus a slight tilt on the top
      tile itself -- the combination reads as a fanned deck of cards rather
      than a single die with a number stapled to it. Selecting it squares the
-     tilt back to 0 so the active tile doesn't look askew mid-swap. */
-  .camp-die-tile.stacked{ transform: rotate(-3deg);
-    box-shadow: 2px 3px 0 0 rgba(0,0,0,0.55), 4px 6px 0 0 rgba(0,0,0,0.4), 6px 9px 0 0 rgba(0,0,0,0.25);
-    margin:0 9px 9px 2px; }
-  .camp-die-tile.stacked.organize-selected{ transform:none;
-    box-shadow: 2px 3px 0 0 rgba(0,0,0,0.55), 4px 6px 0 0 rgba(0,0,0,0.4), 6px 9px 0 0 rgba(0,0,0,0.25), 0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
-  .camp-stack-badge{ position:absolute; bottom:-6px; right:-7px; background:var(--gold); color:#241c10;
+     tilt back to 0 so the active tile doesn't look askew mid-swap.
+     The fan's reach (max 4px/5px) and the count badge's overflow (3px) are
+     both kept comfortably inside the grid's own gap (6-7px) so neither ever
+     crosses into a neighboring tile's box -- they used to reach out to
+     6-9px against a 6-7px gap, which let an adjacent tile (painted later in
+     source order, since every tile here is equally z-index:auto) paint
+     right over the badge, cutting its number off. z-index is bumped too, as
+     a second line of defense, so a stacked tile's fan+badge always paints
+     above a plain neighbor even in a tighter spot. */
+  .camp-die-tile.stacked{ transform: rotate(-3deg); z-index:1;
+    box-shadow: 1.5px 2px 0 0 rgba(0,0,0,0.55), 3px 4px 0 0 rgba(0,0,0,0.4), 4px 5px 0 0 rgba(0,0,0,0.25);
+    margin:0 6px 6px 2px; }
+  .camp-die-tile.stacked.organize-selected{ transform:none; z-index:2;
+    box-shadow: 1.5px 2px 0 0 rgba(0,0,0,0.55), 3px 4px 0 0 rgba(0,0,0,0.4), 4px 5px 0 0 rgba(0,0,0,0.25), 0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
+  .camp-stack-badge{ position:absolute; bottom:-3px; right:-3px; background:var(--gold); color:#241c10;
     font-size:9px; font-weight:800; border-radius:8px; padding:1px 5px; min-width:13px; text-align:center;
-    border:1.5px solid var(--bg); line-height:1.3; transform: rotate(3deg); }
+    border:1.5px solid var(--bg); line-height:1.3; transform: rotate(3deg); z-index:1; }
   /* Back Pocket as a visibly different, darker storage area rather than a
      second list that only a text heading told apart from Tray -- a sunken
      pouch shape (inset shadow, darker fill, bottom corners rounder than the
@@ -1054,11 +1062,22 @@
     display:flex; align-items:center; justify-content:center; gap:5px; }
   .merge-glyph{ flex:0 0 auto; vertical-align:middle; opacity:0.9; }
   .upgrade-preview-btn{ flex:0 0 auto; width:28px; font-weight:bold; font-size:12px; padding:6px 4px; }
-  .swap-list{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-height:440px; overflow-y:auto; margin:8px 0; padding:4px; }
-  .swap-item{ position:relative; background:var(--panel2); border:2px solid var(--stone); border-radius:8px; padding:8px; cursor:pointer; transition: transform .08s; width:88px; }
-  .swap-item:hover{ border-color: var(--gold); transform: translateY(-2px); }
+  /* padding-top here is deliberately bigger than the count badge's -6px
+     overflow below (see .swap-count-badge) -- otherwise the top row's
+     badges would poke past this list's own edge and get sliced off by its
+     overflow-y:auto (setting overflow-y alone forces overflow-x to clip
+     too, per spec, so this box does clip, not just scroll). */
+  .swap-list{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-height:440px; overflow-y:auto; margin:8px 0; padding:10px 4px 4px; }
+  .swap-item{ position:relative; z-index:0; background:var(--panel2); border:2px solid var(--stone); border-radius:8px; padding:8px; cursor:pointer; transition: transform .08s; width:88px; }
+  .swap-item:hover{ border-color: var(--gold); transform: translateY(-2px); z-index:1; }
   .swap-item .loot-preview-tile{ margin-bottom:0; }
-  .swap-item .swap-count-badge{ position:absolute; top:-6px; right:-6px; }
+  /* Same count-badge design language as Camp's stacked dice (.camp-stack-badge)
+     -- solid gold circle, dark bold number, thin border matching the
+     surrounding background -- instead of the old generic white "x3" pill,
+     so a die count reads the same wherever dice are grouped. */
+  .swap-item .swap-count-badge{ position:absolute; top:-6px; right:-6px; z-index:1;
+    background:var(--gold); color:#241c10; border:1.5px solid var(--bg);
+    font-size:10px; font-weight:800; border-radius:9px; padding:1px 6px; min-width:15px; line-height:1.4; }
   .swap-item-label{ margin-top:6px; font-size:10px; line-height:1.25; text-align:center; color:var(--parchment-dim); word-break:break-word; }
   /* Used by the Starting Boon picker (Setup screen) -- its "None" option
      and whichever die is currently picked get a highlighted border/glow so
