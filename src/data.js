@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.6.0';
+const GAME_VERSION = '1.7.0';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -207,16 +207,20 @@ const ORIGINS = [
 
 // ---- Classes ----
 // Tray coordinates: r,c each run 0-3 (r=0 top row, c=0 left column).
+// `color` matches each Class's highlighted-zone color from the original
+// tabletop manual's Dice Tray diagram (Guard=cyan, Armsmaster=red,
+// Dungeoneer=orange, Arcanist=magenta) -- carried over so the digital
+// Class picker identifies each Class the same way the physical game does.
 const CLASSES = [
-  {id:'guard', name:'Guard', ability:'Once per turn, turn any Action or Blank in your zone (middle-right block) into a Block (2).',
+  {id:'guard', name:'Guard', color:'#2fb8b8', ability:'Once per turn, turn any Action or Blank in your zone (middle-right block) into a Block (2).',
     zone:(r,c)=> (r===1||r===2) && (c===2||c===3), convertTo:{type:'block', value:2}},
-  {id:'armsmaster', name:'Armsmaster', ability:'Once per turn, turn any Action or Blank in your zone (right column) into a Hit (2).',
+  {id:'armsmaster', name:'Armsmaster', color:'#c0392f', ability:'Once per turn, turn any Action or Blank in your zone (right column) into a Hit (2).',
     zone:(r,c)=> c===3, convertTo:{type:'hit', value:2}},
-  {id:'dungeoneer', name:'Dungeoneer', ability:'Your zone (the two middle squares on the left and right edges) wraps left-to-right when building a Path.',
+  {id:'dungeoneer', name:'Dungeoneer', color:'#d4812e', ability:'Your zone (the two middle squares on the left and right edges) wraps left-to-right when building a Path.',
     zone:(r,c)=> (r===1||r===2) && (c===0||c===3), wrap:true},
-  {id:'arcanist', name:'Arcanist', ability:'Within your zone (the rising diagonal), you may move diagonally as if using Dodge.',
+  {id:'arcanist', name:'Arcanist', color:'#b4419a', ability:'Within your zone (the rising diagonal), you may move diagonally as if using Dodge.',
     zone:(r,c)=> r+c===3, diagonalZone:true},
-  {id:'debug', name:'Debug', ability:'No class ability. Starting tray is a random assortment of every die type in the game, for testing.',
+  {id:'debug', name:'Debug', color:'#9aa3ab', ability:'No class ability. Starting tray is a random assortment of every die type in the game, for testing.',
     zone:(r,c)=> false, debug:true},
 ];
 

@@ -497,9 +497,9 @@ function originShowcaseHTML(o, unlocked){
 // reflows as the player taps between the 4 tabs above it.
 function classShowcaseHTML(k){
   return `
-    <div class="class-action-icon">${classActionIconHTML(k)}</div>
+    <div class="class-action-icon" style="--class-color:${k.color}">${classActionIconHTML(k)}</div>
     <div class="class-showcase-text">
-      <div class="class-showcase-name">${k.name}</div>
+      <div class="class-showcase-name" style="--class-color:${k.color}">${k.name}</div>
       <div class="class-showcase-ability">${k.ability}</div>
     </div>
   `;
@@ -612,7 +612,7 @@ function renderSetup(){
   function renderClassTabs(){
     classTabRow.innerHTML = '';
     realClasses.forEach(k=>{
-      const c = el(`<button type="button" class="class-tab-btn ${k.id===chosenClass?'selected':''}">${k.name}</button>`);
+      const c = el(`<button type="button" class="class-tab-btn ${k.id===chosenClass?'selected':''}" style="--class-color:${k.color}">${k.name}</button>`);
       c.onclick = ()=>{
         previewedClassId = k.id; chosenClass = k.id;
         renderClassTabs();
