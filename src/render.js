@@ -13,6 +13,14 @@ function disarmClearConfirm(){
   clearConfirmArmed = false;
 }
 
+// Class-ability "armed" state: true for the window between tapping Skill
+// and actually tapping a die in the zone to convert it. Same kind of
+// transient UI state as clearConfirmArmed above (not on S), so the button
+// can show it's mid-toggle instead of looking identical before and after
+// the tap. Reset alongside every S.classAbilityUsed=false (logic.js) so it
+// never survives into a turn/floor where nothing is actually armed.
+let abilityArmed = false;
+
 // Colors for the per-die resolve pulse (see .die.resolving in styles.css),
 // keyed by the same "what kind of thing just happened" bucket describeStepFx()
 // sorts every path step into.
@@ -1103,7 +1111,7 @@ function renderGame(){
         <div class="util-rail">
           <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning)?'disabled':''} ${emphasizeResolve?'pulse':''}" id="resolve-btn">▶<span>Go</span></div>
           <div class="util-btn danger-accent rail-clear ${S.transitioning?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
-          ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''}" id="ability-btn">✦<span>${S.classAbilityUsed?'Used':'Skill'}</span></div>`
+          ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''} ${abilityArmed?'armed':''}" id="ability-btn">✦<span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
             : S.klass.debug ? `<div class="util-btn rail-ability ${(!S.encounter||S.transitioning)?'disabled':''}" id="debug-win-btn">✦<span>Win</span></div>` : ''}
           <div class="char-icon-wrap ${playerFx.cls==='flash-damage'?'dmg-flash':playerFx.cls==='flash-heal'?'heal-flash':''}" title="${S.origin.name} ${S.klass.name}">${(()=>{
             const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
@@ -1178,6 +1186,7 @@ function renderGame(){
     S.path=[];
     S.tray.forEach(c=>delete c.forcedFace);
     S.classAbilityUsed = false;
+    abilityArmed = false;
     render();
   };
   document.getElementById('resolve-btn').onclick = ()=>{
@@ -1194,6 +1203,8 @@ function renderGame(){
   const abilityBtn = document.getElementById('ability-btn');
   if(abilityBtn) abilityBtn.onclick = ()=>{
     if(S.transitioning || S.classAbilityUsed) return;
+    if(abilityArmed){ abilityArmed = false; render(); return; } // tap again to back out before picking a die
+    abilityArmed = true;
     logMsg('sys', `Click a die in your zone to convert it.`);
     render();
     // re-attach one-shot ability click handling
@@ -1204,6 +1215,7 @@ function renderGame(){
         node.style.cursor='crosshair';
         node.addEventListener('click', function handler(ev){
           ev.stopPropagation();
+          abilityArmed = false;
           useClassAbility(idx);
           node.removeEventListener('click',handler);
         }, {once:true, capture:true});

@@ -403,6 +403,7 @@
   .util-btn.rail-go{ flex:0 0 auto; height:46px; font-size:18px; }
   .util-btn.rail-clear{ flex:0 0 auto; height:32px; font-size:12px; }
   .util-btn.rail-ability{ flex:0 0 auto; height:32px; font-size:12px; }
+  .util-btn.rail-ability.armed{ background: var(--gold); color:#241c10; box-shadow: 0 0 0 2px rgba(212,175,82,0.4); }
   .log div{ margin-bottom:2px; }
   .log .dmg{ color:#e6a9a9; }
   .log .heal{ color:#a9e6b8; }

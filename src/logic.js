@@ -656,7 +656,7 @@ function drawEncounter(kind){
 }
 
 function advanceRoute(){
-  S.path = []; S.classAbilityUsed=false; S.turnNumber=0;
+  S.path = []; S.classAbilityUsed=false; S.turnNumber=0; abilityArmed = false;
   // A class-ability conversion (forcedFace) is only ever meant to last the
   // one turn it was used on -- normally cleared by endTurn() -- but when an
   // encounter dies mid-turn (the kill happens during the path-resolution
@@ -761,6 +761,7 @@ function scrambleTray(){
   S.tray.forEach(cell=>{ cell.faceIdx = rand(6); });
   S.path = [];
   S.classAbilityUsed = false;
+  abilityArmed = false;
   S.justScrambled = true;
   if(typeof playDiceRollSound==='function') playDiceRollSound();
 }
