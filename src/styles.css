@@ -716,7 +716,7 @@
      as a bit of ambient motion/juice consistent with the rest of the game's
      feedback (screen shake, particle bursts, etc.). Respects the global
      reduced-motion rule at the top of this file like every other animation. */
-  .camp-fire-wrap{ position:relative; width:106px; height:70px; margin:10px auto 6px; display:flex; align-items:flex-end; justify-content:center; }
+  .camp-fire-wrap{ position:relative; width:106px; height:70px; margin:10px auto 18px; display:flex; align-items:flex-end; justify-content:center; }
   .campfire-glow{ position:absolute; bottom:4px; left:50%; transform:translateX(-50%); width:81px; height:81px; border-radius:50%;
     background: radial-gradient(circle, rgba(255,170,60,0.55) 0%, rgba(255,170,60,0) 70%);
     animation: campfire-glow-pulse 2.4s ease-in-out infinite; }
@@ -1061,7 +1061,7 @@
   .upgrade-rows-col{ display:flex; flex-direction:column; gap:5px; margin-top:6px; }
   .upgrade-row{ display:flex; align-items:stretch; gap:6px; }
   .upgrade-row button:first-child{ flex:1; }
-  .upgrade-btn{ font-size:12px; padding:6px 8px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  .upgrade-btn{ font-size:12px; padding:10px 8px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     display:flex; align-items:center; justify-content:center; gap:5px; }
   .merge-glyph{ flex:0 0 auto; vertical-align:middle; opacity:0.9; }
   .upgrade-preview-btn{ flex:0 0 auto; width:28px; font-weight:bold; font-size:12px; padding:6px 4px; }
