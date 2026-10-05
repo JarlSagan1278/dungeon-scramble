@@ -1615,13 +1615,6 @@ function selectOrganize(type, idx){
   render();
 }
 
-function campDieTileHTML(die, type, idx){
-  const sel = S.organizeSelection;
-  const isSelected = sel && sel.type===type && sel.idx===idx;
-  return `<div class="die dietype-${die.cat} camp-die-tile ${isSelected?'organize-selected':''}" data-camp-type="${type}" data-camp-idx="${idx}" title="${die.name}">
-      <span class="camp-die-label">${die.name}</span>
-    </div>`;
-}
 
 function campRest(){
   if(S.campRested) return;

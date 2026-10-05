@@ -589,40 +589,58 @@
   .camp-section{ background: var(--panel2); border:1px solid var(--stone); border-radius:8px; padding:8px 10px 9px; margin:7px 0; }
   .camp-status-card .bar-row{ margin-bottom:0; }
   .camp-status-card .small-btn-row{ margin-top:6px; }
-  /* Chips that size to their own die name instead of a fixed 8-column grid
-     of tiny squares -- a full name like "Dwarven Doohickie" or "Self-
-     Replicating Forge" has no hope of reading cleanly jammed into a ~34px
-     square at 6.5px type, so this wraps a flexible row of pill-shaped tiles
-     instead, each as wide as its own label needs and no narrower. */
-  .camp-dice-grid{ display:flex; flex-wrap:wrap; gap:6px; margin:3px 0; }
-  .camp-die-tile{ aspect-ratio:unset; width:auto; height:auto; min-width:0; min-height:0;
-    flex:0 0 auto; max-width:100%; border-radius:7px; padding:7px 10px; cursor:pointer;
+  /* Square tiles again, in a responsive grid -- but each one now stands for
+     every identical copy of that die (buildDieStacks(), render.js), so a
+     tray of sixteen Basic dice collapses to a handful of tiles instead of
+     sixteen individually. That's what makes the square affordable this
+     time: a square can't fit "Dwarven Doohickie" (the earlier reason Camp
+     moved to text pills), but it has no trouble with one piece of art or a
+     short "Atk/Man + tier" label, and there are far fewer of them to fit. */
+  .camp-dice-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap:7px; margin:3px 0; }
+  .camp-die-tile{ position:relative; aspect-ratio:1/1; width:auto; height:auto; min-width:0; min-height:0;
+    padding:0; border-radius:8px; cursor:pointer;
     display:flex; align-items:center; justify-content:center; text-align:center; }
-  .camp-die-label{ font-size:11px; line-height:1.2; word-break:normal; white-space:normal; font-weight:bold; }
+  .camp-die-tile img{ width:100%; height:100%; object-fit:cover; display:block; border-radius:6px; }
+  .camp-die-basic-label{ font-size:11px; line-height:1.3; font-weight:800; }
   .camp-die-tile.organize-selected{ box-shadow:0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
-  /* Category sub-headers within a Tray/Back Pocket grid (groupedCampTilesHTML(),
-     render.js) -- flex-basis:100% forces each one onto its own line inside
-     the flex-wrap grid without needing a separate container per group, so a
-     crowded Back Pocket reads as sorted piles (Attack, Maneuver, Loot...)
-     instead of one shuffled wall of chips. */
-  .camp-group-label{ flex-basis:100%; font-size:9.5px; text-transform:uppercase; letter-spacing:0.6px;
-    font-weight:800; color:var(--parchment-dim); margin:5px 0 -2px; }
-  .camp-group-label:first-child{ margin-top:0; }
-  /* Connected swap cue: once a die is picked, the list it came FROM dims
-     (everything but the selection itself) and the list it's going INTO
-     gets a pulsing gold outline + its own label lights up gold -- so the
-     two taps a swap takes read as one continuous gesture aimed at a clear
-     target, not two disconnected clicks into generically-labeled lists. */
+  /* Card-stack look for more than one copy: two faux layers peeking out
+     bottom-right via box-shadow (it follows the tile's own border-radius,
+     so the peeking edges stay rounded too), plus a count badge -- reads as
+     "a pile of these" instead of a single die with a number stapled to it. */
+  .camp-die-tile.stacked{ box-shadow: 3px 3px 0 0 rgba(0,0,0,0.5), 6px 6px 0 0 rgba(0,0,0,0.3); margin:0 6px 6px 0; }
+  .camp-die-tile.stacked.organize-selected{ box-shadow: 3px 3px 0 0 rgba(0,0,0,0.5), 6px 6px 0 0 rgba(0,0,0,0.3), 0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
+  .camp-stack-badge{ position:absolute; bottom:-5px; right:-5px; background:var(--gold); color:#241c10;
+    font-size:9px; font-weight:800; border-radius:8px; padding:1px 5px; min-width:13px; text-align:center;
+    border:1.5px solid var(--bg); line-height:1.3; }
+  /* Back Pocket as a visibly different, darker storage area rather than a
+     second list that only a text heading told apart from Tray -- a sunken
+     pouch shape (inset shadow, darker fill, bottom corners rounder than the
+     top like a drawn drawstring bag) reads as "this is where things are
+     kept" on its own. */
+  .camp-pocket{ position:relative; background:#0d0a07; border:1px solid #000;
+    border-radius:10px 10px 22px 22px; padding:14px 8px 10px; margin-top:4px;
+    box-shadow: inset 0 3px 10px rgba(0,0,0,0.6); }
+  .camp-pocket-count{ position:absolute; top:-9px; left:50%; transform:translateX(-50%);
+    background:var(--stone); border:1.5px solid var(--bg); color:var(--parchment-dim);
+    font-size:10px; font-weight:800; border-radius:9px; padding:1px 8px; }
+  /* Connected swap cue: once a die is picked, the area it came FROM dims
+     (everything but the selection itself) and the area it's going INTO
+     gets a pulsing gold outline -- so the two taps a swap takes read as one
+     continuous gesture aimed at a clear target, not two disconnected clicks
+     into generically-labeled lists. */
   .camp-dice-grid.organize-source{ opacity:0.45; }
   .camp-dice-grid.organize-source .camp-die-tile.organize-selected{ opacity:1; }
   .camp-dice-grid.organize-target{ outline:2px solid var(--gold); outline-offset:4px; border-radius:8px;
+    animation: organize-target-pulse 1.1s ease-in-out infinite; }
+  .camp-pocket.organize-source{ opacity:0.5; }
+  .camp-pocket.organize-source .camp-die-tile.organize-selected{ opacity:1; }
+  .camp-pocket.organize-target{ outline:2px solid var(--gold); outline-offset:4px;
     animation: organize-target-pulse 1.1s ease-in-out infinite; }
   @keyframes organize-target-pulse{
     0%,100%{ box-shadow:0 0 0 0 rgba(212,175,82,0); }
     50%{ box-shadow:0 0 0 5px rgba(212,175,82,0.3); }
   }
-  .reduced-motion .camp-dice-grid.organize-target{ animation:none; box-shadow:0 0 0 3px rgba(212,175,82,0.4); }
-  .camp-subhint.organize-target-label{ color:var(--gold); font-weight:800; }
+  .reduced-motion .camp-dice-grid.organize-target, .reduced-motion .camp-pocket.organize-target{ animation:none; box-shadow:0 0 0 3px rgba(212,175,82,0.4); }
   .organize-swap-arrow{ display:flex; justify-content:center; color:var(--gold); margin:1px 0; }
   .organize-swap-arrow.down{ animation: organize-arrow-bounce-down 0.9s ease-in-out infinite; }
   .organize-swap-arrow.up{ animation: organize-arrow-bounce-up 0.9s ease-in-out infinite; }

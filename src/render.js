@@ -274,20 +274,51 @@ function chevronSVG(size){
 }
 
 const CAMP_CAT_ORDER = ['origin','attack','maneuver','alloy','gilded','magic'];
-const CAMP_CAT_LABEL = {origin:'Origin', attack:'Attack', maneuver:'Maneuver', alloy:'Alloy', gilded:'Gilded', magic:'Magic'};
-// Groups a Tray/Back Pocket list by die category for Organize Dice (Camp),
-// so a crowded Back Pocket reads as sorted piles instead of one shuffled
-// wall of chips. `items` is [{die, idx}], idx being that die's real
-// position in S.tray/S.backPocket -- grouping only changes display order,
-// never the idx each tile carries, so selectOrganize()'s swap-by-index
-// still targets the right die regardless of where it landed visually.
-function groupedCampTilesHTML(items, type){
-  const groups = CAMP_CAT_ORDER
-    .map(cat=>({cat, items: items.filter(it=>it.die.cat===cat)}))
-    .filter(g=>g.items.length);
-  return groups.map(g=>
-    `<div class="camp-group-label">${CAMP_CAT_LABEL[g.cat]}</div>${g.items.map(it=>campDieTileHTML(it.die, type, it.idx)).join('')}`
-  ).join('');
+// Collapses identical dice (same name -- interchangeable, since two
+// "Attack Die I"s have identical faces) in a Tray/Back Pocket list into one
+// card-stack entry, like a deck showing one card face with a count instead
+// of spreading every copy out individually. `items` is [{die, idx}], idx
+// being that die's real position in S.tray/S.backPocket; a stack keeps
+// every index it represents (`indices`) so a tap can swap any one instance
+// -- they're all equivalent -- while the OTHER instances stay put and the
+// stack's count just drops by one on the next render.
+function buildDieStacks(items){
+  const byName = new Map();
+  items.forEach(({die, idx})=>{
+    if(!byName.has(die.name)) byName.set(die.name, {die, indices:[]});
+    byName.get(die.name).indices.push(idx);
+  });
+  return [...byName.values()].sort((a,b)=>{
+    const ai = CAMP_CAT_ORDER.indexOf(a.die.cat), bi = CAMP_CAT_ORDER.indexOf(b.die.cat);
+    if(ai!==bi) return ai-bi;
+    if(a.die.level!=null && b.die.level!=null && a.die.level!==b.die.level) return a.die.level-b.die.level;
+    return a.die.name.localeCompare(b.die.name);
+  });
+}
+// One square tile per stack -- art (LOOT_ART covers every Origin and Loot
+// die) fills the square for anything that has it; the two generic Basic
+// dice (Attack/Maneuver, no unique art) fall back to a short category +
+// tier label instead of their full name, since there's no room to spell
+// "Attack Die I" out in a square this size (the truncation problem Camp
+// used to have). More than one copy gets a layered box-shadow "stack of
+// cards" look plus a corner count badge.
+function campStackTileHTML(stack, type){
+  const { die, indices } = stack;
+  const sel = S.organizeSelection;
+  const isSelected = sel && sel.type===type && indices.includes(sel.idx);
+  const repIdx = indices[0]; // any instance will do -- they're interchangeable
+  const art = LOOT_ART[die.name];
+  const isBasic = die.cat==='attack' || die.cat==='maneuver';
+  const inner = isBasic
+    ? `<span class="camp-die-basic-label">${die.cat==='attack'?'Atk':'Man'}<br>${ROMAN[die.level]}</span>`
+    : (art ? `<img src="${art}" alt="${die.name}">` : `<span class="camp-die-basic-label">${die.name}</span>`);
+  return `<div class="die dietype-${die.cat} camp-die-tile ${indices.length>1?'stacked':''} ${isSelected?'organize-selected':''}" data-camp-type="${type}" data-camp-idx="${repIdx}" title="${die.name}${indices.length>1?` ×${indices.length}`:''}">
+      ${inner}
+      ${indices.length>1?`<span class="camp-stack-badge">${indices.length}</span>`:''}
+    </div>`;
+}
+function campDiceGridHTML(items, type){
+  return buildDieStacks(items).map(stack=>campStackTileHTML(stack, type)).join('');
 }
 
 // The bouncing arrow between Tray and Back Pocket in Organize Dice, shown
@@ -2199,12 +2230,12 @@ function renderCamp(){
       </div>
 
       <div class="camp-section">
-        <h3 class="camp-section-title">Organize Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(click one in each list to swap)</span></h3>
-        <div class="hint camp-subhint ${organizeSel && organizeSel.type==='bp' ? 'organize-target-label':''}" style="margin-top:0;">Tray</div>
+        <h3 class="camp-section-title">Organize Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(tap one in each area to swap)</span></h3>
         <div class="camp-dice-grid ${organizeSel && organizeSel.type==='bp' ? 'organize-target':''} ${organizeSel && organizeSel.type==='tray' ? 'organize-source':''}" id="organize-tray"></div>
         ${organizeSwapArrowHTML()}
-        <div class="hint camp-subhint ${organizeSel && organizeSel.type==='tray' ? 'organize-target-label':''}">Back Pocket <span style="color:var(--parchment-dim);">(${S.backPocket.length} dice)</span></div>
-        ${S.backPocket.length ? `<div class="camp-dice-grid ${organizeSel && organizeSel.type==='tray' ? 'organize-target':''} ${organizeSel && organizeSel.type==='bp' ? 'organize-source':''}" id="organize-bp"></div>` : '<p class="hint camp-empty-hint">Empty — dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one.</p>'}
+        <div class="camp-pocket ${organizeSel && organizeSel.type==='tray' ? 'organize-target':''} ${organizeSel && organizeSel.type==='bp' ? 'organize-source':''}">
+          ${S.backPocket.length ? `<span class="camp-pocket-count" title="Back Pocket">${S.backPocket.length}</span><div class="camp-dice-grid" id="organize-bp"></div>` : '<p class="hint camp-empty-hint" style="margin:0;">Empty — dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one.</p>'}
+        </div>
       </div>
     </div>`;
   document.getElementById('rest-btn').onclick = campRest;
@@ -2236,8 +2267,8 @@ function renderCamp(){
       };
     });
   });
-  document.getElementById('organize-tray').innerHTML = groupedCampTilesHTML(S.tray.map((c,i)=>({die:c.die, idx:i})), 'tray');
-  if(S.backPocket.length) document.getElementById('organize-bp').innerHTML = groupedCampTilesHTML(S.backPocket.map((d,i)=>({die:d, idx:i})), 'bp');
+  document.getElementById('organize-tray').innerHTML = campDiceGridHTML(S.tray.map((c,i)=>({die:c.die, idx:i})), 'tray');
+  if(S.backPocket.length) document.getElementById('organize-bp').innerHTML = campDiceGridHTML(S.backPocket.map((d,i)=>({die:d, idx:i})), 'bp');
   [...document.querySelectorAll('.camp-die-tile')].forEach(tile=>{
     tile.onclick = ()=> selectOrganize(tile.dataset.campType, parseInt(tile.dataset.campIdx));
   });
