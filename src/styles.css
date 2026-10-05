@@ -85,7 +85,11 @@
     border:3px solid var(--stone); background:var(--panel2); overflow:hidden; cursor:pointer; }
   .origin-icon-btn.selected{ border-color: var(--gold); box-shadow: 0 0 0 2px rgba(212,175,82,0.25); }
   .origin-icon-btn.locked{ cursor:default; }
-  .origin-icon-btn img{ width:100%; height:100%; object-fit:cover; object-position:top center; display:block; }
+  /* Zoomed in beyond a plain cover-fit so the tiny picker circle reads as a
+     face, not a shrunk-down full body -- scale anchored to the top so it
+     zooms toward the head instead of the character's center mass. */
+  .origin-icon-btn img{ width:100%; height:100%; object-fit:cover; object-position:top center; display:block;
+    transform: scale(1.8); transform-origin: top center; }
   /* That character's real portrait art, run through brightness(0) so only
      its silhouette shows -- see lockedOriginPortraitHTML(), render.js. */
   .silhouette-img{ filter: brightness(0); opacity:0.8; }
@@ -98,7 +102,7 @@
   .origin-showcase, .class-showcase, .boon-showcase{ background: var(--panel); border:1px solid var(--stone); border-radius:10px; }
   .origin-showcase{ display:flex; flex-direction:column; gap:6px; padding:9px; }
   .origin-showcase-top{ display:flex; gap:12px; align-items:center; }
-  .origin-showcase-portrait{ width:84px; height:84px; border-radius:14px; overflow:hidden; flex-shrink:0; }
+  .origin-showcase-portrait{ width:126px; height:126px; border-radius:18px; overflow:hidden; flex-shrink:0; }
   .origin-showcase-portrait img, .origin-showcase-portrait .mystery-figure{ width:100%; height:100%; object-fit:cover; object-position:top center; }
   .origin-showcase-name-col{ display:flex; flex-direction:column; gap:3px; min-width:0; }
   .origin-showcase-name{ font-size:18px; font-weight:800; color:var(--cream); }
