@@ -963,25 +963,30 @@ function attachLongPressTooltips(selector){
   });
 }
 
-function ensureToastStack(){
-  let stack = document.getElementById('toast-stack');
+// Shared home for every transient overlay -- toast banners, kill callouts,
+// and new-room callouts (see showToast/showKillCallout/showRoomCallout
+// below) -- anchored just below the enemy's card/panel rather than each
+// picking its own spot (toast used to float here already, but kill-callout
+// was dead-center on the whole screen and room-callout was pasted directly
+// over the dice tray -- three different places for what's really the same
+// kind of "here's what just happened" moment). Recomputed on every call
+// since the panel's own height changes (statuses, cycle rows, etc.), and
+// this stack lives outside the templated app.innerHTML so it survives the
+// re-renders that happen between toasts during per-die playback. Falls back
+// to the shrine screen's bare .enc-card (no #enc-panel / dice tray there).
+function ensureFxStack(){
+  let stack = document.getElementById('fx-stack');
   if(!stack){
-    stack = el(`<div id="toast-stack"></div>`);
+    stack = el(`<div id="fx-stack"></div>`);
     document.body.appendChild(stack);
   }
-  // Anchored just below the enemy card/panel (rather than a fixed spot on
-  // the viewport) so it reads as "what the enemy/log just did" instead of
-  // floating in the middle of the dice tray. Recomputed on every call since
-  // the panel's own height changes (statuses, cycle rows, etc.) and this
-  // stack lives outside the templated app.innerHTML (so it survives the
-  // re-renders that happen between toasts during per-die playback).
-  const panel = document.getElementById('enc-panel');
-  if(panel) stack.style.top = `${panel.getBoundingClientRect().bottom + 8}px`;
+  const anchor = document.getElementById('enc-panel') || document.querySelector('.enc-card');
+  if(anchor) stack.style.top = `${anchor.getBoundingClientRect().bottom + 8}px`;
   return stack;
 }
 
 function showToast(text, kind){
-  const stack = ensureToastStack();
+  const stack = ensureFxStack();
   const toast = el(`<div class="toast${kind ? ' toast-'+kind : ''}">${text}</div>`);
   stack.appendChild(toast);
   // The sweep-in/hold/sweep-out is now all one CSS animation (toast-sweep,
@@ -990,37 +995,43 @@ function showToast(text, kind){
   setTimeout(()=>{ if(toast.parentNode) toast.parentNode.removeChild(toast); }, 1150);
 }
 
-// ---- Kill callout: a brief big banner for the two kill moments worth
+// ---- Kill callout: a brief banner for the two kill moments worth
 // distinguishing from an ordinary win -- a Boss/Big Boss going down, and an
 // Overkill -- so they register as they happen instead of only as a status
 // chip on the loot screen afterward. `lines` is an array of {text, cls}
 // (cls picks the visual treatment: 'boss' or 'overkill', plus optional
-// 'sub' on a second line so it pops in slightly after the first). Purely
-// additive on top of whatever renders next (the loot modal, typically). ----
+// 'sub' on a second line so it pops in slightly after the first). Lives in
+// the shared #fx-stack (see ensureFxStack() above) rather than its own
+// dead-center overlay, so it reads as part of the same "what just happened"
+// strip as toasts and room callouts. Purely additive on top of whatever
+// renders next (the loot modal, typically). ----
 function showKillCallout(lines){
+  const stack = ensureFxStack();
   const old = document.getElementById('kill-callout');
   if(old && old.parentNode) old.parentNode.removeChild(old);
   const node = el(`<div id="kill-callout">${lines.map(l=>
     `<div class="kill-callout-line ${l.cls}">${l.text}</div>`).join('')}</div>`);
-  document.body.appendChild(node);
+  stack.appendChild(node);
   setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 1400);
 }
 
 // ---- Room callout: a banner naming whatever's just been stepped into (a
-// regular encounter or a boss), overlaid right on the dice tray -- the
-// thing the player's about to start using -- rather than floating
-// somewhere else on screen. Deliberately a different spot/shape than the
-// dead-center kill callout above, so the two never look like the same
-// kind of moment. Stays up until tapped (rather than timing itself out),
-// so it can't slip by unread. Triggered once per room by renderGame() off
-// the one-shot S.newRoomFx flag set in advanceRoute() (logic.js). ----
+// regular encounter, a boss, or a shrine), now living in the same shared
+// #fx-stack as toasts/kill-callouts (the gap between the enemy panel and
+// the dice tray) instead of being pasted directly over the tray. It still
+// needs to block the board until it's read -- a separate, fully
+// transparent #room-callout-scrim covers the whole screen and catches a
+// tap anywhere to dismiss it, so the "can't act yet" behavior is unchanged
+// even though the banner no longer visually darkens the tray itself. Stays
+// up until tapped (rather than timing itself out), so it can't slip by
+// unread. Triggered once per room by renderGame()/renderShrineEncounter()
+// off the one-shot S.newRoomFx flag set in advanceRoute() (logic.js). ----
 function showRoomCallout(fx, onDismiss){
   const old = document.getElementById('room-callout');
   if(old && old.parentNode) old.parentNode.removeChild(old);
-  // Regular encounters anchor the callout to the dice tray; Shrines have no
-  // tray at all, so fall back to the encounter card itself.
-  const trayWrap = document.querySelector('.tray-wrap') || document.querySelector('.enc-card');
-  if(!trayWrap) return; // shouldn't happen -- renderGame()/renderShrineEncounter() always render one of these first
+  const oldScrim = document.getElementById('room-callout-scrim');
+  if(oldScrim && oldScrim.parentNode) oldScrim.parentNode.removeChild(oldScrim);
+  const stack = ensureFxStack();
   const mainCls = fx.boss ? 'main boss' : 'main';
   const mainText = fx.boss ? '⚠ Boss Encounter' : 'A new room...';
   const node = el(`<div id="room-callout">
@@ -1030,16 +1041,22 @@ function showRoomCallout(fx, onDismiss){
         <div class="room-callout-line hint">Tap to continue</div>
       </div>
     </div>`);
-  trayWrap.appendChild(node);
-  node.addEventListener('click', ()=>{
+  const scrim = el(`<div id="room-callout-scrim"></div>`);
+  document.body.appendChild(scrim);
+  stack.appendChild(node);
+  const dismiss = ()=>{
+    if(scrim.parentNode) scrim.parentNode.removeChild(scrim);
     // When there's a follow-up (e.g. a Shrine revealing its boon), run it
-    // right away -- it calls render() itself, which rebuilds the whole panel
-    // and removes this node along with it, so the fade-out below is moot in
-    // that case and skipped.
-    if(onDismiss){ onDismiss(); return; }
+    // right away -- it calls render() itself, but this node now lives
+    // outside the templated app.innerHTML (in #fx-stack), so render()
+    // rebuilding the panel no longer removes it along with it -- remove it
+    // explicitly before handing off, and skip the fade-out in that case.
+    if(onDismiss){ if(node.parentNode) node.parentNode.removeChild(node); onDismiss(); return; }
     node.classList.add('dismissing');
     setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 200);
-  });
+  };
+  node.addEventListener('click', dismiss);
+  scrim.addEventListener('click', dismiss);
 }
 
 // ---- Sound effects: short generated tones via Web Audio, no external
