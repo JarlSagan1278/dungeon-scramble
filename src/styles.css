@@ -490,33 +490,36 @@
   }
   .die.combo-ripple{ animation: combo-ripple-pulse 0.5s ease-out; z-index:1; }
 
-  /* Live "activated combo" glow: unlike the one-shot ripple above (which
+  /* Live "activated combo" cue: unlike the one-shot ripple above (which
      only fires once a path resolves), this is a standing cue that shows
      BEFORE the player commits to anything -- any Combo die currently
-     touching one or more Hit/Combo neighbors is already worth more than its
-     printed value, so its icon gets a soft gold halo that pulses, growing
-     brighter/bigger/faster across three tiers as the neighbor count (and
-     so the eventual damage multiplier) climbs. Scoped to .face-val so the
-     glow hugs the icon itself rather than the whole tile. */
+     touching one or more Hit/Combo/Shield/H.O.T./D.O.T. neighbors is
+     already worth more than its printed value. Rendered as crisp, hard-edge
+     rings (0-blur box-shadows, not a soft bloom) so it reads like a stat
+     icon's charge/level ring rather than a glow -- tier 2 and 3 add a
+     second concentric ring for a "banded" badge look, stepping up through
+     gold and finally orange as the neighbor count (and so the eventual
+     damage multiplier) climbs. Scoped to .face-val so the rings hug the
+     icon itself rather than the whole tile. */
   .die.combo-active .face-val{ border-radius:50%; }
-  .die.combo-active-1 .face-val{ animation: combo-active-glow-1 2.2s ease-in-out infinite; }
-  .die.combo-active-2 .face-val{ animation: combo-active-glow-2 1.7s ease-in-out infinite; }
-  .die.combo-active-3 .face-val{ animation: combo-active-glow-3 1.3s ease-in-out infinite; }
-  @keyframes combo-active-glow-1{
-    0%,100%{ box-shadow:0 0 0 0 rgba(212,175,82,0.35); }
-    50%{ box-shadow:0 0 5px 3px rgba(212,175,82,0.45); }
+  .die.combo-active-1 .face-val{ animation: combo-active-ring-1 1.8s ease-in-out infinite; }
+  .die.combo-active-2 .face-val{ animation: combo-active-ring-2 1.5s ease-in-out infinite; }
+  .die.combo-active-3 .face-val{ animation: combo-active-ring-3 1.1s ease-in-out infinite; }
+  @keyframes combo-active-ring-1{
+    0%,100%{ box-shadow: 0 0 0 1.5px rgba(212,175,82,0.85); }
+    50%{ box-shadow: 0 0 0 3px rgba(212,175,82,1); }
   }
-  @keyframes combo-active-glow-2{
-    0%,100%{ box-shadow:0 0 0 0 rgba(212,175,82,0.45); }
-    50%{ box-shadow:0 0 9px 5px rgba(212,175,82,0.65); }
+  @keyframes combo-active-ring-2{
+    0%,100%{ box-shadow: 0 0 0 2px rgba(212,175,82,0.9), 0 0 0 4.5px rgba(212,175,82,0.4); }
+    50%{ box-shadow: 0 0 0 2.5px rgba(212,175,82,1), 0 0 0 5.5px rgba(212,175,82,0.6); }
   }
-  @keyframes combo-active-glow-3{
-    0%,100%{ box-shadow:0 0 0 0 rgba(255,140,40,0.5); }
-    50%{ box-shadow:0 0 14px 7px rgba(255,140,40,0.85); }
+  @keyframes combo-active-ring-3{
+    0%,100%{ box-shadow: 0 0 0 2.5px rgba(255,140,40,0.95), 0 0 0 5.5px rgba(255,140,40,0.45); }
+    50%{ box-shadow: 0 0 0 3px rgba(255,140,40,1), 0 0 0 7px rgba(255,140,40,0.7); }
   }
-  .reduced-motion .die.combo-active-1 .face-val{ animation:none; box-shadow:0 0 5px 2px rgba(212,175,82,0.4); }
-  .reduced-motion .die.combo-active-2 .face-val{ animation:none; box-shadow:0 0 8px 3px rgba(212,175,82,0.55); }
-  .reduced-motion .die.combo-active-3 .face-val{ animation:none; box-shadow:0 0 11px 4px rgba(255,140,40,0.7); }
+  .reduced-motion .die.combo-active-1 .face-val{ animation:none; box-shadow: 0 0 0 2px rgba(212,175,82,0.9); }
+  .reduced-motion .die.combo-active-2 .face-val{ animation:none; box-shadow: 0 0 0 2px rgba(212,175,82,0.95), 0 0 0 5px rgba(212,175,82,0.5); }
+  .reduced-motion .die.combo-active-3 .face-val{ animation:none; box-shadow: 0 0 0 2.5px rgba(255,140,40,1), 0 0 0 6px rgba(255,140,40,0.6); }
 
   /* Skill (class ability) conversion flourish: forcing a die's face used to
      be an invisible data mutation -- the tile just showed its new forced
