@@ -229,6 +229,22 @@ function findLootDieByName(name){
   return ALLOY.find(d=>d.name===name) || GILDED.find(d=>d.name===name) || MAGIC.find(d=>d.name===name) || null;
 }
 
+// ---- Reset Progress (Settings) -- wipes every earned-over-time thing so a
+// player can re-experience the unlock curve from scratch: lifetime stats +
+// Achievements (META), the Dice Compendium's discovered set, Run History,
+// favorited boons, and any in-progress run/carryover. Deliberately leaves
+// PREFS (sound/reduced-motion) and the tutorial-seen flag alone -- those
+// are player settings, not progress. Caller reloads the page afterward so
+// every in-memory global (META, DISCOVERED_DICE, S, ...) re-derives from
+// the now-empty storage rather than needing to be reset by hand here.
+function resetAllProgress(){
+  clearSave();
+  clearRunHistory();
+  try{ localStorage.removeItem(CARRYOVER_KEY); } catch(e){}
+  try{ localStorage.removeItem(META_KEY); } catch(e){}
+  try{ localStorage.removeItem(DISCOVERED_DICE_KEY); } catch(e){}
+}
+
 // ---- Debug-mode unlock-everything: fires once when the Setup screen's
 // secret debug-class trigger (5 clicks on "Choose Your Class") is armed --
 // see render.js. Drives every Origin-unlock/Boon-tier gate through its own
@@ -683,7 +699,7 @@ function advanceRoute(){
     S.encounter = drawEncounter('boss');
     scrambleTray();
     S.screen='game';
-    logMsg('sys', `⚠ Boss Encounter: ${S.encounter.name}`);
+    logMsg('sys', `Boss Encounter: ${S.encounter.name}`);
     S.newRoomFx = {name: S.encounter.name, type: S.encounter.type, boss:true};
   }
 }

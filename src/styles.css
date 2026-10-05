@@ -99,7 +99,8 @@
   .origin-showcase-portrait img, .origin-showcase-portrait .mystery-figure{ width:100%; height:100%; object-fit:cover; object-position:top center; }
   .origin-showcase-name-col{ display:flex; flex-direction:column; gap:2px; min-width:0; }
   .origin-showcase-name{ font-size:14px; font-weight:800; color:var(--cream); }
-  .origin-lock-hint{ font-size:11px; color:var(--red); line-height:1.3; }
+  .origin-lock-hint{ font-size:11px; color:var(--red); line-height:1.3; display:flex; align-items:flex-start; gap:4px; }
+  .origin-lock-hint svg{ flex:0 0 auto; margin-top:1px; }
   .origin-die-block{ display:flex; flex-direction:column; gap:5px; }
   .origin-die-block.dim{ filter: grayscale(1) opacity(0.6); }
   .origin-die-head{ display:flex; align-items:flex-start; gap:8px; }
@@ -787,7 +788,9 @@
   .run-history-list{ display:flex; flex-direction:column; gap:6px; max-height:320px; overflow-y:auto; margin:4px 0 14px; text-align:left; }
   .run-history-row{ display:flex; align-items:center; gap:10px; background:var(--panel2); border:1px solid var(--stone); border-radius:6px; padding:7px 10px; }
   .run-history-row.defeat{ opacity:0.75; }
-  .run-history-outcome{ font-size:18px; flex:0 0 auto; }
+  .run-history-outcome{ font-size:18px; flex:0 0 auto; font-weight:800; }
+  .run-history-row.victory .run-history-outcome{ color: var(--green); }
+  .run-history-row.defeat .run-history-outcome{ color: var(--red); }
   .run-history-main{ flex:1 1 auto; min-width:0; }
   .run-history-who{ font-weight:700; font-size:13px; }
   .run-history-detail{ font-size:11px; color:var(--parchment-dim); }

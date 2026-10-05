@@ -232,6 +232,14 @@ function render(){
 
 function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
 
+// One padlock glyph, drawn (not emoji) so every "this is locked" spot in the
+// UI -- the Origin icon badge, its showcase hint, Achievements, the Dice
+// Compendium -- shares the same inked line-art mark instead of a colorful
+// platform-rendered lock emoji that clashes with the parchment/ink palette.
+function lockSVG(size){
+  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>`;
+}
+
 // The landing screen before any game exists: logo/tagline, a lifetime-stats
 // teaser once the player has history, Continue (if a save is sitting there),
 // New Run, and quick links to Achievements/Run History/How to Play. Setup
@@ -375,7 +383,7 @@ function originShowcaseHTML(o, unlocked){
       <div class="origin-showcase-portrait ${unlocked?'':'dim'}">${portraitHTML}</div>
       <div class="origin-showcase-name-col">
         <div class="origin-showcase-name">${o.name}</div>
-        ${unlocked?'':`<div class="origin-lock-hint">🔒 ${ORIGIN_UNLOCK_HINT[o.id]||'Locked.'}</div>`}
+        ${unlocked?'':`<div class="origin-lock-hint">${lockSVG(11)} ${ORIGIN_UNLOCK_HINT[o.id]||'Locked.'}</div>`}
       </div>
     </div>
     <div class="origin-die-block ${unlocked?'':'dim'}">
@@ -483,7 +491,7 @@ function renderSetup(){
         : lockedOriginPortraitHTML(o.id);
       const c = el(`<button type="button" class="origin-icon-btn ${o.id===chosenOrigin?'selected':''} ${unlocked?'':'locked'}" aria-label="${o.name}" title="${o.name}">
           ${portraitHTML}
-          ${unlocked?'':`<span class="origin-lock-badge"><svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg></span>`}
+          ${unlocked?'':`<span class="origin-lock-badge">${lockSVG(9)}</span>`}
         </button>`);
       c.onclick = ()=>{
         previewedOriginId = o.id;
@@ -786,7 +794,7 @@ function renderEncounterCard(e){
   if(e.curDOT) statuses += `<span class="status-chip status-tooltip-target" title="D.O.T. ${e.curDOT}: ${STATUS_DESC.dot}">${iconSpan('dot', e.curDOT)} DOT</span>`;
   if(e.curHOT) statuses += `<span class="status-chip status-tooltip-target" title="H.O.T. ${e.curHOT}: ${STATUS_DESC.hot}">${iconSpan('hot', e.curHOT)} HOT</span>`;
   if(e.curShield) statuses += `<span class="status-chip status-tooltip-target" title="Shield ${e.curShield}: ${STATUS_DESC.shield}">${iconSpan('block', e.curShield)} Shield</span>`;
-  if(e.minionsSpawned) statuses += `<span class="status-chip status-tooltip-target" title="Minions ${e.minionsSpawned}: ${STATUS_DESC.minions}">👹 Minions ${e.minionsSpawned}</span>`;
+  if(e.minionsSpawned) statuses += `<span class="status-chip status-tooltip-target" title="Minions ${e.minionsSpawned}: ${STATUS_DESC.minions}">Minions ${e.minionsSpawned}</span>`;
   // One combined mouseover/long-press tooltip on the health bar itself,
   // listing every status currently affecting this encounter -- so a player
   // can see what Block/D.O.T./H.O.T./etc. actually do without needing a
@@ -985,7 +993,7 @@ function renderGame(){
           <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning)?'disabled':''} ${emphasizeResolve?'pulse':''}" id="resolve-btn">▶<span>Go</span></div>
           <div class="util-btn danger-accent rail-clear ${S.transitioning?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
           ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''}" id="ability-btn">✦<span>${S.classAbilityUsed?'Used':'Skill'}</span></div>`
-            : S.klass.debug ? `<div class="util-btn rail-ability ${(!S.encounter||S.transitioning)?'disabled':''}" id="debug-win-btn">🏆<span>Win</span></div>` : ''}
+            : S.klass.debug ? `<div class="util-btn rail-ability ${(!S.encounter||S.transitioning)?'disabled':''}" id="debug-win-btn">✦<span>Win</span></div>` : ''}
           <div class="char-icon-wrap ${playerFx.cls==='flash-damage'?'dmg-flash':playerFx.cls==='flash-heal'?'heal-flash':''}" title="${S.origin.name} ${S.klass.name}">${(()=>{
             const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
             return portrait.placeholder
@@ -1233,7 +1241,7 @@ function showRoomCallout(fx, onDismiss){
   if(oldScrim && oldScrim.parentNode) oldScrim.parentNode.removeChild(oldScrim);
   const stack = ensureFxStack();
   const mainCls = fx.boss ? 'main boss' : 'main';
-  const mainText = fx.boss ? '⚠ Boss Encounter' : 'A new room...';
+  const mainText = fx.boss ? 'Boss Encounter' : 'A new room...';
   const node = el(`<div id="room-callout">
       <div class="room-callout-box">
         <div class="room-callout-line ${mainCls}">${mainText}</div>
@@ -1585,6 +1593,7 @@ function openSettingsModal(){
         <button id="settings-achievements-btn">Achievements</button>
         <button id="settings-dice-compendium-btn">Dice Compendium</button>
         ${inRun ? '<button id="settings-restart-btn" class="danger">Restart Run</button>' : ''}
+        <button id="settings-reset-progress-btn" class="danger">Reset Progress</button>
         <button id="settings-close-btn">Close</button>
       </div>
       <p class="hint" style="margin:10px 0 0;">v${GAME_VERSION}</p>
@@ -1614,6 +1623,26 @@ function openSettingsModal(){
     openModal(confirmOverlay);
     confirmOverlay.querySelector('#confirm-restart-cancel').onclick = ()=> closeModal(confirmOverlay);
     confirmOverlay.querySelector('#confirm-restart-go').onclick = ()=>{ clearSave(); location.reload(); };
+    confirmOverlay.onclick = (ev)=>{ if(ev.target===confirmOverlay) closeModal(confirmOverlay); };
+  };
+  // Reset Progress: wipes lifetime stats, Achievements, the Dice
+  // Compendium's discovered set, and Run History (resetAllProgress(),
+  // logic.js) so a player can play back through the whole unlock curve --
+  // locked Origins, Starting Boon tiers, everything -- from scratch. Only
+  // sound/reduced-motion prefs and the tutorial-seen flag survive it.
+  overlay.querySelector('#settings-reset-progress-btn').onclick = ()=>{
+    close();
+    const confirmOverlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
+        <h2>Reset Progress?</h2>
+        <p>This permanently erases your lifetime stats, Achievements, Dice Compendium discoveries, and Run History -- locked Origins and Starting Boon tiers go back to locked. Sound and motion settings are kept.${inRun ? ' Your current run will also be lost.' : ''}</p>
+        <div class="small-btn-row" style="justify-content:center;">
+          <button id="confirm-reset-cancel">Cancel</button>
+          <button class="danger" id="confirm-reset-go">Reset Progress</button>
+        </div>
+      </div></div>`);
+    openModal(confirmOverlay);
+    confirmOverlay.querySelector('#confirm-reset-cancel').onclick = ()=> closeModal(confirmOverlay);
+    confirmOverlay.querySelector('#confirm-reset-go').onclick = ()=>{ resetAllProgress(); location.reload(); };
     confirmOverlay.onclick = (ev)=>{ if(ev.target===confirmOverlay) closeModal(confirmOverlay); };
   };
   return overlay;
@@ -1664,7 +1693,7 @@ function openRunHistoryModal(){
   const rows = history.length ? history.map(r=>{
     const dateStr = new Date(r.date).toLocaleDateString(undefined, {month:'short', day:'numeric'});
     return `<div class="run-history-row ${r.outcome}">
-        <span class="run-history-outcome">${r.outcome==='victory' ? '🏆' : '💀'}</span>
+        <span class="run-history-outcome">${r.outcome==='victory' ? '✔' : '✕'}</span>
         <div class="run-history-main">
           <div class="run-history-who">${r.charName?`${r.charName} the `:''}${r.origin} ${r.klass}</div>
           <div class="run-history-detail">Floor ${r.floorReached}/3 &middot; ${r.turnsTaken} turns &middot; ${r.damageDealt} dmg &middot; ${r.overkills} overkill${r.overkills===1?'':'s'}</div>
@@ -1701,7 +1730,7 @@ function openAchievementsModal(){
     const unlocked = META.achievements[a.id];
     const dateStr = unlocked ? new Date(unlocked.date).toLocaleDateString(undefined, {month:'short', day:'numeric'}) : '';
     return `<div class="achv-row ${unlocked?'unlocked':'locked'}">
-        <span class="achv-row-icon">${unlocked?'🏅':'🔒'}</span>
+        <span class="achv-row-icon">${unlocked?'✦':lockSVG(16)}</span>
         <div class="achv-row-main">
           <div class="run-history-who">${a.name}</div>
           <div class="run-history-detail">${a.desc}</div>
@@ -1750,7 +1779,7 @@ function openDiceCompendiumModal(){
         // playthrough -- show that an entry exists without giving away its
         // name, art or faces.
         return `<div class="compendium-row compendium-row-locked">
-            <div class="compendium-thumb compendium-thumb-placeholder">🔒</div>
+            <div class="compendium-thumb compendium-thumb-placeholder">${lockSVG(16)}</div>
             <div class="compendium-main">
               <div class="run-history-who">???</div>
               <div class="compendium-faces hint">Find this die in a run to reveal it.</div>
@@ -2102,12 +2131,12 @@ function renderCamp(){
       </div>
 
       <div class="camp-section">
-        <h3 class="camp-section-title">⚒️ Upgrade Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(1 Attack + 1 Maneuver per Camp)</span></h3>
+        <h3 class="camp-section-title">Upgrade Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(1 Attack + 1 Maneuver per Camp)</span></h3>
         <div class="upgrade-rows-col">${upgradeRows.length? upgradeRows.join('') : '<span class="hint">No matching sets of 3 Basic dice to combine right now.</span>'}</div>
       </div>
 
       <div class="camp-section">
-        <h3 class="camp-section-title">🎒 Organize Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(click one in each list to swap)</span></h3>
+        <h3 class="camp-section-title">Organize Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(click one in each list to swap)</span></h3>
         <div class="hint camp-subhint" style="margin-top:0;">Tray</div>
         <div class="camp-dice-grid" id="organize-tray"></div>
         <div class="hint camp-subhint">Back Pocket <span style="color:var(--parchment-dim);">(${S.backPocket.length} dice)</span></div>
@@ -2177,7 +2206,7 @@ function renderVictory(){
     playTone('grandVictory');
     if(typeof spawnConfettiRain==='function') spawnConfettiRain();
   }
-  app.innerHTML = `<div class="panel"><h2>🏆 Dungeon Conquered!</h2><p>You defeated the Big Boss and cleared all three floors. Well fought, Adventurer.</p>
+  app.innerHTML = `<div class="panel"><h2>Dungeon Conquered!</h2><p>You defeated the Big Boss and cleared all three floors. Well fought, Adventurer.</p>
     ${newAchievementsHTML(S.newAchievements)}
     ${summaryStatsHTML()}
     <button class="primary" style="margin-top:12px;" onclick="location.reload()">Play Again</button></div>`;
@@ -2196,7 +2225,7 @@ function renderGameOver(){
   // way for repeat attempts to compound a little rather than starting from
   // zero every single time.
   if(S.carryoverOptions && S.carryoverOptions.length && !S.carryoverChosenName){
-    app.innerHTML = `<div class="panel"><h2>💀 Defeated</h2>
+    app.innerHTML = `<div class="panel"><h2>Defeated</h2>
       <p>Your Adventurer retreats to town in temporary defeat... but gets to keep one die for next time. Choose a die to carry into your next run:</p>
       <div class="swap-list" id="carryover-list"></div>
       </div>`;
@@ -2215,7 +2244,7 @@ function renderGameOver(){
     return;
   }
   const carryNote = S.carryoverChosenName ? `<p class="hint">${S.carryoverChosenName} will join your tray at the start of your next run.</p>` : '';
-  app.innerHTML = `<div class="panel"><h2>💀 Defeated</h2><p>Your Adventurer retreats to town in temporary defeat...</p>
+  app.innerHTML = `<div class="panel"><h2>Defeated</h2><p>Your Adventurer retreats to town in temporary defeat...</p>
     ${carryNote}
     ${newAchievementsHTML(S.newAchievements)}
     ${summaryStatsHTML()}
@@ -2230,7 +2259,7 @@ function renderGameOver(){
 function newAchievementsHTML(newAchievements){
   if(!newAchievements || !newAchievements.length) return '';
   const rows = newAchievements.map(a=>
-    `<div class="achv-unlock-row"><span class="achv-unlock-icon">🏅</span><div>
+    `<div class="achv-unlock-row"><span class="achv-unlock-icon">✦</span><div>
        <div class="achv-unlock-name">${a.name}</div>
        <div class="achv-unlock-desc">${a.desc}</div>
      </div></div>`).join('');
