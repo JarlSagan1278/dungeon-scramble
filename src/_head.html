@@ -4,5 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dungeon Scramble — Prototype</title>
+<!-- A custom-drawn 5-pip die favicon (gold face, dark pips/border matching
+     the in-game palette) rather than a dice emoji, consistent with the
+     project's own hand-drawn icon style elsewhere (lockSVG, chevronSVG,
+     etc. in render.js). Inlined as a data URI so the shipped file stays a
+     single, fully self-contained HTML document -- no separate .ico/.png
+     asset to lose track of. Shows up as the browser tab icon, and as the
+     file's icon once downloaded, on OSes that read favicons/og tags for
+     saved HTML files. -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect x='4' y='4' width='56' height='56' rx='14' fill='%23d4af52' stroke='%23241c10' stroke-width='4'/><circle cx='19' cy='19' r='6.5' fill='%23241c10'/><circle cx='45' cy='19' r='6.5' fill='%23241c10'/><circle cx='32' cy='32' r='6.5' fill='%23241c10'/><circle cx='19' cy='45' r='6.5' fill='%23241c10'/><circle cx='45' cy='45' r='6.5' fill='%23241c10'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
