@@ -546,7 +546,7 @@ function renderSetup(){
 
       <div class="setup-section">
         <div class="setup-label">Origin</div>
-        <div class="class-tab-row" id="origin-tab-row"></div>
+        <div class="class-tab-row" id="origin-tab-row" style="--class-color:var(--green)"></div>
         <div class="origin-showcase" id="origin-showcase"></div>
       </div>
 
