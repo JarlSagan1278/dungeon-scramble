@@ -2295,8 +2295,8 @@ function renderLootModal(){
   const big = options.length >= 3;
   const overlay = el(`<div class="modal-overlay loot-overlay">
       <div class="modal loot-modal ${S.lootChoice.opened?'':'loot-modal-chest'}">
-      <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
-        <h2 style="margin:0;">${fromShrine ? 'Shrine Boon' : 'Victory!'}</h2>
+      <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:4px;">
+        <h2 style="margin:0; width:100%; text-align:center; padding-right:0;">${fromShrine ? 'Shrine Boon' : 'Victory!'}</h2>
         ${overkill?'<span class="status-chip" style="background:var(--gold);color:#241c10;">Overkill! +1 option</span>':''}
       </div>
       <div id="loot-body"></div>
@@ -2328,7 +2328,7 @@ function renderLootModal(){
           <div class="loot-opt-streaks">${lootStreaksHTML(0.5+i*0.12)}</div>
           ${art?`<img class="loot-art-thumb" src="${art}" alt="${opt.name}"/>`:''}
           ${lootPreviewTileHTML(opt, `loot-${i}`)}
-          <div class="faces">${opt.faces.map(f=>`<span>${iconSpan(f.type, f.value)}${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?f.value:''}</span>`).join('')}</div>
+          <div class="faces faces-dots">${opt.faces.filter(f=>f.type!=='blank').map(f=>`<span class="face-dot" title="${LABEL[f.type]}${f.value?' '+f.value:''}">${iconSpan(f.type, f.value)}${(f.value && !ICON_VALUE_SLOT.has(f.type))?`<b>${f.value}</b>`:''}</span>`).join('')}</div>
         </div>`);
       card.onclick = ()=>{
         if(locked) return;

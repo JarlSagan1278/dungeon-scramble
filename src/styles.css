@@ -1408,3 +1408,10 @@
   .die{ padding-top:17px !important; padding-bottom:3px !important; justify-content:center !important; gap:0; }
   .die .face-val{ font-size: clamp(18px, 10.5cqw, 34px); line-height:1; }
   .die .face-word{ line-height:1.1; margin-top:1px; }
+
+  /* Loot cards: faces as plain icon dots (no text labels, blanks hidden). */
+  .loot-modal .loot-opt .faces-dots{ display:grid; grid-template-columns:repeat(3,auto); justify-content:center; gap:4px; }
+  .loot-modal .loot-opt .faces-dots .face-dot{ display:inline-flex; align-items:center; justify-content:center; gap:1px; min-width:28px; height:28px; padding:0 3px;
+    border-radius:var(--r-pill); background:var(--cream); border:2px solid var(--line); font-size:10px; font-weight:800; color:#241c10; }
+  .loot-modal .loot-opt .faces-dots .icon-svg{ width:20px; height:20px; margin:0; }
+  .loot-modal h2{ border-bottom:none; padding-bottom:0; margin-bottom:6px; text-align:center; }
