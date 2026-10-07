@@ -1014,9 +1014,9 @@ function renderEncounterCard(e){
             ${isBoss ? bossCycle : regularActionsRow}
             <div class="statuses">${statuses}</div>
             ${quests}
+            ${e.flavor?`<div class="enc-flavor">${e.flavor}</div>`:''}
           </div>
         </div>
-        ${e.flavor?`<div class="enc-flavor">${e.flavor}</div>`:''}
       </div>
     </div>`;
 }
