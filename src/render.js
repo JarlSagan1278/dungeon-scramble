@@ -2514,7 +2514,9 @@ function openExportDataModal(){
       a.href = url; a.download = `dungeon-scramble-playdata-${new Date().toISOString().slice(0,10)}.json`;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(()=>URL.revokeObjectURL(url), 4000);
-      status.textContent = 'Download started. If nothing happened, use Copy instead.';
+      // Embedded viewers (e.g. a hosted preview page) silently swallow downloads, so
+      // never claim success -- always offer the text for copying alongside.
+      showText('If a file didn\'t appear, copy the text below instead.');
     } catch(e){ showText('Downloads are blocked here. Copy the text below instead.'); }
   };
   overlay.querySelector('#export-copy-btn').onclick = ()=>{
