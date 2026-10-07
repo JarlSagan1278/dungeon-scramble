@@ -377,6 +377,7 @@ function renderTitle(){
             <button id="title-compendium-btn">Dice Compendium</button>
             <button id="title-howto-btn">How to Play</button>
           </div>
+          <p class="hint" style="text-align:center; margin:10px 0 0; font-size:12px;">Playtesting? After a few runs, tap the gear &rarr; Export Play Data and send the file.</p>
         </div>
       </div>
     </div>
@@ -2762,13 +2763,14 @@ function summaryStatsHTML(){
 // embedded page).
 function openExportDataModal(){
   const data = buildPlayDataExport();
-  const json = JSON.stringify(data, null, 1);
+  let json = JSON.stringify(data, null, 1);
   const runCount = data.runs.length + (data.inProgress ? 1 : 0);
   const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:340px;">
       <button class="modal-x-btn" id="export-x-btn" title="Close">✕</button>
       <h2 style="margin-top:0;">Export Play Data</h2>
       <p class="hint" style="text-align:left;">Helps balance the game. This makes a small file of how your runs went (rooms, loot picks, what beat you). It has no personal info, and <strong>nothing is sent anywhere</strong> unless you choose to share the file.</p>
       <p class="hint">${runCount} run${runCount===1?'':'s'} recorded &middot; ${(json.length/1024).toFixed(0)} KB</p>
+      <textarea id="export-note" maxlength="1500" placeholder="Anything to tell the developer? (too hard, confusing, bug, favorite moment...)" style="width:100%; height:64px; font-size:13px; box-sizing:border-box; margin-bottom:8px;"></textarea>
       <div class="small-btn-row" style="justify-content:center; flex-direction:column;">
         <button class="primary" id="export-download-btn">Download File</button>
         <button id="export-copy-btn">Copy to Clipboard</button>
@@ -2784,9 +2786,12 @@ function openExportDataModal(){
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
   const status = overlay.querySelector('#export-status');
   const ta = overlay.querySelector('#export-text');
-  const showText = (msg)=>{ ta.style.display='block'; ta.value = json; ta.focus(); ta.select(); status.textContent = msg; };
+  const noteEl = overlay.querySelector('#export-note');
+  const refreshJson = ()=>{ data.testerNote = noteEl.value.trim(); json = JSON.stringify(data, null, 1); };
+  const showText = (msg)=>{ refreshJson(); ta.style.display='block'; ta.value = json; ta.focus(); ta.select(); status.textContent = msg; };
   overlay.querySelector('#export-download-btn').onclick = ()=>{
     try{
+      refreshJson();
       const blob = new Blob([json], {type:'application/json'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -2800,6 +2805,7 @@ function openExportDataModal(){
   };
   overlay.querySelector('#export-copy-btn').onclick = ()=>{
     const fallback = ()=> showText('Copy the text below (Select All, then Copy).');
+    refreshJson();
     try{
       if(navigator.clipboard && navigator.clipboard.writeText){
         navigator.clipboard.writeText(json).then(()=>{ status.textContent = 'Copied! Paste it into a message to the developer.'; }, fallback);
@@ -2820,7 +2826,8 @@ function renderVictory(){
   app.innerHTML = `<div class="panel"><h2>Dungeon Conquered!</h2><p>You defeated the Big Boss and cleared all three floors. Well fought, Adventurer.</p>
     ${newAchievementsHTML(S.newAchievements)}
     ${summaryStatsHTML()}
-    <button class="primary" style="margin-top:12px;" onclick="location.reload()">Play Again</button></div>`;
+    <button class="primary" style="margin-top:12px;" onclick="location.reload()">Play Again</button>
+    <button style="margin-top:8px;" onclick="openExportDataModal()">Send Play Data</button></div>`;
   animateSummary();
 }
 function renderGameOver(){
@@ -2860,7 +2867,8 @@ function renderGameOver(){
     ${carryNote}
     ${newAchievementsHTML(S.newAchievements)}
     ${summaryStatsHTML()}
-    <button class="primary" style="margin-top:12px;" onclick="location.reload()">Try Again</button></div>`;
+    <button class="primary" style="margin-top:12px;" onclick="location.reload()">Try Again</button>
+    <button style="margin-top:8px;" onclick="openExportDataModal()">Send Play Data</button></div>`;
 }
 
 // A short "New Achievement" callout block for the post-run screens (shown
