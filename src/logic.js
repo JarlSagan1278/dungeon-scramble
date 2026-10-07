@@ -88,31 +88,40 @@ function grantRelic(id, opts){
 function applyRelicsToSteps(steps, path){
   if(!S.relics || !S.relics.length) return steps;
   const lastDmgStep = ()=>{ for(let i=steps.length-1;i>=0;i--) if(steps[i].dmg>0) return steps[i]; return null; };
+  // tag() records which relic changed a step, so playback can pulse that relic's badge.
+  const tag = (s,id,text)=>{ (s.relicFx = s.relicFx||[]).push({id,text}); };
   if(hasRelic('whetstone')){
     const first = steps.find(s=>s.type==='hit');
-    if(first) first.dmg += 2;
+    if(first){ first.dmg += 2; tag(first,'whetstone','+2'); }
   }
   steps.forEach(s=>{
-    if(hasRelic('venom_vial') && s.dotToEncounter>0) s.dotToEncounter += 1;
-    if(hasRelic('tincture') && s.type==='heal') s.healGain += 1;
+    if(hasRelic('venom_vial') && s.dotToEncounter>0){ s.dotToEncounter += 1; tag(s,'venom_vial','+1 DOT'); }
+    if(hasRelic('tincture') && s.type==='heal'){ s.healGain += 1; tag(s,'tincture','+1'); }
     if(hasRelic('picnic_basket')){
-      if(s.type==='heal') s.healGain += 2;
-      if(s.type==='hot') s.hotToPlayer += 1;
+      if(s.type==='heal'){ s.healGain += 2; tag(s,'picnic_basket','+2'); }
+      if(s.type==='hot'){ s.hotToPlayer += 1; tag(s,'picnic_basket','+1'); }
     }
-    if(hasRelic('spore_satchel') && s.type==='leech'){ s.dotToEncounter += 2; s.hotToPlayer += 1; }
+    if(hasRelic('spore_satchel') && s.type==='leech'){ s.dotToEncounter += 2; s.hotToPlayer += 1; tag(s,'spore_satchel','+2 DOT'); }
   });
-  if(hasRelic('echo_chime') && steps.length>=5){ const t = lastDmgStep(); if(t) t.dmg += 3; }
+  if(hasRelic('echo_chime') && steps.length>=5){ const t = lastDmgStep(); if(t){ t.dmg += 3; tag(t,'echo_chime','+3'); } }
   if(hasRelic('glimmer_dust')){
     const m = steps.filter(s=>s.type==='dodge'||s.type==='leap'||s.type==='pivot').length;
-    const t = lastDmgStep(); if(m>0 && t) t.dmg += m;
+    const t = lastDmgStep(); if(m>0 && t){ t.dmg += m; tag(t,'glimmer_dust','+'+m); }
   }
   return steps;
 }
 
+// Queue a badge pulse + floating text for a relic that just did something; the
+// next render consumes it (consumeRelicPulses, render.js).
+function fireRelic(id, text){
+  if(!S._relicQ) S._relicQ = [];
+  if(S._relicQ.length < 12) S._relicQ.push({id, text});
+}
+
 function applyRelicsOnRoomStart(){
   let block = 0;
-  if(hasRelic('banner')) block += 3;
-  if(hasRelic('forgeplate')) block += 5;
+  if(hasRelic('banner')){ block += 3; fireRelic('banner','+3 Block'); }
+  if(hasRelic('forgeplate')){ block += 5; fireRelic('forgeplate','+5 Block'); }
   if(block>0){ S.playerBlock += block; logMsg('sys', `Relics grant ${block} Block.`, 'good'); }
 }
 
@@ -1168,6 +1177,7 @@ function clearMinionAt(idx){
 // a time instead of jumping straight to the final total.
 function applyPathStep(step){
   const e = S.encounter;
+  if(step.relicFx) step.relicFx.forEach(r=>fireRelic(r.id, r.text));
   if(step.dmg>0){
     e.curHealth = capUpper(e.curHealth-step.dmg, e.maxHealth);
     S.stats.damageDealt += step.dmg;
@@ -1460,7 +1470,7 @@ function runPlayerUpkeep(){
 }
 
 function dealEncounterDamage(e, amount){
-  if(amount>0 && hasRelic('gambeson')) amount = Math.max(0, amount-1);
+  if(amount>0 && hasRelic('gambeson')){ amount = Math.max(0, amount-1); fireRelic('gambeson','-1'); }
   const blocked = Math.min(S.playerBlock, amount);
   S.playerBlock -= blocked;
   const dealt = amount-blocked;
@@ -1686,13 +1696,14 @@ function onEncounterDefeated(){
   // what was needed) adds one extra option to choose from, per the manual's
   // "+1 to the Encounter Loot Reward value."
   const floor = FLOORS[S.floorIdx];
-  const overkill = e.curHealth < (hasRelic('hungry_blade') ? -5 : -9); // curHealth is allowed to go negative (see capUpper) so this is measurable
+  const overkill = e.curHealth < (hasRelic('hungry_blade') ? -5 : -9);
+  if(overkill && hasRelic('hungry_blade') && e.curHealth >= -9) fireRelic('hungry_blade','Overkill!'); // curHealth is allowed to go negative (see capUpper) so this is measurable
   if(overkill) S.stats.overkills++;
   const isBoss = e.type==='Boss' || e.type==='Big Boss';
   let drawCount = isBoss ? 3 : 2;
   if(overkill) drawCount += 1;
-  if(hasRelic('lucky_coin')) drawCount += 1;
-  if(hasRelic('iron_rations')){ S.health = cap(S.health+2, S.maxHealth); logMsg('heal', 'Iron Rations: healed 2.', 'good'); }
+  if(hasRelic('lucky_coin')){ drawCount += 1; fireRelic('lucky_coin','+1 option'); }
+  if(hasRelic('iron_rations')){ S.health = cap(S.health+2, S.maxHealth); logMsg('heal', 'Iron Rations: healed 2.', 'good'); fireRelic('iron_rations','+2 HP'); }
   const options = pickLootNUnused(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
   S.lootChoice = { options, lootName: floor.lootName, overkill };
   teleLog('room_win', {name:e.name, type:e.type, turns:S.turnNumber, ms:S._roomStartedAt?Date.now()-S._roomStartedAt:null, overkill, overBy:Math.max(0,Math.round(-e.curHealth)), hp:S.health});
@@ -1723,7 +1734,16 @@ function onEncounterDefeated(){
     if(typeof playTone==='function') playTone('encounterKill');
     if(typeof spawnParticleBurstAtPortrait==='function') spawnParticleBurstAtPortrait(['#ffd76a','#fff5d6']);
   }
-  render();
+  // Let the enemy visibly die (flash, shake, fade) before the chest takes over the
+  // screen -- the beat between the killing blow and the reward is the anticipation.
+  // State (S.lootChoice etc.) is already set, so this only delays the redraw.
+  const deathCard = (typeof document!=='undefined') ? document.querySelector('#enc-panel .enc-card-col') : null;
+  if(deathCard && !(typeof PREFS!=='undefined' && PREFS.reducedMotion) && S.screen==='game'){
+    deathCard.classList.add('enc-death');
+    setTimeout(()=>{ if(S && S.lootChoice) render(); }, 480);
+  } else {
+    render();
+  }
 }
 
 // Debug-only: instantly clears the current encounter without playing it
@@ -1857,6 +1877,7 @@ function campUpgrade(cat, level){
   }
   S.campUpgrades[cat] = true;
   S.organizeSelection = null; // the Bag/Tray just changed shape; any held selection is now stale
+  S._fuseFx = { name:newDie.name, type: consumedTray.length ? 'tray' : 'bp', idx: consumedTray.length ? consumedTray[0] : S.backPocket.length-1 };
   const label = cat.charAt(0).toUpperCase()+cat.slice(1);
   logMsg('sys', `Upgraded 3 ${label} Die ${ROMAN[level]} into one ${newDie.name}.`, 'good');
   render();
@@ -1896,6 +1917,7 @@ function campRest(){
   let count=0;
   S.tray.forEach(c=>{ if(currentFace(c).type!=='blank') count++; });
   const heal = Math.ceil(count/2) + (hasRelic('kettle') ? 3 : 0);
+  if(hasRelic('kettle')) fireRelic('kettle','+3 HP');
   S.health = cap(S.health+heal, S.maxHealth);
   S.campRested = true;
   logMsg('heal', `Rested: scrambled ${count} actions, healed ${heal}.`, 'good');

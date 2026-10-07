@@ -1450,6 +1450,12 @@ const TONE_SEQUENCES = {
   // Soft tick as each die joins the path (pitch climbs with path length via
   // playTone's pentatonic ladder); a brighter 3-note sparkle when the path's
   // damage badge crosses a tier; and the turn's closing 'tally' chord.
+  relicProc: [{freq:1175,start:0,    dur:0.09, type:'sine',     gain:0.12},
+              {freq:1568,start:0.06, dur:0.12, type:'sine',     gain:0.10}],
+  fuse:      [{freq:392, start:0,    dur:0.1,  type:'triangle', gain:0.16},
+              {freq:587, start:0.09, dur:0.1,  type:'triangle', gain:0.16},
+              {freq:784, start:0.18, dur:0.1,  type:'triangle', gain:0.16},
+              {freq:1175,start:0.27, dur:0.3,  type:'sine',     gain:0.18}],
   pathTick:  [{freq:520, start:0,    dur:0.07, type:'sine',     gain:0.11},
               {freq:1040,start:0.01, dur:0.05, type:'triangle', gain:0.05}],
   tierUp:    [{freq:784, start:0,    dur:0.08, type:'triangle', gain:0.14},
@@ -2296,7 +2302,7 @@ function pickLootOption(overlay, container, chosenCard, opt){
 
 // ---- Relics UI ----
 function relicBadgeHTML(r, extraCls){
-  return `<span class="relic-badge ${r.origin?'relic-origin':''} ${extraCls||''}" title="${r.name}: ${r.desc}">${r.mono}</span>`;
+  return `<span data-relic="${r.id}" class="relic-badge ${r.origin?'relic-origin':''} ${extraCls||''}" title="${r.name}: ${r.desc}">${r.mono}</span>`;
 }
 
 // A compact row of the relics held this run (game board + Camp); tap for details.
@@ -2306,6 +2312,34 @@ function relicStripHTML(){
 }
 function attachRelicStrip(){
   document.querySelectorAll('.relic-strip').forEach(n=>{ n.onclick = openRunRelicsModal; });
+  consumeRelicPulses();
+}
+
+// A relic just did something: its badge pops and a short label floats up (queued by
+// fireRelic(), logic.js). Skipped quietly if the badge isn't on screen.
+function consumeRelicPulses(){
+  const q = S && S._relicQ;
+  if(!q || !q.length) return;
+  S._relicQ = [];
+  if(PREFS.reducedMotion) return;
+  let played = false;
+  q.forEach((r,i)=>{
+    if(!document.querySelector(`.relic-strip [data-relic="${r.id}"]`)) return;
+    setTimeout(()=>{
+      // Effects live in a body-level fixed layer, not inside the badge: the board
+      // re-renders every beat of a turn and would wipe anything attached to it.
+      const b = document.querySelector(`.relic-strip [data-relic="${r.id}"]`);
+      if(!b) return;
+      const rc = b.getBoundingClientRect();
+      const fx = document.createElement('div');
+      fx.className = 'relic-fx';
+      fx.style.left = (rc.left+rc.width/2)+'px'; fx.style.top = (rc.top+rc.height/2)+'px';
+      fx.innerHTML = `<span class="relic-ring"></span><span class="relic-float">${r.text}</span>`;
+      document.body.appendChild(fx);
+      setTimeout(()=>fx.remove(), 950);
+    }, i*120);
+    if(!played){ played = true; if(typeof playTone==='function') playTone('relicProc'); }
+  });
 }
 
 function relicRowHTML(r, locked){
@@ -2577,6 +2611,43 @@ function renderCamp(){
     tile.onclick = ()=> selectOrganize(tile.dataset.campType, parseInt(tile.dataset.campIdx));
   });
   attachLongPressTooltips('.route-tooltip-target');
+  attachRelicStrip();
+  if(S._fuseFx){
+    const fx = S._fuseFx; S._fuseFx = null;
+    const tiles = [...document.querySelectorAll('.camp-die-tile')];
+    // Tiles are stacks of identical dice keyed by their first index, so the new die's
+    // tile is the same-type tile with the largest first-index at or below its slot.
+    const tile = tiles.filter(t=>t.dataset.campType===fx.type && parseInt(t.dataset.campIdx)<=fx.idx)
+                      .sort((a,b)=>parseInt(b.dataset.campIdx)-parseInt(a.dataset.campIdx))[0];
+    if(tile && !PREFS.reducedMotion){
+      tile.classList.add('fuse-flash');
+      tile.id = tile.id || 'fuse-target';
+      spawnParticleBurstAtEl('#'+tile.id, ['#ffd76a','#8fd0ff','#fff5d6']);
+    }
+    if(typeof playTone==='function') playTone('fuse');
+  }
+}
+
+// Run-end tally: the summary chips pop in one by one, each number counting up from
+// 0 with a rising tick, then a closing chord. (Final values are already in the DOM,
+// so Reduce Motion / a failed script just shows the finished numbers.)
+function animateSummary(){
+  if(PREFS.reducedMotion) return;
+  const chips = [...document.querySelectorAll('.sum-chip')];
+  if(!chips.length) return;
+  chips.forEach(c=>c.classList.add('sum-pre'));
+  chips.forEach((c,i)=>{
+    setTimeout(()=>{
+      if(!c.isConnected) return;
+      c.classList.remove('sum-pre'); c.classList.add('sum-pop');
+      if(typeof playTone==='function') playTone('pathTick', i);
+      const n = c.querySelector('.sum-count'); if(!n) return;
+      const to = parseFloat(n.dataset.to)||0, t0 = performance.now(), dur = 420;
+      const tick = (now)=>{ const k=Math.min(1,(now-t0)/dur); n.textContent = Math.round(to*(1-Math.pow(1-k,3))); if(k<1 && n.isConnected) requestAnimationFrame(tick); };
+      requestAnimationFrame(tick);
+    }, 350 + i*260);
+  });
+  setTimeout(()=>{ if(typeof playTone==='function') playTone('tally', 4); }, 350 + chips.length*260 + 200);
 }
 
 function summaryStatsHTML(){
@@ -2585,13 +2656,13 @@ function summaryStatsHTML(){
     <div class="key-card" style="text-align:left;">
       <div class="camp-section-title" style="font-weight:800; text-align:center; margin-bottom:8px;">Run Summary</div>
       <div class="statuses" style="justify-content:center;">
-        <span class="status-chip">Floor reached: ${S.floorIdx+1}/3</span>
-        <span class="status-chip">Turns taken: ${st.turnsTaken}</span>
-        <span class="status-chip">Damage dealt: ${Math.round(st.damageDealt)}</span>
-        <span class="status-chip">Encounters defeated: ${st.encountersDefeated}</span>
-        <span class="status-chip">Shrines visited: ${st.shrinesVisited}</span>
-        <span class="status-chip">Overkills: ${st.overkills}</span>
-        <span class="status-chip">Loot Dice collected: ${st.lootCollected}</span>
+        <span class="status-chip sum-chip">Floor reached: <b class="sum-count" data-to="${S.floorIdx+1}">${S.floorIdx+1}</b>/3</span>
+        <span class="status-chip sum-chip">Turns taken: <b class="sum-count" data-to="${st.turnsTaken}">${st.turnsTaken}</b></span>
+        <span class="status-chip sum-chip">Damage dealt: <b class="sum-count" data-to="${Math.round(st.damageDealt)}">${Math.round(st.damageDealt)}</b></span>
+        <span class="status-chip sum-chip">Encounters defeated: <b class="sum-count" data-to="${st.encountersDefeated}">${st.encountersDefeated}</b></span>
+        <span class="status-chip sum-chip">Shrines visited: <b class="sum-count" data-to="${st.shrinesVisited}">${st.shrinesVisited}</b></span>
+        <span class="status-chip sum-chip">Overkills: <b class="sum-count" data-to="${st.overkills}">${st.overkills}</b></span>
+        <span class="status-chip sum-chip">Loot Dice collected: <b class="sum-count" data-to="${st.lootCollected}">${st.lootCollected}</b></span>
         ${(S.relics||[]).map(id=>`<span class="status-chip">Relic: ${relicById(id).name}</span>`).join('')}
       </div>
     </div>`;
@@ -2662,6 +2733,7 @@ function renderVictory(){
     ${newAchievementsHTML(S.newAchievements)}
     ${summaryStatsHTML()}
     <button class="primary" style="margin-top:12px;" onclick="location.reload()">Play Again</button></div>`;
+  animateSummary();
 }
 function renderGameOver(){
   if(!S.gameOverRecorded){
