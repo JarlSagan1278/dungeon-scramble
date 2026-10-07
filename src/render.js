@@ -1153,11 +1153,6 @@ function renderGame(){
     <div class="panel" id="enc-panel" style="margin-bottom:8px;">
       <div class="enc-rail-row">
         <div class="enc-card-col">${e?renderEncounterCard(e):'<p>No active encounter.</p>'}</div>
-        <div class="util-rail">
-          <div class="util-btn" id="open-key-btn">${iconSpan('key')}<span>Key</span></div>
-          <div class="util-btn" id="open-backpocket-btn">${iconSpan('bag')}<span>Bag</span>${S.backPocket.length?`<span class="badge">${S.backPocket.length}</span>`:''}</div>
-          <div class="util-btn ${totalTokens?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Use</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
-        </div>
       </div>
     </div>
     <div class="panel">
@@ -1173,6 +1168,8 @@ function renderGame(){
         </div>
         <div class="util-rail">
           <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning)?'disabled':''} ${emphasizeResolve?'pulse':''}" id="resolve-btn">▶<span>Go</span></div>
+          <div class="util-btn rail-pocket" id="open-backpocket-btn">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?`<span class="badge">${S.backPocket.length}</span>`:''}</div>
+          <div class="util-btn rail-item ${totalTokens?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Item</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
           <div class="util-btn danger-accent rail-clear ${S.transitioning?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
           ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''} ${abilityArmed?'armed':''}" id="ability-btn">✦<span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
             : S.klass.debug ? `<div class="util-btn rail-ability ${(!S.encounter||S.transitioning)?'disabled':''}" id="debug-win-btn">✦<span>Win</span></div>` : ''}
@@ -1261,7 +1258,7 @@ function renderGame(){
   attachLongPressTooltips('.enemy-action-badge');
   attachLongPressTooltips('.status-tooltip-target');
   attachLongPressTooltips('.route-tooltip-target');
-  document.getElementById('open-key-btn').onclick = ()=> openInfoModal('Action Key', keyCardHTML());
+  { const kb=document.getElementById('open-key-btn'); if(kb) kb.onclick = ()=> openInfoModal('Action Key', keyCardHTML()); }
   document.getElementById('open-backpocket-btn').onclick = ()=> openInfoModal('Back Pocket', backPocketViewHTML());
   document.getElementById('open-tokens-btn').onclick = ()=>{ if(totalTokens>0) openTokensModal(); };
   const abilityBtn = document.getElementById('ability-btn');
@@ -1865,6 +1862,7 @@ function openSettingsModal(){
         <button id="settings-how-to-play-btn">How to Play</button>
         <button id="settings-run-history-btn">Run History</button>
         <button id="settings-achievements-btn">Achievements</button>
+        <button id="settings-key-btn">Action Key</button>
         <button id="settings-export-data-btn">Export Play Data</button>
         <button id="settings-dice-compendium-btn">Dice Compendium</button>
         <button id="settings-relic-codex-btn">Relic Codex</button>
@@ -1882,6 +1880,7 @@ function openSettingsModal(){
   if(logBtn) logBtn.onclick = ()=>{ close(); openInfoModal('Log', logViewHTML()); };
   overlay.querySelector('#settings-how-to-play-btn').onclick = ()=>{ close(); openTutorialModal(0); };
   overlay.querySelector('#settings-run-history-btn').onclick = ()=>{ close(); openRunHistoryModal(); };
+  overlay.querySelector('#settings-key-btn').onclick = ()=>{ close(); openInfoModal('Action Key', keyCardHTML()); };
   overlay.querySelector('#settings-export-data-btn').onclick = ()=>{ close(); openExportDataModal(); };
   overlay.querySelector('#settings-achievements-btn').onclick = ()=>{ close(); openAchievementsModal(); };
   overlay.querySelector('#settings-relic-codex-btn').onclick = ()=>{ close(); openRelicCodexModal(); };

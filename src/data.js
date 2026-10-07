@@ -138,7 +138,7 @@ const TUTORIAL_STEPS = [
   },
   {
     title: "One More Thing",
-    body: "The Key button (next to your Bag and Log) is a full glossary of every icon in the game -- check it any time you forget what something does. Good luck!",
+    body: "The Action Key in Settings (the gear) is a full glossary of every icon in the game -- check it any time you forget what something does. Good luck!",
   },
 ];
 
