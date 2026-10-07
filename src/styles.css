@@ -1,8 +1,8 @@
   :root{
     --bg: #1c1109;
-    --panel: #5a3a20;
-    --panel2: #6b4627;
-    --stone: #4a2f1a;
+    --panel: #3f2813;
+    --panel2: #4c3119;
+    --stone: #3a2412;
     --line: #2a1608;          /* the one outline color used on every border */
     --parchment: #fff1d6;
     --parchment-dim: #e3caa3;
@@ -1060,7 +1060,7 @@
      negative margin-top), so this now has to double as a readability scrim
      behind the buttons, not just a soft transition into the panel color. */
   .title-art-fade{ position:absolute; left:0; right:0; bottom:0; height:190px; pointer-events:none;
-    background: linear-gradient(to bottom, rgba(31,26,21,0) 0%, rgba(31,26,21,0.78) 45%, var(--panel) 100%); }
+    background: linear-gradient(to bottom, rgba(24,13,5,0) 0%, rgba(24,13,5,0.8) 45%, #24130a 100%); }
   .title-content{ position:relative; flex:1; display:flex; flex-direction:column; justify-content:center;
     padding:10px 14px 16px; margin-top:-130px; }
   .title-btn-col{ display:flex; flex-direction:column; gap:7px; width:66%; margin:0 auto; }
@@ -1485,3 +1485,23 @@
   body{ font-family: Georgia,'Iowan Old Style',serif !important; }
   button,.util-btn,.pcf-num,.status-chip,.face-val,.face-word,.chip-num,.name-tag-svg text,.mini-face small,.kill-hint,.new-tag,.round-badge,.boss-cycle-item,.run-total,.class-tab-btn{ font-family:var(--font-ui) !important; }
   
+
+
+  /* ===== Round 5 tweaks ===== */
+  .title-panel{ background:#24130a !important; }
+  .setup-panel .setup-label{ font-size:10px; letter-spacing:1.2px; padding:6px 4px 5px; margin-bottom:2px; }
+  .enc-portrait{ border:none !important; }
+  /* class-ability convert: glow only, no scale (the scale pulse read as the tray resizing) */
+  @keyframes ability-convert-pulse{
+    0%{ box-shadow:0 0 0 0 rgba(212,175,82,0); filter:brightness(1); }
+    30%{ box-shadow:0 0 0 7px rgba(212,175,82,0.65); filter:brightness(1.3); }
+    100%{ box-shadow:0 0 0 0 rgba(212,175,82,0); filter:brightness(1); }
+  }
+  /* damage bubble: lining sans numerals, centered in the badge */
+  .path-counter-float{ align-items:center !important; padding:3px 11px 4px !important; }
+  .pcf-num{ font-family:'Trebuchet MS','Segoe UI',Verdana,Arial,sans-serif !important; line-height:1 !important; }
+  /* path trail: opacity on the whole svg so segment joints don't double-darken */
+  .path-trail-line{ opacity:1 !important; stroke-linejoin:round; }
+  #path-trail-svg{ opacity:0.88; }
+  .path-trail-line{ filter:none !important; }
+  #path-trail-svg{ filter:drop-shadow(0 0 3px rgba(212,175,82,0.65)); }

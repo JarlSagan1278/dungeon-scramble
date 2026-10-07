@@ -124,7 +124,7 @@ function pathTrailAppendSegment(svg, a, b, animate, curved){
     const len = Math.hypot(dx,dy) || 1;
     const ux = dx/len, uy = dy/len;
     const px = -uy, py = ux; // perpendicular unit vector
-    const bow = Math.min(len*0.22, 20);
+    const bow = Math.min(len*0.1, 9);
     const mx = (a.x+b.x)/2 + px*bow, my = (a.y+b.y)/2 + py*bow;
     el = document.createElementNS('http://www.w3.org/2000/svg','path');
     el.setAttribute('d', `M ${a.x},${a.y} Q ${mx},${my} ${b.x},${b.y}`);
