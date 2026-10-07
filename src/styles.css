@@ -1415,3 +1415,13 @@
     border-radius:var(--r-pill); background:var(--cream); border:2px solid var(--line); font-size:10px; font-weight:800; color:#241c10; }
   .loot-modal .loot-opt .faces-dots .icon-svg{ width:20px; height:20px; margin:0; }
   .loot-modal h2{ border-bottom:none; padding-bottom:0; margin-bottom:6px; text-align:center; }
+
+  /* Loot cards: each face as a mini die tile (die color, small icon, name underneath). */
+  .loot-modal .loot-opt .faces-tiles{ display:grid; grid-template-columns:repeat(2,auto); justify-content:center; gap:3px; }
+  .mini-face{ display:flex; flex-direction:column; align-items:center; justify-content:center; width:40px; height:40px; border-radius:var(--r-sm);
+    border:2px solid var(--line); box-shadow:0 2px 0 var(--line); line-height:1; color:#241c10; }
+  .mini-face .icon-svg, .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ width:21px; height:21px; margin:0; }
+  .mini-face small{ font-size:8px; font-weight:900; margin-top:2px; white-space:nowrap; }
+  .mf-attack{ background:#ff5b5b; color:#fff3e6; } .mf-maneuver{ background:#ffe9a8; } .mf-origin{ background:#4a8a5c; color:#eafbea; }
+  .mf-alloy{ background:#9aa3ab; } .mf-gilded{ background:#d9a93a; } .mf-magic{ background:#9a6ad0; color:#fff; }
+  .mini-face.mf-blank{ background:#6b4627; opacity:.45; box-shadow:none; border-style:dashed; }
