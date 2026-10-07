@@ -1435,3 +1435,5 @@
   .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ background:transparent; box-shadow:none; border-radius:0; width:24px; height:24px; color:#241c10; }
   .mf-attack .icon-svg, .mf-magic .icon-svg{ color:#fff !important; }
   .mini-face .icon-value-overlay{ font-size:9px; font-weight:900; }
+  /* Only two loot options: shrink the modal to hug them. */
+  .loot-modal.loot-modal-n2:not(.loot-modal-chest){ max-width:268px; }

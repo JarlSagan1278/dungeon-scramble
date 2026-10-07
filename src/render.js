@@ -2294,7 +2294,7 @@ function renderLootModal(){
   // denser burst below -- reads as "bigger haul", not just a recolor.
   const big = options.length >= 3;
   const overlay = el(`<div class="modal-overlay loot-overlay">
-      <div class="modal loot-modal ${S.lootChoice.opened?'':'loot-modal-chest'}">
+      <div class="modal loot-modal ${S.lootChoice.opened?'':'loot-modal-chest'} ${options.length<=2?'loot-modal-n2':''}">
       <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:4px;">
         <h2 style="margin:0; width:100%; text-align:center; padding-right:0;">${fromShrine ? 'Shrine Boon' : 'Victory!'}</h2>
         ${overkill?'<span class="status-chip" style="background:var(--gold);color:#241c10;">Overkill! +1 option</span>':''}
