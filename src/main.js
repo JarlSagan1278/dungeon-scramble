@@ -10,6 +10,13 @@ window.addEventListener('unhandledrejection', (ev)=>{
 
 document.getElementById('settings-btn').onclick = openSettingsModal;
 applyReducedMotionClass();
+// Existing players: everything already found counts as "seen", so NEW! tags
+// only light up for discoveries made from this version on.
+try{
+  if(localStorage.getItem(SEEN_KEY)===null){
+    saveSeen({ dice:new Set(DISCOVERED_DICE), relics:new Set((META && META.relicsFound)||[]) });
+  }
+}catch(e){}
 
 // Keyboard shortcuts for desktop play: Enter = Go, Backspace/Delete = Clear,
 // and a 4x4 key block (matching the tray's own 4-column grid, row by row)

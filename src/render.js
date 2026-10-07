@@ -809,6 +809,7 @@ function renderDie(cell, idx){
   const num = inPath ? S.path.indexOf(idx)+1 : null;
   const zoneCls = inZone(idx) ? 'zone-cell' : '';
   const shakeCls = S.justScrambled ? 'shaking' : '';
+  const strongGlint = S.justScrambled && !cell.minion && !isBlank && f.value>=3 && (f.type==='hit'||f.type==='combo'||f.type==='heal'||f.type==='block'||f.type==='shield');
   const rippleEntry = S.lastComboRipple && S.lastComboRipple.find(r=>r.idx===idx);
   const rippleCls = rippleEntry ? 'combo-ripple' : '';
   const justConverted = S.justConvertedIdx===idx;
@@ -827,6 +828,7 @@ function renderDie(cell, idx){
   const resolveFx = isResolving ? S.resolvingFx : null;
   const styleParts = [];
   if(S.justScrambled) styleParts.push(`animation-delay:${idx*18}ms`);
+  if(strongGlint) styleParts.push(`--glint-delay:${idx*18+400}ms`);
   else if(rippleEntry) styleParts.push(`animation-delay:${rippleEntry.order*90}ms`);
   if(resolveFx) styleParts.push(`--resolve-color:${RESOLVE_PULSE_COLORS[resolveFx.pulse]||RESOLVE_PULSE_COLORS.move}`);
   const shakeDelay = styleParts.length ? `style="${styleParts.join(';')}"` : '';
@@ -852,7 +854,7 @@ function renderDie(cell, idx){
   // reads as "worth building toward" at a glance.
   const comboAdjCount = f.type==='combo' ? attackNeighborsCount(idx) : 0;
   const comboActiveCls = comboAdjCount>0 ? `combo-active combo-active-${Math.min(comboAdjCount,3)}` : '';
-  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${resolveCls} ${minionClearCls} ${comboActiveCls}"
+  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${strongGlint?'glint-strong':''} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${resolveCls} ${minionClearCls} ${comboActiveCls}"
             data-idx="${idx}" title="${isLastMove?'Click to undo this move':(cell.minion?'Minion die':cell.die.name)}" ${shakeDelay}>
             ${num?`<div class="pathnum">${num}</div>`:''}
             ${(cell.forcedFace || boostTargetCls) ? `<div class="corner-badges">
@@ -904,12 +906,23 @@ function renderEncounterCard(e){
   // Live preview of the currently-built (not-yet-committed) path's damage:
   // a hatched ghost slice at the leading edge of the health bar, so the
   // player can see the projected outcome before tapping Go.
-  let dmgPreviewLeftPct = 0, dmgPreviewWidthPct = 0;
+  let dmgPreviewLeftPct = 0, dmgPreviewWidthPct = 0, killHint = null;
   if(e.maxHealth && S.path && S.path.length && S.encounter===e && !S.transitioning){
     const pathPreview = computePathEffects(S.path);
     const dmgAmt = Math.min(pathPreview.totalDamage, curHealthClamped);
     dmgPreviewWidthPct = dmgAmt/e.maxHealth*100;
     dmgPreviewLeftPct = hpPct - dmgPreviewWidthPct;
+    // Anticipation tied to real numbers: how this path stacks up against a
+    // kill and against the Overkill line (10 past dead, 6 with Hungry Blade).
+    const thr = (typeof hasRelic==='function' && hasRelic('hungry_blade')) ? 5 : 9;
+    const d = pathPreview.totalDamage;
+    const hp = e.curHealth;
+    if(d > hp + thr)      killHint = {state:'overkill', text:'OVERKILL!'};
+    else if(d >= hp && hp > 0) {
+      const more = Math.floor(hp + thr) + 1 - d;
+      killHint = {state:'kill', text:`Lethal${more<=3?` \u00b7 +${more} for Overkill`:''}`};
+    }
+    else if(d > 0 && hp - d > 0 && hp - d <= 3) killHint = {state:'close', text:`So close \u2014 ${Math.ceil(hp-d)} short`};
   }
   const fx = healthFX(curHealthClamped, e._lastHealth);
   e._lastHealth = curHealthClamped;
@@ -983,11 +996,12 @@ function renderEncounterCard(e){
               : (e.type!=='Shrine' ? `<div class="enc-art-wrap">${mysteryFigureHTML('width:70%; aspect-ratio:1/1;')}</div>` : '')}
           </div>
           <div class="enc-vitals">
-            <div class="bar-row status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;"><span>${iconSpan('heal')}</span><div class="bar ${fx.cls}">
+            <div class="bar-row status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;"><span>${iconSpan('heal')}</span><div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
                 <div class="bar-fill hp" style="width:${hpPct}%"></div>
                 ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
                 ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
               </div><span>${curHealthClamped.toFixed(0)}/${e.maxHealth}</span>${fx.deltaHTML}</div>
+            ${killHint?`<div class="kill-hint kill-hint-${killHint.state}" data-hint="${killHint.state}">${killHint.text}</div>`:''}
             ${isBoss ? bossCycle : regularActionsRow}
             <div class="statuses">${statuses}</div>
             ${quests}
@@ -1002,7 +1016,19 @@ function renderEncounterCard(e){
 // Crossing up a tier plays a sparkle once; the digits roll up to each new total.
 let pcfLastTier = 0, pcfLastVal = 0;
 function pcfTierFor(v){ return v>=25 ? 3 : v>=15 ? 2 : v>=8 ? 1 : 0; }
-function resetPathCounterFx(){ pcfLastTier = 0; pcfLastVal = 0; }
+function resetPathCounterFx(){ pcfLastTier = 0; pcfLastVal = 0; khLast = ''; }
+// Plays a cue only when the kill-hint state changes (render() runs a lot).
+let khLast = '';
+function killHintFx(){
+  const n = document.querySelector('.kill-hint[data-hint]');
+  const st = n ? n.dataset.hint : '';
+  if(st === khLast) return;
+  const prev = khLast; khLast = st;
+  if(!st || S.transitioning) return;
+  if(st==='close') playTone('closeCall');
+  else if(st==='kill' && prev!=='overkill') playTone('tierUp', 1);
+  else if(st==='overkill'){ playTone('tierUp', 4); vibrate(20); }
+}
 function rollPathCounter(){
   const n = document.querySelector('.pcf-num[data-to]');
   if(!n) return;
@@ -1161,6 +1187,10 @@ function renderGame(){
     if(S.newRoomFx.boss) vibrate([30,40,30]);
     S.newRoomFx = null; // consumed -- plays once, on the render right after advanceRoute() set it
   }
+  if(S.justScrambled){
+    const strong = document.querySelectorAll('#tray .glint-strong').length;
+    if(strong && !PREFS.reducedMotion) setTimeout(()=> playTone('glint', Math.min(4, strong-1)), 520);
+  }
   S.justScrambled = false;
   S.lastComboRipple = null; // consumed -- plays once, on the render right after runPlayerPathSteps() set it
   S.lastMinionClearIdx = null; // consumed -- plays once, on the render right after runPlayerPathSteps() set it
@@ -1265,6 +1295,7 @@ function renderGame(){
 
   updatePathTrail();
   rollPathCounter();
+  killHintFx();
   attachRelicStrip();
   if(S.lootChoice) renderLootModal();
   if(S.shrineChoice) renderShrineChoiceModal();
@@ -1366,6 +1397,22 @@ function showToast(text, kind){
 // dead-center overlay, so it reads as part of the same "what just happened"
 // strip as toasts and room callouts. Purely additive on top of whatever
 // renders next (the loot modal, typically). ----
+const FLOOR_TITLES = ['The Upper Halls','The Gilded Vaults','The Magic Deep'];
+function showFloorCard(num, _name){
+  const old = document.getElementById('floor-card');
+  if(old) old.remove();
+  const node = el(`<div id="floor-card"><div class="floor-card-box"><div class="floor-card-num">Floor ${num}</div><div class="floor-card-name">${FLOOR_TITLES[num-1]||''}</div></div></div>`);
+  document.body.appendChild(node);
+  setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, PREFS.reducedMotion ? 1100 : 1700);
+}
+
+// Soft tick on every button press (not Go / loot cards, which have their own sounds).
+document.addEventListener('pointerdown', ev=>{
+  const b = ev.target && ev.target.closest && ev.target.closest('button');
+  if(!b || b.disabled || b.id==='resolve-btn' || b.classList.contains('loot-chest-btn')) return;
+  playTone('uiTick');
+}, true);
+
 function showKillCallout(lines){
   const stack = ensureFxStack();
   const old = document.getElementById('kill-callout');
@@ -1456,6 +1503,11 @@ const TONE_SEQUENCES = {
               {freq:587, start:0.09, dur:0.1,  type:'triangle', gain:0.16},
               {freq:784, start:0.18, dur:0.1,  type:'triangle', gain:0.16},
               {freq:1175,start:0.27, dur:0.3,  type:'sine',     gain:0.18}],
+  uiTick:    [{freq:1500,start:0,    dur:0.03, type:'sine',     gain:0.05}],
+  glint:     [{freq:2093,start:0,    dur:0.07, type:'sine',     gain:0.07},
+              {freq:3136,start:0.05, dur:0.1,  type:'sine',     gain:0.06}],
+  closeCall: [{freq:330, start:0,    dur:0.09, type:'sine',     gain:0.1},
+              {freq:330, start:0.14, dur:0.12, type:'sine',     gain:0.1}],
   pathTick:  [{freq:520, start:0,    dur:0.07, type:'sine',     gain:0.11},
               {freq:1040,start:0.01, dur:0.05, type:'triangle', gain:0.05}],
   tierUp:    [{freq:784, start:0,    dur:0.08, type:'triangle', gain:0.14},
@@ -1625,6 +1677,13 @@ function playDiceRollSound(){
     const g = 0.32 * (1-progress*0.65) * (0.75+Math.random()*0.5);
     playNoiseBurst(ctx, now+t, dur, g, 'bandpass', 900+Math.random()*1800, 1+Math.random()*0.8);
   }
+  // Landing click-clacks, timed to the tray's staggered settle (dice land
+  // left-to-right), each a touch higher and crisper than the rattle.
+  const clacks = juiceLow() ? 3 : 6;
+  for(let i=0;i<clacks;i++){
+    const at = 0.26 + i*(0.34/clacks) + Math.random()*0.02;
+    playNoiseBurst(ctx, now+at, 0.03, 0.2, 'highpass', 2400+i*350, 0.7);
+  }
 }
 
 // A sharp, broadband noise "crash" (the breaking/clattering sound of a real
@@ -1653,8 +1712,12 @@ function playPlayerHitSound(){
 // ---- Haptics: a short vibrate on mobile when taking damage or crossing
 // into the low-health danger zone. Silently no-ops where unsupported. ----
 function vibrate(pattern){
+  if(PREFS.vibration===false || PREFS.reducedMotion) return;
   try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){}
 }
+// Low intensity: smaller shakes, fewer particles, no hit-stop. (Reduce Motion
+// still turns movement off entirely.)
+function juiceLow(){ return !!PREFS.lowIntensity; }
 
 function applyReducedMotionClass(){
   document.body.classList.toggle('reduced-motion', !!PREFS.reducedMotion);
@@ -1683,7 +1746,7 @@ function screenShake(intensity){
   if(!wrap) return;
   wrap.classList.remove('screen-shake-big','screen-shake-small');
   void wrap.offsetWidth; // force reflow so re-adding the class restarts the animation
-  wrap.classList.add(intensity==='big' ? 'screen-shake-big' : 'screen-shake-small');
+  wrap.classList.add(intensity==='big' && !juiceLow() ? 'screen-shake-big' : 'screen-shake-small');
 }
 
 // ---- Particle burst: a quick radial confetti-style burst of small colored
@@ -1698,7 +1761,7 @@ function spawnParticleBurst(x, y, palette){
     layer.id = 'particle-layer';
     document.body.appendChild(layer);
   }
-  const n = 16;
+  const n = juiceLow() ? 8 : 16;
   for(let i=0;i<n;i++){
     const chip = document.createElement('div');
     chip.className = 'particle-chip';
@@ -1750,7 +1813,7 @@ function spawnConfettiRain(){
     document.body.appendChild(layer);
   }
   const palette = ['#ffd76a','#ff8a3d','#8fd0ff','#9affa0','#ff6ad5','#fff5d6'];
-  const n = 50;
+  const n = juiceLow() ? 24 : 50;
   for(let i=0;i<n;i++){
     const chip = document.createElement('div');
     chip.className = 'confetti-chip';
@@ -1781,6 +1844,8 @@ function openSettingsModal(){
       <div class="settings-toggles">
         ${settingsToggleRowHTML('pref-sound', 'Sound effects', PREFS.sound)}
         ${settingsToggleRowHTML('pref-reduced-motion', 'Reduce motion', PREFS.reducedMotion)}
+        ${settingsToggleRowHTML('pref-low-intensity', 'Gentler effects (smaller shakes, fewer sparks)', PREFS.lowIntensity)}
+        ${settingsToggleRowHTML('pref-vibration', 'Vibration (phones)', PREFS.vibration!==false)}
       </div>
       <p class="hint" style="text-align:left;">Keyboard: <strong>Enter</strong> Go &middot; <strong>Backspace</strong> Clear &middot; <strong>1234/qwer/asdf/zxcv</strong> tap a tray die (matches its grid position)</p>
       <div class="small-btn-row" style="justify-content:center; flex-direction:column;">
@@ -1812,6 +1877,8 @@ function openSettingsModal(){
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
   overlay.querySelector('#pref-sound').onchange = (ev)=>{ setPref('sound', ev.target.checked); if(ev.target.checked) playTone('hit'); };
   overlay.querySelector('#pref-reduced-motion').onchange = (ev)=> setPref('reducedMotion', ev.target.checked);
+  overlay.querySelector('#pref-low-intensity').onchange = (ev)=> setPref('lowIntensity', ev.target.checked);
+  overlay.querySelector('#pref-vibration').onchange = (ev)=>{ setPref('vibration', ev.target.checked); if(ev.target.checked) vibrate(30); };
   const restartBtn = overlay.querySelector('#settings-restart-btn');
   if(restartBtn) restartBtn.onclick = ()=>{
     close();
@@ -1971,6 +2038,9 @@ function openDiceCompendiumModal(){
     {label:'Gilded', pool:GILDED},
     {label:'Magic', pool:MAGIC},
   ];
+  const seen = loadSeen();
+  const newDice = new Set();
+  tiers.forEach(t=>t.pool.forEach(d=>{ if(DISCOVERED_DICE.has(d.name) && !seen.dice.has(d.name)) newDice.add(d.name); }));
   const totalDice = tiers.reduce((n,t)=>n + t.pool.length, 0);
   const discoveredCount = tiers.reduce((n,t)=>n + t.pool.filter(d=>DISCOVERED_DICE.has(d.name)).length, 0);
   const sections = tiers.map(t=>{
@@ -1996,7 +2066,7 @@ function openDiceCompendiumModal(){
       return `<div class="compendium-row">
           ${thumb}
           <div class="compendium-main">
-            <div class="run-history-who">${d.name}</div>
+            <div class="run-history-who">${d.name}${newDice.has(d.name)?' <span class="new-tag">NEW!</span>':''}</div>
             <div class="compendium-faces">${facesHTML}</div>
           </div>
         </div>`;
@@ -2016,6 +2086,7 @@ function openDiceCompendiumModal(){
       </div>
     </div></div>`);
   openModal(overlay);
+  DISCOVERED_DICE.forEach(n=> seen.dice.add(n)); saveSeen(seen); // viewed -- tags clear next visit
   const close = ()=> closeModal(overlay);
   overlay.querySelector('#compendium-x-btn').onclick = close;
   overlay.querySelector('#compendium-close-btn').onclick = close;
@@ -2248,7 +2319,9 @@ function renderLootModal(){
     let locked = false; // guards against picking a second option once one's chosen
     options.forEach((opt,i)=>{
       const art = LOOT_ART[opt.name];
+      const isNew = (S.lootChoice.fresh||[]).includes(opt.name);
       const card = el(`<div class="loot-opt loot-opt-reveal" style="--loot-tier-color:${accent.color}; --loot-tier-glow:${accent.glow}; animation-delay:${(i*0.1).toFixed(2)}s;">
+          ${isNew?'<span class="new-tag new-tag-card">NEW!</span>':''}
           <div class="loot-opt-streaks">${lootStreaksHTML(0.5+i*0.12)}</div>
           ${art?`<img class="loot-art-thumb" src="${art}" alt="${opt.name}"/>`:''}
           ${lootPreviewTileHTML(opt, `loot-${i}`)}
@@ -2342,9 +2415,9 @@ function consumeRelicPulses(){
   });
 }
 
-function relicRowHTML(r, locked){
+function relicRowHTML(r, locked, isNew){
   if(locked) return `<div class="relic-row relic-row-locked"><span class="relic-badge relic-locked">?</span><div><div class="relic-name">???</div><div class="hint" style="margin:0;">${r.origin?`Win a run as a ${ORIGINS.find(o=>o.id===r.origin).name} to earn this.`:'Not found yet -- look for Relic Shrines.'}</div></div></div>`;
-  return `<div class="relic-row">${relicBadgeHTML(r)}<div><div class="relic-name">${r.name}${r.origin?` <span class="relic-origin-tag">${ORIGINS.find(o=>o.id===r.origin).name} relic</span>`:''}</div><div class="relic-desc">${r.desc}</div></div></div>`;
+  return `<div class="relic-row">${relicBadgeHTML(r)}<div><div class="relic-name">${r.name}${isNew?' <span class="new-tag">NEW!</span>':''}${r.origin?` <span class="relic-origin-tag">${ORIGINS.find(o=>o.id===r.origin).name} relic</span>`:''}</div><div class="relic-desc">${r.desc}</div></div></div>`;
 }
 
 function openRunRelicsModal(){
@@ -2356,11 +2429,13 @@ function openRelicCodexModal(){
   const found = new Set(META.relicsFound||[]);
   const owned = (typeof S!=='undefined' && S && S.relics) ? S.relics : [];
   const isFound = r => found.has(r.id) || owned.includes(r.id) || (r.origin && (META.lifetime.victoriesByOrigin[r.origin]||0)>=1);
-  const section = (title, list)=>`<h3 class="camp-section-title" style="margin:10px 0 4px;">${title}</h3>${list.map(r=>relicRowHTML(r, !isFound(r))).join('')}`;
+  const seenR = loadSeen();
+  const section = (title, list)=>`<h3 class="camp-section-title" style="margin:10px 0 4px;">${title}</h3>${list.map(r=>relicRowHTML(r, !isFound(r), isFound(r) && !seenR.relics.has(r.id))).join('')}`;
   openInfoModal('Relic Codex',
     `<p class="hint" style="text-align:left;">Relics are permanent perks for a single run. Find them at Relic Shrines. Win a run with an Origin and it will start every later run with its own signature relic.</p>`
     + section('Origin Relics', RELICS.filter(r=>r.origin))
     + section('Shrine Relics', RELICS.filter(r=>!r.origin)));
+  RELICS.forEach(r=>{ if(isFound(r)) seenR.relics.add(r.id); }); saveSeen(seenR);
 }
 
 // Relic Shrine: pick 1 of 3 (S.relicChoice, see runShrineEffect 'relicChoice').

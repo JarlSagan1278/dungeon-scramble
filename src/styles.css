@@ -53,7 +53,7 @@
     transition: background .15s, transform .05s;
   }
   button:hover:not(:disabled){ background:#4a3f32; transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-  button:active:not(:disabled){ transform: translateY(1px); box-shadow:none; }
+  button:active:not(:disabled){ transform: translateY(1px) scale(0.95); box-shadow:none; }
   button:disabled{ opacity:0.4; cursor:default; }
   button.primary{ background: var(--gold); color:#241c10; font-weight:bold; }
   button.primary:hover:not(:disabled){ background:#e6c265; }
@@ -467,7 +467,21 @@
     55%{ transform:rotateX(94deg); }
     100%{ transform:rotateX(0deg); }
   }
-  .die.shaking{ animation: flip-tile 0.42s cubic-bezier(.3,.1,.3,1); transform-style:preserve-3d; backface-visibility:hidden; }
+  .die.shaking{ animation: flip-tile 0.5s cubic-bezier(.3,.1,.3,1); transform-style:preserve-3d; backface-visibility:hidden; }
+  /* Landing settle: each die overshoots a touch when it comes back face-up. */
+  @keyframes flip-tile{
+    0%{ transform:rotateX(0deg) scale(1); }
+    40%{ transform:rotateX(94deg) scale(1.08); }
+    52%{ transform:rotateX(94deg) scale(1.08); }
+    78%{ transform:rotateX(-10deg) scale(0.97); }
+    90%{ transform:rotateX(4deg) scale(1.01); }
+    100%{ transform:rotateX(0deg) scale(1); }
+  }
+  /* Strong faces (3+) catch the light as they land. */
+  .die.glint-strong::after{ content:''; position:absolute; inset:0; pointer-events:none; opacity:0;
+    background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,.75) 50%, transparent 70%); transform:translateX(-100%);
+    animation: die-glint .55s ease-out var(--glint-delay,400ms) 1 both; }
+  @keyframes die-glint{ 0%{ opacity:1; transform:translateX(-100%);} 100%{ opacity:0; transform:translateX(100%);} }
 
   /* Whole-tray rattle: plays at the same moment as the per-die flip wave
      above, so a fresh scramble reads as one physical event -- the box
@@ -1321,3 +1335,26 @@
 .sum-chip.sum-pre{ opacity:0; transform:scale(0.6); }
 .sum-chip.sum-pop{ animation: pop-in 0.25s ease-out; }
 .reduced-motion .enc-card-col.enc-death, .reduced-motion .camp-die-tile.fuse-flash{ animation:none; }
+
+  /* ---- Juice pass 3 ---- */
+  .kill-hint{ white-space:nowrap; font-size:10px; font-weight:800; letter-spacing:.4px; margin:2px 0 0 24px; text-transform:uppercase; }
+  .kill-hint-close{ color:#ffb347; animation: kh-tremble .5s ease-in-out infinite; }
+  .kill-hint-kill{ color:#9affa0; }
+  .kill-hint-overkill{ color:#ff8a3d; text-shadow:0 0 8px rgba(255,138,61,.7); animation: kh-pulse .7s ease-in-out infinite; }
+  .bar.bar-close{ box-shadow:0 0 0 1px #ffb347, 0 0 8px rgba(255,179,71,.6); }
+  .bar.bar-kill{ box-shadow:0 0 0 1px #9affa0, 0 0 8px rgba(154,255,160,.5); }
+  .bar.bar-overkill{ box-shadow:0 0 0 1px #ff8a3d, 0 0 12px rgba(255,138,61,.8); animation: kh-pulse .7s ease-in-out infinite; }
+  @keyframes kh-tremble{ 0%,100%{ transform:translateX(0);} 25%{ transform:translateX(-1px);} 75%{ transform:translateX(1px);} }
+  @keyframes kh-pulse{ 0%,100%{ opacity:1;} 50%{ opacity:.65;} }
+  .new-tag{ display:inline-block; background:var(--gold); color:#241c10; font-size:9px; font-weight:900; letter-spacing:.5px; padding:1px 5px; border-radius:999px; vertical-align:middle; animation: new-tag-pop .5s cubic-bezier(.3,1.6,.4,1) both; }
+  .new-tag-card{ position:absolute; top:6px; right:6px; z-index:5; font-size:11px; padding:2px 7px; box-shadow:0 0 10px rgba(255,215,106,.8); }
+  @keyframes new-tag-pop{ from{ transform:scale(0) rotate(-20deg);} to{ transform:scale(1) rotate(0);} }
+  .loot-opt{ position:relative; }
+  #floor-card{ position:fixed; inset:0; z-index:9000; display:flex; align-items:center; justify-content:center; pointer-events:none;
+    background:radial-gradient(ellipse at center, rgba(0,0,0,.55), rgba(0,0,0,0) 70%); animation: floor-card-bg 1.7s ease-out both; }
+  .floor-card-box{ text-align:center; animation: floor-card-in 1.7s cubic-bezier(.2,.9,.3,1) both; }
+  .floor-card-num{ font-size:34px; font-weight:900; color:var(--gold); letter-spacing:4px; text-transform:uppercase; -webkit-text-stroke:1px #241c10; }
+  .floor-card-name{ font-size:15px; color:var(--parchment); letter-spacing:2px; margin-top:4px; }
+  @keyframes floor-card-in{ 0%{ opacity:0; transform:scale(.8);} 18%{ opacity:1; transform:scale(1.04);} 28%{ transform:scale(1);} 80%{ opacity:1;} 100%{ opacity:0; transform:scale(1.06);} }
+  @keyframes floor-card-bg{ 0%{ opacity:0;} 15%{ opacity:1;} 80%{ opacity:1;} 100%{ opacity:0;} }
+  .reduced-motion #floor-card, .reduced-motion .floor-card-box{ animation:none !important; }

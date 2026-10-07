@@ -464,12 +464,25 @@ let DISCOVERED_DICE = loadDiscoveredDice();
 function markDiceDiscovered(dice){
   const list = Array.isArray(dice) ? dice : [dice];
   let changed = false;
+  const fresh = [];
   list.forEach(d=>{
-    if(d && d.name && !DISCOVERED_DICE.has(d.name)){ DISCOVERED_DICE.add(d.name); changed = true; }
+    if(d && d.name && !DISCOVERED_DICE.has(d.name)){ DISCOVERED_DICE.add(d.name); changed = true; fresh.push(d.name); }
   });
   if(changed){
     try{ localStorage.setItem(DISCOVERED_DICE_KEY, JSON.stringify([...DISCOVERED_DICE])); } catch(e){}
   }
+  return fresh; // names found for the very first time (drives the NEW! tags)
+}
+
+// "NEW!" tags in the Compendium / Relic Codex: remember which entries the
+// player has already looked at, so only things found since the last visit glow.
+const SEEN_KEY = 'dungeonScrambleSeen_v1';
+function loadSeen(){
+  try{ const o = JSON.parse(localStorage.getItem(SEEN_KEY)) || {}; return { dice:new Set(o.dice||[]), relics:new Set(o.relics||[]) }; }
+  catch(e){ return { dice:new Set(), relics:new Set() }; }
+}
+function saveSeen(seen){
+  try{ localStorage.setItem(SEEN_KEY, JSON.stringify({ dice:[...seen.dice], relics:[...seen.relics] })); }catch(e){}
 }
 
 // ---- Player prefs (sound / reduced-motion) -- small, separate from the
@@ -477,7 +490,7 @@ function markDiceDiscovered(dice){
 // should survive across runs (including after a run ends and the save is
 // cleared). ----
 const PREFS_KEY = 'dungeonScramblePrefs_v1';
-const DEFAULT_PREFS = { sound: true, reducedMotion: false };
+const DEFAULT_PREFS = { sound: true, reducedMotion: false, lowIntensity: false, vibration: true };
 let PREFS = loadPrefs();
 function loadPrefs(){
   try{
@@ -836,6 +849,7 @@ function advanceRoute(){
       S.route = buildRoute();
       logMsg('sys', `— Floor ${S.floorIdx+1} —`, true);
       if(typeof playTone==='function') playTone('floorUp');
+      if(typeof showFloorCard==='function') showFloorCard(S.floorIdx+1, FLOORS[S.floorIdx].name || '');
       if(typeof spawnParticleBurstAtEl==='function') spawnParticleBurstAtEl('#app', ['#ffd76a','#8fd0ff','#9affa0','#fff5d6']);
     } else {
       S.screen='victory';
@@ -1340,7 +1354,7 @@ function runPlayerPathSteps(steps, i, path, effects){
   // audio) so they land with weight. Skip fast-forwards past all of it.
   const hitTier = step.dmg>=8 ? 3 : step.dmg>=4 ? 2 : step.dmg>=2 ? 1 : 0;
   if(hitTier>0 && typeof impactPulse==='function') impactPulse(hitTier);
-  const hitStop = (typeof PREFS!=='undefined' && PREFS.reducedMotion) ? 0 : [0,0,45,90][hitTier];
+  const hitStop = (typeof PREFS!=='undefined' && (PREFS.reducedMotion||PREFS.lowIntensity)) ? 0 : [0,0,45,90][hitTier];
   const advance = () => { S._pendingTimeout=null; runPlayerPathSteps(steps, i+1, path, effects); };
   S._advance = advance;
   if(S._skipAll) advance();
@@ -1618,7 +1632,7 @@ function runShrineEffect(e, effect){
     }
     case 'tradeLoot': {
       S.lootChoice = { options: pickLootNUnused(lootPoolByName(effect.pool), 3), lootName: effect.pool, overkill:false, fromShrine:true };
-      if(typeof markDiceDiscovered==='function') markDiceDiscovered(S.lootChoice.options);
+      if(typeof markDiceDiscovered==='function') S.lootChoice.fresh = markDiceDiscovered(S.lootChoice.options);
       render(); return;
     }
     case 'randomDieReplace': {
@@ -1708,7 +1722,7 @@ function onEncounterDefeated(){
   S.lootChoice = { options, lootName: floor.lootName, overkill };
   teleLog('room_win', {name:e.name, type:e.type, turns:S.turnNumber, ms:S._roomStartedAt?Date.now()-S._roomStartedAt:null, overkill, overBy:Math.max(0,Math.round(-e.curHealth)), hp:S.health});
   teleLog('loot_offer', {tier:(options[0]&&options[0].cat)||null, overkill, offered:options.map(o=>o.name)});
-  if(typeof markDiceDiscovered==='function') markDiceDiscovered(options);
+  if(typeof markDiceDiscovered==='function') S.lootChoice.fresh = markDiceDiscovered(options);
   // A Boss/Big Boss kill or an Overkill each get a distinct sound + a big
   // callout banner, so the moment registers as it happens instead of only
   // as a status chip on the loot screen that follows.
