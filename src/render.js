@@ -510,10 +510,16 @@ function originShowcaseHTML(o, unlocked){
 // icon (or Dungeoneer's own wrap glyph), in a fixed-height panel so nothing
 // reflows as the player taps between the 4 tabs above it.
 function classShowcaseHTML(k){
+  // A little 4x4 tray with this class's zone lit up in the class color.
+  const cells = [];
+  for(let r=0;r<4;r++) for(let c=0;c<4;c++) cells.push(`<i class="${k.zone(r,c)?'zone':''}"></i>`);
   return `
-    <div class="class-action-icon" style="--class-color:${k.color}">${classActionIconHTML(k)}</div>
+    <div class="class-mini-tray" style="--class-color:${k.color}" title="Your zone is highlighted">${cells.join('')}</div>
     <div class="class-showcase-text">
-      <div class="class-showcase-name" style="--class-color:${k.color}">${k.name}</div>
+      <div class="class-showcase-head">
+        <div class="class-action-icon" style="--class-color:${k.color}">${classActionIconHTML(k)}</div>
+        <div class="class-showcase-name" style="--class-color:${k.color}">${k.name}</div>
+      </div>
       <div class="class-showcase-ability">${k.ability}</div>
     </div>
   `;
@@ -550,8 +556,10 @@ function renderSetup(){
 
       <div class="setup-section">
         <div class="setup-label">Origin</div>
-        <div class="class-tab-row" id="origin-tab-row" style="--class-color:var(--green)"></div>
-        <div class="origin-showcase" id="origin-showcase"></div>
+        <div class="origin-layout">
+          <div class="class-tab-row" id="origin-tab-row" style="--class-color:var(--green)"></div>
+          <div class="origin-showcase" id="origin-showcase"></div>
+        </div>
       </div>
 
       <div class="setup-section">

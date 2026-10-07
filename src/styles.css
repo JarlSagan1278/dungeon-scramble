@@ -1372,7 +1372,7 @@
   /* ================= Toy theme (v1.23) =================
      Chunky outlines, a lip under every pressable thing (drop shadow, so faces
      keep their full size), bright dice on a dark brown ground. */
-  body{ background: radial-gradient(circle at 50% 0%, #4a2f1a 0%, #2a1a0d 55%, #150c05 100%) !important; font-family: var(--font-ui) !important; }
+  body{ background: radial-gradient(circle at 50% -10%, #2a190c 0%, #1a0f06 45%, #0e0702 100%) !important; font-family: var(--font-ui) !important; }
   h1,h2,h3{ text-shadow:0 2px 0 rgba(0,0,0,.4); }
   button{ border:2px solid var(--line) !important; box-shadow:0 4px 0 var(--line) !important; font-weight:800; background:#b9824a; color:#fff; transform:translateY(-2px); margin-bottom:2px; }
   button:hover:not(:disabled){ background:#c8915a; transform:translateY(-3px); }
@@ -1437,3 +1437,44 @@
   .mini-face .icon-value-overlay{ font-size:9px; font-weight:900; }
   /* Only two loot options: shrink the modal to hug them. */
   .loot-modal.loot-modal-n2:not(.loot-modal-chest){ max-width:268px; }
+
+
+  /* ===== QA pass: character select ===== */
+  .setup-panel{ background:#7a5232 !important; }
+  .setup-panel .origin-showcase, .setup-panel .class-showcase, .setup-panel .boon-showcase{ background:#8d6139; }
+  .setup-panel .setup-label{ color:#f1dcb4; }
+  .char-name-input{ color:#ffeab8 !important; text-shadow:0 1px 0 rgba(0,0,0,.35); border-bottom:2px dashed rgba(255,234,184,.45); }
+  .char-name-input::placeholder{ color:rgba(255,234,184,.8); }
+  .char-name-pencil{ color:#ffeab8; }
+  /* Origin: picker column on the left, showcase on the right */
+  .origin-layout{ display:flex; gap:8px; align-items:stretch; }
+  .origin-layout #origin-tab-row{ flex-direction:column; flex:0 0 82px; width:82px; gap:5px; }
+  .origin-layout #origin-tab-row .class-tab-btn{ flex:1 1 0; width:100%; padding:4px 4px; font-size:12px; }
+  .origin-layout .origin-showcase{ flex:1; min-width:0; }
+  .origin-showcase-portrait{ width:96px !important; height:96px !important; border-radius:var(--r-lg) !important; border:3px solid var(--line); background:linear-gradient(#c4a073,#8d6139); box-shadow:inset 0 0 0 2px rgba(255,255,255,.18); }
+  .origin-showcase-portrait img, .origin-showcase-portrait .mystery-figure{ object-fit:contain !important; object-position:center bottom !important; padding:3px; }
+  /* Class: taller panel with a mini tray showing the zone */
+  .class-showcase{ height:auto !important; min-height:118px; align-items:center; gap:12px; padding:10px; }
+  .class-mini-tray{ display:grid; grid-template-columns:repeat(4,1fr); gap:3px; width:96px; flex:0 0 96px; padding:5px; background:#3a2412; border:3px solid var(--line); border-radius:var(--r-md); }
+  .class-mini-tray i{ aspect-ratio:1/1; border-radius:4px; background:#5a3a20; border:1.5px solid rgba(0,0,0,.35); display:block; }
+  .class-mini-tray i.zone{ background:var(--class-color); border-color:var(--line); box-shadow:inset 0 2px 0 rgba(255,255,255,.35), 0 0 6px var(--class-color); }
+  .class-showcase-head{ display:flex; align-items:center; gap:8px; margin-bottom:3px; }
+  .class-showcase-head .class-action-icon{ width:28px; height:28px; font-size:16px; }
+  .class-showcase-name{ font-size:15px; }
+  .class-showcase-ability{ font-size:11.5px; color:#f1dcb4; -webkit-line-clamp:unset; display:block; overflow:visible; }
+
+  /* ===== QA pass: camp dice art shouldn't squash (the tray-die padding was leaking in) ===== */
+  .die.camp-die-tile{ padding:0 !important; justify-content:center !important; }
+  .camp-die-tile img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+
+  /* ===== QA pass: tray buttons in one wide row under the tray (bigger dice, bigger buttons) ===== */
+  .enc-rail-row{ flex-direction:column !important; flex-wrap:nowrap !important; gap:8px !important; }
+  .enc-card-col{ max-width:none !important; width:100%; min-width:0 !important; flex:0 0 auto; }
+  .tray-wrap.tray-wrap-full{ max-width:none !important; }
+  .util-rail{ flex-direction:row !important; width:100% !important; align-items:stretch; gap:8px !important; }
+  .util-btn.rail-clear{ order:1; flex:1 1 0 !important; height:54px !important; font-size:13px !important; }
+  .util-btn.rail-go{ order:2; flex:2.2 1 0 !important; height:54px !important; font-size:24px !important; }
+  .util-btn.rail-ability{ order:3; flex:1 1 0 !important; height:54px !important; font-size:13px !important; }
+  .util-btn.rail-go span, .util-btn.rail-clear span, .util-btn.rail-ability span{ font-size:12px; }
+  .char-icon-wrap{ order:4; flex:0 0 52px !important; margin-left:0 !important; align-self:flex-end; }
+  .setup-panel .class-showcase-name{ color:#fff1d6; text-shadow:0 0 0 var(--class-color); border-bottom:3px solid var(--class-color); padding-bottom:1px; }
