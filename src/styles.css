@@ -1561,3 +1561,5 @@
   /* Loot picker: the item art lives on the big die face itself (the six faces are already shown beside it) */
   .loot-modal .loot-opt .loot-preview-tile{ grid-row:1 / span 2 !important; width:92px !important; height:92px !important; position:relative; }
   .loot-modal .loot-opt .loot-tile-art{ position:absolute; left:50%; top:58%; transform:translate(-50%,-50%); width:54px; height:54px; object-fit:contain; filter:drop-shadow(1px 2px 0 rgba(0,0,0,.35)); pointer-events:none; }
+  /* name arc is drawn on a 63x20 box: scale its height with the wider loot tile so the text isn't stretched */
+  .loot-modal .loot-opt .loot-preview-tile .name-tag{ height:27px; }
