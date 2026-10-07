@@ -2111,6 +2111,41 @@ function lootFanfareHTML(){
     </div>`;
 }
 
+// Hand-built treasure chest for the closed-chest loot phase (renderLootModal):
+// wooden body, bands + lock in the loot tier's metal color, soft tier glow.
+const LOOT_CHEST_METAL = {
+  alloy:  {metal:'#c9ced6', dark:'#8d94a0'},
+  gilded: {metal:'#f0c64a', dark:'#b8902a'},
+  magic:  {metal:'#b583f0', dark:'#7a4bc0'},
+};
+function lootChestSVG(tier){
+  const c = LOOT_CHEST_METAL[tier] || LOOT_CHEST_METAL.alloy;
+  const m=c.metal, d=c.dark, wood='#9a5b26', woodDk='#74421b', woodLt='#b97636';
+  return `<svg class="loot-chest-svg" viewBox="0 0 140 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<defs><radialGradient id="lootChestGlow" cx="50%" cy="60%" r="55%"><stop offset="0" stop-color="${m}" stop-opacity=".55"/><stop offset="1" stop-color="${m}" stop-opacity="0"/></radialGradient></defs>
+<ellipse cx="70" cy="68" rx="68" ry="58" fill="url(#lootChestGlow)"/>
+<ellipse cx="70" cy="118" rx="52" ry="6" fill="#000" opacity=".35"/>
+<g stroke="#000" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M20 64 H120 V108 a5 5 0 0 1-5 5 H25 a5 5 0 0 1-5-5 Z" fill="${wood}"/>
+ <path d="M18 64 V50 C18 28 40 18 70 18 C100 18 122 28 122 50 V64 Z" fill="${woodLt}"/>
+ <path d="M18 64 H122" fill="none"/>
+ <path d="M38 21 V64 H54 V18 C48 18 42 19 38 21Z" fill="${m}"/>
+ <path d="M102 21 V64 H86 V18 C92 18 98 19 102 21Z" fill="${m}"/>
+ <path d="M38 64 V113 H54 V64Z" fill="${m}"/>
+ <path d="M102 64 V113 H86 V64Z" fill="${m}"/>
+ <rect x="58" y="54" width="24" height="26" rx="5" fill="${m}"/>
+ <circle cx="70" cy="64" r="4" fill="#1a1208" stroke="none"/>
+ <path d="M70 66 V74" stroke="#1a1208" stroke-width="3.5" fill="none"/>
+</g>
+<g fill="none" stroke="${woodDk}" stroke-width="2.4" stroke-linecap="round" opacity=".8">
+ <path d="M24 82 H34 M106 82 H116 M24 98 H34 M106 98 H116"/>
+ <path d="M26 36 Q32 28 38 25 M114 36 Q108 28 102 25"/>
+</g>
+<g fill="#fff" opacity=".45"><rect x="42" y="26" width="3" height="30" rx="1.5"/><rect x="90" y="26" width="3" height="30" rx="1.5" opacity=".5"/><rect x="62" y="57" width="3" height="10" rx="1.5"/></g>
+<g fill="${d}" stroke="#000" stroke-width="1.5"><circle cx="46" cy="72" r="2.4"/><circle cx="46" cy="104" r="2.4"/><circle cx="94" cy="72" r="2.4"/><circle cx="94" cy="104" r="2.4"/></g>
+</svg>`;
+}
+
 function renderLootModal(){
   const {options, lootName, overkill, fromShrine} = S.lootChoice;
   const tier = (options[0] && options[0].cat) || 'alloy';
@@ -2167,7 +2202,7 @@ function renderLootModal(){
   // Phase 1: a closed chest to tap. Its glow is the loot's tier color, so the
   // rarity is hinted before it opens. Tapping flips it, then bursts + reveals.
   body.innerHTML = `<button type="button" class="loot-chest-btn" aria-label="Open your loot" style="--loot-tier-color:${accent.color}; --loot-tier-glow:${accent.glow};">
-      <div class="loot-chest"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8Z"/><path d="M3 10V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3"/><path d="M12 10v10"/><circle cx="12" cy="12.5" r="1.4" fill="currentColor" stroke="none"/></svg></div>
+      <div class="loot-chest">${lootChestSVG(tier)}</div>
     </button>`;
   const chestBtn = body.querySelector('.loot-chest-btn');
   chestBtn.onclick = ()=>{

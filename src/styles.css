@@ -1260,3 +1260,7 @@
   67%{ transform:translate(-1px,0) rotate(-1deg); }
   70%{ transform:translate(0,0) rotate(0); }
 }
+/* Illustrated chest (lootChestSVG): no frame box, the art is the button. */
+.loot-modal.loot-modal-chest .loot-chest{ width:100%; height:auto; background:none; border:none; border-radius:0; box-shadow:none;
+  animation: loot-chest-twitch 2.2s ease-in-out infinite; }
+.loot-modal.loot-modal-chest .loot-chest .loot-chest-svg{ width:100%; height:auto; display:block; }
