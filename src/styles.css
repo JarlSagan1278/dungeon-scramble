@@ -1474,11 +1474,10 @@
   .tray-wrap.tray-wrap-full{ max-width:none !important; }
   .util-rail{ flex-direction:column !important; width:62px !important; flex:0 0 62px !important; align-items:stretch; gap:6px !important; }
   .util-btn.rail-ability{ order:1; flex:0 0 auto !important; height:38px !important; font-size:12px !important; }
-  .util-btn.rail-go{ order:2; flex:1 1 auto !important; height:auto !important; min-height:96px; font-size:22px !important; }
+  .util-btn.rail-go{ order:2; flex:1 1 auto !important; height:auto !important; min-height:60px; font-size:22px !important; }
   .util-btn.rail-clear{ order:3; flex:0 0 auto !important; height:38px !important; font-size:12px !important; }
   .util-btn.rail-go span, .util-btn.rail-clear span, .util-btn.rail-ability span{ font-size:10px; }
-  .char-icon-wrap{ order:4; display:flex !important; flex:0 0 58px !important; margin:0 !important; align-self:stretch; min-height:0; padding-top:0 !important; height:58px; overflow:hidden; justify-content:center !important; }
-  .char-icon-wrap .char-icon-img{ transform:scaleX(-1.1) scaleY(1.1) !important; max-height:58px; }
+  .char-icon-wrap{ order:4; display:flex !important; flex:0 0 92px !important; margin-left:-10px !important; align-self:stretch; min-height:0; padding-top:0 !important; justify-content:flex-end !important; overflow:visible; }
   .setup-panel .class-showcase-name{ color:#fff1d6; text-shadow:0 0 0 var(--class-color); border-bottom:3px solid var(--class-color); padding-bottom:1px; }
 
   /* ===== Fonts: Metamorphous for titles/names/banners, MedievalSharp for buttons, numbers, chips and dice labels ===== */
