@@ -1141,7 +1141,7 @@ function renderGame(){
   app.innerHTML = `
     <div class="panel" style="margin-bottom:8px;">
       ${renderRoute()}
-      <div class="bar-row status-tooltip-target" ${playerStatusTip?`title="${playerStatusTip}"`:''} style="position:relative;"><span style="width:70px;">Health</span><div class="bar ${playerFx.cls}"><div class="bar-fill hp player" style="width:${hpPct}%"></div></div><span>${S.health}/${S.maxHealth}</span>${playerFx.deltaHTML}</div>
+      <div class="bar-row status-tooltip-target" ${playerStatusTip?`title="${playerStatusTip}"`:''} style="position:relative;"><span style="flex:0 0 auto;">Health</span><div class="bar ${playerFx.cls}"><div class="bar-fill hp player" style="width:${hpPct}%"></div></div><span>${S.health}/${S.maxHealth}</span>${playerFx.deltaHTML}</div>
       <div class="statuses">
         ${S.playerDOT?`<span class="status-chip status-tooltip-target" title="D.O.T. ${S.playerDOT}: ${STATUS_DESC.dot}">${iconSpan('dot', S.playerDOT)} DOT</span>`:''}
         ${S.playerHOT?`<span class="status-chip status-tooltip-target" title="H.O.T. ${S.playerHOT}: ${STATUS_DESC.hot}">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}
@@ -2637,7 +2637,7 @@ function renderCamp(){
 
       <div class="camp-section camp-status-card">
         ${relicStripHTML()}
-        <div class="bar-row" style="position:relative;"><span style="width:70px;">Health</span><div class="bar ${campFx.cls}"><div class="bar-fill hp player" style="width:${S.health/S.maxHealth*100}%"></div></div><span>${S.health}/${S.maxHealth}</span>${campFx.deltaHTML}</div>
+        <div class="bar-row" style="position:relative;"><span style="flex:0 0 auto;">Health</span><div class="bar ${campFx.cls}"><div class="bar-fill hp player" style="width:${S.health/S.maxHealth*100}%"></div></div><span>${S.health}/${S.maxHealth}</span>${campFx.deltaHTML}</div>
         <div class="camp-fire-wrap">
           <div class="campfire-glow"></div>
           <div class="campfire-logs"></div>
