@@ -1,4 +1,13 @@
 
+// Any uncaught error lands in the play-data log (Settings -> Export Play
+// Data) with its screen, so a tester's "it froze" report comes with a stack.
+window.addEventListener('error', (ev)=>{
+  try{ teleLog('error', {msg:String(ev.message||'').slice(0,200), at:String((ev.error&&ev.error.stack)||'').split('\n').slice(0,3).join(' | ').slice(0,300), screen:S&&S.screen}); }catch(e){}
+});
+window.addEventListener('unhandledrejection', (ev)=>{
+  try{ teleLog('error', {msg:'unhandledrejection: '+String(ev.reason&&ev.reason.message||ev.reason).slice(0,200), screen:S&&S.screen}); }catch(e){}
+});
+
 document.getElementById('settings-btn').onclick = openSettingsModal;
 applyReducedMotionClass();
 

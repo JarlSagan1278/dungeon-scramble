@@ -468,6 +468,11 @@ function loadGame(){
     // ||[] also covers loading a save written before this field existed.
     data.usedLootNames = new Set(data.usedLootNames||[]);
     delete data.classId; delete data.originId;
+    // Heal saves corrupted by an old Organize/Upgrade bug (holes in the Bag,
+    // Tray slots with no die) so a bad save can't brick the run.
+    if(Array.isArray(data.backPocket)) data.backPocket = data.backPocket.filter(Boolean);
+    if(Array.isArray(data.tray)) data.tray.forEach(c=>{ if(c && !c.die) c.die = clone(basic('attack',1)); });
+    data.organizeSelection = null;
     S = data;
     return true;
   }catch(e){ return false; }
@@ -1732,6 +1737,7 @@ function campUpgrade(cat, level){
     }
   }
   S.campUpgrades[cat] = true;
+  S.organizeSelection = null; // the Bag/Tray just changed shape; any held selection is now stale
   const label = cat.charAt(0).toUpperCase()+cat.slice(1);
   logMsg('sys', `Upgraded 3 ${label} Die ${ROMAN[level]} into one ${newDie.name}.`, 'good');
   render();
@@ -1741,6 +1747,13 @@ function campUpgrade(cat, level){
 // either order) to swap them. Clicking two of the same list just changes
 // which one is selected.
 function selectOrganize(type, idx){
+  // A selection can outlive the list it pointed into (e.g. an upgrade
+  // consumed Bag dice after one was selected, so its index now runs past
+  // the end). Drop stale selections and ignore taps on nothing, rather
+  // than swapping a die with `undefined` and corrupting the Tray/Bag.
+  const listFor = t => t==='tray' ? S.tray : S.backPocket;
+  if(S.organizeSelection && !listFor(S.organizeSelection.type)[S.organizeSelection.idx]) S.organizeSelection = null;
+  if(!listFor(type)[idx]){ render(); return; }
   if(!S.organizeSelection){ S.organizeSelection = {type, idx}; render(); return; }
   const sel = S.organizeSelection;
   if(sel.type===type){ S.organizeSelection = {type, idx}; render(); return; }
@@ -1748,6 +1761,7 @@ function selectOrganize(type, idx){
   const bpIdx = type==='bp' ? idx : sel.idx;
   const trayCell = S.tray[trayIndex];
   const bpDie = S.backPocket[bpIdx];
+  if(!trayCell || !trayCell.die || !bpDie){ S.organizeSelection = null; render(); return; }
   S.backPocket[bpIdx] = trayCell.die;
   trayCell.die = bpDie;
   trayCell.faceIdx = 0;
