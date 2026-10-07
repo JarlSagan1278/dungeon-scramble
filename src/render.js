@@ -1726,6 +1726,7 @@ function openSettingsModal(){
         <button id="settings-how-to-play-btn">How to Play</button>
         <button id="settings-run-history-btn">Run History</button>
         <button id="settings-achievements-btn">Achievements</button>
+        <button id="settings-export-data-btn">Export Play Data</button>
         <button id="settings-dice-compendium-btn">Dice Compendium</button>
         ${inRun ? '<button id="settings-restart-btn" class="danger">Restart Run</button>' : ''}
         <button id="settings-reset-progress-btn" class="danger">Reset Progress</button>
@@ -1741,6 +1742,7 @@ function openSettingsModal(){
   if(logBtn) logBtn.onclick = ()=>{ close(); openInfoModal('Log', logViewHTML()); };
   overlay.querySelector('#settings-how-to-play-btn').onclick = ()=>{ close(); openTutorialModal(0); };
   overlay.querySelector('#settings-run-history-btn').onclick = ()=>{ close(); openRunHistoryModal(); };
+  overlay.querySelector('#settings-export-data-btn').onclick = ()=>{ close(); openExportDataModal(); };
   overlay.querySelector('#settings-achievements-btn').onclick = ()=>{ close(); openAchievementsModal(); };
   overlay.querySelector('#settings-dice-compendium-btn').onclick = ()=>{ close(); openDiceCompendiumModal(); };
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
@@ -2473,6 +2475,56 @@ function summaryStatsHTML(){
         <span class="status-chip">Loot Dice collected: ${st.lootCollected}</span>
       </div>
     </div>`;
+}
+
+// Settings -> Export Play Data: nothing is uploaded; this just packages the
+// on-device telemetry (see buildPlayDataExport(), logic.js) as a file to
+// download, or as text to copy when downloads are blocked (e.g. inside an
+// embedded page).
+function openExportDataModal(){
+  const data = buildPlayDataExport();
+  const json = JSON.stringify(data, null, 1);
+  const runCount = data.runs.length + (data.inProgress ? 1 : 0);
+  const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:340px;">
+      <button class="modal-x-btn" id="export-x-btn" title="Close">✕</button>
+      <h2 style="margin-top:0;">Export Play Data</h2>
+      <p class="hint" style="text-align:left;">Helps balance the game. This makes a small file of how your runs went (rooms, loot picks, what beat you). It has no personal info, and <strong>nothing is sent anywhere</strong> unless you choose to share the file.</p>
+      <p class="hint">${runCount} run${runCount===1?'':'s'} recorded &middot; ${(json.length/1024).toFixed(0)} KB</p>
+      <div class="small-btn-row" style="justify-content:center; flex-direction:column;">
+        <button class="primary" id="export-download-btn">Download File</button>
+        <button id="export-copy-btn">Copy to Clipboard</button>
+        <button id="export-close-btn">Close</button>
+      </div>
+      <p class="hint" id="export-status" style="min-height:1.2em;"></p>
+      <textarea id="export-text" readonly style="display:none; width:100%; height:110px; font-size:10px;"></textarea>
+    </div></div>`);
+  openModal(overlay);
+  const close = ()=> closeModal(overlay);
+  overlay.querySelector('#export-x-btn').onclick = close;
+  overlay.querySelector('#export-close-btn').onclick = close;
+  overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
+  const status = overlay.querySelector('#export-status');
+  const ta = overlay.querySelector('#export-text');
+  const showText = (msg)=>{ ta.style.display='block'; ta.value = json; ta.focus(); ta.select(); status.textContent = msg; };
+  overlay.querySelector('#export-download-btn').onclick = ()=>{
+    try{
+      const blob = new Blob([json], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `dungeon-scramble-playdata-${new Date().toISOString().slice(0,10)}.json`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 4000);
+      status.textContent = 'Download started. If nothing happened, use Copy instead.';
+    } catch(e){ showText('Downloads are blocked here. Copy the text below instead.'); }
+  };
+  overlay.querySelector('#export-copy-btn').onclick = ()=>{
+    const fallback = ()=> showText('Copy the text below (Select All, then Copy).');
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(json).then(()=>{ status.textContent = 'Copied! Paste it into a message to the developer.'; }, fallback);
+      } else fallback();
+    } catch(e){ fallback(); }
+  };
 }
 
 function renderVictory(){

@@ -67,6 +67,87 @@ function highestTierTrayGroups(){
   return groups;
 }
 
+// ---- Play telemetry -- an anonymous, on-device log of how each run
+// actually went (rooms, turns, loot offered vs. picked, what ended the run),
+// so playtest sessions can be turned into balance data. NOTHING is sent
+// anywhere: finished runs pile up in localStorage and the player can export
+// them as a file from Settings -> Export Play Data (see render.js) and send
+// that file along. Deliberately excludes the player's typed character name;
+// the only identifier is a random per-device id so several files from one
+// tester can be grouped. Best-effort throughout -- never allowed to throw
+// into gameplay. ----
+const TELE_KEY = 'dungeonScrambleTelemetry_v1';
+const TELE_PLAYER_KEY = 'dungeonScrambleTelePlayer_v1';
+const MAX_TELE_RUNS = 40;
+const MAX_TELE_EVENTS = 2500;
+
+function getTelePlayerId(){
+  try{
+    let id = localStorage.getItem(TELE_PLAYER_KEY);
+    if(!id){
+      id = 'p-' + Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4);
+      localStorage.setItem(TELE_PLAYER_KEY, id);
+    }
+    return id;
+  } catch(e){ return 'p-unknown'; }
+}
+
+function getTelemetryRuns(){
+  try{ return JSON.parse(localStorage.getItem(TELE_KEY)) || []; }
+  catch(e){ return []; }
+}
+
+function newTelemetry(){
+  return { runId: 'r-' + Date.now().toString(36) + Math.random().toString(36).slice(2,6), startedAt: Date.now(), version: (typeof GAME_VERSION!=='undefined'?GAME_VERSION:''), events: [] };
+}
+
+// One event: {t: ms since run start, f: floor, s: route step, e: type, ...data}
+function teleLog(type, data){
+  try{
+    if(typeof S==='undefined' || !S) return;
+    if(!S.tele) S.tele = newTelemetry(); // older saves that predate telemetry
+    if(S.tele.events.length >= MAX_TELE_EVENTS) return;
+    S.tele.events.push({ t: Date.now()-S.tele.startedAt, f: S.floorIdx+1, s: S.routeStep, e: type, ...(data||{}) });
+  } catch(err){ /* telemetry must never break the game */ }
+}
+
+function finalizeTelemetry(outcome){
+  try{
+    if(!S.tele) S.tele = newTelemetry();
+    teleLog('run_end', {outcome});
+    const rec = {
+      runId: S.tele.runId, startedAt: S.tele.startedAt, endedAt: Date.now(), version: S.tele.version,
+      origin: S.origin.name, klass: S.klass.name, outcome, floorReached: S.floorIdx+1,
+      stats: {...S.stats, damageDealt: Math.round(S.stats.damageDealt)},
+      events: S.tele.events,
+    };
+    const list = getTelemetryRuns();
+    list.push(rec);
+    while(list.length > MAX_TELE_RUNS) list.shift();
+    localStorage.setItem(TELE_KEY, JSON.stringify(list));
+  } catch(e){ /* storage full/unavailable */ }
+}
+
+// Everything a tester needs to hand over: finished runs, the in-progress
+// run (if any), and lifetime totals.
+function buildPlayDataExport(){
+  const runs = getTelemetryRuns();
+  let inProgress = null;
+  try{
+    if(S && S.tele && S.screen!=='victory' && S.screen!=='gameover' && S.origin){
+      inProgress = { runId:S.tele.runId, startedAt:S.tele.startedAt, version:S.tele.version, origin:S.origin.name, klass:S.klass.name,
+        outcome:'in_progress', floorReached:S.floorIdx+1, stats:{...S.stats, damageDealt:Math.round(S.stats.damageDealt)}, events:S.tele.events };
+    }
+  } catch(e){}
+  return {
+    game: 'Dungeon Scramble', exportFormat: 1, version: (typeof GAME_VERSION!=='undefined'?GAME_VERSION:''),
+    exportedAt: new Date().toISOString(), playerId: getTelePlayerId(),
+    device: { viewport: [window.innerWidth, window.innerHeight], touch: ('ontouchstart' in window) },
+    lifetime: META.lifetime, achievementsUnlocked: Object.keys(META.achievements||{}),
+    runs, inProgress,
+  };
+}
+
 // ---- Run history -- a small persisted log of finished runs (win or lose),
 // separate from the save file (which only tracks the CURRENT in-progress
 // run and is cleared the moment a run ends). Survives across runs so a
@@ -82,6 +163,7 @@ function getRunHistory(){
 // Called once when a run ends (victory or defeat), before the save file is
 // cleared, so it can pull the run's final stats off S.
 function recordRunHistory(outcome){
+  finalizeTelemetry(outcome);
   try{
     const list = getRunHistory();
     list.unshift({
@@ -529,11 +611,13 @@ function newGame(originId, classId, boonDieName, charName){
     usedLootNames: new Set([carryDie && carryDie.name, appliedBoonName].filter(Boolean)),
     _lastPlayerHealth: 20, // for the heal/damage flash effect on the health bar
     stats: { turnsTaken:0, damageDealt:0, encountersDefeated:0, shrinesVisited:0, overkills:0, lootCollected:0 },
+    tele: newTelemetry(),
     campRested: false,
     shrineResult: null,
     segmentShrineUsed: false,
     segmentTrapUsed: false,
   };
+  teleLog('run_start', {origin:origin.name, klass:klass.name, carry:carryDie?carryDie.name:null, boon:boonDieName||null, tray:S.tray.map(c=>c.die.name)});
   logMsg('sys', `A ${origin.name} ${klass.name} descends into the dungeon...`);
   if(carryDie) logMsg('sys', `${carryDie.name} joins your tray, carried over from your last run.`, 'good');
   if(boonDieName && !klass.debug && findLootDieByName(boonDieName)) logMsg('sys', `${boonDieName} joins your tray as your Starting Boon.`, 'good');
@@ -687,6 +771,7 @@ function advanceRoute(){
     S.organizeSelection = null;
     S.campUpgrades = {attack:false, maneuver:false};
     S.campRested = false;
+    teleLog('room_start', {type:'Camp', hp:S.health, maxHp:S.maxHealth});
     // a new segment (the stretch of rooms up to the next Camp or the Boss)
     // starts fresh -- one Shrine and one Trap are allowed per segment
     S.segmentShrineUsed = false;
@@ -701,6 +786,7 @@ function advanceRoute(){
       S.screen = 'shrine';
       S.shrineResult = null;
       logMsg('sys', `A door creaks open: ${drawn.name} (${drawn.type})`);
+      teleLog('room_start', {type:'Shrine', name:drawn.name, hp:S.health, maxHp:S.maxHealth});
       S.stats.shrinesVisited++;
       // Shrines skipped the same "A new room..." callout regular encounters
       // get, so stepping into one gave no sense of having entered anything --
@@ -726,6 +812,8 @@ function advanceRoute(){
     // every enc-to-enc and enc-to-boss transition within a segment.
     scrambleTray();
     S.screen='game';
+    S._roomStartedAt = Date.now();
+    teleLog('room_start', {type:drawn.type, name:drawn.name, enemyHp:drawn.maxHealth, hp:S.health, maxHp:S.maxHealth});
     logMsg('sys', `A door creaks open: ${drawn.name} (${drawn.type})`);
     // One-shot "new room" flourish -- read by renderGame()/renderEncounterCard()
     // on the very next render (a card entrance animation + a banner callout +
@@ -735,6 +823,8 @@ function advanceRoute(){
     S.encounter = drawEncounter('boss');
     scrambleTray();
     S.screen='game';
+    S._roomStartedAt = Date.now();
+    teleLog('room_start', {type:S.encounter.type, name:S.encounter.name, enemyHp:S.encounter.maxHealth, hp:S.health, maxHp:S.maxHealth});
     logMsg('sys', `Boss Encounter: ${S.encounter.name}`);
     S.newRoomFx = {name: S.encounter.name, type: S.encounter.type, boss:true};
   }
@@ -1116,6 +1206,7 @@ function startTurnTransition(){
   S._skipAll = false;
   S._hitStreak = 0; // climbing pitch for consecutive damage-dealing dice this turn -- see playStepTone()
   S.stats.turnsTaken++;
+  teleLog('turn', {n:S.turnNumber, len:S.path.length, hp:S.health, enemy:S.encounter?S.encounter.name:null, enemyHp:S.encounter?Math.round(S.encounter.curHealth):null});
   S.pendingFreeBoost = 0; // a free Boost token is spent by end of turn whether or not it landed on anything
   const path = S.path.slice();
   const steps = computePathSteps(path);
@@ -1480,6 +1571,8 @@ function onEncounterDefeated(){
   if(overkill) drawCount += 1;
   const options = pickLootNUnused(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
   S.lootChoice = { options, lootName: floor.lootName, overkill };
+  teleLog('room_win', {name:e.name, type:e.type, turns:S.turnNumber, ms:S._roomStartedAt?Date.now()-S._roomStartedAt:null, overkill, overBy:Math.max(0,Math.round(-e.curHealth)), hp:S.health});
+  teleLog('loot_offer', {tier:(options[0]&&options[0].cat)||null, overkill, offered:options.map(o=>o.name)});
   if(typeof markDiceDiscovered==='function') markDiceDiscovered(options);
   // A Boss/Big Boss kill or an Overkill each get a distinct sound + a big
   // callout banner, so the moment registers as it happens instead of only
@@ -1526,6 +1619,7 @@ function chooseLoot(dieOption){
   // the current screen, see renderSwapModal()/render() in render.js) --
   // there's no dedicated S.screen value for it, so whatever screen was
   // showing (normally 'game') just stays put underneath.
+  teleLog('loot_pick', {picked:dieOption.name, tier:dieOption.cat||null, offered:S.lootChoice?S.lootChoice.options.map(o=>o.name):null, shrine:!!(S.lootChoice&&S.lootChoice.fromShrine)});
   S.pendingLootDie = dieOption;
   S.lootChoice = null;
   render();
@@ -1533,6 +1627,7 @@ function chooseLoot(dieOption){
 
 function swapInLootDie(trayIndex){
   const cell = S.tray[trayIndex];
+  teleLog('loot_equip', {equipped:S.pendingLootDie.name, replaced:cell.die.name});
   S.backPocket.push(cell.die);
   cell.die = { name: S.pendingLootDie.name, faces: S.pendingLootDie.faces, cat: S.pendingLootDie.cat || 'loot' };
   cell.faceIdx = 0;
@@ -1552,6 +1647,7 @@ function swapInLootDie(trayIndex){
 }
 
 function onPlayerDefeated(){
+  teleLog('player_down', {enemy:S.encounter?S.encounter.name:null, enemyHp:S.encounter?Math.round(S.encounter.curHealth):null, backPocket:S.backPocket.length});
   if(S.backPocket.length>0){
     const idx = rand(S.backPocket.length);
     const d = S.backPocket.splice(idx,1)[0];
