@@ -1245,3 +1245,18 @@
 .loot-modal.loot-modal-chest{ max-width:220px; }
 .loot-modal.loot-modal-chest h2{ padding-right:0; text-align:center; }
 .loot-modal.loot-modal-chest .loot-chest-btn{ padding:10px 0 6px; }
+/* Closed chest fills the narrow card and twitches (quick shake, then a
+   pause) until tapped; the .opening flip animation replaces it. */
+.loot-modal.loot-modal-chest .loot-chest{ width:100%; height:150px; border-radius:16px;
+  animation: loot-chest-glow 1.6s ease-in-out infinite, loot-chest-twitch 2.2s ease-in-out infinite; }
+.loot-modal.loot-modal-chest .loot-chest svg{ width:84px; height:84px; }
+.loot-modal.loot-modal-chest .loot-chest-btn.opening .loot-chest{ animation: loot-chest-flip 0.48s ease-in-out both; }
+@keyframes loot-chest-twitch{
+  0%,52%,100%{ transform:translate(0,0) rotate(0); }
+  55%{ transform:translate(-3px,0) rotate(-3deg); }
+  58%{ transform:translate(3px,-2px) rotate(3deg); }
+  61%{ transform:translate(-3px,0) rotate(-2.5deg); }
+  64%{ transform:translate(2px,-1px) rotate(2deg); }
+  67%{ transform:translate(-1px,0) rotate(-1deg); }
+  70%{ transform:translate(0,0) rotate(0); }
+}
