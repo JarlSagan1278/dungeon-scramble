@@ -1395,3 +1395,8 @@
   .path-coin{ position:relative; flex:0 0 30px; width:30px; height:30px; border-radius:50%; background:var(--cream); color:#241c10;
     border:2px solid var(--line); box-shadow:0 2px 0 var(--line); display:flex; align-items:center; justify-content:center; animation: pop-in .18s var(--ease-pop) both; }
   .path-coin .icon-svg{ width:18px; height:18px; }
+
+  /* Selected tab (Origin / Class / Boon pickers): filled, raised, ringed. */
+  .class-tab-btn.selected{ background:var(--class-color, var(--gold)) !important; color:#fff !important; text-shadow:0 1px 0 rgba(0,0,0,.45);
+    border-color:var(--line) !important; box-shadow:0 4px 0 var(--line), 0 0 0 3px var(--gold) !important; transform:translateY(-3px); }
+  .class-tab-btn:not(.selected){ opacity:.82; }
