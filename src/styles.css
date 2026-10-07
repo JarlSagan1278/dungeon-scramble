@@ -24,7 +24,7 @@
     --ease-pop: var(--ease-pop);
     --shadow-1: 0 2px 4px rgba(0,0,0,0.3);
     --shadow-2: 0 4px 12px rgba(0,0,0,0.5);
-    --font-ui: 'MedievalSharp','Baloo 2',Cambria,Georgia,serif;
+    --font-ui: Georgia,'Iowan Old Style',serif;
     --font-display: 'Metamorphous','Trajan Pro',Cambria,Georgia,serif;
   }
   *{box-sizing:border-box;}
@@ -924,7 +924,7 @@
      keeping it low keeps it closer to the thumb than a reach up the
      screen. */
   .modal-overlay.modal-bottom{ align-items:flex-end; padding-bottom:max(20px, env(safe-area-inset-bottom)); }
-  .modal{ position:relative; background: var(--panel); border:3px solid var(--line); box-shadow:0 6px 0 var(--line); border-radius:var(--r-lg); padding:20px; max-width:520px; width:100%; max-height:85vh; overflow-y:auto;
+  .modal{ position:relative; background: var(--panel); border:3px solid var(--line); filter:drop-shadow(0 6px 0 var(--line)); border-radius:var(--r-lg); padding:20px; max-width:520px; width:100%; max-height:85vh; overflow-y:auto;
     box-shadow: 0 8px 28px rgba(0,0,0,0.5); animation: modal-card-in 0.2s cubic-bezier(.25,1.4,.4,1); }
   /* Mirrors the entrance on the way out -- openModal()/closeModal() in
      render.js add/remove .modal-closing and wait for it to finish before the
@@ -1375,17 +1375,17 @@
      keep their full size), bright dice on a dark brown ground. */
   body{ background: radial-gradient(circle at 50% -10%, #2a190c 0%, #1a0f06 45%, #0e0702 100%) !important; font-family: var(--font-ui) !important; }
   h1,h2,h3{ text-shadow:0 2px 0 rgba(0,0,0,.4); }
-  button{ border:2px solid var(--line) !important; box-shadow:0 4px 0 var(--line) !important; font-weight:800; background:#b9824a; color:#fff; transform:translateY(-2px); margin-bottom:2px; }
+  button{ border:2px solid var(--line) !important; filter:drop-shadow(0 4px 0 var(--line)); font-weight:800; background:#b9824a; color:#fff; transform:translateY(-2px); margin-bottom:2px; }
   button:hover:not(:disabled){ background:#c8915a; transform:translateY(-3px); }
-  button:active:not(:disabled){ transform:translateY(2px) scale(0.97) !important; box-shadow:0 0 0 var(--line) !important; }
+  button:active:not(:disabled){ transform:translateY(2px) scale(0.97) !important; filter:none; }
   button.primary{ background:var(--gold) !important; color:#3a2200 !important; }
-  .die{ border:3px solid var(--line) !important; box-shadow: inset 0 3px 0 rgba(255,255,255,.3), 0 3px 0 var(--line) !important; }
+  .die{ border:3px solid var(--line) !important; box-shadow: inset 0 3px 0 rgba(255,255,255,.3); filter:drop-shadow(0 3px 0 var(--line)); }
   .die.dietype-attack{ background:#ff5b5b !important; }
   .die.dietype-maneuver{ background:#ffe9a8 !important; }
   .die .name-tag-svg text{ opacity:.95 !important; font-weight:900 !important; paint-order:stroke; stroke:rgba(0,0,0,.35); stroke-width:.6px; }
   .die .face-word{ font-weight:900; }
   .tray-wrap{ background:#3a2412 !important; }
-  .enc-card{ border:3px solid var(--line) !important; box-shadow:0 4px 0 var(--line); }
+  .enc-card{ border:3px solid var(--line) !important; filter:drop-shadow(0 4px 0 var(--line)); }
   .bar{ height:16px !important; border:3px solid var(--line) !important; }
   .bar-fill.hp{ background:linear-gradient(#ff8a8a,#ff3b3b) !important; }
 
@@ -1399,7 +1399,7 @@
 
   /* Selected tab (Origin / Class / Boon pickers): filled, raised, ringed. */
   .class-tab-btn.selected{ background:var(--class-color, var(--gold)) !important; color:#fff !important; text-shadow:0 1px 0 rgba(0,0,0,.45);
-    border-color:var(--line) !important; box-shadow:0 4px 0 var(--line), 0 0 0 3px var(--gold) !important; transform:translateY(-3px); }
+    border-color:var(--line) !important; box-shadow:0 0 0 3px var(--gold) !important; transform:translateY(-3px); }
   .class-tab-btn:not(.selected){ opacity:.82; }
 
   /* Camp status card (health, campfire, Rest / Break Camp): near-black so the fire glows. */
@@ -1484,4 +1484,4 @@
   h1,h2,h3,.enc-name-txt,.origin-showcase-name,.class-showcase-name,.kill-callout-line,.room-callout-line,.floor-card-num,.floor-card-name,.char-name-input,.camp-section-title,.key-title{ font-family:var(--font-display) !important; font-weight:400; }
   body{ font-family: Georgia,'Iowan Old Style',serif !important; }
   button,.util-btn,.pcf-num,.status-chip,.face-val,.face-word,.chip-num,.name-tag-svg text,.mini-face small,.kill-hint,.new-tag,.round-badge,.boss-cycle-item,.run-total,.class-tab-btn{ font-family:var(--font-ui) !important; }
-  .die .name-tag-svg text, .die .face-word{ font-weight:400 !important; stroke-width:.4px; }
+  
