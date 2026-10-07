@@ -2118,8 +2118,8 @@ function renderLootModal(){
   // Overkill's 3rd option (or a Boss's 3-option draw) gets the bigger,
   // denser burst below -- reads as "bigger haul", not just a recolor.
   const big = options.length >= 3;
-  const overlay = el(`<div class="modal-overlay">
-      <div class="modal">
+  const overlay = el(`<div class="modal-overlay loot-overlay">
+      <div class="modal loot-modal">
       <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
         <h2 style="margin:0;">${fromShrine ? 'Shrine Boon' : 'Victory!'}</h2>
         ${overkill?'<span class="status-chip" style="background:var(--gold);color:#241c10;">Overkill! +1 option</span>':''}

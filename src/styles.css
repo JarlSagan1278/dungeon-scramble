@@ -434,7 +434,9 @@
      of #app, z-index:12) at the document root. Anything lower than 12 here
      let the gold path line paint right across the number instead of running
      behind the badge like it's meant to. */
-  .path-counter-float{ position:absolute; top:-10px; right:0px; background: radial-gradient(circle at 32% 28%, #f3dd98, var(--gold) 60%); color:#241c10; border:3px solid #000;
+  /* Display-only readout: pointer-events:none so a big total growing over the
+     top-right die can never swallow taps meant for that die. */
+  .path-counter-float{ pointer-events:none; position:absolute; top:-10px; right:0px; background: radial-gradient(circle at 32% 28%, #f3dd98, var(--gold) 60%); color:#241c10; border:3px solid #000;
     border-radius:999px; padding:2px 10px; z-index:13; display:flex; align-items:baseline; gap:4px;
     box-shadow:0 3px 8px rgba(0,0,0,0.55); animation: pop-in 0.2s ease-out;
     transition: font-size .15s cubic-bezier(.3,1.4,.4,1); }
@@ -1219,3 +1221,23 @@
   .small-btn-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
   .hint{ font-size:12px; color:var(--parchment-dim); margin:6px 0; }
   a{ color: var(--gold); }
+
+/* Compact loot screen: a smaller card so the sunray burst, streaks and
+   fanfare around it actually read, instead of hiding behind a big panel.
+   Backdrop is also lighter so the rays show through. */
+.loot-overlay{ background:rgba(0,0,0,0.55); }
+.loot-modal{ max-width:340px; padding:10px 12px 12px; }
+.loot-modal h2{ font-size:16px; padding-bottom:5px; margin-bottom:6px; }
+.loot-modal p{ font-size:12px; margin:4px 0; text-align:center; }
+.loot-modal .loot-chest-btn{ padding:6px 0 2px; gap:8px; }
+.loot-modal .loot-chest{ width:76px; height:66px; border-radius:12px; }
+.loot-modal .loot-chest svg{ width:36px; height:36px; }
+.loot-modal .loot-chest-label{ font-size:12px; }
+.loot-modal .loot-options{ gap:6px; margin:6px 0 0; }
+.loot-modal .loot-opt{ flex:1 1 calc(33.3% - 6px); min-width:92px; max-width:104px; padding:4px; }
+.loot-modal .loot-preview-tile{ width:52px; height:52px; margin-bottom:4px; }
+.loot-modal .loot-preview-tile .face-val{ font-size:22px; }
+.loot-modal .loot-art-thumb{ width:36px; height:36px; margin-bottom:2px; }
+.loot-modal .loot-opt .faces{ gap:3px; }
+.loot-modal .loot-opt .faces span{ font-size:8px; padding:2px 3px; }
+.loot-modal .loot-opt .faces .icon-svg{ width:9px; height:9px; }
