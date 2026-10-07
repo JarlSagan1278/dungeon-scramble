@@ -982,6 +982,7 @@ function toggleSelect(idx){
   if(S.path.includes(idx)) return; // only the last move can be undone this way
   if(!canSelect(idx)) return;
   S.path.push(idx);
+  if(typeof playTone==='function') playTone('pathTick', S.path.length-1); // rises up the pentatonic ladder as the path grows
   render();
 }
 
@@ -1170,6 +1171,7 @@ function applyPathStep(step){
   if(step.dmg>0){
     e.curHealth = capUpper(e.curHealth-step.dmg, e.maxHealth);
     S.stats.damageDealt += step.dmg;
+    S.resolveTotal = (S.resolveTotal||0) + step.dmg;
   }
   if(step.dotToEncounter) e.curDOT += step.dotToEncounter;
   if(step.hotToPlayer) S.playerHOT += step.hotToPlayer;
@@ -1285,6 +1287,8 @@ function startTurnTransition(){
   // through to the encounter's own beat instead of silently doing nothing.
   S.transitioning = true;
   S._skipAll = false;
+  S.resolveTotal = 0; // running damage tally shown while the path plays out
+  if(typeof resetPathCounterFx==='function') resetPathCounterFx();
   S._hitStreak = 0; // climbing pitch for consecutive damage-dealing dice this turn -- see playStepTone()
   S.stats.turnsTaken++;
   teleLog('turn', {n:S.turnNumber, len:S.path.length, hp:S.health, enemy:S.encounter?S.encounter.name:null, enemyHp:S.encounter?Math.round(S.encounter.curHealth):null});
@@ -1321,10 +1325,16 @@ function runPlayerPathSteps(steps, i, path, effects){
   const pitchStep = step.dmg>0 ? S._hitStreak++ : 0;
   if(typeof playStepTone==='function') playStepTone(S.resolvingFx, pitchStep);
   render();
+  // Impact tier from the die's own damage; bigger hits also linger a beat
+  // (a brief 'hit-stop' -- only this sequence's own timer, never the UI or
+  // audio) so they land with weight. Skip fast-forwards past all of it.
+  const hitTier = step.dmg>=8 ? 3 : step.dmg>=4 ? 2 : step.dmg>=2 ? 1 : 0;
+  if(hitTier>0 && typeof impactPulse==='function') impactPulse(hitTier);
+  const hitStop = (typeof PREFS!=='undefined' && PREFS.reducedMotion) ? 0 : [0,0,45,90][hitTier];
   const advance = () => { S._pendingTimeout=null; runPlayerPathSteps(steps, i+1, path, effects); };
   S._advance = advance;
   if(S._skipAll) advance();
-  else S._pendingTimeout = setTimeout(advance, 180);
+  else S._pendingTimeout = setTimeout(advance, 180 + hitStop);
 }
 
 // Once every die in the path has landed: the path's own damage already
@@ -1343,6 +1353,14 @@ function finishPlayerPath(path, effects){
     pivotCount:effects.pivotCount, nullifyCount:effects.nullifyCount, supportCount:effects.supportCount
   });
   if(e.curHealth<=0){ S.transitioning=false; onEncounterDefeated(); return; }
+  // Closing 'tally' beat for a strong turn (the kill case has its own, bigger
+  // callouts in onEncounterDefeated): chord + shake scaled to the total.
+  { const tot = S.resolveTotal||0, tier = tot>=25 ? 3 : tot>=15 ? 2 : tot>=8 ? 1 : 0;
+    if(tier>0){
+      if(typeof playTone==='function') playTone('tally', tier*2);
+      if(tier>=2 && typeof screenShake==='function') screenShake(tier>=3 ? 'big' : 'small');
+      if(tier>=3 && typeof spawnParticleBurstAtPortrait==='function') spawnParticleBurstAtPortrait(['#ff8a3d','#ffd76a','#fff5d6']);
+    } }
   runEnemyBeat(0);
 }
 

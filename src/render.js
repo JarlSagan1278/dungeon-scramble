@@ -36,7 +36,7 @@ const RESOLVE_PULSE_COLORS = {
 // has no numeric effect -- it still gets a pulse (movement, not impact) but
 // no popped-off number.
 function describeStepFx(step){
-  if(step.dmg>0) return {pulse:'dmg', cls:'damage', text:`-${step.dmg%1?step.dmg.toFixed(1):step.dmg}`};
+  if(step.dmg>0) return {pulse:'dmg', cls:'damage', text:`-${step.dmg%1?step.dmg.toFixed(1):step.dmg}`, size: Math.round(14 + Math.min(step.dmg,14)*1.4)}; // bigger hit, bigger number
   if(step.healGain>0) return {pulse:'heal', cls:'heal', text:`+${step.healGain}`};
   if(step.blockGain>0) return {pulse:'block', cls:'block', text:`+${step.blockGain}`};
   if(step.hotToPlayer>0) return {pulse:'heal', cls:'heal', text:`+${step.hotToPlayer} HOT`};
@@ -861,7 +861,7 @@ function renderDie(cell, idx){
             </div>` : ''}
             ${nameTag}
             ${label}
-            ${resolveFx && resolveFx.text ? `<span class="delta-float ${resolveFx.cls}">${resolveFx.text}</span>` : ''}
+            ${resolveFx && resolveFx.text ? `<span class="delta-float ${resolveFx.cls}" ${resolveFx.size?`style="font-size:${resolveFx.size}px;"`:''}>${resolveFx.text}</span>` : ''}
           </div>`;
 }
 
@@ -998,10 +998,34 @@ function renderEncounterCard(e){
     </div>`;
 }
 
+// Tier of the live path total: 0 plain, 1 (8+) glowing, 2 (15+) orange, 3 (25+) red-hot.
+// Crossing up a tier plays a sparkle once; the digits roll up to each new total.
+let pcfLastTier = 0, pcfLastVal = 0;
+function pcfTierFor(v){ return v>=25 ? 3 : v>=15 ? 2 : v>=8 ? 1 : 0; }
+function resetPathCounterFx(){ pcfLastTier = 0; pcfLastVal = 0; }
+function rollPathCounter(){
+  const n = document.querySelector('.pcf-num[data-to]');
+  if(!n) return;
+  const from = parseFloat(n.dataset.from), to = parseFloat(n.dataset.to);
+  if(PREFS.reducedMotion || !(from<to)) return;
+  const t0 = performance.now(), dur = 180;
+  const fmt = v => (to%1 ? v.toFixed(1) : String(Math.round(v)));
+  const tick = (now)=>{
+    const k = Math.min(1,(now-t0)/dur);
+    n.textContent = fmt(from + (to-from)*(1-Math.pow(1-k,3)));
+    if(k<1 && n.isConnected) requestAnimationFrame(tick); else if(n.isConnected) n.textContent = fmt(to);
+  };
+  requestAnimationFrame(tick);
+}
+
 function pathCounterHTML(){
-  if(!S.path.length) return '';
+  if(!S.path.length){ resetPathCounterFx(); return ''; }
   const preview = computePathEffects(S.path);
   const val = preview.totalDamage;
+  const tier = pcfTierFor(val);
+  const fromVal = pcfLastVal;
+  if(tier>pcfLastTier && typeof playTone==='function') playTone('tierUp');
+  pcfLastTier = tier; pcfLastVal = val;
   // No upper cap anymore -- now that this badge lives outside .tray-wrap's
   // clipped box (see .tray-float-wrap, styles.css), it's free to keep
   // growing and spill out over the tray/card edge as the total climbs,
@@ -1018,8 +1042,8 @@ function pathCounterHTML(){
   if(preview.selfDot) extras.push(`+${preview.selfDot}${iconSpan('fumble')}`);
   if(preview.nullifyCount) extras.push(iconSpan('nullify'));
   if(preview.freeze) extras.push(iconSpan('freeze'));
-  return `<div class="path-counter-float ${big?'pcf-big':''}">
-      <span class="pcf-num" style="font-size:${size}px;">${val%1?val.toFixed(1):val}</span>
+  return `<div class="path-counter-float ${big?'pcf-big':''} ${tier>=2?'pcf-t'+tier:''}">
+      <span class="pcf-num" data-from="${fromVal}" data-to="${val}" style="font-size:${size}px;">${val%1?val.toFixed(1):val}</span>
       ${extras.length?`<span class="pcf-extra">${extras.join(' ')}</span>`:''}
     </div>`;
 }
@@ -1109,7 +1133,7 @@ function renderGame(){
               <span class="round-badge">Round ${S.turnNumber+1}</span>
               <div class="tray" id="tray"></div>
             </div>
-            ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip ▶</button>` : pathCounterHTML()}
+            ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip ▶</button>${S.resolveTotal>0 ? `<div class="run-total">${S.resolveTotal%1?S.resolveTotal.toFixed(1):S.resolveTotal}<small> dmg</small></div>` : ''}` : pathCounterHTML()}
           </div>
         </div>
         <div class="util-rail">
@@ -1240,6 +1264,7 @@ function renderGame(){
   }
 
   updatePathTrail();
+  rollPathCounter();
   attachRelicStrip();
   if(S.lootChoice) renderLootModal();
   if(S.shrineChoice) renderShrineChoiceModal();
@@ -1422,6 +1447,18 @@ const TONE_SEQUENCES = {
   // freqTo handling for the sweep.
   hit:       [{freq:1400, freqTo:140, start:0,    dur:0.1,  type:'sawtooth', gain:0.2},
               {freq:1800,             start:0.045,dur:0.05, type:'square',   gain:0.14}],
+  // Soft tick as each die joins the path (pitch climbs with path length via
+  // playTone's pentatonic ladder); a brighter 3-note sparkle when the path's
+  // damage badge crosses a tier; and the turn's closing 'tally' chord.
+  pathTick:  [{freq:520, start:0,    dur:0.07, type:'sine',     gain:0.11},
+              {freq:1040,start:0.01, dur:0.05, type:'triangle', gain:0.05}],
+  tierUp:    [{freq:784, start:0,    dur:0.08, type:'triangle', gain:0.14},
+              {freq:1047,start:0.07, dur:0.08, type:'triangle', gain:0.14},
+              {freq:1568,start:0.14, dur:0.16, type:'triangle', gain:0.14}],
+  tally:     [{freq:392, start:0,    dur:0.16, type:'triangle', gain:0.18},
+              {freq:494, start:0,    dur:0.16, type:'triangle', gain:0.14},
+              {freq:587, start:0,    dur:0.16, type:'triangle', gain:0.14},
+              {freq:784, start:0.05, dur:0.26, type:'sine',     gain:0.16}],
   heal:      [{freq:520, start:0,    dur:0.12, type:'sine',     gain:0.14},
               {freq:660, start:0.09, dur:0.16, type:'sine',     gain:0.14}],
   victory:   [{freq:392, start:0,    dur:0.14, type:'triangle', gain:0.2},
@@ -1511,7 +1548,11 @@ function playTone(kind, pitchStep){
   // territory. Used for the per-die 'hit' sword tone (see playStepTone()
   // in logic.js) -- every other caller passes no step and plays at its
   // normal fixed pitch.
-  const pitchMult = pitchStep ? Math.pow(2, Math.min(pitchStep,10)*1.5/12) : 1;
+  // Pitch ladder on a major-pentatonic scale (semitone offsets below), so a
+  // run of rising notes always sounds in tune/pleasant instead of drifting
+  // chromatically. Index 0 is the base note; capped at the top of the table.
+  const PENTA = [0,2,4,7,9,12,14,16,19,21,24];
+  const pitchMult = pitchStep ? Math.pow(2, PENTA[Math.min(Math.max(0,Math.floor(pitchStep)), PENTA.length-1)]/12) : 1;
   notes.forEach(n=>{
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -1618,6 +1659,18 @@ function applyReducedMotionClass(){
 // banner/sound so the impact registers physically, not just visually.
 // Re-triggerable back-to-back (forced reflow) since a Boss kill that's also
 // an Overkill fires this once at 'big' only -- see onEncounterDefeated.
+// A quick punch on the enemy card when a die lands: scale/tilt/brighten, sized by
+// how hard the hit was (tier 1-3). Restarts cleanly on back-to-back hits.
+function impactPulse(tier){
+  if(PREFS.reducedMotion) return;
+  const n = document.querySelector('#enc-panel .enc-card-col');
+  if(!n) return;
+  n.style.setProperty('--impact-scale', [1,1.03,1.05,1.08][tier]);
+  n.style.setProperty('--impact-rot', (Math.random()<0.5?-1:1)*[0,0.6,1,1.6][tier]+'deg');
+  n.style.setProperty('--impact-dur', [0.18,0.2,0.24,0.3][tier]+'s');
+  n.classList.remove('enc-impact'); void n.offsetWidth; n.classList.add('enc-impact');
+}
+
 function screenShake(intensity){
   if(PREFS.reducedMotion) return;
   const wrap = document.querySelector('.wrap');
