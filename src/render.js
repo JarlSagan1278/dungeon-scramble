@@ -1155,8 +1155,8 @@ function renderGame(){
       <div class="enc-rail-row">
         <div class="enc-card-col">
           <div class="tray-float-wrap">
+            <span class="round-badge">Round ${S.turnNumber+1}</span>
             <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
-              <span class="round-badge">Round ${S.turnNumber+1}</span>
               <div class="tray" id="tray"></div>
             </div>
             ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip ▶</button>${S.resolveTotal>0 ? `<div class="run-total">${S.resolveTotal%1?S.resolveTotal.toFixed(1):S.resolveTotal}<small> dmg</small></div>` : ''}` : pathCounterHTML()}
