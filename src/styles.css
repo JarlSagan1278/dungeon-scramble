@@ -1241,3 +1241,7 @@
 .loot-modal .loot-opt .faces{ gap:3px; }
 .loot-modal .loot-opt .faces span{ font-size:8px; padding:2px 3px; }
 .loot-modal .loot-opt .faces .icon-svg{ width:9px; height:9px; }
+/* Closed-chest phase only: a narrow, centered card -- just the title and the chest. */
+.loot-modal.loot-modal-chest{ max-width:220px; }
+.loot-modal.loot-modal-chest h2{ padding-right:0; text-align:center; }
+.loot-modal.loot-modal-chest .loot-chest-btn{ padding:10px 0 6px; }

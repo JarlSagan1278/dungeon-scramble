@@ -2119,7 +2119,7 @@ function renderLootModal(){
   // denser burst below -- reads as "bigger haul", not just a recolor.
   const big = options.length >= 3;
   const overlay = el(`<div class="modal-overlay loot-overlay">
-      <div class="modal loot-modal">
+      <div class="modal loot-modal ${S.lootChoice.opened?'':'loot-modal-chest'}">
       <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
         <h2 style="margin:0;">${fromShrine ? 'Shrine Boon' : 'Victory!'}</h2>
         ${overkill?'<span class="status-chip" style="background:var(--gold);color:#241c10;">Overkill! +1 option</span>':''}
@@ -2134,6 +2134,7 @@ function renderLootModal(){
   // up), so the shake + sunray only play on the actual opening.
   function reveal(burst){
     S.lootChoice.opened = true;
+    overlay.querySelector('.modal').classList.remove('loot-modal-chest');
     if(burst){
       overlay.insertAdjacentHTML('afterbegin', `<div class="loot-sunray-burst" style="--sunray-color:${accent.color};">
           <div class="loot-sunray-wheel ${big?'loot-sunray-wheel-big':''}"></div>
@@ -2165,9 +2166,8 @@ function renderLootModal(){
 
   // Phase 1: a closed chest to tap. Its glow is the loot's tier color, so the
   // rarity is hinted before it opens. Tapping flips it, then bursts + reveals.
-  body.innerHTML = `<button type="button" class="loot-chest-btn" style="--loot-tier-color:${accent.color}; --loot-tier-glow:${accent.glow};">
+  body.innerHTML = `<button type="button" class="loot-chest-btn" aria-label="Open your loot" style="--loot-tier-color:${accent.color}; --loot-tier-glow:${accent.glow};">
       <div class="loot-chest"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8Z"/><path d="M3 10V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3"/><path d="M12 10v10"/><circle cx="12" cy="12.5" r="1.4" fill="currentColor" stroke="none"/></svg></div>
-      <div class="loot-chest-label">Tap to open your loot</div>
     </button>`;
   const chestBtn = body.querySelector('.loot-chest-btn');
   chestBtn.onclick = ()=>{
