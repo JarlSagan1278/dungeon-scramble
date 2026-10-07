@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.18.2';
+const GAME_VERSION = '1.19.0';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -197,6 +197,36 @@ const BASIC_DICE = [
 ];
 function basic(cat, level){ return BASIC_DICE.find(d=>d.cat===cat && d.level===level); }
 
+
+// ---- Relics: permanent, run-long passive perks (a second build axis next to
+// dice). Found at Relic Shrines (choose 1 of 3) -- and each Origin has its
+// own signature relic, which that Origin starts every run with once the
+// player has won a run as it (see newGame()). `mono` is the 2-letter badge
+// shown until real art exists. Effects are applied in logic.js (search for
+// hasRelic / applyRelicsToSteps). Keep in sync with the manual's Relics
+// section.
+const RELICS = [
+  // General pool (Relic Shrine offers)
+  {id:'whetstone',  name:'Whetstone',          mono:'WS', desc:'Your first Hit each turn deals +2 damage.'},
+  {id:'iron_rations',name:'Iron Rations',      mono:'IR', desc:'Heal 2 after every victory.'},
+  {id:'gambeson',   name:'Padded Gambeson',    mono:'PG', desc:'Every enemy attack deals 1 less damage.'},
+  {id:'lucky_coin', name:'Lucky Coin',         mono:'LC', desc:'Loot rewards offer +1 die to choose from.'},
+  {id:'kettle',     name:'Campfire Kettle',    mono:'CK', desc:'Resting at Camp heals 3 extra.'},
+  {id:'banner',     name:'Vanguard Banner',    mono:'VB', desc:'Start every fight with 3 Block.'},
+  {id:'flask',      name:'Bottomless Flask',   mono:'BF', desc:'+8 maximum health, right now.'},
+  {id:'echo_chime', name:'Echo Chime',         mono:'EC', desc:'A Path of 5 or more dice deals +3 damage.'},
+  {id:'venom_vial', name:'Venom Vial',         mono:'VV', desc:'Every D.O.T. face you play adds +1 D.O.T.'},
+  {id:'hungry_blade',name:'Hungry Blade',      mono:'HB', desc:'Overkill triggers at 6 extra damage instead of 10.'},
+  {id:'tincture',   name:'Tincture Kit',       mono:'TK', desc:'Every Heal face you play heals +1.'},
+  // Origin signature relics (never offered at shrines)
+  {id:'forgeplate', name:'Forgeplate',         mono:'FP', origin:'dwarf',    desc:'Start every fight with 5 Block.'},
+  {id:'spore_satchel',name:'Spore Satchel',    mono:'SS', origin:'gnome',    desc:'Leech faces also add +2 D.O.T. and heal +1 more.'},
+  {id:'picnic_basket',name:'Picnic Basket',    mono:'PB', origin:'halfling', desc:'Heal faces heal +2 and H.O.T. faces add +1 H.O.T.'},
+  {id:'glimmer_dust',name:'Glimmer Dust',      mono:'GD', origin:'pixie',    desc:'Each Dodge, Leap or Pivot in your Path adds +1 damage to its last damaging die.'},
+];
+function relicById(id){ return RELICS.find(r=>r.id===id); }
+function originRelicFor(originId){ return RELICS.find(r=>r.origin===originId); }
+
 // ---- Origin dice ----
 const ORIGINS = [
   {id:'dwarf', name:'Dwarf', die:'Dwarven Doohickie', blurb:'Shield up, then pop it for a big Hit.', faces:faces(['Hit2','Boost1','Boost1','Pivot','Block2','Block2'])},
@@ -347,7 +377,7 @@ const FLOOR2_TRAPS = [
 const FLOOR2_SHRINES = [
   enc('Enchanted Anvil','Shrine',0,{boon:'Upgrade a lvl 1 Attack Die to a lvl 2 Attack Die.', effect:{type:'dieUpgrade', cat:'attack'}}),
   enc('Alchemists Stone','Shrine',0,{boon:'Upgrade Player Maximum Health by 10.', effect:{type:'maxHealthUp', amount:10}}),
-  enc('Department Spore','Shrine',0,{boon:'Trade in loot for one of three Gilded dice options.', effect:{type:'tradeLoot', pool:'Gilded'}}),
+  enc('Department Spore','Shrine',0,{boon:'Choose one of three Relics.', effect:{type:'relicChoice'}}),
   enc('Half-Full Fountain','Shrine',0,{boon:'Heal 15 OR Upgrade Player Maximum Health by 10.', effect:{type:'choice', options:[
     {label:'Heal 15', effect:{type:'heal', amount:15}},
     {label:'+10 Max Health', effect:{type:'maxHealthUp', amount:10}},
@@ -381,7 +411,7 @@ const FLOOR3_TRAPS = [
 const FLOOR3_SHRINES = [
   enc('Scrying Spheroid','Shrine',0,{boon:'Replace a loot die with a random Magic die.', effect:{type:'randomDieReplace', pool:'Magic'}}),
   enc("Heron's Fountain",'Shrine',0,{boon:'Upgrade Player Maximum Health by 15.', effect:{type:'maxHealthUp', amount:15}}),
-  enc('Storied Emporium','Shrine',0,{boon:'Trade in loot for one of three Magic dice options.', effect:{type:'tradeLoot', pool:'Magic'}}),
+  enc('Storied Emporium','Shrine',0,{boon:'Choose one of three Relics.', effect:{type:'relicChoice'}}),
   enc('Scroll Dispenser: STOP','Shrine',0,{boon:'Gain a one-use Freeze token.', effect:{type:'grantToken', token:'freeze', charges:1}}),
 ];
 const BIG_BOSSES = [

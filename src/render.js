@@ -1089,6 +1089,7 @@ function renderGame(){
         ${S.playerBlock?`<span class="status-chip status-tooltip-target" title="Block ${S.playerBlock}: ${STATUS_DESC.block}">${iconSpan('block', S.playerBlock)} Block</span>`:''}
         ${S.pendingFreeBoost?`<span class="status-chip status-tooltip-target" style="background:var(--gold);color:#241c10;" title="Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}">${iconSpan('boost')} Boost x${S.pendingFreeBoost} armed</span>`:''}
       </div>
+      ${relicStripHTML()}
     </div>
     <div class="panel" id="enc-panel" style="margin-bottom:8px;">
       <div class="enc-rail-row">
@@ -1239,8 +1240,10 @@ function renderGame(){
   }
 
   updatePathTrail();
+  attachRelicStrip();
   if(S.lootChoice) renderLootModal();
   if(S.shrineChoice) renderShrineChoiceModal();
+  if(S.relicChoice) renderRelicChoiceModal();
   if(S.pendingLootDie) renderSwapModal();
 }
 
@@ -1728,6 +1731,7 @@ function openSettingsModal(){
         <button id="settings-achievements-btn">Achievements</button>
         <button id="settings-export-data-btn">Export Play Data</button>
         <button id="settings-dice-compendium-btn">Dice Compendium</button>
+        <button id="settings-relic-codex-btn">Relic Codex</button>
         ${inRun ? '<button id="settings-restart-btn" class="danger">Restart Run</button>' : ''}
         <button id="settings-reset-progress-btn" class="danger">Reset Progress</button>
         <button id="settings-close-btn">Close</button>
@@ -1744,6 +1748,7 @@ function openSettingsModal(){
   overlay.querySelector('#settings-run-history-btn').onclick = ()=>{ close(); openRunHistoryModal(); };
   overlay.querySelector('#settings-export-data-btn').onclick = ()=>{ close(); openExportDataModal(); };
   overlay.querySelector('#settings-achievements-btn').onclick = ()=>{ close(); openAchievementsModal(); };
+  overlay.querySelector('#settings-relic-codex-btn').onclick = ()=>{ close(); openRelicCodexModal(); };
   overlay.querySelector('#settings-dice-compendium-btn').onclick = ()=>{ close(); openDiceCompendiumModal(); };
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
   overlay.querySelector('#pref-sound').onchange = (ev)=>{ setPref('sound', ev.target.checked); if(ev.target.checked) playTone('hit'); };
@@ -2236,6 +2241,64 @@ function pickLootOption(overlay, container, chosenCard, opt){
   setTimeout(()=> closeModal(overlay, ()=> chooseLoot(opt)), delay);
 }
 
+// ---- Relics UI ----
+function relicBadgeHTML(r, extraCls){
+  return `<span class="relic-badge ${r.origin?'relic-origin':''} ${extraCls||''}" title="${r.name}: ${r.desc}">${r.mono}</span>`;
+}
+
+// A compact row of the relics held this run (game board + Camp); tap for details.
+function relicStripHTML(){
+  if(!S.relics || !S.relics.length) return '';
+  return `<div class="relic-strip" title="Tap to see your relics">${S.relics.map(id=>relicBadgeHTML(relicById(id))).join('')}</div>`;
+}
+function attachRelicStrip(){
+  document.querySelectorAll('.relic-strip').forEach(n=>{ n.onclick = openRunRelicsModal; });
+}
+
+function relicRowHTML(r, locked){
+  if(locked) return `<div class="relic-row relic-row-locked"><span class="relic-badge relic-locked">?</span><div><div class="relic-name">???</div><div class="hint" style="margin:0;">${r.origin?`Win a run as a ${ORIGINS.find(o=>o.id===r.origin).name} to earn this.`:'Not found yet -- look for Relic Shrines.'}</div></div></div>`;
+  return `<div class="relic-row">${relicBadgeHTML(r)}<div><div class="relic-name">${r.name}${r.origin?` <span class="relic-origin-tag">${ORIGINS.find(o=>o.id===r.origin).name} relic</span>`:''}</div><div class="relic-desc">${r.desc}</div></div></div>`;
+}
+
+function openRunRelicsModal(){
+  const rows = (S.relics||[]).map(id=>relicRowHTML(relicById(id), false)).join('');
+  openInfoModal('Your Relics', rows || '<p class="hint">No relics yet. Relic Shrines offer a choice of three.</p>');
+}
+
+function openRelicCodexModal(){
+  const found = new Set(META.relicsFound||[]);
+  const owned = (typeof S!=='undefined' && S && S.relics) ? S.relics : [];
+  const isFound = r => found.has(r.id) || owned.includes(r.id) || (r.origin && (META.lifetime.victoriesByOrigin[r.origin]||0)>=1);
+  const section = (title, list)=>`<h3 class="camp-section-title" style="margin:10px 0 4px;">${title}</h3>${list.map(r=>relicRowHTML(r, !isFound(r))).join('')}`;
+  openInfoModal('Relic Codex',
+    `<p class="hint" style="text-align:left;">Relics are permanent perks for a single run. Find them at Relic Shrines. Win a run with an Origin and it will start every later run with its own signature relic.</p>`
+    + section('Origin Relics', RELICS.filter(r=>r.origin))
+    + section('Shrine Relics', RELICS.filter(r=>!r.origin)));
+}
+
+// Relic Shrine: pick 1 of 3 (S.relicChoice, see runShrineEffect 'relicChoice').
+function renderRelicChoiceModal(){
+  const {name, options} = S.relicChoice;
+  const overlay = el(`<div class="modal-overlay"><div class="modal" style="max-width:360px;">
+      <h2 style="text-align:center;">${name}</h2>
+      <p style="text-align:center;">Choose a Relic. It lasts for the rest of your run.</p>
+      <div class="relic-choice-list" id="relic-choice-list"></div>
+    </div></div>`);
+  openUniqueOverlay('relic-choice', overlay);
+  const list = overlay.querySelector('#relic-choice-list');
+  options.forEach(id=>{
+    const r = relicById(id);
+    const card = el(`<div class="relic-choice-card">${relicBadgeHTML(r, 'relic-badge-lg')}<div><div class="relic-name">${r.name}</div><div class="relic-desc">${r.desc}</div></div></div>`);
+    card.onclick = ()=>{
+      if(overlay.dataset.picked) return;
+      overlay.dataset.picked = '1';
+      if(typeof playTone==='function') playTone('lootPick');
+      closeModal(overlay, ()=> chooseRelic(id));
+    };
+    list.appendChild(card);
+  });
+}
+
 function renderShrineChoiceModal(){
   const {name, options} = S.shrineChoice;
   const overlay = el(`<div class="modal-overlay"><div class="modal">
@@ -2350,13 +2413,15 @@ function renderShrineEncounter(){
         </div>
         <div class="enc-card-body">
           <div class="enc-flavor" style="border-top:none; padding-top:0;">${e.boon}</div>
-          ${!S.shrineResult && !S.shrineChoice ? '<p class="hint">Revealing the shrine\'s boon...</p>' : ''}
+          ${!S.shrineResult && !S.shrineChoice && !S.relicChoice ? '<p class="hint">Revealing the shrine\'s boon...</p>' : ''}
         </div>
       </div>
     </div>
   `;
+  attachRelicStrip();
   if(S.lootChoice) renderLootModal();
   if(S.shrineChoice) renderShrineChoiceModal();
+  if(S.relicChoice) renderRelicChoiceModal();
   if(S.shrineResult) renderShrineResultModal();
   if(S.pendingLootDie) renderSwapModal();
   attachLongPressTooltips('.route-tooltip-target');
@@ -2397,6 +2462,7 @@ function renderCamp(){
       <p class="hint" style="margin:0 0 6px;">Rest and prepare before pressing onward.</p>
 
       <div class="camp-section camp-status-card">
+        ${relicStripHTML()}
         <div class="bar-row" style="position:relative;"><span style="width:70px;">Health</span><div class="bar ${campFx.cls}"><div class="bar-fill hp player" style="width:${S.health/S.maxHealth*100}%"></div></div><span>${S.health}/${S.maxHealth}</span>${campFx.deltaHTML}</div>
         <div class="camp-fire-wrap">
           <div class="campfire-glow"></div>
@@ -2473,6 +2539,7 @@ function summaryStatsHTML(){
         <span class="status-chip">Shrines visited: ${st.shrinesVisited}</span>
         <span class="status-chip">Overkills: ${st.overkills}</span>
         <span class="status-chip">Loot Dice collected: ${st.lootCollected}</span>
+        ${(S.relics||[]).map(id=>`<span class="status-chip">Relic: ${relicById(id).name}</span>`).join('')}
       </div>
     </div>`;
 }

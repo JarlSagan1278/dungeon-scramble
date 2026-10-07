@@ -67,6 +67,64 @@ function highestTierTrayGroups(){
   return groups;
 }
 
+// ---- Relics (definitions in data.js). S.relics is a list of relic ids. ----
+function hasRelic(id){ return !!(S && S.relics && S.relics.includes(id)); }
+
+function grantRelic(id, opts){
+  const r = relicById(id);
+  if(!r || hasRelic(id)) return false;
+  if(!S.relics) S.relics = [];
+  S.relics.push(id);
+  if(id==='flask'){ S.maxHealth += 8; S.health = cap(S.health+8, S.maxHealth); }
+  markRelicFound(id);
+  teleLog('relic_gain', {relic:id, via:(opts&&opts.via)||'shrine'});
+  if(!(opts&&opts.silent)) logMsg('sys', `Relic gained: ${r.name} -- ${r.desc}`, 'good');
+  return true;
+}
+
+// Relics that change a Path's numbers. Mutates the per-die `steps` that
+// computePathSteps() builds, so the live preview (computePathEffects), the
+// step-by-step playback, and the final totals all agree.
+function applyRelicsToSteps(steps, path){
+  if(!S.relics || !S.relics.length) return steps;
+  const lastDmgStep = ()=>{ for(let i=steps.length-1;i>=0;i--) if(steps[i].dmg>0) return steps[i]; return null; };
+  if(hasRelic('whetstone')){
+    const first = steps.find(s=>s.type==='hit');
+    if(first) first.dmg += 2;
+  }
+  steps.forEach(s=>{
+    if(hasRelic('venom_vial') && s.dotToEncounter>0) s.dotToEncounter += 1;
+    if(hasRelic('tincture') && s.type==='heal') s.healGain += 1;
+    if(hasRelic('picnic_basket')){
+      if(s.type==='heal') s.healGain += 2;
+      if(s.type==='hot') s.hotToPlayer += 1;
+    }
+    if(hasRelic('spore_satchel') && s.type==='leech'){ s.dotToEncounter += 2; s.hotToPlayer += 1; }
+  });
+  if(hasRelic('echo_chime') && steps.length>=5){ const t = lastDmgStep(); if(t) t.dmg += 3; }
+  if(hasRelic('glimmer_dust')){
+    const m = steps.filter(s=>s.type==='dodge'||s.type==='leap'||s.type==='pivot').length;
+    const t = lastDmgStep(); if(m>0 && t) t.dmg += m;
+  }
+  return steps;
+}
+
+function applyRelicsOnRoomStart(){
+  let block = 0;
+  if(hasRelic('banner')) block += 3;
+  if(hasRelic('forgeplate')) block += 5;
+  if(block>0){ S.playerBlock += block; logMsg('sys', `Relics grant ${block} Block.`, 'good'); }
+}
+
+// ---- Relic discovery (Relic Codex shows a relic's details only once the
+// player has found it for themselves, same idea as the Dice Compendium) ----
+function markRelicFound(id){
+  try{
+    if(!Array.isArray(META.relicsFound)) META.relicsFound = [];
+    if(!META.relicsFound.includes(id)){ META.relicsFound.push(id); saveMeta(); }
+  } catch(e){}
+}
+
 // ---- Play telemetry -- an anonymous, on-device log of how each run
 // actually went (rooms, turns, loot offered vs. picked, what ended the run),
 // so playtest sessions can be turned into balance data. NOTHING is sent
@@ -119,6 +177,7 @@ function finalizeTelemetry(outcome){
       runId: S.tele.runId, startedAt: S.tele.startedAt, endedAt: Date.now(), version: S.tele.version,
       origin: S.origin.name, klass: S.klass.name, outcome, floorReached: S.floorIdx+1,
       stats: {...S.stats, damageDealt: Math.round(S.stats.damageDealt)},
+      relics: (S.relics||[]).slice(),
       events: S.tele.events,
     };
     const list = getTelemetryRuns();
@@ -204,14 +263,15 @@ const DEFAULT_LIFETIME = {
 function loadMeta(){
   try{
     const raw = localStorage.getItem(META_KEY);
-    if(!raw) return { lifetime: {...DEFAULT_LIFETIME}, achievements: {}, favoriteBoons: [] };
+    if(!raw) return { lifetime: {...DEFAULT_LIFETIME}, achievements: {}, favoriteBoons: [], relicsFound: [] };
     const parsed = JSON.parse(raw) || {};
     return {
       lifetime: {...DEFAULT_LIFETIME, ...(parsed.lifetime||{})},
       achievements: parsed.achievements || {},
       favoriteBoons: Array.isArray(parsed.favoriteBoons) ? parsed.favoriteBoons : [],
+      relicsFound: Array.isArray(parsed.relicsFound) ? parsed.relicsFound : [],
     };
-  } catch(e){ return { lifetime: {...DEFAULT_LIFETIME}, achievements: {}, favoriteBoons: [] }; }
+  } catch(e){ return { lifetime: {...DEFAULT_LIFETIME}, achievements: {}, favoriteBoons: [], relicsFound: [] }; }
 }
 let META = loadMeta();
 function saveMeta(){
@@ -482,7 +542,7 @@ function loadGame(){
 // mid-transition or mid-modal, since a Shrine choice's callback can't
 // survive being written to JSON (see serializeState).
 function maybeAutosave(){
-  if(!S || S.transitioning || S.lootChoice || S.shrineChoice || S.pendingLootDie) return;
+  if(!S || S.transitioning || S.lootChoice || S.shrineChoice || S.relicChoice || S.pendingLootDie) return;
   if(S.screen!=='game' && S.screen!=='camp' && S.screen!=='shrine') return;
   saveGame();
 }
@@ -605,6 +665,8 @@ function newGame(originId, classId, boonDieName, charName){
     boostTokenValue:0,
     pendingFreeBoost:0,
     shrineChoice:null,
+    relicChoice:null,
+    relics:[],
     usedCards: new Set(),
     // Same "no repeats until the whole pool's been seen" idea as usedCards
     // above, but for Loot dice actually acquired this run (floor drops,
@@ -622,7 +684,9 @@ function newGame(originId, classId, boonDieName, charName){
     segmentShrineUsed: false,
     segmentTrapUsed: false,
   };
-  teleLog('run_start', {origin:origin.name, klass:klass.name, carry:carryDie?carryDie.name:null, boon:boonDieName||null, tray:S.tray.map(c=>c.die.name)});
+  // An Origin that has won a run starts every later run holding its signature relic.
+  { const oc = originRelicFor(origin.id); if(oc && (META.lifetime.victoriesByOrigin[origin.id]||0)>=1) grantRelic(oc.id, {silent:true, via:'origin'}); }
+  teleLog('run_start', {relics:S.relics.slice(), origin:origin.name, klass:klass.name, carry:carryDie?carryDie.name:null, boon:boonDieName||null, tray:S.tray.map(c=>c.die.name)});
   logMsg('sys', `A ${origin.name} ${klass.name} descends into the dungeon...`);
   if(carryDie) logMsg('sys', `${carryDie.name} joins your tray, carried over from your last run.`, 'good');
   if(boonDieName && !klass.debug && findLootDieByName(boonDieName)) logMsg('sys', `${boonDieName} joins your tray as your Starting Boon.`, 'good');
@@ -818,6 +882,7 @@ function advanceRoute(){
     scrambleTray();
     S.screen='game';
     S._roomStartedAt = Date.now();
+    applyRelicsOnRoomStart();
     teleLog('room_start', {type:drawn.type, name:drawn.name, enemyHp:drawn.maxHealth, hp:S.health, maxHp:S.maxHealth});
     logMsg('sys', `A door creaks open: ${drawn.name} (${drawn.type})`);
     // One-shot "new room" flourish -- read by renderGame()/renderEncounterCard()
@@ -829,6 +894,7 @@ function advanceRoute(){
     scrambleTray();
     S.screen='game';
     S._roomStartedAt = Date.now();
+    applyRelicsOnRoomStart();
     teleLog('room_start', {type:S.encounter.type, name:S.encounter.name, enemyHp:S.encounter.maxHealth, hp:S.health, maxHp:S.maxHealth});
     logMsg('sys', `Boss Encounter: ${S.encounter.name}`);
     S.newRoomFx = {name: S.encounter.name, type: S.encounter.type, boss:true};
@@ -1018,6 +1084,15 @@ function computePathEffects(path){
     if(f.type!=='boost') boostMult = 1;
   });
 
+  // Relics adjust the per-die steps (see applyRelicsToSteps); take the totals
+  // from them so the live preview includes every relic bonus.
+  if(S.relics && S.relics.length){
+    const st = computePathSteps(path);
+    totalDamage = st.reduce((a,x)=>a+x.dmg,0);
+    dotToEncounter = st.reduce((a,x)=>a+x.dotToEncounter,0);
+    healGain = st.reduce((a,x)=>a+x.healGain,0);
+    hotToPlayer = st.reduce((a,x)=>a+x.hotToPlayer,0);
+  }
   const blankCount = S.tray.filter((c,i)=>!path.includes(i) && getFaceForIdx(i).type==='blank').length;
 
   return { totalDamage, dotToEncounter, hotToPlayer, blockGain, healGain, selfDot, freeze, nullifyCount,
@@ -1032,7 +1107,7 @@ function computePathEffects(path){
 // lump sum. Pure -- no side effects, same as computePathEffects().
 function computePathSteps(path){
   let boostMult = S.pendingFreeBoost>0 ? S.pendingFreeBoost : 1;
-  return path.map((idx,i)=>{
+  const steps = path.map((idx,i)=>{
     const f = getFaceForIdx(idx);
     const val = f.value||0;
     const step = {idx, type:f.type, dmg:0, dotToEncounter:0, hotToPlayer:0, blockGain:0, healGain:0, selfDot:0, freeze:false, nullify:false, boostMultApplied:0, leapClearIdx:null};
@@ -1065,6 +1140,7 @@ function computePathSteps(path){
     if(f.type!=='boost') boostMult = 1;
     return step;
   });
+  return applyRelicsToSteps(steps, path);
 }
 
 // Un-minions the first minion-covered tray cell found (tray order), same
@@ -1366,6 +1442,7 @@ function runPlayerUpkeep(){
 }
 
 function dealEncounterDamage(e, amount){
+  if(amount>0 && hasRelic('gambeson')) amount = Math.max(0, amount-1);
   const blocked = Math.min(S.playerBlock, amount);
   S.playerBlock -= blocked;
   const dealt = amount-blocked;
@@ -1498,6 +1575,19 @@ function runShrineEffect(e, effect){
       S.shrineResult = { title: e.name, text: t };
       render(); return;
     }
+    case 'relicChoice': {
+      const pool = RELICS.filter(r=>!r.origin && !hasRelic(r.id));
+      if(!pool.length){
+        S.health = cap(S.health+10, S.maxHealth);
+        const t = 'You already hold every relic -- the altar heals 10 instead.';
+        logMsg('heal', `${e.name}: ${t}`);
+        S.shrineResult = { title: e.name, text: t };
+        render(); return;
+      }
+      S.relicChoice = { name:e.name, options: pickN(pool, Math.min(3, pool.length)).map(r=>r.id) };
+      S.relicChoice.options.forEach(markRelicFound);
+      render(); return;
+    }
     case 'tradeLoot': {
       S.lootChoice = { options: pickLootNUnused(lootPoolByName(effect.pool), 3), lootName: effect.pool, overkill:false, fromShrine:true };
       if(typeof markDiceDiscovered==='function') markDiceDiscovered(S.lootChoice.options);
@@ -1556,6 +1646,15 @@ function applyShrineBoon(e){
   runShrineEffect(e, e.effect);
 }
 
+function chooseRelic(id){
+  const e = S.encounter, name = (S.relicChoice && S.relicChoice.name) || (e&&e.name) || 'Relic';
+  S.relicChoice = null;
+  grantRelic(id, {silent:true, via:'shrine'});
+  const r = relicById(id);
+  S.shrineResult = { title: name, text: `Gained relic: ${r.name}. ${r.desc}` };
+  render();
+}
+
 function chooseShrineOption(option){
   S.shrineChoice = null;
   option.action();
@@ -1569,11 +1668,13 @@ function onEncounterDefeated(){
   // what was needed) adds one extra option to choose from, per the manual's
   // "+1 to the Encounter Loot Reward value."
   const floor = FLOORS[S.floorIdx];
-  const overkill = e.curHealth < -9; // curHealth is allowed to go negative (see capUpper) so this is measurable
+  const overkill = e.curHealth < (hasRelic('hungry_blade') ? -5 : -9); // curHealth is allowed to go negative (see capUpper) so this is measurable
   if(overkill) S.stats.overkills++;
   const isBoss = e.type==='Boss' || e.type==='Big Boss';
   let drawCount = isBoss ? 3 : 2;
   if(overkill) drawCount += 1;
+  if(hasRelic('lucky_coin')) drawCount += 1;
+  if(hasRelic('iron_rations')){ S.health = cap(S.health+2, S.maxHealth); logMsg('heal', 'Iron Rations: healed 2.', 'good'); }
   const options = pickLootNUnused(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
   S.lootChoice = { options, lootName: floor.lootName, overkill };
   teleLog('room_win', {name:e.name, type:e.type, turns:S.turnNumber, ms:S._roomStartedAt?Date.now()-S._roomStartedAt:null, overkill, overBy:Math.max(0,Math.round(-e.curHealth)), hp:S.health});
@@ -1776,7 +1877,7 @@ function campRest(){
   scrambleTray();
   let count=0;
   S.tray.forEach(c=>{ if(currentFace(c).type!=='blank') count++; });
-  const heal = Math.ceil(count/2);
+  const heal = Math.ceil(count/2) + (hasRelic('kettle') ? 3 : 0);
   S.health = cap(S.health+heal, S.maxHealth);
   S.campRested = true;
   logMsg('heal', `Rested: scrambled ${count} actions, healed ${heal}.`, 'good');

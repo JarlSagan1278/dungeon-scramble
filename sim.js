@@ -49,6 +49,11 @@ const TICK_FN = () => {
     chooseShrineOption(opts[Math.floor(Math.random() * opts.length)]);
     return { done: false, note: 'shrine-choice' };
   }
+  if (S.relicChoice) {
+    const opts = S.relicChoice.options;
+    chooseRelic(opts[Math.floor(Math.random() * opts.length)]);
+    return { done: false, note: 'relic' };
+  }
   if (S.shrineResult) {
     continueFromShrine();
     return { done: false, note: 'shrine-continue' };
@@ -109,7 +114,7 @@ async function runOne(browser, originId, classId, label) {
   const pageErrors = [];
   page.on('pageerror', e => pageErrors.push(e.message));
   await page.goto('file://' + FILE);
-  await page.evaluate(({ originId, classId }) => {
+  await page.evaluate(({ originId, classId, relicsAll }) => {
     // Pre-unlock every Origin (Halfling/Pixie are achievement-gated in the
     // real game, see isOriginUnlocked()/newGame() in logic.js) so the sim
     // actually exercises the requested origin instead of silently falling
@@ -120,7 +125,10 @@ async function runOne(browser, originId, classId, label) {
     META.lifetime.bestFloorReached = 3;
     META.achievements['origin_duo'] = { date: Date.now() };
     newGame(originId, classId);
-  }, { originId, classId });
+    // --relics=all stress-tests every relic hook at once (default: none, so the
+    // baseline sim matches a fresh player's run).
+    if(relicsAll) RELICS.forEach(r=>grantRelic(r.id, {silent:true}));
+  }, { originId, classId, relicsAll: args.relics==='all' });
 
   const actualOriginId = await page.evaluate(() => S.origin.id);
   if (actualOriginId !== originId) {
