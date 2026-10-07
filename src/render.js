@@ -1288,7 +1288,7 @@ function renderGame(){
     document.getElementById('path-strip').innerHTML = S.path.map((idx,k)=>{
       const f = getFaceForIdx(idx);
       const tip = `${k+1}. ${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?(' '+f.value):''}`;
-      return `<span class="path-coin" style="${k?`margin-left:${(step-30).toFixed(1)}px;`:''}z-index:${k+1}" title="${tip}"><span class="chip-num">${k+1}</span>${iconSpan(f.type, f.value)}</span>`;
+      return `<span class="path-coin" style="${k?`margin-left:${(step-30).toFixed(1)}px;`:''}z-index:${k+1}" title="${tip}">${iconSpan(f.type, f.value)}</span>`;
     }).join('');
   }
   if(S.transitioning){

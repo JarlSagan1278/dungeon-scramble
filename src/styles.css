@@ -442,7 +442,7 @@
      behind the badge like it's meant to. */
   /* Display-only readout: pointer-events:none so a big total growing over the
      top-right die can never swallow taps meant for that die. */
-  .path-counter-float{ pointer-events:none; position:absolute; top:24px; right:0px; background: radial-gradient(circle at 32% 28%, #f3dd98, var(--gold) 60%); color:#241c10; border:3px solid var(--line);
+  .path-counter-float{ pointer-events:none; position:absolute; top:-10px; right:0px; background: radial-gradient(circle at 32% 28%, #f3dd98, var(--gold) 60%); color:#241c10; border:3px solid var(--line);
     border-radius:999px; padding:2px 10px; z-index:13; display:flex; align-items:baseline; gap:4px;
     box-shadow:0 3px 8px rgba(0,0,0,0.55); animation: pop-in 0.2s ease-out;
     transition: font-size .15s var(--ease-pop); }
@@ -619,7 +619,7 @@
      top-right corner the live path-total preview (.path-counter-float)
      used while building the path, since that preview is hidden once
      resolution starts (see pathCounterHTML()/renderGame() in render.js). */
-  .skip-turn-btn{ position:absolute; top:26px; right:4px; background:var(--stone); color:var(--parchment);
+  .skip-turn-btn{ position:absolute; top:-8px; right:4px; background:var(--stone); color:var(--parchment);
     border:2px solid var(--line); border-radius:14px; padding:3px 10px; font-size:11px; font-weight:bold; cursor:pointer;
     z-index:3; box-shadow:0 2px 6px rgba(0,0,0,0.5); }
   .skip-turn-btn:hover{ background:var(--gold); color:#241c10; }
@@ -1316,7 +1316,7 @@
   100%{ transform:none; filter:none; }
 }
 .enc-impact{ animation: enc-impact-kf var(--impact-dur,0.2s) ease-out; }
-.run-total{ position:absolute; top:22px; left:0; right:0; margin:0 auto; width:max-content; z-index:13; pointer-events:none;
+.run-total{ position:absolute; top:-12px; left:0; right:0; margin:0 auto; width:max-content; z-index:13; pointer-events:none;
   background:rgba(20,15,10,0.88); color:#ffd76a; border:2px solid var(--gold); border-radius:999px; padding:1px 12px;
   font-weight:800; font-size:17px; box-shadow:0 3px 8px rgba(0,0,0,0.6); animation: pop-in 0.14s ease-out; font-variant-numeric:tabular-nums; }
 .run-total small{ font-size:10px; font-weight:700; color:var(--parchment); }
@@ -1396,5 +1396,3 @@
   .path-coin{ position:relative; flex:0 0 30px; width:30px; height:30px; border-radius:50%; background:var(--cream); color:#241c10;
     border:2px solid var(--line); box-shadow:0 2px 0 var(--line); display:flex; align-items:center; justify-content:center; animation: pop-in .18s var(--ease-pop) both; }
   .path-coin .icon-svg{ width:18px; height:18px; }
-  .path-coin .chip-num{ position:absolute; top:-5px; left:-4px; width:13px; height:13px; border-radius:50%; background:var(--gold); color:#241c10;
-    font-size:8px; font-weight:900; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--line); z-index:1; }
