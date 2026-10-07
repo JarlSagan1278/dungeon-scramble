@@ -1155,7 +1155,7 @@ function renderGame(){
       <div class="enc-rail-row">
         <div class="enc-card-col">
           <div class="tray-float-wrap">
-            <span class="round-badge">Round ${S.turnNumber+1}</span>
+            <div class="tray-head"><span class="round-badge">Round ${S.turnNumber+1}</span><div class="path-strip" id="path-strip"></div></div>
             <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
               <div class="tray" id="tray"></div>
             </div>
@@ -1174,9 +1174,6 @@ function renderGame(){
               : `<img class="char-icon-img" src="${portrait.img}" alt="${S.origin.name}">`;
           })()}</div>
         </div>
-      </div>
-      <div class="path-strip-col">
-        <div class="path-strip" id="path-strip" style="margin-top:${S.path.length?6:0}px;"></div>
       </div>
     </div>
   `;
@@ -1285,9 +1282,15 @@ function renderGame(){
     if(!S.encounter || S.transitioning) return;
     debugWinEncounter();
   };
-  document.getElementById('path-strip').innerHTML = S.path.length ?
-    S.path.map((idx,n)=>{ const f=getFaceForIdx(idx); return `<span class="path-chip"><span class="chip-num">${n+1}</span>${iconSpan(f.type, f.value)} ${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?(' '+f.value):''}</span>`; }).join('')
-    : '';
+  { // Path as a rightward-growing stack of overlapping coins, one per move (latest on top).
+    const n = S.path.length;
+    const step = n>1 ? Math.min(16, 180/(n-1)) : 16;
+    document.getElementById('path-strip').innerHTML = S.path.map((idx,k)=>{
+      const f = getFaceForIdx(idx);
+      const tip = `${k+1}. ${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?(' '+f.value):''}`;
+      return `<span class="path-coin" style="${k?`margin-left:${(step-30).toFixed(1)}px;`:''}z-index:${k+1}" title="${tip}"><span class="chip-num">${k+1}</span>${iconSpan(f.type, f.value)}</span>`;
+    }).join('');
+  }
   if(S.transitioning){
     const skipBtn = document.getElementById('skip-transition-btn');
     if(skipBtn) skipBtn.onclick = skipTransition;
