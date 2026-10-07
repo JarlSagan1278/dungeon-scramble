@@ -541,7 +541,7 @@ function renderSetup(){
   const boonDice = boonTiers.flatMap(t=>BOON_TIER_POOLS[t].filter(d=>DISCOVERED_DICE.has(d.name)).map(d=>({...d, tier:t})));
   app.innerHTML = `
     <div class="panel setup-panel">
-      <button id="setup-back-btn" class="setup-back-btn" title="Back to title">&larr; Back</button>
+      <button id="setup-back-btn" class="setup-back-btn" title="Back to title"><svg viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><path d="M7.5 1.5 3 6l4.5 4.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Back</button>
 
       <div class="setup-name-row">
         <input id="char-name-input" class="char-name-input" type="text" maxlength="24" placeholder="New Character" autocomplete="off">

@@ -1065,8 +1065,7 @@
   .title-btn-col{ display:flex; flex-direction:column; gap:7px; width:66%; margin:0 auto; }
   .title-btn-col button{ font-size:13px; padding:9px 14px; }
   .title-btn-col .hint{ font-size:11px; }
-  .setup-back-btn{ background:none; border:none; color:var(--parchment-dim); font-size:12px; padding:0 0 10px; margin:0; cursor:pointer; }
-  .setup-back-btn:hover{ color:var(--cream); background:none; }
+  .setup-back-btn{ display:inline-flex; align-items:center; gap:5px; font-size:12px; padding:5px 12px 5px 9px; margin:0 0 10px; border-radius:var(--r-pill); }
 
   .compendium-tier{ margin-bottom:14px; text-align:left; }
   .compendium-list{ display:flex; flex-direction:column; gap:5px; max-height:220px; overflow-y:auto; margin-top:6px; }
