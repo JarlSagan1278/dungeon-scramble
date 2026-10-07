@@ -1505,3 +1505,10 @@
   #path-trail-svg{ opacity:0.88; }
   .path-trail-line{ filter:none !important; }
   #path-trail-svg{ filter:drop-shadow(0 0 3px rgba(212,175,82,0.65)); }
+
+  /* ===== One fixed screen height: every screen is at least as tall as the game screen ===== */
+  :root{ --screen-h:640px; }
+  .wrap{ min-height:var(--screen-h); }
+  #app{ display:flex; flex-direction:column; min-height:var(--screen-h); }
+  #app > *:last-child{ flex:1 1 auto; }
+  .title-screen-fill{ min-height:var(--screen-h) !important; }
