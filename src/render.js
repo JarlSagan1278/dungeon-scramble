@@ -2161,9 +2161,9 @@ function logViewHTML(){
 // same dietype background, the same arced name-tag, and a representative
 // face -- instead of the old plain icon-in-a-box preview, so a loot option
 // actually shows what the die will look like once it's in your tray.
-function lootPreviewTileHTML(opt, uniqueId){
+function lootPreviewTileHTML(opt, uniqueId, artSrc){
   const pf = pickPreviewFace(opt.faces);
-  const label = `<div class="face-val">${iconSpan(pf.type, pf.value)}</div><div class="face-word">${LABEL[pf.type]}${(pf.value && !ICON_VALUE_SLOT.has(pf.type))?(' '+pf.value):''}</div>`;
+  const label = artSrc ? `<img class="loot-tile-art" src="${artSrc}" alt="${opt.name}"/>` : `<div class="face-val">${iconSpan(pf.type, pf.value)}</div><div class="face-word">${LABEL[pf.type]}${(pf.value && !ICON_VALUE_SLOT.has(pf.type))?(' '+pf.value):''}</div>`;
   return `<div class="die loot-preview-tile dietype-${opt.cat}">
       <div class="name-tag">${nameTagSVG(opt.name, uniqueId)}</div>
       ${label}
@@ -2334,8 +2334,7 @@ function renderLootModal(){
       const card = el(`<div class="loot-opt loot-opt-reveal" style="--loot-tier-color:${accent.color}; --loot-tier-glow:${accent.glow}; animation-delay:${(i*0.1).toFixed(2)}s;">
           ${isNew?'<span class="new-tag new-tag-card">NEW!</span>':''}
           <div class="loot-opt-streaks">${lootStreaksHTML(0.5+i*0.12)}</div>
-          ${art?`<img class="loot-art-thumb" src="${art}" alt="${opt.name}"/>`:''}
-          ${lootPreviewTileHTML(opt, `loot-${i}`)}
+          ${lootPreviewTileHTML(opt, `loot-${i}`, art)}
           <div class="faces-tiles">${opt.faces.map(f=>f.type==='blank'
             ? '<div class="mini-face mf-blank"></div>'
             : `<div class="mini-face mf-${opt.cat}" title="${LABEL[f.type]}${f.value?' '+f.value:''}">${iconSpan(f.type, f.value)}<small>${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</small></div>`).join('')}</div>
