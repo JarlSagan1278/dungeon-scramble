@@ -2328,7 +2328,7 @@ function renderLootModal(){
           <div class="loot-opt-streaks">${lootStreaksHTML(0.5+i*0.12)}</div>
           ${art?`<img class="loot-art-thumb" src="${art}" alt="${opt.name}"/>`:''}
           ${lootPreviewTileHTML(opt, `loot-${i}`)}
-          <div class="faces faces-tiles">${opt.faces.map(f=>f.type==='blank'
+          <div class="faces-tiles">${opt.faces.map(f=>f.type==='blank'
             ? '<div class="mini-face mf-blank"></div>'
             : `<div class="mini-face mf-${opt.cat}" title="${LABEL[f.type]}${f.value?' '+f.value:''}">${iconSpan(f.type, f.value)}<small>${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</small></div>`).join('')}</div>
         </div>`);

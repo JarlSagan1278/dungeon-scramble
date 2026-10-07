@@ -1425,3 +1425,13 @@
   .mf-attack{ background:#ff5b5b; color:#fff3e6; } .mf-maneuver{ background:#ffe9a8; } .mf-origin{ background:#4a8a5c; color:#eafbea; }
   .mf-alloy{ background:#9aa3ab; } .mf-gilded{ background:#d9a93a; } .mf-magic{ background:#9a6ad0; color:#fff; }
   .mini-face.mf-blank{ background:#6b4627; opacity:.45; box-shadow:none; border-style:dashed; }
+  /* Light backdrop so dark icons read on every die color. */
+  .mini-face .icon-svg, .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ background:#fff4d2; border-radius:50%; box-shadow:0 0 0 2px #fff4d2; width:19px; height:19px; margin:2px 0 1px; }
+  .mini-face .icon-svg, .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ color:#241c10; }
+  .mini-face .icon-svg, .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ box-shadow:none; width:22px; height:22px; margin:1px 0 1px; border-radius:50%; }
+  .mini-face .icon-svg svg{ inset:1px; width:calc(100% - 2px); height:calc(100% - 2px); }
+
+  /* Final mini-face icon: plain glyph, no chip styling (the old .faces chip rules added a dark disc). */
+  .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ background:transparent; box-shadow:none; border-radius:0; width:24px; height:24px; color:#241c10; }
+  .mf-attack .icon-svg, .mf-magic .icon-svg{ color:#fff !important; }
+  .mini-face .icon-value-overlay{ font-size:9px; font-weight:900; }
