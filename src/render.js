@@ -1094,12 +1094,13 @@ function renderEncounterCard(e, mode){
     return `
     <div class="enc-card fo-arch fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${(e.quests&&e.quests.length)?'fo-has-quests':''} ${(e.quests||[]).join(' ').length>70?'fo-tight':''} ${roomEnterCls}">
       <div class="fo-torch fo-torch-l"></div><div class="fo-torch fo-torch-r"></div>
-      <div class="fo-hud">${relicStripHTML()}<div class="fo-hud-col fo-hud-l">${hudChips(p.statusHTML)}</div><div class="fo-hud-col fo-hud-r">${hudChips(statuses)}</div></div>
+      <div class="fo-hud">${relicStripHTML()}<div class="fo-hud-col fo-hud-r">${hudChips(statuses)}</div></div>
       <div class="fo-band">
         <div class="fo-side fo-player">
           <div class="fo-fig ${p.figCls||''}" title="${S.origin.name} ${S.klass.name}">${p.figHTML||''}</div><div class="fo-floor"></div>
           <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}"><div class="bar-fill hp player" style="width:${p.hpPct||0}%"></div></div><span>${S.health}/${S.maxHealth}</span>${p.deltaHTML||''}</div>
           <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim():S.origin.name+' '+S.klass.name}</div>
+          <div class="fo-chips fo-buffs">${hudChips(p.statusHTML)}</div>
         </div>
         <div class="fo-vs">vs</div>
         <div class="fo-side fo-enemy">
@@ -1112,9 +1113,9 @@ function renderEncounterCard(e, mode){
           ${killHint?`<div class="kill-hint kill-hint-${killHint.state}" data-hint="${killHint.state}">${killHint.text}</div>`:''}
           <div class="fo-name" ${e.flavor?`title="${e.flavor.replace(/"/g,'&quot;')}"`:''}>${typeTag}${e.name}</div>
           <div class="fo-chips">${chipsOnly}</div>
+          ${questLine}
         </div>
       </div>
-      ${questLine}
       ${e.flavor?`<div class="fo-flavor">${e.flavor}</div>`:''}
     </div>`;
   }
@@ -2471,7 +2472,7 @@ function renderLootModal(){
         </div>`);
       if(typeof screenShake==='function') screenShake(big ? 'big' : 'small');
     }
-    body.innerHTML = `<p>Choose one ${lootName} Loot Die to add to your tray:</p><div class="loot-options" id="loot-options"></div>`;
+    body.innerHTML = `<p class="modal-lead">Choose one ${lootName} Loot Die to add to your tray:</p><div class="loot-options" id="loot-options"></div>`;
     const container = body.querySelector('#loot-options');
     let locked = false; // guards against picking a second option once one's chosen
     options.forEach((opt,i)=>{
@@ -2665,7 +2666,7 @@ function renderShrineResultModal(){
 function renderSwapModal(){
   const overlay = el(`<div class="modal-overlay modal-bottom"><div class="modal">
       <h2>Equip ${S.pendingLootDie.name}</h2>
-      <p>Choose which die in your tray to replace. The replaced die goes to your Back Pocket.</p>
+      <p class="modal-lead">Choose which die in your tray to replace. The replaced die goes to your Back Pocket.</p>
       <div class="swap-list" id="swap-list"></div>
     </div></div>`);
   openUniqueOverlay('swap', overlay);

@@ -1661,3 +1661,18 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .fo-hud-l{ left:14px; align-items:flex-start; } .fo-hud-r{ right:14px; align-items:flex-end; }
 .fo-hud-col .status-chip{ pointer-events:auto; font-size:10px; padding:1px 5px; white-space:nowrap; }
 .fo-hud-col:empty{ display:none; }
+
+/* Player buffs sit under the name; enemy quests sit under the enemy */
+.fo-buffs{ min-height:0; }
+.fo-buffs:empty{ display:none; }
+.fo-buffs .status-chip{ font-size:10px; padding:1px 5px; white-space:nowrap; }
+.fo-enemy .fo-quests{ margin:2px 0 0; align-items:flex-start; justify-content:flex-start; flex-direction:column; flex-wrap:nowrap; gap:1px; width:100%; text-align:left; font-size:8.5px; }
+.fo-enemy .fo-quest{ display:block; }
+
+/* Basic dice: icon dead-centre in the tile, word pinned along the bottom */
+#tray .die.dietype-attack:not(.blank), #tray .die.dietype-maneuver:not(.blank){ position:relative; padding-top:0 !important; padding-bottom:0 !important; }
+#tray .die.dietype-attack:not(.blank) .face-val, #tray .die.dietype-maneuver:not(.blank) .face-val{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+#tray .die.dietype-attack:not(.blank) .face-word, #tray .die.dietype-maneuver:not(.blank) .face-word{ position:absolute; left:0; right:0; bottom:3px; margin:0; text-align:center; }
+
+.modal-lead{ text-align:center; }
+.fo-has-quests .fo-flavor{ display:none; }
