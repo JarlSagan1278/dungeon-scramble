@@ -390,8 +390,8 @@ function rollHpNumbers(){
     const now = performance.now();
     for(const side in sides){
       const el = document.querySelector(sides[side]); if(!el) continue;
-      const m = /^(-?\d+)\/(\d+)$/.exec(el.textContent.trim()); if(!m) continue;
-      const to = +m[1], max = m[2];
+      const m = /^(-?\d+)(?:\+(\d+))?\/(\d+)$/.exec(el.textContent.trim()); if(!m) continue;
+      const to = +m[1], sh = m[2], max = m[3];
       const st = r[side] || (r[side] = {from:to, to, t:0, shown:to});
       if(st.to !== to){ st.from = st.shown; st.to = to; st.t = now; }
       if(noAnim){ st.shown = to; continue; }
@@ -399,13 +399,14 @@ function rollHpNumbers(){
         const e = document.querySelector(sides[side]); if(!e) return;
         const k = Math.min(1, (performance.now()-st.t)/450);
         st.shown = Math.round(st.from + (st.to-st.from)*(1-Math.pow(1-k,3)));
-        e.textContent = `${st.shown}/${max}`;
+        e.innerHTML = `${st.shown}${shieldNumHTML(+sh||0)}/${max}`;
         if(k<1) requestAnimationFrame(tick);
       };
       if(now - st.t < 450) tick();
     }
   }catch(err){}
 }
+function shieldNumHTML(v){ return v>0 ? `<span class="bn-sh" title="Shield/Block ${v}: absorbs damage before health">+${v}</span>` : ''; }
 function shieldBarHTML(val, max, hpPct, side){
   side = side || 'x';
   const g = (S._shieldFx = S._shieldFx || {});
@@ -421,8 +422,7 @@ function shieldBarHTML(val, max, hpPct, side){
   const dl = fx ? `animation-delay:-${Math.round(el)}ms` : '';
   const room = Math.max(0, 100 - (hpPct||0));
   const w = Math.min(room, val/Math.max(1,max)*100);
-  return (w>0?`<div class="bar-fill shield-seg${fx}" style="left:${hpPct||0}%; width:${w}%; ${dl}" title="Shield ${val}"></div>`:'')
-    + `<span class="bar-shield${fx}" style="${dl}" title="Shield/Block ${val}: absorbs damage before health"><b>+${val}</b></span>`;
+  return (w>0?`<div class="bar-fill shield-seg${fx}" style="left:${hpPct||0}%; width:${w}%; ${dl}" title="Shield ${val}"></div>`:'');
 }
 function decorateArch(){
   try{
@@ -1243,7 +1243,7 @@ function renderEncounterCard(e, mode){
       <div class="fo-band">
         <div class="fo-side fo-player">
           <div class="fo-fig ${p.figCls||''}" title="${S.origin.name} ${S.klass.name}">${p.figHTML||''}</div><div class="fo-floor"></div>
-          <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}">${hpFillHTML('player','hp player',p.hpPct)}${shieldBarHTML(S.playerBlock, S.maxHealth, p.hpPct, 'player')}<span class="bar-num">${S.health}/${S.maxHealth}</span></div>${p.deltaHTML||''}</div>
+          <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}">${hpFillHTML('player','hp player',p.hpPct)}${shieldBarHTML(S.playerBlock, S.maxHealth, p.hpPct, 'player')}<span class="bar-num">${S.health}${shieldNumHTML(S.playerBlock)}/${S.maxHealth}</span></div>${p.deltaHTML||''}</div>
           <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim():S.origin.name+' '+S.klass.name}</div>
           <div class="fo-chips fo-buffs">${hudChips(p.statusHTML)}</div>
         </div>
@@ -1254,7 +1254,7 @@ function renderEncounterCard(e, mode){
               ${hpFillHTML('enemy','hp',hpPct)}
               ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
               ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
-              ${shieldBarHTML(e.curShield, e.maxHealth, hpPct, 'enemy')}<span class="bar-num">${curHealthClamped.toFixed(0)}/${e.maxHealth}</span>
+              ${shieldBarHTML(e.curShield, e.maxHealth, hpPct, 'enemy')}<span class="bar-num">${curHealthClamped.toFixed(0)}${shieldNumHTML(e.curShield)}/${e.maxHealth}</span>
             </div>${fx.deltaHTML}</div>
           <div class="kill-hint fo-hint ${killHint?'kill-hint-'+killHint.state:''}" ${killHint?`data-hint="${killHint.state}"`:''}>${killHint?killHint.text:'&nbsp;'}</div>
           <div class="fo-name" ${e.flavor?`title="${e.flavor.replace(/"/g,'&quot;')}"`:''}>${typeTag}${e.name}</div>

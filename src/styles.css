@@ -1928,3 +1928,5 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .bar-shield.sh-up, .bar-fill.shield-seg.sh-up{ animation:sh-up-kf .5s cubic-bezier(.2,1.4,.4,1) both; }
 .bar-shield.sh-down, .bar-fill.shield-seg.sh-down{ animation:sh-down-kf .4s ease-out both; }
 .reduced-motion .sh-up, .reduced-motion .sh-down{ animation:none !important; }
+
+.bar-num .bn-sh{ color:#8cd0ff; text-shadow:0 1px 0 #0a2236, 0 0 3px #0a2236; }
