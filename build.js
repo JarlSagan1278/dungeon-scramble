@@ -54,7 +54,7 @@ const WEB = path.join(DIST_DIR, 'web');
 fs.rmSync(WEB, { recursive: true, force: true });
 fs.mkdirSync(WEB, { recursive: true });
 const PWA_HEAD = [
-  '<link rel="manifest" href="manifest.webmanifest">',
+  '<link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials">',
   '<meta name="theme-color" content="#2a1a0c">',
   '<meta name="mobile-web-app-capable" content="yes">',
   '<meta name="apple-mobile-web-app-capable" content="yes">',
