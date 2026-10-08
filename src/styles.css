@@ -1888,3 +1888,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .origin-relic-line.locked{ opacity:.65; border-style:dashed; }
 @media (prefers-reduced-motion: reduce){ .origin-relic-earned{ animation:none; } }
 .near-miss-chip{ white-space:nowrap; font-size:12px !important; padding:3px 10px !important; width:auto !important; max-width:none; }
+
+/* ---- v1.32.3: campfire logs get the same thick black outline as the portraits ---- */
+.campfire-logs{ height:13px !important; border:2.5px solid #000 !important; background:#6b4628 !important; }
+.campfire-logs::before, .campfire-logs::after{ height:11px !important; border:2.5px solid #000 !important; top:-2.5px !important; left:-2.5px !important; background:#7a4f2c !important; }
