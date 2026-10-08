@@ -2681,7 +2681,6 @@ function renderLootModal(){
   // before the reveal.
   body.innerHTML = `<button type="button" class="loot-chest-btn" aria-label="Open your loot" style="--loot-tier-color:${accent.color}; --loot-tier-glow:${accent.glow};">
       <div class="loot-chest">${lootChestSVG(tier)}</div>
-      <div class="loot-pips">${options.map(()=>'<i></i>').join('')}</div>
       <div class="loot-tap-hint">Tap to open</div>
     </button>`;
   const chestBtn = body.querySelector('.loot-chest-btn');
@@ -2691,12 +2690,9 @@ function renderLootModal(){
     chestBtn.classList.add('opening');
     const reduced = typeof PREFS!=='undefined' && PREFS.reducedMotion;
     if(reduced){ reveal(true); return; }
-    const pips = [...chestBtn.querySelectorAll('.loot-pips i')];
-    pips.forEach((p,i)=> setTimeout(()=>{
-      p.classList.add('lit');
-      if(typeof playTone==='function') playTone('pathTick', i+1);
-    }, 140 + i*170));
-    const total = 480 + pips.length*170;
+    const n = options.length;
+    for(let i=0;i<n;i++) setTimeout(()=>{ if(typeof playTone==='function') playTone('pathTick', i+1); }, 140 + i*170);
+    const total = 480 + n*170;
     setTimeout(()=> reveal(true), total);
   };
 }
