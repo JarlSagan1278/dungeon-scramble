@@ -1867,3 +1867,24 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .path-strip{ min-height:36px; box-sizing:border-box; }
 /* Flying banners use the regular UI font like the rest of the text */
 .rb, .rb-in{ font-family:var(--font-ui) !important; font-weight:800; letter-spacing:.2px; }
+
+/* ---- v1.32: anticipation pips, near-miss chip, run highlights, origin relic ---- */
+.loot-pips{ display:flex; gap:7px; justify-content:center; min-height:10px; }
+.loot-pips i{ width:9px; height:9px; border-radius:50%; background:rgba(255,255,255,.14); border:1px solid var(--loot-tier-color, var(--gold)); transition:background .12s, box-shadow .12s, transform .12s; }
+.loot-pips i.lit{ background:var(--loot-tier-color, var(--gold)); box-shadow:0 0 10px var(--loot-tier-glow, var(--gold)); transform:scale(1.35); }
+.loot-tap-hint{ font-size:12px; letter-spacing:.06em; opacity:.75; }
+.loot-chest-btn.opening .loot-tap-hint{ visibility:hidden; }
+.near-miss-chip{ background:rgba(255,138,61,.16) !important; color:#ffb877 !important; border:1px solid rgba(255,138,61,.5) !important; }
+.run-highlights .hl-row{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:5px 0; border-top:1px solid var(--line); }
+.run-highlights .hl-row:first-of-type{ border-top:none; }
+.run-highlights .hl-k{ font-weight:700; }
+.run-highlights .hl-v{ text-align:right; }
+.run-highlights .hl-v small{ display:block; opacity:.7; font-size:11px; }
+.origin-relic-earned{ border:1px solid var(--gold) !important; box-shadow:0 0 18px rgba(255,215,106,.35); text-align:center; animation:ore-in .6s cubic-bezier(.2,1.4,.4,1) both; }
+.origin-relic-earned .ore-kicker{ color:var(--gold); font-weight:800; letter-spacing:.08em; text-transform:uppercase; font-size:13px; margin-bottom:8px; }
+.origin-relic-earned .ore-body{ display:flex; gap:12px; align-items:center; justify-content:center; }
+@keyframes ore-in{ from{ opacity:0; transform:scale(.85) translateY(10px);} to{ opacity:1; transform:none; } }
+.origin-relic-line{ display:flex; gap:10px; align-items:center; margin-top:8px; padding:8px 10px; border:1px solid var(--line); border-radius:10px; text-align:left; }
+.origin-relic-line.locked{ opacity:.65; border-style:dashed; }
+@media (prefers-reduced-motion: reduce){ .origin-relic-earned{ animation:none; } }
+.near-miss-chip{ white-space:nowrap; font-size:12px !important; padding:3px 10px !important; width:auto !important; max-width:none; }

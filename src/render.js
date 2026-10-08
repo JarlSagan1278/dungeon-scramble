@@ -595,7 +595,20 @@ function originShowcaseHTML(o, unlocked){
       </div>
       <div class="die-face-row">${dieFaceChipsHTML(o.faces, 'origin-tone')}</div>
     </div>
+    ${originRelicLineHTML(o)}
   `;
+}
+
+// Setup screen: the Origin's signature relic -- shown in full once earned,
+// otherwise as a locked silhouette with the goal ("win a run as X"), so
+// there's always a visible thing to chase.
+function originRelicLineHTML(o){
+  const r = originRelicFor(o.id);
+  if(!r) return '';
+  const earned = (META.lifetime.victoriesByOrigin[o.id]||0) >= 1;
+  return earned
+    ? `<div class="origin-relic-line">${relicBadgeHTML(r)}<div><div class="relic-name">${r.name} <span class="relic-origin-tag">starts every run</span></div><div class="relic-desc">${r.desc}</div></div></div>`
+    : `<div class="origin-relic-line locked"><span class="relic-badge relic-locked">?</span><div><div class="relic-name">Signature Relic</div><div class="relic-desc">Win a run as a ${o.name} to earn it.</div></div></div>`;
 }
 
 // Class showcase: the selected Class's name, ability text, and its action
@@ -2492,6 +2505,7 @@ function renderLootModal(){
       <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:4px;">
         <h2 style="margin:0; width:100%; text-align:center; padding-right:0;">${fromShrine ? 'Shrine Boon' : 'Victory!'}</h2>
         ${overkill?'<span class="status-chip" style="background:var(--gold);color:#241c10;">Overkill! +1 option</span>':''}
+        ${(!overkill && S.lootChoice.nearMiss)?`<span class="status-chip near-miss-chip">So close! ${S.lootChoice.nearMiss} short of Overkill</span>`:''}
       </div>
       <div id="loot-body"></div>
     </div></div>`);
@@ -2538,8 +2552,13 @@ function renderLootModal(){
 
   // Phase 1: a closed chest to tap. Its glow is the loot's tier color, so the
   // rarity is hinted before it opens. Tapping flips it, then bursts + reveals.
+  // One pip per die inside: an Overkill/Boss chest visibly holds more, and
+  // the pips light one by one (rising tick) as it opens -- the build-up
+  // before the reveal.
   body.innerHTML = `<button type="button" class="loot-chest-btn" aria-label="Open your loot" style="--loot-tier-color:${accent.color}; --loot-tier-glow:${accent.glow};">
       <div class="loot-chest">${lootChestSVG(tier)}</div>
+      <div class="loot-pips">${options.map(()=>'<i></i>').join('')}</div>
+      <div class="loot-tap-hint">Tap to open</div>
     </button>`;
   const chestBtn = body.querySelector('.loot-chest-btn');
   chestBtn.onclick = ()=>{
@@ -2547,7 +2566,14 @@ function renderLootModal(){
     chestBtn.dataset.opening = '1';
     chestBtn.classList.add('opening');
     const reduced = typeof PREFS!=='undefined' && PREFS.reducedMotion;
-    setTimeout(()=> reveal(true), reduced ? 0 : 480);
+    if(reduced){ reveal(true); return; }
+    const pips = [...chestBtn.querySelectorAll('.loot-pips i')];
+    pips.forEach((p,i)=> setTimeout(()=>{
+      p.classList.add('lit');
+      if(typeof playTone==='function') playTone('pathTick', i+1);
+    }, 140 + i*170));
+    const total = 480 + pips.length*170;
+    setTimeout(()=> reveal(true), total);
   };
 }
 
@@ -2957,9 +2983,38 @@ function animateSummary(){
   setTimeout(()=>{ if(typeof playTone==='function') playTone('tally', 4); }, 350 + chips.length*260 + 200);
 }
 
+// Highlight reel for the run-end screen: the best moments of the run, with a
+// gold "New best!" tag where it beat the player's lifetime record.
+function runHighlightsHTML(){
+  const st = S.stats, pbs = S.personalBests||[];
+  const tag = label => pbs.includes(label) ? ' <span class="new-tag">NEW BEST!</span>' : '';
+  const rows = [];
+  if(st.bestTurn>0) rows.push(['Biggest turn', `${st.bestTurn} damage`, st.bestTurnFoe ? `vs ${st.bestTurnFoe}` : '', 'Biggest turn']);
+  if(st.bestOverBy>0) rows.push(['Biggest overkill', `${st.bestOverBy} past dead`, st.bestOverFoe ? `on ${st.bestOverFoe}` : '', 'Biggest overkill']);
+  if(st.longestPath>0) rows.push(['Longest path', `${st.longestPath} dice`, '', 'Longest path']);
+  if(st.nearMisses>0) rows.push(['Close calls', `${st.nearMisses}`, 'nearly-lethal swings & near-overkills', '']);
+  if(!rows.length) return '';
+  return `<div class="key-card run-highlights" style="text-align:left;">
+    <div class="camp-section-title" style="font-weight:800; text-align:center; margin-bottom:6px;">Highlights</div>
+    ${rows.map(r=>`<div class="hl-row"><span class="hl-k">${r[0]}${r[3]?tag(r[3]):''}</span><span class="hl-v"><b>${r[1]}</b>${r[2]?` <small>${r[2]}</small>`:''}</span></div>`).join('')}
+  </div>`;
+}
+
+// Victory-only reveal: the first win with an Origin earns its signature relic.
+function originRelicEarnedHTML(){
+  if(!S.newOriginRelic) return '';
+  const r = relicById(S.newOriginRelic), o = ORIGINS.find(x=>x.id===r.origin);
+  return `<div class="key-card origin-relic-earned">
+    <div class="ore-kicker">Origin Relic Earned!</div>
+    <div class="ore-body">${relicBadgeHTML(r, 'relic-badge-lg')}<div style="text-align:left;"><div class="relic-name">${r.name}</div><div class="relic-desc">${r.desc}</div></div></div>
+    <div class="hint" style="margin:6px 0 0;">Every future ${o.name} run now starts with it.</div>
+  </div>`;
+}
+
 function summaryStatsHTML(){
   const st = S.stats;
   return `
+    ${runHighlightsHTML()}
     <div class="key-card" style="text-align:left;">
       <div class="camp-section-title" style="font-weight:800; text-align:center; margin-bottom:8px;">Run Summary</div>
       <div class="statuses" style="justify-content:center;">
@@ -3040,8 +3095,10 @@ function renderVictory(){
     clearSave();
     playTone('grandVictory');
     if(typeof spawnConfettiRain==='function') spawnConfettiRain();
+    if(S.newOriginRelic) setTimeout(()=>{ if(typeof playTone==='function') playTone('relicProc'); }, 700);
   }
   app.innerHTML = `<div class="panel"><h2>Dungeon Conquered!</h2><p>You defeated the Big Boss and cleared all three floors. Well fought, Adventurer.</p>
+    ${originRelicEarnedHTML()}
     ${newAchievementsHTML(S.newAchievements)}
     ${summaryStatsHTML()}
     <button class="primary" style="margin-top:12px;" onclick="location.reload()">Play Again</button>

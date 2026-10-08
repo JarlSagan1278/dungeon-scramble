@@ -268,6 +268,7 @@ const DEFAULT_LIFETIME = {
   runsPlayed:0, victories:0, bestFloorReached:0, totalDamageDealt:0,
   totalEncountersDefeated:0, totalOverkills:0, totalShrinesVisited:0,
   victoriesByOrigin:{}, victoriesByClass:{},
+  bestTurnDamage:0, bestOverkillBy:0, bestPathLen:0,
 };
 function loadMeta(){
   try{
@@ -440,6 +441,19 @@ function recordMetaProgress(outcome){
   L.totalEncountersDefeated += S.stats.encountersDefeated;
   L.totalOverkills += S.stats.overkills;
   L.totalShrinesVisited += S.stats.shrinesVisited;
+  // Personal bests: flagged only when beating a real earlier mark (a first
+  // run would otherwise "beat" zero in every category).
+  S.personalBests = [];
+  [['Biggest turn', 'bestTurnDamage', S.stats.bestTurn||0],
+   ['Biggest overkill', 'bestOverkillBy', S.stats.bestOverBy||0],
+   ['Longest path', 'bestPathLen', S.stats.longestPath||0]].forEach(([label, key, val])=>{
+    if(val > (L[key]||0)){ if((L[key]||0) > 0) S.personalBests.push(label); L[key] = val; }
+  });
+  S.newOriginRelic = null;
+  if(outcome==='victory' && !(L.victoriesByOrigin[S.origin.id]>0)){
+    const orc = originRelicFor(S.origin.id);
+    if(orc) S.newOriginRelic = orc.id;
+  }
   if(outcome==='victory'){
     L.victoriesByOrigin[S.origin.id] = (L.victoriesByOrigin[S.origin.id]||0)+1;
     L.victoriesByClass[S.klass.id] = (L.victoriesByClass[S.klass.id]||0)+1;
@@ -699,7 +713,7 @@ function newGame(originId, classId, boonDieName, charName){
     // carryover die.
     usedLootNames: new Set([carryDie && carryDie.name, appliedBoonName].filter(Boolean)),
     _lastPlayerHealth: 20, // for the heal/damage flash effect on the health bar
-    stats: { turnsTaken:0, damageDealt:0, encountersDefeated:0, shrinesVisited:0, overkills:0, lootCollected:0 },
+    stats: { turnsTaken:0, damageDealt:0, encountersDefeated:0, shrinesVisited:0, overkills:0, lootCollected:0, bestTurn:0, bestTurnFoe:'', bestOverBy:0, bestOverFoe:'', longestPath:0, nearMisses:0 },
     tele: newTelemetry(),
     campRested: false,
     shrineResult: null,
@@ -1315,6 +1329,7 @@ function startTurnTransition(){
   if(typeof resetPathCounterFx==='function') resetPathCounterFx();
   S._hitStreak = 0; // climbing pitch for consecutive damage-dealing dice this turn -- see playStepTone()
   S.stats.turnsTaken++;
+  S.stats.longestPath = Math.max(S.stats.longestPath||0, S.path.length);
   teleLog('turn', {n:S.turnNumber, len:S.path.length, hp:S.health, enemy:S.encounter?S.encounter.name:null, enemyHp:S.encounter?Math.round(S.encounter.curHealth):null});
   S.pendingFreeBoost = 0; // a free Boost token is spent by end of turn whether or not it landed on anything
   const path = S.path.slice();
@@ -1376,7 +1391,16 @@ function finishPlayerPath(path, effects){
     boostCount:effects.boostCount, dodgeCount:effects.dodgeCount, leapCount:effects.leapCount,
     pivotCount:effects.pivotCount, nullifyCount:effects.nullifyCount, supportCount:effects.supportCount
   });
+  { const tt = Math.round(S.resolveTotal||0);
+    if(tt > (S.stats.bestTurn||0)){ S.stats.bestTurn = tt; S.stats.bestTurnFoe = e.name; } }
   if(e.curHealth<=0){ S.transitioning=false; onEncounterDefeated(); return; }
+  // Near-miss: the swing left the foe barely standing. Name the exact number
+  // (it motivates "one more turn") and give it its own cue.
+  if((S.resolveTotal||0) > 0 && e.curHealth > 0 && e.curHealth <= 3 && e.maxHealth >= 8){
+    S.stats.nearMisses = (S.stats.nearMisses||0) + 1;
+    showToastIfAvailable(`Just ${Math.ceil(e.curHealth)} HP left!`, null);
+    if(typeof playTone==='function') playTone('closeCall');
+  }
   // Closing 'tally' beat for a strong turn (the kill case has its own, bigger
   // callouts in onEncounterDefeated): chord + shake scaled to the total.
   { const tot = S.resolveTotal||0, tier = tot>=25 ? 3 : tot>=15 ? 2 : tot>=8 ? 1 : 0;
@@ -1713,14 +1737,22 @@ function onEncounterDefeated(){
   const overkill = e.curHealth < (hasRelic('hungry_blade') ? -5 : -9);
   if(overkill && hasRelic('hungry_blade') && e.curHealth >= -9) fireRelic('hungry_blade','Overkill!'); // curHealth is allowed to go negative (see capUpper) so this is measurable
   if(overkill) S.stats.overkills++;
+  // Overkill near-miss: a kill that fell 1-3 short of the Overkill line gets
+  // told exactly how close it was, on the loot screen.
+  const okThr = hasRelic('hungry_blade') ? 5 : 9;
+  const overBy = Math.max(0, -e.curHealth);
+  if(overBy > (S.stats.bestOverBy||0)){ S.stats.bestOverBy = Math.round(overBy); S.stats.bestOverFoe = e.name; }
+  const okMiss = (!overkill && e.curHealth <= 0) ? Math.floor(okThr - overBy) + 1 : 0;
+  const nearMiss = (okMiss>=1 && okMiss<=3) ? okMiss : 0;
+  if(nearMiss) S.stats.nearMisses = (S.stats.nearMisses||0) + 1;
   const isBoss = e.type==='Boss' || e.type==='Big Boss';
   let drawCount = isBoss ? 3 : 2;
   if(overkill) drawCount += 1;
   if(hasRelic('lucky_coin')){ drawCount += 1; fireRelic('lucky_coin','+1 option'); }
   if(hasRelic('iron_rations')){ S.health = cap(S.health+2, S.maxHealth); logMsg('heal', 'Iron Rations: healed 2.', 'good'); fireRelic('iron_rations','+2 HP'); }
   const options = pickLootNUnused(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
-  S.lootChoice = { options, lootName: floor.lootName, overkill };
-  teleLog('room_win', {name:e.name, type:e.type, turns:S.turnNumber, ms:S._roomStartedAt?Date.now()-S._roomStartedAt:null, overkill, overBy:Math.max(0,Math.round(-e.curHealth)), hp:S.health});
+  S.lootChoice = { options, lootName: floor.lootName, overkill, nearMiss };
+  teleLog('room_win', {name:e.name, type:e.type, turns:S.turnNumber, ms:S._roomStartedAt?Date.now()-S._roomStartedAt:null, overkill, overBy:Math.max(0,Math.round(-e.curHealth)), nearMiss, offered:options.length, hp:S.health});
   teleLog('loot_offer', {tier:(options[0]&&options[0].cat)||null, overkill, offered:options.map(o=>o.name)});
   if(typeof markDiceDiscovered==='function') S.lootChoice.fresh = markDiceDiscovered(options);
   // A Boss/Big Boss kill or an Overkill each get a distinct sound + a big
