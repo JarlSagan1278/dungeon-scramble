@@ -1838,3 +1838,15 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
   .camp-fire-wrap{ zoom:1.7; margin:14px auto 22px !important; }
   .title-panel .title-btn, .title-panel button{ padding-top:14px; padding-bottom:14px; }
 }
+
+/* ===== Ribbons restyled to match the game's toy-like art: flat colour, chunky dark outline, button-style drop edge ===== */
+.rb{ text-shadow:none; letter-spacing:.3px; }
+.rb-in{ clip-path:none !important; border-radius:14px; padding:9px 22px; border:3px solid #1b0f06;
+  box-shadow:0 4px 0 #1b0f06, inset 0 3px 0 rgba(255,255,255,.28), inset 0 -3px 0 rgba(0,0,0,.18) !important; }
+.rb-in{ color:#fff1d6; text-shadow:0 2px 0 rgba(27,15,6,.85); -webkit-text-stroke:0; }
+.rb-bad .rb-in{ background:#c0392b !important; }
+.rb-good .rb-in{ background:#3fa357 !important; }
+.rb-neutral .rb-in{ background:#b8844a !important; color:#2a1608; text-shadow:0 1px 0 rgba(255,241,214,.45); }
+.rb-gold .rb-in{ background:#ffc83a !important; color:#2a1608; text-shadow:0 1px 0 rgba(255,255,255,.4); padding:7px 20px; }
+.rb-in small{ color:inherit; opacity:.75; }
+.rb-l .rb-in{ margin-left:6px; } .rb-r .rb-in{ margin-right:6px; }
