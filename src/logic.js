@@ -1451,6 +1451,7 @@ function runPlayerPathSteps(steps, i, path, effects){
   const pitchStep = step.dmg>0 ? S._hitStreak++ : 0;
   if(typeof playStepTone==='function') playStepTone(S.resolvingFx, pitchStep);
   render();
+  if(step.dmg>0 && typeof lungeFigure==='function') lungeFigure('player');
   // Impact tier from the die's own damage; bigger hits also linger a beat
   // (a brief 'hit-stop' -- only this sequence's own timer, never the UI or
   // audio) so they land with weight. Skip fast-forwards past all of it.
@@ -1539,8 +1540,10 @@ function runEnemyBeat(i){
     },
   ];
   if(i>=beats.length){ endTurn(); return; }
+  const hpBefore = S.health;
   const result = beats[i]() || {};
   render();
+  if(i===1 && S.health < hpBefore && typeof lungeFigure==='function') lungeFigure('enemy');
   const advance = () => {
     S._pendingTimeout = null;
     if(result.stop==='encounterDefeated'){ S.transitioning=false; onEncounterDefeated(); return; }

@@ -302,6 +302,55 @@ function archFrameSVG(w,h,lvl){
   }
   return out;
 }
+// ---- Animation polish (v1.32.13) ----
+// Ghost "recent damage" segment: when a bar drops, a pale chunk lingers where the lost health was
+// and then slides away. State survives render() rebuilds via S._ghost so the chunk isn't cut short.
+function ghostBarHTML(side, pct){
+  try{
+    if(typeof PREFS!=='undefined' && PREFS.reducedMotion) return '';
+    pct = Math.max(0, Math.min(100, pct||0));
+    const g = (S._ghost = S._ghost || {});
+    const st = g[side] || (g[side] = {last:pct, from:pct, t:0});
+    const now = performance.now();
+    if(pct < st.last - 0.01){
+      if(now - st.t >= 900) st.from = st.last;
+      st.t = now;
+    } else if(pct > st.last + 0.01){
+      st.from = pct; st.t = 0;
+    }
+    st.last = pct;
+    const el = now - st.t;
+    if(el >= 900 || pct >= st.from - 0.01) return '';
+    return `<div class="bar-fill hp-ghost" style="left:${pct}%; width:${st.from-pct}%; animation-delay:-${Math.round(el)}ms"></div>`;
+  }catch(err){ return ''; }
+}
+// Idle breathing: render() rebuilds the DOM, so a plain CSS loop would restart on every redraw.
+// A negative delay tied to the clock keeps the loop continuous across rebuilds.
+function syncIdleBreath(){
+  try{
+    const figs = document.querySelectorAll('#enc-panel .fo-player .fo-fig > *, #enc-panel .fo-enemy .fo-fig > *');
+    figs.forEach((el,i)=>{
+      const period = 3200 + (el.closest('.fo-enemy') ? 400 : 0);
+      el.classList.add('idle-breath');
+      el.style.animationDuration = period+'ms';
+      el.style.animationDelay = '-'+Math.round(performance.now() % period)+'ms';
+    });
+  }catch(err){}
+}
+// One-shot lunge toward the other side (Web Animations API: never fights the CSS transforms).
+function lungeFigure(side){
+  try{
+    if(typeof PREFS!=='undefined' && (PREFS.reducedMotion || PREFS.lowIntensity)) return;
+    const el = document.querySelector(`#enc-panel .fo-${side} .fo-fig > *`);
+    if(!el || !el.animate) return;
+    const dx = side==='player' ? 14 : -14;
+    el.animate([
+      {translate:'0 0'},
+      {translate:`${dx}px -2px`, offset:0.35},
+      {translate:'0 0'}
+    ], {duration:200, easing:'cubic-bezier(.2,.8,.3,1)'});
+  }catch(err){}
+}
 function shieldBarHTML(val, max, hpPct){
   if(!val || val<=0) return '';
   const room = Math.max(0, 100 - (hpPct||0));
@@ -319,6 +368,7 @@ function decorateArch(){
     const w = Math.round(card.offsetWidth), h = Math.round(card.offsetHeight+10);
     const lvl = Math.min(3,(S.floorIdx||0)+1);
     card.insertAdjacentHTML('beforeend', `<svg class="fo-frame" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">${archFrameSVG(w,h,lvl)}</svg>`);
+    syncIdleBreath();
     // The settings cog tucks into the empty corner beside the arch's right shoulder.
     document.body.classList.add('cog-arch');
     document.body.style.setProperty('--cog-top', Math.max(2, Math.round(r.top + window.scrollY - 10))+'px');
@@ -1127,7 +1177,7 @@ function renderEncounterCard(e, mode){
       <div class="fo-band">
         <div class="fo-side fo-player">
           <div class="fo-fig ${p.figCls||''}" title="${S.origin.name} ${S.klass.name}">${p.figHTML||''}</div><div class="fo-floor"></div>
-          <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}"><div class="bar-fill hp player" style="width:${p.hpPct||0}%"></div>${shieldBarHTML(S.playerBlock, S.maxHealth, p.hpPct)}<span class="bar-num">${S.health}/${S.maxHealth}</span></div>${p.deltaHTML||''}</div>
+          <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}"><div class="bar-fill hp player" style="width:${p.hpPct||0}%"></div>${ghostBarHTML('player', p.hpPct)}${shieldBarHTML(S.playerBlock, S.maxHealth, p.hpPct)}<span class="bar-num">${S.health}/${S.maxHealth}</span></div>${p.deltaHTML||''}</div>
           <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim():S.origin.name+' '+S.klass.name}</div>
           <div class="fo-chips fo-buffs">${hudChips(p.statusHTML)}</div>
         </div>
@@ -1136,6 +1186,7 @@ function renderEncounterCard(e, mode){
           <div class="fo-fig enc-portrait ${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}">${monsterFig}</div><div class="fo-floor"></div>
           <div class="fo-hpwrap status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;"><div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
               <div class="bar-fill hp" style="width:${hpPct}%"></div>
+              ${ghostBarHTML('enemy', hpPct)}
               ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
               ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
               ${shieldBarHTML(e.curShield, e.maxHealth, hpPct)}<span class="bar-num">${curHealthClamped.toFixed(0)}/${e.maxHealth}</span>

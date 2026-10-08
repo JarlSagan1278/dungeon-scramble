@@ -1910,3 +1910,11 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .bar-shield b{ font-weight:700; line-height:1; }
 .bar-shield .icon-svg{ width:12px; height:12px; display:inline-flex; color:#8cc8f0; }
 .bar-shield .icon-svg svg{ width:12px; height:12px; }
+
+/* v1.32.13 animation polish */
+@keyframes idle-breath-kf{ 0%,100%{ translate:0 0; scale:1 1; } 50%{ translate:0 -1.5px; scale:1 1.025; } }
+.idle-breath{ animation: idle-breath-kf 3.2s ease-in-out infinite; transform-origin:50% 100%; }
+.fo-fig.fo-dead .idle-breath, .enc-death .idle-breath{ animation:none; }
+@keyframes hp-ghost-kf{ 0%,35%{ transform:scaleX(1); opacity:.95; } 100%{ transform:scaleX(0); opacity:.4; } }
+.bar-fill.hp-ghost{ position:absolute; top:0; bottom:0; height:auto; background:#ffe6c4 !important; transform-origin:left center; animation:hp-ghost-kf .9s ease-in forwards; z-index:1; }
+.reduced-motion .idle-breath, .reduced-motion .hp-ghost{ animation:none !important; }
