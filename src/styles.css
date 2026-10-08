@@ -1865,3 +1865,5 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 /* Action-coin row reserves its full height up front so the tray never shifts when the first coin appears */
 .tray-head{ min-height:38px !important; }
 .path-strip{ min-height:36px; box-sizing:border-box; }
+/* Flying banners use the regular UI font like the rest of the text */
+.rb, .rb-in{ font-family:var(--font-ui) !important; font-weight:800; letter-spacing:.2px; }

@@ -413,7 +413,7 @@ function campStackTileHTML(stack, type){
   const art = LOOT_ART[die.name];
   const isBasic = die.cat==='attack' || die.cat==='maneuver';
   const inner = isBasic
-    ? `<span class="camp-die-basic-label">${die.cat==='attack'?'Atk':'Man'}<br>${ROMAN[die.level]}</span>`
+    ? `<span class="camp-die-basic-label">${die.cat==='attack'?'Atk':'Mvr'}<br>${ROMAN[die.level]}</span>`
     : (art ? `<img src="${art}" alt="${die.name}">` : `<span class="camp-die-basic-label">${die.name}</span>`);
   return `<div class="die dietype-${die.cat} camp-die-tile ${indices.length>1?'stacked':''} ${isSelected?'organize-selected':''}" data-camp-type="${type}" data-camp-idx="${repIdx}" title="${die.name}${indices.length>1?` ×${indices.length}`:''}">
       ${inner}
@@ -2334,7 +2334,7 @@ function backPocketViewHTML(){
   if(!S.backPocket.length){
     return `<p class="hint">Empty — dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one. Visit Camp to swap them into your Tray.</p>`;
   }
-  return `<div class="camp-dice-grid">${S.backPocket.map(d=>`<div class="die dietype-${d.cat} camp-die-tile" style="cursor:default;" title="${d.name}"><span class="camp-die-label">${d.name}</span></div>`).join('')}</div>
+  return `<div class="camp-dice-grid">${S.backPocket.map(d=>`<div class="die dietype-${d.cat} camp-die-tile" style="cursor:default;" title="${d.name}"><span class="camp-die-label">${d.name.replace(/^Maneuver\b/,'Mvr').replace(/^Attack\b/,'Atk')}</span></div>`).join('')}</div>
     <p class="hint" style="margin-top:8px;">Visit Camp to swap these into your Tray.</p>`;
 }
 
