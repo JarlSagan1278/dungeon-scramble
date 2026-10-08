@@ -309,7 +309,7 @@ function decorateArch(){
     card.querySelectorAll('.fo-frame').forEach(n=>n.remove());
     // offset sizes, NOT getBoundingClientRect: the room-enter animation scales the card while this runs
     const r = card.getBoundingClientRect();
-    const w = Math.round(card.offsetWidth+10), h = Math.round(card.offsetHeight+10);
+    const w = Math.round(card.offsetWidth), h = Math.round(card.offsetHeight+10);
     const lvl = Math.min(3,(S.floorIdx||0)+1);
     card.insertAdjacentHTML('beforeend', `<svg class="fo-frame" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">${archFrameSVG(w,h,lvl)}</svg>`);
     // The settings cog tucks into the empty corner beside the arch's right shoulder.
