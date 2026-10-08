@@ -1781,3 +1781,8 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
   80%{ transform:rotate(-4deg) translateX(0); opacity:1; animation-timing-function:cubic-bezier(.5,0,.9,.4); }
   100%{ transform:rotate(-4deg) translateX(-50%); opacity:0; } }
 .reduced-motion .rb{ animation:none !important; opacity:1; }
+
+/* Shrine in the doorway: the shrine's art stands where the monster would */
+.fo-shrine .fo-vs{ visibility:hidden; }
+.fo-shrine .fo-enemy .fo-quests{ align-items:center; font-size:10px; line-height:1.25; color:#e8d9bd; font-style:italic; padding:0 6px; }
+.fo-shrine .fo-enemy .fo-type{ margin-bottom:2px; }

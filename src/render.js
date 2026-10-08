@@ -234,7 +234,7 @@ function render(){
   if(S.screen==='victory'){ clearPathTrail(); renderVictory(); maybeScreenTransition('victory'); return; }
   if(S.screen==='gameover'){ clearPathTrail(); renderGameOver(); maybeScreenTransition('gameover'); return; }
   if(S.screen==='camp'){ clearPathTrail(); renderCamp(); tuckCampCog(); maybeAutosave(); maybeScreenTransition('camp'); return; }
-  if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); maybeAutosave(); maybeScreenTransition('shrine'); return; }
+  if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); decorateArch(); maybeAutosave(); maybeScreenTransition('shrine'); return; }
   renderGame();
   decorateArch();
   maybeAutosave();
@@ -2757,22 +2757,40 @@ function confirmDieReplace(trayIndex, oldName, newName, swapOverlay){
 function renderShrineEncounter(){
   const e = S.encounter;
   const roomEnterCls = S.newRoomFx ? 'room-enter' : '';
+  const art = MONSTER_ART[e.name];
+  const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
+  const heroFig = portrait.placeholder ? mysteryFigureHTML('width:60px; height:60px;') : `<img class="fo-img" src="${portrait.img}" alt="${S.origin.name}">`;
+  const hpPct = Math.max(0, Math.min(100, S.health/S.maxHealth*100));
+  const shrineFig = art ? `<img class="fo-img enc-art" src="${art}" alt="${e.name}"/>` : `<div class="fo-img fo-mystery">${mysteryFigureHTML('width:70%; aspect-ratio:1/1;')}</div>`;
+  const waiting = !S.shrineResult && !S.shrineChoice && !S.relicChoice && !S.lootChoice && !S.pendingLootDie;
   app.innerHTML = `
     <div class="panel" style="margin-bottom:8px;">
       ${renderRoute()}
     </div>
-    <div class="panel">
-      <div class="enc-card ${roomEnterCls}">
-        <div class="enc-header">
-          <h3 class="enc-name-txt">${e.name}</h3>
-          <span class="enc-type">Shrine</span>
+    <div class="panel enc-panel-arch" id="enc-panel" style="margin-bottom:8px;">
+      <div class="enc-rail-row"><div class="enc-card-col">
+        <div class="enc-card fo-arch fo-shrine fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${roomEnterCls}">
+          <div class="fo-torch fo-torch-l"></div><div class="fo-torch fo-torch-r"></div>
+          <div class="fo-hud">${relicStripHTML()}</div>
+          <div class="fo-band">
+            <div class="fo-side fo-player">
+              <div class="fo-fig" title="${S.origin.name} ${S.klass.name}">${heroFig}</div>
+              <div class="fo-hpwrap" style="position:relative;"><div class="bar"><div class="bar-fill hp player" style="width:${hpPct}%"></div></div><span>${S.health}/${S.maxHealth}</span></div>
+              <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim():S.origin.name+' '+S.klass.name}</div>
+              <div class="fo-chips fo-buffs"></div>
+            </div>
+            <div class="fo-vs">&nbsp;</div>
+            <div class="fo-side fo-enemy">
+              <div class="fo-fig">${shrineFig}</div>
+              <div class="fo-name">${e.name}</div>
+              <small class="fo-type">Shrine</small>
+              <div class="fo-quests" style="text-align:center;">${e.boon}</div>
+            </div>
+          </div>
         </div>
-        <div class="enc-card-body">
-          <div class="enc-flavor" style="border-top:none; padding-top:0;">${e.boon}</div>
-          ${!S.shrineResult && !S.shrineChoice && !S.relicChoice && !S.lootChoice && !S.pendingLootDie ? (S.newRoomFx ? '<p class="hint">Revealing the shrine\'s boon...</p>' : '<button class="primary" id="shrine-reveal-btn" style="width:100%; margin-top:8px;">Reveal the boon</button>') : ''}
-        </div>
-      </div>
+      </div></div>
     </div>
+    ${waiting ? `<div class="panel">${S.newRoomFx ? '<p class="hint" style="text-align:center;">Revealing the shrine\'s boon...</p>' : '<button class="primary" id="shrine-reveal-btn" style="width:100%;">Reveal the boon</button>'}</div>` : ''}
   `;
   attachRelicStrip();
   if(S.lootChoice) renderLootModal();
