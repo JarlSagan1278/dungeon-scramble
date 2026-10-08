@@ -1,6 +1,6 @@
 {
   "name": "dungeon-scramble",
-  "version": "1.29.2",
+  "version": "1.29.3",
   "private": true,
   "description": "Dungeon Scramble digital prototype (dice-path dungeon crawler)",
   "scripts": {

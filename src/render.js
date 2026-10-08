@@ -232,7 +232,7 @@ function render(){
   }
   if(S.screen==='victory'){ clearPathTrail(); renderVictory(); maybeScreenTransition('victory'); return; }
   if(S.screen==='gameover'){ clearPathTrail(); renderGameOver(); maybeScreenTransition('gameover'); return; }
-  if(S.screen==='camp'){ clearPathTrail(); renderCamp(); maybeAutosave(); maybeScreenTransition('camp'); return; }
+  if(S.screen==='camp'){ clearPathTrail(); renderCamp(); tuckCampCog(); maybeAutosave(); maybeScreenTransition('camp'); return; }
   if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); maybeAutosave(); maybeScreenTransition('shrine'); return; }
   renderGame();
   decorateArch();
@@ -315,7 +315,16 @@ function decorateArch(){
     document.body.style.setProperty('--cog-top', Math.max(2, Math.round(r.top + window.scrollY - 10))+'px');
   } catch(err){ /* decoration only -- never let it break the game */ }
 }
-window.addEventListener('resize', ()=>{ if(document.querySelector('#enc-panel .fo-arch')) decorateArch(); });
+// Camp: the cog sits in the empty space to the right of the "Camp" heading.
+function tuckCampCog(){
+  try{
+    const h = document.querySelector('#app h2'); if(!h) return;
+    const r = h.getBoundingClientRect();
+    document.body.classList.add('cog-arch');
+    document.body.style.setProperty('--cog-top', Math.round(r.top + window.scrollY + r.height/2 - 16)+'px');
+  } catch(err){}
+}
+window.addEventListener('resize', ()=>{ if(document.querySelector('#enc-panel .fo-arch')) decorateArch(); else if(S && S.screen==='camp') tuckCampCog(); });
 
 function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
 
