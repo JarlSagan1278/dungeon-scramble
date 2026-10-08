@@ -55,7 +55,7 @@ fs.rmSync(WEB, { recursive: true, force: true });
 fs.mkdirSync(WEB, { recursive: true });
 const PWA_HEAD = [
   '<link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials">',
-  '<meta name="theme-color" content="#16101c">',
+  '<meta name="theme-color" content="#130d09">',
   '<meta name="mobile-web-app-capable" content="yes">',
   '<meta name="apple-mobile-web-app-capable" content="yes">',
   '<meta name="apple-mobile-web-app-title" content="Dungeon Scramble">',
@@ -78,7 +78,7 @@ fs.writeFileSync(path.join(WEB, 'manifest.webmanifest'), JSON.stringify({
   name: 'Dungeon Scramble', short_name: 'Dungeon Scramble',
   description: 'A dice-drafting dungeon crawler.',
   start_url: './', scope: './', display: 'standalone', orientation: 'portrait',
-  background_color: '#16101c', theme_color: '#16101c',
+  background_color: '#130d09', theme_color: '#130d09',
   icons: [
     { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
     { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
