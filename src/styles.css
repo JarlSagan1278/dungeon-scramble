@@ -1676,3 +1676,5 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 
 .modal-lead{ text-align:center; }
 .fo-has-quests .fo-flavor{ display:none; }
+.util-btn, .util-btn span{ text-align:center; }
+.util-btn.rail-ability span{ line-height:1.1; width:100%; display:block; }
