@@ -1784,3 +1784,16 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .fo-shrine .fo-vs{ visibility:hidden; }
 .fo-shrine .fo-enemy .fo-quests{ align-items:center; font-size:10px; line-height:1.25; color:#e8d9bd; font-style:italic; padding:0 6px; }
 .fo-shrine .fo-enemy .fo-type{ margin-bottom:2px; }
+
+/* ===== Real-device target (installed app on a 411x785 CSS-px phone viewport) =====
+   Measured from on-device screenshots: usable viewport 411 x 785 (between the status bar and the nav bar),
+   8px body padding all round -> game card 395 x 769. The screen height follows the real viewport
+   (dvh) within a 720..769 band, so every screen fills the phone without scrolling on this device
+   and never gets shorter than the 720 the layouts were designed for. */
+:root{ --screen-h: clamp(720px, calc(100dvh - 16px), 769px); }
+.wrap{ max-width:395px; }
+/* Spend the extra device height on the doorway scene (scales with --screen-h; unchanged at 720) */
+.enc-card.fo-arch{ min-height:calc(272px + (var(--screen-h) - 720px) * 0.65) !important; }
+.fo-fig .fo-img, .enc-portrait.fo-fig .enc-art{ height:calc(104px + (var(--screen-h) - 720px) * 0.25) !important; }
+.fo-has-quests .fo-fig .fo-img, .fo-has-quests .enc-portrait.fo-fig .enc-art{ height:calc(88px + (var(--screen-h) - 720px) * 0.2) !important; }
+.title-panel{ max-width:395px !important; }
