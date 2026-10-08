@@ -989,7 +989,9 @@ function healthFX(current, last){
 }
 
 // Encounter art is mirrored to face the hero by default; list any whose original art already faces left here.
-const ENCOUNTER_NO_FLIP = new Set(['Viscous Orb','Unbound Automa']);
+// Encounters whose current art is known to be the wrong picture: show the placeholder until the right art is supplied.
+const ART_WRONG = new Set(['Leper Con-Trap']);
+const ENCOUNTER_NO_FLIP = new Set(['Viscous Orb','Unbound Automa','Rogue Golemancer']);
 let foPlayer = null; // the hero's half of the face-off band, set each renderGame()
 function renderEncounterCard(e, mode){
   const curHealthClamped = Math.max(0,e.curHealth);
@@ -1075,7 +1077,7 @@ function renderEncounterCard(e, mode){
     const chips = items.map(it=>`<span class="boss-cycle-item next enemy-action-badge" title="${enemyActionTooltip(it.type, it.val)}">${iconSpan(it.type, ICON_VALUE_SLOT.has(it.type)?it.val:null)} ${it.label}${!ICON_VALUE_SLOT.has(it.type)?' '+it.val:''}</span>`).join('');
     return `<div class="boss-cycle-row"><span class="hint" style="margin:0;">Each turn:</span>${chips}</div>`;
   })() : '';
-  const art = MONSTER_ART[e.name];
+  const art = ART_WRONG.has(e.name) ? null : MONSTER_ART[e.name];
   const bossCycle = (isBoss && e.actionCycle && e.actionCycle.length) ? (()=>{
     const labels = {dmg:'Hit', minion:'Minion', shield:'Shield', heal:'Heal', hot:'H.O.T.', dot:'D.O.T.'};
     const iconKey = {dmg:'hit', minion:'minion', shield:'block', heal:'heal', hot:'hot', dot:'dot'};
