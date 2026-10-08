@@ -1102,11 +1102,11 @@ function renderEncounterCard(e, mode){
     return `
     <div class="enc-card fo-arch fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${(e.quests&&e.quests.length)?'fo-has-quests':''} ${(e.quests||[]).join(' ').length>70?'fo-tight':''} ${roomEnterCls}">
       <div class="fo-torch fo-torch-l"></div><div class="fo-torch fo-torch-r"></div>
-      <div class="fo-hud">${relicStripHTML()}<div class="fo-hud-col fo-hud-r">${hudChips(statuses)}</div></div>
+      <div class="fo-hud">${relicStripHTML()}</div>
       <div class="fo-band">
         <div class="fo-side fo-player">
           <div class="fo-fig ${p.figCls||''}" title="${S.origin.name} ${S.klass.name}">${p.figHTML||''}</div><div class="fo-floor"></div>
-          <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}"><div class="bar-fill hp player" style="width:${p.hpPct||0}%"></div></div><span>${S.health}/${S.maxHealth}</span>${p.deltaHTML||''}</div>
+          <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}"><div class="bar-fill hp player" style="width:${p.hpPct||0}%"></div><span class="bar-num">${S.health}/${S.maxHealth}</span></div>${p.deltaHTML||''}</div>
           <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim():S.origin.name+' '+S.klass.name}</div>
           <div class="fo-chips fo-buffs">${hudChips(p.statusHTML)}</div>
         </div>
@@ -1117,9 +1117,12 @@ function renderEncounterCard(e, mode){
               <div class="bar-fill hp" style="width:${hpPct}%"></div>
               ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
               ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
-            </div><span>${curHealthClamped.toFixed(0)}/${e.maxHealth}</span>${fx.deltaHTML}</div>
+              <span class="bar-num">${curHealthClamped.toFixed(0)}/${e.maxHealth}</span>
+            </div>${fx.deltaHTML}</div>
           <div class="kill-hint fo-hint ${killHint?'kill-hint-'+killHint.state:''}" ${killHint?`data-hint="${killHint.state}"`:''}>${killHint?killHint.text:'&nbsp;'}</div>
           <div class="fo-name" ${e.flavor?`title="${e.flavor.replace(/"/g,'&quot;')}"`:''}>${typeTag}${e.name}</div>
+          <div class="fo-chips fo-buffs">${hudChips(statuses)}</div>
+          ${chipsOnly?`<div class="fo-turnlabel" title="${isBoss?'Bosses cycle through these actions, one per turn (the lit one is next).':'The enemy does all of these every turn.'}">${isBoss?'Cycles through':'Every turn'}</div>`:''}
           <div class="fo-chips">${chipsOnly}</div>
           ${questLine}
         </div>
