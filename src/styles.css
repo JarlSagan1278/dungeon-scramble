@@ -1645,3 +1645,19 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
   100%{ filter:grayscale(1) blur(2px); transform:scale(.8) translateY(10px); opacity:0; }
 }
 .reduced-motion .enc-card-col.enc-death .fo-fig.enc-portrait{ animation:none; }
+
+/* Text-only rail buttons (no glyph icons) */
+.util-btn.rail-go span{ font-size:20px !important; font-weight:800; letter-spacing:.5px; text-transform:uppercase; }
+.util-btn.rail-ability span{ font-size:12px !important; }
+/* A defeated monster stays gone when the loot modal redraws the card */
+.fo-fig.fo-dead{ opacity:0; visibility:hidden; }
+
+/* HUD overlay on the doorway: relics across the top, your statuses left, the monster's right.
+   Absolutely positioned so nothing here can change the screen height. */
+.fo-arch .fo-hud{ position:absolute; inset:0; z-index:6; pointer-events:none; }
+.fo-hud .relic-strip{ position:absolute; top:5px; left:50%; transform:translateX(-50%); margin:0; gap:3px; flex-wrap:nowrap; pointer-events:auto; background:rgba(20,12,6,.55); padding:2px 5px; border-radius:14px; }
+.fo-hud .relic-badge{ width:20px; height:20px; font-size:9px; }
+.fo-hud-col{ position:absolute; top:44px; display:flex; flex-direction:column; gap:2px; pointer-events:none; }
+.fo-hud-l{ left:14px; align-items:flex-start; } .fo-hud-r{ right:14px; align-items:flex-end; }
+.fo-hud-col .status-chip{ pointer-events:auto; font-size:10px; padding:1px 5px; white-space:nowrap; }
+.fo-hud-col:empty{ display:none; }

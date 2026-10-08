@@ -1094,6 +1094,7 @@ function renderEncounterCard(e, mode){
     return `
     <div class="enc-card fo-arch fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${(e.quests&&e.quests.length)?'fo-has-quests':''} ${(e.quests||[]).join(' ').length>70?'fo-tight':''} ${roomEnterCls}">
       <div class="fo-torch fo-torch-l"></div><div class="fo-torch fo-torch-r"></div>
+      <div class="fo-hud">${relicStripHTML()}<div class="fo-hud-col fo-hud-l">${hudChips(p.statusHTML)}</div><div class="fo-hud-col fo-hud-r">${hudChips(statuses)}</div></div>
       <div class="fo-band">
         <div class="fo-side fo-player">
           <div class="fo-fig ${p.figCls||''}" title="${S.origin.name} ${S.klass.name}">${p.figHTML||''}</div><div class="fo-floor"></div>
@@ -1102,7 +1103,7 @@ function renderEncounterCard(e, mode){
         </div>
         <div class="fo-vs">vs</div>
         <div class="fo-side fo-enemy">
-          <div class="fo-fig enc-portrait ${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}">${monsterFig}</div><div class="fo-floor"></div>
+          <div class="fo-fig enc-portrait ${(e.curHealth<=0)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}">${monsterFig}</div><div class="fo-floor"></div>
           <div class="fo-hpwrap status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;"><div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
               <div class="bar-fill hp" style="width:${hpPct}%"></div>
               ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
@@ -1110,7 +1111,7 @@ function renderEncounterCard(e, mode){
             </div><span>${curHealthClamped.toFixed(0)}/${e.maxHealth}</span>${fx.deltaHTML}</div>
           ${killHint?`<div class="kill-hint kill-hint-${killHint.state}" data-hint="${killHint.state}">${killHint.text}</div>`:''}
           <div class="fo-name" ${e.flavor?`title="${e.flavor.replace(/"/g,'&quot;')}"`:''}>${typeTag}${e.name}</div>
-          <div class="fo-chips">${chipsOnly}${statuses}</div>
+          <div class="fo-chips">${chipsOnly}</div>
         </div>
       </div>
       ${questLine}
@@ -1264,19 +1265,12 @@ function renderGame(){
   if(S.pendingFreeBoost) playerStatusTipLines.push(`Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}`);
   const playerStatusTip = playerStatusTipLines.join('\n');
   { const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
-    foPlayer = { fxCls:playerFx.cls, deltaHTML:playerFx.deltaHTML, hpPct, tip:playerStatusTip,
+    foPlayer = { statusHTML:`${S.playerDOT?`<span class="status-chip status-tooltip-target" title="D.O.T. ${S.playerDOT}: ${STATUS_DESC.dot}">${iconSpan('dot', S.playerDOT)} DOT</span>`:''}        ${S.playerHOT?`<span class="status-chip status-tooltip-target" title="H.O.T. ${S.playerHOT}: ${STATUS_DESC.hot}">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}        ${S.playerBlock?`<span class="status-chip status-tooltip-target" title="Block ${S.playerBlock}: ${STATUS_DESC.block}">${iconSpan('block', S.playerBlock)} Block</span>`:''}        ${S.pendingFreeBoost?`<span class="status-chip status-tooltip-target" style="background:var(--gold);color:#241c10;" title="Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}">${iconSpan('boost')} Boost x${S.pendingFreeBoost} armed</span>`:''}`, fxCls:playerFx.cls, deltaHTML:playerFx.deltaHTML, hpPct, tip:playerStatusTip,
       figCls: playerFx.cls==='flash-damage'?'dmg-flash':playerFx.cls==='flash-heal'?'heal-flash':'',
       figHTML: portrait.placeholder ? mysteryFigureHTML('width:60px; height:60px;') : `<img class="fo-img" src="${portrait.img}" alt="${S.origin.name}">` }; }
   app.innerHTML = `
     <div class="panel" style="margin-bottom:8px;">
       ${renderRoute()}
-      <div class="statuses">
-        ${S.playerDOT?`<span class="status-chip status-tooltip-target" title="D.O.T. ${S.playerDOT}: ${STATUS_DESC.dot}">${iconSpan('dot', S.playerDOT)} DOT</span>`:''}
-        ${S.playerHOT?`<span class="status-chip status-tooltip-target" title="H.O.T. ${S.playerHOT}: ${STATUS_DESC.hot}">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}
-        ${S.playerBlock?`<span class="status-chip status-tooltip-target" title="Block ${S.playerBlock}: ${STATUS_DESC.block}">${iconSpan('block', S.playerBlock)} Block</span>`:''}
-        ${S.pendingFreeBoost?`<span class="status-chip status-tooltip-target" style="background:var(--gold);color:#241c10;" title="Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}">${iconSpan('boost')} Boost x${S.pendingFreeBoost} armed</span>`:''}
-      </div>
-      ${relicStripHTML()}
     </div>
     <div class="panel enc-panel-arch" id="enc-panel" style="margin-bottom:8px;">
       <div class="enc-rail-row">
@@ -1291,16 +1285,16 @@ function renderGame(){
             <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
               <div class="tray" id="tray"></div>
             </div>
-            ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip ▶</button>${S.resolveTotal>0 ? `<div class="run-total">${S.resolveTotal%1?S.resolveTotal.toFixed(1):S.resolveTotal}<small> dmg</small></div>` : ''}` : pathCounterHTML()}
+            ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip</button>${S.resolveTotal>0 ? `<div class="run-total">${S.resolveTotal%1?S.resolveTotal.toFixed(1):S.resolveTotal}<small> dmg</small></div>` : ''}` : pathCounterHTML()}
           </div>
         </div>
         <div class="util-rail">
-          <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning)?'disabled':''} ${emphasizeResolve?'pulse':''}" id="resolve-btn">▶<span>Go</span></div>
+          <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning)?'disabled':''} ${emphasizeResolve?'pulse':''}" id="resolve-btn"><span>Go</span></div>
           <div class="util-btn rail-pocket" id="open-backpocket-btn">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?`<span class="badge">${S.backPocket.length}</span>`:''}</div>
           <div class="util-btn rail-item ${totalTokens?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Item</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
           <div class="util-btn danger-accent rail-clear ${S.transitioning?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
-          ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''} ${abilityArmed?'armed':''}" id="ability-btn">✦<span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
-            : S.klass.debug ? `<div class="util-btn rail-ability ${(!S.encounter||S.transitioning)?'disabled':''}" id="debug-win-btn">✦<span>Win</span></div>` : ''}
+          ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''} ${abilityArmed?'armed':''}" id="ability-btn"><span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
+            : S.klass.debug ? `<div class="util-btn rail-ability ${(!S.encounter||S.transitioning)?'disabled':''}" id="debug-win-btn"><span>Win</span></div>` : ''}
         </div>
       </div>
     </div>
@@ -2543,6 +2537,10 @@ function relicBadgeHTML(r, extraCls){
 }
 
 // A compact row of the relics held this run (game board + Camp); tap for details.
+// Status chips shown over the doorway are icon + number only (full wording lives in the tooltip).
+function hudChips(h){
+  return (h||'').replace(/ (DOT|HOT|Block|Shield|Boost x\d+ armed)<\/span>/g,'</span>').replace(/Minions (\d+)<\/span>/g,'👥$1</span>'.replace('👥','Min '));
+}
 function relicStripHTML(){
   if(!S.relics || !S.relics.length) return '';
   return `<div class="relic-strip" title="Tap to see your relics">${S.relics.map(id=>relicBadgeHTML(relicById(id))).join('')}</div>`;
