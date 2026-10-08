@@ -1562,7 +1562,7 @@ function showToast(text, kind){
   const ic = (iconKey && typeof iconSpan==='function') ? `<span class="rb-ic">${iconSpan(iconKey)}</span>` : '';
   const label = (!notice && /hits you/i.test(text)) ? '<small>Enemy turn</small>' : '';
   const len = text.length;
-  const rb = el(`<div class="rb rb-${tone} rb-${dir} ${len>34?'rb-long':''}"><div class="rb-in">${label}${ic}${text}</div><i class="rb-streak s1"></i><i class="rb-streak s2"></i></div>`);
+  const rb = el(`<div class="rb rb-${tone} rb-${dir} ${len>34?'rb-long':''}"><div class="rb-in">${label}${ic}${text}</div></div>`);
   layer.appendChild(rb);
   document.body.appendChild(layer);
   setTimeout(()=>{ if(layer.parentNode) layer.parentNode.removeChild(layer); }, notice ? 1500 : 1300);

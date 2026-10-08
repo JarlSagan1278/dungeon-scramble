@@ -1750,3 +1750,5 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 @keyframes rb-in-n{ 0%{ transform:translateX(100%) rotate(-4deg); opacity:0; } 14%{ transform:translateX(0) rotate(-4deg); opacity:1; } 80%{ transform:translateX(0) rotate(-4deg); opacity:1; } 100%{ transform:translateX(-40%) rotate(-4deg); opacity:0; } }
 .reduced-motion .rb{ animation:none !important; opacity:1; }
 .reduced-motion .rb-streak{ display:none; }
+
+.rb-streak{ display:none !important; }
