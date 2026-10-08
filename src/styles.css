@@ -1861,3 +1861,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 /* Enemy statuses sit under the name like the hero's; "Every turn" labels the action badges */
 .fo-turnlabel{ font-family:var(--font-ui); font-size:8.5px; letter-spacing:1.4px; text-transform:uppercase; color:#e8cf9a; opacity:.85; margin-top:1px; line-height:1; display:flex; align-items:center; gap:5px; }
 .fo-turnlabel::before,.fo-turnlabel::after{ content:''; width:14px; height:1px; background:currentColor; opacity:.6; }
+
+/* Action-coin row reserves its full height up front so the tray never shifts when the first coin appears */
+.tray-head{ min-height:38px !important; }
+.path-strip{ min-height:36px; box-sizing:border-box; }
