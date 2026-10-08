@@ -221,6 +221,7 @@ function maybeScreenTransition(key){
 let preGameScreen = 'title';
 
 function render(){
+  hideFaceTooltip();
   document.body.classList.remove('cog-arch');
   updateHeaderMeta();
   updateLowHealthVignette();
@@ -1483,6 +1484,7 @@ function attachLongPressTooltips(){ /* superseded by the delegated handler below
   };
   document.addEventListener('pointerdown', ev=>{
     clearTimeout(hideT); clearTimeout(timer);
+    hideFaceTooltip(); // any new touch dismisses a lingering bubble
     if(ev.pointerType==='mouse') return;
     const n = target(ev); if(!n) return;
     startX=ev.clientX; startY=ev.clientY;
@@ -1501,7 +1503,8 @@ function attachLongPressTooltips(){ /* superseded by the delegated handler below
     if(faceTooltipEl && Date.now()<swallowUntil){ clearTimeout(hideT); hideT=setTimeout(hideFaceTooltip, 2200); }
   }, true));
   document.addEventListener('click', ev=>{
-    if(Date.now()<swallowUntil){ ev.stopPropagation(); ev.preventDefault(); swallowUntil=0; }
+    if(Date.now()<swallowUntil){ ev.stopPropagation(); ev.preventDefault(); swallowUntil=0; return; }
+    hideFaceTooltip();
   }, true);
   // No native copy/paste/image menu on long-press (inputs/textareas keep theirs).
   document.addEventListener('contextmenu', ev=>{
@@ -2342,6 +2345,7 @@ function openModal(overlay){
   return overlay;
 }
 function closeModal(overlay, after){
+  hideFaceTooltip();
   if(!overlay || !overlay.parentNode){ if(after) after(); return; }
   if(overlay.classList.contains('modal-closing')){ return; } // already closing
   overlay.classList.add('modal-closing');
@@ -2740,7 +2744,7 @@ function renderShrineEncounter(){
         </div>
         <div class="enc-card-body">
           <div class="enc-flavor" style="border-top:none; padding-top:0;">${e.boon}</div>
-          ${!S.shrineResult && !S.shrineChoice && !S.relicChoice ? '<p class="hint">Revealing the shrine\'s boon...</p>' : ''}
+          ${!S.shrineResult && !S.shrineChoice && !S.relicChoice && !S.lootChoice && !S.pendingLootDie ? (S.newRoomFx ? '<p class="hint">Revealing the shrine\'s boon...</p>' : '<button class="primary" id="shrine-reveal-btn" style="width:100%; margin-top:8px;">Reveal the boon</button>') : ''}
         </div>
       </div>
     </div>
@@ -2751,6 +2755,9 @@ function renderShrineEncounter(){
   if(S.relicChoice) renderRelicChoiceModal();
   if(S.shrineResult) renderShrineResultModal();
   if(S.pendingLootDie) renderSwapModal();
+  // Safety net: if the screen is reached with no pending boon UI and no room callout (e.g. a resumed save),
+  // the player always has a way forward.
+  { const rb = document.getElementById('shrine-reveal-btn'); if(rb) rb.onclick = ()=> applyShrineBoon(S.encounter); }
   attachLongPressTooltips('.route-tooltip-target');
   if(S.newRoomFx){
     // Defer the boon reveal until the player taps past "A new room... Shrine"
