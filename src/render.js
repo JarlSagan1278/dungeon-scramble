@@ -2790,6 +2790,7 @@ function renderCamp(){
         ${relicStripHTML()}
         <div class="bar-row" style="position:relative;"><span style="flex:0 0 auto;">Health</span><div class="bar ${campFx.cls}"><div class="bar-fill hp player" style="width:${S.health/S.maxHealth*100}%"></div></div><span>${S.health}/${S.maxHealth}</span>${campFx.deltaHTML}</div>
         <div class="camp-fire-wrap">
+          <div class="camp-hero" title="${S.origin.name} ${S.klass.name}">${(S.portrait&&!S.portrait.placeholder)?`<img src="${S.portrait.img}" alt="${S.origin.name}">`:mysteryFigureHTML('width:56px; height:56px;')}</div>
           <div class="campfire-glow"></div>
           <div class="campfire-logs"></div>
           <div class="campfire-flame flame-back"></div>
