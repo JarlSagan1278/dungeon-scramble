@@ -603,7 +603,83 @@ function originPortraitArray(originId){
 function pickPortrait(originId){
   const arr = originPortraitArray(originId);
   if(!arr) return { img: GNOME_SILHOUETTE, placeholder:true };
-  return { img: arr[rand(arr.length)], placeholder:false };
+  const idx = rand(arr.length);
+  const portrait = { img: arr[idx], placeholder:false, tone:'original' };
+  applyRandomSkinTone(portrait, originId, idx);
+  return portrait;
+}
+
+// ---- Random skin tone per run ----
+// Each fresh portrait pick rolls one of five skin tones (Original keeps the
+// art as drawn). The tint is done at runtime on a canvas, only on the skin
+// pixels, so outlines, hair, clothes and props never change and the source
+// PNGs stay untouched. Dwarf and Halfling art is fully supported; two Gnome
+// portraits (a cream robe, a scroll) and every Pixie (their face colours are
+// per-portrait palette choices) keep their original colours.
+const SKIN_TONES = [
+  { id:'original', name:'Original', rgb:null },
+  { id:'green',    name:'Green',    rgb:[120,200,100] },
+  { id:'blue',     name:'Blue',     rgb:[120,170,235] },
+  { id:'purple',   name:'Purple',   rgb:[180,130,220] },
+  { id:'gray',     name:'Gray',     rgb:[165,170,175] },
+];
+const SKIN_TINT_SKIP = { pixie:'all', gnome:[8,9] };
+const SKIN_PEACH = [250,203,157];
+const _skinTintCache = {};
+function skinTintEligible(originId, idx){
+  const skip = SKIN_TINT_SKIP[originId];
+  if(skip==='all') return false;
+  if(Array.isArray(skip) && skip.indexOf(idx)>=0) return false;
+  return originId==='dwarf' || originId==='gnome' || originId==='halfling';
+}
+function tintSkinPixels(src, originId, rgb){
+  return new Promise((resolve)=>{
+    const im = new Image();
+    im.onload = ()=>{
+      try{
+        const c = document.createElement('canvas'); c.width = im.width; c.height = im.height;
+        const g = c.getContext('2d'); g.drawImage(im,0,0);
+        const d = g.getImageData(0,0,c.width,c.height); const px = d.data;
+        const peach = originId==='halfling';
+        for(let i=0;i<px.length;i+=4){
+          const a=px[i+3]; if(!a) continue;
+          const r=px[i], gg=px[i+1], b=px[i+2];
+          let w, lum;
+          if(peach){
+            const dr=r-SKIN_PEACH[0], dg=gg-SKIN_PEACH[1], db=b-SKIN_PEACH[2];
+            const dist=Math.sqrt(dr*dr+dg*dg+db*db);
+            w = Math.max(0,Math.min(1,(34-dist)/14)); lum = ((r+gg+b)/3)/203*1.15;
+          } else {
+            const mn=Math.min(r,gg,b);
+            w = Math.max(0,Math.min(1,(mn-165)/35)) * Math.max(0,Math.min(1,((r-b)-3)/8)); lum = ((r+gg+b)/3)/236;
+          }
+          if(w<=0) continue;
+          px[i]   = r*(1-w) + Math.min(255,rgb[0]*lum)*w;
+          px[i+1] = gg*(1-w) + Math.min(255,rgb[1]*lum)*w;
+          px[i+2] = b*(1-w) + Math.min(255,rgb[2]*lum)*w;
+        }
+        g.putImageData(d,0,0);
+        resolve(c.toDataURL('image/png'));
+      }catch(e){ resolve(null); }
+    };
+    im.onerror = ()=>resolve(null);
+    im.src = src;
+  });
+}
+function applyRandomSkinTone(portrait, originId, idx){
+  if(!skinTintEligible(originId, idx)) return;
+  const tone = SKIN_TONES[rand(SKIN_TONES.length)];
+  portrait.tone = tone.id;
+  if(!tone.rgb) return;
+  const key = originId+':'+idx+':'+tone.id;
+  if(_skinTintCache[key]){ portrait.img = _skinTintCache[key]; return; }
+  const orig = portrait.img;
+  tintSkinPixels(orig, originId, tone.rgb).then(url=>{
+    if(!url) return;
+    _skinTintCache[key] = url;
+    portrait.img = url;
+    if(typeof render==='function' && typeof S!=='undefined' && S) render();
+  });
 }
 
 // The character-select screen shows a portrait per Origin card before a
@@ -722,7 +798,7 @@ function newGame(originId, classId, boonDieName, charName){
   };
   // An Origin that has won a run starts every later run holding its signature relic.
   { const oc = originRelicFor(origin.id); if(oc && (META.lifetime.victoriesByOrigin[origin.id]||0)>=1) grantRelic(oc.id, {silent:true, via:'origin'}); }
-  teleLog('run_start', {relics:S.relics.slice(), origin:origin.name, klass:klass.name, carry:carryDie?carryDie.name:null, boon:boonDieName||null, tray:S.tray.map(c=>c.die.name)});
+  teleLog('run_start', {skin:(S.portrait&&S.portrait.tone)||'original', relics:S.relics.slice(), origin:origin.name, klass:klass.name, carry:carryDie?carryDie.name:null, boon:boonDieName||null, tray:S.tray.map(c=>c.die.name)});
   logMsg('sys', `A ${origin.name} ${klass.name} descends into the dungeon...`);
   if(carryDie) logMsg('sys', `${carryDie.name} joins your tray, carried over from your last run.`, 'good');
   if(boonDieName && !klass.debug && findLootDieByName(boonDieName)) logMsg('sys', `${boonDieName} joins your tray as your Starting Boon.`, 'good');
