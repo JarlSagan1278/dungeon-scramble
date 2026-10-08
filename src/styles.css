@@ -1716,3 +1716,5 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .zone-cell{ outline-color: color-mix(in srgb, var(--class-color,#fff) 65%, #fff) !important; box-shadow: inset 0 0 0 5px rgba(20,10,4,.55), inset 0 0 14px 3px color-mix(in srgb, var(--class-color,#fff) 80%, transparent), inset 0 3px 0 rgba(255,255,255,.3); }
 /* Loot chest: the art is the button -- no frame lines around it */
 .loot-chest-btn, .loot-chest-btn:hover, .loot-chest-btn:active, .loot-chest-btn:focus{ border:none !important; filter:none !important; box-shadow:none !important; outline:none !important; background:transparent !important; }
+
+#room-callout{ position:fixed; left:50%; margin:0; z-index:97; transform:translate(-50%,-50%); width:max-content; max-width:92vw; }

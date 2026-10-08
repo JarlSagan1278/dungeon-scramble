@@ -1600,7 +1600,6 @@ function showRoomCallout(fx, onDismiss){
   if(old && old.parentNode) old.parentNode.removeChild(old);
   const oldScrim = document.getElementById('room-callout-scrim');
   if(oldScrim && oldScrim.parentNode) oldScrim.parentNode.removeChild(oldScrim);
-  const stack = ensureFxStack();
   const introCls = fx.boss ? 'intro boss' : 'intro';
   const introText = fx.boss ? 'Boss Encounter' : 'A new room...';
   const nameCls = fx.boss ? 'name boss' : 'name';
@@ -1614,7 +1613,11 @@ function showRoomCallout(fx, onDismiss){
     </div>`);
   const scrim = el(`<div id="room-callout-scrim"></div>`);
   document.body.appendChild(scrim);
-  stack.appendChild(node);
+  // Own slot (not the shared #fx-stack toasts/equip notices use): fixed at the vertical middle of the game UI.
+  document.body.appendChild(node);
+  { const a = document.getElementById('app'); const r = a ? a.getBoundingClientRect() : {top:0,height:window.innerHeight};
+    const mid = Math.max(110, Math.min(window.innerHeight-110, r.top + r.height/2));
+    node.style.top = mid+'px'; }
   const dismiss = ()=>{
     if(scrim.parentNode) scrim.parentNode.removeChild(scrim);
     // When there's a follow-up (e.g. a Shrine revealing its boon), run it
