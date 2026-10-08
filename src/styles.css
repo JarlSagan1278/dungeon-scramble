@@ -1603,7 +1603,7 @@
   .fo-vs{ flex:0 0 22px; align-self:center; font-family:var(--font-display); color:#d9b36a; font-size:13px; opacity:.9; margin-bottom:30px; text-align:center; }
   .fo-floor{ height:6px; border-radius:3px; background:rgba(0,0,0,.28); width:92%; margin-top:-6px; }
   .fo-flavor{ margin:0 10px 6px; padding-top:4px; border-top:2px solid #2a1608; font-style:italic; font-size:9.5px; color:#e8d9bd; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; position:relative; z-index:1; }
-  body{ background: radial-gradient(ellipse at 50% 35%, #5a3d20 0%, #321e0e 40%, #170c05 72%, #080402 100%) !important; }
+  body{ background:#16101c !important; }
 
   .fo-fig .fo-img, .enc-portrait.fo-fig .enc-art{ height:89px !important; width:auto !important; max-width:100%; }
   .fo-has-quests .fo-fig .fo-img, .fo-has-quests .enc-portrait.fo-fig .enc-art{ height:74px !important; }
