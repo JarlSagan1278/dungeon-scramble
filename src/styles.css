@@ -1720,3 +1720,4 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 #room-callout{ position:fixed; left:50%; margin:0; z-index:97; transform:translate(-50%,-50%); width:max-content; max-width:92vw; }
 #room-callout{ display:flex; justify-content:center; }
 #room-callout .room-callout-box{ margin:0 auto; max-width:100%; box-sizing:border-box; }
+.fo-flavor{ display:none !important; }
