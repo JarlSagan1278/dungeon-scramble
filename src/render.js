@@ -302,6 +302,13 @@ function archFrameSVG(w,h,lvl){
   }
   return out;
 }
+function shieldBarHTML(val, max, hpPct){
+  if(!val || val<=0) return '';
+  const room = Math.max(0, 100 - (hpPct||0));
+  const w = Math.min(room, val/Math.max(1,max)*100);
+  return (w>0?`<div class="bar-fill shield-seg" style="left:${hpPct||0}%; width:${w}%;" title="Shield ${val}"></div>`:'')
+    + `<span class="bar-shield" title="Shield/Block ${val}: absorbs damage before health">${iconSpan('block')}<b>+${val}</b></span>`;
+}
 function decorateArch(){
   try{
     const card = document.querySelector('#enc-panel .fo-arch');
@@ -1120,7 +1127,7 @@ function renderEncounterCard(e, mode){
       <div class="fo-band">
         <div class="fo-side fo-player">
           <div class="fo-fig ${p.figCls||''}" title="${S.origin.name} ${S.klass.name}">${p.figHTML||''}</div><div class="fo-floor"></div>
-          <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}"><div class="bar-fill hp player" style="width:${p.hpPct||0}%"></div><span class="bar-num">${S.health}/${S.maxHealth}</span></div>${p.deltaHTML||''}</div>
+          <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}"><div class="bar-fill hp player" style="width:${p.hpPct||0}%"></div>${shieldBarHTML(S.playerBlock, S.maxHealth, p.hpPct)}<span class="bar-num">${S.health}/${S.maxHealth}</span></div>${p.deltaHTML||''}</div>
           <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim():S.origin.name+' '+S.klass.name}</div>
           <div class="fo-chips fo-buffs">${hudChips(p.statusHTML)}</div>
         </div>
@@ -1131,7 +1138,7 @@ function renderEncounterCard(e, mode){
               <div class="bar-fill hp" style="width:${hpPct}%"></div>
               ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
               ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
-              <span class="bar-num">${curHealthClamped.toFixed(0)}/${e.maxHealth}</span>
+              ${shieldBarHTML(e.curShield, e.maxHealth, hpPct)}<span class="bar-num">${curHealthClamped.toFixed(0)}/${e.maxHealth}</span>
             </div>${fx.deltaHTML}</div>
           <div class="kill-hint fo-hint ${killHint?'kill-hint-'+killHint.state:''}" ${killHint?`data-hint="${killHint.state}"`:''}>${killHint?killHint.text:'&nbsp;'}</div>
           <div class="fo-name" ${e.flavor?`title="${e.flavor.replace(/"/g,'&quot;')}"`:''}>${typeTag}${e.name}</div>
