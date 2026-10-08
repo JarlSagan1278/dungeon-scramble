@@ -1839,14 +1839,15 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
   .title-panel .title-btn, .title-panel button{ padding-top:14px; padding-bottom:14px; }
 }
 
-/* ===== Ribbons restyled to match the game's toy-like art: flat colour, chunky dark outline, button-style drop edge ===== */
+/* ===== Ribbons restyled to match the game's toy-like art: flat colour, chunky dark outline, button-style drop edge; slanted parallelogram kept ===== */
 .rb{ text-shadow:none; letter-spacing:.3px; }
-.rb-in{ clip-path:none !important; border-radius:14px; padding:9px 22px; border:3px solid #1b0f06;
-  box-shadow:0 4px 0 #1b0f06, inset 0 3px 0 rgba(255,255,255,.28), inset 0 -3px 0 rgba(0,0,0,.18) !important; }
-.rb-in{ color:#fff1d6; text-shadow:0 2px 0 rgba(27,15,6,.85); -webkit-text-stroke:0; }
-.rb-bad .rb-in{ background:#c0392b !important; }
-.rb-good .rb-in{ background:#3fa357 !important; }
-.rb-neutral .rb-in{ background:#b8844a !important; color:#2a1608; text-shadow:0 1px 0 rgba(255,241,214,.45); }
-.rb-gold .rb-in{ background:#ffc83a !important; color:#2a1608; text-shadow:0 1px 0 rgba(255,255,255,.4); padding:7px 20px; }
+.rb-in{ --rbc:#b8844a; --rbt:#fff1d6; position:relative; isolation:isolate; z-index:0; clip-path:none !important; box-shadow:none !important; background:none !important; border:0;
+  padding:9px 40px; color:var(--rbt); text-shadow:0 2px 0 rgba(27,15,6,.85); }
+.rb-in::before, .rb-in::after{ content:''; position:absolute; z-index:-1; clip-path:polygon(16px 0,100% 0,calc(100% - 16px) 100%,0 100%); }
+.rb-in::before{ inset:-3px -3px -8px -3px; background:#1b0f06; z-index:-2; }
+.rb-in::after{ inset:0 0 -1px 0; background:var(--rbc); box-shadow:inset 0 3px 0 rgba(255,255,255,.28), inset 0 -3px 0 rgba(0,0,0,.18); }
+.rb-bad .rb-in{ --rbc:#c0392b; }
+.rb-good .rb-in{ --rbc:#3fa357; }
+.rb-neutral .rb-in{ --rbc:#b8844a; --rbt:#2a1608; text-shadow:0 1px 0 rgba(255,241,214,.45); }
+.rb-gold .rb-in{ --rbc:#ffc83a; --rbt:#2a1608; text-shadow:0 1px 0 rgba(255,255,255,.4); padding:7px 32px; }
 .rb-in small{ color:inherit; opacity:.75; }
-.rb-l .rb-in{ margin-left:6px; } .rb-r .rb-in{ margin-right:6px; }
