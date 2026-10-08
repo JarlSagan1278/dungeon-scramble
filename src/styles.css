@@ -1752,3 +1752,32 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .reduced-motion .rb-streak{ display:none; }
 
 .rb-streak{ display:none !important; }
+
+/* Rail order: Go on top, Skill beneath it */
+.util-btn.rail-go{ order:1 !important; }
+.util-btn.rail-ability{ order:2 !important; }
+.util-btn.rail-pocket{ order:3 !important; } .util-btn.rail-item{ order:4 !important; } .util-btn.rail-clear{ order:5 !important; }
+
+/* Encounter art: un-mirrored so it faces your hero */
+.fo-img.fo-flip{ transform:none !important; }
+
+/* Ribbon motion: slide along the ribbon's OWN diagonal (rotate first, then translate), ease-out in, ease-in out */
+.rb-l{ animation: rb-l 1.25s linear forwards !important; }
+.rb-r{ animation: rb-r 1.25s linear forwards !important; }
+.rb-n{ animation: rb-n 1.4s linear forwards !important; }
+@keyframes rb-l{
+  0%{ transform:rotate(-9deg) translateX(110%); opacity:0; animation-timing-function:cubic-bezier(.16,1,.3,1); }
+  16%{ transform:rotate(-9deg) translateX(0); opacity:1; }
+  78%{ transform:rotate(-9deg) translateX(0); opacity:1; animation-timing-function:cubic-bezier(.5,0,.9,.4); }
+  100%{ transform:rotate(-9deg) translateX(-70%); opacity:0; } }
+@keyframes rb-r{
+  0%{ transform:rotate(9deg) translateX(-110%); opacity:0; animation-timing-function:cubic-bezier(.16,1,.3,1); }
+  16%{ transform:rotate(9deg) translateX(0); opacity:1; }
+  78%{ transform:rotate(9deg) translateX(0); opacity:1; animation-timing-function:cubic-bezier(.5,0,.9,.4); }
+  100%{ transform:rotate(9deg) translateX(70%); opacity:0; } }
+@keyframes rb-n{
+  0%{ transform:rotate(-4deg) translateX(100%); opacity:0; animation-timing-function:cubic-bezier(.16,1,.3,1); }
+  14%{ transform:rotate(-4deg) translateX(0); opacity:1; }
+  80%{ transform:rotate(-4deg) translateX(0); opacity:1; animation-timing-function:cubic-bezier(.5,0,.9,.4); }
+  100%{ transform:rotate(-4deg) translateX(-50%); opacity:0; } }
+.reduced-motion .rb{ animation:none !important; opacity:1; }
