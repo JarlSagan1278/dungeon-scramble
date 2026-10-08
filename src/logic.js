@@ -1910,7 +1910,13 @@ function selectOrganize(type, idx){
   if(!listFor(type)[idx]){ render(); return; }
   if(!S.organizeSelection){ S.organizeSelection = {type, idx}; render(); return; }
   const sel = S.organizeSelection;
-  if(sel.type===type){ S.organizeSelection = {type, idx}; render(); return; }
+  if(sel.type===type){
+    // Tapping the already-selected die (any copy in its stack) backs out of organizing.
+    const dieOf = i => { const it = listFor(type)[i]; return it && (type==='tray' ? it.die : it); };
+    const a = dieOf(idx), c = dieOf(sel.idx);
+    const same = idx===sel.idx || !!(a && c && a.name===c.name);
+    S.organizeSelection = same ? null : {type, idx}; render(); return;
+  }
   const trayIndex = type==='tray' ? idx : sel.idx;
   const bpIdx = type==='bp' ? idx : sel.idx;
   const trayCell = S.tray[trayIndex];
