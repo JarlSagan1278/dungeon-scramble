@@ -307,7 +307,7 @@ function shieldBarHTML(val, max, hpPct){
   const room = Math.max(0, 100 - (hpPct||0));
   const w = Math.min(room, val/Math.max(1,max)*100);
   return (w>0?`<div class="bar-fill shield-seg" style="left:${hpPct||0}%; width:${w}%;" title="Shield ${val}"></div>`:'')
-    + `<span class="bar-shield" title="Shield/Block ${val}: absorbs damage before health">${iconSpan('block')}<b>+${val}</b></span>`;
+    + `<span class="bar-shield" title="Shield/Block ${val}: absorbs damage before health"><b>+${val}</b></span>`;
 }
 function decorateArch(){
   try{
