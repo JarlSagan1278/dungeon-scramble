@@ -1688,3 +1688,5 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .camp-fire-wrap{ height:78px !important; }
 .camp-hero{ position:absolute; right:calc(50% + 24px); bottom:0; z-index:3; }
 .camp-hero img{ display:block; height:74px; width:auto; filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)) drop-shadow(6px 0 8px rgba(255,150,40,.45)); }
+.camp-hero{ width:max-content; }
+.camp-hero img{ max-width:none !important; width:auto !important; object-fit:contain; }
