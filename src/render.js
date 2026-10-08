@@ -221,6 +221,7 @@ function maybeScreenTransition(key){
 let preGameScreen = 'title';
 
 function render(){
+  document.body.classList.remove('cog-arch');
   updateHeaderMeta();
   updateLowHealthVignette();
   if(!S){
@@ -234,9 +235,87 @@ function render(){
   if(S.screen==='camp'){ clearPathTrail(); renderCamp(); maybeAutosave(); maybeScreenTransition('camp'); return; }
   if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); maybeAutosave(); maybeScreenTransition('shrine'); return; }
   renderGame();
+  decorateArch();
   maybeAutosave();
   maybeScreenTransition('game');
 }
+
+// ---- Doorway frame: a stone arch (with floor-by-floor creeping moss) drawn as SVG over the
+// face-off card. Built after layout because it needs the card's real pixel size. Floor 1 is
+// lightly mossy; floors 2 and 3 get progressively more overgrown. Growth keeps clear of the
+// torches. ----
+function archPath(w,h,i){ const rx=120, ry=90, r=12;
+  return 'M'+i+','+(h-r)+' L'+i+','+ry+' A'+(rx-i)+','+(ry-i)+' 0 0 1 '+rx+','+i+' L'+(w-rx)+','+i+' A'+(rx-i)+','+(ry-i)+' 0 0 1 '+(w-i)+','+ry+' L'+(w-i)+','+(h-r); }
+function archPoints(w,h,i,step){ const pts=[], rx=120, ry=90;
+  for(let y=h-12;y>=ry;y-=step) pts.push([i,y]);
+  for(let a=Math.PI;a<=1.5*Math.PI+0.001;a+=step/110) pts.push([rx+(rx-i)*Math.cos(a), ry+(ry-i)*Math.sin(a)]);
+  for(let x=rx;x<=w-rx;x+=step) pts.push([x,i]);
+  for(let a=1.5*Math.PI;a<=2*Math.PI+0.001;a+=step/110) pts.push([w-rx+(rx-i)*Math.cos(a), ry+(ry-i)*Math.sin(a)]);
+  for(let y=ry;y<=h-12;y+=step) pts.push([w-i,y]);
+  return pts; }
+function archFrameSVG(w,h,lvl){
+  const base = `<path d="${archPath(w,h,5)}" fill="none" stroke="#2a1608" stroke-width="14"/><path d="${archPath(w,h,5)}" fill="none" stroke="#8d7d68" stroke-width="10"/><path d="${archPath(w,h,5)}" fill="none" stroke="#2a1608" stroke-width="10" stroke-dasharray="2 22"/><path d="${archPath(w,h,2)}" fill="none" stroke="#a89880" stroke-width="2" opacity=".6"/>`;
+  if(lvl<=1){
+    return base + `<g fill="#4f7a34" opacity=".92">
+  <circle cx="70" cy="14" r="6"/><circle cx="80" cy="9" r="4.5"/><circle cx="60" cy="20" r="4"/><circle cx="92" cy="7" r="3.5"/>
+  <circle cx="${w-70}" cy="14" r="6"/><circle cx="${w-80}" cy="9" r="4.5"/><circle cx="${w-60}" cy="20" r="4"/><circle cx="${w-92}" cy="7" r="3.5"/>
+  <circle cx="9" cy="${h-40}" r="5"/><circle cx="8" cy="${h-28}" r="6.5"/><circle cx="14" cy="${h-16}" r="5"/>
+  <circle cx="${w-9}" cy="${h-40}" r="5"/><circle cx="${w-8}" cy="${h-28}" r="6.5"/><circle cx="${w-14}" cy="${h-16}" r="5"/>
+  <circle cx="${w/2-10}" cy="4" r="4"/><circle cx="${w/2+8}" cy="3" r="3.5"/></g>
+ <g stroke="#4f7a34" stroke-width="2" fill="none" stroke-linecap="round" opacity=".92">
+  <path d="M66,20 q-3,14 1,26"/><path d="M84,13 q2,12 -1,20"/><path d="M${w-66},20 q3,14 -1,26"/><path d="M${w-84},13 q-2,12 1,20"/>
+  <path d="M10,${h-44} q4,-10 1,-22"/><path d="M${w-10},${h-44} q-4,-10 -1,-22"/></g>`;
+  }
+  let s=11*lvl+3; const rnd=()=>{ s=(s*9301+49297)%233280; return s/233280; };
+  const G=['#3f6a2c','#4f7a34','#5f8c3c','#6f9a46'];
+  const torchZone=(x,y)=>(x<40||x>w-40)&&y>34&&y<96;   // keep the torches clear
+  let out=base;
+  const dens=[0,1,2.4,4.6][lvl];
+  const pts=archPoints(w,h,5,6);
+  let g='';
+  pts.forEach(p=>{ if(torchZone(p[0],p[1])) return; if(rnd()<0.10*dens){ const n=1+Math.floor(rnd()*2*lvl); for(let k=0;k<n;k++){ g+=`<circle cx="${(p[0]+(rnd()-.5)*10).toFixed(1)}" cy="${(p[1]+(rnd()-.5)*10).toFixed(1)}" r="${(2+rnd()*(2+lvl*1.6)).toFixed(1)}" fill="${G[Math.floor(rnd()*4)]}"/>`; } } });
+  out+=`<g opacity=".93">${g}</g>`;
+  if(lvl>=3){
+    out+=`<path d="${archPath(w,h,5)}" fill="none" stroke="#4a7430" stroke-width="9" stroke-dasharray="14 5 6 7 11 4" opacity=".8"/>`;
+    out+=`<path d="${archPath(w,h,2)}" fill="none" stroke="#6f9a46" stroke-width="3" stroke-dasharray="3 9" stroke-linecap="round" opacity=".8"/>`;
+  }
+  const vineN=[0,4,8,13][lvl]; let v='';
+  for(let k=0;k<vineN;k++){
+    const t=(k+.5)/vineN, x=46+(w-92)*t+(rnd()-.5)*10, yTop=Math.max(3, 60*Math.pow(2*t-1,2)*0.9+4);
+    const len=10+rnd()*(10+lvl*10); if(torchZone(x,yTop+len)) continue;
+    const sway=(rnd()-.5)*10;
+    v+=`<path d="M${x.toFixed(1)},${yTop.toFixed(1)} q${sway.toFixed(1)},${(len/2).toFixed(1)} ${(sway/2).toFixed(1)},${len.toFixed(1)}" stroke="${G[1]}" stroke-width="${(1.6+lvl*.4).toFixed(1)}" fill="none" stroke-linecap="round"/>`;
+    if(lvl>=2){ const lx=(x+sway/2+3).toFixed(1), ly=(yTop+len*.6).toFixed(1), mx=(x+sway/2-3).toFixed(1), my=(yTop+len*.9).toFixed(1);
+      v+=`<ellipse cx="${lx}" cy="${ly}" rx="3.6" ry="2" fill="${G[2]}" transform="rotate(-30 ${lx} ${ly})"/><ellipse cx="${mx}" cy="${my}" rx="3.6" ry="2" fill="${G[3]}" transform="rotate(30 ${mx} ${my})"/>`; }
+  }
+  out+=`<g>${v}</g>`;
+  const n=[0,2,4,7][lvl]; let sv='';
+  for(let k=0;k<n;k++){ const side=k%2?1:-1, x=side>0?w-9:9, y0=h-14-Math.floor(k/2)*10, len=22+rnd()*(14+lvl*8);
+    sv+=`<path d="M${x},${y0} q${side*-4},${-len/2} ${side*-1},${-len}" stroke="${G[1]}" stroke-width="${(1.6+lvl*.4).toFixed(1)}" fill="none" stroke-linecap="round"/>`; }
+  out+=sv;
+  if(lvl>=2){ const fl=[0,0,5,9][lvl]; let f=''; for(let k=0;k<fl;k++){ const p=pts[Math.floor(rnd()*pts.length)]; if(torchZone(p[0],p[1])) continue; f+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.2" fill="${k%2?'#f2d35c':'#f4eee0'}"/>`; } out+=f; }
+  if(lvl>=3){
+    const mush=(x,y,c)=>`<g transform="translate(${x},${y})"><rect x="-1" y="0" width="2" height="5" fill="#d8d0b0"/><path d="M-5,0 a5,4 0 0 1 10,0z" fill="${c}"/><circle cx="0" cy="-1" r="9" fill="${c}" opacity=".18"/></g>`;
+    out+=mush(14,h-9,'#6fe0d0')+mush(24,h-7,'#b78cf0')+mush(w-14,h-9,'#6fe0d0')+mush(w-25,h-7,'#b78cf0');
+    out+=`<path d="M0,${h-8} q10,-10 8,-26" stroke="#4a3320" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M${w},${h-8} q-10,-10 -8,-26" stroke="#4a3320" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  }
+  return out;
+}
+function decorateArch(){
+  try{
+    const card = document.querySelector('#enc-panel .fo-arch');
+    if(!card) return;
+    card.querySelectorAll('.fo-frame').forEach(n=>n.remove());
+    const r = card.getBoundingClientRect();
+    const w = Math.round(r.width+10), h = Math.round(r.height+10);
+    const lvl = Math.min(3,(S.floorIdx||0)+1);
+    card.insertAdjacentHTML('beforeend', `<svg class="fo-frame" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">${archFrameSVG(w,h,lvl)}</svg>`);
+    // The settings cog tucks into the empty corner beside the arch's right shoulder.
+    document.body.classList.add('cog-arch');
+    document.body.style.setProperty('--cog-top', Math.max(2, Math.round(r.top + window.scrollY - 10))+'px');
+  } catch(err){ /* decoration only -- never let it break the game */ }
+}
+window.addEventListener('resize', ()=>{ if(document.querySelector('#enc-panel .fo-arch')) decorateArch(); });
 
 function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
 
@@ -897,7 +976,8 @@ function healthFX(current, last){
   };
 }
 
-function renderEncounterCard(e){
+let foPlayer = null; // the hero's half of the face-off band, set each renderGame()
+function renderEncounterCard(e, mode){
   const curHealthClamped = Math.max(0,e.curHealth);
   const hpPct = e.maxHealth? curHealthClamped/e.maxHealth*100 : 0;
   // Quest Health used to be spelled out as its own "X/Y remaining" line.
@@ -992,6 +1072,42 @@ function renderEncounterCard(e){
     }).join('');
     return `<div class="boss-cycle-row"><span class="hint" style="margin:0;">Cycles through:</span>${items}</div>`;
   })() : '';
+  if(mode==='faceoff'){
+    // The doorway face-off: your hero on the left, the monster (mirrored to face you) on the
+    // right, each with their own health bar underneath. See decorateArch() for the stone frame.
+    const chipsOnly = (isBoss ? bossCycle : regularActionsRow).replace(/<span class="hint"[^>]*>[^<]*<\/span>/,'');
+    const typeTag = (e.type && e.type!=='Enemy') ? `<small class="fo-type">${e.type}</small>` : '';
+    const questLine = (e.quests && e.quests.length)
+      ? `<div class="fo-quests">${e.quests.map((q,i)=>`<span class="fo-quest ${e.questsDone[i]?'complete':''}">${e.questsDone[i]?'✔':'○'} ${q}</span>`).join('')}</div>` : '';
+    const monsterFig = art ? `<img class="fo-img fo-flip enc-art" src="${art}" alt="${e.name}"/>`
+      : `<div class="fo-img fo-flip fo-mystery">${mysteryFigureHTML('width:70%; aspect-ratio:1/1;')}</div>`;
+    const p = foPlayer || {};
+    return `
+    <div class="enc-card fo-arch fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${(e.quests&&e.quests.length)?'fo-has-quests':''} ${(e.quests||[]).join(' ').length>70?'fo-tight':''} ${roomEnterCls}">
+      <div class="fo-torch fo-torch-l"></div><div class="fo-torch fo-torch-r"></div>
+      <div class="fo-band">
+        <div class="fo-side fo-player">
+          <div class="fo-fig ${p.figCls||''}" title="${S.origin.name} ${S.klass.name}">${p.figHTML||''}</div><div class="fo-floor"></div>
+          <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}"><div class="bar-fill hp player" style="width:${p.hpPct||0}%"></div></div><span>${S.health}/${S.maxHealth}</span>${p.deltaHTML||''}</div>
+          <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim():S.origin.name+' '+S.klass.name}</div>
+        </div>
+        <div class="fo-vs">vs</div>
+        <div class="fo-side fo-enemy">
+          <div class="fo-fig enc-portrait ${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}">${monsterFig}</div><div class="fo-floor"></div>
+          <div class="fo-hpwrap status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;"><div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
+              <div class="bar-fill hp" style="width:${hpPct}%"></div>
+              ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
+              ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
+            </div><span>${curHealthClamped.toFixed(0)}/${e.maxHealth}</span>${fx.deltaHTML}</div>
+          ${killHint?`<div class="kill-hint kill-hint-${killHint.state}" data-hint="${killHint.state}">${killHint.text}</div>`:''}
+          <div class="fo-name" ${e.flavor?`title="${e.flavor.replace(/"/g,'&quot;')}"`:''}>${typeTag}${e.name}</div>
+          <div class="fo-chips">${chipsOnly}${statuses}</div>
+        </div>
+      </div>
+      ${questLine}
+      ${e.flavor?`<div class="fo-flavor">${e.flavor}</div>`:''}
+    </div>`;
+  }
   return `
     <div class="enc-card ${roomEnterCls}">
       <div class="enc-header">
@@ -1138,10 +1254,13 @@ function renderGame(){
   if(S.playerBlock) playerStatusTipLines.push(`Block ${S.playerBlock}: ${STATUS_DESC.block}`);
   if(S.pendingFreeBoost) playerStatusTipLines.push(`Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}`);
   const playerStatusTip = playerStatusTipLines.join('\n');
+  { const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
+    foPlayer = { fxCls:playerFx.cls, deltaHTML:playerFx.deltaHTML, hpPct, tip:playerStatusTip,
+      figCls: playerFx.cls==='flash-damage'?'dmg-flash':playerFx.cls==='flash-heal'?'heal-flash':'',
+      figHTML: portrait.placeholder ? mysteryFigureHTML('width:60px; height:60px;') : `<img class="fo-img" src="${portrait.img}" alt="${S.origin.name}">` }; }
   app.innerHTML = `
     <div class="panel" style="margin-bottom:8px;">
       ${renderRoute()}
-      <div class="bar-row status-tooltip-target" ${playerStatusTip?`title="${playerStatusTip}"`:''} style="position:relative;"><span style="flex:0 0 auto;">Health</span><div class="bar ${playerFx.cls}"><div class="bar-fill hp player" style="width:${hpPct}%"></div></div><span>${S.health}/${S.maxHealth}</span>${playerFx.deltaHTML}</div>
       <div class="statuses">
         ${S.playerDOT?`<span class="status-chip status-tooltip-target" title="D.O.T. ${S.playerDOT}: ${STATUS_DESC.dot}">${iconSpan('dot', S.playerDOT)} DOT</span>`:''}
         ${S.playerHOT?`<span class="status-chip status-tooltip-target" title="H.O.T. ${S.playerHOT}: ${STATUS_DESC.hot}">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}
@@ -1150,9 +1269,9 @@ function renderGame(){
       </div>
       ${relicStripHTML()}
     </div>
-    <div class="panel" id="enc-panel" style="margin-bottom:8px;">
+    <div class="panel enc-panel-arch" id="enc-panel" style="margin-bottom:8px;">
       <div class="enc-rail-row">
-        <div class="enc-card-col">${e?renderEncounterCard(e):'<p>No active encounter.</p>'}</div>
+        <div class="enc-card-col">${e?renderEncounterCard(e,'faceoff'):'<p>No active encounter.</p>'}</div>
       </div>
     </div>
     <div class="panel">
@@ -1173,12 +1292,6 @@ function renderGame(){
           <div class="util-btn danger-accent rail-clear ${S.transitioning?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
           ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''} ${abilityArmed?'armed':''}" id="ability-btn">✦<span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
             : S.klass.debug ? `<div class="util-btn rail-ability ${(!S.encounter||S.transitioning)?'disabled':''}" id="debug-win-btn">✦<span>Win</span></div>` : ''}
-          <div class="char-icon-wrap ${playerFx.cls==='flash-damage'?'dmg-flash':playerFx.cls==='flash-heal'?'heal-flash':''}" title="${S.origin.name} ${S.klass.name}">${(()=>{
-            const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
-            return portrait.placeholder
-              ? mysteryFigureHTML('width:48px; height:48px;')
-              : `<img class="char-icon-img" src="${portrait.img}" alt="${S.origin.name}">`;
-          })()}</div>
         </div>
       </div>
     </div>
