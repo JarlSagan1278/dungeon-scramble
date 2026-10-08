@@ -988,6 +988,8 @@ function healthFX(current, last){
   };
 }
 
+// Encounter art is mirrored to face the hero by default; list any whose original art already faces left here.
+const ENCOUNTER_NO_FLIP = new Set(['Viscous Orb']);
 let foPlayer = null; // the hero's half of the face-off band, set each renderGame()
 function renderEncounterCard(e, mode){
   const curHealthClamped = Math.max(0,e.curHealth);
@@ -1091,8 +1093,9 @@ function renderEncounterCard(e, mode){
     const typeTag = (e.type && e.type!=='Enemy') ? `<small class="fo-type">${e.type}</small>` : '';
     const questLine = (e.quests && e.quests.length)
       ? `<div class="fo-quests">${e.quests.map((q,i)=>`<span class="fo-quest ${e.questsDone[i]?'complete':''}">${e.questsDone[i]?'✔':'○'} ${q}</span>`).join('')}</div>` : '';
-    const monsterFig = art ? `<img class="fo-img fo-flip enc-art" src="${art}" alt="${e.name}"/>`
-      : `<div class="fo-img fo-flip fo-mystery">${mysteryFigureHTML('width:70%; aspect-ratio:1/1;')}</div>`;
+    const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
+    const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}"/>`
+      : `<div class="fo-img ${flipCls} fo-mystery">${mysteryFigureHTML('width:70%; aspect-ratio:1/1;')}</div>`;
     const p = foPlayer || {};
     return `
     <div class="enc-card fo-arch fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${(e.quests&&e.quests.length)?'fo-has-quests':''} ${(e.quests||[]).join(' ').length>70?'fo-tight':''} ${roomEnterCls}">

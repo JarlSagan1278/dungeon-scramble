@@ -1758,8 +1758,6 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .util-btn.rail-ability{ order:2 !important; }
 .util-btn.rail-pocket{ order:3 !important; } .util-btn.rail-item{ order:4 !important; } .util-btn.rail-clear{ order:5 !important; }
 
-/* Encounter art: un-mirrored so it faces your hero */
-.fo-img.fo-flip{ transform:none !important; }
 
 /* Ribbon motion: slide along the ribbon's OWN diagonal (rotate first, then translate), ease-out in, ease-in out */
 .rb-l{ animation: rb-l 1.25s linear forwards !important; }
