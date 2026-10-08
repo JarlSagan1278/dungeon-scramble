@@ -1544,6 +1544,8 @@ function ensureFxStack(){
 // Both overlay the scene, so they can't change the screen height. ----
 const RB_NOTICE_RE = /^(Equipped|Relic|Upgraded|Swapped|Rested|— Floor|Iron Rations|Not enough|Locked|Debug|Origin|Unlock|Debug)|joins your tray/i;
 function showToast(text, kind){
+  // Plain damage/heal numbers are already shown by the floating numbers + health bars; skip the redundant ribbon.
+  if(/^Path dealt|hits you for|takes \d+ D\.O\.T\. damage|You take \d+ D\.O\.T\. damage|You recover \d+ from H\.O\.T\.|heals \d+\./i.test(text)) return;
   const notice = RB_NOTICE_RE.test(text) || (!kind && !/hit|damage|dealt|heal|block|nullify|leap|minion|quest|dot|hot|shield|freeze/i.test(text));
   const toPlayer = !notice && (kind==='bad' || /hits you|you for|your D\.O\.T|desperate/i.test(text)) && !/dealt/i.test(text);
   const arch = document.querySelector('#enc-panel .fo-arch');

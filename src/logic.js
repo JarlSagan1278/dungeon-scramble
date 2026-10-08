@@ -1916,6 +1916,8 @@ function selectOrganize(type, idx){
   const trayCell = S.tray[trayIndex];
   const bpDie = S.backPocket[bpIdx];
   if(!trayCell || !trayCell.die || !bpDie){ S.organizeSelection = null; render(); return; }
+  // Swapping two identical dice changes nothing -- say so and keep the selection instead of looking like it cancelled.
+  if(trayCell.die.name===bpDie.name){ if(typeof showToast==='function') showToast('Those two dice are identical -- pick a different one.', null); render(); return; }
   S.backPocket[bpIdx] = trayCell.die;
   trayCell.die = bpDie;
   trayCell.faceIdx = 0;
