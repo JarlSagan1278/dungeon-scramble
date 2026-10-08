@@ -2899,8 +2899,16 @@ function renderCamp(){
       if(previewBtn) previewBtn.onclick = ()=>{
         const resultDie = basic(cat, level+1);
         const label = cat.charAt(0).toUpperCase()+cat.slice(1);
-        const facesHTML = resultDie.faces.map(f=>`<span>${iconSpan(f.type, f.value)}${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?f.value:''}</span>`).join('');
-        openInfoModal(`${label} ${ROMAN[level+1]}: ${resultDie.name}`, `<div class="faces">${facesHTML}</div>`);
+        // Same presentation as a loot option: the die tile plus its faces as mini-face tiles.
+        const accent = LOOT_TIER_ACCENT[resultDie.cat] || LOOT_TIER_ACCENT.alloy;
+        const facesHTML = resultDie.faces.map(f=>f.type==='blank'
+          ? '<div class="mini-face mf-blank"></div>'
+          : `<div class="mini-face mf-${resultDie.cat}" title="${LABEL[f.type]}${f.value?' '+f.value:''}">${iconSpan(f.type, f.value)}<small>${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</small></div>`).join('');
+        const pv = openInfoModal(`${label} ${ROMAN[level+1]}`, `<div class="loot-options"><div class="loot-opt" style="--loot-tier-color:${accent.color}; --loot-tier-glow:${accent.glow}; cursor:default;">
+            ${lootPreviewTileHTML(resultDie, `upg-${cat}-${level}`, LOOT_ART[resultDie.name])}
+            <div class="faces-tiles">${facesHTML}</div>
+          </div></div>`);
+        pv.querySelector('.modal').classList.add('loot-modal','loot-modal-n2');
       };
     });
   });
