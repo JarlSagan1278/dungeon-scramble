@@ -1629,3 +1629,19 @@
   @keyframes fo-flash-green{ 0%{ filter:brightness(2) sepia(1) saturate(6) hue-rotate(60deg) drop-shadow(0 0 8px #3cff7a); } 100%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); } }
   .reduced-motion .fo-fig.dmg-flash .fo-img, .reduced-motion .fo-fig.heal-flash .fo-img{ animation:none; }
   .fo-hpwrap .delta-float{ left:0; right:0; top:-74px; text-align:center; text-shadow:0 2px 0 #2a1608, 0 0 6px rgba(0,0,0,.7); z-index:5; pointer-events:none; }
+
+/* Touch: no OS long-press callout / text selection / tap flash on the game; form fields stay normal */
+html, body{ -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; -webkit-tap-highlight-color:transparent; }
+input, textarea{ -webkit-user-select:text; user-select:text; -webkit-touch-callout:default; }
+img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
+
+/* Face-off kill: the doorway and hero stay put; only the monster dissolves */
+.enc-card-col.enc-death:has(.fo-arch){ animation:none; }
+.enc-card-col.enc-death .fo-fig.enc-portrait{ animation: fo-mon-death .46s ease-in forwards; }
+@keyframes fo-mon-death{
+  0%{ filter:brightness(2.4); transform:scale(1.06); opacity:1; }
+  30%{ filter:brightness(1.5) saturate(.6); transform:translateX(-3px) rotate(-2deg); }
+  55%{ transform:translateX(3px) rotate(2deg); }
+  100%{ filter:grayscale(1) blur(2px); transform:scale(.8) translateY(10px); opacity:0; }
+}
+.reduced-motion .enc-card-col.enc-death .fo-fig.enc-portrait{ animation:none; }

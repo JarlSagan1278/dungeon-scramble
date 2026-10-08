@@ -1459,20 +1459,50 @@ function hideFaceTooltip(){
 // own tooltip -- this just adds the touch equivalent, reusing the same
 // fixed-position bubble as the die-face tooltip). Call after the elements
 // matching `selector` exist in the DOM.
-function attachLongPressTooltips(selector){
-  document.querySelectorAll(selector).forEach(node=>{
-    if(!node.title) return;
-    let pressTimer = null;
-    const start = ()=>{
-      const rect = node.getBoundingClientRect();
-      const text = node.title;
-      pressTimer = setTimeout(()=> showFaceTooltip(rect, text), 420);
-    };
-    const cancel = ()=>{ if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; } hideFaceTooltip(); };
-    node.addEventListener('pointerdown', start);
-    ['pointerup','pointerleave','pointercancel'].forEach(evt=> node.addEventListener(evt, cancel));
+function attachLongPressTooltips(){ /* superseded by the delegated handler below */ }
+
+// Delegated touch tooltips: press-and-hold ANY element carrying a `title`
+// (relics, status chips, action badges, face chips, route nodes, path coins,
+// key legend...) and the same bubble used on desktop-hover appears. Lives on
+// document so it needs no re-attaching after render(). Dice tiles keep their
+// own richer handler (data-idx); buttons are skipped. The bubble stays up
+// briefly after release so a thumb isn't covering it, and the click that
+// follows a long-press is swallowed.
+(function(){
+  let timer=null, startX=0, startY=0, hideT=null, swallowUntil=0;
+  const target = ev=>{
+    const n = ev.target && ev.target.closest ? ev.target.closest('[title]') : null;
+    if(!n || n.tagName==='BUTTON' || n.closest('[data-idx]') || !n.getAttribute('title')) return null;
+    return n;
+  };
+  document.addEventListener('pointerdown', ev=>{
+    clearTimeout(hideT); clearTimeout(timer);
+    if(ev.pointerType==='mouse') return;
+    const n = target(ev); if(!n) return;
+    startX=ev.clientX; startY=ev.clientY;
+    timer=setTimeout(()=>{
+      timer=null;
+      const text = n.getAttribute('title'); if(!text) return;
+      swallowUntil = Date.now()+700;
+      showFaceTooltip(n.getBoundingClientRect(), text);
+    }, 420);
+  }, true);
+  document.addEventListener('pointermove', ev=>{
+    if(timer && Math.hypot(ev.clientX-startX, ev.clientY-startY)>10){ clearTimeout(timer); timer=null; }
+  }, true);
+  ['pointerup','pointercancel'].forEach(t=> document.addEventListener(t, ()=>{
+    if(timer){ clearTimeout(timer); timer=null; return; }
+    if(faceTooltipEl && Date.now()<swallowUntil){ clearTimeout(hideT); hideT=setTimeout(hideFaceTooltip, 2200); }
+  }, true));
+  document.addEventListener('click', ev=>{
+    if(Date.now()<swallowUntil){ ev.stopPropagation(); ev.preventDefault(); swallowUntil=0; }
+  }, true);
+  // No native copy/paste/image menu on long-press (inputs/textareas keep theirs).
+  document.addEventListener('contextmenu', ev=>{
+    const t=ev.target; if(t && t.closest && t.closest('input,textarea')) return;
+    ev.preventDefault();
   });
-}
+})();
 
 // Shared home for every transient overlay -- toast banners, kill callouts,
 // and new-room callouts (see showToast/showKillCallout/showRoomCallout
