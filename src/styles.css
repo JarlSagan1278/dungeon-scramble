@@ -1718,3 +1718,5 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .loot-chest-btn, .loot-chest-btn:hover, .loot-chest-btn:active, .loot-chest-btn:focus{ border:none !important; filter:none !important; box-shadow:none !important; outline:none !important; background:transparent !important; }
 
 #room-callout{ position:fixed; left:50%; margin:0; z-index:97; transform:translate(-50%,-50%); width:max-content; max-width:92vw; }
+#room-callout{ display:flex; justify-content:center; }
+#room-callout .room-callout-box{ margin:0 auto; max-width:100%; box-sizing:border-box; }
