@@ -79,3 +79,9 @@ used to trace the icon set.
 - No further art is coming for now (Halfling/Pixie portraits and most
   monster illustrations use placeholder art) -- don't request or assume
   new assets.
+
+## Installable web app (v1.31+)
+`node build.js` also writes `dist/web/` (index.html, manifest, icons, sw.js). Upload that whole folder to any HTTPS static host
+(GitHub Pages / Netlify / Cloudflare Pages). Testers open the link and use "Add to Home Screen" (iOS Safari) or "Install app" (Android/desktop Chrome).
+The cache name is stamped with GAME_VERSION in data.js, so bump it every release. Icons live in `src/pwa/`.
+`dist/dungeon_scramble.html` remains the single-file build (no service worker).
