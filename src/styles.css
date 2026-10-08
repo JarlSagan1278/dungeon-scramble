@@ -1892,3 +1892,12 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 /* ---- v1.32.3: campfire logs get the same thick black outline as the portraits ---- */
 .campfire-logs{ height:13px !important; border:2.5px solid #000 !important; background:#6b4628 !important; }
 .campfire-logs::before, .campfire-logs::after{ height:11px !important; border:2.5px solid #000 !important; top:-2.5px !important; left:-2.5px !important; background:#7a4f2c !important; }
+
+/* v1.32.8 contrast pass: flat colors, lighter edges so brown layers separate */
+.wrap > .panel{ background:#2b1a0c !important; border:2px solid #6b4a28 !important; box-shadow:0 0 0 2px #0d0805; }
+.camp-section{ border:2px solid #6b4a28 !important; box-shadow:inset 0 0 0 1px rgba(255,220,160,.12); }
+.camp-section.camp-status-card{ background:#0f0905 !important; }
+.camp-pocket{ background:#0f0905 !important; border:1px solid #6b4a28 !important; }
+.tray-wrap{ background:#2a170a !important; border-color:#9a7240 !important; box-shadow:0 0 0 2px #0d0805; }
+.upgrade-btn:disabled, .upgrade-preview-btn:disabled{ opacity:1 !important; background:#5a3f22 !important; color:#e3caa3 !important; border-color:#2a1608 !important; }
+.upgrade-btn:disabled .icon-svg, .upgrade-btn:disabled svg{ opacity:.85; }
