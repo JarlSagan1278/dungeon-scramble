@@ -828,7 +828,8 @@ function drawEncounter(kind){
   // either -- a fresh room is a clean slate for both sides, same as the
   // enemy's own stacks just above. (Mid-fight, a Nullify is still the only
   // way to clear it early.)
-  S.playerDOT = 0; S.playerHOT = 0;
+  // Block (like every other status) is a clean slate in a new room too.
+  S.playerDOT = 0; S.playerHOT = 0; S.playerBlock = 0;
   e.questsDone = (e.quests||[]).map(()=>false);
   e.questDamageDealt = 0;
   e.minionsSpawned = 0;
@@ -1203,11 +1204,21 @@ function clearMinionAt(idx){
 // game state. Called once per die as runPlayerPathSteps() plays the path
 // back, so the encounter's/player's health bars drain and fill one die at
 // a time instead of jumping straight to the final total.
+// Enemy Shield soaks player-dealt damage (Hits, Combos, quest bonuses) before
+// Health is touched. Returns the damage that gets through to Health.
+function absorbWithShield(e, dmg){
+  if(!(e.curShield>0) || !(dmg>0)) return dmg;
+  const soaked = Math.min(e.curShield, dmg);
+  e.curShield -= soaked;
+  logMsg('sys', `${e.name}'s Shield absorbs ${soaked} damage.`);
+  return dmg - soaked;
+}
+
 function applyPathStep(step){
   const e = S.encounter;
   if(step.relicFx) step.relicFx.forEach(r=>fireRelic(r.id, r.text));
   if(step.dmg>0){
-    e.curHealth = capUpper(e.curHealth-step.dmg, e.maxHealth);
+    e.curHealth = capUpper(e.curHealth-absorbWithShield(e, step.dmg), e.maxHealth);
     S.stats.damageDealt += step.dmg;
     S.resolveTotal = (S.resolveTotal||0) + step.dmg;
   }
@@ -1292,7 +1303,7 @@ function applyQuestReward(e, rewardText){
     const already = e.questDamageDealt||0;
     const applied = Math.max(0, Math.min(amt, questCap-already));
     if(applied>0){
-      e.curHealth = capUpper(e.curHealth-applied, e.maxHealth);
+      e.curHealth = capUpper(e.curHealth-absorbWithShield(e, applied), e.maxHealth);
       e.questDamageDealt = already+applied;
       logMsg('dmg', `Bonus ${applied} damage from quest!`);
     } else {

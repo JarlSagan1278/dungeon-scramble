@@ -1027,13 +1027,14 @@ function renderEncounterCard(e, mode){
   let dmgPreviewLeftPct = 0, dmgPreviewWidthPct = 0, killHint = null;
   if(e.maxHealth && S.path && S.path.length && S.encounter===e && !S.transitioning){
     const pathPreview = computePathEffects(S.path);
-    const dmgAmt = Math.min(pathPreview.totalDamage, curHealthClamped);
+    const effDmg = Math.max(0, pathPreview.totalDamage - (e.curShield||0));
+    const dmgAmt = Math.min(effDmg, curHealthClamped);
     dmgPreviewWidthPct = dmgAmt/e.maxHealth*100;
     dmgPreviewLeftPct = hpPct - dmgPreviewWidthPct;
     // Anticipation tied to real numbers: how this path stacks up against a
     // kill and against the Overkill line (10 past dead, 6 with Hungry Blade).
     const thr = (typeof hasRelic==='function' && hasRelic('hungry_blade')) ? 5 : 9;
-    const d = pathPreview.totalDamage;
+    const d = effDmg;
     const hp = e.curHealth;
     if(d > hp + thr)      killHint = {state:'overkill', text:'OVERKILL!'};
     else if(d >= hp && hp > 0) {

@@ -1,0 +1,19 @@
+@page{size:Letter;margin:0.45in 0.4in}
+html,body{background:#1c1109!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{font-size:13.5px}
+.book{max-width:none;padding-inline:0;padding-block:0;gap:0}
+.cover{min-height:9.9in;break-after:page;border-radius:0}
+.page{break-before:page;margin-bottom:0;box-shadow:none;padding-top:54px}
+.toc{break-before:page}
+.page+.page{margin-top:0}
+.card,.dcard,.fr,.relic,.boss,.call,.figure,.campbanner,tr,.steps>li,.qr div,.route{break-inside:avoid}
+h3{break-after:avoid}
+.tw{break-inside:auto}
+.rib-wrap{top:-18px}
+.colophon{break-before:avoid;padding-top:10px}
+.press{animation:none}
+.dgrid{grid-template-columns:repeat(4,1fr)}
+.bosses{grid-template-columns:repeat(2,1fr)}
+.grid2{grid-template-columns:repeat(2,1fr)}
+.faceTbl{grid-template-columns:repeat(2,1fr)}
+.relics{grid-template-columns:repeat(2,1fr)}
