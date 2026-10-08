@@ -1918,3 +1918,13 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 @keyframes hp-ghost-kf{ 0%,35%{ transform:scaleX(1); opacity:.95; } 100%{ transform:scaleX(0); opacity:.4; } }
 .bar-fill.hp-ghost{ position:absolute; top:0; bottom:0; height:auto; background:#ffe6c4 !important; transform-origin:left center; animation:hp-ghost-kf .9s ease-in forwards; z-index:1; }
 .reduced-motion .idle-breath, .reduced-motion .hp-ghost{ animation:none !important; }
+
+@keyframes hp-heal-kf{ from{ width:var(--from); filter:brightness(1.5) saturate(1.2); } to{ filter:none; } }
+.bar-fill.hp-heal-fill{ animation:hp-heal-kf .6s cubic-bezier(.3,.7,.3,1) both; }
+.reduced-motion .hp-heal-fill{ animation:none !important; }
+
+@keyframes sh-up-kf{ 0%{ filter:brightness(2.2); scale:1.35; } 100%{ filter:none; scale:1; } }
+@keyframes sh-down-kf{ 0%{ filter:brightness(2); scale:1; translate:0 0; } 30%{ translate:-3px 0; } 60%{ translate:3px 0; } 100%{ filter:none; translate:0 0; } }
+.bar-shield.sh-up, .bar-fill.shield-seg.sh-up{ animation:sh-up-kf .5s cubic-bezier(.2,1.4,.4,1) both; }
+.bar-shield.sh-down, .bar-fill.shield-seg.sh-down{ animation:sh-down-kf .4s ease-out both; }
+.reduced-motion .sh-up, .reduced-motion .sh-down{ animation:none !important; }

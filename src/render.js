@@ -305,24 +305,35 @@ function archFrameSVG(w,h,lvl){
 // ---- Animation polish (v1.32.13) ----
 // Ghost "recent damage" segment: when a bar drops, a pale chunk lingers where the lost health was
 // and then slides away. State survives render() rebuilds via S._ghost so the chunk isn't cut short.
-function ghostBarHTML(side, pct){
+function hpFillHTML(side, cls, pct){
   try{
-    if(typeof PREFS!=='undefined' && PREFS.reducedMotion) return '';
     pct = Math.max(0, Math.min(100, pct||0));
+    const noAnim = (typeof PREFS!=='undefined' && PREFS.reducedMotion);
     const g = (S._ghost = S._ghost || {});
-    const st = g[side] || (g[side] = {last:pct, from:pct, t:0});
+    const st = g[side] || (g[side] = {last:pct, from:pct, t:0, hf:pct, ht:0});
     const now = performance.now();
     if(pct < st.last - 0.01){
       if(now - st.t >= 900) st.from = st.last;
-      st.t = now;
+      st.t = now; st.ht = 0;
     } else if(pct > st.last + 0.01){
       st.from = pct; st.t = 0;
+      if(now - st.ht >= 650) st.hf = st.last;   // healing: the fill sweeps up from where it was
+      st.ht = now;
     }
     st.last = pct;
+    let fillStyle = `width:${pct}%`, healCls = '';
+    const he = now - st.ht;
+    if(!noAnim && st.ht && he < 650 && pct > st.hf + 0.01){
+      healCls = ' hp-heal-fill';
+      fillStyle += `; --from:${st.hf}%; animation-delay:-${Math.round(he)}ms`;
+    }
+    let ghost = '';
     const el = now - st.t;
-    if(el >= 900 || pct >= st.from - 0.01) return '';
-    return `<div class="bar-fill hp-ghost" style="left:${pct}%; width:${st.from-pct}%; animation-delay:-${Math.round(el)}ms"></div>`;
-  }catch(err){ return ''; }
+    if(!noAnim && st.t && el < 900 && pct < st.from - 0.01){
+      ghost = `<div class="bar-fill hp-ghost" style="left:${pct}%; width:${st.from-pct}%; animation-delay:-${Math.round(el)}ms"></div>`;
+    }
+    return `<div class="bar-fill ${cls}${healCls}" style="${fillStyle}"></div>${ghost}`;
+  }catch(err){ return `<div class="bar-fill ${cls}" style="width:${pct}%"></div>`; }
 }
 // Idle breathing: render() rebuilds the DOM, so a plain CSS loop would restart on every redraw.
 // A negative delay tied to the clock keeps the loop continuous across rebuilds.
@@ -343,20 +354,75 @@ function lungeFigure(side){
     if(typeof PREFS!=='undefined' && (PREFS.reducedMotion || PREFS.lowIntensity)) return;
     const el = document.querySelector(`#enc-panel .fo-${side} .fo-fig > *`);
     if(!el || !el.animate) return;
-    const dx = side==='player' ? 14 : -14;
-    el.animate([
-      {translate:'0 0'},
-      {translate:`${dx}px -2px`, offset:0.35},
-      {translate:'0 0'}
-    ], {duration:200, easing:'cubic-bezier(.2,.8,.3,1)'});
+    if(side==='player'){
+      el.animate([{translate:'0 0'},{translate:'14px -2px', offset:0.35},{translate:'0 0'}], {duration:200, easing:'cubic-bezier(.2,.8,.3,1)'});
+    } else {
+      // enemy: pull back (wind-up), then snap forward
+      el.animate([{translate:'0 0', scale:'1 1'},{translate:'7px 1px', scale:'1.04 .96', offset:0.35},{translate:'-18px -2px', scale:'1 1', offset:0.6},{translate:'0 0'}], {duration:380, easing:'ease-out'});
+      document.querySelectorAll('#enc-panel .fo-enemy .enemy-action-badge.next, #enc-panel .fo-enemy .fo-chips .enemy-action-badge').forEach(c=>{
+        if(c.animate) c.animate([{scale:'1'},{scale:'1.18', offset:0.4},{scale:'1'}], {duration:360, easing:'ease-out'});
+      });
+    }
   }catch(err){}
 }
-function shieldBarHTML(val, max, hpPct){
-  if(!val || val<=0) return '';
+// Mascot hop: the route marker hops across to its new node instead of snapping.
+function syncMascotHop(){
+  try{
+    const m = document.querySelector('.route-wrap .mascot-wrap'); if(!m) return;
+    const left = parseFloat(m.style.left);
+    const prev = S._mascotLeft; S._mascotLeft = left;
+    if(prev==null || prev===left || !m.animate) return;
+    if(typeof PREFS!=='undefined' && PREFS.reducedMotion) return;
+    const w = m.parentElement.getBoundingClientRect().width;
+    const dx = (prev-left)/100*w;
+    m.animate([{translate:`${dx}px 0`},{translate:'0 0'}], {duration:480, easing:'cubic-bezier(.3,.7,.3,1)'});
+    const img = m.firstElementChild;
+    if(img && img.animate) img.animate([{translate:'0 0'},{translate:'0 -12px', offset:.45},{translate:'0 0'}], {duration:480, easing:'ease-out'});
+  }catch(err){}
+}
+// Rolling HP numbers: the digits count toward the new value. State lives in S._roll so it
+// survives the DOM being rebuilt mid-count.
+function rollHpNumbers(){
+  try{
+    const noAnim = (typeof PREFS!=='undefined' && PREFS.reducedMotion);
+    const sides = {player:'#enc-panel .fo-player .bar-num', enemy:'#enc-panel .fo-enemy .bar-num'};
+    const r = (S._roll = S._roll || {});
+    const now = performance.now();
+    for(const side in sides){
+      const el = document.querySelector(sides[side]); if(!el) continue;
+      const m = /^(-?\d+)\/(\d+)$/.exec(el.textContent.trim()); if(!m) continue;
+      const to = +m[1], max = m[2];
+      const st = r[side] || (r[side] = {from:to, to, t:0, shown:to});
+      if(st.to !== to){ st.from = st.shown; st.to = to; st.t = now; }
+      if(noAnim){ st.shown = to; continue; }
+      const tick = ()=>{
+        const e = document.querySelector(sides[side]); if(!e) return;
+        const k = Math.min(1, (performance.now()-st.t)/450);
+        st.shown = Math.round(st.from + (st.to-st.from)*(1-Math.pow(1-k,3)));
+        e.textContent = `${st.shown}/${max}`;
+        if(k<1) requestAnimationFrame(tick);
+      };
+      if(now - st.t < 450) tick();
+    }
+  }catch(err){}
+}
+function shieldBarHTML(val, max, hpPct, side){
+  side = side || 'x';
+  const g = (S._shieldFx = S._shieldFx || {});
+  const st = g[side] || (g[side] = {last:0, dir:'', t:0});
+  const now = performance.now();
+  val = val || 0;
+  if(val !== st.last){ st.dir = val>st.last ? 'up' : 'down'; st.t = now; }
+  st.last = val;
+  if(!val) return '';
+  const noAnim = (typeof PREFS!=='undefined' && PREFS.reducedMotion);
+  const el = now - st.t;
+  const fx = (!noAnim && st.dir && el<600) ? ` sh-${st.dir}` : '';
+  const dl = fx ? `animation-delay:-${Math.round(el)}ms` : '';
   const room = Math.max(0, 100 - (hpPct||0));
   const w = Math.min(room, val/Math.max(1,max)*100);
-  return (w>0?`<div class="bar-fill shield-seg" style="left:${hpPct||0}%; width:${w}%;" title="Shield ${val}"></div>`:'')
-    + `<span class="bar-shield" title="Shield/Block ${val}: absorbs damage before health"><b>+${val}</b></span>`;
+  return (w>0?`<div class="bar-fill shield-seg${fx}" style="left:${hpPct||0}%; width:${w}%; ${dl}" title="Shield ${val}"></div>`:'')
+    + `<span class="bar-shield${fx}" style="${dl}" title="Shield/Block ${val}: absorbs damage before health"><b>+${val}</b></span>`;
 }
 function decorateArch(){
   try{
@@ -368,7 +434,7 @@ function decorateArch(){
     const w = Math.round(card.offsetWidth), h = Math.round(card.offsetHeight+10);
     const lvl = Math.min(3,(S.floorIdx||0)+1);
     card.insertAdjacentHTML('beforeend', `<svg class="fo-frame" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">${archFrameSVG(w,h,lvl)}</svg>`);
-    syncIdleBreath();
+    syncIdleBreath(); syncMascotHop(); rollHpNumbers();
     // The settings cog tucks into the empty corner beside the arch's right shoulder.
     document.body.classList.add('cog-arch');
     document.body.style.setProperty('--cog-top', Math.max(2, Math.round(r.top + window.scrollY - 10))+'px');
@@ -1177,7 +1243,7 @@ function renderEncounterCard(e, mode){
       <div class="fo-band">
         <div class="fo-side fo-player">
           <div class="fo-fig ${p.figCls||''}" title="${S.origin.name} ${S.klass.name}">${p.figHTML||''}</div><div class="fo-floor"></div>
-          <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}"><div class="bar-fill hp player" style="width:${p.hpPct||0}%"></div>${ghostBarHTML('player', p.hpPct)}${shieldBarHTML(S.playerBlock, S.maxHealth, p.hpPct)}<span class="bar-num">${S.health}/${S.maxHealth}</span></div>${p.deltaHTML||''}</div>
+          <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}">${hpFillHTML('player','hp player',p.hpPct)}${shieldBarHTML(S.playerBlock, S.maxHealth, p.hpPct, 'player')}<span class="bar-num">${S.health}/${S.maxHealth}</span></div>${p.deltaHTML||''}</div>
           <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim():S.origin.name+' '+S.klass.name}</div>
           <div class="fo-chips fo-buffs">${hudChips(p.statusHTML)}</div>
         </div>
@@ -1185,11 +1251,10 @@ function renderEncounterCard(e, mode){
         <div class="fo-side fo-enemy">
           <div class="fo-fig enc-portrait ${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}">${monsterFig}</div><div class="fo-floor"></div>
           <div class="fo-hpwrap status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;"><div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
-              <div class="bar-fill hp" style="width:${hpPct}%"></div>
-              ${ghostBarHTML('enemy', hpPct)}
+              ${hpFillHTML('enemy','hp',hpPct)}
               ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
               ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
-              ${shieldBarHTML(e.curShield, e.maxHealth, hpPct)}<span class="bar-num">${curHealthClamped.toFixed(0)}/${e.maxHealth}</span>
+              ${shieldBarHTML(e.curShield, e.maxHealth, hpPct, 'enemy')}<span class="bar-num">${curHealthClamped.toFixed(0)}/${e.maxHealth}</span>
             </div>${fx.deltaHTML}</div>
           <div class="kill-hint fo-hint ${killHint?'kill-hint-'+killHint.state:''}" ${killHint?`data-hint="${killHint.state}"`:''}>${killHint?killHint.text:'&nbsp;'}</div>
           <div class="fo-name" ${e.flavor?`title="${e.flavor.replace(/"/g,'&quot;')}"`:''}>${typeTag}${e.name}</div>
