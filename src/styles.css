@@ -1695,3 +1695,8 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .fo-enemy .fo-quests{ align-items:center !important; text-align:center !important; justify-content:center !important; }
 /* Top map panel: even frame (the mascot hangs into the bottom padding instead of extra margin) */
 .route-wrap{ margin:2px 0 6px !important; }
+
+/* Kill hint ("So close", "Lethal"...) always owns its slot so nothing shifts when it appears */
+.fo-enemy .fo-hint{ margin:0 !important; height:12px; line-height:12px; text-align:center; width:100%; overflow:visible; }
+:root{ --screen-h:660px; }
+.enc-card.fo-arch{ min-height:222px !important; }
