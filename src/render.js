@@ -980,8 +980,8 @@ function healthFX(current, last){
   // uniform-size float, so a 1-damage tick and a 10-damage combo don't read
   // the same. Scales the font-size and adds a stronger "big" bounce past a
   // threshold, both purely cosmetic (position:absolute, no layout impact).
-  const fontSize = Math.round(Math.min(34, 14 + mag*1.8));
-  const bigCls = mag>=6 ? 'big' : '';
+  const fontSize = Math.round(Math.min(68, 28 + mag*3.4));
+  const bigCls = mag>=4 ? 'big' : '';
   return {
     cls: isHeal ? 'flash-heal' : 'flash-damage',
     deltaHTML: `<span class="delta-float ${isHeal?'heal':'damage'} ${bigCls}" style="font-size:${fontSize}px;">${isHeal?'+':'-'}${shown}</span>`
@@ -1294,7 +1294,7 @@ function renderGame(){
             <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
               <div class="tray" id="tray" style="--class-color:${S.klass.color||'#ffffff'}"></div>
             </div>
-            ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip</button>${S.resolveTotal>0 ? `<div class="run-total">${S.resolveTotal%1?S.resolveTotal.toFixed(1):S.resolveTotal}<small> dmg</small></div>` : ''}` : pathCounterHTML()}
+            ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip</button>` : pathCounterHTML()}
           </div>
         </div>
         <div class="util-rail">
