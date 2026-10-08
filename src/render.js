@@ -330,7 +330,8 @@ function hpFillHTML(side, cls, pct){
     let ghost = '';
     const el = now - st.t;
     if(!noAnim && st.t && el < 900 && pct < st.from - 0.01){
-      ghost = `<div class="bar-fill hp-ghost" style="left:${pct}%; width:${st.from-pct}%; animation-delay:-${Math.round(el)}ms"></div>`;
+      const big = Math.min(1,(st.from-pct)/35); const gc = `rgb(255,${Math.round(230-big*95)},${Math.round(196-big*110)})`;
+      ghost = `<div class="bar-fill hp-ghost" style="left:${pct}%; width:${st.from-pct}%; background:${gc} !important; animation-delay:-${Math.round(el)}ms"></div>`;
     }
     return `<div class="bar-fill ${cls}${healCls}" style="${fillStyle}"></div>${ghost}`;
   }catch(err){ return `<div class="bar-fill ${cls}" style="width:${pct}%"></div>`; }
@@ -341,7 +342,8 @@ function syncIdleBreath(){
   try{
     const figs = document.querySelectorAll('#enc-panel .fo-player .fo-fig > *, #enc-panel .fo-enemy .fo-fig > *');
     figs.forEach((el,i)=>{
-      const period = 3200 + (el.closest('.fo-enemy') ? 400 : 0);
+      const seedStr = ((S.encounter&&S.encounter.name)||'')+(S.routeStep||0)+(el.closest('.fo-enemy')?'e':'p'); let hsh=0; for(let c=0;c<seedStr.length;c++) hsh=(hsh*31+seedStr.charCodeAt(c))>>>0;
+      const period = Math.round(2800 + (hsh%1200));
       el.classList.add('idle-breath');
       el.style.animationDuration = period+'ms';
       el.style.animationDelay = '-'+Math.round(performance.now() % period)+'ms';
@@ -349,19 +351,24 @@ function syncIdleBreath(){
   }catch(err){}
 }
 // One-shot lunge toward the other side (Web Animations API: never fights the CSS transforms).
-function lungeFigure(side){
+function lungeFigure(side, dmg){
   try{
     if(typeof PREFS!=='undefined' && (PREFS.reducedMotion || PREFS.lowIntensity)) return;
-    const el = document.querySelector(`#enc-panel .fo-${side} .fo-fig > *`);
+    const sel = (side==='player') ? 'player' : 'enemy';
+    const el = document.querySelector(`#enc-panel .fo-${sel} .fo-fig > *`);
     if(!el || !el.animate) return;
     if(side==='player'){
-      el.animate([{translate:'0 0'},{translate:'14px -2px', offset:0.35},{translate:'0 0'}], {duration:200, easing:'cubic-bezier(.2,.8,.3,1)'});
-    } else {
-      // enemy: pull back (wind-up), then snap forward
-      el.animate([{translate:'0 0', scale:'1 1'},{translate:'7px 1px', scale:'1.04 .96', offset:0.35},{translate:'-18px -2px', scale:'1 1', offset:0.6},{translate:'0 0'}], {duration:380, easing:'ease-out'});
-      document.querySelectorAll('#enc-panel .fo-enemy .enemy-action-badge.next, #enc-panel .fo-enemy .fo-chips .enemy-action-badge').forEach(c=>{
-        if(c.animate) c.animate([{scale:'1'},{scale:'1.18', offset:0.4},{scale:'1'}], {duration:360, easing:'ease-out'});
+      const d = Math.max(1, dmg||1);
+      const dist = 8 + Math.min(d,8)*2;            // 10px .. 24px by damage
+      const big = d>=4 ? 1.07 : 1;
+      el.animate([{translate:'0 0', scale:'1 1'},{translate:`${dist}px -2px`, scale:`${big} ${big}`, offset:0.35},{translate:'0 0', scale:'1 1'}], {duration:200 + Math.min(d,8)*8, easing:'cubic-bezier(.2,.8,.3,1)'});
+    } else if(side==='enemyWind'){
+      el.animate([{translate:'0 0', scale:'1 1'},{translate:'9px 1px', scale:'1.05 .95'}], {duration:200, easing:'ease-out', fill:'forwards'});
+      document.querySelectorAll('#enc-panel .fo-enemy .fo-chips .enemy-action-badge').forEach(c=>{
+        if(c.animate) c.animate([{scale:'1'},{scale:'1.2', offset:0.5},{scale:'1'}], {duration:300, easing:'ease-out'});
       });
+    } else if(side==='enemyStrike'){
+      el.animate([{translate:'9px 1px', scale:'1.05 .95'},{translate:'-20px -2px', scale:'1 1', offset:0.35},{translate:'0 0'}], {duration:260, easing:'cubic-bezier(.2,.8,.3,1)'});
     }
   }catch(err){}
 }
@@ -375,9 +382,9 @@ function syncMascotHop(){
     if(typeof PREFS!=='undefined' && PREFS.reducedMotion) return;
     const w = m.parentElement.getBoundingClientRect().width;
     const dx = (prev-left)/100*w;
-    m.animate([{translate:`${dx}px 0`},{translate:'0 0'}], {duration:480, easing:'cubic-bezier(.3,.7,.3,1)'});
+    m.animate([{translate:`${dx}px 0`},{translate:'0 0'}], {duration:520, easing:'cubic-bezier(.35,.1,.3,1)'});
     const img = m.firstElementChild;
-    if(img && img.animate) img.animate([{translate:'0 0'},{translate:'0 -12px', offset:.45},{translate:'0 0'}], {duration:480, easing:'ease-out'});
+    if(img && img.animate) img.animate([{translate:'0 0', scale:'1 1'},{translate:'0 -14px', scale:'.94 1.08', offset:.4},{translate:'0 0', scale:'1.18 .82', offset:.88},{translate:'0 0', scale:'1 1'}], {duration:520, easing:'ease-in-out'});
   }catch(err){}
 }
 // Rolling HP numbers: the digits count toward the new value. State lives in S._roll so it
@@ -398,7 +405,8 @@ function rollHpNumbers(){
       const tick = ()=>{
         const e = document.querySelector(sides[side]); if(!e) return;
         const k = Math.min(1, (performance.now()-st.t)/450);
-        st.shown = Math.round(st.from + (st.to-st.from)*(1-Math.pow(1-k,3)));
+        const up = st.to>st.from; const c1=1.7, c3=c1+1; const ease = up ? 1 + c3*Math.pow(k-1,3) + c1*Math.pow(k-1,2) : 1-Math.pow(1-k,3);
+        st.shown = Math.min(+max, Math.round(st.from + (st.to-st.from)*ease));
         e.innerHTML = `${st.shown}${shieldNumHTML(+sh||0)}/${max}`;
         if(k<1) requestAnimationFrame(tick);
       };
@@ -1120,7 +1128,7 @@ function healthFX(current, last){
   const bigCls = mag>=4 ? 'big' : '';
   return {
     cls: isHeal ? 'flash-heal' : 'flash-damage',
-    deltaHTML: `<span class="delta-float ${isHeal?'heal':'damage'} ${bigCls}" style="font-size:${fontSize}px;">${isHeal?'+':'-'}${shown}</span>`
+    deltaHTML: `<span class="delta-float ${isHeal?'heal':'damage'} ${bigCls}" style="font-size:${fontSize}px; translate:${((Math.round(shown)*13)%5-2)*7}px 0;">${isHeal?'+':'-'}${shown}</span>`
   };
 }
 
@@ -1432,7 +1440,7 @@ function renderGame(){
           <div class="tray-float-wrap">
             <div class="tray-head"><span class="round-badge">Round ${S.turnNumber+1}</span><div class="path-strip" id="path-strip"></div></div>
             <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
-              <div class="tray" id="tray" style="--class-color:${S.klass.color||'#ffffff'}"></div>
+              <div class="tray ${S.newRoomFx?'tray-room-in':''}" id="tray" style="--class-color:${S.klass.color||'#ffffff'}"></div>
             </div>
             ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip</button>` : pathCounterHTML()}
           </div>

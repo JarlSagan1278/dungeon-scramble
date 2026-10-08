@@ -1152,7 +1152,7 @@ function buildComboRipple(path){
     if(getFaceForIdx(idx).type!=='combo') return;
     ripple.push({idx, order});
     order++;
-    attackNeighborIndices(idx).forEach(nIdx=>{ ripple.push({idx:nIdx, order}); });
+    attackNeighborIndices(idx).forEach((nIdx,k)=>{ ripple.push({idx:nIdx, order:order+0.5+k*0.35}); });
     order++;
   });
   return ripple.length ? ripple : null;
@@ -1451,7 +1451,7 @@ function runPlayerPathSteps(steps, i, path, effects){
   const pitchStep = step.dmg>0 ? S._hitStreak++ : 0;
   if(typeof playStepTone==='function') playStepTone(S.resolvingFx, pitchStep);
   render();
-  if(step.dmg>0 && typeof lungeFigure==='function') lungeFigure('player');
+  if(step.dmg>0 && typeof lungeFigure==='function') lungeFigure('player', step.dmg);
   // Impact tier from the die's own damage; bigger hits also linger a beat
   // (a brief 'hit-stop' -- only this sequence's own timer, never the UI or
   // audio) so they land with weight. Skip fast-forwards past all of it.
@@ -1504,8 +1504,17 @@ function finishPlayerPath(path, effects){
 // action, then your upkeep tick -- each landing as a toast + whatever
 // portrait/health-bar flash that beat's own state change naturally
 // triggers, instead of all three crammed into one text card.
-function runEnemyBeat(i){
+function runEnemyBeat(i, noWind){
   const e = S.encounter;
+  // The enemy's action (beat 1) gets a short wind-up so the hit lands at the END of the lunge,
+  // not while the monster is still pulling back.
+  if(i===1 && !noWind && !S._skipAll && typeof lungeFigure==='function' && !(typeof PREFS!=='undefined' && (PREFS.reducedMotion||PREFS.lowIntensity))){
+    lungeFigure('enemyWind');
+    const go = () => { if(S._pendingTimeout){ clearTimeout(S._pendingTimeout); S._pendingTimeout=null; } runEnemyBeat(1, true); };
+    S._advance = go;
+    S._pendingTimeout = setTimeout(go, 210);
+    return;
+  }
   const beats = [
     () => {
       if(!(e.curDOT>0)) return null;
@@ -1543,7 +1552,7 @@ function runEnemyBeat(i){
   const hpBefore = S.health;
   const result = beats[i]() || {};
   render();
-  if(i===1 && S.health < hpBefore && typeof lungeFigure==='function') lungeFigure('enemy');
+  if(i===1 && typeof lungeFigure==='function' && S.health < hpBefore) lungeFigure('enemyStrike');
   const advance = () => {
     S._pendingTimeout = null;
     if(result.stop==='encounterDefeated'){ S.transitioning=false; onEncounterDefeated(); return; }
@@ -1875,8 +1884,9 @@ function onEncounterDefeated(){
   // State (S.lootChoice etc.) is already set, so this only delays the redraw.
   const deathCard = (typeof document!=='undefined') ? document.querySelector('#enc-panel .enc-card-col') : null;
   if(deathCard && !(typeof PREFS!=='undefined' && PREFS.reducedMotion) && S.screen==='game'){
-    deathCard.classList.add('enc-death');
-    setTimeout(()=>{ if(S && S.lootChoice) render(); }, 480);
+    const bossDeath = (e.type==='Boss' || e.type==='Big Boss');
+    deathCard.classList.add('enc-death'); if(bossDeath) deathCard.classList.add('enc-death-boss');
+    setTimeout(()=>{ if(S && S.lootChoice) render(); }, bossDeath ? 1000 : 700);
   } else {
     render();
   }

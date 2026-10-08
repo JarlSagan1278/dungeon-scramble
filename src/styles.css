@@ -1930,3 +1930,38 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .reduced-motion .sh-up, .reduced-motion .sh-down{ animation:none !important; }
 
 .bar-num .bn-sh{ color:#8cd0ff; text-shadow:0 1px 0 #0a2236, 0 0 3px #0a2236; }
+
+/* v1.32.17 animation refinements */
+/* Kill: hit-freeze -> flash -> wobble -> dissolve (bosses linger longer) */
+.enc-card-col.enc-death .fo-fig.enc-portrait{ animation: fo-mon-death2 .66s ease-in forwards; }
+.enc-card-col.enc-death-boss .fo-fig.enc-portrait{ animation: fo-mon-death2-boss .95s ease-in forwards; }
+@keyframes fo-mon-death2{
+  0%,16%{ filter:brightness(2.8) contrast(1.2); transform:scale(1.08); opacity:1; }
+  32%{ filter:brightness(1.6) saturate(.6); transform:translateX(-4px) rotate(-3deg) scale(1.04); }
+  50%{ transform:translateX(4px) rotate(3deg) scale(1.02); }
+  100%{ filter:grayscale(1) blur(3px); transform:scale(.75) translateY(12px); opacity:0; }
+}
+@keyframes fo-mon-death2-boss{
+  0%,20%{ filter:brightness(3) contrast(1.25); transform:scale(1.1); opacity:1; }
+  30%{ transform:translateX(-6px) rotate(-4deg) scale(1.08); filter:brightness(1.8); }
+  40%{ transform:translateX(6px) rotate(4deg) scale(1.06); }
+  50%{ transform:translateX(-5px) rotate(-3deg) scale(1.1); filter:brightness(2.2) saturate(.5); }
+  60%{ transform:translateX(5px) rotate(3deg) scale(1.12); }
+  100%{ filter:grayscale(1) blur(4px) brightness(1.4); transform:scale(.6) translateY(16px); opacity:0; }
+}
+.reduced-motion .enc-card-col.enc-death .fo-fig.enc-portrait{ animation:none; }
+/* Chest: shaking builds and light leaks out before the reveal */
+@keyframes chest-build-kf{
+  0%{ transform:translate(0,0) scale(1); filter:drop-shadow(0 0 0 transparent) brightness(1); }
+  25%{ transform:translate(-1px,0) rotate(-1deg) scale(1.02); }
+  45%{ transform:translate(2px,-1px) rotate(1.5deg) scale(1.05); filter:drop-shadow(0 0 8px var(--loot-tier-glow,#ffd76a)) brightness(1.15); }
+  65%{ transform:translate(-3px,0) rotate(-2.5deg) scale(1.08); }
+  85%{ transform:translate(3px,-2px) rotate(3deg) scale(1.11); filter:drop-shadow(0 0 20px var(--loot-tier-glow,#ffd76a)) brightness(1.5); }
+  100%{ transform:translate(0,0) scale(1.14); filter:drop-shadow(0 0 30px var(--loot-tier-glow,#ffd76a)) brightness(1.9); }
+}
+.loot-chest-btn.opening .loot-chest-svg{ animation: chest-build-kf 1s ease-in .35s both; transform-origin:50% 80%; }
+.reduced-motion .loot-chest-btn.opening .loot-chest-svg{ animation:none; }
+/* Tray settles in with each new room */
+@keyframes tray-room-in-kf{ 0%{ opacity:.25; transform:translateY(14px) scale(.97); } 70%{ opacity:1; transform:translateY(-2px) scale(1.005); } 100%{ transform:none; } }
+.tray.tray-room-in{ animation: tray-room-in-kf .45s ease-out both; }
+.reduced-motion .tray.tray-room-in{ animation:none; }
