@@ -1678,3 +1678,8 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .fo-has-quests .fo-flavor{ display:none; }
 .util-btn, .util-btn span{ text-align:center; }
 .util-btn.rail-ability span{ line-height:1.1; width:100%; display:block; }
+
+/* Character select: a bigger, more enticing call to action */
+#start-btn{ width:100%; padding:16px 12px; font-size:20px; letter-spacing:.8px; border-radius:var(--r-lg); font-family:var(--font-display) !important; box-shadow:0 4px 0 #8a6a1c, 0 0 0 rgba(255,215,106,0); }
+#start-btn:not(:disabled){ animation: pulse-glow 1.8s ease-in-out infinite; }
+.reduced-motion #start-btn{ animation:none !important; }
