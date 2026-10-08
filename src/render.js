@@ -2854,7 +2854,7 @@ function renderCamp(){
           <div class="campfire-flame flame-front"></div>
         </div>
         <div class="small-btn-row">
-          <button id="rest-btn" ${S.campRested?'disabled':''} title="Scramble your Tray's faces, then heal for half the non-blank faces showing">${S.campRested?'Rested':'Rest'}</button>
+          <button id="rest-btn" ${S.campRested?'disabled':''} title="Scramble your Tray's faces, then heal for half the non-blank faces showing">${S.campRested?'Rested':'Stay a while &amp; rest'}</button>
           <button id="leave-btn" class="primary">Break Camp &amp; Continue</button>
         </div>
       </div>
