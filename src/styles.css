@@ -1690,3 +1690,8 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .camp-hero img{ display:block; height:74px; width:auto; filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)) drop-shadow(6px 0 8px rgba(255,150,40,.45)); }
 .camp-hero{ width:max-content; }
 .camp-hero img{ max-width:none !important; width:auto !important; object-fit:contain; }
+
+.fo-floor{ display:none !important; }
+.fo-enemy .fo-quests{ align-items:center !important; text-align:center !important; justify-content:center !important; }
+/* Top map panel: even frame (the mascot hangs into the bottom padding instead of extra margin) */
+.route-wrap{ margin:2px 0 6px !important; }

@@ -306,8 +306,9 @@ function decorateArch(){
     const card = document.querySelector('#enc-panel .fo-arch');
     if(!card) return;
     card.querySelectorAll('.fo-frame').forEach(n=>n.remove());
+    // offset sizes, NOT getBoundingClientRect: the room-enter animation scales the card while this runs
     const r = card.getBoundingClientRect();
-    const w = Math.round(r.width+10), h = Math.round(r.height+10);
+    const w = Math.round(card.offsetWidth+10), h = Math.round(card.offsetHeight+10);
     const lvl = Math.min(3,(S.floorIdx||0)+1);
     card.insertAdjacentHTML('beforeend', `<svg class="fo-frame" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">${archFrameSVG(w,h,lvl)}</svg>`);
     // The settings cog tucks into the empty corner beside the arch's right shoulder.
@@ -324,6 +325,7 @@ function tuckCampCog(){
     document.body.style.setProperty('--cog-top', Math.round(r.top + window.scrollY + r.height/2 - 16)+'px');
   } catch(err){}
 }
+document.addEventListener('animationend', ev=>{ if(ev.target && ev.target.classList && ev.target.classList.contains('fo-arch')) decorateArch(); }, true);
 window.addEventListener('resize', ()=>{ if(document.querySelector('#enc-panel .fo-arch')) decorateArch(); else if(S && S.screen==='camp') tuckCampCog(); });
 
 function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
