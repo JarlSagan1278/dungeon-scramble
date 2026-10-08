@@ -1538,14 +1538,34 @@ function ensureFxStack(){
   return stack;
 }
 
+// ---- Ribbons: the diagonal banners that replaced plain toasts. Combat messages (damage dealt/taken,
+// heals, blocks...) slash across the doorway scene, tilted toward whoever they happened to; everything
+// else (equips, relics, upgrades) gets its own smaller gold ribbon higher up, so the two never share a slot.
+// Both overlay the scene, so they can't change the screen height. ----
+const RB_NOTICE_RE = /^(Equipped|Relic|Upgraded|Swapped|Rested|— Floor|Iron Rations|Not enough|Locked|Debug|Origin|Unlock|Debug)|joins your tray/i;
 function showToast(text, kind){
-  const stack = ensureFxStack();
-  const toast = el(`<div class="toast${kind ? ' toast-'+kind : ''}">${text}</div>`);
-  stack.appendChild(toast);
-  // The sweep-in/hold/sweep-out is now all one CSS animation (toast-sweep,
-  // styles.css) instead of a separate fade-in then fade-out pair of timers,
-  // so this just needs to clean the node up once that animation has run.
-  setTimeout(()=>{ if(toast.parentNode) toast.parentNode.removeChild(toast); }, 1150);
+  const notice = RB_NOTICE_RE.test(text) || (!kind && !/hit|damage|dealt|heal|block|nullify|leap|minion|quest|dot|hot|shield|freeze/i.test(text));
+  const toPlayer = !notice && (kind==='bad' || /hits you|you for|your D\.O\.T|desperate/i.test(text)) && !/dealt/i.test(text);
+  const arch = document.querySelector('#enc-panel .fo-arch');
+  const base = arch || document.getElementById('app') || document.body;
+  const r = base.getBoundingClientRect();
+  const layerId = notice ? 'rb-layer-notice' : 'rb-layer-combat';
+  let layer = document.getElementById(layerId);
+  if(layer) layer.remove();
+  layer = document.createElement('div');
+  layer.id = layerId; layer.className = 'rb-layer';
+  const h = arch ? r.height : Math.min(r.height, 280);
+  layer.style.cssText = `left:${r.left}px;top:${Math.max(0,r.top)}px;width:${r.width}px;height:${h}px;`;
+  const tone = notice ? 'gold' : (kind==='bad'||toPlayer ? 'bad' : kind==='good' ? 'good' : 'neutral');
+  const dir = notice ? 'n' : (toPlayer ? 'l' : 'r');
+  const iconKey = notice ? null : (/block/i.test(text)?'block':/heal/i.test(text)?'heal':/hit|damage|dealt/i.test(text)?'hit':null);
+  const ic = (iconKey && typeof iconSpan==='function') ? `<span class="rb-ic">${iconSpan(iconKey)}</span>` : '';
+  const label = (!notice && /hits you/i.test(text)) ? '<small>Enemy turn</small>' : '';
+  const len = text.length;
+  const rb = el(`<div class="rb rb-${tone} rb-${dir} ${len>34?'rb-long':''}"><div class="rb-in">${label}${ic}${text}</div><i class="rb-streak s1"></i><i class="rb-streak s2"></i></div>`);
+  layer.appendChild(rb);
+  document.body.appendChild(layer);
+  setTimeout(()=>{ if(layer.parentNode) layer.parentNode.removeChild(layer); }, notice ? 1500 : 1300);
 }
 
 // ---- Kill callout: a brief banner for the two kill moments worth

@@ -1721,3 +1721,32 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 #room-callout{ display:flex; justify-content:center; }
 #room-callout .room-callout-box{ margin:0 auto; max-width:100%; box-sizing:border-box; }
 .fo-flavor{ display:none !important; }
+
+/* ---- Diagonal ribbons (replace toasts) ---- */
+.rb-layer{ position:fixed; z-index:95; overflow:hidden; pointer-events:none; }
+.rb{ position:absolute; left:0; right:0; display:flex; align-items:center; pointer-events:none; color:#fff1d6; text-align:center;
+  font-family:var(--font-display) !important; font-size:17px; line-height:1.1; letter-spacing:.5px; text-shadow:0 2px 0 rgba(0,0,0,.75); }
+.rb-in{ position:relative; max-width:96%; padding:8px 40px; clip-path:polygon(14px 0,100% 0,calc(100% - 14px) 100%,0 100%); box-shadow:inset 0 2px 0 rgba(255,255,255,.14); }
+.rb-in small{ display:block; font-family:var(--font-ui) !important; font-size:9px; letter-spacing:1.2px; text-transform:uppercase; opacity:.8; margin-bottom:3px; }
+.rb-ic{ display:inline-flex; width:15px; height:15px; vertical-align:-2px; margin-right:6px; }
+.rb-bad .rb-in{ background:linear-gradient(180deg,#8a241a,#3a0c08); }
+.rb-good .rb-in{ background:linear-gradient(180deg,#25783a,#0c2c14); }
+.rb-neutral .rb-in{ background:linear-gradient(180deg,#3a2616,#160c05); }
+.rb-gold .rb-in{ background:linear-gradient(180deg,#9a7a22,#3a2a08); padding:5px 30px; font-size:12px; }
+.rb-long{ font-size:13px; }
+.rb-streak{ position:absolute; height:2px; width:70px; background:linear-gradient(90deg,transparent,rgba(255,241,214,.85),transparent); opacity:.9; }
+.rb-streak.s1{ top:34%; } .rb-streak.s2{ top:66%; width:46px; }
+/* placement: combat slashes the middle of the scene tilted toward the target; notices ride higher */
+.rb-combat-pos{}
+#rb-layer-combat .rb{ top:40%; }
+#rb-layer-notice .rb{ top:14%; }
+.rb-l{ justify-content:flex-start; transform:rotate(-9deg); animation: rb-in-l 1.25s cubic-bezier(.22,1,.36,1) forwards; }
+.rb-l .rb-in{ margin-left:-14px; } .rb-l .rb-streak{ left:-6px; }
+.rb-r{ justify-content:flex-end; transform:rotate(9deg); animation: rb-in-r 1.25s cubic-bezier(.22,1,.36,1) forwards; }
+.rb-r .rb-in{ margin-right:-14px; } .rb-r .rb-streak{ right:-6px; }
+.rb-n{ justify-content:center; transform:rotate(-4deg); animation: rb-in-n 1.4s cubic-bezier(.22,1,.36,1) forwards; }
+@keyframes rb-in-l{ 0%{ transform:translateX(120%) rotate(-9deg); opacity:0; } 14%{ transform:translateX(0) rotate(-9deg); opacity:1; } 78%{ transform:translateX(0) rotate(-9deg); opacity:1; } 100%{ transform:translateX(-60%) rotate(-9deg); opacity:0; } }
+@keyframes rb-in-r{ 0%{ transform:translateX(-120%) rotate(9deg); opacity:0; } 14%{ transform:translateX(0) rotate(9deg); opacity:1; } 78%{ transform:translateX(0) rotate(9deg); opacity:1; } 100%{ transform:translateX(60%) rotate(9deg); opacity:0; } }
+@keyframes rb-in-n{ 0%{ transform:translateX(100%) rotate(-4deg); opacity:0; } 14%{ transform:translateX(0) rotate(-4deg); opacity:1; } 80%{ transform:translateX(0) rotate(-4deg); opacity:1; } 100%{ transform:translateX(-40%) rotate(-4deg); opacity:0; } }
+.reduced-motion .rb{ animation:none !important; opacity:1; }
+.reduced-motion .rb-streak{ display:none; }
