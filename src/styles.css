@@ -1700,3 +1700,12 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .fo-enemy .fo-hint{ margin:0 !important; height:12px; line-height:12px; text-align:center; width:100%; overflow:visible; }
 :root{ --screen-h:660px; }
 .enc-card.fo-arch{ min-height:222px !important; }
+/* Buff row always reserves its line so the hero and name don't hop when a buff lands */
+.fo-buffs, .fo-buffs:empty{ display:flex !important; min-height:18px; }
+
+/* Extra height: roughly one die (~60px) more screen, spent on a bigger doorway and larger fighters */
+:root{ --screen-h:720px; }
+.enc-card.fo-arch{ min-height:272px !important; }
+.fo-fig .fo-img, .enc-portrait.fo-fig .enc-art{ height:104px !important; }
+.fo-has-quests .fo-fig .fo-img, .fo-has-quests .enc-portrait.fo-fig .enc-art{ height:88px !important; }
+.fo-hud-col{ top:56px; }
