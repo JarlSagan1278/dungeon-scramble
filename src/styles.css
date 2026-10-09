@@ -2121,14 +2121,29 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 
 
 /* ---- Dice tray as an oak-and-iron chest ---- */
-.tray-wrap{ padding:0 !important; border:3px solid #0c0705 !important; border-radius:9px !important; margin-bottom:22px !important; overflow:visible !important;
+.tray-wrap{ padding:0 !important; border:3px solid #0c0705 !important; border-radius:9px !important; margin-bottom:12px !important; overflow:visible !important;
   box-shadow:0 5px 0 #0c0705, 0 0 0 rgba(0,0,0,0) !important;
   background:repeating-linear-gradient(90deg,transparent 0 46px,rgba(0,0,0,.28) 46px 48px),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 7px),linear-gradient(180deg,#6b4220,#4d2d14) !important; }
-.tray-wrap .tray{ margin:12px 12px 36px; padding:5px; border-radius:5px;
+.tray-wrap .tray{ margin:8px 8px 26px; padding:4px; border-radius:5px;
   background:#1b0f07;
   box-shadow:inset 0 6px 12px rgba(0,0,0,.85),inset 0 0 0 2px #0c0705,0 0 0 2px rgba(255,255,255,.12); }
-.tray-wrap::after{ content:""; position:absolute; left:3px; right:3px; bottom:3px; height:20px; border-top:2px solid rgba(0,0,0,.55); box-shadow:inset 0 2px 0 rgba(255,255,255,.12); border-radius:0 0 6px 6px; background:repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 2px,transparent 2px 38px); pointer-events:none; }
+.tray-wrap::after{ content:""; position:absolute; left:3px; right:3px; bottom:3px; height:19px; border-top:2px solid rgba(0,0,0,.55); box-shadow:inset 0 2px 0 rgba(255,255,255,.12); border-radius:0 0 6px 6px; background:repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 2px,transparent 2px 38px); pointer-events:none; }
 .tray-wrap .cc{ position:absolute; z-index:3; width:36px; height:36px; pointer-events:none; }
 .tray-wrap .cc.tl{ left:-4px; top:-4px; } .tray-wrap .cc.tr{ right:-4px; top:-4px; transform:scaleX(-1); }
 .tray-wrap .cc.bl{ left:-4px; bottom:-4px; transform:scaleY(-1); } .tray-wrap .cc.br{ right:-4px; bottom:-4px; transform:scale(-1,-1); }
-.tray-wrap .chest-lock{ position:absolute; left:50%; transform:translateX(-50%); bottom:-20px; z-index:4; pointer-events:none; filter:drop-shadow(0 3px 0 rgba(0,0,0,.4)); }
+.tray-wrap .chest-lock{ position:absolute; left:50%; transform:translateX(-50%) scale(.84); transform-origin:50% 100%; bottom:-9px; z-index:4; pointer-events:none; filter:drop-shadow(0 3px 0 rgba(0,0,0,.4)); }
+
+
+/* ---- Chest lock animations ---- */
+.chest-lock svg{ overflow:visible; }
+.chest-lock .ch-shackle{ transform-box:fill-box; transform-origin:85% 100%; }
+.chest-lock .ch-shine{ opacity:0; animation:lk-shine 7s ease-in-out infinite; animation-delay:2s; }
+.chest-lock.unlock{ animation:lk-jolt .7s cubic-bezier(.3,.7,.4,1) both; animation-delay:var(--lk-delay,0ms); }
+.chest-lock.unlock .ch-shackle{ animation:lk-pop .7s cubic-bezier(.3,.7,.4,1) both; animation-delay:var(--lk-delay,0ms); }
+.chest-lock.ready{ animation:lk-ready 1.3s ease-in-out infinite; }
+.chest-lock.ready .ch-shine{ animation:lk-shine 1.6s ease-in-out infinite; animation-delay:0s; }
+@keyframes lk-shine{ 0%,70%{ transform:translateX(0); opacity:0; } 76%{ opacity:1; } 94%{ transform:translateX(100px); opacity:1; } 100%{ transform:translateX(100px); opacity:0; } }
+@keyframes lk-jolt{ 0%{ transform:translateX(-50%) scale(.84) rotate(0) translateY(0); } 12%{ transform:translateX(-50%) scale(.84) rotate(-7deg) translateY(2px); } 26%{ transform:translateX(-50%) scale(.84) rotate(5deg) translateY(-1px); } 40%{ transform:translateX(-50%) scale(.84) rotate(-2deg); } 60%,100%{ transform:translateX(-50%) scale(.84) rotate(0); } }
+@keyframes lk-pop{ 0%{ transform:translateY(0) rotate(0); } 28%{ transform:translateY(-7px) rotate(-22deg); } 66%{ transform:translateY(-7px) rotate(-22deg); } 100%{ transform:translateY(0) rotate(0); } }
+@keyframes lk-ready{ 0%,100%{ transform:translateX(-50%) scale(.84); filter:drop-shadow(0 3px 0 rgba(0,0,0,.4)) drop-shadow(0 0 3px rgba(255,200,90,.35)); } 50%{ transform:translateX(-50%) scale(.9); filter:drop-shadow(0 3px 0 rgba(0,0,0,.4)) drop-shadow(0 0 11px rgba(255,205,90,.95)); } }
+.reduced-motion .chest-lock, .reduced-motion .chest-lock *{ animation:none !important; }

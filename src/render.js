@@ -582,12 +582,22 @@ function campStackTileHTML(stack, type){
     </div>`;
 }
 // Chest dressing for the dice tray: four riveted iron corner brackets and a front lock (CSS gives the box its planks/interior).
-const CHEST_TRIM_HTML = (()=>{
+let chestLockFxAt = -1e9; // when Go was last pressed (render() rebuilds the lock, so the animation resumes from this)
+const CHEST_TRIM_STATIC = (()=>{
   const g='<defs><linearGradient id="chMg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8d98a2"/><stop offset="1" stop-color="#4a5560"/></linearGradient><linearGradient id="chLg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e0b14a"/><stop offset="1" stop-color="#9a6d1d"/></linearGradient></defs>';
   const corner='<svg viewBox="0 0 36 36" width="36" height="36">'+g+'<path d="M2 2H34V13H13V34H2Z" fill="url(#chMg)" stroke="#0c0705" stroke-width="2.2" stroke-linejoin="round"/><circle cx="7.5" cy="7.5" r="2.2" fill="#0c0705" opacity=".55"/><circle cx="24" cy="7.5" r="2.2" fill="#0c0705" opacity=".55"/><circle cx="7.5" cy="24" r="2.2" fill="#0c0705" opacity=".55"/><circle cx="7.1" cy="7.1" r="1.1" fill="#fff" opacity=".5"/></svg>';
-  const lock='<svg viewBox="0 0 64 58" width="58" height="52">'+g+'<path d="M14 6 Q32 -2 50 6 L50 18 L14 18Z" fill="url(#chMg)" stroke="#0c0705" stroke-width="2.4" stroke-linejoin="round"/><path d="M6 16 H58 Q60 16 60 19 V40 Q60 54 32 55 Q4 54 4 40 V19 Q4 16 6 16Z" fill="url(#chLg)" stroke="#0c0705" stroke-width="2.6" stroke-linejoin="round"/><path d="M9 21 H55 V30" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="2" stroke-linecap="round"/><circle cx="32" cy="28" r="5" fill="#0c0705"/><path d="M32 31 L29 43 H35Z" fill="#0c0705"/></svg>';
-  return '<div class="cc tl">'+corner+'</div><div class="cc tr">'+corner+'</div><div class="cc bl">'+corner+'</div><div class="cc br">'+corner+'</div><div class="chest-lock">'+lock+'</div>';
+  const lock='<svg viewBox="0 0 64 58" width="58" height="52">'+g+'<path class="ch-shackle" d="M14 6 Q32 -2 50 6 L50 18 L14 18Z" fill="url(#chMg)" stroke="#0c0705" stroke-width="2.4" stroke-linejoin="round"/><path d="M6 16 H58 Q60 16 60 19 V40 Q60 54 32 55 Q4 54 4 40 V19 Q4 16 6 16Z" fill="url(#chLg)" stroke="#0c0705" stroke-width="2.6" stroke-linejoin="round"/><path d="M9 21 H55 V30" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="2" stroke-linecap="round"/><circle cx="32" cy="28" r="5" fill="#0c0705"/><path d="M32 31 L29 43 H35Z" fill="#0c0705"/><clipPath id="chLockClip"><path d="M6 16 H58 Q60 16 60 19 V40 Q60 54 32 55 Q4 54 4 40 V19 Q4 16 6 16Z"/></clipPath><g clip-path="url(#chLockClip)"><g class="ch-shine"><rect x="-26" y="0" width="12" height="60" fill="#fff" opacity=".7" transform="skewX(-20)"/></g></g></svg>';
+  return {corners:'<div class="cc tl">'+corner+'</div><div class="cc tr">'+corner+'</div><div class="cc bl">'+corner+'</div><div class="cc br">'+corner+'</div>', lock};
 })();
+function chestTrimHTML(){
+  const age = performance.now() - chestLockFxAt;
+  const open = age < 900;
+  let ready = false;
+  try{ if(S.path && S.path.length && !S.transitioning){ ready = pcfTierFor(computePathEffects(S.path).totalDamage) >= 2; } }catch(e){}
+  const st = open ? ` style="animation-delay:-${Math.round(age)}ms"` : '';
+  // The shackle needs its own delay too, so it is set on the wrapper via a CSS variable
+  return CHEST_TRIM_STATIC.corners + `<div class="chest-lock ${open?'unlock':''} ${ready?'ready':''}" style="--lk-delay:-${open?Math.round(age):0}ms">` + CHEST_TRIM_STATIC.lock + '</div>';
+}
 function campDiceGridHTML(items, type){
   return buildDieStacks(items).map(stack=>campStackTileHTML(stack, type)).join('');
 }
@@ -1479,7 +1489,7 @@ function renderGame(){
             <div class="tray-head"><span class="round-badge">Round ${S.turnNumber+1}</span><div class="path-strip" id="path-strip"></div></div>
             <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
               <div class="tray ${S.newRoomFx?'tray-room-in':''}" id="tray" style="--class-color:${S.klass.color||'#ffffff'}"></div>
-              ${CHEST_TRIM_HTML}
+              ${chestTrimHTML()}
             </div>
             ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip</button>` : pathCounterHTML()}
           </div>
@@ -1565,6 +1575,8 @@ function renderGame(){
   document.getElementById('resolve-btn').onclick = ()=>{
     if(resolveDisabled||S.transitioning) return;
     getAudioCtx(); // warm up/unlock audio inside this user gesture; later queued tones (from setTimeout-driven transition steps) then play fine
+    chestLockFxAt = performance.now();
+    { const lk=document.querySelector('.chest-lock'); if(lk) lk.classList.add('unlock'); }
     endTurnButton();
   };
   attachLongPressTooltips('.enemy-action-badge');
