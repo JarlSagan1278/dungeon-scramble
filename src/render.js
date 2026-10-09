@@ -1522,7 +1522,7 @@ function renderGame(){
     showRoomCallout(S.newRoomFx);
     playTone(S.newRoomFx.boss ? 'bossRoomEnter' : 'roomEnter');
     if(S.newRoomFx.boss) vibrate([30,40,30]);
-    if(typeof screenShake==='function') screenShake(S.newRoomFx.boss ? 'big' : 'small');
+    if(S.newRoomFx.boss && typeof screenShake==='function') screenShake('big'); // ordinary rooms: the banner and door burst are enough
     S.newRoomFx = null; // consumed -- plays once, on the render right after advanceRoute() set it
   }
   if(S.justScrambled){

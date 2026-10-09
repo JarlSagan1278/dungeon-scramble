@@ -1497,7 +1497,8 @@ function finishPlayerPath(path, effects){
   // Closing 'tally' beat for a strong turn (the kill case has its own, bigger
   // callouts in onEncounterDefeated): chord + shake scaled to the total.
   { const tot = S.resolveTotal||0, tier = tot>=25 ? 3 : tot>=15 ? 2 : tot>=8 ? 1 : 0;
-    if(tier>0){
+    // A killing blow skips this beat entirely -- onEncounterDefeated() plays its own (bigger) sound, shake and burst.
+    if(tier>0 && !(S.encounter && S.encounter.curHealth<=0)){
       if(typeof playTone==='function') playTone('tally', tier*2);
       if(tier>=2 && typeof screenShake==='function') screenShake(tier>=3 ? 'big' : 'small');
       if(tier>=3 && typeof spawnParticleBurstAtPortrait==='function') spawnParticleBurstAtPortrait(['#ff8a3d','#ffd76a','#fff5d6']);
