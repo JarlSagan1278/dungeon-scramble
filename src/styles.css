@@ -1923,10 +1923,32 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
   90%{ translate:0 0; rotate:0deg; }
 }
 .idle-breath{ animation: idle-breath-kf 4.4s steps(1,end) infinite; transform-origin:50% 100%; }
+/* Player: composed -- a quick head-up shrug and a slow weight shift. Enemy: jerky, erratic double/triple spasms. */
+@keyframes idle-twitch-p{
+  0%,40%,100%{ translate:0 0; rotate:0deg; scale:1 1; }
+  42%{ translate:0 -2px; rotate:0deg; scale:1 1.02; }
+  46%{ translate:0 0; rotate:0deg; scale:1 1; }
+  78%{ translate:-1px 0; rotate:-.7deg; scale:1 1; }
+  90%{ translate:0 0; rotate:0deg; }
+}
+@keyframes idle-twitch-e{
+  0%,30%,100%{ translate:0 0; rotate:0deg; scale:1 1; }
+  31%{ translate:-2px 1px; rotate:2.4deg; scale:.98 1.02; }
+  33%{ translate:2px -1px; rotate:-2deg; scale:1.02 .98; }
+  35%{ translate:-1px 0; rotate:1.2deg; scale:1 1; }
+  37%{ translate:0 0; rotate:0deg; scale:1 1; }
+  71%{ translate:2px -2px; rotate:-3deg; scale:1.03 .97; }
+  73%{ translate:0 0; rotate:0deg; scale:1 1; }
+  83%{ translate:-1px 0; rotate:1.5deg; }
+  85%{ translate:0 0; rotate:0deg; }
+}
+.idle-breath.idle-p{ animation-name: idle-twitch-p; animation-timing-function: steps(1,end); }
+.idle-breath.idle-p{ animation-timing-function: ease-in-out; }
+.idle-breath.idle-e{ animation-name: idle-twitch-e; }
 .fo-fig.fo-dead .idle-breath, .enc-death .idle-breath{ animation:none; }
 @keyframes hp-ghost-kf{ 0%,35%{ transform:scaleX(1); opacity:.95; } 100%{ transform:scaleX(0); opacity:.4; } }
 .bar-fill.hp-ghost{ position:absolute; top:0; bottom:0; height:auto; background:#ffe6c4 !important; transform-origin:left center; animation:hp-ghost-kf .9s ease-in forwards; z-index:1; }
-.reduced-motion .idle-breath, .reduced-motion .hp-ghost{ animation:none !important; }
+.reduced-motion .idle-breath, .reduced-motion .idle-p, .reduced-motion .idle-e, .reduced-motion .hp-ghost{ animation:none !important; }
 
 @keyframes hp-heal-kf{ from{ width:var(--from); filter:brightness(1.5) saturate(1.2); } to{ filter:none; } }
 .bar-fill.hp-heal-fill{ animation:hp-heal-kf .6s cubic-bezier(.3,.7,.3,1) both; }

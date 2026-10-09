@@ -351,7 +351,7 @@ function syncIdleBreath(){
     figs.forEach((el,i)=>{
       const seedStr = ((S.encounter&&S.encounter.name)||'')+(S.routeStep||0)+(el.closest('.fo-enemy')?'e':'p'); let hsh=0; for(let c=0;c<seedStr.length;c++) hsh=(hsh*31+seedStr.charCodeAt(c))>>>0;
       const period = Math.round(3600 + (hsh%2600));
-      el.classList.add('idle-breath');
+      el.classList.add('idle-breath', el.closest('.fo-enemy')?'idle-e':'idle-p');
       el.style.animationDuration = period+'ms';
       el.style.animationDelay = '-'+Math.round(performance.now() % period)+'ms';
     });
