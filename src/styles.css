@@ -2339,10 +2339,10 @@ body.is-resolving .hall-fx i{ opacity:0; }
 /* the doorway shows the floor through it: no card background, no inset black, no panel behind it */
 #app.has-room-floor .enc-card.fo-arch{ background:transparent !important; box-shadow:none !important; border-bottom-color:transparent !important; }
 #room-floor ~ #enc-panel, #room-floor ~ .panel.tray-panel{ background:transparent !important; border-color:transparent !important; box-shadow:none !important; }
-.hall-fx .hf-wall{ position:absolute; left:0; right:0; top:0; height:38%; z-index:-1;
+.hall-fx .hf-wall{ position:absolute; left:0; right:0; top:0; height:var(--hz,38%); z-index:-1;
   background:radial-gradient(ellipse 45% 60% at 6% 45%, rgba(255,140,50,.55), transparent 75%), radial-gradient(ellipse 45% 60% at 94% 45%, rgba(255,140,50,.45), transparent 75%),
     linear-gradient(to bottom, rgba(8,4,2,.9) 0%, rgba(8,4,2,.35) 60%, rgba(8,4,2,.7) 100%), var(--tex-wall) 0 0/230px auto, #120b07; }
-.hall-fx .hf-ledge{ position:absolute; left:0; right:0; top:calc(38% - 5px); height:8px; background:linear-gradient(#2a1c12,#120b07); box-shadow:0 2px 0 #0c0705; }
+.hall-fx .hf-ledge{ position:absolute; left:0; right:0; top:calc(var(--hz,38%) - 5px); height:8px; background:linear-gradient(#2a1c12,#120b07); box-shadow:0 2px 0 #0c0705; }
 .rf-shadow{ position:absolute; pointer-events:none; }
 .rf-pool{ width:192px; background:radial-gradient(ellipse 50% 52% at 50% 38%, rgba(8,4,2,.82) 0%, rgba(8,4,2,.62) 50%, transparent 100%); }
 .rf-feet{ width:156px; height:34px; border-radius:50%; background:radial-gradient(ellipse, rgba(0,0,0,.8) 0%, rgba(0,0,0,.55) 45%, transparent 72%); }

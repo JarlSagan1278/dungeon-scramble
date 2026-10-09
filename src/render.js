@@ -465,7 +465,7 @@ function bossArcBarHTML(o){
 // ---- Stone-floor room: the doorway's back wall (brick, above a horizon ledge) and one flagstone floor that
 // runs from the horizon down behind the chest, so the top of the screen reads as a wall and the chest as
 // something you look down on. Textures are painted once at runtime (canvas) into CSS variables.
-const ROOM_HORIZON = 0.38;
+const ROOM_HORIZON = 0.38, ROOM_MIN_HORIZON = 134;
 let ROOM_TEX_READY = false;
 function ensureRoomTextures(){
   if(ROOM_TEX_READY) return; ROOM_TEX_READY = true;
@@ -505,7 +505,11 @@ function syncRoomFloor(card){
     const off = el=>{ let t=0,l=0,n=el; while(n && n!==app){ t+=n.offsetTop; l+=n.offsetLeft; n=n.offsetParent; } return {t,l}; };
     const c = off(card), cw = card.offsetWidth, ch = card.offsetHeight;
     const appL = 0, vw = app.offsetWidth; // hard cutoff at the app's own width
-    const hy = Math.round(c.t + ch*ROOM_HORIZON), yb = Math.round(c.t + ch - hy), edge = 3;
+    // Horizon: 38% down, but never above the bottom of the tallest possible quest note (about 122px) plus a margin.
+    const hz = Math.round(Math.min(ch*0.6, Math.max(ch*ROOM_HORIZON, ROOM_MIN_HORIZON)));
+    card.style.setProperty('--hz', hz+'px');
+    // Where the doorway's stone pillars end (archPath stops 12px above the frame's bottom, which sits 5px above the card's top edge + 10px taller)
+    const hy = Math.round(c.t + hz), yb = Math.round(ch - 7 - hz), edge = 3;
     const xl = Math.round(appL + c.l + edge), xr = Math.round(appL + c.l + cw - edge);
     const fl = document.createElement('div'); fl.id = 'room-floor';
     fl.style.cssText = `left:${-appL}px;width:${vw}px;top:${hy}px;bottom:-30px;clip-path:polygon(${xl}px 0,${xr}px 0,${xr}px ${yb}px,100% ${yb}px,100% 100%,0 100%,0 ${yb}px,${xl}px ${yb}px);`;
