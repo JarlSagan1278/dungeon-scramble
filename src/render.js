@@ -3106,6 +3106,27 @@ function renderShrineEncounter(){
   }
 }
 
+// Camp rest: the health bar and number fill gradually instead of snapping. The animation record lives
+// in the transient UIFX (never saved) and the loop re-queries the DOM, so a mid-fill re-render is harmless.
+function syncCampHeal(){
+  try{
+    const h = UIFX.campHeal; if(!h) return;
+    const dur = h.dur, noAnim = (typeof PREFS!=='undefined' && PREFS.reducedMotion);
+    if(noAnim || performance.now()-h.at >= dur){ UIFX.campHeal = null; return; }
+    if(h.running) return; h.running = true;
+    const step = ()=>{
+      const fill = document.querySelector('.camp-hp-fill'), num = document.querySelector('.camp-hp-num');
+      const k = Math.max(0, Math.min(1, (performance.now()-h.at)/dur));
+      if(!fill || !num || S.screen!=='camp' || !UIFX.campHeal){ h.running=false; return; }
+      const e = 1-Math.pow(1-k,2);
+      const v = h.from + (h.to-h.from)*e;
+      fill.style.width = (v/S.maxHealth*100)+'%';
+      num.textContent = Math.round(v)+'/'+S.maxHealth;
+      if(k<1) requestAnimationFrame(step); else { h.running=false; UIFX.campHeal=null; }
+    };
+    step();
+  }catch(err){ UIFX.campHeal=null; }
+}
 function renderCamp(){
   const campFx = healthFX(S.health, S._lastPlayerHealth);
   S._lastPlayerHealth = S.health;
@@ -3135,7 +3156,7 @@ function renderCamp(){
 
       <div class="camp-section camp-status-card">
         ${relicStripHTML()}
-        <div class="bar-row" style="position:relative;"><span style="flex:0 0 auto;">Health</span><div class="bar ${campFx.cls}"><div class="bar-fill hp player" style="width:${S.health/S.maxHealth*100}%"></div></div><span>${S.health}/${S.maxHealth}</span>${campFx.deltaHTML}</div>
+        <div class="bar-row" style="position:relative;"><span style="flex:0 0 auto;">Health</span><div class="bar ${campFx.cls}"><div class="bar-fill hp player camp-hp-fill" style="width:${S.health/S.maxHealth*100}%"></div></div><span class="camp-hp-num">${S.health}/${S.maxHealth}</span>${campFx.deltaHTML}</div>
         <div class="camp-fire-wrap ${(performance.now()-UIFX.flareAt)<900?'flare':''}" style="--fl:-${Math.max(0,Math.round(performance.now()-UIFX.flareAt))}ms">
           <div class="camp-hero" title="${S.origin.name} ${S.klass.name}">${(S.portrait&&!S.portrait.placeholder)?`<img src="${S.portrait.img}" alt="${S.origin.name}">`:mysteryFigureHTML('width:56px; height:56px;')}</div>
           <div class="campfire-glow"></div>
@@ -3164,6 +3185,7 @@ function renderCamp(){
       </div>
     </div>`;
   document.getElementById('rest-btn').onclick = campRest;
+  syncCampHeal();
   document.getElementById('leave-btn').onclick = ()=>{
     const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
         <h2>Break Camp?</h2>

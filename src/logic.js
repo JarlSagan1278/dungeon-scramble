@@ -2085,7 +2085,9 @@ function campRest(){
   S.tray.forEach(c=>{ if(currentFace(c).type!=='blank') count++; });
   const heal = Math.ceil(count/2) + (hasRelic('kettle') ? 3 : 0);
   if(hasRelic('kettle')) fireRelic('kettle','+3 HP');
+  const hpFrom = S.health;
   S.health = cap(S.health+heal, S.maxHealth);
+  if(typeof UIFX!=='undefined' && S.health>hpFrom) UIFX.campHeal = {from:hpFrom, to:S.health, at:performance.now(), dur:900+Math.min(heal,10)*120};
   S.campRested = true;
   logMsg('heal', `Rested: scrambled ${count} actions, healed ${heal}.`, 'good');
   render();

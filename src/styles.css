@@ -2274,3 +2274,6 @@ body.hit-stop .fo-enemy .fo-fig{ filter:brightness(2.4) saturate(.35); }
 body.is-resolving .hall-fx i, body.is-resolving .hall-fx .hf-glow, body.is-resolving .tray-wrap .tray::before,
 body.is-resolving .idle-breath, body.is-resolving .chest-lock *, body.is-resolving .combo-ring, body.is-resolving .icon-svg svg.combo-ring *{ animation:none !important; }
 body.is-resolving .hall-fx i{ opacity:0; }
+
+/* Campfire flames: no dark outline (logs keep theirs) */
+.campfire-flame{ border:0 !important; box-shadow:none !important; filter:none; }
