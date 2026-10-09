@@ -255,7 +255,10 @@ function archPoints(w,h,i,step){ const pts=[], rx=120, ry=90;
   for(let y=ry;y<=h-12;y+=step) pts.push([w-i,y]);
   return pts; }
 function archFrameSVG(w,h,lvl){
-  const base = `<path d="${archPath(w,h,5)}" fill="none" stroke="#0c0705" stroke-width="14"/><path d="${archPath(w,h,5)}" fill="none" stroke="#8d7d68" stroke-width="10"/><path d="${archPath(w,h,5)}" fill="none" stroke="#0c0705" stroke-width="10" stroke-dasharray="2 22"/><path d="${archPath(w,h,2)}" fill="none" stroke="#a89880" stroke-width="2" opacity=".6"/>`;
+  const AP = archPath(w,h,5);
+  // Outlined bricks: one stone band over a black underlay, cut into bricks by thin black joints; a faint second pass on a
+  // different period lightens a few bricks at irregular intervals so it reads as stonework, not stripes.
+  const base = `<path d="${AP}" fill="none" stroke="#0c0705" stroke-width="14"/><path d="${AP}" fill="none" stroke="#8d7d68" stroke-width="10" stroke-dasharray="21 2.5"/><path d="${AP}" fill="none" stroke="#b3a48d" stroke-width="10" stroke-dasharray="21 47" stroke-dashoffset="-9" opacity=".32"/><path d="${AP}" fill="none" stroke="#6f6252" stroke-width="10" stroke-dasharray="21 61" stroke-dashoffset="-44" opacity=".35"/><path d="${archPath(w,h,2)}" fill="none" stroke="#a89880" stroke-width="1.5" opacity=".35"/>`;
   if(lvl<=1){
     return base + `<g fill="#4f7a34" opacity=".92">
   <circle cx="70" cy="14" r="6"/><circle cx="80" cy="9" r="4.5"/><circle cx="60" cy="20" r="4"/><circle cx="92" cy="7" r="3.5"/>
