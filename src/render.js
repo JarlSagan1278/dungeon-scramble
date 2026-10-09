@@ -581,6 +581,13 @@ function campStackTileHTML(stack, type){
       ${indices.length>1?`<span class="camp-stack-badge">${indices.length}</span>`:''}
     </div>`;
 }
+// Chest dressing for the dice tray: four riveted iron corner brackets and a front lock (CSS gives the box its planks/interior).
+const CHEST_TRIM_HTML = (()=>{
+  const g='<defs><linearGradient id="chMg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6a5a86"/><stop offset="1" stop-color="#352c48"/></linearGradient><linearGradient id="chLg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7be0c8"/><stop offset="1" stop-color="#2f8f86"/></linearGradient></defs>';
+  const corner='<svg viewBox="0 0 36 36" width="36" height="36">'+g+'<path d="M2 2H34V13H13V34H2Z" fill="url(#chMg)" stroke="#0c0705" stroke-width="2.2" stroke-linejoin="round"/><circle cx="7.5" cy="7.5" r="2.2" fill="#0c0705" opacity=".55"/><circle cx="24" cy="7.5" r="2.2" fill="#0c0705" opacity=".55"/><circle cx="7.5" cy="24" r="2.2" fill="#0c0705" opacity=".55"/><circle cx="7.1" cy="7.1" r="1.1" fill="#fff" opacity=".5"/></svg>';
+  const lock='<svg viewBox="0 0 64 58" width="58" height="52">'+g+'<path d="M14 6 Q32 -2 50 6 L50 18 L14 18Z" fill="url(#chMg)" stroke="#0c0705" stroke-width="2.4" stroke-linejoin="round"/><path d="M6 16 H58 Q60 16 60 19 V40 Q60 54 32 55 Q4 54 4 40 V19 Q4 16 6 16Z" fill="url(#chLg)" stroke="#0c0705" stroke-width="2.6" stroke-linejoin="round"/><path d="M9 21 H55 V30" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="2" stroke-linecap="round"/><circle cx="32" cy="29" r="8" fill="#7be0c8" stroke="#0c0705" stroke-width="2.2"/><circle cx="29.5" cy="26.5" r="2.4" fill="#fff" opacity=".6"/><path d="M32 31 L29 43 H35Z" fill="#0c0705"/></svg>';
+  return '<div class="cc tl">'+corner+'</div><div class="cc tr">'+corner+'</div><div class="cc bl">'+corner+'</div><div class="cc br">'+corner+'</div><div class="chest-lock">'+lock+'</div>';
+})();
 function campDiceGridHTML(items, type){
   return buildDieStacks(items).map(stack=>campStackTileHTML(stack, type)).join('');
 }
@@ -1472,6 +1479,7 @@ function renderGame(){
             <div class="tray-head"><span class="round-badge">Round ${S.turnNumber+1}</span><div class="path-strip" id="path-strip"></div></div>
             <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
               <div class="tray ${S.newRoomFx?'tray-room-in':''}" id="tray" style="--class-color:${S.klass.color||'#ffffff'}"></div>
+              ${CHEST_TRIM_HTML}
             </div>
             ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip</button>` : pathCounterHTML()}
           </div>
