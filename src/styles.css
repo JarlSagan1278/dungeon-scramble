@@ -2035,3 +2035,18 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .fo-quests-float .fo-quests{ margin:0 !important; width:auto !important; align-items:center !important; gap:1px !important; font-size:9px !important; line-height:1.2; color:#e8d9bd; }
 .fo-quests-float .fo-quest.complete{ color:var(--gold); }
 .fo-quests-float .fo-quest{ display:block; white-space:normal; }
+
+/* Quests as a paper notice pinned to the dungeon wall, behind the fighters */
+.fo-quests-float{ z-index:0 !important; left:50%; top:18px; transform:translateX(-68%) rotate(-2.2deg) !important; transform-origin:50% 0; width:124px; padding:9px 8px 8px;
+  background:
+    radial-gradient(ellipse at 20% 15%, rgba(255,255,255,.28), transparent 55%),
+    repeating-linear-gradient(0deg, rgba(120,80,30,.05) 0 2px, transparent 2px 5px),
+    linear-gradient(170deg,#efdfb4,#d8c08a);
+  border:none; border-radius:2px; box-shadow:none;
+  filter:drop-shadow(0 3px 2px rgba(0,0,0,.55));
+  clip-path:polygon(0 0,100% 0,100% 94%,94% 98%,86% 94%,78% 99%,68% 95%,58% 99%,48% 95%,38% 99%,28% 95%,18% 99%,8% 95%,0 98%); }
+.fo-quests-float::before{ content:''; position:absolute; top:2px; left:50%; width:7px; height:7px; margin-left:-3.5px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #ff9a8a, #b3261e 60%, #6b130e); box-shadow:0 1px 1px rgba(0,0,0,.6); }
+.fo-quests-label{ color:#7a1f14 !important; font-family:var(--font-display); font-size:9.5px !important; letter-spacing:2px; border-bottom:1px solid rgba(90,55,20,.45); padding-bottom:2px; margin-bottom:3px !important; }
+.fo-quests-float .fo-quests{ color:#3a2410 !important; }
+.fo-quests-float .fo-quest.complete{ color:#2d6a2f !important; text-decoration:line-through; }
