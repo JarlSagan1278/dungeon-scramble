@@ -2091,3 +2091,5 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 /* wall sconces under the torch flames */
 .fo-sconce{ position:absolute; top:56px; pointer-events:none; filter:drop-shadow(0 2px 1px rgba(0,0,0,.6)); }
 .fo-sconce-l{ left:12px; } .fo-sconce-r{ right:12px; }
+
+.fo-sconce{ transform-origin:50% 10%; } .fo-sconce-l{ transform:rotate(-5deg); } .fo-sconce-r{ transform:rotate(4deg) scaleX(-1); }
