@@ -1793,7 +1793,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 :root{ --screen-h: clamp(720px, calc(100dvh - 16px), 769px); }
 .wrap{ max-width:395px; }
 /* Spend the extra device height on the doorway scene (scales with --screen-h; unchanged at 720) */
-.enc-card.fo-arch{ min-height:calc(272px + (var(--screen-h) - 720px) * 0.65) !important; }
+.enc-card.fo-arch{ min-height:calc(253px + (var(--screen-h) - 720px) * 0.65) !important; }
 .fo-fig .fo-img, .enc-portrait.fo-fig .enc-art{ height:calc(104px + (var(--screen-h) - 720px) * 0.25) !important; }
 .fo-has-quests .fo-fig .fo-img, .fo-has-quests .enc-portrait.fo-fig .enc-art{ height:calc(88px + (var(--screen-h) - 720px) * 0.2) !important; }
 .title-panel{ max-width:395px !important; }
