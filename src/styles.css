@@ -2147,3 +2147,26 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 @keyframes lk-pop{ 0%{ transform:translateY(0) rotate(0); } 28%{ transform:translateY(-7px) rotate(-22deg); } 66%{ transform:translateY(-7px) rotate(-22deg); } 100%{ transform:translateY(0) rotate(0); } }
 @keyframes lk-ready{ 0%,100%{ transform:translateX(-50%) scale(.84); filter:drop-shadow(0 3px 0 rgba(0,0,0,.4)) drop-shadow(0 0 3px rgba(255,200,90,.35)); } 50%{ transform:translateX(-50%) scale(.9); filter:drop-shadow(0 3px 0 rgba(0,0,0,.4)) drop-shadow(0 0 11px rgba(255,205,90,.95)); } }
 .reduced-motion .chest-lock, .reduced-motion .chest-lock *{ animation:none !important; }
+
+/* ---- Combo outline follows the star glyph (not a circle) ----
+   Chained zero-blur drop-shadows grow the icon's own silhouette outward, so the ring is star-shaped. Each extra shadow
+   chain steps further out; tier 2/3 add a fainter outer band, tier 3 turns orange. */
+.die.combo-active .face-val .icon-svg{ border-radius:0 !important; box-shadow:none !important; overflow:visible; }
+.die.combo-active-1 .face-val .icon-svg{ animation: combo-star-1 1.8s ease-in-out infinite !important; }
+.die.combo-active-2 .face-val .icon-svg{ animation: combo-star-2 1.5s ease-in-out infinite !important; }
+.die.combo-active-3 .face-val .icon-svg{ animation: combo-star-3 1.1s ease-in-out infinite !important; }
+@keyframes combo-star-1{
+  0%,100%{ filter: drop-shadow(1.2px 0 0 #d4af52) drop-shadow(-1.2px 0 0 #d4af52) drop-shadow(0 1.2px 0 #d4af52) drop-shadow(0 -1.2px 0 #d4af52); }
+  50%{ filter: drop-shadow(2px 0 0 #f0cf6a) drop-shadow(-2px 0 0 #f0cf6a) drop-shadow(0 2px 0 #f0cf6a) drop-shadow(0 -2px 0 #f0cf6a); }
+}
+@keyframes combo-star-2{
+  0%,100%{ filter: drop-shadow(1.5px 0 0 #d4af52) drop-shadow(-1.5px 0 0 #d4af52) drop-shadow(0 1.5px 0 #d4af52) drop-shadow(0 -1.5px 0 #d4af52) drop-shadow(2px 0 0 rgba(212,175,82,.45)) drop-shadow(-2px 0 0 rgba(212,175,82,.45)) drop-shadow(0 2px 0 rgba(212,175,82,.45)) drop-shadow(0 -2px 0 rgba(212,175,82,.45)); }
+  50%{ filter: drop-shadow(2px 0 0 #f0cf6a) drop-shadow(-2px 0 0 #f0cf6a) drop-shadow(0 2px 0 #f0cf6a) drop-shadow(0 -2px 0 #f0cf6a) drop-shadow(2.5px 0 0 rgba(240,207,106,.6)) drop-shadow(-2.5px 0 0 rgba(240,207,106,.6)) drop-shadow(0 2.5px 0 rgba(240,207,106,.6)) drop-shadow(0 -2.5px 0 rgba(240,207,106,.6)); }
+}
+@keyframes combo-star-3{
+  0%,100%{ filter: drop-shadow(1.8px 0 0 #ff8c28) drop-shadow(-1.8px 0 0 #ff8c28) drop-shadow(0 1.8px 0 #ff8c28) drop-shadow(0 -1.8px 0 #ff8c28) drop-shadow(2.4px 0 0 rgba(255,140,40,.5)) drop-shadow(-2.4px 0 0 rgba(255,140,40,.5)) drop-shadow(0 2.4px 0 rgba(255,140,40,.5)) drop-shadow(0 -2.4px 0 rgba(255,140,40,.5)); }
+  50%{ filter: drop-shadow(2.3px 0 0 #ffa64d) drop-shadow(-2.3px 0 0 #ffa64d) drop-shadow(0 2.3px 0 #ffa64d) drop-shadow(0 -2.3px 0 #ffa64d) drop-shadow(3px 0 0 rgba(255,140,40,.7)) drop-shadow(-3px 0 0 rgba(255,140,40,.7)) drop-shadow(0 3px 0 rgba(255,140,40,.7)) drop-shadow(0 -3px 0 rgba(255,140,40,.7)); }
+}
+.reduced-motion .die.combo-active-1 .face-val .icon-svg{ animation:none !important; filter: drop-shadow(1.5px 0 0 #d4af52) drop-shadow(-1.5px 0 0 #d4af52) drop-shadow(0 1.5px 0 #d4af52) drop-shadow(0 -1.5px 0 #d4af52); }
+.reduced-motion .die.combo-active-2 .face-val .icon-svg{ animation:none !important; filter: drop-shadow(1.8px 0 0 #d4af52) drop-shadow(-1.8px 0 0 #d4af52) drop-shadow(0 1.8px 0 #d4af52) drop-shadow(0 -1.8px 0 #d4af52) drop-shadow(2.4px 0 0 rgba(212,175,82,.5)) drop-shadow(-2.4px 0 0 rgba(212,175,82,.5)) drop-shadow(0 2.4px 0 rgba(212,175,82,.5)) drop-shadow(0 -2.4px 0 rgba(212,175,82,.5)); }
+.reduced-motion .die.combo-active-3 .face-val .icon-svg{ animation:none !important; filter: drop-shadow(2px 0 0 #ff8c28) drop-shadow(-2px 0 0 #ff8c28) drop-shadow(0 2px 0 #ff8c28) drop-shadow(0 -2px 0 #ff8c28) drop-shadow(2.8px 0 0 rgba(255,140,40,.6)) drop-shadow(-2.8px 0 0 rgba(255,140,40,.6)) drop-shadow(0 2.8px 0 rgba(255,140,40,.6)) drop-shadow(0 -2.8px 0 rgba(255,140,40,.6)); }

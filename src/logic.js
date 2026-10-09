@@ -1163,6 +1163,8 @@ function getFaceForIdx(idx){
   return currentFace(cell);
 }
 
+// Balance (v1.32.25): the first Block die in a path is worth +1 extra.
+const BLOCK_FIRST_BONUS = 1;
 // Pure calculator -- no side effects. Used both for the actual turn
 // resolution and for the live running-total preview while building a path.
 function computePathEffects(path){
@@ -1181,7 +1183,7 @@ function computePathEffects(path){
       case 'leech': dotToEncounter += val*boostMult; hotToPlayer += val*boostMult; break;
       case 'heal': supportCount++; healCount++; healGain += val*boostMult; break;
       case 'hot': supportCount++; hotToPlayer += val*boostMult; break;
-      case 'block': supportCount++; blockCount++; blockGain += val*boostMult; break;
+      case 'block': supportCount++; blockCount++; blockGain += val*boostMult + (blockCount===1?BLOCK_FIRST_BONUS:0); break;
       case 'boost': boostCount++; boostMult *= val; break;
       case 'fumble': selfDot += val; break;
       case 'nullify': nullifyCount++; break;
@@ -1246,7 +1248,7 @@ function computePathSteps(path){
       case 'leech': step.dotToEncounter = val*boostMult; step.hotToPlayer = val*boostMult; break;
       case 'heal': step.healGain = val*boostMult; break;
       case 'hot': step.hotToPlayer = val*boostMult; break;
-      case 'block': step.blockGain = val*boostMult; break;
+      case 'block': step.blockGain = val*boostMult + (path.slice(0,i).some(j=>getFaceForIdx(j).type==='block')?0:BLOCK_FIRST_BONUS); break;
       case 'boost': step.boostMultApplied = val; boostMult *= val; break;
       case 'fumble': step.selfDot = val; break;
       case 'nullify': step.nullify = true; break;
@@ -1299,7 +1301,7 @@ function applyPathStep(step){
     S.resolveTotal = (S.resolveTotal||0) + step.dmg;
   }
   if(step.dotToEncounter) e.curDOT += step.dotToEncounter;
-  if(step.hotToPlayer) S.playerHOT += step.hotToPlayer;
+  if(step.hotToPlayer) addPlayerHOT(step.hotToPlayer);
   if(step.blockGain) S.playerBlock += step.blockGain;
   if(step.healGain) S.health = cap(S.health+step.healGain, S.maxHealth);
   if(step.selfDot) S.playerDOT += step.selfDot;
@@ -1312,21 +1314,23 @@ function applyPathStep(step){
   }
 }
 
+// Balance (v1.32.25): your own H.O.T. can't stack past this -- it used to snowball into near-permanent healing.
+const PLAYER_HOT_CAP = 6;
+function addPlayerHOT(n){ S.playerHOT = Math.min(PLAYER_HOT_CAP, (S.playerHOT||0) + n); }
+
+// Nullify now clears EVERYTHING it can reach in one go (it used to clear just one of: Minions, your D.O.T., enemy H.O.T.).
 function applyNullify(){
   const e = S.encounter;
+  const cleared = [];
   if(e.minionsSpawned>0){
     e.minionsSpawned = 0;
     S.tray.forEach(cell=>{ if(cell.minion){ cell.minion=false; cell.die=cell.coveredDie; cell.coveredDie=null; } });
-    logMsg('sys','Nullify: minions cleared.', 'good');
-  } else if(S.playerDOT>0){
-    S.playerDOT = 0;
-    logMsg('sys','Nullify: your D.O.T. cleared.', 'good');
-  } else if(e.curHOT>0){
-    e.curHOT = 0;
-    logMsg('sys','Nullify: encounter H.O.T. cleared.', 'good');
-  } else {
-    logMsg('sys','Nullify: nothing to clear.', true);
+    cleared.push('minions');
   }
+  if(S.playerDOT>0){ S.playerDOT = 0; cleared.push('your D.O.T.'); }
+  if(e.curHOT>0){ e.curHOT = 0; cleared.push('encounter H.O.T.'); }
+  if(cleared.length) logMsg('sys','Nullify: cleared '+cleared.join(', ')+'.', 'good');
+  else logMsg('sys','Nullify: nothing to clear.', true);
 }
 
 function parseQuestSpec(q){
@@ -1369,7 +1373,7 @@ function applyQuestReward(e, rewardText){
   const amt = m? parseFloat(m[1]) : 0;
   const low = rewardText.toLowerCase();
   if(low.includes('dot')) { e.curDOT += amt; }
-  else if(low.includes('hot')) { S.playerHOT += amt; }
+  else if(low.includes('hot')) { addPlayerHOT(amt); }
   else if(low.includes('nullify')) { applyNullify(); }
   else if(amt>0){
     // questHealth is the total health this encounter can lose from quest
