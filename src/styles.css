@@ -2066,3 +2066,24 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 /* One ink colour everywhere. Camp props get a slimmer outline than the characters: logs 2px, flames 2.5px */
 .campfire-logs, .campfire-logs::before, .campfire-logs::after{ border:2px solid var(--line); box-sizing:border-box; }
 .campfire-flame{ border:2.5px solid var(--line); box-sizing:border-box; }
+
+/* v1.32.19 dark hallway: two torch-lit foci, a faint warm centre, near-black edges */
+.enc-card.fo-arch{ background:
+    radial-gradient(circle at 19px 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
+    radial-gradient(circle at calc(100% - 19px) 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
+    radial-gradient(ellipse at 50% 62%, rgba(120,80,42,.5) 0%, transparent 70%),
+    radial-gradient(ellipse at 50% 50%, #26170b 0%, #120a04 60%, #040201 100%) !important;
+    box-shadow:inset 0 0 70px 20px rgba(0,0,0,.8) !important; }
+.enc-card.fo-arch.fo-lvl2{ background:
+    radial-gradient(circle at 19px 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
+    radial-gradient(circle at calc(100% - 19px) 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
+    radial-gradient(ellipse at 50% 62%, rgba(115,88,40,.5) 0%, transparent 70%),
+    radial-gradient(ellipse at 50% 50%, #241a0a 0%, #110c04 60%, #040201 100%) !important;
+    box-shadow:inset 0 0 70px 20px rgba(0,0,0,.8) !important; }
+.enc-card.fo-arch.fo-lvl3{ background:
+    radial-gradient(circle at 19px 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
+    radial-gradient(circle at calc(100% - 19px) 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
+    radial-gradient(ellipse at 50% 62%, rgba(100,92,42,.45) 0%, transparent 70%),
+    radial-gradient(ellipse at 50% 50%, #1f1c0a 0%, #0d0c04 60%, #040201 100%) !important;
+    box-shadow:inset 0 0 70px 20px rgba(0,0,0,.8) !important; }
+.fo-torch{ box-shadow:0 0 18px 9px rgba(255,130,30,.62), 0 0 40px 18px rgba(255,100,20,.28) !important; background:radial-gradient(circle at 50% 70%,#fff6b8,#ffa530 55%,#e0501a) !important; }
