@@ -2324,3 +2324,6 @@ body.is-resolving .hall-fx i{ opacity:0; }
   73.5%{ translate:0 0; rotate:0deg; } }
 .idle-breath.idle-p{ animation-name:idle-glint-p, idle-move-p !important; animation-timing-function:ease-in-out !important; }
 .idle-breath.idle-e{ animation-name:idle-glint-e, idle-move-e !important; animation-timing-function:ease-in-out, steps(1,end) !important; }
+
+/* Room tracker floats in the dark: no panel card behind it */
+.panel.route-float{ background:transparent !important; border-color:transparent !important; box-shadow:none !important; padding-top:2px; padding-bottom:0; }

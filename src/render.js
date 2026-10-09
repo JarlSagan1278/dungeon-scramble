@@ -1490,7 +1490,7 @@ function renderGame(){
       figCls: playerFx.cls==='flash-damage'?'dmg-flash':playerFx.cls==='flash-heal'?'heal-flash':'',
       figHTML: portrait.placeholder ? mysteryFigureHTML('width:60px; height:60px;') : `<img class="fo-img" src="${portrait.img}" alt="${S.origin.name}">` }; }
   app.innerHTML = `
-    <div class="panel" style="margin-bottom:8px;">
+    <div class="panel route-float" style="margin-bottom:8px;">
       ${renderRoute()}
     </div>
     <div class="panel enc-panel-arch" id="enc-panel" style="margin-bottom:8px;">
@@ -3058,7 +3058,7 @@ function renderShrineEncounter(){
   const shrineFig = art ? `<img class="fo-img enc-art" src="${art}" alt="${e.name}"/>` : `<div class="fo-img fo-mystery">${mysteryFigureHTML('width:70%; aspect-ratio:1/1;')}</div>`;
   const waiting = !S.shrineResult && !S.shrineChoice && !S.relicChoice && !S.lootChoice && !S.pendingLootDie;
   app.innerHTML = `
-    <div class="panel" style="margin-bottom:8px;">
+    <div class="panel route-float" style="margin-bottom:8px;">
       ${renderRoute()}
     </div>
     <div class="panel enc-panel-arch" id="enc-panel" style="margin-bottom:8px;">
