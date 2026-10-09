@@ -2093,3 +2093,28 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .fo-sconce-l{ left:12px; } .fo-sconce-r{ right:12px; }
 
 .fo-sconce{ transform-origin:50% 10%; } .fo-sconce-l{ transform:rotate(-5deg); } .fo-sconce-r{ transform:rotate(4deg) scaleX(-1); }
+
+/* Banners: room / boss callouts and the new-floor card read as ribbons (opaque, notched ends, gold trim) instead of floating text */
+#room-callout{ filter:drop-shadow(0 6px 8px rgba(0,0,0,.7)); }
+#room-callout .room-callout-box{ width:min(92vw,372px); min-width:0 !important; border:none !important; border-radius:0 !important; box-shadow:none !important; padding:16px 34px 14px !important; gap:4px !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.07), transparent 40%),
+    linear-gradient(90deg, #1b1008, #3a2412 18%, #3a2412 82%, #1b1008) !important;
+  clip-path:polygon(0 0,100% 0,calc(100% - 16px) 50%,100% 100%,0 100%,16px 50%);
+  position:relative; }
+#room-callout .room-callout-box::before{ content:''; position:absolute; left:20px; right:20px; top:5px; bottom:5px; border-top:2px solid var(--gold); border-bottom:2px solid var(--gold); opacity:.85; pointer-events:none; }
+#room-callout .room-callout-box.boss, #room-callout:has(.intro.boss) .room-callout-box{
+  background:
+    linear-gradient(180deg, rgba(255,200,160,.10), transparent 40%),
+    linear-gradient(90deg, #2a0906, #6b1a12 18%, #6b1a12 82%, #2a0906) !important; }
+#room-callout .room-callout-line{ text-shadow:0 2px 0 rgba(0,0,0,.65); }
+#room-callout .room-callout-line.name.boss, #room-callout .room-callout-line.intro.boss{ color:#ffd9a0 !important; }
+#room-callout .room-callout-line.name{ color:#fff1d6; }
+#room-callout .room-callout-line.hint{ color:#d8c3a0; }
+
+#floor-card .floor-card-box{ position:relative; width:min(92vw,372px); padding:20px 34px 18px; background:linear-gradient(180deg, rgba(255,255,255,.07), transparent 40%), linear-gradient(90deg,#1b1008,#3a2412 18%,#3a2412 82%,#1b1008);
+  clip-path:polygon(0 0,100% 0,calc(100% - 18px) 50%,100% 100%,0 100%,18px 50%); filter:none; }
+#floor-card .floor-card-box::before{ content:''; position:absolute; left:22px; right:22px; top:6px; bottom:6px; border-top:2px solid var(--gold); border-bottom:2px solid var(--gold); opacity:.85; }
+#floor-card{ background:radial-gradient(ellipse at center, rgba(0,0,0,.35), rgba(0,0,0,0) 70%) !important; }
+#floor-card .floor-card-num{ text-shadow:0 2px 0 rgba(0,0,0,.7); -webkit-text-stroke:0; }
+#floor-card .floor-card-name{ color:#fff1d6; text-shadow:0 2px 0 rgba(0,0,0,.7); }
