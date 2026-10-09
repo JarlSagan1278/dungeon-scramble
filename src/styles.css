@@ -2087,3 +2087,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
     radial-gradient(ellipse at 50% 50%, #1f1c0a 0%, #0d0c04 60%, #040201 100%) !important;
     box-shadow:inset 0 0 70px 20px rgba(0,0,0,.8) !important; }
 .fo-torch{ box-shadow:0 0 18px 9px rgba(255,130,30,.62), 0 0 40px 18px rgba(255,100,20,.28) !important; background:radial-gradient(circle at 50% 70%,#fff6b8,#ffa530 55%,#e0501a) !important; }
+
+/* wall sconces under the torch flames */
+.fo-sconce{ position:absolute; top:56px; pointer-events:none; filter:drop-shadow(0 2px 1px rgba(0,0,0,.6)); }
+.fo-sconce-l{ left:12px; } .fo-sconce-r{ right:12px; }

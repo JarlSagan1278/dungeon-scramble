@@ -1277,7 +1277,7 @@ function renderEncounterCard(e, mode){
     const p = foPlayer || {};
     return `
     <div class="enc-card fo-arch fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${roomEnterCls}">
-      <div class="fo-torch fo-torch-l"></div><div class="fo-torch fo-torch-r"></div>
+      <svg class="fo-sconce fo-sconce-l" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><rect x="5" y="9" width="4" height="21" rx="1.2" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6"/><rect x="1.5" y="15" width="11" height="4" rx="1" fill="#55555e" stroke="#0c0705" stroke-width="1.5"/><path d="M1.5 1.5h11l-2 8h-7z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-l"></div><svg class="fo-sconce fo-sconce-r" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><rect x="5" y="9" width="4" height="21" rx="1.2" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6"/><rect x="1.5" y="15" width="11" height="4" rx="1" fill="#55555e" stroke="#0c0705" stroke-width="1.5"/><path d="M1.5 1.5h11l-2 8h-7z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-r"></div>
       <div class="fo-hud">${relicStripHTML()}</div>
       ${questLine}
       <div class="fo-band">
@@ -2963,7 +2963,7 @@ function renderShrineEncounter(){
     <div class="panel enc-panel-arch" id="enc-panel" style="margin-bottom:8px;">
       <div class="enc-rail-row"><div class="enc-card-col">
         <div class="enc-card fo-arch fo-shrine fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${roomEnterCls}">
-          <div class="fo-torch fo-torch-l"></div><div class="fo-torch fo-torch-r"></div>
+          <svg class="fo-sconce fo-sconce-l" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><rect x="5" y="9" width="4" height="21" rx="1.2" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6"/><rect x="1.5" y="15" width="11" height="4" rx="1" fill="#55555e" stroke="#0c0705" stroke-width="1.5"/><path d="M1.5 1.5h11l-2 8h-7z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-l"></div><svg class="fo-sconce fo-sconce-r" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><rect x="5" y="9" width="4" height="21" rx="1.2" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6"/><rect x="1.5" y="15" width="11" height="4" rx="1" fill="#55555e" stroke="#0c0705" stroke-width="1.5"/><path d="M1.5 1.5h11l-2 8h-7z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-r"></div>
           <div class="fo-hud">${relicStripHTML()}</div>
           <div class="fo-band">
             <div class="fo-side fo-player">
