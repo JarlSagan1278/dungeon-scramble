@@ -1965,3 +1965,14 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 @keyframes tray-room-in-kf{ 0%{ opacity:.25; transform:translateY(14px) scale(.97); } 70%{ opacity:1; transform:translateY(-2px) scale(1.005); } 100%{ transform:none; } }
 .tray.tray-room-in{ animation: tray-room-in-kf .45s ease-out both; }
 .reduced-motion .tray.tray-room-in{ animation:none; }
+
+/* v1.32.19 monster presence: per-encounter size (--sz). Big ones grow up AND down, looming behind their health bar. */
+.enc-card.fo-arch{ --fh:calc(104px + (var(--screen-h) - 720px) * 0.25); }
+.enc-card.fo-arch.fo-has-quests{ --fh:calc(88px + (var(--screen-h) - 720px) * 0.2); }
+.enc-card.fo-arch .fo-enemy .fo-fig.enc-portrait{ height:var(--fh) !important; }
+.enc-card.fo-arch .fo-enemy .fo-fig.enc-portrait .fo-img.enc-art{ height:calc(var(--fh) * var(--sz,1)) !important; max-width:none; width:auto !important; flex:none; }
+.enc-card.fo-arch .fo-enemy .fo-fig.fo-big{ z-index:0; }
+.enc-card.fo-arch .fo-enemy .fo-fig.fo-big .fo-img.enc-art{ margin-bottom:calc(-1 * (var(--sz) - 1) * var(--fh) * .75); max-width:135%; object-fit:contain; }
+.enc-card.fo-arch .fo-enemy .fo-fig.fo-big::after{ inset:calc(-1 * (var(--sz) - 1) * var(--fh) * .3) -12% calc(-1 * (var(--sz) - 1) * var(--fh) * .75) -12% !important; }
+.fo-enemy .fo-hpwrap, .fo-enemy .fo-name, .fo-enemy .fo-chips, .fo-enemy .kill-hint, .fo-enemy .fo-turnlabel, .fo-enemy .fo-quests{ position:relative; z-index:2; }
+.fo-enemy .fo-name{ text-shadow:0 1px 0 #1c0e06, 0 0 5px rgba(0,0,0,.85); }

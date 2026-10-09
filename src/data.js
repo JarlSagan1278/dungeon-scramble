@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.32.18';
+const GAME_VERSION = '1.32.19';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -424,3 +424,19 @@ const FLOORS = [
   {enemies:FLOOR2_ENEMIES, traps:FLOOR2_TRAPS, shrines:FLOOR2_SHRINES, bosses:FLOOR2_BOSSES, lootPool:GILDED, lootName:'Gilded'},
   {enemies:FLOOR3_ENEMIES, traps:FLOOR3_TRAPS, shrines:FLOOR3_SHRINES, bosses:[], lootPool:MAGIC, lootName:'Magic'},
 ];
+
+// ---- Monster presence: how large each monster is drawn in the face-off (1 = standard ~89px tall).
+// Under 1 = small/scuttling things; over 1 = hulking things that loom behind their own health bar.
+// Anything unlisted is 1 (Bosses default to 1.3).
+const ENCOUNTER_SIZE = {
+  'Viscous Orb':.65,'Filement Bunny':.7,'Feral Pet Rock':.78,'Beaker Breakers':.9,'Leper Colonizers':.95,
+  'Wooden Golem':1.1,'Amanitabomination':1.3,
+  'Displacer Lair':1.2,'Rigged Sporks':.95,'Leper Con-Trap':1.05,
+  'Rogue Golemancer':1.2,'Heating Elemental':1.45,'Grosteque Grafter':1.55,
+  'Displacer Kitty':.8,'Armored Gear-Pest':.7,'Rusty Golem':1.3,'Rogue Technician':1,'The Warcart':1.4,
+  'Blastogenesis Engine':1.1,'Half-life Host':1.2,'Lichen-Thrope':1.15,'Fungal Flayer':1.15,
+  'The Necrorancher':1.3,'Bellicose Biomancer':1.45,'Ceramic Golem':1.65,
+  'Morel Dilemma':.8,'Chimeric Sludge':1.3,'Gnome Chomper':1,'Parasite Seer':1.05,'Gestalt Network':1.25,
+  "Oilephant's Foot":1.55,'Extractnid Matriarch':1.45,'The Punished':1.25,'Profane Geometry':1.35,'Sacred(?) Geometry':1.35
+};
+function encounterSize(e){ if(!e) return 1; const v = ENCOUNTER_SIZE[e.name]; return v || (e.type==='Boss' ? 1.3 : 1); }

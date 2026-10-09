@@ -1241,7 +1241,8 @@ function renderEncounterCard(e, mode){
     const questLine = (e.quests && e.quests.length)
       ? `<div class="fo-quests">${e.quests.map((q,i)=>`<span class="fo-quest ${e.questsDone[i]?'complete':''}">${e.questsDone[i]?'✔':'○'} ${q}</span>`).join('')}</div>` : '';
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
-    const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}"/>`
+    const sz = encounterSize(e);
+    const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz}"/>`
       : `<div class="fo-img ${flipCls} fo-mystery">${mysteryFigureHTML('width:70%; aspect-ratio:1/1;')}</div>`;
     const p = foPlayer || {};
     return `
@@ -1257,7 +1258,7 @@ function renderEncounterCard(e, mode){
         </div>
         <div class="fo-vs">vs</div>
         <div class="fo-side fo-enemy">
-          <div class="fo-fig enc-portrait ${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}">${monsterFig}</div><div class="fo-floor"></div>
+          <div class="fo-fig enc-portrait ${sz>1.05?'fo-big ':''}${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}" style="--sz:${sz}">${monsterFig}</div><div class="fo-floor"></div>
           <div class="fo-hpwrap status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;"><div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
               ${hpFillHTML('enemy','hp',hpPct)}
               ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
