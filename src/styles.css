@@ -2277,3 +2277,14 @@ body.is-resolving .hall-fx i{ opacity:0; }
 .hall-fx::after{ content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(116,80,45,.55) 0, rgba(80,52,28,.3) 16%, transparent 38%); }
 /* Round badge: muted slate so it reads apart from the brown panel without competing with Go / Skill */
 .tray-head .round-badge{ background:#2f3b42 !important; color:#c9d6dc !important; border-color:var(--line) !important; }
+
+/* Quest note: aged parchment (stains + darkened edges), no ruled lines */
+.fo-quests-float{
+  background:
+    radial-gradient(ellipse at 20% 15%, rgba(255,255,255,.26), transparent 50%),
+    radial-gradient(ellipse 22px 16px at 78% 70%, rgba(130,85,35,.22), transparent 70%),
+    radial-gradient(ellipse 16px 12px at 18% 82%, rgba(120,75,30,.18), transparent 70%),
+    radial-gradient(ellipse 30px 10px at 62% 12%, rgba(140,95,40,.14), transparent 70%),
+    linear-gradient(170deg,#ecd9a8,#cfb27a) !important;
+  box-shadow:inset 0 0 10px 1px rgba(110,70,25,.5) !important; }
+.fo-quests-label{ border-bottom:none !important; padding-bottom:0 !important; margin-bottom:2px !important; }
