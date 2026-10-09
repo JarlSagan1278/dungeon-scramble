@@ -1266,16 +1266,17 @@ function renderEncounterCard(e, mode){
     const chipsOnly = (isBoss ? bossCycle : regularActionsRow).replace(/<span class="hint"[^>]*>[^<]*<\/span>/,'');
     const typeTag = (e.type && e.type!=='Enemy') ? `<small class="fo-type${isBoss?' fo-type-inline':''}">${e.type}</small>` : '';
     const questLine = (e.quests && e.quests.length)
-      ? `<div class="fo-quests">${e.quests.map((q,i)=>`<span class="fo-quest ${e.questsDone[i]?'complete':''}">${e.questsDone[i]?'✔':'○'} ${q}</span>`).join('')}</div>` : '';
+      ? `<div class="fo-quests-float" title="Complete these during the fight for bonus rewards"><div class="fo-quests-label">Quests</div><div class="fo-quests">${e.quests.map((q,i)=>`<span class="fo-quest ${e.questsDone[i]?'complete':''}">${e.questsDone[i]?'✔':'○'} ${q}</span>`).join('')}</div></div>` : '';
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
     const sz = encounterSize(e);
     const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz}"/>`
       : `<div class="fo-img ${flipCls} fo-mystery">${mysteryFigureHTML('width:70%; aspect-ratio:1/1;')}</div>`;
     const p = foPlayer || {};
     return `
-    <div class="enc-card fo-arch fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${(e.quests&&e.quests.length)?'fo-has-quests':''} ${(e.quests||[]).join(' ').length>70?'fo-tight':''} ${roomEnterCls}">
+    <div class="enc-card fo-arch fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${roomEnterCls}">
       <div class="fo-torch fo-torch-l"></div><div class="fo-torch fo-torch-r"></div>
       <div class="fo-hud">${relicStripHTML()}</div>
+      ${questLine}
       <div class="fo-band">
         <div class="fo-side fo-player">
           <div class="fo-fig ${p.figCls||''}" title="${S.origin.name} ${S.klass.name}">${p.figHTML||''}</div><div class="fo-floor"></div>
@@ -1297,7 +1298,6 @@ function renderEncounterCard(e, mode){
           <div class="fo-chips fo-buffs">${hudChips(statuses)}</div>
           ${chipsOnly?`<div class="fo-turnlabel" title="${isBoss?'Bosses cycle through these actions, one per turn (the lit one is next).':'The enemy does all of these every turn.'}">${isBoss?'Cycles through':'Every turn'}</div>`:''}
           <div class="fo-chips">${chipsOnly}</div>
-          ${questLine}
         </div>
       </div>
       ${e.flavor?`<div class="fo-flavor">${e.flavor}</div>`:''}

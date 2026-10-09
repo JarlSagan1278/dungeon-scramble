@@ -2027,3 +2027,11 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .fo-enemy:not(.fo-boss-side) > .kill-hint{ position:absolute; top:0; left:0; right:0; margin:0 !important; z-index:4; text-align:center; pointer-events:none; text-shadow:0 1px 0 #1c0e06, 0 0 5px rgba(0,0,0,.9); }
 /* Bosses keep their bars where they are; the portrait stands a little higher */
 .enc-card.fo-arch .fo-boss-side .fo-fig .fo-img.enc-art{ margin-bottom:calc(-1 * var(--down, 0px) + 10px) !important; }
+
+/* Quests float above the "vs" in their own labeled plate, so they never push the fighters around */
+.fo-quests-float{ position:absolute; left:50%; top:20px; transform:translateX(calc(-100% + 10px)); z-index:5; width:118px; padding:3px 7px 4px; text-align:center;
+  background:rgba(28,14,6,.82); border:1px solid #6b4a28; border-radius:8px; box-shadow:0 2px 0 rgba(0,0,0,.5); pointer-events:auto; }
+.fo-quests-label{ font-family:var(--font-ui); font-size:8px; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin-bottom:1px; }
+.fo-quests-float .fo-quests{ margin:0 !important; width:auto !important; align-items:center !important; gap:1px !important; font-size:9px !important; line-height:1.2; color:#e8d9bd; }
+.fo-quests-float .fo-quest.complete{ color:var(--gold); }
+.fo-quests-float .fo-quest{ display:block; white-space:normal; }
