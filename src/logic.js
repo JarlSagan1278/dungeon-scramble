@@ -1463,11 +1463,11 @@ function runPlayerPathSteps(steps, i, path, effects){
   // audio) so they land with weight. Skip fast-forwards past all of it.
   const hitTier = step.dmg>=8 ? 3 : step.dmg>=4 ? 2 : step.dmg>=2 ? 1 : 0;
   if(hitTier>0 && typeof impactPulse==='function') impactPulse(hitTier);
-  const hitStop = (typeof PREFS!=='undefined' && (PREFS.reducedMotion||PREFS.lowIntensity)) ? 0 : [0,0,45,90][hitTier];
+  const hitStop = (typeof PREFS!=='undefined' && (PREFS.reducedMotion||PREFS.lowIntensity)) ? 0 : [0,0,70,130][hitTier];
   const advance = () => { S._pendingTimeout=null; runPlayerPathSteps(steps, i+1, path, effects); };
   S._advance = advance;
   if(S._skipAll) advance();
-  else S._pendingTimeout = setTimeout(advance, 180 + hitStop);
+  else S._pendingTimeout = setTimeout(advance, 320 + hitStop);
 }
 
 // Once every die in the path has landed: the path's own damage already
