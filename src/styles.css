@@ -2050,3 +2050,12 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .fo-quests-label{ color:#7a1f14 !important; font-family:var(--font-display); font-size:9.5px !important; letter-spacing:2px; border-bottom:1px solid rgba(90,55,20,.45); padding-bottom:2px; margin-bottom:3px !important; }
 .fo-quests-float .fo-quests{ color:#3a2410 !important; }
 .fo-quests-float .fo-quest.complete{ color:#2d6a2f !important; text-decoration:line-through; }
+
+/* two nails instead of a pin; more centered, a bit narrower, balanced wrapping (no one-word last lines) */
+.fo-quests-float{ transform:translateX(-56%) rotate(-2.2deg) !important; width:112px; }
+.fo-quests-float .fo-quest{ text-wrap:balance; }
+.fo-quests-float::before{ top:3px; left:6px; margin-left:0; width:5px; height:5px;
+  background:radial-gradient(circle at 35% 30%, #d8d8d8, #7d7d7d 60%, #3b3b3b); }
+.fo-quests-float::after{ content:''; position:absolute; top:3px; right:6px; width:5px; height:5px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #d8d8d8, #7d7d7d 60%, #3b3b3b); box-shadow:0 1px 1px rgba(0,0,0,.6); }
+.fo-quests-float{ transform:translateX(-63%) rotate(-2.2deg) !important; width:108px; }
