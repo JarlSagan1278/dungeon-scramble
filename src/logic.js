@@ -10,7 +10,8 @@ const SAVE_KEY = 'dungeonScrambleSave_v1';
 // (they carry a live zone() function that can't survive JSON) and rebuilt
 // on load; usedCards/usedLootNames (both Sets) are stored as arrays.
 function serializeState(){
-  const { klass, origin, _advance, _pendingTimeout, ...rest } = S;
+  // _roll/_ghost/_shieldFx hold performance.now() timestamps for animations; they mean nothing after a reload (the clock restarts), so never save them.
+  const { klass, origin, _advance, _pendingTimeout, _roll, _ghost, _shieldFx, ...rest } = S;
   return { ...rest, classId: klass.id, originId: origin.id, usedCards: [...S.usedCards], usedLootNames: [...S.usedLootNames] };
 }
 
@@ -569,6 +570,7 @@ function loadGame(){
     if(Array.isArray(data.backPocket)) data.backPocket = data.backPocket.filter(Boolean);
     if(Array.isArray(data.tray)) data.tray.forEach(c=>{ if(c && !c.die) c.die = clone(basic('attack',1)); });
     data.organizeSelection = null;
+    delete data._roll; delete data._ghost; delete data._shieldFx; // old saves carried stale animation clocks -> absurd HP numbers
     S = data;
     return true;
   }catch(e){ return false; }

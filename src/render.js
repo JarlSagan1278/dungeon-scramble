@@ -407,11 +407,12 @@ function rollHpNumbers(){
       const m = /^(-?\d+)(?:\+(\d+))?\/(\d+)$/.exec(el.textContent.trim()); if(!m) continue;
       const to = +m[1], sh = m[2], max = m[3];
       const st = r[side] || (r[side] = {from:to, to, t:0, shown:to});
+      if(st.t > now) st.t = 0; // timestamp from another page session
       if(st.to !== to){ st.from = st.shown; st.to = to; st.t = now; }
       if(noAnim){ st.shown = to; continue; }
       const tick = ()=>{
         const e = document.querySelector(sides[side]); if(!e) return;
-        const k = Math.min(1, (performance.now()-st.t)/450);
+        const k = Math.max(0, Math.min(1, (performance.now()-st.t)/450));
         const up = st.to>st.from; const c1=1.7, c3=c1+1; const ease = up ? 1 + c3*Math.pow(k-1,3) + c1*Math.pow(k-1,2) : 1-Math.pow(1-k,3);
         st.shown = Math.min(+max, Math.round(st.from + (st.to-st.from)*ease));
         e.innerHTML = `${st.shown}${shieldNumHTML(+sh||0)}/${max}`;
