@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.32.26';
+const GAME_VERSION = '1.32.28';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -59,7 +59,7 @@ const FACE_DESC = {
   freeze: "The enemy skips its next action.",
   heal: "Restores your health immediately.",
   hot: "Heals you over time. Your H.O.T. can stack up to 6.",
-  block: "Gains Block, reducing the next hit you take. The first Block die in a path gains +1.",
+  block: "Gains Block, reducing the next hit you take.",
   nullify: "Clears every active effect it can -- Minions, your D.O.T. and the enemy's H.O.T.",
   blank: "No effect this turn.",
 };

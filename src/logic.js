@@ -1163,8 +1163,6 @@ function getFaceForIdx(idx){
   return currentFace(cell);
 }
 
-// Balance (v1.32.25): the first Block die in a path is worth +1 extra.
-const BLOCK_FIRST_BONUS = 1;
 // Pure calculator -- no side effects. Used both for the actual turn
 // resolution and for the live running-total preview while building a path.
 function computePathEffects(path){
@@ -1183,7 +1181,7 @@ function computePathEffects(path){
       case 'leech': dotToEncounter += val*boostMult; hotToPlayer += val*boostMult; break;
       case 'heal': supportCount++; healCount++; healGain += val*boostMult; break;
       case 'hot': supportCount++; hotToPlayer += val*boostMult; break;
-      case 'block': supportCount++; blockCount++; blockGain += val*boostMult + (blockCount===1?BLOCK_FIRST_BONUS:0); break;
+      case 'block': supportCount++; blockCount++; blockGain += val*boostMult; break;
       case 'boost': boostCount++; boostMult *= val; break;
       case 'fumble': selfDot += val; break;
       case 'nullify': nullifyCount++; break;
@@ -1248,7 +1246,7 @@ function computePathSteps(path){
       case 'leech': step.dotToEncounter = val*boostMult; step.hotToPlayer = val*boostMult; break;
       case 'heal': step.healGain = val*boostMult; break;
       case 'hot': step.hotToPlayer = val*boostMult; break;
-      case 'block': step.blockGain = val*boostMult + (path.slice(0,i).some(j=>getFaceForIdx(j).type==='block')?0:BLOCK_FIRST_BONUS); break;
+      case 'block': step.blockGain = val*boostMult; break;
       case 'boost': step.boostMultApplied = val; boostMult *= val; break;
       case 'fumble': step.selfDot = val; break;
       case 'nullify': step.nullify = true; break;

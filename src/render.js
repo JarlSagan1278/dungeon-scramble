@@ -1145,6 +1145,16 @@ function renderDie(cell, idx){
   // reads as "worth building toward" at a glance.
   const comboAdjCount = f.type==='combo' ? attackNeighborsCount(idx) : 0;
   const comboActiveCls = comboAdjCount>0 ? `combo-active combo-active-${Math.min(comboAdjCount,3)}` : '';
+  // Star-shaped outline with a clear gap: a thin stroke around the star polygon, masked so nothing is drawn within `gap` of the star.
+  const comboRingHTML = (()=>{
+    if(!comboAdjCount) return '';
+    const lvl = Math.min(comboAdjCount,3);
+    const P='M0 9.13L5.75 14.87L4.73 22.99L11.49 19.27L12.51 19.27L19.27 22.99L17.92 14.87L23.66 9.13L15.55 7.77L11.83 .68L7.77 8.11Z';
+    const col = lvl>=3 ? '#ff8c28' : '#e8c35a';
+    const ring=(id,gap,line)=>`<mask id="${id}" maskUnits="userSpaceOnUse" x="-10" y="-10" width="44" height="44"><rect x="-10" y="-10" width="44" height="44" fill="#fff"/><path d="${P}" fill="#000" stroke="#000" stroke-width="${gap*2}" stroke-linejoin="round"/></mask><path d="${P}" fill="none" stroke="${col}" stroke-width="${(gap+line)*2}" stroke-linejoin="round" mask="url(#${id})"/>`;
+    const rings = ring('cr'+lvl+'a',1.3,1.0) + (lvl>=2 ? ring('cr'+lvl+'b',2.8,1.0) : '');
+    return `<svg class="combo-ring combo-ring-${lvl}" viewBox="-8 -8 40 40" aria-hidden="true">${rings}</svg>`;
+  })();
   return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${strongGlint?'glint-strong':''} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${resolveCls} ${minionClearCls} ${comboActiveCls}"
             data-idx="${idx}" title="${isLastMove?'Click to undo this move':(cell.minion?'Minion die':cell.die.name)}" ${shakeDelay}>
             ${num?`<div class="pathnum">${num}</div>`:''}
@@ -1153,7 +1163,7 @@ function renderDie(cell, idx){
               ${boostTargetCls?`<span class="boost-target-badge" title="Your armed Boost token will apply to this action">${iconSpan('boost')}</span>`:''}
             </div>` : ''}
             ${nameTag}
-            ${label}
+            ${comboRingHTML ? label.replace('<span class="icon-svg">','<span class="icon-svg">'+comboRingHTML) : label}
             ${resolveFx && resolveFx.text ? `<span class="delta-float ${resolveFx.cls}" ${resolveFx.size?`style="font-size:${resolveFx.size}px;"`:''}>${resolveFx.text}</span>` : ''}
           </div>`;
 }
