@@ -1971,8 +1971,12 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .enc-card.fo-arch.fo-has-quests{ --fh:calc(88px + (var(--screen-h) - 720px) * 0.2); }
 .enc-card.fo-arch .fo-enemy .fo-fig.enc-portrait{ height:var(--fh) !important; }
 .enc-card.fo-arch .fo-enemy .fo-fig.enc-portrait .fo-img.enc-art{ height:calc(var(--fh) * var(--sz,1)) !important; max-width:none; width:auto !important; flex:none; }
-.enc-card.fo-arch .fo-enemy .fo-fig.fo-big{ z-index:0; }
-.enc-card.fo-arch .fo-enemy .fo-fig.fo-big .fo-img.enc-art{ margin-bottom:calc(-1 * (var(--sz) - 1) * var(--fh) * .75); max-width:135%; object-fit:contain; }
-.enc-card.fo-arch .fo-enemy .fo-fig.fo-big::after{ inset:calc(-1 * (var(--sz) - 1) * var(--fh) * .3) -12% calc(-1 * (var(--sz) - 1) * var(--fh) * .75) -12% !important; }
+.enc-card.fo-arch .fo-enemy .fo-fig.fo-big{ z-index:0;
+  --ex:calc((var(--sz) - 1) * var(--fh));
+  /* grow upward until the arch would hide the head; the rest grows downward, and never less than enough
+     for the feet to show beneath the health bar (~34px for the biggest) */
+  --down:max(min(34px, calc(var(--ex) * 1.2)), calc(var(--ex) - var(--head, 40px))); }
+.enc-card.fo-arch .fo-enemy .fo-fig.fo-big .fo-img.enc-art{ margin-bottom:calc(-1 * var(--down)); max-width:135%; object-fit:contain; }
+.enc-card.fo-arch .fo-enemy .fo-fig.fo-big::after{ inset:calc(-1 * max(0px, var(--ex) - var(--down))) -12% calc(-1 * var(--down)) -12% !important; }
 .fo-enemy .fo-hpwrap, .fo-enemy .fo-name, .fo-enemy .fo-chips, .fo-enemy .kill-hint, .fo-enemy .fo-turnlabel, .fo-enemy .fo-quests{ position:relative; z-index:2; }
 .fo-enemy .fo-name{ text-shadow:0 1px 0 #1c0e06, 0 0 5px rgba(0,0,0,.85); }

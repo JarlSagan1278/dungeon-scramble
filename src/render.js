@@ -443,6 +443,10 @@ function decorateArch(){
     const lvl = Math.min(3,(S.floorIdx||0)+1);
     card.insertAdjacentHTML('beforeend', `<svg class="fo-frame" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">${archFrameSVG(w,h,lvl)}</svg>`);
     syncIdleBreath(); syncMascotHop(); rollHpNumbers();
+    // Headroom above the monster (offset sizes again), so big monsters grow upward only until the arch would hide them.
+    const efig = card.querySelector('.fo-enemy .fo-fig');
+    if(efig){ let top = 0, n = efig; while(n && n !== card){ top += n.offsetTop; n = n.offsetParent; }
+      card.style.setProperty('--head', Math.max(0, Math.round(top - 16)) + 'px'); }
     // The settings cog tucks into the empty corner beside the arch's right shoulder.
     document.body.classList.add('cog-arch');
     document.body.style.setProperty('--cog-top', Math.max(2, Math.round(r.top + window.scrollY - 10))+'px');
