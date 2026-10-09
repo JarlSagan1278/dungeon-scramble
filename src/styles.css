@@ -1975,7 +1975,9 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
   --ex:calc((var(--sz) - 1) * var(--fh));
   /* grow upward until the arch would hide the head; the rest grows downward, and never less than enough
      for the feet to show beneath the health bar (~34px for the biggest) */
-  --down:max(min(34px, calc(var(--ex) * 1.2)), calc(var(--ex) - var(--head, 40px))); }
+  --down:max(0px, calc(var(--ex) - var(--head, 40px))); }
+/* Bosses loom bigger: grow up AND down, with their feet showing below the health bar */
+.enc-card.fo-arch .fo-enemy .fo-fig.fo-bossbig{ --down:max(min(46px, calc(var(--ex) * 1.2)), calc(var(--ex) - var(--head, 40px))); }
 .enc-card.fo-arch .fo-enemy .fo-fig.fo-big .fo-img.enc-art{ margin-bottom:calc(-1 * var(--down)); max-width:135%; object-fit:contain; }
 .enc-card.fo-arch .fo-enemy .fo-fig.fo-big::after{ inset:calc(-1 * max(0px, var(--ex) - var(--down))) -12% calc(-1 * var(--down)) -12% !important; }
 .fo-enemy .fo-hpwrap, .fo-enemy .fo-name, .fo-enemy .fo-chips, .fo-enemy .kill-hint, .fo-enemy .fo-turnlabel, .fo-enemy .fo-quests{ position:relative; z-index:2; }
