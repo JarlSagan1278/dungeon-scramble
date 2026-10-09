@@ -471,6 +471,7 @@ function decorateArch(){
     const w = Math.round(card.offsetWidth), h = Math.round(card.offsetHeight+10);
     const lvl = Math.min(3,(S.floorIdx||0)+1);
     card.insertAdjacentHTML('beforeend', `<svg class="fo-frame" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">${archFrameSVG(w,h,lvl)}</svg>`);
+    try{ document.body.classList.toggle('is-resolving', !!S.transitioning); }catch(e){}
     syncIdleBreath(); syncMascotHop(); rollHpNumbers();
     // Headroom above the monster (offset sizes again), so big monsters grow upward only until the arch would hide them.
     const efig = card.querySelector('.fo-enemy .fo-fig');

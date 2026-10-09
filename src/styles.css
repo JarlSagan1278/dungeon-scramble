@@ -2269,3 +2269,8 @@ body.hit-stop .fo-enemy .fo-fig{ filter:brightness(2.4) saturate(.35); }
 @keyframes idle-glint-e{ 0%,78%,100%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); } 80%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)) brightness(1.35) saturate(1.2) drop-shadow(0 0 5px rgba(255,70,40,.7)); } 83%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); } 86%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)) brightness(1.2) drop-shadow(0 0 3px rgba(255,70,40,.5)); } 90%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); } }
 .idle-breath.idle-p{ animation-name:idle-glint-p !important; animation-timing-function:ease-in-out !important; }
 .idle-breath.idle-e{ animation-name:idle-glint-e !important; animation-timing-function:ease-in-out !important; }
+
+/* While a path is resolving, pause purely decorative loops so phones spend the frame budget on the hit sequence */
+body.is-resolving .hall-fx i, body.is-resolving .hall-fx .hf-glow, body.is-resolving .tray-wrap .tray::before,
+body.is-resolving .idle-breath, body.is-resolving .chest-lock *, body.is-resolving .combo-ring, body.is-resolving .icon-svg svg.combo-ring *{ animation:none !important; }
+body.is-resolving .hall-fx i{ opacity:0; }
