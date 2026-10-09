@@ -29,7 +29,24 @@ def main():
         im=Image.open(f).convert('RGBA'); a=np.array(im); H=im.size[1]
         T=max(2,round(STD[cat]/100*H)); t=thickness(a)
         if t>=round(T*0.7): continue
+        # Old, coloured outlines (dark green, brown...) would otherwise show as a thin tinted line between themselves and the new
+        # ink ring, so first walk inward from the silhouette edge and repaint any dark-ish rim as ink.
+        m0=a[...,3]>128; lum=a[...,:3].max(axis=2); cur=m0.copy(); darkened=0
+        for _ in range(16):
+            er=ndi.binary_erosion(cur); ring=cur&~er
+            if ring.sum()==0 or (lum[ring]<150).mean()<=0.55: break
+            sel=ring
+            a[sel,:3]=INK; a[sel,3]=255
+            darkened+=1; cur=er
+        # semi-transparent edge pixels keep a light tint of the old fill: make them solid ink too
+        fr=(a[...,3]>0)&(a[...,3]<250)&(a[...,:3].max(axis=2)>=60)&ndi.binary_dilation(~m0,iterations=2)
+        a[fr,:3]=INK; a[fr,3]=255
+        t=max(t,darkened)
         add=T-t
+        if add<=0:
+            print(f'recoloured rim of {os.path.basename(f)}')
+            if not dry: Image.fromarray(a,'RGBA').save(f)
+            n+=1; continue
         # grow the silhouette by `add` px using a round structuring element (keeps corners soft)
         m=a[...,3]>40
         r=np.arange(-add,add+1); se=(r[:,None]**2+r[None,:]**2)<=add*add+add
@@ -40,6 +57,9 @@ def main():
         # soften the outer edge by one pixel of partial alpha
         edge=ndi.binary_dilation(grown,iterations=1)&~grown
         a[edge,:3]=INK; a[edge,3]=np.maximum(a[edge,3],110)
+        # stray faint specks beyond the new outline: clear them
+        stray=(a[...,3]>0)&(a[...,3]<=40)&~ndi.binary_dilation(grown,iterations=1)
+        a[stray,3]=0
         print(('would add ' if dry else 'added ')+f'{add}px to {os.path.basename(f)} (had {t}, standard {T})')
         if not dry: Image.fromarray(a,'RGBA').save(f)
         n+=1
