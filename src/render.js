@@ -1306,6 +1306,7 @@ function renderEncounterCard(e, mode){
     const p = foPlayer || {};
     return `
     <div class="enc-card fo-arch fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${roomEnterCls}">
+      ${hallFxHTML()}
       <svg class="fo-sconce fo-sconce-l" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><path d="M5 9.2 Q4.3 18 5.1 30 Q7.2 31.6 9.2 30 Q9.7 19 9 9.2Z" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/><path d="M1.6 15.4 Q7 13.9 12.4 15.2 Q13 17.6 12.2 19 Q7 20.3 1.8 19 Q1.1 17 1.6 15.4Z" fill="#55555e" stroke="#0c0705" stroke-width="1.5" stroke-linejoin="round"/><path d="M1.2 1.9 Q7 -0.7 12.8 1.7 Q12.2 6.6 9.7 9.7 Q7 10.7 4.4 9.5 Q2 6.6 1.2 1.9Z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-l"></div><svg class="fo-sconce fo-sconce-r" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><path d="M5 9.2 Q4.3 18 5.1 30 Q7.2 31.6 9.2 30 Q9.7 19 9 9.2Z" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/><path d="M1.6 15.4 Q7 13.9 12.4 15.2 Q13 17.6 12.2 19 Q7 20.3 1.8 19 Q1.1 17 1.6 15.4Z" fill="#55555e" stroke="#0c0705" stroke-width="1.5" stroke-linejoin="round"/><path d="M1.2 1.9 Q7 -0.7 12.8 1.7 Q12.2 6.6 9.7 9.7 Q7 10.7 4.4 9.5 Q2 6.6 1.2 1.9Z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-r"></div>
       <div class="fo-hud">${relicStripHTML()}</div>
       ${questLine}
@@ -1500,7 +1501,7 @@ function renderGame(){
           <div class="tray-float-wrap">
             <div class="tray-head"><span class="round-badge">Round ${S.turnNumber+1}</span><div class="path-strip" id="path-strip"></div></div>
             <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
-              <div class="tray ${S.newRoomFx?'tray-room-in':''}" id="tray" style="--class-color:${S.klass.color||'#ffffff'}"></div>
+              <div class="tray ${S.newRoomFx?'tray-room-in':''}" id="tray" style="--class-color:${S.klass.color||'#ffffff'}; --gd:-${Math.round(performance.now()%4600)}ms"></div>
               ${chestTrimHTML()}
             </div>
             ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip</button>` : pathCounterHTML()}
@@ -2202,6 +2203,18 @@ function flyDiceToFuse(cat, level, run){
       setTimeout(()=>c.remove(), 520+k*40);
     });
   }catch(e){ clones.forEach(c=>c.remove()); }
+}
+
+// Passive doorway atmosphere: warm light breathing around the two torches plus a few dust motes drifting through it.
+// Delays are tied to the clock so render() rebuilding the DOM doesn't restart the loops.
+function hallFxHTML(){
+  const t=performance.now();
+  const motes=[0,1,2,3,4,5,6,7,8,9].map(i=>{
+    const dur=9000+(i*1370)%7000;
+    return `<i style="left:${(i*37+11)%84+8}%;top:${(i*53)%55+30}%;--sz:${(2+(i%3)*0.8).toFixed(1)}px;--dx:${((i%2)?1:-1)*(8+(i*5)%14)}px;animation-duration:${dur}ms;animation-delay:-${Math.round(t%dur)}ms"></i>`;
+  }).join('');
+  const f1=3100, f2=2300;
+  return `<div class="hall-fx" aria-hidden="true"><b class="hf-glow hf-l" style="animation-delay:-${Math.round(t%f1)}ms"></b><b class="hf-glow hf-r" style="animation-delay:-${Math.round(t%f2)}ms"></b>${motes}</div>`;
 }
 
 // ---- Particle burst: a quick radial confetti-style burst of small colored
@@ -3048,6 +3061,7 @@ function renderShrineEncounter(){
     <div class="panel enc-panel-arch" id="enc-panel" style="margin-bottom:8px;">
       <div class="enc-rail-row"><div class="enc-card-col">
         <div class="enc-card fo-arch fo-shrine fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${roomEnterCls}">
+          ${hallFxHTML()}
           <svg class="fo-sconce fo-sconce-l" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><path d="M5 9.2 Q4.3 18 5.1 30 Q7.2 31.6 9.2 30 Q9.7 19 9 9.2Z" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/><path d="M1.6 15.4 Q7 13.9 12.4 15.2 Q13 17.6 12.2 19 Q7 20.3 1.8 19 Q1.1 17 1.6 15.4Z" fill="#55555e" stroke="#0c0705" stroke-width="1.5" stroke-linejoin="round"/><path d="M1.2 1.9 Q7 -0.7 12.8 1.7 Q12.2 6.6 9.7 9.7 Q7 10.7 4.4 9.5 Q2 6.6 1.2 1.9Z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-l"></div><svg class="fo-sconce fo-sconce-r" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><path d="M5 9.2 Q4.3 18 5.1 30 Q7.2 31.6 9.2 30 Q9.7 19 9 9.2Z" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/><path d="M1.6 15.4 Q7 13.9 12.4 15.2 Q13 17.6 12.2 19 Q7 20.3 1.8 19 Q1.1 17 1.6 15.4Z" fill="#55555e" stroke="#0c0705" stroke-width="1.5" stroke-linejoin="round"/><path d="M1.2 1.9 Q7 -0.7 12.8 1.7 Q12.2 6.6 9.7 9.7 Q7 10.7 4.4 9.5 Q2 6.6 1.2 1.9Z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-r"></div>
           <div class="fo-hud">${relicStripHTML()}</div>
           <div class="fo-band">

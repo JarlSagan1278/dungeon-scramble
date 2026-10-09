@@ -2190,3 +2190,21 @@ body.hit-stop .fo-enemy .fo-fig{ filter:brightness(2.4) saturate(.35); }
 .fuse-fly{ filter:drop-shadow(0 0 6px rgba(255,215,106,.8)); }
 .camp-fire-wrap.flare .campfire-glow{ animation:fire-flare .9s ease-out both; animation-delay:var(--fl,0ms); }
 @keyframes fire-flare{ 0%{ transform:translateX(-50%) scale(1); filter:brightness(1); } 25%{ transform:translateX(-50%) scale(1.9); filter:brightness(1.8); } 100%{ transform:translateX(-50%) scale(1); filter:brightness(1); } }
+
+
+/* ---- Passive atmosphere: torch light breathing, dust motes, chest interior glow ---- */
+.enc-card.fo-arch{ isolation:isolate; }
+.hall-fx{ position:absolute; inset:0; border-radius:inherit; overflow:hidden; pointer-events:none; z-index:-1; }
+.hall-fx .hf-glow{ position:absolute; top:0; bottom:0; width:58%; opacity:.5; animation:hf-breathe 3.1s ease-in-out infinite; }
+.hall-fx .hf-l{ left:0; background:radial-gradient(ellipse 120px 150px at 19px 53px, rgba(255,160,70,.34), rgba(255,120,40,.12) 45%, transparent 75%); }
+.hall-fx .hf-r{ right:0; background:radial-gradient(ellipse 120px 150px at calc(100% - 19px) 53px, rgba(255,160,70,.34), rgba(255,120,40,.12) 45%, transparent 75%); animation-duration:2.3s; }
+@keyframes hf-breathe{ 0%,100%{ opacity:.35; } 22%{ opacity:.8; } 48%{ opacity:.5; } 71%{ opacity:.95; } }
+.hall-fx i{ position:absolute; width:var(--sz,2px); height:var(--sz,2px); border-radius:50%; background:rgba(255,226,170,.85); box-shadow:0 0 4px 1px rgba(255,200,120,.5); opacity:0; animation:mote-drift 12s linear infinite; }
+@keyframes mote-drift{ 0%{ opacity:0; transform:translate(0,12px); } 15%{ opacity:.8; } 50%{ transform:translate(var(--dx),-24px); opacity:.55; } 85%{ opacity:.7; } 100%{ opacity:0; transform:translate(calc(var(--dx) * -.6),-62px); } }
+.reduced-motion .hall-fx i{ display:none; } .reduced-motion .hall-fx .hf-glow{ animation:none; opacity:.6; }
+/* chest interior: a warm pulse in the gaps between the dice */
+.tray-wrap .tray{ position:relative; }
+.tray-wrap .tray::before{ content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:radial-gradient(ellipse 70% 60% at 50% 55%, rgba(255,190,90,.30), transparent 72%); animation:chest-glow 4.6s ease-in-out infinite; animation-delay:var(--gd,0ms); z-index:0; }
+.tray-wrap .tray > .die{ z-index:1; }
+@keyframes chest-glow{ 0%,100%{ opacity:.25; } 50%{ opacity:.95; } }
+.reduced-motion .tray-wrap .tray::before{ animation:none; opacity:.5; }
