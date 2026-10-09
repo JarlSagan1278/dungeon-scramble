@@ -504,7 +504,7 @@ function syncRoomFloor(card){
     document.querySelectorAll('#room-floor, .rf-shadow').forEach(n=>n.remove());
     const off = el=>{ let t=0,l=0,n=el; while(n && n!==app){ t+=n.offsetTop; l+=n.offsetLeft; n=n.offsetParent; } return {t,l}; };
     const c = off(card), cw = card.offsetWidth, ch = card.offsetHeight;
-    const appL = app.getBoundingClientRect().left, vw = document.documentElement.clientWidth;
+    const appL = 0, vw = app.offsetWidth; // hard cutoff at the app's own width
     const hy = Math.round(c.t + ch*ROOM_HORIZON), yb = Math.round(c.t + ch - hy), edge = 3;
     const xl = Math.round(appL + c.l + edge), xr = Math.round(appL + c.l + cw - edge);
     const fl = document.createElement('div'); fl.id = 'room-floor';
