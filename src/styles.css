@@ -2271,3 +2271,9 @@ body.is-resolving .hall-fx i{ opacity:0; }
 
 /* Campfire flames: no dark outline (logs keep theirs) */
 .campfire-flame{ border:0 !important; box-shadow:none !important; filter:none; }
+
+/* Hallway floor: the bottom of the doorway warms toward the dice-box brown instead of dropping to black; the base edge is solid ink, not the torch gradient bleeding through the transparent border */
+.enc-card.fo-arch{ border-bottom-color:var(--line) !important; }
+.hall-fx::after{ content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(116,80,45,.55) 0, rgba(80,52,28,.3) 16%, transparent 38%); }
+/* Round badge: muted slate so it reads apart from the brown panel without competing with Go / Skill */
+.tray-head .round-badge{ background:#2f3b42 !important; color:#c9d6dc !important; border-color:var(--line) !important; }
