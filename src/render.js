@@ -1260,7 +1260,8 @@ function renderEncounterCard(e, mode){
   // A brand-new room gets a one-shot entrance flourish (see advanceRoute()
   // in logic.js) so stepping into it actually registers, instead of the
   // card just silently having different stats than a moment ago.
-  const roomEnterCls = S.newRoomFx ? (S.newRoomFx.boss ? 'room-enter room-enter-boss' : 'room-enter') : '';
+  const roomEnterCls = S.newRoomFx ? (S.newRoomFx.boss ? 'room-enter room-enter-boss door-kick' : 'room-enter door-kick') : '';
+  const doorDustHTML = S.newRoomFx ? '<div class="door-dust">'+[0,1,2,3,4,5,6].map(i=>`<i style="--dx:${(i-3)*17}px;--dy:${-10-((i*7)%5)*5}px;--d:${i*28}ms"></i>`).join('')+'</div>' : '';
   const isBoss = e.type==='Boss' || e.type==='Big Boss';
   // Regular (non-boss) encounters don't cycle through one action at a time
   // like bosses do -- every listed effect fires every turn, all at once.
@@ -1297,7 +1298,7 @@ function renderEncounterCard(e, mode){
     const chipsOnly = (isBoss ? bossCycle : regularActionsRow).replace(/<span class="hint"[^>]*>[^<]*<\/span>/,'');
     const typeTag = (e.type && e.type!=='Enemy') ? `<small class="fo-type${isBoss?' fo-type-inline':''}">${e.type}</small>` : '';
     const questLine = (e.quests && e.quests.length)
-      ? `<div class="fo-quests-float" title="Complete these during the fight for bonus rewards"><div class="fo-quests-label">Quests</div><div class="fo-quests">${e.quests.map((q,i)=>`<span class="fo-quest ${e.questsDone[i]?'complete':''}">${e.questsDone[i]?'✔':'○'} ${q}</span>`).join('')}</div></div>` : '';
+      ? `<div class="fo-quests-float" title="Complete these during the fight for bonus rewards"><div class="fo-quests-label">Quests</div><div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls}"${qs.style}>${e.questsDone[i]?'✔':'○'} ${q}</span>`; }).join('')}</div></div>` : '';
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
     const sz = encounterSize(e);
     const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz}"/>`
@@ -1311,19 +1312,19 @@ function renderEncounterCard(e, mode){
       <div class="fo-band">
         <div class="fo-side fo-player">
           <div class="fo-fig ${p.figCls||''}" title="${S.origin.name} ${S.klass.name}">${p.figHTML||''}</div><div class="fo-floor"></div>
-          <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}">${hpFillHTML('player','hp player',p.hpPct)}${shieldBarHTML(S.playerBlock, S.maxHealth, p.hpPct, 'player')}<span class="bar-num">${S.health}${shieldNumHTML(S.playerBlock)}/${S.maxHealth}</span></div>${p.deltaHTML||''}</div>
+          <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}">${hpFillHTML('player','hp player',p.hpPct)}${shieldBarHTML(S.playerBlock, S.maxHealth, p.hpPct, 'player')}<span class="bar-num">${S.health}${shieldNumHTML(S.playerBlock)}/${S.maxHealth}</span></div>${p.deltaHTML||''}${tickFloatersHTML('player')}</div>
           <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim().replace(/</g,'&lt;')+', '+S.origin.name+' '+S.klass.name:S.origin.name+' '+S.klass.name}</div>
           <div class="fo-chips fo-buffs">${hudChips(p.statusHTML)}</div>
         </div>
         <div class="fo-vs">vs</div>
         <div class="fo-side fo-enemy${isBoss?' fo-boss-side':''}">
-          <div class="fo-fig enc-portrait ${sz>1.05?'fo-big ':''}${(sz>1.05&&/Boss/.test(e.type))?'fo-bossbig ':''}${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}" style="--sz:${sz}">${monsterFig}</div><div class="fo-floor"></div>
+          ${doorDustHTML}<div class="fo-fig enc-portrait ${sz>1.05?'fo-big ':''}${(sz>1.05&&/Boss/.test(e.type))?'fo-bossbig ':''}${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}" style="--sz:${sz}">${monsterFig}</div><div class="fo-floor"></div>
           <div class="fo-hpwrap status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;">${isBoss ? bossArcBarHTML({hpPct, questLeft:questSegLeftPct, questW:questSegWidthPct, prevLeft:dmgPreviewLeftPct, prevW:dmgPreviewWidthPct, shieldVal:e.curShield, shieldMax:e.maxHealth, cls:`${fx.cls} ${killHint?'bar-'+killHint.state:''}`, numHTML:`<span class="bar-num">${curHealthClamped.toFixed(0)}${shieldNumHTML(e.curShield)}/${e.maxHealth}</span>`}) : `<div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
               ${hpFillHTML('enemy','hp',hpPct)}
               ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
               ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
               ${shieldBarHTML(e.curShield, e.maxHealth, hpPct, 'enemy')}<span class="bar-num">${curHealthClamped.toFixed(0)}${shieldNumHTML(e.curShield)}/${e.maxHealth}</span>
-            </div>`}${fx.deltaHTML}</div>
+            </div>`}${fx.deltaHTML}${tickFloatersHTML('enemy')}</div>
           <div class="kill-hint fo-hint ${killHint?'kill-hint-'+killHint.state:''}" ${killHint?`data-hint="${killHint.state}"`:''}>${killHint?killHint.text:'&nbsp;'}</div>
           <div class="fo-name" ${e.flavor?`title="${e.flavor.replace(/"/g,'&quot;')}"`:''}>${typeTag}${e.name}</div>
           <div class="fo-chips fo-buffs">${hudChips(statuses)}</div>
@@ -1521,6 +1522,7 @@ function renderGame(){
     showRoomCallout(S.newRoomFx);
     playTone(S.newRoomFx.boss ? 'bossRoomEnter' : 'roomEnter');
     if(S.newRoomFx.boss) vibrate([30,40,30]);
+    if(typeof screenShake==='function') screenShake(S.newRoomFx.boss ? 'big' : 'small');
     S.newRoomFx = null; // consumed -- plays once, on the render right after advanceRoute() set it
   }
   if(S.justScrambled){
@@ -2148,6 +2150,58 @@ function screenShake(intensity){
   wrap.classList.remove('screen-shake-big','screen-shake-small');
   void wrap.offsetWidth; // force reflow so re-adding the class restarts the animation
   wrap.classList.add(intensity==='big' && !juiceLow() ? 'screen-shake-big' : 'screen-shake-small');
+}
+
+// ---- Transient FX registry (cosmetic only -- never saved; timestamps are performance.now()) ----
+const UIFX = {ticks:[], quests:[], flareAt:-1e9};
+function fxTick(side,type,amt){ if(amt>0) UIFX.ticks.push({side,type,amt,t:performance.now()}); }
+function tickFloatersHTML(side){
+  const now=performance.now(); UIFX.ticks=UIFX.ticks.filter(x=>now-x.t<1300);
+  return UIFX.ticks.filter(x=>x.side===side).map((x,k)=>`<span class="tick-float tf-${x.type}" style="animation-delay:-${Math.round(now-x.t)}ms; --k:${k%3}">${iconSpan(x.type)}<b>${x.type==='dot'?'-':'+'}${x.amt}</b></span>`).join('');
+}
+function fxQuest(name,i){
+  UIFX.quests.push({name,i,t:performance.now()});
+  setTimeout(()=>{ try{ if(!PREFS.reducedMotion) spawnParticleBurstAtEl('.fo-quests-float', ['#ffd76a','#fff5d6','#e0603a']); }catch(e){} }, 160);
+}
+function questStampAttrs(name,i){
+  const now=performance.now(); UIFX.quests=UIFX.quests.filter(x=>now-x.t<1200);
+  const q=UIFX.quests.find(x=>x.name===name&&x.i===i);
+  return q ? {cls:'q-stamp', style:` style="--qd:-${Math.round(now-q.t)}ms"`} : {cls:'', style:''};
+}
+// Hit-stop: a brief freeze of every running animation plus a white-hot flash on the target.
+function hitStop(ms){
+  if(PREFS.reducedMotion || juiceLow()) return;
+  document.body.classList.add('hit-stop');
+  clearTimeout(hitStop._t);
+  hitStop._t = setTimeout(()=>document.body.classList.remove('hit-stop'), ms);
+}
+// Camp upgrade: clones of the dice being combined fly into the new die's tile.
+function flyDiceToFuse(cat, level, run){
+  let clones=[];
+  try{
+    if(!PREFS.reducedMotion){
+      const name = basic(cat,level).name;
+      const tiles=[...document.querySelectorAll('.camp-die-tile')].filter(t=>(t.title||'').startsWith(name));
+      for(let k=0;k<3&&tiles.length;k++){
+        const t=tiles[k%tiles.length], r=t.getBoundingClientRect(), c=t.cloneNode(true);
+        c.removeAttribute('id'); c.className+=' fuse-fly';
+        c.style.cssText=`position:fixed;left:${r.left+(tiles.length<3?(k-1)*10:0)}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;margin:0;z-index:9999;pointer-events:none;`;
+        document.body.appendChild(c); clones.push(c);
+      }
+    }
+  }catch(e){}
+  run();
+  try{
+    const target=document.querySelector('.camp-die-tile.fuse-flash');
+    const tr=target?target.getBoundingClientRect():{left:innerWidth/2-20,top:innerHeight/2-20,width:40,height:40};
+    clones.forEach((c,k)=>{
+      const r=c.getBoundingClientRect();
+      const dx=(tr.left+tr.width/2)-(r.left+r.width/2), dy=(tr.top+tr.height/2)-(r.top+r.height/2);
+      c.style.transition=`transform .34s cubic-bezier(.5,0,.8,.4) ${k*40}ms, opacity .34s ease-in ${k*40}ms`;
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{ c.style.transform=`translate(${dx}px,${dy}px) scale(.35) rotate(${(k-1)*40}deg)`; c.style.opacity='.15'; }));
+      setTimeout(()=>c.remove(), 520+k*40);
+    });
+  }catch(e){ clones.forEach(c=>c.remove()); }
 }
 
 // ---- Particle burst: a quick radial confetti-style burst of small colored
@@ -3065,7 +3119,7 @@ function renderCamp(){
       <div class="camp-section camp-status-card">
         ${relicStripHTML()}
         <div class="bar-row" style="position:relative;"><span style="flex:0 0 auto;">Health</span><div class="bar ${campFx.cls}"><div class="bar-fill hp player" style="width:${S.health/S.maxHealth*100}%"></div></div><span>${S.health}/${S.maxHealth}</span>${campFx.deltaHTML}</div>
-        <div class="camp-fire-wrap">
+        <div class="camp-fire-wrap ${(performance.now()-UIFX.flareAt)<900?'flare':''}" style="--fl:-${Math.max(0,Math.round(performance.now()-UIFX.flareAt))}ms">
           <div class="camp-hero" title="${S.origin.name} ${S.klass.name}">${(S.portrait&&!S.portrait.placeholder)?`<img src="${S.portrait.img}" alt="${S.origin.name}">`:mysteryFigureHTML('width:56px; height:56px;')}</div>
           <div class="campfire-glow"></div>
           <div class="campfire-logs"></div>
@@ -3110,7 +3164,7 @@ function renderCamp(){
   ['attack','maneuver'].forEach(cat=>{
     [1,2].forEach(level=>{
       const btn = document.getElementById(`upgrade-${cat}-${level}`);
-      if(btn) btn.onclick = ()=> campUpgrade(cat, level);
+      if(btn) btn.onclick = ()=> flyDiceToFuse(cat, level, ()=> campUpgrade(cat, level));
       const previewBtn = document.getElementById(`preview-${cat}-${level}`);
       if(previewBtn) previewBtn.onclick = ()=>{
         const resultDie = basic(cat, level+1);

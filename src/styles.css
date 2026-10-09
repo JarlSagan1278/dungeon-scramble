@@ -2159,3 +2159,34 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 
 /* ---- Health bar segments meet in clean flat edges (the .bar clips the outer rounded ends) ---- */
 .bar .bar-fill, .bar .bar-shield, .bar .bar-fill.hp, .bar .bar-fill.quest-hp, .bar .bar-fill.shield-seg, .bar .bar-fill.hp-ghost, .bar .bar-fill.dmg-preview{ border-radius:0 !important; }
+
+
+/* ---- Juice pass 3: quest stamp, status ticks, door kick, hit-stop, camp fuse fly, fire flare ---- */
+/* Quest completion: the line slaps down and a red DONE stamp lands on it */
+.fo-quests-float .fo-quest.q-stamp{ position:relative; animation:q-slap .5s cubic-bezier(.3,1.6,.4,1) both; animation-delay:var(--qd,0ms); }
+@keyframes q-slap{ 0%{ transform:scale(1.35) rotate(-4deg); } 100%{ transform:none; } }
+.fo-quests-float .fo-quest.q-stamp::after{ content:'DONE'; position:absolute; right:-3px; top:50%; font-weight:800; font-size:9px; line-height:1; letter-spacing:1px; color:#b02a1c; border:2px solid #b02a1c; border-radius:3px; padding:1px 3px; background:rgba(255,250,235,.8); pointer-events:none;
+  animation:q-stamp-kf 1.1s ease-out both; animation-delay:var(--qd,0ms); }
+@keyframes q-stamp-kf{ 0%{ opacity:0; transform:translateY(-50%) rotate(-10deg) scale(3); } 20%{ opacity:1; transform:translateY(-50%) rotate(-10deg) scale(.9); } 30%{ transform:translateY(-50%) rotate(-10deg) scale(1); } 75%{ opacity:1; } 100%{ opacity:0; transform:translateY(-50%) rotate(-10deg) scale(1); } }
+/* D.O.T./H.O.T. ticks: icon + amount float off the bar */
+.fo-hpwrap .tick-float{ position:absolute; left:calc(6% + var(--k,0)*30%); top:-6px; z-index:20; display:inline-flex; align-items:center; gap:2px; font-size:13px; font-weight:800; pointer-events:none; text-shadow:-1px -1px 0 #0c0705,1px -1px 0 #0c0705,-1px 1px 0 #0c0705,1px 1px 0 #0c0705; animation:tick-rise 1.2s ease-out both; }
+.fo-hpwrap .tick-float .icon-svg{ width:14px; height:14px; }
+.tick-float.tf-dot{ color:#c58bff; } .tick-float.tf-hot{ color:#74e58c; }
+@keyframes tick-rise{ 0%{ opacity:0; transform:translateY(8px) scale(.6); } 15%{ opacity:1; transform:translateY(0) scale(1.15); } 100%{ opacity:0; transform:translateY(-30px) scale(1); } }
+/* Door kick: monster bursts in through the doorway with a puff of dust (individual transform props so idle-breath/lunges still compose) */
+.door-kick .fo-enemy .fo-fig{ animation:door-burst .55s cubic-bezier(.2,1.25,.4,1) .1s both; }
+@keyframes door-burst{ 0%{ translate:46px 6px; scale:.55; opacity:0; } 55%{ opacity:1; } 100%{ translate:0 0; scale:1; opacity:1; } }
+.fo-enemy{ position:relative; }
+.door-dust{ position:absolute; left:50%; top:calc(var(--fh,104px) + 4px); width:0; height:0; z-index:4; pointer-events:none; }
+.door-dust i{ position:absolute; left:-9px; top:-9px; width:18px; height:18px; border-radius:50%; background:radial-gradient(circle,rgba(226,206,170,.85),rgba(150,125,95,.0) 70%); opacity:0; animation:dust-puff .7s ease-out both; animation-delay:calc(.08s + var(--d,0ms)); }
+@keyframes dust-puff{ 0%{ opacity:0; transform:translate(0,0) scale(.4); } 25%{ opacity:.9; } 100%{ opacity:0; transform:translate(var(--dx),var(--dy)) scale(2.4); } }
+/* Hit-stop on a kill: everything running freezes for a beat and the target flashes white-hot */
+body.hit-stop #app *, body.hit-stop #app *::before, body.hit-stop #app *::after{ animation-play-state:paused !important; transition:none !important; }
+body.hit-stop .fo-enemy .fo-fig{ filter:brightness(2.4) saturate(.35); }
+.reduced-motion .door-dust, .reduced-motion .door-kick .fo-enemy .fo-fig, .reduced-motion .tick-float{ animation:none; }
+.reduced-motion .door-dust{ display:none; }
+/* Camp: dice fly together; the fused tile waits for them, then pops */
+.camp-die-tile.fuse-flash{ animation-delay:.34s; animation-fill-mode:both; }
+.fuse-fly{ filter:drop-shadow(0 0 6px rgba(255,215,106,.8)); }
+.camp-fire-wrap.flare .campfire-glow{ animation:fire-flare .9s ease-out both; animation-delay:var(--fl,0ms); }
+@keyframes fire-flare{ 0%{ transform:translateX(-50%) scale(1); filter:brightness(1); } 25%{ transform:translateX(-50%) scale(1.9); filter:brightness(1.8); } 100%{ transform:translateX(-50%) scale(1); filter:brightness(1); } }

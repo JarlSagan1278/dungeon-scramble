@@ -1363,6 +1363,7 @@ function checkQuests(e, ctx){
       e.questsDone[i] = true;
       applyQuestReward(e, rewardText);
       logMsg('sys', `Quest complete: "${q}"`, 'good');
+      if(typeof fxQuest==='function') fxQuest(e.name, i);
     }
   });
 }
@@ -1530,12 +1531,14 @@ function runEnemyBeat(i, noWind){
       // each tick burns off 1 stack after applying, so a 3-stack ticks for
       // 3, then 2, then 1, then nothing, rather than hitting for 3 forever
       // until something else clears it.
+      if(typeof fxTick==='function') fxTick('enemy','dot',e.curDOT);
       e.curDOT = Math.max(0, e.curDOT-1);
       if(e.curHealth<=0) return {stop:'encounterDefeated'};
       return null;
     },
     () => {
       if(e.curHOT>0){
+        if(typeof fxTick==='function') fxTick('enemy','hot',e.curHOT);
         e.curHealth = cap(e.curHealth+e.curHOT, e.maxHealth);
         e.curHOT = Math.max(0, e.curHOT-1);
       }
@@ -1599,12 +1602,14 @@ function runPlayerUpkeep(){
     // Depleting stack, same as the encounter's own D.O.T./H.O.T. (see
     // runEnemyBeat()) -- burns off 1 after each tick rather than hitting
     // for the same amount indefinitely.
+    if(typeof fxTick==='function') fxTick('player','dot',S.playerDOT);
     S.playerDOT = Math.max(0, S.playerDOT-1);
   }
   if(S.playerHOT>0){
     S.health = cap(S.health+S.playerHOT, S.maxHealth);
     const t = `You recover ${S.playerHOT} from H.O.T.`;
     logMsg('heal', t); parts.push(t);
+    if(typeof fxTick==='function') fxTick('player','hot',S.playerHOT);
     S.playerHOT = Math.max(0, S.playerHOT-1);
   }
   return parts.join(' ');
@@ -1861,6 +1866,7 @@ function onEncounterDefeated(){
   // A Boss/Big Boss kill or an Overkill each get a distinct sound + a big
   // callout banner, so the moment registers as it happens instead of only
   // as a status chip on the loot screen that follows.
+  if(typeof hitStop==='function') hitStop(isBoss ? 180 : 120);
   if(isBoss){
     if(typeof playTone==='function') playTone('bossKill');
     if(typeof vibrate==='function') vibrate([50,40,90]);
@@ -2071,6 +2077,7 @@ function selectOrganize(type, idx){
 
 function campRest(){
   if(S.campRested) return;
+  if(typeof UIFX!=='undefined') UIFX.flareAt = performance.now();
   scrambleTray();
   let count=0;
   S.tray.forEach(c=>{ if(currentFace(c).type!=='blank') count++; });
