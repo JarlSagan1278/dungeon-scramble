@@ -255,7 +255,7 @@ function archPoints(w,h,i,step){ const pts=[], rx=120, ry=90;
   for(let y=ry;y<=h-12;y+=step) pts.push([w-i,y]);
   return pts; }
 function archFrameSVG(w,h,lvl){
-  const base = `<path d="${archPath(w,h,5)}" fill="none" stroke="#2a1608" stroke-width="14"/><path d="${archPath(w,h,5)}" fill="none" stroke="#8d7d68" stroke-width="10"/><path d="${archPath(w,h,5)}" fill="none" stroke="#2a1608" stroke-width="10" stroke-dasharray="2 22"/><path d="${archPath(w,h,2)}" fill="none" stroke="#a89880" stroke-width="2" opacity=".6"/>`;
+  const base = `<path d="${archPath(w,h,5)}" fill="none" stroke="#0c0705" stroke-width="14"/><path d="${archPath(w,h,5)}" fill="none" stroke="#8d7d68" stroke-width="10"/><path d="${archPath(w,h,5)}" fill="none" stroke="#0c0705" stroke-width="10" stroke-dasharray="2 22"/><path d="${archPath(w,h,2)}" fill="none" stroke="#a89880" stroke-width="2" opacity=".6"/>`;
   if(lvl<=1){
     return base + `<g fill="#4f7a34" opacity=".92">
   <circle cx="70" cy="14" r="6"/><circle cx="80" cy="9" r="4.5"/><circle cx="60" cy="20" r="4"/><circle cx="92" cy="7" r="3.5"/>
@@ -2632,7 +2632,7 @@ function lootChestSVG(tier){
 <defs><radialGradient id="lootChestGlow" cx="50%" cy="60%" r="55%"><stop offset="0" stop-color="${m}" stop-opacity=".55"/><stop offset="1" stop-color="${m}" stop-opacity="0"/></radialGradient></defs>
 <ellipse cx="70" cy="68" rx="68" ry="58" fill="url(#lootChestGlow)"/>
 <ellipse cx="70" cy="118" rx="52" ry="6" fill="#000" opacity=".35"/>
-<g stroke="#000" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+<g stroke="#0c0705" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
  <path d="M20 64 H120 V108 a5 5 0 0 1-5 5 H25 a5 5 0 0 1-5-5 Z" fill="${wood}"/>
  <path d="M18 64 V50 C18 28 40 18 70 18 C100 18 122 28 122 50 V64 Z" fill="${woodLt}"/>
  <path d="M18 64 H122" fill="none"/>
@@ -2641,15 +2641,15 @@ function lootChestSVG(tier){
  <path d="M38 64 V113 H54 V64Z" fill="${m}"/>
  <path d="M102 64 V113 H86 V64Z" fill="${m}"/>
  <rect x="58" y="54" width="24" height="26" rx="5" fill="${m}"/>
- <circle cx="70" cy="64" r="4" fill="#1a1208" stroke="none"/>
- <path d="M70 66 V74" stroke="#1a1208" stroke-width="3.5" fill="none"/>
+ <circle cx="70" cy="64" r="4" fill="#0c0705" stroke="none"/>
+ <path d="M70 66 V74" stroke="#0c0705" stroke-width="3.5" fill="none"/>
 </g>
 <g fill="none" stroke="${woodDk}" stroke-width="2.4" stroke-linecap="round" opacity=".8">
  <path d="M24 82 H34 M106 82 H116 M24 98 H34 M106 98 H116"/>
  <path d="M26 36 Q32 28 38 25 M114 36 Q108 28 102 25"/>
 </g>
 <g fill="#fff" opacity=".45"><rect x="42" y="26" width="3" height="30" rx="1.5"/><rect x="90" y="26" width="3" height="30" rx="1.5" opacity=".5"/><rect x="62" y="57" width="3" height="10" rx="1.5"/></g>
-<g fill="${d}" stroke="#000" stroke-width="1.5"><circle cx="46" cy="72" r="2.4"/><circle cx="46" cy="104" r="2.4"/><circle cx="94" cy="72" r="2.4"/><circle cx="94" cy="104" r="2.4"/></g>
+<g fill="${d}" stroke="#0c0705" stroke-width="1.5"><circle cx="46" cy="72" r="2.4"/><circle cx="46" cy="104" r="2.4"/><circle cx="94" cy="72" r="2.4"/><circle cx="94" cy="104" r="2.4"/></g>
 </svg>`;
 }
 
