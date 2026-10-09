@@ -21,6 +21,18 @@ def thickness(a):
         if ring.sum()==0 or (lum[ring]<75).mean()<=0.6: break
         t+=1; cur=er
     return t
+def seal(a,T):
+    # Fill thin tinted lines left inside the black band (e.g. a dark-green old outline sitting just inside the new ink):
+    # close the ink mask across gaps up to ~3px, but only near the silhouette edge and only over dark-ish pixels.
+    op=a[...,3]>200; lum=a[...,:3].max(axis=2)
+    dist=ndi.distance_transform_edt(np.pad(op,1))[1:-1,1:-1]
+    band=op&(dist<=T+4)
+    ink=op&(lum<85)&band
+    closed=ndi.binary_closing(np.pad(ink,4),structure=np.ones((3,3)),iterations=2)[4:-4,4:-4]
+    fill=closed&~ink&band&(lum<190)
+    snap=(ink|fill)&(a[...,3]>200)
+    a[snap,:3]=INK; a[snap,3]=255
+    return int(snap.sum())
 def main():
     d=sys.argv[1]; dry='--dry' in sys.argv; n=0
     for f in sorted(glob.glob(os.path.join(d,'*.png'))):
@@ -44,6 +56,7 @@ def main():
         t=max(t,darkened)
         add=T-t
         if add<=0:
+            seal(a,T)
             print(f'recoloured rim of {os.path.basename(f)}')
             if not dry: Image.fromarray(a,'RGBA').save(f)
             n+=1; continue
@@ -60,6 +73,7 @@ def main():
         # stray faint specks beyond the new outline: clear them
         stray=(a[...,3]>0)&(a[...,3]<=40)&~ndi.binary_dilation(grown,iterations=1)
         a[stray,3]=0
+        seal(a,T)
         print(('would add ' if dry else 'added ')+f'{add}px to {os.path.basename(f)} (had {t}, standard {T})')
         if not dry: Image.fromarray(a,'RGBA').save(f)
         n+=1
