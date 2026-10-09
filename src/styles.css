@@ -2020,3 +2020,10 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .fo-boss-side > *{ order:2; }
 .fo-boss-side > .fo-fig, .fo-boss-side > .fo-floor, .fo-boss-side > .fo-hpwrap, .fo-boss-side > .fo-name{ order:0; }
 .fo-boss-side > .kill-hint{ order:1; }
+
+/* Regular enemies: the kill-hint no longer takes a line between bar and name -- it floats at the top of the column --
+   so the portrait and bar sit the same distance above the name as the player's do. */
+.fo-enemy:not(.fo-boss-side){ position:relative; }
+.fo-enemy:not(.fo-boss-side) > .kill-hint{ position:absolute; top:0; left:0; right:0; margin:0 !important; z-index:4; text-align:center; pointer-events:none; text-shadow:0 1px 0 #1c0e06, 0 0 5px rgba(0,0,0,.9); }
+/* Bosses keep their bars where they are; the portrait stands a little higher */
+.enc-card.fo-arch .fo-boss-side .fo-fig .fo-img.enc-art{ margin-bottom:calc(-1 * var(--down, 0px) + 10px) !important; }
