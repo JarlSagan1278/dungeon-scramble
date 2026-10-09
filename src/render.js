@@ -350,7 +350,7 @@ function syncIdleBreath(){
     const figs = document.querySelectorAll('#enc-panel .fo-player .fo-fig > *, #enc-panel .fo-enemy .fo-fig > *');
     figs.forEach((el,i)=>{
       const seedStr = ((S.encounter&&S.encounter.name)||'')+(S.routeStep||0)+(el.closest('.fo-enemy')?'e':'p'); let hsh=0; for(let c=0;c<seedStr.length;c++) hsh=(hsh*31+seedStr.charCodeAt(c))>>>0;
-      const period = Math.round(6000 + (hsh%4000));
+      const period = Math.round(11000 + (hsh%7000));
       el.classList.add('idle-breath', el.closest('.fo-enemy')?'idle-e':'idle-p');
       el.style.animationDuration = period+'ms';
       el.style.animationDelay = '-'+Math.round(performance.now() % period)+'ms';
@@ -1301,7 +1301,7 @@ function renderEncounterCard(e, mode){
     const chipsOnly = (isBoss ? bossCycle : regularActionsRow).replace(/<span class="hint"[^>]*>[^<]*<\/span>/,'');
     const typeTag = (e.type && e.type!=='Enemy') ? `<small class="fo-type${isBoss?' fo-type-inline':''}">${e.type}</small>` : '';
     const questLine = (e.quests && e.quests.length)
-      ? `<div class="fo-quests-float" title="Complete these during the fight for bonus rewards"><div class="fo-quests-label">Quests</div><div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls}"${qs.style}>${e.questsDone[i]?'✔':'○'} ${q}</span>`; }).join('')}</div></div>` : '';
+      ? `<div class="fo-quests-float" style="animation-delay:-${Math.round(performance.now()%3100)}ms" title="Complete these during the fight for bonus rewards"><div class="fo-quests-label">Quests</div><div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls}"${qs.style}>${e.questsDone[i]?'✔':'○'} ${q}</span>`; }).join('')}</div></div>` : '';
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
     const sz = encounterSize(e);
     const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz}"/>`
