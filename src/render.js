@@ -223,6 +223,7 @@ let preGameScreen = 'title';
 function render(){
   hideFaceTooltip();
   document.body.classList.remove('cog-arch');
+  { const a = document.getElementById('app'); if(a) a.classList.remove('has-room-floor'); }
   updateHeaderMeta();
   updateLowHealthVignette();
   if(!S){
@@ -461,6 +462,70 @@ function bossArcBarHTML(o){
   if(o.prevW>0){ s += `<path class="ba-seg ba-prev" pathLength="100" d="${P}" ${seg(o.prevLeft,o.prevW)}/><path class="ba-seg ba-prev-end" pathLength="100" d="${P}" ${seg(o.prevLeft+o.prevW-1.2,1.2)}/>`; }
   return `<div class="bar bar-arc ${o.cls||''}"><svg viewBox="0 0 ${W} ${H}" width="100%" aria-hidden="true">${s}</svg>${o.numHTML}</div>`;
 }
+// ---- Stone-floor room: the doorway's back wall (brick, above a horizon ledge) and one flagstone floor that
+// runs from the horizon down behind the chest, so the top of the screen reads as a wall and the chest as
+// something you look down on. Textures are painted once at runtime (canvas) into CSS variables.
+const ROOM_HORIZON = 0.38;
+let ROOM_TEX_READY = false;
+function ensureRoomTextures(){
+  if(ROOM_TEX_READY) return; ROOM_TEX_READY = true;
+  try{
+    let seed = 23; const rnd = ()=>{ seed = (seed*16807)%2147483647; return seed/2147483647; };
+    const rr = (g,x,y,w,h,r)=>{ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); };
+    const noise = (g,W,H,amt)=>{ const id=g.getImageData(0,0,W,H); for(let i=0;i<id.data.length;i+=4){ const n=(rnd()-.5)*amt; id.data[i]+=n; id.data[i+1]+=n; id.data[i+2]+=n; } g.putImageData(id,0,0); };
+    // floor: crisp flagstones, thin mortar, a few cracks and moss patches
+    { const W=1024,H=1024,c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+      g.fillStyle='#0c0705'; g.fillRect(0,0,W,H);
+      let y=0; while(y<H){ const rh=128+rnd()*80; let x=-rnd()*130;
+        while(x<W){ const sw=160+rnd()*160; const k=.78+rnd()*.4; const warm=rnd()>.8; const b=warm?[104,84,62]:[96,88,76];
+          const x0=x+2.5,y0=y+2.5,w=sw-5,h=rh-5;
+          const gr=g.createLinearGradient(x0,y0,x0,y0+h); gr.addColorStop(0,`rgb(${b[0]*k*1.06|0},${b[1]*k*1.06|0},${b[2]*k*1.06|0})`); gr.addColorStop(1,`rgb(${b[0]*k*.88|0},${b[1]*k*.88|0},${b[2]*k*.88|0})`);
+          g.fillStyle=gr; rr(g,x0,y0,w,h,5); g.fill();
+          g.fillStyle='rgba(255,236,200,.13)'; g.fillRect(x0+4,y0+1,w-8,2);
+          if(rnd()>.72){ g.strokeStyle='rgba(10,6,4,.5)'; g.lineWidth=1.2; g.beginPath(); let cx=x0+w*rnd(),cy=y0; g.moveTo(cx,cy); for(let i=0;i<4;i++){ cx+=(rnd()-.5)*20; cy+=h/4; g.lineTo(cx,cy); } g.stroke(); }
+          if(rnd()>.84){ const m=g.createRadialGradient(x0+w*.5,y0+h*.9,0,x0+w*.5,y0+h*.9,w*.45); m.addColorStop(0,'rgba(70,110,50,.3)'); m.addColorStop(1,'rgba(70,110,50,0)'); g.fillStyle=m; rr(g,x0,y0,w,h,5); g.fill(); }
+          x+=sw; }
+        y+=rh; }
+      noise(g,W,H,14);
+      document.documentElement.style.setProperty('--tex-floor', `url("${c.toDataURL('image/jpeg',.85)}")`); }
+    // wall: dark running-bond brick
+    { const W=512,H=256,c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+      g.fillStyle='#0a0705'; g.fillRect(0,0,W,H);
+      let y=0,row=0; while(y<H){ const rh=40; let x=-(row%2)*50; while(x<W){ const sw=100, k=.7+rnd()*.5; g.fillStyle=`rgb(${62*k|0},${44*k|0},${32*k|0})`; rr(g,x+2,y+2,sw-4,rh-4,3); g.fill(); g.fillStyle='rgba(255,230,190,.08)'; g.fillRect(x+5,y+3,sw-10,2); x+=sw; } y+=rh; row++; }
+      noise(g,W,H,12);
+      document.documentElement.style.setProperty('--tex-wall', `url("${c.toDataURL('image/jpeg',.85)}")`); }
+  }catch(err){}
+}
+function syncRoomFloor(card){
+  try{
+    const app = document.getElementById('app'); if(!app || !card) return;
+    ensureRoomTextures();
+    app.classList.add('has-room-floor');
+    document.querySelectorAll('#room-floor, .rf-shadow').forEach(n=>n.remove());
+    const off = el=>{ let t=0,l=0,n=el; while(n && n!==app){ t+=n.offsetTop; l+=n.offsetLeft; n=n.offsetParent; } return {t,l}; };
+    const c = off(card), cw = card.offsetWidth, ch = card.offsetHeight;
+    const appL = app.getBoundingClientRect().left, vw = document.documentElement.clientWidth;
+    const hy = Math.round(c.t + ch*ROOM_HORIZON), yb = Math.round(c.t + ch - hy), edge = 3;
+    const xl = Math.round(appL + c.l + edge), xr = Math.round(appL + c.l + cw - edge);
+    const fl = document.createElement('div'); fl.id = 'room-floor';
+    fl.style.cssText = `left:${-appL}px;width:${vw}px;top:${hy}px;bottom:-30px;clip-path:polygon(${xl}px 0,${xr}px 0,${xr}px ${yb}px,100% ${yb}px,100% 100%,0 100%,0 ${yb}px,${xl}px ${yb}px);`;
+    fl.innerHTML = '<div class="rf-plane"></div><div class="rf-fade"></div><div class="rf-light"></div><div class="rf-vig"></div>';
+    app.insertBefore(fl, app.firstChild);
+    // Ground shadows: a feet shadow plus a tall soft pool running down through the health bar, name and chips.
+    const hf = card.querySelector('.hall-fx'); if(!hf) return;
+    const cr = card.getBoundingClientRect(), sc = cr.width/cw || 1;
+    ['.fo-enemy','.fo-player'].forEach(sel=>{
+      const side = card.querySelector(sel); const fig = side && side.querySelector('.fo-fig'); if(!fig) return;
+      const art = fig.querySelector('img,svg,.fo-img') || fig, r = art.getBoundingClientRect();
+      let B = r.bottom + 30;
+      side.querySelectorAll('.fo-name, .fo-chips, .fo-chips *, .fo-turnlabel').forEach(e=>{ B = Math.max(B, e.getBoundingClientRect().bottom); });
+      const cx = (r.left + r.width/2 - cr.left)/sc, fb = (r.bottom - cr.top)/sc, H = (B - r.bottom)/sc + 16;
+      const pool = document.createElement('div'); pool.className = 'rf-shadow rf-pool'; pool.style.cssText = `left:${cx-96}px;top:${fb-18}px;height:${H}px;`;
+      const feet = document.createElement('div'); feet.className = 'rf-shadow rf-feet'; feet.style.cssText = `left:${cx-78}px;top:${fb-20}px;`;
+      hf.appendChild(pool); hf.appendChild(feet);
+    });
+  }catch(err){}
+}
 function decorateArch(){
   try{
     const card = document.querySelector('#enc-panel .fo-arch');
@@ -470,6 +535,7 @@ function decorateArch(){
     const r = card.getBoundingClientRect();
     const w = Math.round(card.offsetWidth), h = Math.round(card.offsetHeight+10);
     const lvl = Math.min(3,(S.floorIdx||0)+1);
+    syncRoomFloor(card);
     card.insertAdjacentHTML('beforeend', `<svg class="fo-frame" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">${archFrameSVG(w,h,lvl)}</svg>`);
     try{ document.body.classList.toggle('is-resolving', !!S.transitioning); }catch(e){}
     syncIdleBreath(); syncMascotHop(); rollHpNumbers();
@@ -1498,7 +1564,7 @@ function renderGame(){
         <div class="enc-card-col">${e?renderEncounterCard(e,'faceoff'):'<p>No active encounter.</p>'}</div>
       </div>
     </div>
-    <div class="panel">
+    <div class="panel tray-panel">
       <div class="enc-rail-row">
         <div class="enc-card-col">
           <div class="tray-float-wrap">
@@ -2217,7 +2283,7 @@ function hallFxHTML(){
     return `<i style="left:${(i*37+11)%84+8}%;top:${(i*53)%55+30}%;--sz:${(2+(i%3)*0.8).toFixed(1)}px;--dx:${((i%2)?1:-1)*(8+(i*5)%14)}px;animation-duration:${dur}ms;animation-delay:-${Math.round(t%dur)}ms"></i>`;
   }).join('');
   const f1=3100, f2=2300;
-  return `<div class="hall-fx" aria-hidden="true"><b class="hf-glow hf-l" style="animation-delay:-${Math.round(t%f1)}ms"></b><b class="hf-glow hf-r" style="animation-delay:-${Math.round(t%f2)}ms"></b>${motes}</div>`;
+  return `<div class="hall-fx" aria-hidden="true"><b class="hf-wall"></b><b class="hf-ledge"></b><b class="hf-glow hf-l" style="animation-delay:-${Math.round(t%f1)}ms"></b><b class="hf-glow hf-r" style="animation-delay:-${Math.round(t%f2)}ms"></b>${motes}</div>`;
 }
 
 // ---- Particle burst: a quick radial confetti-style burst of small colored

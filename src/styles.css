@@ -2274,7 +2274,6 @@ body.is-resolving .hall-fx i{ opacity:0; }
 
 /* Hallway floor: the bottom of the doorway warms toward the dice-box brown instead of dropping to black; the base edge is solid ink, not the torch gradient bleeding through the transparent border */
 .enc-card.fo-arch{ border-bottom-color:var(--line) !important; }
-.hall-fx::after{ content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(116,80,45,.55) 0, rgba(80,52,28,.3) 16%, transparent 38%); }
 /* Round badge: muted slate so it reads apart from the brown panel without competing with Go / Skill */
 .tray-head .round-badge{ background:#2f3b42 !important; color:#c9d6dc !important; border-color:var(--line) !important; }
 
@@ -2327,3 +2326,30 @@ body.is-resolving .hall-fx i{ opacity:0; }
 
 /* Room tracker floats in the dark: no panel card behind it */
 .panel.route-float{ background:transparent !important; border-color:transparent !important; box-shadow:none !important; padding-top:2px; padding-bottom:0; }
+
+
+/* ======== Stone-floor room (v1.32.48): brick back wall above a horizon ledge, one flagstone floor under everything below ======== */
+#app.has-room-floor{ position:relative; }
+#room-floor ~ .panel{ position:relative; }
+#room-floor{ position:absolute; z-index:0; pointer-events:none; overflow:hidden; }
+#room-floor .rf-plane{ position:absolute; left:-40%; right:-40%; top:0; height:260%; background:var(--tex-floor) 0 0/170px auto; transform-origin:50% 0; transform:perspective(880px) rotateX(70deg); }
+#room-floor .rf-fade{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(10,6,4,.97) 0%, rgba(10,6,4,.6) 7%, rgba(10,6,4,.1) 26%, transparent 40%); }
+#room-floor .rf-light{ position:absolute; inset:0; background:radial-gradient(ellipse 55% 26% at 0% 0%, rgba(255,150,60,.55), transparent 75%), radial-gradient(ellipse 55% 26% at 100% 0%, rgba(255,150,60,.45), transparent 75%), radial-gradient(ellipse 70% 40% at 50% 12%, rgba(255,170,90,.10), transparent 70%); }
+#room-floor .rf-vig{ position:absolute; inset:0; background:linear-gradient(to bottom, transparent 50%, rgba(0,0,0,.55) 100%); }
+/* the doorway shows the floor through it: no card background, no inset black, no panel behind it */
+#app.has-room-floor .enc-card.fo-arch{ background:transparent !important; box-shadow:none !important; border-bottom-color:transparent !important; }
+#room-floor ~ #enc-panel, #room-floor ~ .panel.tray-panel{ background:transparent !important; border-color:transparent !important; box-shadow:none !important; }
+.hall-fx .hf-wall{ position:absolute; left:0; right:0; top:0; height:38%; z-index:-1;
+  background:radial-gradient(ellipse 45% 60% at 6% 45%, rgba(255,140,50,.55), transparent 75%), radial-gradient(ellipse 45% 60% at 94% 45%, rgba(255,140,50,.45), transparent 75%),
+    linear-gradient(to bottom, rgba(8,4,2,.9) 0%, rgba(8,4,2,.35) 60%, rgba(8,4,2,.7) 100%), var(--tex-wall) 0 0/230px auto, #120b07; }
+.hall-fx .hf-ledge{ position:absolute; left:0; right:0; top:calc(38% - 5px); height:8px; background:linear-gradient(#2a1c12,#120b07); box-shadow:0 2px 0 #0c0705; }
+.rf-shadow{ position:absolute; pointer-events:none; }
+.rf-pool{ width:192px; background:radial-gradient(ellipse 50% 52% at 50% 38%, rgba(8,4,2,.82) 0%, rgba(8,4,2,.62) 50%, transparent 100%); }
+.rf-feet{ width:156px; height:34px; border-radius:50%; background:radial-gradient(ellipse, rgba(0,0,0,.8) 0%, rgba(0,0,0,.55) 45%, transparent 72%); }
+/* chest sits on the floor */
+#room-floor ~ .panel.tray-panel .tray-wrap{ box-shadow:0 20px 24px -4px rgba(0,0,0,.8), 0 4px 0 rgba(0,0,0,.65) !important; }
+/* disabled Go: solid dim gold, not see-through */
+.util-btn.rail-go.disabled{ opacity:1 !important; background:linear-gradient(#7d6228,#5e481b) !important; color:#2a1f0c !important; }
+
+/* class zone cells in the dice chest: solid line in the class color */
+.zone-cell{ outline-style:solid !important; }
