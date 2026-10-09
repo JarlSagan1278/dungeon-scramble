@@ -2353,3 +2353,7 @@ body.is-resolving .hall-fx i{ opacity:0; }
 
 /* class zone cells in the dice chest: solid line in the class color */
 .zone-cell{ outline-style:solid !important; }
+
+/* Skill button wears the class color (armed state keeps its white ring + glow) */
+#ability-btn.rail-ability{ background:var(--class-color,#6a45a8) !important; color:#fff !important; text-shadow:0 1px 0 rgba(0,0,0,.55), 0 0 3px rgba(0,0,0,.45); }
+#ability-btn.rail-ability.armed{ background:var(--class-color,var(--gold)) !important; color:#fff !important; filter:brightness(1.12); }
