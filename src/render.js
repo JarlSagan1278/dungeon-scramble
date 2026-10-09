@@ -305,7 +305,7 @@ function archFrameSVG(w,h,lvl){
 // ---- Animation polish (v1.32.13) ----
 // Ghost "recent damage" segment: when a bar drops, a pale chunk lingers where the lost health was
 // and then slides away. State survives render() rebuilds via S._ghost so the chunk isn't cut short.
-function hpFillHTML(side, cls, pct){
+function hpFillHTML(side, cls, pct, asData){
   try{
     pct = Math.max(0, Math.min(100, pct||0));
     const noAnim = (typeof PREFS!=='undefined' && PREFS.reducedMotion);
@@ -321,20 +321,24 @@ function hpFillHTML(side, cls, pct){
       st.ht = now;
     }
     st.last = pct;
-    let fillStyle = `width:${pct}%`, healCls = '';
+    let fillStyle = `width:${pct}%`, healCls = '', dHeal = null, dGhost = null;
     const he = now - st.ht;
     if(!noAnim && st.ht && he < 650 && pct > st.hf + 0.01){
       healCls = ' hp-heal-fill';
       fillStyle += `; --from:${st.hf}%; animation-delay:-${Math.round(he)}ms`;
+      dHeal = {from:st.hf, delay:Math.round(he)};
     }
     let ghost = '';
     const el = now - st.t;
     if(!noAnim && st.t && el < 900 && pct < st.from - 0.01){
       const big = Math.min(1,(st.from-pct)/35); const gc = `rgb(255,${Math.round(230-big*95)},${Math.round(196-big*110)})`;
+      dGhost = {from:st.from, color:gc, delay:Math.round(el)};
       ghost = `<div class="bar-fill hp-ghost" style="left:${pct}%; width:${st.from-pct}%; background:${gc} !important; animation-delay:-${Math.round(el)}ms"></div>`;
     }
+    if(asData) return {pct, heal:dHeal, ghost:dGhost};
     return `<div class="bar-fill ${cls}${healCls}" style="${fillStyle}"></div>${ghost}`;
-  }catch(err){ return `<div class="bar-fill ${cls}" style="width:${pct}%"></div>`; }
+  }catch(err){
+    if(asData) return {pct, heal:null, ghost:null}; return `<div class="bar-fill ${cls}" style="width:${pct}%"></div>`; }
 }
 // Idle breathing: render() rebuilds the DOM, so a plain CSS loop would restart on every redraw.
 // A negative delay tied to the clock keeps the loop continuous across rebuilds.
@@ -431,6 +435,25 @@ function shieldBarHTML(val, max, hpPct, side){
   const room = Math.max(0, 100 - (hpPct||0));
   const w = Math.min(room, val/Math.max(1,max)*100);
   return (w>0?`<div class="bar-fill shield-seg${fx}" style="left:${hpPct||0}%; width:${w}%; ${dl}" title="Shield ${val}"></div>`:'');
+}
+
+// Boss health bar: a U-shaped arc that starts and ends where the straight bar would, and dips below. Segments are
+// SVG strokes on one path (pathLength=100, so a segment is just "start, length" in percent of the bar).
+function bossArcBarHTML(o){
+  const W=160, D=24, T=8, mid=T, P='M 10 '+mid+' Q '+(W/2)+' '+(mid+2*D)+' '+(W-10)+' '+mid;
+  const H=T+D+T, seg=(a,len)=>`stroke-dasharray="0 ${Math.max(0,a).toFixed(2)} ${Math.max(0,len).toFixed(2)} 300"`;
+  const fx = hpFillHTML('enemy','hp',o.hpPct,true);
+  const hp = Math.max(0,Math.min(100,fx.pct));
+  let s = `<path class="ba-out" d="${P}"/><path class="ba-track" d="${P}"/>`;
+  if(fx.ghost){ s += `<path class="ba-seg ba-ghost" pathLength="100" d="${P}" ${seg(hp,fx.ghost.from-hp)} style="stroke:${fx.ghost.color}; animation-delay:-${fx.ghost.delay}ms"/>`; }
+  const healCls = fx.heal ? ' ba-heal' : '';
+  const healStyle = fx.heal ? ` style="--from:${fx.heal.from}; --to:${hp}; animation-delay:-${fx.heal.delay}ms"` : '';
+  s += `<path class="ba-seg ba-hp${healCls}" pathLength="100" d="${P}" stroke-dasharray="${hp.toFixed(2)} 300"${healStyle}/>`;
+  if(o.questW>0) s += `<path class="ba-seg ba-quest" pathLength="100" d="${P}" ${seg(o.questLeft,o.questW)}/>`;
+  if(o.shieldVal>0){ const sh = shieldBarHTML(o.shieldVal,o.shieldMax,hp,'enemy'); const m = /shield-seg( sh-\w+)?" style="left:([\d.]+)%; width:([\d.]+)%; ([^"]*)"/.exec(sh);
+    if(m) s += `<path class="ba-seg ba-shield${m[1]||''}" pathLength="100" d="${P}" ${seg(+m[2],+m[3])} style="${m[4]}"/>`; }
+  if(o.prevW>0){ s += `<path class="ba-seg ba-prev" pathLength="100" d="${P}" ${seg(o.prevLeft,o.prevW)}/><path class="ba-seg ba-prev-end" pathLength="100" d="${P}" ${seg(o.prevLeft+o.prevW-1.2,1.2)}/>`; }
+  return `<div class="bar bar-arc ${o.cls||''}"><svg viewBox="0 0 ${W} ${H}" width="100%" aria-hidden="true">${s}</svg>${o.numHTML}</div>`;
 }
 function decorateArch(){
   try{
@@ -1241,7 +1264,7 @@ function renderEncounterCard(e, mode){
     // The doorway face-off: your hero on the left, the monster (mirrored to face you) on the
     // right, each with their own health bar underneath. See decorateArch() for the stone frame.
     const chipsOnly = (isBoss ? bossCycle : regularActionsRow).replace(/<span class="hint"[^>]*>[^<]*<\/span>/,'');
-    const typeTag = (e.type && e.type!=='Enemy') ? `<small class="fo-type">${e.type}</small>` : '';
+    const typeTag = (e.type && e.type!=='Enemy') ? `<small class="fo-type${isBoss?' fo-type-inline':''}">${e.type}</small>` : '';
     const questLine = (e.quests && e.quests.length)
       ? `<div class="fo-quests">${e.quests.map((q,i)=>`<span class="fo-quest ${e.questsDone[i]?'complete':''}">${e.questsDone[i]?'✔':'○'} ${q}</span>`).join('')}</div>` : '';
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
@@ -1263,12 +1286,12 @@ function renderEncounterCard(e, mode){
         <div class="fo-vs">vs</div>
         <div class="fo-side fo-enemy">
           <div class="fo-fig enc-portrait ${sz>1.05?'fo-big ':''}${(sz>1.05&&/Boss/.test(e.type))?'fo-bossbig ':''}${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}" style="--sz:${sz}">${monsterFig}</div><div class="fo-floor"></div>
-          <div class="fo-hpwrap status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;"><div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
+          <div class="fo-hpwrap status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;">${isBoss ? bossArcBarHTML({hpPct, questLeft:questSegLeftPct, questW:questSegWidthPct, prevLeft:dmgPreviewLeftPct, prevW:dmgPreviewWidthPct, shieldVal:e.curShield, shieldMax:e.maxHealth, cls:`${fx.cls} ${killHint?'bar-'+killHint.state:''}`, numHTML:`<span class="bar-num">${curHealthClamped.toFixed(0)}${shieldNumHTML(e.curShield)}/${e.maxHealth}</span>`}) : `<div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
               ${hpFillHTML('enemy','hp',hpPct)}
               ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
               ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
               ${shieldBarHTML(e.curShield, e.maxHealth, hpPct, 'enemy')}<span class="bar-num">${curHealthClamped.toFixed(0)}${shieldNumHTML(e.curShield)}/${e.maxHealth}</span>
-            </div>${fx.deltaHTML}</div>
+            </div>`}${fx.deltaHTML}</div>
           <div class="kill-hint fo-hint ${killHint?'kill-hint-'+killHint.state:''}" ${killHint?`data-hint="${killHint.state}"`:''}>${killHint?killHint.text:'&nbsp;'}</div>
           <div class="fo-name" ${e.flavor?`title="${e.flavor.replace(/"/g,'&quot;')}"`:''}>${typeTag}${e.name}</div>
           <div class="fo-chips fo-buffs">${hudChips(statuses)}</div>

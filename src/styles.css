@@ -1984,3 +1984,34 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .fo-enemy .fo-name{ text-shadow:0 1px 0 #1c0e06, 0 0 5px rgba(0,0,0,.85); }
 /* Normal big monsters stand a little higher, clear of the health bar */
 .enc-card.fo-arch .fo-enemy .fo-fig.fo-big:not(.fo-bossbig) .fo-img.enc-art{ margin-bottom:calc(-1 * var(--down) + 6px); }
+
+/* v1.32.19 boss health bar: U-shaped arc */
+.fo-enemy .bar.bar-arc{ height:auto !important; border:none !important; background:none !important; overflow:visible !important; box-shadow:none !important; border-radius:0; flex:none; width:100%; animation:none !important; }
+.bar-arc svg{ display:block; overflow:visible; }
+.bar-arc .ba-out, .bar-arc .ba-track, .bar-arc .ba-seg{ fill:none; }
+.bar-arc .ba-out{ stroke:var(--line); stroke-width:16; stroke-linecap:round; }
+.bar-arc .ba-track{ stroke:#2a2420; stroke-width:10; stroke-linecap:round; }
+.bar-arc .ba-seg{ stroke-width:10; stroke-linecap:butt; }
+.bar-arc .ba-hp{ stroke:#ff4d43; }
+.bar-arc .ba-quest{ stroke:var(--gold); }
+.bar-arc .ba-shield{ stroke:#5fa8d8; }
+.bar-arc .ba-prev{ stroke:rgba(255,255,255,.5); }
+.bar-arc .ba-prev-end{ stroke:#fff; }
+.bar-arc .ba-ghost{ animation:ba-ghost-kf .9s ease-in forwards; }
+.bar-arc .ba-heal{ animation:ba-heal-kf .6s cubic-bezier(.3,.7,.3,1) both; }
+@keyframes ba-ghost-kf{ 0%,35%{ opacity:.95; } 100%{ opacity:0; } }
+@keyframes ba-heal-kf{ from{ stroke-dasharray:var(--from) 300; filter:brightness(1.5); } to{ stroke-dasharray:var(--to) 300; filter:none; } }
+.bar-arc .ba-shield.sh-up{ animation:ba-pop-kf .5s ease-out both; }
+.bar-arc .ba-shield.sh-down{ animation:ba-pop-kf .4s ease-out both; }
+@keyframes ba-pop-kf{ 0%{ filter:brightness(2.2); } 100%{ filter:none; } }
+.bar-arc.flash-damage svg{ animation:ba-flash-kf .7s ease; --flash-color:rgba(255,80,60,.9); }
+.bar-arc.flash-heal svg{ animation:ba-flash-kf .7s ease; --flash-color:rgba(90,230,120,.9); }
+@keyframes ba-flash-kf{ 0%{ filter:drop-shadow(0 0 0 transparent); } 15%{ filter:drop-shadow(0 0 6px var(--flash-color)) brightness(1.3); } 100%{ filter:drop-shadow(0 0 0 transparent); } }
+.bar-arc.bar-close svg{ filter:drop-shadow(0 0 4px rgba(255,179,71,.7)); }
+.bar-arc.bar-kill svg{ filter:drop-shadow(0 0 4px rgba(154,255,160,.7)); }
+.bar-arc.bar-overkill svg{ filter:drop-shadow(0 0 6px rgba(255,138,61,.9)); }
+.reduced-motion .bar-arc .ba-ghost, .reduced-motion .bar-arc .ba-heal, .reduced-motion .bar-arc svg, .reduced-motion .bar-arc .ba-shield{ animation:none !important; }
+/* the number sits at the lowest point of the U */
+.fo-hpwrap .bar-arc .bar-num{ inset:auto; left:0; right:0; top:calc(100% * 24 / 40 - 3px); height:18px; }
+.fo-type.fo-type-inline{ display:inline !important; margin-right:6px; font-size:9px; vertical-align:1px; color:#e0b45a; }
+.fo-enemy .fo-hpwrap:has(.bar-arc){ padding-bottom:5px; }
