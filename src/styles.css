@@ -2014,4 +2014,9 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 /* the number sits at the lowest point of the U */
 .fo-hpwrap .bar-arc .bar-num{ inset:auto; left:0; right:0; top:calc(100% * 24 / 40 - 3px); height:18px; }
 .fo-type.fo-type-inline{ display:inline !important; margin-right:6px; font-size:9px; vertical-align:1px; color:#e0b45a; }
-.fo-enemy .fo-hpwrap:has(.bar-arc){ padding-bottom:5px; }
+
+/* Boss: the arc's lowest point sits as far above the name as the player's bar sits above the player's name.
+   The kill-hint line moves under the name to make room. */
+.fo-boss-side > *{ order:2; }
+.fo-boss-side > .fo-fig, .fo-boss-side > .fo-floor, .fo-boss-side > .fo-hpwrap, .fo-boss-side > .fo-name{ order:0; }
+.fo-boss-side > .kill-hint{ order:1; }

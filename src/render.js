@@ -1280,11 +1280,11 @@ function renderEncounterCard(e, mode){
         <div class="fo-side fo-player">
           <div class="fo-fig ${p.figCls||''}" title="${S.origin.name} ${S.klass.name}">${p.figHTML||''}</div><div class="fo-floor"></div>
           <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}">${hpFillHTML('player','hp player',p.hpPct)}${shieldBarHTML(S.playerBlock, S.maxHealth, p.hpPct, 'player')}<span class="bar-num">${S.health}${shieldNumHTML(S.playerBlock)}/${S.maxHealth}</span></div>${p.deltaHTML||''}</div>
-          <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim():S.origin.name+' '+S.klass.name}</div>
+          <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim().replace(/</g,'&lt;')+', '+S.origin.name+' '+S.klass.name:S.origin.name+' '+S.klass.name}</div>
           <div class="fo-chips fo-buffs">${hudChips(p.statusHTML)}</div>
         </div>
         <div class="fo-vs">vs</div>
-        <div class="fo-side fo-enemy">
+        <div class="fo-side fo-enemy${isBoss?' fo-boss-side':''}">
           <div class="fo-fig enc-portrait ${sz>1.05?'fo-big ':''}${(sz>1.05&&/Boss/.test(e.type))?'fo-bossbig ':''}${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}" style="--sz:${sz}">${monsterFig}</div><div class="fo-floor"></div>
           <div class="fo-hpwrap status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;">${isBoss ? bossArcBarHTML({hpPct, questLeft:questSegLeftPct, questW:questSegWidthPct, prevLeft:dmgPreviewLeftPct, prevW:dmgPreviewWidthPct, shieldVal:e.curShield, shieldMax:e.maxHealth, cls:`${fx.cls} ${killHint?'bar-'+killHint.state:''}`, numHTML:`<span class="bar-num">${curHealthClamped.toFixed(0)}${shieldNumHTML(e.curShield)}/${e.maxHealth}</span>`}) : `<div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
               ${hpFillHTML('enemy','hp',hpPct)}
@@ -2966,7 +2966,7 @@ function renderShrineEncounter(){
             <div class="fo-side fo-player">
               <div class="fo-fig" title="${S.origin.name} ${S.klass.name}">${heroFig}</div>
               <div class="fo-hpwrap" style="position:relative;"><div class="bar"><div class="bar-fill hp player" style="width:${hpPct}%"></div></div><span>${S.health}/${S.maxHealth}</span></div>
-              <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim():S.origin.name+' '+S.klass.name}</div>
+              <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim().replace(/</g,'&lt;')+', '+S.origin.name+' '+S.klass.name:S.origin.name+' '+S.klass.name}</div>
               <div class="fo-chips fo-buffs"></div>
             </div>
             <div class="fo-vs">&nbsp;</div>
