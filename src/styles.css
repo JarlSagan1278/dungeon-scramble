@@ -2156,3 +2156,6 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .combo-ring-3{ animation:combo-ring-pulse 1.1s ease-in-out infinite; }
 @keyframes combo-ring-pulse{ 0%,100%{ opacity:.8; transform:scale(1); } 50%{ opacity:1; transform:scale(1.05); } }
 .reduced-motion .combo-ring{ animation:none; opacity:1; }
+
+/* ---- Health bar segments meet in clean flat edges (the .bar clips the outer rounded ends) ---- */
+.bar .bar-fill, .bar .bar-shield, .bar .bar-fill.hp, .bar .bar-fill.quest-hp, .bar .bar-fill.shield-seg, .bar .bar-fill.hp-ghost, .bar .bar-fill.dmg-preview{ border-radius:0 !important; }
