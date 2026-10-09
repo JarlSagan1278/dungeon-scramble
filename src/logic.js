@@ -1098,6 +1098,7 @@ function toggleSelect(idx){
   if(S.path.includes(idx)) return; // only the last move can be undone this way
   if(!canSelect(idx)) return;
   S.path.push(idx);
+  if(S.path.length===1 && typeof lungeFigure==='function') lungeFigure('playerReady');
   if(typeof playTone==='function') playTone('pathTick', S.path.length-1); // rises up the pentatonic ladder as the path grows
   render();
 }

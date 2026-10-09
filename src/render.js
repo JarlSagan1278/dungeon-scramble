@@ -350,7 +350,7 @@ function syncIdleBreath(){
     const figs = document.querySelectorAll('#enc-panel .fo-player .fo-fig > *, #enc-panel .fo-enemy .fo-fig > *');
     figs.forEach((el,i)=>{
       const seedStr = ((S.encounter&&S.encounter.name)||'')+(S.routeStep||0)+(el.closest('.fo-enemy')?'e':'p'); let hsh=0; for(let c=0;c<seedStr.length;c++) hsh=(hsh*31+seedStr.charCodeAt(c))>>>0;
-      const period = Math.round(7000 + (hsh%4000));
+      const period = Math.round(6000 + (hsh%4000));
       el.classList.add('idle-breath', el.closest('.fo-enemy')?'idle-e':'idle-p');
       el.style.animationDuration = period+'ms';
       el.style.animationDelay = '-'+Math.round(performance.now() % period)+'ms';
@@ -369,6 +369,8 @@ function lungeFigure(side, dmg){
       const dist = 8 + Math.min(d,8)*2;            // 10px .. 24px by damage
       const big = d>=4 ? 1.07 : 1;
       el.animate([{translate:'0 0', scale:'1 1'},{translate:`${dist}px -2px`, scale:`${big} ${big}`, offset:0.35},{translate:'0 0', scale:'1 1'}], {duration:200 + Math.min(d,8)*8, easing:'cubic-bezier(.2,.8,.3,1)'});
+    } else if(side==='playerReady'){
+      el.animate([{translate:'0 0', scale:'1 1'},{translate:'3px 0', scale:'1.015 .99', offset:.4},{translate:'0 0', scale:'1 1'}], {duration:260, easing:'ease-out'});
     } else if(side==='enemyWind'){
       el.animate([{translate:'0 0', scale:'1 1'},{translate:'9px 1px', scale:'1.05 .95'}], {duration:200, easing:'ease-out', fill:'forwards'});
       document.querySelectorAll('#enc-panel .fo-enemy .fo-chips .enemy-action-badge').forEach(c=>{
