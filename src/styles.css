@@ -1,8 +1,8 @@
-  :root{
-    --bg: #1c1109;
-    --panel: #3f2813;
-    --panel2: #4c3119;
-    --stone: #3a2412;
+  :root{ --b0:#0c0705; --b1:#1c1109; --b2:#33200f; --b3:#4c3119; --b4:#74502d; --b5:#8d6139; --b6:#b8844a; 
+    --bg: var(--b1);
+    --panel: var(--b2);
+    --panel2: var(--b3);
+    --stone: var(--b2);
     --line: #0c0705;          /* the one outline color used on every border */
     --parchment: #fff1d6;
     --parchment-dim: #e3caa3;
@@ -35,7 +35,7 @@
   body.reduced-motion, body.reduced-motion *{ animation: none !important; transition-duration: 0.01ms !important; }
   body{
     margin:0; min-height:100vh;
-    background:#130d09;
+    background:var(--b0);
     color: var(--parchment);
     font-family: Georgia, 'Iowan Old Style', serif;
     padding:8px;
@@ -57,21 +57,21 @@
   .settings-toggle-row input{ width:18px; height:18px; accent-color:var(--gold); cursor:pointer; }
   button{
     font-family: inherit; cursor:pointer; border:none; border-radius:var(--r-sm);
-    background: var(--stone); color: var(--parchment); padding:8px 16px; font-size:14px;
+    background:var(--stone); color: var(--parchment); padding:8px 16px; font-size:14px;
     transition: background .15s, transform .05s;
   }
-  button:hover:not(:disabled){ background:#4a3f32; transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  button:hover:not(:disabled){ background:#4a3f32; transform: translateY(-1px); box-shadow:0 2px 4px rgba(0,0,0,0.3); }
   button:active:not(:disabled){ transform: translateY(1px) scale(0.95); box-shadow:none; }
   button:disabled{ opacity:0.4; cursor:default; }
-  button.primary{ background: var(--gold); color:#241c10; font-weight:bold; }
+  button.primary{ background:var(--gold); color:#241c10; font-weight:bold; }
   button.primary:hover:not(:disabled){ background:#e6c265; }
   @keyframes pulse-glow{
     0%,100%{ box-shadow:0 0 0 0 rgba(212,175,82,0.7); }
     50%{ box-shadow:0 0 0 8px rgba(212,175,82,0); }
   }
   button.primary.pulse, .util-btn.pulse{ animation: pulse-glow 1.1s ease-in-out infinite; }
-  button.danger{ background: var(--red-dim); }
-  .panel{ background: var(--panel); border:1px solid var(--line); border-radius:var(--r-md); padding:6px 6px; }
+  button.danger{ background:var(--red-dim); }
+  .panel{ background:var(--panel); border:1px solid var(--line); border-radius:var(--r-md); padding:6px 6px; }
 
   /* Setup screen (character creation) -- a WoW-style icon-row -> contextual
      detail-panel pattern: tapping an Origin/Class icon fills one shared
@@ -82,7 +82,7 @@
   .char-name-input{ font-family: var(--font-display); font-size:18px; font-weight:800;
     color:var(--gold); letter-spacing:0.3px; background:transparent; border:none; border-bottom:1.5px solid transparent;
     outline:none; padding:0 0 2px 0; max-width:220px; }
-  .char-name-input:hover, .char-name-input:focus{ border-bottom-color: var(--gold); }
+  .char-name-input:hover, .char-name-input:focus{ border-bottom-color:var(--gold); }
   .char-name-pencil{ color: var(--parchment-dim); flex-shrink:0; }
   .setup-section{ display:flex; flex-direction:column; gap:6px; margin:0 0 10px; }
   .setup-label{ font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; color:var(--parchment-dim); user-select:none; }
@@ -93,7 +93,7 @@
      used by the (now single, larger) Origin showcase portrait below. */
   .silhouette-img{ filter: brightness(0); opacity:0.8; }
 
-  .origin-showcase, .class-showcase, .boon-showcase{ background: var(--panel); border:1px solid var(--line); border-radius:var(--r-lg); }
+  .origin-showcase, .class-showcase, .boon-showcase{ background:var(--panel); border:1px solid var(--line); border-radius:var(--r-lg); }
   .origin-showcase{ display:flex; flex-direction:column; gap:6px; padding:9px; }
   .origin-showcase-top{ display:flex; gap:12px; align-items:center; }
   .origin-showcase-portrait{ width:126px; height:126px; border-radius:18px; overflow:hidden; flex-shrink:0; }
@@ -137,7 +137,7 @@
     border:2.5px solid var(--line); border-bottom:4px solid var(--class-color, var(--stone));
     background:var(--panel2); color:var(--parchment);
     font-family:inherit; font-size:10px; font-weight:800; letter-spacing:-0.1px; cursor:pointer; text-align:center; }
-  .class-tab-btn.selected{ border-color: var(--class-color, var(--gold)); box-shadow: 0 0 0 2px var(--class-color, rgba(212,175,82,0.25)); }
+  .class-tab-btn.selected{ border-color:var(--class-color, var(--gold)); box-shadow:0 0 0 2px var(--class-color, rgba(212,175,82,0.25)); }
   /* Locked Origin tab (Class tabs never lock) -- dimmed text plus the inline
      lock glyph render.js already prefixes the label with, cursor stays
      default since tapping it still previews rather than selects. */
@@ -148,7 +148,7 @@
      never claims to be the actual pick, but still gives that specific tab
      visible feedback instead of leaving an unrelated tab looking "chosen"
      while this one's info is what's showing. */
-  .class-tab-btn.previewing{ border-color: var(--parchment-dim); box-shadow: 0 0 0 2px rgba(224,214,188,0.2); }
+  .class-tab-btn.previewing{ border-color:var(--parchment-dim); box-shadow:0 0 0 2px rgba(224,214,188,0.2); }
   .class-showcase{ display:flex; gap:10px; align-items:center; padding:9px; height:64px; box-sizing:border-box; }
   .class-action-icon{ width:36px; height:36px; border-radius:var(--r-md); background:var(--panel2); border:1.5px solid var(--class-color, var(--gold));
     color:var(--class-color, var(--gold)); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:20px; }
@@ -165,18 +165,18 @@
   .boon-tile{ position:relative; flex-shrink:0; width:50px; padding:0; border:none; background:none; cursor:pointer;
     display:flex; flex-direction:column; align-items:center; gap:3px; font-family:inherit; }
   .boon-tile-circle{ width:44px; height:44px; border-radius:50%; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; }
-  .boon-tile.selected .boon-tile-circle{ border-color: var(--gold); box-shadow: 0 0 8px 1px rgba(212,175,82,0.45); }
+  .boon-tile.selected .boon-tile-circle{ border-color:var(--gold); box-shadow:0 0 8px 1px rgba(212,175,82,0.45); }
   .boon-tile-circle img{ width:26px; height:26px; object-fit:contain; }
   .boon-tile-label{ font-size:8.5px; color:var(--parchment-dim); white-space:nowrap; max-width:50px; overflow:hidden; text-overflow:ellipsis; }
   .boon-fav-btn{ position:absolute; top:-4px; right:0px; width:16px; height:16px; border-radius:50%; background:var(--bg);
     border:1px solid var(--line); color:var(--gold); display:flex; align-items:center; justify-content:center; }
-  .boon-fav-btn.active{ border-color: var(--gold); }
+  .boon-fav-btn.active{ border-color:var(--gold); }
   .boon-showcase{ display:flex; flex-direction:column; gap:5px; padding:8px; }
   .boon-showcase-empty{ padding:10px 2px; font-size:11px; color:var(--parchment-dim); text-align:center; }
 
   /* Route tracker */
   .route-wrap{ position:relative; margin-bottom:12px; }
-  .route{ display:flex; margin-bottom:0; border:3px solid var(--line); border-radius:var(--r-md); overflow:hidden; box-shadow: 2px 2px 0 rgba(0,0,0,0.35); }
+  .route{ display:flex; margin-bottom:0; border:3px solid var(--line); border-radius:var(--r-md); overflow:hidden; box-shadow:2px 2px 0 rgba(0,0,0,0.35); }
   .mascot-wrap{ position:absolute; bottom:-3px; transform: translateX(-78%); transition: left 0.6s ease; pointer-events:none; z-index:2; display:flex; flex-direction:column; align-items:center; }
   .mascot-marker{ display:block; height:34px; width:auto; filter: drop-shadow(1px 2px 0 rgba(0,0,0,0.4)); }
 
@@ -188,13 +188,13 @@
     margin-left:-10px; z-index:2; }
   .char-icon-img{ display:block; max-height:100%; max-width:100%; width:auto; height:auto; object-fit:contain; filter: drop-shadow(1px 2px 0 rgba(0,0,0,0.4)); transform: scaleX(-1.5) scaleY(1.5); }
   .route .node{ flex:1; display:flex; align-items:center; justify-content:center; position:relative;
-    padding:6px 2px; font-size:32px; background: var(--floor1); border-right:2px solid rgba(0,0,0,0.25); color: var(--ink); }
+    padding:6px 2px; font-size:32px; background:var(--floor1); border-right:2px solid rgba(0,0,0,0.25); color: var(--ink); }
   .route .node:last-child{ border-right:none; }
-  .route .node.floor1{ background: var(--floor1); }
-  .route .node.floor2{ background: var(--floor2); }
-  .route .node.floor3{ background: var(--floor3); color:#f5eaff; }
+  .route .node.floor1{ background:var(--floor1); }
+  .route .node.floor2{ background:var(--floor2); }
+  .route .node.floor3{ background:var(--floor3); color:#f5eaff; }
   .route .node.done{ filter: brightness(0.6) saturate(0.7); }
-  .route .node.current{ filter: brightness(1.15); box-shadow: inset 0 0 0 3px #fff; z-index:1; }
+  .route .node.current{ filter: brightness(1.15); box-shadow:inset 0 0 0 3px #fff; z-index:1; }
   .route .node.route-tooltip-target{ cursor:help; }
 
   /* Tray */
@@ -214,13 +214,13 @@
      badge is free to grow past the card's edge instead of being cut off
      at it. */
   .tray-float-wrap{ position:relative; }
-  .tray-wrap{ background: linear-gradient(160deg,#3a2f22,#241c14); border:3px solid var(--line); border-radius:var(--r-lg); padding:4px; max-width:310px; min-width:216px; margin:0 auto; position:relative;
+  .tray-wrap{ background:linear-gradient(160deg,var(--b2),var(--b1)); border:3px solid var(--line); border-radius:var(--r-lg); padding:4px; max-width:310px; min-width:216px; margin:0 auto; position:relative;
     overflow-x:auto; container-type: inline-size; container-name: tray; }
   .tray-wrap.tray-wrap-full{ max-width:310px; margin:0 auto; }
   .tray{ display:grid; grid-template-columns: repeat(4, minmax(44px,1fr)); gap:3px; perspective:500px; }
   .die{
     aspect-ratio:1/1; border-radius:var(--r-md); display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
-    background: #cbbf9e; color:#241c10; font-weight:bold; font-size:11px; cursor:pointer;
+    background:#cbbf9e; color:#241c10; font-weight:bold; font-size:11px; cursor:pointer;
     border:2px solid rgba(0,0,0,0.25); position:relative; user-select:none; text-align:center; padding:27px 2px 2px;
     transition: transform .08s; min-width:44px; min-height:44px; overflow:hidden;
   }
@@ -272,11 +272,11 @@
   .die .name-tag{ position:absolute; top:0; left:0; right:0; height:20px; z-index:1; pointer-events:none; }
   .die .name-tag-svg{ width:100%; height:100%; display:block; overflow:visible; }
   .die .name-tag-svg text{ fill:currentColor; opacity:0.55; font-weight:700; font-family:inherit; }
-  .zone-cell{ outline: 2px dashed rgba(255,255,255,0.55); outline-offset:-2px; }
+  .zone-cell{ outline:2px dashed rgba(255,255,255,0.55); outline-offset:-2px; }
 
   /* Encounter card */
-  .enc-card{ position:relative; background: var(--panel2); border:2px solid var(--line); border-radius:var(--r-md); padding:0 0 12px; margin-bottom:8px; overflow:hidden;
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.35); }
+  .enc-card{ position:relative; background:var(--panel2); border:2px solid var(--line); border-radius:var(--r-md); padding:0 0 12px; margin-bottom:8px; overflow:hidden;
+    box-shadow:3px 3px 0 rgba(0,0,0,0.35); }
   /* New-room entrance: the card itself drops/settles in with a brief
      golden glow around it, so a new encounter reads as something that just
      *happened* rather than the same card silently showing new stats. Boss
@@ -290,15 +290,15 @@
     100%{ opacity:1; transform:translateY(0) scale(1); }
   }
   @keyframes enc-card-glow{
-    0%{ box-shadow: 3px 3px 0 rgba(0,0,0,0.35), 0 0 0 3px rgba(212,175,100,0.85); }
-    100%{ box-shadow: 3px 3px 0 rgba(0,0,0,0.35), 0 0 0 3px rgba(212,175,100,0); }
+    0%{ box-shadow:3px 3px 0 rgba(0,0,0,0.35), 0 0 0 3px rgba(212,175,100,0.85); }
+    100%{ box-shadow:3px 3px 0 rgba(0,0,0,0.35), 0 0 0 3px rgba(212,175,100,0); }
   }
   @keyframes enc-card-glow-boss{
-    0%{ box-shadow: 3px 3px 0 rgba(0,0,0,0.35), 0 0 0 4px rgba(201,66,45,0.9); }
-    100%{ box-shadow: 3px 3px 0 rgba(0,0,0,0.35), 0 0 0 4px rgba(201,66,45,0); }
+    0%{ box-shadow:3px 3px 0 rgba(0,0,0,0.35), 0 0 0 4px rgba(201,66,45,0.9); }
+    100%{ box-shadow:3px 3px 0 rgba(0,0,0,0.35), 0 0 0 4px rgba(201,66,45,0); }
   }
   .reduced-motion .enc-card.room-enter, .reduced-motion .enc-card.room-enter-boss{ animation:none; opacity:1; transform:none; }
-  .enc-header{ background: var(--stone); border-bottom:2px solid var(--line);
+  .enc-header{ background:var(--stone); border-bottom:2px solid var(--line);
     padding:6px 8px; display:flex; align-items:center; gap:6px; }
   .enc-name-txt{ margin:0; font-size:14px; color: var(--parchment); font-weight:800; line-height:1.15; flex:1; }
   .enc-type{ font-size:8px; text-transform:uppercase; letter-spacing:1px; color: var(--parchment-dim); font-weight:bold; white-space:nowrap; }
@@ -348,17 +348,17 @@
   .bar-row.status-tooltip-target[title]{ cursor:help; }
   .bar{ flex:1; height:11px; background:#2a2420; border-radius:var(--r-md); border:1px solid var(--line); position:relative; overflow:hidden; }
   .bar-fill{ height:100%; border-radius:var(--r-md); }
-  .bar-fill.hp{ background: linear-gradient(90deg,#7a1f1f,#c0392b); }
-  .bar-fill.hp.player{ background: linear-gradient(90deg,#1f5a2a,#3fae54); }
+  .bar-fill.hp{ background:linear-gradient(90deg,#7a1f1f,#c0392b); }
+  .bar-fill.hp.player{ background:linear-gradient(90deg,#1f5a2a,#3fae54); }
   /* Quest Health used to be a separate "X/Y remaining" text line; it's now
      this gold slice layered on the HP bar, flush against the current
      health level -- the amount a completed quest could still shave off. */
-  .bar-fill.quest-hp{ position:absolute; top:0; background: linear-gradient(90deg,#a3812f,var(--gold)); }
-  .bar-fill.dmg-preview{ position:absolute; top:0; z-index:2; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.5) 0 3px, rgba(255,255,255,0.15) 3px 6px); border-right:2px solid #fff; }
+  .bar-fill.quest-hp{ position:absolute; top:0; background:linear-gradient(90deg,#a3812f,var(--gold)); }
+  .bar-fill.dmg-preview{ position:absolute; top:0; z-index:2; background:repeating-linear-gradient(45deg, rgba(255,255,255,0.5) 0 3px, rgba(255,255,255,0.15) 3px 6px); border-right:2px solid #fff; }
   @keyframes flash-bar{
-    0%{ box-shadow: 0 0 0 0 rgba(255,255,255,0); }
-    15%{ box-shadow: 0 0 14px 4px var(--flash-color); }
-    100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+    0%{ box-shadow:0 0 0 0 rgba(255,255,255,0); }
+    15%{ box-shadow:0 0 14px 4px var(--flash-color); }
+    100%{ box-shadow:0 0 0 0 rgba(255,255,255,0); }
   }
   .bar.flash-heal{ animation: flash-bar 0.7s ease; --flash-color: rgba(63,174,84,0.85); }
   .bar.flash-damage{ animation: flash-bar 0.7s ease; --flash-color: rgba(192,57,43,0.85); }
@@ -383,9 +383,9 @@
   .boss-cycle-item .icon-value-overlay{ font-size:5px; }
   .boss-cycle-item.next{ opacity:1; background:var(--gold); color:#241c10; box-shadow:0 0 6px 1px rgba(212,175,82,0.7); font-weight:bold; }
   .statuses{ display:flex; gap:4px; flex-wrap:wrap; margin-top:3px; font-size:11px; }
-  .status-chip{ background: linear-gradient(160deg, #3c3022, #221a12); border:1px solid rgba(0,0,0,0.6);
+  .status-chip{ background:linear-gradient(160deg, var(--b2), var(--b1)); border:1px solid rgba(0,0,0,0.6);
     color: var(--parchment); border-radius:var(--r-lg); padding:1px 7px;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); }
+    box-shadow:0 1px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); }
   .token-count{ background:rgba(255,255,255,0.2); border-radius:var(--r-md); padding:0 6px; margin-left:4px; font-size:11px; }
   .quest-list{ margin-top:3px; font-size:10.5px; }
   .quest{ display:flex; gap:5px; align-items:flex-start; margin:1px 0; padding:1px 4px; border-radius:var(--r-sm); background:rgba(255,255,255,0.06); color: var(--parchment); }
@@ -410,12 +410,12 @@
   .util-btn:not(.disabled):hover{ transform: translateY(-1px); box-shadow:0 2px 4px rgba(0,0,0,0.35); }
   .util-btn:not(.disabled):active{ transform: translateY(1px); box-shadow:none; }
   .util-btn.disabled{ opacity:0.35; cursor:default; }
-  .util-btn.danger-accent{ background: var(--red-dim); }
-  .util-btn.primary-accent{ background: var(--gold); color:#241c10; }
+  .util-btn.danger-accent{ background:var(--red-dim); }
+  .util-btn.primary-accent{ background:var(--gold); color:#241c10; }
   .util-btn.rail-go{ flex:0 0 auto; height:46px; font-size:18px; }
   .util-btn.rail-clear{ flex:0 0 auto; height:32px; font-size:12px; }
   .util-btn.rail-ability{ flex:0 0 auto; height:32px; font-size:12px; }
-  .util-btn.rail-ability.armed{ background: var(--gold); color:#241c10; box-shadow: 0 0 0 2px rgba(212,175,82,0.4); }
+  .util-btn.rail-ability.armed{ background:var(--gold); color:#241c10; box-shadow:0 0 0 2px rgba(212,175,82,0.4); }
   .log div{ margin-bottom:2px; }
   .log .dmg{ color:#e6a9a9; }
   .log .heal{ color:#a9e6b8; }
@@ -443,7 +443,7 @@
      behind the badge like it's meant to. */
   /* Display-only readout: pointer-events:none so a big total growing over the
      top-right die can never swallow taps meant for that die. */
-  .path-counter-float{ pointer-events:none; position:absolute; top:-10px; right:0px; background: radial-gradient(circle at 32% 28%, #f3dd98, var(--gold) 60%); color:#241c10; border:3px solid var(--line);
+  .path-counter-float{ pointer-events:none; position:absolute; top:-10px; right:0px; background:radial-gradient(circle at 32% 28%, #f3dd98, var(--gold) 60%); color:#241c10; border:3px solid var(--line);
     border-radius:999px; padding:2px 10px; z-index:13; display:flex; align-items:baseline; gap:4px;
     box-shadow:0 3px 8px rgba(0,0,0,0.55); animation: pop-in 0.2s ease-out;
     transition: font-size .15s var(--ease-pop); }
@@ -543,20 +543,20 @@
   .die.combo-active-2 .face-val .icon-svg{ animation: combo-active-ring-2 1.5s ease-in-out infinite; }
   .die.combo-active-3 .face-val .icon-svg{ animation: combo-active-ring-3 1.1s ease-in-out infinite; }
   @keyframes combo-active-ring-1{
-    0%,100%{ box-shadow: 0 0 0 1.5px rgba(212,175,82,0.85); }
-    50%{ box-shadow: 0 0 0 3px rgba(212,175,82,1); }
+    0%,100%{ box-shadow:0 0 0 1.5px rgba(212,175,82,0.85); }
+    50%{ box-shadow:0 0 0 3px rgba(212,175,82,1); }
   }
   @keyframes combo-active-ring-2{
-    0%,100%{ box-shadow: 0 0 0 2px rgba(212,175,82,0.9), 0 0 0 4.5px rgba(212,175,82,0.4); }
-    50%{ box-shadow: 0 0 0 2.5px rgba(212,175,82,1), 0 0 0 5.5px rgba(212,175,82,0.6); }
+    0%,100%{ box-shadow:0 0 0 2px rgba(212,175,82,0.9), 0 0 0 4.5px rgba(212,175,82,0.4); }
+    50%{ box-shadow:0 0 0 2.5px rgba(212,175,82,1), 0 0 0 5.5px rgba(212,175,82,0.6); }
   }
   @keyframes combo-active-ring-3{
-    0%,100%{ box-shadow: 0 0 0 2.5px rgba(255,140,40,0.95), 0 0 0 5.5px rgba(255,140,40,0.45); }
-    50%{ box-shadow: 0 0 0 3px rgba(255,140,40,1), 0 0 0 7px rgba(255,140,40,0.7); }
+    0%,100%{ box-shadow:0 0 0 2.5px rgba(255,140,40,0.95), 0 0 0 5.5px rgba(255,140,40,0.45); }
+    50%{ box-shadow:0 0 0 3px rgba(255,140,40,1), 0 0 0 7px rgba(255,140,40,0.7); }
   }
-  .reduced-motion .die.combo-active-1 .face-val .icon-svg{ animation:none; box-shadow: 0 0 0 2px rgba(212,175,82,0.9); }
-  .reduced-motion .die.combo-active-2 .face-val .icon-svg{ animation:none; box-shadow: 0 0 0 2px rgba(212,175,82,0.95), 0 0 0 5px rgba(212,175,82,0.5); }
-  .reduced-motion .die.combo-active-3 .face-val .icon-svg{ animation:none; box-shadow: 0 0 0 2.5px rgba(255,140,40,1), 0 0 0 6px rgba(255,140,40,0.6); }
+  .reduced-motion .die.combo-active-1 .face-val .icon-svg{ animation:none; box-shadow:0 0 0 2px rgba(212,175,82,0.9); }
+  .reduced-motion .die.combo-active-2 .face-val .icon-svg{ animation:none; box-shadow:0 0 0 2px rgba(212,175,82,0.95), 0 0 0 5px rgba(212,175,82,0.5); }
+  .reduced-motion .die.combo-active-3 .face-val .icon-svg{ animation:none; box-shadow:0 0 0 2.5px rgba(255,140,40,1), 0 0 0 6px rgba(255,140,40,0.6); }
 
   /* Skill (class ability) conversion flourish: forcing a die's face used to
      be an invisible data mutation -- the tile just showed its new forced
@@ -631,17 +631,17 @@
      coin instead of plain text, echoing the gold .pathnum badges already
      used on the tray tiles themselves. */
   .path-chip{ display:inline-flex; align-items:center; gap:5px;
-    background: linear-gradient(160deg, #3c3022, #221a12);
+    background:linear-gradient(160deg, var(--b2), var(--b1));
     border:1px solid rgba(0,0,0,0.65); border-radius:var(--r-md); padding:3px 8px 3px 3px;
     font-size:12px; color: var(--parchment);
-    box-shadow: 0 2px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08); }
+    box-shadow:0 2px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08); }
   .path-chip .chip-num{ display:flex; align-items:center; justify-content:center; flex:0 0 auto;
     width:15px; height:15px; border-radius:50%;
-    background: radial-gradient(circle at 35% 30%, #f3dd98, var(--gold));
+    background:radial-gradient(circle at 35% 30%, #f3dd98, var(--gold));
     color:#241c10; font-weight:800; font-size:9px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.55); }
+    box-shadow:0 1px 2px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.55); }
 
-  .key-card{ background: var(--panel2); border:3px solid var(--line); border-radius:var(--r-lg); padding:12px 12px 8px; margin-top:16px; }
+  .key-card{ background:var(--panel2); border:3px solid var(--line); border-radius:var(--r-lg); padding:12px 12px 8px; margin-top:16px; }
   .key-title{ font-weight:800; font-size:15px; color: var(--gold); text-align:center; font-family: var(--font-display); white-space:nowrap; }
   .key-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap:8px 6px; }
   .key-item{ display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 2px; border-radius:var(--r-md); text-align:center; }
@@ -662,7 +662,7 @@
      bordered panel2 card instead of floating directly on the page
      background, so Camp reads as a real game screen with distinct areas
      rather than a flat stack of controls. */
-  .camp-section{ background: var(--panel2); border:1px solid var(--line); border-radius:var(--r-md); padding:8px 10px 9px; margin:7px 0; }
+  .camp-section{ background:var(--panel2); border:1px solid var(--line); border-radius:var(--r-md); padding:8px 10px 9px; margin:7px 0; }
   .camp-status-card .bar-row{ margin-bottom:0; }
   .camp-status-card .small-btn-row{ margin-top:6px; }
   .camp-status-card .small-btn-row button{ flex:1 1 0; }
@@ -703,10 +703,10 @@
      a second line of defense, so a stacked tile's fan+badge always paints
      above a plain neighbor even in a tighter spot. */
   .camp-die-tile.stacked{ transform: rotate(-3deg); z-index:1;
-    box-shadow: 1.5px 2px 0 0 rgba(0,0,0,0.55), 3px 4px 0 0 rgba(0,0,0,0.4), 4px 5px 0 0 rgba(0,0,0,0.25);
+    box-shadow:1.5px 2px 0 0 rgba(0,0,0,0.55), 3px 4px 0 0 rgba(0,0,0,0.4), 4px 5px 0 0 rgba(0,0,0,0.25);
     margin:0 9px 9px 2px; }
   .camp-die-tile.stacked.organize-selected{ transform:none; z-index:2;
-    box-shadow: 1.5px 2px 0 0 rgba(0,0,0,0.55), 3px 4px 0 0 rgba(0,0,0,0.4), 4px 5px 0 0 rgba(0,0,0,0.25), 0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
+    box-shadow:1.5px 2px 0 0 rgba(0,0,0,0.55), 3px 4px 0 0 rgba(0,0,0,0.4), 4px 5px 0 0 rgba(0,0,0,0.25), 0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
   /* Pushed further past the tile's own edge (was -3px) so the badge visibly
      breaks out of the card stack it's counting instead of reading as just
      another corner decoration still inside the stack's silhouette -- the
@@ -722,9 +722,9 @@
      kept" on its own. Deliberately smaller than the Tray above it (tighter
      padding, smaller tiles via its own grid rule below) -- it's a side
      pocket for spares, not a second equal-weight tray. */
-  .camp-pocket{ position:relative; background:#0d0a07; border:1px solid var(--line);
+  .camp-pocket{ position:relative; background:var(--b0); border:1px solid var(--line);
     border-radius:8px 8px 16px 16px; padding:11px 7px 7px; margin-top:4px;
-    box-shadow: inset 0 3px 10px rgba(0,0,0,0.6); }
+    box-shadow:inset 0 3px 10px rgba(0,0,0,0.6); }
   .camp-pocket .camp-dice-grid{ grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap:6px; }
   .camp-pocket-count{ position:absolute; top:-8px; left:50%; transform:translateX(-50%);
     background:var(--stone); border:1.5px solid var(--line); color:var(--parchment-dim);
@@ -765,16 +765,16 @@
      reduced-motion rule at the top of this file like every other animation. */
   .camp-fire-wrap{ position:relative; width:106px; height:70px; margin:10px auto 18px; display:flex; align-items:flex-end; justify-content:center; }
   .campfire-glow{ position:absolute; bottom:4px; left:50%; transform:translateX(-50%); width:81px; height:81px; border-radius:50%;
-    background: radial-gradient(circle, rgba(255,170,60,0.55) 0%, rgba(255,170,60,0) 70%);
+    background:radial-gradient(circle, rgba(255,170,60,0.55) 0%, rgba(255,170,60,0) 70%);
     animation: campfire-glow-pulse 2.4s ease-in-out infinite; }
-  .campfire-logs{ position:relative; width:48px; height:10px; background:#5a3b22; border-radius:var(--r-sm); z-index:1; }
-  .campfire-logs::before, .campfire-logs::after{ content:''; position:absolute; width:48px; height:8px; background:#6b4628; border-radius:var(--r-sm); top:0; left:0; }
+  .campfire-logs{ position:relative; width:48px; height:10px; background:var(--b3); border-radius:var(--r-sm); z-index:1; }
+  .campfire-logs::before, .campfire-logs::after{ content:''; position:absolute; width:48px; height:8px; background:var(--b4); border-radius:var(--r-sm); top:0; left:0; }
   .campfire-logs::before{ transform: rotate(22deg); }
   .campfire-logs::after{ transform: rotate(-22deg); }
   .campfire-flame{ position:absolute; bottom:13px; left:50%; border-radius:50% 50% 50% 50% / 62% 62% 38% 38%; z-index:2; }
-  .campfire-flame.flame-back{ width:27px; height:41px; margin-left:-13.5px; background: linear-gradient(to top, #ff7a1a, #ffce54);
+  .campfire-flame.flame-back{ width:27px; height:41px; margin-left:-13.5px; background:linear-gradient(to top, #ff7a1a, #ffce54);
     animation: campfire-flicker-a 1.1s ease-in-out infinite; }
-  .campfire-flame.flame-front{ width:15px; height:24px; margin-left:-7.5px; background: linear-gradient(to top, #ffb23d, #fff2b0);
+  .campfire-flame.flame-front{ width:15px; height:24px; margin-left:-7.5px; background:linear-gradient(to top, #ffb23d, #fff2b0);
     animation: campfire-flicker-b 0.9s ease-in-out infinite; }
   @keyframes campfire-glow-pulse{ 0%,100%{ opacity:0.75; transform:translateX(-50%) scale(1); } 50%{ opacity:1; transform:translateX(-50%) scale(1.08); } }
   @keyframes campfire-flicker-a{ 0%,100%{ transform:scaleY(1) scaleX(1); } 50%{ transform:scaleY(1.12) scaleX(0.92); } }
@@ -786,8 +786,8 @@
      two softly pulsing eyes reads as an intentional "mystery" design on its
      own, so it replaces the old placeholder-image + red "PLACEHOLDER"
      banner combo. Sized per call site via an inline width/aspect-ratio. */
-  .mystery-figure{ position:relative; margin:auto; background: radial-gradient(ellipse at 50% 32%, #332b22 0%, #15110c 70%);
-    border-radius: 50% 50% 45% 45% / 62% 62% 38% 38%; box-shadow: inset 0 -4px 8px rgba(0,0,0,0.45); flex:0 0 auto; }
+  .mystery-figure{ position:relative; margin:auto; background:radial-gradient(ellipse at 50% 32%, #332b22 0%, var(--b0) 70%);
+    border-radius:50% 50% 45% 45% / 62% 62% 38% 38%; box-shadow:inset 0 -4px 8px rgba(0,0,0,0.45); flex:0 0 auto; }
   .mystery-figure::before, .mystery-figure::after{ content:''; position:absolute; top:36%; width:14%; height:14%; border-radius:50%;
     background:#8fd0ff; box-shadow:0 0 6px 2px rgba(143,208,255,0.75); animation: mystery-eye-glow 2.4s ease-in-out infinite; }
   .mystery-figure::before{ left:28%; }
@@ -795,7 +795,7 @@
   @keyframes mystery-eye-glow{ 0%,100%{ opacity:0.6; } 50%{ opacity:1; } }
 
   #low-health-vignette{ position:fixed; inset:0; z-index:40; pointer-events:none; opacity:0;
-    box-shadow: inset 0 0 60px 12px rgba(192,57,43,0.55), inset 0 0 140px 40px rgba(192,57,43,0.35); }
+    box-shadow:inset 0 0 60px 12px rgba(192,57,43,0.55), inset 0 0 140px 40px rgba(192,57,43,0.35); }
   #low-health-vignette.active{ opacity:1; animation: low-health-pulse 1.8s ease-in-out infinite; }
   @keyframes low-health-pulse{ 0%,100%{ opacity:0.55; } 50%{ opacity:1; } }
 
@@ -841,8 +841,8 @@
      hard-edged plaque (2px ink border, beveled gradient, drop shadow) to
      match the dice tiles and token chips rather than a default notification
      bubble. */
-  .toast{ background: linear-gradient(160deg, #3c3022, #201810); border:2px solid var(--line);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 4px 10px rgba(0,0,0,0.55);
+  .toast{ background:linear-gradient(160deg, var(--b2), var(--b1)); border:2px solid var(--line);
+    box-shadow:0 1px 0 rgba(255,255,255,0.08) inset, 0 4px 10px rgba(0,0,0,0.55);
     color: var(--cream); font-size:12.5px; font-weight:bold; padding:7px 16px; border-radius:var(--r-md);
     white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis;
     animation: toast-sweep 1.15s cubic-bezier(.22,1,.36,1) forwards; }
@@ -859,8 +859,8 @@
      actually visible (not stuck at the keyframe's own 0% opacity:0) once
      the animation is switched off. */
   .reduced-motion .toast{ opacity:1; transform:none; }
-  .toast-good{ border-color:#2f5a33; box-shadow: 0 0 0 1px #7fd17f inset, 0 4px 10px rgba(0,0,0,0.55); }
-  .toast-bad{ border-color:#5a2f2f; box-shadow: 0 0 0 1px #d17f7f inset, 0 4px 10px rgba(0,0,0,0.55); }
+  .toast-good{ border-color:#2f5a33; box-shadow:0 0 0 1px #7fd17f inset, 0 4px 10px rgba(0,0,0,0.55); }
+  .toast-bad{ border-color:#5a2f2f; box-shadow:0 0 0 1px #d17f7f inset, 0 4px 10px rgba(0,0,0,0.55); }
 
   /* Kill callout: a brief banner for the two moments worth making feel
      different from an ordinary kill -- a Boss/Big Boss going down, and an
@@ -924,8 +924,8 @@
      keeping it low keeps it closer to the thumb than a reach up the
      screen. */
   .modal-overlay.modal-bottom{ align-items:flex-end; padding-bottom:max(20px, env(safe-area-inset-bottom)); }
-  .modal{ position:relative; background: var(--panel); border:3px solid var(--line); filter:drop-shadow(0 6px 0 var(--line)); border-radius:var(--r-lg); padding:20px; max-width:520px; width:100%; max-height:85vh; overflow-y:auto;
-    box-shadow: 0 8px 28px rgba(0,0,0,0.5); animation: modal-card-in 0.2s cubic-bezier(.25,1.4,.4,1); }
+  .modal{ position:relative; background:var(--panel); border:3px solid var(--line); filter:drop-shadow(0 6px 0 var(--line)); border-radius:var(--r-lg); padding:20px; max-width:520px; width:100%; max-height:85vh; overflow-y:auto;
+    box-shadow:0 8px 28px rgba(0,0,0,0.5); animation: modal-card-in 0.2s cubic-bezier(.25,1.4,.4,1); }
   /* Mirrors the entrance on the way out -- openModal()/closeModal() in
      render.js add/remove .modal-closing and wait for it to finish before the
      node actually leaves the DOM, instead of every modal popping in and
@@ -948,12 +948,12 @@
      the physical half of the same beat. */
   .loot-sunray-burst{ position:absolute; inset:0; overflow:hidden; pointer-events:none; display:flex; align-items:center; justify-content:center; }
   .loot-sunray-wheel{ position:absolute; width:220vmax; height:220vmax;
-    background: repeating-conic-gradient(var(--sunray-color, var(--gold)) 0deg 9deg, transparent 9deg 27deg);
+    background:repeating-conic-gradient(var(--sunray-color, var(--gold)) 0deg 9deg, transparent 9deg 27deg);
     animation: loot-sunray-kf 0.6s ease-out both; }
   /* Overkill (or a Boss's 3-option draw) gets a denser wheel (narrower
      wedges) plus this second, slightly delayed layer underneath -- reads as
      a bigger burst for a bigger haul, not just a recolored one. */
-  .loot-sunray-wheel.loot-sunray-wheel-big{ background: repeating-conic-gradient(var(--sunray-color, var(--gold)) 0deg 7deg, transparent 7deg 21deg); }
+  .loot-sunray-wheel.loot-sunray-wheel-big{ background:repeating-conic-gradient(var(--sunray-color, var(--gold)) 0deg 7deg, transparent 7deg 21deg); }
   .loot-sunray-wheel.loot-sunray-wheel-2{ opacity:0.6; animation: loot-sunray-kf 0.7s ease-out 0.12s both; }
   @keyframes loot-sunray-kf{
     0%{ opacity:0; transform: scale(0.2) rotate(0deg); }
@@ -1060,7 +1060,7 @@
      negative margin-top), so this now has to double as a readability scrim
      behind the buttons, not just a soft transition into the panel color. */
   .title-art-fade{ position:absolute; left:0; right:0; bottom:0; height:190px; pointer-events:none;
-    background: linear-gradient(to bottom, rgba(24,13,5,0) 0%, rgba(24,13,5,0.8) 45%, #24130a 100%); }
+    background:linear-gradient(to bottom, rgba(24,13,5,0) 0%, rgba(24,13,5,0.8) 45%, var(--b1) 100%); }
   .title-content{ position:relative; flex:1; display:flex; flex-direction:column; justify-content:center;
     padding:10px 14px 16px; margin-top:-130px; }
   .title-btn-col{ display:flex; flex-direction:column; gap:7px; width:66%; margin:0 auto; }
@@ -1092,8 +1092,8 @@
   @keyframes loot-chest-bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
   @keyframes loot-chest-flip{ 0%{ transform:rotateY(0) scale(1); } 45%,55%{ transform:rotateY(90deg) scale(1.08); } 100%{ transform:rotateY(180deg) scale(1); } }
   .loot-options{ display:flex; gap:10px; margin:12px 0; flex-wrap:wrap; justify-content:center; }
-  .loot-opt{ position:relative; flex:1 1 calc(50% - 10px); min-width:140px; max-width:220px; background: var(--panel2); border:2px solid var(--line); border-radius:var(--r-md); padding:8px; cursor:pointer; transition: transform .08s; }
-  .loot-opt:hover{ border-color: var(--loot-tier-color, var(--gold)); transform: translateY(-2px); }
+  .loot-opt{ position:relative; flex:1 1 calc(50% - 10px); min-width:140px; max-width:220px; background:var(--panel2); border:2px solid var(--line); border-radius:var(--r-md); padding:8px; cursor:pointer; transition: transform .08s; }
+  .loot-opt:hover{ border-color:var(--loot-tier-color, var(--gold)); transform: translateY(-2px); }
   .loot-chest{ width:120px; height:104px; border-radius:var(--r-lg); background:var(--panel2); border:2.5px solid var(--loot-tier-color, var(--gold));
     display:flex; align-items:center; justify-content:center;
     animation: loot-chest-glow 1.6s ease-in-out infinite, loot-chest-bob 1.6s ease-in-out infinite; }
@@ -1103,8 +1103,8 @@
   @keyframes loot-chest-bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
   @keyframes loot-chest-flip{ 0%{ transform:rotateY(0) scale(1); } 45%,55%{ transform:rotateY(90deg) scale(1.08); } 100%{ transform:rotateY(180deg) scale(1); } }
   .loot-options{ display:flex; gap:10px; margin:12px 0; flex-wrap:wrap; justify-content:center; }
-  .loot-opt{ position:relative; flex:1 1 calc(50% - 10px); min-width:140px; max-width:220px; background: var(--panel2); border:2px solid var(--line); border-radius:var(--r-md); padding:8px; cursor:pointer; transition: transform .08s; }
-  .loot-opt:hover{ border-color: var(--loot-tier-color, var(--gold)); transform: translateY(-2px); }
+  .loot-opt{ position:relative; flex:1 1 calc(50% - 10px); min-width:140px; max-width:220px; background:var(--panel2); border:2px solid var(--line); border-radius:var(--r-md); padding:8px; cursor:pointer; transition: transform .08s; }
+  .loot-opt:hover{ border-color:var(--loot-tier-color, var(--gold)); transform: translateY(-2px); }
   .loot-opt h4{ margin:4px 0 0; font-size:13px; color:var(--parchment); text-align:center; }
   /* Reveal pop-in + ambient glow (mirrors dieSettle/glowPulse from the
      loot-reveal-animation mockup): each card springs in on its own short
@@ -1197,10 +1197,10 @@
      results) are "what's printed on this die", so they read better as a
      tiny token than a generic UI label. */
   .faces span{ display:inline-flex; align-items:center;
-    background: linear-gradient(160deg, #3c3022, #221a12);
+    background:linear-gradient(160deg, var(--b2), var(--b1));
     border:1px solid rgba(0,0,0,0.65); color: var(--parchment);
     border-radius:var(--r-md); padding:3px 6px; white-space:nowrap; flex:0 0 auto;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); }
+    box-shadow:0 1px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); }
   /* Upgrade Dice rows (renderCamp(), render.js) -- kept deliberately compact
      (small font/padding, short "Attack I -> II" wording instead of a full
      "Combine 3 ... into 1 ..." sentence) so this section doesn't blow out
@@ -1221,7 +1221,7 @@
      too, per spec, so this box does clip, not just scroll). */
   .swap-list{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-height:440px; overflow-y:auto; margin:8px 0; padding:10px 4px 4px; }
   .swap-item{ position:relative; z-index:0; background:var(--panel2); border:2px solid var(--line); border-radius:var(--r-md); padding:8px; cursor:pointer; transition: transform .08s; width:88px; }
-  .swap-item:hover{ border-color: var(--gold); transform: translateY(-2px); z-index:1; }
+  .swap-item:hover{ border-color:var(--gold); transform: translateY(-2px); z-index:1; }
   .swap-item .loot-preview-tile{ margin-bottom:0; }
   /* Same count-badge design language as Camp's stacked dice (.camp-stack-badge)
      -- solid gold circle, dark bold number, thin border matching the
@@ -1235,7 +1235,7 @@
      and whichever die is currently picked get a highlighted border/glow so
      the choice (unlike the carryover list above, which is a one-time pick
      with no way back) is clearly a toggle you can change your mind on. */
-  .swap-item.selected{ border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold), 0 0 8px 1px rgba(212,175,82,0.5); }
+  .swap-item.selected{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold), 0 0 8px 1px rgba(212,175,82,0.5); }
   .boon-none-item{ display:flex; align-items:center; justify-content:center; min-height:56px; }
   .boon-none-item .swap-item-label{ margin-top:0; font-weight:bold; color:var(--parchment); }
   .small-btn-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
@@ -1303,8 +1303,8 @@
 .relic-choice-card:hover{ border-color:var(--gold); transform:translateY(-2px); }
 
 /* ---- Juice pass 1: path badge tiers, impact punch, running tally ---- */
-.path-counter-float.pcf-t2{ background: radial-gradient(circle at 32% 28%, #ffdcae, #ff9a3d 60%); animation: pop-in 0.2s ease-out, pcf-glow-hot 0.9s ease-in-out infinite 0.2s; }
-.path-counter-float.pcf-t3{ background: radial-gradient(circle at 32% 28%, #ffc9c2, #ff5a4d 60%); animation: pop-in 0.2s ease-out, pcf-glow-hot 0.65s ease-in-out infinite 0.2s; }
+.path-counter-float.pcf-t2{ background:radial-gradient(circle at 32% 28%, #ffdcae, #ff9a3d 60%); animation: pop-in 0.2s ease-out, pcf-glow-hot 0.9s ease-in-out infinite 0.2s; }
+.path-counter-float.pcf-t3{ background:radial-gradient(circle at 32% 28%, #ffc9c2, #ff5a4d 60%); animation: pop-in 0.2s ease-out, pcf-glow-hot 0.65s ease-in-out infinite 0.2s; }
 @keyframes pcf-glow-hot{
   0%,100%{ box-shadow:0 3px 8px rgba(0,0,0,0.55), 0 0 6px 1px rgba(255,140,70,0.55); }
   50%{ box-shadow:0 3px 10px rgba(0,0,0,0.6), 0 0 20px 7px rgba(255,120,60,0.7); }
@@ -1368,23 +1368,23 @@
   /* ---- Style tighten pass: UI chrome and numerals share one display face ---- */
   button, .pcf-num, .kill-callout-line, .room-callout-line, .floor-card-num, .floor-card-name, .new-tag, .status-chip, .kill-hint, .face-val, .face-word, .chip-num{ font-family: var(--font-ui); }
   .pcf-num, .face-val, .sum-count, .bar + span{ font-variant-numeric: tabular-nums; }
-  button{ box-shadow: var(--shadow-1); letter-spacing:.2px; }
+  button{ box-shadow:var(--shadow-1); letter-spacing:.2px; }
 
   /* ================= Toy theme (v1.23) =================
      Chunky outlines, a lip under every pressable thing (drop shadow, so faces
      keep their full size), bright dice on a dark brown ground. */
-  body{ background:#130d09 !important; font-family: var(--font-ui) !important; }
+  body{ background:var(--b0) !important; font-family: var(--font-ui) !important; }
   h1,h2,h3{ text-shadow:0 2px 0 rgba(0,0,0,.4); }
-  button{ border:2px solid var(--line) !important; filter:drop-shadow(0 4px 0 var(--line)); font-weight:800; background:#b9824a; color:#fff; transform:translateY(-2px); margin-bottom:2px; }
+  button{ border:2px solid var(--line) !important; filter:drop-shadow(0 4px 0 var(--line)); font-weight:800; background:var(--b6); color:#fff; transform:translateY(-2px); margin-bottom:2px; }
   button:hover:not(:disabled){ background:#c8915a; transform:translateY(-3px); }
   button:active:not(:disabled){ transform:translateY(2px) scale(0.97) !important; filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); }
   button.primary{ background:var(--gold) !important; color:#3a2200 !important; }
-  .die{ border:3px solid var(--line) !important; box-shadow: inset 0 3px 0 rgba(255,255,255,.3); filter:drop-shadow(0 3px 0 var(--line)); }
+  .die{ border:3px solid var(--line) !important; box-shadow:inset 0 3px 0 rgba(255,255,255,.3); filter:drop-shadow(0 3px 0 var(--line)); }
   .die.dietype-attack{ background:#ff5b5b !important; }
   .die.dietype-maneuver{ background:#ffe9a8 !important; }
   .die .name-tag-svg text{ opacity:.95 !important; font-weight:900 !important; paint-order:stroke; stroke:rgba(0,0,0,.35); stroke-width:.6px; }
   .die .face-word{ font-weight:900; }
-  .tray-wrap{ background:#3a2412 !important; }
+  .tray-wrap{ background:var(--b2) !important; }
   .enc-card{ border:3px solid var(--line) !important; filter:drop-shadow(0 4px 0 var(--line)); }
   .bar{ height:16px !important; border:3px solid var(--line) !important; }
   .bar-fill.hp{ background:linear-gradient(#ff8a8a,#ff3b3b) !important; }
@@ -1403,7 +1403,7 @@
   .class-tab-btn:not(.selected){ opacity:.82; }
 
   /* Camp status card (health, campfire, Rest / Break Camp): near-black so the fire glows. */
-  .camp-status-card{ background:#120a05 !important; border:3px solid var(--line) !important; box-shadow:inset 0 0 24px rgba(0,0,0,.7), 0 4px 0 var(--line); }
+  .camp-status-card{ background:var(--b0) !important; border:3px solid var(--line) !important; box-shadow:inset 0 0 24px rgba(0,0,0,.7), 0 4px 0 var(--line); }
 
   /* Dice are bigger now: center the icon + label in the area under the name arc instead of bottom-stacking (which pushed icons up into the name). */
   .die{ padding-top:17px !important; padding-bottom:3px !important; justify-content:center !important; gap:0; }
@@ -1425,7 +1425,7 @@
   .mini-face small{ font-size:8px; font-weight:900; margin-top:2px; white-space:nowrap; }
   .mf-attack{ background:#ff5b5b; color:#fff3e6; } .mf-maneuver{ background:#ffe9a8; } .mf-origin{ background:#4a8a5c; color:#eafbea; }
   .mf-alloy{ background:#9aa3ab; } .mf-gilded{ background:#d9a93a; } .mf-magic{ background:#9a6ad0; color:#fff; }
-  .mini-face.mf-blank{ background:#6b4627; opacity:.45; box-shadow:none; border-style:dashed; }
+  .mini-face.mf-blank{ background:var(--b4); opacity:.45; box-shadow:none; border-style:dashed; }
   /* Light backdrop so dark icons read on every die color. */
   .mini-face .icon-svg, .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ background:#fff4d2; border-radius:50%; box-shadow:0 0 0 2px #fff4d2; width:19px; height:19px; margin:2px 0 1px; }
   .mini-face .icon-svg, .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ color:#241c10; }
@@ -1441,8 +1441,8 @@
 
 
   /* ===== QA pass: character select ===== */
-  .setup-panel{ background:#7a5232 !important; }
-  .setup-panel .origin-showcase, .setup-panel .class-showcase, .setup-panel .boon-showcase{ background:#8d6139; }
+  .setup-panel{ background:var(--b4) !important; }
+  .setup-panel .origin-showcase, .setup-panel .class-showcase, .setup-panel .boon-showcase{ background:var(--b5); }
   .setup-panel .setup-label{ color:#f1dcb4; }
   .char-name-input{ color:#ffeab8 !important; text-shadow:0 1px 0 rgba(0,0,0,.35); border-bottom:2px dashed rgba(255,234,184,.45); }
   .char-name-input::placeholder{ color:rgba(255,234,184,.8); }
@@ -1452,12 +1452,12 @@
   .origin-layout #origin-tab-row{ flex-direction:column; flex:0 0 82px; width:82px; gap:5px; }
   .origin-layout #origin-tab-row .class-tab-btn{ flex:1 1 0; width:100%; padding:4px 4px; font-size:12px; }
   .origin-layout .origin-showcase{ flex:1; min-width:0; }
-  .origin-showcase-portrait{ width:96px !important; height:96px !important; border-radius:var(--r-lg) !important; border:3px solid var(--line); background:linear-gradient(#c4a073,#8d6139); box-shadow:inset 0 0 0 2px rgba(255,255,255,.18); }
+  .origin-showcase-portrait{ width:96px !important; height:96px !important; border-radius:var(--r-lg) !important; border:3px solid var(--line); background:linear-gradient(#c4a073,var(--b5)); box-shadow:inset 0 0 0 2px rgba(255,255,255,.18); }
   .origin-showcase-portrait img, .origin-showcase-portrait .mystery-figure{ object-fit:contain !important; object-position:center bottom !important; padding:3px; }
   /* Class: taller panel with a mini tray showing the zone */
   .class-showcase{ height:auto !important; min-height:118px; align-items:center; gap:12px; padding:10px; }
-  .class-mini-tray{ display:grid; grid-template-columns:repeat(4,1fr); gap:3px; width:96px; flex:0 0 96px; padding:5px; background:#3a2412; border:3px solid var(--line); border-radius:var(--r-md); }
-  .class-mini-tray i{ aspect-ratio:1/1; border-radius:4px; background:#5a3a20; border:1.5px solid rgba(0,0,0,.35); display:block; }
+  .class-mini-tray{ display:grid; grid-template-columns:repeat(4,1fr); gap:3px; width:96px; flex:0 0 96px; padding:5px; background:var(--b2); border:3px solid var(--line); border-radius:var(--r-md); }
+  .class-mini-tray i{ aspect-ratio:1/1; border-radius:4px; background:var(--b3); border:1.5px solid rgba(0,0,0,.35); display:block; }
   .class-mini-tray i.zone{ background:var(--class-color); border-color:var(--line); box-shadow:inset 0 2px 0 rgba(255,255,255,.35), 0 0 6px var(--class-color); }
   .class-showcase-head{ display:flex; align-items:center; gap:8px; margin-bottom:3px; }
   .class-showcase-head .class-action-icon{ width:28px; height:28px; font-size:16px; }
@@ -1488,7 +1488,7 @@
 
 
   /* ===== Round 5 tweaks ===== */
-  .title-panel{ background:#24130a !important; }
+  .title-panel{ background:var(--b1) !important; }
   .setup-panel .setup-label{ font-size:10px; letter-spacing:1.2px; padding:6px 4px 5px; margin-bottom:2px; }
   .enc-portrait{ border:none !important; }
   /* class-ability convert: glow only, no scale (the scale pulse read as the tray resizing) */
@@ -1515,11 +1515,11 @@
 
 
   /* ===== Contrast pass: dark base, light-brown windows, never the same brown side by side ===== */
-  :root{ --brown-dark:#33200f; --brown-light:#74502d; --brown-lighter:#86603a; }
+  :root{ --brown-dark:var(--b2); --brown-light:var(--b4); --brown-lighter:var(--b5); }
   .panel{ background:var(--brown-dark); }
   .enc-card{ background:var(--brown-light) !important; }
   .enc-portrait{ background:transparent !important; }
-  .setup-panel{ background:#2c1a0b !important; }
+  .setup-panel{ background:var(--b2) !important; }
   .setup-panel .origin-showcase, .setup-panel .class-showcase, .setup-panel .boon-showcase{ background:var(--brown-light) !important; }
   /* unique rail button colors */
   .util-btn.rail-ability{ background:#6a45a8 !important; color:#fff1d6; }
@@ -1574,8 +1574,8 @@
   .enc-panel-arch .enc-card-col{ width:100% !important; }
   body.cog-arch .settings-btn-floating{ position:absolute; top:var(--cog-top,10px); right:max(4px, calc(50% - 195px + 4px)); transform:scale(.82); }
   .enc-card.fo-arch{ position:relative; overflow:visible !important; border:5px solid transparent !important; border-radius:120px 120px 12px 12px / 90px 90px 12px 12px !important; filter:none !important; margin:0 !important; padding:15px 8px 2px;
-    background:radial-gradient(ellipse at 50% 35%, #6b4a2a 0%, #3c2412 55%, #0c0705 100%) !important; box-shadow:inset 0 8px 24px rgba(0,0,0,.6); }
-  .enc-card.fo-arch.fo-lvl2{ background:radial-gradient(ellipse at 50% 35%, #5e4a26 0%, #33260f 55%, #150e05 100%) !important; }
+    background:radial-gradient(ellipse at 50% 35%, var(--b4) 0%, var(--b2) 55%, var(--b0) 100%) !important; box-shadow:inset 0 8px 24px rgba(0,0,0,.6); }
+  .enc-card.fo-arch.fo-lvl2{ background:radial-gradient(ellipse at 50% 35%, #5e4a26 0%, #33260f 55%, var(--b1) 100%) !important; }
   .enc-card.fo-arch.fo-lvl3{ background:radial-gradient(ellipse at 50% 35%, #4f4a22 0%, #2a2610 55%, #0e1006 100%) !important; }
   .fo-frame{ position:absolute; left:-5px; top:-10px; pointer-events:none; overflow:visible; filter:drop-shadow(0 4px 0 #0c0705); z-index:2; }
   .fo-torch{ position:absolute; top:46px; width:10px; height:14px; border-radius:50% 50% 40% 40%; background:radial-gradient(circle at 50% 70%,#fff2a0,#ff9a2a 60%,#d4401a); box-shadow:0 0 14px 6px rgba(255,150,40,.45); animation:fo-flick .7s infinite; z-index:1; }
@@ -1602,8 +1602,8 @@
   .fo-quest.complete{ color:var(--gold); }
   .fo-vs{ flex:0 0 22px; align-self:center; font-family:var(--font-display); color:#d9b36a; font-size:13px; opacity:.9; margin-bottom:30px; text-align:center; }
   .fo-floor{ height:6px; border-radius:3px; background:rgba(0,0,0,.28); width:92%; margin-top:-6px; }
-  .fo-flavor{ margin:0 10px 6px; padding-top:4px; border-top:2px solid #0c0705; font-style:italic; font-size:9.5px; color:#e8d9bd; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; position:relative; z-index:1; }
-  body{ background:#130d09 !important; }
+  .fo-flavor{ margin:0 10px 6px; padding-top:4px; border-top:2px solid var(--b0); font-style:italic; font-size:9.5px; color:#e8d9bd; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; position:relative; z-index:1; }
+  body{ background:var(--b0) !important; }
 
   .fo-fig .fo-img, .enc-portrait.fo-fig .enc-art{ height:89px !important; width:auto !important; max-width:100%; }
   .fo-has-quests .fo-fig .fo-img, .fo-has-quests .enc-portrait.fo-fig .enc-art{ height:74px !important; }
@@ -1711,9 +1711,9 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .fo-hud-col{ top:56px; }
 
 /* Class-coloured zone: the cells your class ability applies to, and the armed ability button */
-.zone-cell{ outline:3px dashed var(--class-color,#fff) !important; outline-offset:-3px; box-shadow: inset 0 0 12px color-mix(in srgb, var(--class-color,#fff) 55%, transparent), inset 0 3px 0 rgba(255,255,255,.3); }
+.zone-cell{ outline:3px dashed var(--class-color,#fff) !important; outline-offset:-3px; box-shadow:inset 0 0 12px color-mix(in srgb, var(--class-color,#fff) 55%, transparent), inset 0 3px 0 rgba(255,255,255,.3); }
 .util-btn.rail-ability.armed{ background:var(--class-color,var(--gold)) !important; color:#fff !important; box-shadow:0 0 0 2px #fff6, 0 0 12px var(--class-color,gold); }
-.zone-cell{ outline-color: color-mix(in srgb, var(--class-color,#fff) 65%, #fff) !important; box-shadow: inset 0 0 0 5px rgba(20,10,4,.55), inset 0 0 14px 3px color-mix(in srgb, var(--class-color,#fff) 80%, transparent), inset 0 3px 0 rgba(255,255,255,.3); }
+.zone-cell{ outline-color:color-mix(in srgb, var(--class-color,#fff) 65%, #fff) !important; box-shadow:inset 0 0 0 5px rgba(20,10,4,.55), inset 0 0 14px 3px color-mix(in srgb, var(--class-color,#fff) 80%, transparent), inset 0 3px 0 rgba(255,255,255,.3); }
 /* Loot chest: the art is the button -- no frame lines around it */
 .loot-chest-btn, .loot-chest-btn:hover, .loot-chest-btn:active, .loot-chest-btn:focus{ border:none !important; filter:none !important; box-shadow:none !important; outline:none !important; background:transparent !important; }
 
@@ -1731,7 +1731,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .rb-ic{ display:inline-flex; width:15px; height:15px; vertical-align:-2px; margin-right:6px; }
 .rb-bad .rb-in{ background:linear-gradient(180deg,#8a241a,#3a0c08); }
 .rb-good .rb-in{ background:linear-gradient(180deg,#25783a,#0c2c14); }
-.rb-neutral .rb-in{ background:linear-gradient(180deg,#3a2616,#160c05); }
+.rb-neutral .rb-in{ background:linear-gradient(180deg,var(--b2),var(--b1)); }
 .rb-gold .rb-in{ background:linear-gradient(180deg,#9a7a22,#3a2a08); padding:5px 30px; font-size:12px; }
 .rb-long{ font-size:13px; }
 .rb-streak{ position:absolute; height:2px; width:70px; background:linear-gradient(90deg,transparent,rgba(255,241,214,.85),transparent); opacity:.9; }
@@ -1844,7 +1844,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .rb-in{ --rbc:#b8844a; --rbt:#fff1d6; position:relative; isolation:isolate; z-index:0; clip-path:none !important; box-shadow:none !important; background:none !important; border:0;
   padding:9px 40px; color:var(--rbt); text-shadow:0 2px 0 rgba(27,15,6,.85); }
 .rb-in::before, .rb-in::after{ content:''; position:absolute; z-index:-1; clip-path:polygon(16px 0,100% 0,calc(100% - 16px) 100%,0 100%); }
-.rb-in::before{ inset:-3px -3px -8px -3px; background:#1b0f06; z-index:-2; }
+.rb-in::before{ inset:-3px -3px -8px -3px; background:var(--b1); z-index:-2; }
 .rb-in::after{ inset:0 0 -1px 0; background:var(--rbc); box-shadow:inset 0 3px 0 rgba(255,255,255,.28), inset 0 -3px 0 rgba(0,0,0,.18); }
 .rb-bad .rb-in{ --rbc:#c0392b; }
 .rb-good .rb-in{ --rbc:#3fa357; }
@@ -1890,16 +1890,16 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .near-miss-chip{ white-space:nowrap; font-size:12px !important; padding:3px 10px !important; width:auto !important; max-width:none; }
 
 /* ---- v1.32.3: campfire logs get the same thick black outline as the portraits ---- */
-.campfire-logs{ height:13px !important; border:2.5px solid #000 !important; background:#6b4628 !important; }
-.campfire-logs::before, .campfire-logs::after{ height:11px !important; border:2.5px solid #000 !important; top:-2.5px !important; left:-2.5px !important; background:#7a4f2c !important; }
+.campfire-logs{ height:13px !important; border:2.5px solid #000 !important; background:var(--b4) !important; }
+.campfire-logs::before, .campfire-logs::after{ height:11px !important; border:2.5px solid #000 !important; top:-2.5px !important; left:-2.5px !important; background:var(--b4) !important; }
 
 /* v1.32.8 contrast pass: flat colors, lighter edges so brown layers separate */
-.wrap > .panel{ background:#2b1a0c !important; border:2px solid #6b4a28 !important; box-shadow:0 0 0 2px #0d0805; }
-.camp-section{ border:2px solid #6b4a28 !important; box-shadow:inset 0 0 0 1px rgba(255,220,160,.12); }
-.camp-section.camp-status-card{ background:#0f0905 !important; }
-.camp-pocket{ background:#0f0905 !important; border:1px solid #6b4a28 !important; }
-.tray-wrap{ background:#2a170a !important; border-color:#9a7240 !important; box-shadow:0 0 0 2px #0d0805; }
-.upgrade-btn:disabled, .upgrade-preview-btn:disabled{ opacity:1 !important; background:#5a3f22 !important; color:#e3caa3 !important; border-color:#0c0705 !important; }
+.wrap > .panel{ background:var(--b2) !important; border:2px solid var(--b4) !important; box-shadow:0 0 0 2px var(--b0); }
+.camp-section{ border:2px solid var(--b4) !important; box-shadow:inset 0 0 0 1px rgba(255,220,160,.12); }
+.camp-section.camp-status-card{ background:var(--b0) !important; }
+.camp-pocket{ background:var(--b0) !important; border:1px solid var(--b4) !important; }
+.tray-wrap{ background:var(--b2) !important; border-color:var(--b5) !important; box-shadow:0 0 0 2px var(--b0); }
+.upgrade-btn:disabled, .upgrade-preview-btn:disabled{ opacity:1 !important; background:var(--b3) !important; color:#e3caa3 !important; border-color:var(--b0) !important; }
 .upgrade-btn:disabled .icon-svg, .upgrade-btn:disabled svg{ opacity:.85; }
 
 /* v1.32.10 shield on health bars */
@@ -2085,7 +2085,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 
 /* Quests float above the "vs" in their own labeled plate, so they never push the fighters around */
 .fo-quests-float{ position:absolute; left:50%; top:20px; transform:translateX(calc(-100% + 10px)); z-index:5; width:118px; padding:3px 7px 4px; text-align:center;
-  background:rgba(28,14,6,.82); border:1px solid #6b4a28; border-radius:8px; box-shadow:0 2px 0 rgba(0,0,0,.5); pointer-events:auto; }
+  background:rgba(28,14,6,.82); border:1px solid var(--b4); border-radius:8px; box-shadow:0 2px 0 rgba(0,0,0,.5); pointer-events:auto; }
 .fo-quests-label{ font-family:var(--font-ui); font-size:8px; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin-bottom:1px; }
 .fo-quests-float .fo-quests{ margin:0 !important; width:auto !important; align-items:center !important; gap:1px !important; font-size:9px !important; line-height:1.2; color:#e8d9bd; }
 .fo-quests-float .fo-quest.complete{ color:var(--gold); }
@@ -2093,8 +2093,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 
 /* Quests as a paper notice pinned to the dungeon wall, behind the fighters */
 .fo-quests-float{ z-index:0 !important; left:50%; top:18px; transform:translateX(-68%) rotate(-2.2deg) !important; transform-origin:50% 0; width:124px; padding:9px 8px 8px;
-  background:
-    radial-gradient(ellipse at 20% 15%, rgba(255,255,255,.28), transparent 55%),
+  background:radial-gradient(ellipse at 20% 15%, rgba(255,255,255,.28), transparent 55%),
     repeating-linear-gradient(0deg, rgba(120,80,30,.05) 0 2px, transparent 2px 5px),
     linear-gradient(170deg,#efdfb4,#d8c08a);
   border:none; border-radius:2px; box-shadow:none;
@@ -2123,25 +2122,22 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .campfire-flame{ border:2.5px solid var(--line); box-sizing:border-box; }
 
 /* v1.32.19 dark hallway: two torch-lit foci, a faint warm centre, near-black edges */
-.enc-card.fo-arch{ background:
-    radial-gradient(circle at 19px 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
+.enc-card.fo-arch{ background:radial-gradient(circle at 19px 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
     radial-gradient(circle at calc(100% - 19px) 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
     radial-gradient(ellipse at 50% 62%, rgba(120,80,42,.5) 0%, transparent 70%),
-    radial-gradient(ellipse at 50% 50%, #26170b 0%, #120a04 60%, #040201 100%) !important;
+    radial-gradient(ellipse at 50% 50%, var(--b1) 0%, var(--b0) 60%, #040201 100%) !important;
     box-shadow:inset 0 0 70px 20px rgba(0,0,0,.8) !important; }
-.enc-card.fo-arch.fo-lvl2{ background:
-    radial-gradient(circle at 19px 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
+.enc-card.fo-arch.fo-lvl2{ background:radial-gradient(circle at 19px 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
     radial-gradient(circle at calc(100% - 19px) 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
     radial-gradient(ellipse at 50% 62%, rgba(115,88,40,.5) 0%, transparent 70%),
     radial-gradient(ellipse at 50% 50%, #241a0a 0%, #110c04 60%, #040201 100%) !important;
     box-shadow:inset 0 0 70px 20px rgba(0,0,0,.8) !important; }
-.enc-card.fo-arch.fo-lvl3{ background:
-    radial-gradient(circle at 19px 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
+.enc-card.fo-arch.fo-lvl3{ background:radial-gradient(circle at 19px 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
     radial-gradient(circle at calc(100% - 19px) 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
     radial-gradient(ellipse at 50% 62%, rgba(100,92,42,.45) 0%, transparent 70%),
     radial-gradient(ellipse at 50% 50%, #1f1c0a 0%, #0d0c04 60%, #040201 100%) !important;
     box-shadow:inset 0 0 70px 20px rgba(0,0,0,.8) !important; }
-.fo-torch{ box-shadow:0 0 18px 9px rgba(255,130,30,.62), 0 0 40px 18px rgba(255,100,20,.28) !important; background:radial-gradient(circle at 50% 70%,#fff6b8,#ffa530 55%,#e0501a) !important; }
+.fo-torch{ box-shadow:0 0 18px 9px rgba(255,130,30,.62), 0 0 40px 18px rgba(255,100,20,.28) !important; background:radial-gradient(circle at 50% 70%,#fff6b8,#ffa530 55%,var(--b6)) !important; }
 
 /* wall sconces under the torch flames */
 .fo-sconce{ position:absolute; top:56px; pointer-events:none; filter:drop-shadow(0 2px 1px rgba(0,0,0,.6)); }
@@ -2152,22 +2148,20 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 /* Banners: room / boss callouts and the new-floor card read as ribbons (opaque, notched ends, gold trim) instead of floating text */
 #room-callout{ filter:drop-shadow(0 6px 8px rgba(0,0,0,.7)); }
 #room-callout .room-callout-box{ width:min(92vw,372px); min-width:0 !important; border:none !important; border-radius:0 !important; box-shadow:none !important; padding:16px 34px 14px !important; gap:4px !important;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.07), transparent 40%),
-    linear-gradient(90deg, #1b1008, #3a2412 18%, #3a2412 82%, #1b1008) !important;
+  background:linear-gradient(180deg, rgba(255,255,255,.07), transparent 40%),
+    linear-gradient(90deg, var(--b1), var(--b2) 18%, var(--b2) 82%, var(--b1)) !important;
   clip-path:polygon(0 0,100% 0,calc(100% - 16px) 50%,100% 100%,0 100%,16px 50%);
   position:relative; }
 #room-callout .room-callout-box::before{ content:''; position:absolute; left:20px; right:20px; top:5px; bottom:5px; border-top:2px solid var(--gold); border-bottom:2px solid var(--gold); opacity:.85; pointer-events:none; }
 #room-callout .room-callout-box.boss, #room-callout:has(.intro.boss) .room-callout-box{
-  background:
-    linear-gradient(180deg, rgba(255,200,160,.10), transparent 40%),
+  background:linear-gradient(180deg, rgba(255,200,160,.10), transparent 40%),
     linear-gradient(90deg, #2a0906, #6b1a12 18%, #6b1a12 82%, #2a0906) !important; }
 #room-callout .room-callout-line{ text-shadow:0 2px 0 rgba(0,0,0,.65); }
 #room-callout .room-callout-line.name.boss, #room-callout .room-callout-line.intro.boss{ color:#ffd9a0 !important; }
 #room-callout .room-callout-line.name{ color:#fff1d6; }
 #room-callout .room-callout-line.hint{ color:#d8c3a0; }
 
-#floor-card .floor-card-box{ position:relative; width:min(92vw,372px); padding:20px 34px 18px; background:linear-gradient(180deg, rgba(255,255,255,.07), transparent 40%), linear-gradient(90deg,#1b1008,#3a2412 18%,#3a2412 82%,#1b1008);
+#floor-card .floor-card-box{ position:relative; width:min(92vw,372px); padding:20px 34px 18px; background:linear-gradient(180deg, rgba(255,255,255,.07), transparent 40%), linear-gradient(90deg,var(--b1),var(--b2) 18%,var(--b2) 82%,var(--b1));
   clip-path:polygon(0 0,100% 0,calc(100% - 18px) 50%,100% 100%,0 100%,18px 50%); filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); }
 #floor-card .floor-card-box::before{ content:''; position:absolute; left:22px; right:22px; top:6px; bottom:6px; border-top:2px solid var(--gold); border-bottom:2px solid var(--gold); opacity:.85; }
 #floor-card{ background:radial-gradient(ellipse at center, rgba(0,0,0,.35), rgba(0,0,0,0) 70%) !important; }
@@ -2176,12 +2170,12 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 
 
 /* ---- Dice tray as an oak-and-iron chest ---- */
-.tray-wrap{ padding:0 !important; border:3px solid #0c0705 !important; border-radius:9px !important; margin-bottom:12px !important; overflow:visible !important;
-  box-shadow:0 5px 0 #0c0705, 0 0 0 rgba(0,0,0,0) !important;
-  background:repeating-linear-gradient(90deg,transparent 0 46px,rgba(0,0,0,.28) 46px 48px),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 7px),linear-gradient(180deg,#6b4220,#4d2d14) !important; }
+.tray-wrap{ padding:0 !important; border:3px solid var(--b0) !important; border-radius:9px !important; margin-bottom:12px !important; overflow:visible !important;
+  box-shadow:0 5px 0 var(--b0), 0 0 0 rgba(0,0,0,0) !important;
+  background:repeating-linear-gradient(90deg,transparent 0 46px,rgba(0,0,0,.28) 46px 48px),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 7px),linear-gradient(180deg,var(--b4),var(--b3)) !important; }
 .tray-wrap .tray{ margin:8px 8px 26px; padding:4px; border-radius:5px;
-  background:#1b0f07;
-  box-shadow:inset 0 6px 12px rgba(0,0,0,.85),inset 0 0 0 2px #0c0705,0 0 0 2px rgba(255,255,255,.12); }
+  background:var(--b1);
+  box-shadow:inset 0 6px 12px rgba(0,0,0,.85),inset 0 0 0 2px var(--b0),0 0 0 2px rgba(255,255,255,.12); }
 .tray-wrap::after{ content:""; position:absolute; left:3px; right:3px; bottom:3px; height:19px; border-top:2px solid rgba(0,0,0,.55); box-shadow:inset 0 2px 0 rgba(255,255,255,.12); border-radius:0 0 6px 6px; background:repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 2px,transparent 2px 38px); pointer-events:none; }
 .tray-wrap .cc{ position:absolute; z-index:3; width:36px; height:36px; pointer-events:none; }
 .tray-wrap .cc.tl{ left:-4px; top:-4px; } .tray-wrap .cc.tr{ right:-4px; top:-4px; transform:scaleX(-1); }
