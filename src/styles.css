@@ -1982,3 +1982,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .enc-card.fo-arch .fo-enemy .fo-fig.fo-big::after{ inset:calc(-1 * max(0px, var(--ex) - var(--down))) -12% calc(-1 * var(--down)) -12% !important; }
 .fo-enemy .fo-hpwrap, .fo-enemy .fo-name, .fo-enemy .fo-chips, .fo-enemy .kill-hint, .fo-enemy .fo-turnlabel, .fo-enemy .fo-quests{ position:relative; z-index:2; }
 .fo-enemy .fo-name{ text-shadow:0 1px 0 #1c0e06, 0 0 5px rgba(0,0,0,.85); }
+/* Normal big monsters stand a little higher, clear of the health bar */
+.enc-card.fo-arch .fo-enemy .fo-fig.fo-big:not(.fo-bossbig) .fo-img.enc-art{ margin-bottom:calc(-1 * var(--down) + 6px); }
+/* Where a boss does overlap its bar, give the bar a dark plate so it reads as UI laid over the art */
+.fo-enemy .fo-fig.fo-bossbig ~ .fo-hpwrap .bar{ box-shadow:0 0 0 3px #1c0e06, 0 5px 9px rgba(0,0,0,.65) !important; border-color:#1c0e06 !important; }
