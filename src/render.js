@@ -3189,7 +3189,28 @@ function renderShrineEncounter(){
       </div></div>
     </div>
     ${waiting ? `<div class="panel">${S.newRoomFx ? '<p class="hint" style="text-align:center;">Revealing the shrine\'s boon...</p>' : '<button class="primary" id="shrine-reveal-btn" style="width:100%;">Reveal the boon</button>'}</div>` : ''}
+    <div class="panel tray-panel tray-idle">
+      <div class="enc-rail-row">
+        <div class="enc-card-col">
+          <div class="tray-float-wrap">
+            <div class="tray-head"><span class="round-badge">Shrine</span><div class="path-strip"></div></div>
+            <div class="tray-wrap tray-wrap-full">
+              <div class="tray" id="tray" style="--class-color:${S.klass.color||'#ffffff'}"></div>
+              ${chestTrimHTML()}
+            </div>
+          </div>
+        </div>
+        <div class="util-rail">
+          <div class="util-btn primary-accent rail-go disabled"><span>Go</span></div>
+          <div class="util-btn rail-pocket">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?`<span class="badge">${S.backPocket.length}</span>`:''}</div>
+          <div class="util-btn rail-item disabled">${iconSpan('use')}<span>Item</span></div>
+          <div class="util-btn danger-accent rail-clear disabled">${iconSpan('fumble')}<span>Clear</span></div>
+          ${S.klass.convertTo ? `<div class="util-btn rail-ability disabled" style="--class-color:${S.klass.color||'#d4af52'}"><span>Skill</span></div>` : ''}
+        </div>
+      </div>
+    </div>
   `;
+  { const tr = document.getElementById('tray'); if(tr) tr.innerHTML = (S.tray||[]).map((c,i)=>renderDie(c,i)).join(''); }
   attachRelicStrip();
   if(S.lootChoice) renderLootModal();
   if(S.shrineChoice) renderShrineChoiceModal();

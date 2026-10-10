@@ -2434,3 +2434,7 @@ body.is-resolving .hall-fx i{ opacity:0; }
 .bar-arc .ba-hl{ stroke-width:5; transform:translate(0,-3px); }
 .bar-arc .ba-hl-hp{ stroke:#ff8a8a; } .bar-arc .ba-hl-quest{ stroke:#f2dc8f; } .bar-arc .ba-hl-shield{ stroke:#a6d3ef; }
 .bar-arc .ba-hl{ opacity:.7; stroke-width:6; }
+
+/* 1.32.70: the shrine keeps the dice box on screen (inert, no combat) so the room doesn't go blank under the doorway */
+.tray-idle{ pointer-events:none; }
+.tray-idle .die{ filter:saturate(.8) brightness(.9); }
