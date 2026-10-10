@@ -410,6 +410,8 @@ function resetAllProgress(){
   try{ localStorage.removeItem(CARRYOVER_KEY); } catch(e){}
   try{ localStorage.removeItem(META_KEY); } catch(e){}
   try{ localStorage.removeItem(DISCOVERED_DICE_KEY); } catch(e){}
+  try{ localStorage.removeItem(DIE_COPIES_KEY); } catch(e){}
+  DIE_COPIES = {};
 }
 
 // ---- Debug-mode unlock-everything: fires once when the Setup screen's
@@ -440,6 +442,8 @@ function debugUnlockEverything(){
   // (so "unlock everything" never silently misses one).
   ACHIEVEMENTS.forEach(a=>{ if(!META.achievements[a.id]) META.achievements[a.id] = { date: Date.now() }; });
   markDiceDiscovered([...ALLOY, ...GILDED, ...MAGIC]);
+  [...ALLOY, ...GILDED, ...MAGIC].forEach(d=>{ DIE_COPIES[d.name] = Math.max(dieCopies(d.name), BOON_COPIES_NEEDED); });
+  try{ localStorage.setItem(DIE_COPIES_KEY, JSON.stringify(DIE_COPIES)); }catch(e){}
   saveMeta();
 }
 
@@ -501,6 +505,31 @@ function markDiceDiscovered(dice){
     try{ localStorage.setItem(DISCOVERED_DICE_KEY, JSON.stringify([...DISCOVERED_DICE])); } catch(e){}
   }
   return fresh; // names found for the very first time (drives the NEW! tags)
+}
+
+// ---- Copies: a die joins the Compendium the first time you actually GET it (equip it), but only becomes a
+// Starting Boon option after you've gotten it BOON_COPIES_NEEDED times (cumulative across runs; a run never offers the same die twice,
+// so that's five separate runs). Offered-but-not-taken dice are not discovered. ----
+const DIE_COPIES_KEY = 'dungeonScrambleDieCopies_v1';
+const BOON_COPIES_NEEDED = 3;
+function loadDieCopies(){
+  try{ const o = JSON.parse(localStorage.getItem(DIE_COPIES_KEY)); return (o && typeof o==='object') ? o : {}; }
+  catch(e){ return {}; }
+}
+let DIE_COPIES = loadDieCopies();
+function dieCopies(name){ return DIE_COPIES[name]||0; }
+function isBoonReady(name){ return dieCopies(name) >= BOON_COPIES_NEEDED; }
+function recordDieAcquired(die){
+  if(!die || !die.name) return;
+  markDiceDiscovered(die);
+  const was = dieCopies(die.name);
+  DIE_COPIES[die.name] = was + 1;
+  if(was < BOON_COPIES_NEEDED && was+1 >= BOON_COPIES_NEEDED && typeof S!=='undefined' && S){ (S.newBoonDice = S.newBoonDice||[]).push(die.name); } // announced on the end-of-run screen
+  try{ localStorage.setItem(DIE_COPIES_KEY, JSON.stringify(DIE_COPIES)); }catch(e){}
+}
+// Dice not yet in the Compendium (drives the NEW! tag on a loot card) -- looks only, never marks.
+function peekFreshDice(dice){
+  return (dice||[]).filter(d=>d && d.name && !DISCOVERED_DICE.has(d.name)).map(d=>d.name);
 }
 
 // "NEW!" tags in the Compendium / Relic Codex: remember which entries the
@@ -1792,7 +1821,7 @@ function runShrineEffect(e, effect){
     }
     case 'tradeLoot': {
       S.lootChoice = { options: pickLootNUnused(lootPoolByName(effect.pool), 3), lootName: effect.pool, overkill:false, fromShrine:true };
-      if(typeof markDiceDiscovered==='function') S.lootChoice.fresh = markDiceDiscovered(S.lootChoice.options);
+      if(typeof markDiceDiscovered==='function') S.lootChoice.fresh = peekFreshDice(S.lootChoice.options);
       render(); return;
     }
     case 'randomDieReplace': {
@@ -1802,7 +1831,6 @@ function runShrineEffect(e, effect){
       // a dedicated S.screen value, so the Shrine screen stays visible
       // underneath it.
       S.pendingLootDie = pickLootUnused(lootPoolByName(effect.pool));
-      if(typeof markDiceDiscovered==='function') markDiceDiscovered(S.pendingLootDie);
       logMsg('sys', `${e.name}: choose a die to replace with a random ${effect.pool} die (${S.pendingLootDie.name}).`);
       render(); return;
     }
@@ -1892,7 +1920,7 @@ function onEncounterDefeated(){
   S.lootChoice = { options, lootName: floor.lootName, overkill, nearMiss };
   teleLog('room_win', {name:e.name, type:e.type, turns:S.turnNumber+1, ms:(S._roomStartedAt!=null)?Math.max(0,teleActiveMs()-S._roomStartedAt):null, overkill, overBy:Math.max(0,Math.round(-e.curHealth)), nearMiss, offered:options.length, hp:S.health});
   teleLog('loot_offer', {tier:(options[0]&&options[0].cat)||null, overkill, offered:options.map(o=>o.name)});
-  if(typeof markDiceDiscovered==='function') S.lootChoice.fresh = markDiceDiscovered(options);
+  if(typeof markDiceDiscovered==='function') S.lootChoice.fresh = peekFreshDice(options);
   // A Boss/Big Boss kill or an Overkill each get a distinct sound + a big
   // callout banner, so the moment registers as it happens instead of only
   // as a status chip on the loot screen that follows.
@@ -1967,6 +1995,7 @@ function swapInLootDie(trayIndex){
   // than at each call site, is what lets pickLootUnused()/pickLootNUnused()
   // keep a future draw from handing the player a second copy.
   S.usedLootNames.add(cell.die.name);
+  recordDieAcquired(cell.die);
   S.pendingLootDie = null;
   logMsg('sys', `Equipped ${cell.die.name}.`, 'good');
   S.stats.lootCollected++;

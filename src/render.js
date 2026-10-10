@@ -934,7 +934,7 @@ function boonShowcaseHTML(d){
 
 function renderSetup(){
   const boonTiers = unlockedBoonTiers();
-  const boonDice = boonTiers.flatMap(t=>BOON_TIER_POOLS[t].filter(d=>DISCOVERED_DICE.has(d.name)).map(d=>({...d, tier:t})));
+  const boonDice = boonTiers.flatMap(t=>BOON_TIER_POOLS[t].filter(d=>isBoonReady(d.name)).map(d=>({...d, tier:t})));
   app.innerHTML = `
     <div class="panel setup-panel">
       <button id="setup-back-btn" class="setup-back-btn" title="Back to title"><svg viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><path d="M7.5 1.5 3 6l4.5 4.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Back</button>
@@ -964,7 +964,7 @@ function renderSetup(){
         ${boonDice.length ? `
           <div class="boon-scroll" id="boon-scroll"></div>
           <div class="boon-showcase" id="boon-showcase"></div>
-        ` : `<p class="hint">You've unlocked Starting Boon tier${boonTiers.length>1?'s':''} (${boonTiers.map(t=>BOON_TIER_LABELS[t]).join(', ')}), but haven't discovered a die from ${boonTiers.length>1?'them':'it'} yet -- find one as loot in a run to make it pickable here.</p>`}
+        ` : `<p class="hint">You've unlocked Starting Boon tier${boonTiers.length>1?'s':''} (${boonTiers.map(t=>BOON_TIER_LABELS[t]).join(', ')}), but no die is ready yet -- take the same loot die in ${BOON_COPIES_NEEDED} runs (see the Dice Compendium) to make it pickable here.</p>`}
       </div>` : ''}
 
       <button class="primary" id="start-btn" disabled>Enter the Dungeon</button>
@@ -2630,7 +2630,7 @@ function openDiceCompendiumModal(){
             <div class="compendium-thumb compendium-thumb-placeholder">${lockSVG(16)}</div>
             <div class="compendium-main">
               <div class="run-history-who">???</div>
-              <div class="compendium-faces hint">Find this die in a run to reveal it.</div>
+              <div class="compendium-faces hint">Take this die in a run to reveal it.</div>
             </div>
           </div>`;
       }
@@ -2644,6 +2644,7 @@ function openDiceCompendiumModal(){
           <div class="compendium-main">
             <div class="run-history-who">${d.name}${newDice.has(d.name)?' <span class="new-tag">NEW!</span>':''}</div>
             <div class="compendium-faces">${facesHTML}</div>
+            <div class="hint" style="font-size:11px; margin-top:2px;">${isBoonReady(d.name)?'Starting Boon ready':`Collected ${dieCopies(d.name)}/${BOON_COPIES_NEEDED} for a Starting Boon`}</div>
           </div>
         </div>`;
     }).join('');
@@ -3508,6 +3509,7 @@ function renderVictory(){
   app.innerHTML = `<div class="panel"><h2>Dungeon Conquered!</h2><p>You defeated the Big Boss and cleared all three floors. Well fought, Adventurer.</p>
     ${originRelicEarnedHTML()}
     ${newAchievementsHTML(S.newAchievements)}
+    ${newBoonsHTML()}
     ${summaryStatsHTML()}
     <button class="primary" style="margin-top:12px;" onclick="location.reload()">Play Again</button>
     <button style="margin-top:8px;" onclick="openExportDataModal()">Send Play Data</button></div>`;
@@ -3549,6 +3551,7 @@ function renderGameOver(){
   app.innerHTML = `<div class="panel"><h2>Defeated</h2><p>Your Adventurer retreats to town in temporary defeat...</p>
     ${carryNote}
     ${newAchievementsHTML(S.newAchievements)}
+    ${newBoonsHTML()}
     ${summaryStatsHTML()}
     <button class="primary" style="margin-top:12px;" onclick="location.reload()">Try Again</button>
     <button style="margin-top:8px;" onclick="openExportDataModal()">Send Play Data</button></div>`;
@@ -3559,6 +3562,23 @@ function renderGameOver(){
 // entries). Plain inline HTML rather than a modal/toast -- the player is
 // already looking at a dedicated end-of-run screen, so this just adds to
 // it rather than interrupting with another popup.
+// Dice that reached BOON_COPIES_NEEDED copies during this run and so can now be chosen as a Starting Boon.
+function newBoonsHTML(){
+  const names = (S.newBoonDice||[]).filter((n,i,a)=>a.indexOf(n)===i);
+  if(!names.length) return '';
+  const tiersOpen = unlockedBoonTiers();
+  const rows = names.map(n=>{
+    const tier = Object.keys(BOON_TIER_POOLS).find(t=>BOON_TIER_POOLS[t].some(d=>d.name===n));
+    const open = !tier || tiersOpen.includes(tier);
+    return `<div class="achv-unlock-row"><span class="achv-unlock-icon">✦</span><div>
+       <div class="achv-unlock-name">${n}</div>
+       <div class="achv-unlock-desc">${open ? 'Now available as a Starting Boon on the setup screen.' : `Collected ${BOON_COPIES_NEEDED} times. It becomes a Starting Boon once the ${BOON_TIER_LABELS[tier]} tier unlocks.`}</div>
+     </div></div>`; }).join('');
+  return `<div class="achv-unlock-box">
+      <div class="achv-unlock-title">Starting Boon${names.length>1?'s':''} unlocked!</div>
+      ${rows}
+    </div>`;
+}
 function newAchievementsHTML(newAchievements){
   if(!newAchievements || !newAchievements.length) return '';
   const rows = newAchievements.map(a=>
