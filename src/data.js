@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.32.57';
+const GAME_VERSION = '1.32.58';
 
 function face(str){
   if(str==null) return {type:'blank'};
