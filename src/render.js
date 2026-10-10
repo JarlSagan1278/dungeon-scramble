@@ -3072,6 +3072,7 @@ function renderShrineChoiceModal(){
 // even when there was no choice to make, so a boon is never applied silently.
 function renderShrineResultModal(){
   const {title, text} = S.shrineResult;
+  if(!S.shrineResult._logged){ S.shrineResult._logged = true; teleLog('shrine_result', {shrine:title, text:String(text).replace(/<[^>]+>/g,'').slice(0,160), hp:S.health, maxHp:S.maxHealth}); }
   const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
       <h2>${title}</h2>
       <p>${text}</p>

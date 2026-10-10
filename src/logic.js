@@ -170,12 +170,26 @@ function newTelemetry(){
 }
 
 // One event: {t: ms since run start, f: floor, s: route step, e: type, ...data}
+// Active play time in ms: wall-clock gaps longer than IDLE_GAP_MS (tab hidden, phone asleep, walked away) are not counted,
+// so per-fight durations mean "time actually playing" instead of "time the app sat open".
+const IDLE_GAP_MS = 45000;
+function teleActiveMs(){
+  try{
+    if(!S.tele) S.tele = newTelemetry();
+    const now = Date.now(), tl = S.tele;
+    if(tl._last==null) tl._last = now;
+    const gap = now - tl._last;
+    if(gap>0 && gap<=IDLE_GAP_MS && !(typeof document!=='undefined' && document.hidden)) tl.active = (tl.active||0) + gap;
+    tl._last = now;
+    return tl.active||0;
+  }catch(e){ return 0; }
+}
 function teleLog(type, data){
   try{
     if(typeof S==='undefined' || !S) return;
     if(!S.tele) S.tele = newTelemetry(); // older saves that predate telemetry
     if(S.tele.events.length >= MAX_TELE_EVENTS) return;
-    S.tele.events.push({ t: Date.now()-S.tele.startedAt, f: S.floorIdx+1, s: S.routeStep, e: type, ...(data||{}) });
+    S.tele.events.push({ t: teleActiveMs(), f: S.floorIdx+1, s: S.routeStep, e: type, ...(data||{}) });
   } catch(err){ /* telemetry must never break the game */ }
 }
 
@@ -998,7 +1012,7 @@ function advanceRoute(){
     // every enc-to-enc and enc-to-boss transition within a segment.
     scrambleTray();
     S.screen='game';
-    S._roomStartedAt = Date.now();
+    S._roomStartedAt = teleActiveMs();
     applyRelicsOnRoomStart();
     teleLog('room_start', {type:drawn.type, name:drawn.name, enemyHp:drawn.maxHealth, hp:S.health, maxHp:S.maxHealth});
     logMsg('sys', `A door creaks open: ${drawn.name} (${drawn.type})`);
@@ -1010,7 +1024,7 @@ function advanceRoute(){
     S.encounter = drawEncounter('boss');
     scrambleTray();
     S.screen='game';
-    S._roomStartedAt = Date.now();
+    S._roomStartedAt = teleActiveMs();
     applyRelicsOnRoomStart();
     teleLog('room_start', {type:S.encounter.type, name:S.encounter.name, enemyHp:S.encounter.maxHealth, hp:S.health, maxHp:S.maxHealth});
     logMsg('sys', `Boss Encounter: ${S.encounter.name}`);
@@ -1310,7 +1324,9 @@ function applyPathStep(step){
   if(step.freeze) S.freezeNext = true;
   if(step.nullify) applyNullify();
   // One minion cleared per point of damage dealt (any damaging die: Hits, Combos, bonuses).
-  for(let k=0; k<(step.dmg||0); k++){ if(!S.tray.some(c=>c.minion)) break; clearOneMinion(); }
+  { const m0 = S.tray.filter(c=>c.minion).length;
+    for(let k=0; k<(step.dmg||0); k++){ if(!S.tray.some(c=>c.minion)) break; clearOneMinion(); }
+    const cl = m0 - S.tray.filter(c=>c.minion).length; if(cl>0) teleLog('minions_cleared', {n:cl, left:m0-cl}); }
   if(step.leapClearIdx!=null){
     clearMinionAt(step.leapClearIdx);
     logMsg('sys', 'Leaped clean over a Minion -- cleared it!', 'good');
@@ -1499,6 +1515,7 @@ function finishPlayerPath(path, effects){
   // (it motivates "one more turn") and give it its own cue.
   if((S.resolveTotal||0) > 0 && e.curHealth > 0 && e.curHealth <= 3 && e.maxHealth >= 8){
     S.stats.nearMisses = (S.stats.nearMisses||0) + 1;
+    teleLog('close_call', {enemy:e.name, left:Math.ceil(e.curHealth)});
     showToastIfAvailable(`Just ${Math.ceil(e.curHealth)} HP left!`, null);
     if(typeof playTone==='function') playTone('closeCall');
   }
@@ -1636,6 +1653,7 @@ function dealEncounterDamage(e, amount){
   // own health bar deserves to register physically too, not just the
   // damage you deal out.
   if(dealt>=8 && typeof screenShake==='function') screenShake('small');
+  if(amount>0) teleLog('hit_taken', {enemy:e.name, dealt, blocked, hp:S.health});
   const t = `${e.name} hits you for ${dealt}${blocked?` (${blocked} blocked)`:''}.`;
   logMsg('dmg', t);
   return t;
@@ -1650,6 +1668,7 @@ function spawnMinions(e, n){
     placed++;
   });
   e.minionsSpawned = (e.minionsSpawned||0)+placed;
+  if(placed>0) teleLog('minions', {enemy:e.name, placed, onTray:S.tray.filter(c=>c.minion).length});
   if(placed>0){ const t = `${placed} Minion die${placed>1?'s':''} clog your tray!`; logMsg('sys', t); return t; }
   return null;
 }
@@ -1839,6 +1858,7 @@ function chooseRelic(id){
 }
 
 function chooseShrineOption(option){
+  teleLog('shrine_choice', {shrine:(S.shrineChoice&&S.shrineChoice.name)||null, picked:option.label, offered:S.shrineChoice?S.shrineChoice.options.map(o=>o.label):null});
   S.shrineChoice = null;
   option.action();
 }
@@ -1870,7 +1890,7 @@ function onEncounterDefeated(){
   if(hasRelic('iron_rations')){ S.health = cap(S.health+2, S.maxHealth); logMsg('heal', 'Iron Rations: healed 2.', 'good'); fireRelic('iron_rations','+2 HP'); }
   const options = pickLootNUnused(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
   S.lootChoice = { options, lootName: floor.lootName, overkill, nearMiss };
-  teleLog('room_win', {name:e.name, type:e.type, turns:S.turnNumber, ms:S._roomStartedAt?Date.now()-S._roomStartedAt:null, overkill, overBy:Math.max(0,Math.round(-e.curHealth)), nearMiss, offered:options.length, hp:S.health});
+  teleLog('room_win', {name:e.name, type:e.type, turns:S.turnNumber+1, ms:(S._roomStartedAt!=null)?Math.max(0,teleActiveMs()-S._roomStartedAt):null, overkill, overBy:Math.max(0,Math.round(-e.curHealth)), nearMiss, offered:options.length, hp:S.health});
   teleLog('loot_offer', {tier:(options[0]&&options[0].cat)||null, overkill, offered:options.map(o=>o.name)});
   if(typeof markDiceDiscovered==='function') S.lootChoice.fresh = markDiceDiscovered(options);
   // A Boss/Big Boss kill or an Overkill each get a distinct sound + a big
