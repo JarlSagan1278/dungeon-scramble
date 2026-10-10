@@ -2406,3 +2406,8 @@ body.is-resolving .hall-fx i{ opacity:0; }
 /* 1.32.60: quest paper gets an even ink-brown outline all the way round (straight bottom edge so the outline is continuous) */
 .fo-quests-float{ clip-path:none !important; border:2px solid #4a2c12 !important; border-radius:3px !important;
   box-shadow:inset 0 0 0 1px rgba(255,225,160,.25), inset 0 0 10px 1px rgba(110,70,25,.5) !important; }
+
+/* 1.32.61: the hit punch used to tilt/scale the WHOLE card (arch + wall ledge) while the stone floor stayed put, so the wall/floor seam
+   visibly slid on every hit. Now only the fighters take the punch; the room itself stays rock steady. */
+.enc-card-col.enc-impact{ animation:none !important; filter:none !important; }
+.enc-card-col.enc-impact .fo-arch .fo-enemy, .enc-card-col.enc-impact .fo-arch .fo-player{ animation:enc-impact-kf var(--impact-dur,0.2s) ease-out; transform-origin:50% 80%; }
