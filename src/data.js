@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.32.72';
+const GAME_VERSION = '1.32.73';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -70,7 +70,7 @@ const FACE_DESC = {
 // dice you're playing.
 const ENEMY_ACTION_DESC = {
   hit: "Deals damage to you.",
-  minion: "Summons Minion dice that clog your Tray until you Hit them, or Leap clean over them, to clear.",
+  minion: "Summons Minion dice that clog your Tray. Each damage you deal clears one, or Leap clean over them.",
   block: "The enemy gains Shield, which absorbs damage before its health does.",
   heal: "The enemy restores its own health.",
   hot: "The enemy gains healing over time (H.O.T.).",
@@ -86,7 +86,7 @@ function enemyActionTooltip(type, val){
   if(val==null) return ENEMY_ACTION_DESC[type]||'';
   switch(type){
     case 'hit': return `Deals ${val} damage to you.`;
-    case 'minion': return `Summons ${val} Minion ${val===1?'die that clogs':'dice that clog'} your Tray until you Hit ${val===1?'it':'them'}, or Leap clean over ${val===1?'it':'them'}, to clear.`;
+    case 'minion': return `Summons ${val} Minion ${val===1?'die that clogs':'dice that clog'} your Tray. Each damage you deal clears one, or Leap clean over ${val===1?'it':'them'}.`;
     case 'block': return `The enemy gains ${val} Shield, which absorbs damage before its health does.`;
     case 'heal': return `The enemy restores ${val} of its own health.`;
     case 'hot': return `The enemy gains ${val} healing over time (H.O.T.).`;
@@ -104,7 +104,7 @@ const STATUS_DESC = {
   hot: "Heals each turn, then drops by 1.",
   block: "Absorbs the next hit(s) taken before health is touched.",
   shield: "Absorbs the next hit(s) the enemy takes before its health is touched.",
-  minions: "Minion dice are clogging the tray until Hits -- or a Leap clean over one -- clear them.",
+  minions: "Minion dice clog your tray. Each point of damage you deal clears one; a Leap clean over one clears it too.",
   boost: "Your next played action's value will be multiplied.",
 };
 

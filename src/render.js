@@ -1659,7 +1659,7 @@ function renderGame(){
         longPressed = true;
         const cell = S.tray[idx];
         if(cell.minion){
-          showFaceTooltip(rect, `<strong>Minion die</strong> — clogs this space; land a Hit on it, or Leap clean over it, to clear.`);
+          showFaceTooltip(rect, `<strong>Minion die</strong> — clogs this space; each damage you deal clears one, or Leap clean over it.`);
           return;
         }
         const f = cell.forcedFace || currentFace(cell);

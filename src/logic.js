@@ -1309,7 +1309,8 @@ function applyPathStep(step){
   if(step.selfDot) S.playerDOT += step.selfDot;
   if(step.freeze) S.freezeNext = true;
   if(step.nullify) applyNullify();
-  if(step.type==='hit') clearOneMinion();
+  // One minion cleared per point of damage dealt (any damaging die: Hits, Combos, bonuses).
+  for(let k=0; k<(step.dmg||0); k++){ if(!S.tray.some(c=>c.minion)) break; clearOneMinion(); }
   if(step.leapClearIdx!=null){
     clearMinionAt(step.leapClearIdx);
     logMsg('sys', 'Leaped clean over a Minion -- cleared it!', 'good');
