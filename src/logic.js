@@ -911,6 +911,7 @@ function drawEncounter(kind){
   e.questsDone = (e.quests||[]).map(()=>false);
   e.questDamageDealt = 0;
   e.minionsSpawned = 0;
+  clearAllMinions();
   e._lastHealth = e.curHealth; // baseline for the heal/damage flash effect
   if(e.type==='Boss' || e.type==='Big Boss'){
     // Bosses cycle one action at a time through whichever of their stats are
@@ -1320,6 +1321,11 @@ const PLAYER_HOT_CAP = 6;
 function addPlayerHOT(n){ S.playerHOT = Math.min(PLAYER_HOT_CAP, (S.playerHOT||0) + n); }
 
 // Nullify now clears EVERYTHING it can reach in one go (it used to clear just one of: Minions, your D.O.T., enemy H.O.T.).
+// Minions never outlive the fight that spawned them.
+function clearAllMinions(){
+  if(!S.tray) return;
+  S.tray.forEach(cell=>{ if(cell.minion){ cell.minion=false; cell.die=cell.coveredDie||cell.die; cell.coveredDie=null; } });
+}
 function applyNullify(){
   const e = S.encounter;
   const cleared = [];
@@ -1838,6 +1844,7 @@ function chooseShrineOption(option){
 
 function onEncounterDefeated(){
   const e = S.encounter;
+  clearAllMinions();
   logMsg('sys', `${e.name} defeated!`);
   S.stats.encountersDefeated++;
   // loot: draw dice from the floor pool, pick 1. Overkill (10+ damage beyond
