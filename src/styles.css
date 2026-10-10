@@ -2365,3 +2365,13 @@ body.is-resolving .hall-fx i{ opacity:0; }
 .boss-cycle-item.enemy-action-badge:not(.next){ opacity:.5; }
 .boss-cycle-item.enemy-action-badge.next{ opacity:1; }
 .boss-cycle-row .boss-cycle-item.enemy-action-badge.next:not(:only-child){ box-shadow:inset 0 0 0 1.5px #0c0705, inset 0 0 0 3px rgba(235,220,185,.75), 0 0 8px 1px rgba(235,220,185,.35), 0 2px 0 rgba(0,0,0,.6) !important; }
+
+/* Lock when a path is ready: no pulsing -- a steady warm glow only (the slow passive shine stays) */
+.chest-lock.ready{ animation:none !important; filter:drop-shadow(0 3px 0 rgba(0,0,0,.4)) drop-shadow(0 0 4px rgba(255,200,90,.45)); }
+.chest-lock.ready .ch-shine{ animation:lk-shine 7s ease-in-out infinite !important; animation-delay:2s !important; }
+
+/* Enemy action badges, final: dark ink with a bone rim (overrides the stone-slab pass above) */
+.enemy-action-badge{ background:linear-gradient(#2a2018,#1a120c) !important; color:#f1e4c8 !important; font-weight:bold;
+  box-shadow:inset 0 0 0 1.5px #d9c9a3, 0 2px 0 rgba(0,0,0,.6) !important; }
+.boss-cycle-item.enemy-action-badge:not(.next){ opacity:.45; }
+.boss-cycle-row .boss-cycle-item.enemy-action-badge.next:not(:only-child){ box-shadow:inset 0 0 0 1.5px #f4ead0, inset 0 0 0 3px rgba(12,7,5,.9), 0 0 8px 1px rgba(235,220,185,.4), 0 2px 0 rgba(0,0,0,.6) !important; }
