@@ -2357,3 +2357,11 @@ body.is-resolving .hall-fx i{ opacity:0; }
 /* Skill button wears the class color (armed state keeps its white ring + glow) */
 #ability-btn.rail-ability{ background:var(--class-color,#6a45a8) !important; color:#fff !important; text-shadow:0 1px 0 rgba(0,0,0,.55), 0 0 3px rgba(0,0,0,.45); }
 #ability-btn.rail-ability.armed{ background:var(--class-color,var(--gold)) !important; color:#fff !important; filter:brightness(1.12); }
+
+/* Enemy action badges (Every Turn / Cycles through): stone slab, not gold -- gold means Quest health.
+   The icon carries the meaning; the lit "next" action of a boss gets a bone rim and a soft glow. */
+.enemy-action-badge{ background:linear-gradient(#6a5f52,#4a4036) !important; color:#f4ead6 !important; font-weight:bold;
+  box-shadow:inset 0 0 0 1.5px #0c0705, inset 0 2px 0 rgba(255,240,210,.25), 0 2px 0 rgba(0,0,0,.6) !important; }
+.boss-cycle-item.enemy-action-badge:not(.next){ opacity:.5; }
+.boss-cycle-item.enemy-action-badge.next{ opacity:1; }
+.boss-cycle-row .boss-cycle-item.enemy-action-badge.next:not(:only-child){ box-shadow:inset 0 0 0 1.5px #0c0705, inset 0 0 0 3px rgba(235,220,185,.75), 0 0 8px 1px rgba(235,220,185,.35), 0 2px 0 rgba(0,0,0,.6) !important; }
