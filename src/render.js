@@ -1344,7 +1344,6 @@ function renderEncounterCard(e, mode){
   if(e.curDOT) statuses += `<span class="status-chip status-tooltip-target" title="D.O.T. ${e.curDOT}: ${STATUS_DESC.dot}">${iconSpan('dot', e.curDOT)} DOT</span>`;
   if(e.curHOT) statuses += `<span class="status-chip status-tooltip-target" title="H.O.T. ${e.curHOT}: ${STATUS_DESC.hot}">${iconSpan('hot', e.curHOT)} HOT</span>`;
   if(e.curShield) statuses += `<span class="status-chip status-tooltip-target" title="Shield ${e.curShield}: ${STATUS_DESC.shield}">${iconSpan('block', e.curShield)} Shield</span>`;
-  if(e.minionsSpawned) statuses += `<span class="status-chip status-tooltip-target" title="Minions ${e.minionsSpawned}: ${STATUS_DESC.minions}">Minions ${e.minionsSpawned}</span>`;
   // One combined mouseover/long-press tooltip on the health bar itself,
   // listing every status currently affecting this encounter -- so a player
   // can see what Block/D.O.T./H.O.T./etc. actually do without needing a
@@ -1353,7 +1352,6 @@ function renderEncounterCard(e, mode){
   if(e.curDOT) statusTipLines.push(`D.O.T. ${e.curDOT}: ${STATUS_DESC.dot}`);
   if(e.curHOT) statusTipLines.push(`H.O.T. ${e.curHOT}: ${STATUS_DESC.hot}`);
   if(e.curShield) statusTipLines.push(`Shield ${e.curShield}: ${STATUS_DESC.shield}`);
-  if(e.minionsSpawned) statusTipLines.push(`Minions ${e.minionsSpawned}: ${STATUS_DESC.minions}`);
   const statusTip = statusTipLines.join('\n');
   let quests = '';
   if(e.quests && e.quests.length){
@@ -1586,10 +1584,12 @@ function renderGame(){
   if(S.playerDOT) playerStatusTipLines.push(`D.O.T. ${S.playerDOT}: ${STATUS_DESC.dot}`);
   if(S.playerHOT) playerStatusTipLines.push(`H.O.T. ${S.playerHOT}: ${STATUS_DESC.hot}`);
   if(S.playerBlock) playerStatusTipLines.push(`Block ${S.playerBlock}: ${STATUS_DESC.block}`);
+  const minionCount = (S.tray||[]).filter(c=>c.minion).length; // the minions are on YOUR tray, so the debuff lives under you
+  if(minionCount) playerStatusTipLines.push(`Minions ${minionCount}: ${STATUS_DESC.minions}`);
   if(S.pendingFreeBoost) playerStatusTipLines.push(`Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}`);
   const playerStatusTip = playerStatusTipLines.join('\n');
   { const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
-    foPlayer = { statusHTML:`${S.playerDOT?`<span class="status-chip status-tooltip-target" title="D.O.T. ${S.playerDOT}: ${STATUS_DESC.dot}">${iconSpan('dot', S.playerDOT)} DOT</span>`:''}        ${S.playerHOT?`<span class="status-chip status-tooltip-target" title="H.O.T. ${S.playerHOT}: ${STATUS_DESC.hot}">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}        ${S.playerBlock?`<span class="status-chip status-tooltip-target" title="Block ${S.playerBlock}: ${STATUS_DESC.block}">${iconSpan('block', S.playerBlock)} Block</span>`:''}        ${S.pendingFreeBoost?`<span class="status-chip status-tooltip-target" style="background:var(--gold);color:#241c10;" title="Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}">${iconSpan('boost')} Boost x${S.pendingFreeBoost} armed</span>`:''}`, fxCls:playerFx.cls, deltaHTML:playerFx.deltaHTML, hpPct, tip:playerStatusTip,
+    foPlayer = { statusHTML:`${S.playerDOT?`<span class="status-chip status-tooltip-target" title="D.O.T. ${S.playerDOT}: ${STATUS_DESC.dot}">${iconSpan('dot', S.playerDOT)} DOT</span>`:''}        ${S.playerHOT?`<span class="status-chip status-tooltip-target" title="H.O.T. ${S.playerHOT}: ${STATUS_DESC.hot}">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}        ${S.playerBlock?`<span class="status-chip status-tooltip-target" title="Block ${S.playerBlock}: ${STATUS_DESC.block}">${iconSpan('block', S.playerBlock)} Block</span>`:''}        ${minionCount?`<span class="status-chip status-tooltip-target" title="Minions ${minionCount}: ${STATUS_DESC.minions}">Minions ${minionCount}</span>`:''}${S.pendingFreeBoost?`<span class="status-chip status-tooltip-target" style="background:var(--gold);color:#241c10;" title="Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}">${iconSpan('boost')} Boost x${S.pendingFreeBoost} armed</span>`:''}`, fxCls:playerFx.cls, deltaHTML:playerFx.deltaHTML, hpPct, tip:playerStatusTip,
       figCls: playerFx.cls==='flash-damage'?'dmg-flash':playerFx.cls==='flash-heal'?'heal-flash':'',
       figHTML: portrait.placeholder ? mysteryFigureHTML('width:60px; height:60px;') : `<img class="fo-img" src="${portrait.img}" alt="${S.origin.name}">` }; }
   app.innerHTML = `

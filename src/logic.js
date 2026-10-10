@@ -1269,7 +1269,7 @@ function computePathSteps(path){
 // moment each Hit actually lands instead of after the fact.
 function clearOneMinion(){
   const cell = S.tray.find(c=>c.minion);
-  if(cell){ cell.minion=false; cell.die=cell.coveredDie; cell.coveredDie=null; }
+  if(cell){ cell.minion=false; cell.die=cell.coveredDie||cell.die; cell.coveredDie=null; if(S.encounter && S.encounter.minionsSpawned>0) S.encounter.minionsSpawned--; }
 }
 
 // Clears one SPECIFIC Minion-covered cell -- as opposed to clearOneMinion()'s
@@ -1277,7 +1277,7 @@ function clearOneMinion(){
 // it (see computePathSteps()'s step.leapClearIdx, above).
 function clearMinionAt(idx){
   const cell = S.tray[idx];
-  if(cell && cell.minion){ cell.minion=false; cell.die=cell.coveredDie; cell.coveredDie=null; }
+  if(cell && cell.minion){ cell.minion=false; cell.die=cell.coveredDie||cell.die; cell.coveredDie=null; if(S.encounter && S.encounter.minionsSpawned>0) S.encounter.minionsSpawned--; }
 }
 
 // Applies exactly one die's contribution (see computePathSteps()) to live
