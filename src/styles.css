@@ -2388,5 +2388,17 @@ body.is-resolving .hall-fx i{ opacity:0; }
 .rt-door.rt-boss .rt-arch{ border-color:#7a2a22; }
 .rt-door.rt-boss.current .rt-arch{ border-color:#e8553d; box-shadow:0 0 10px rgba(230,80,50,.55), inset 0 0 8px rgba(230,80,50,.35); }
 .rt-tick{ font-size:16px; }
-.mascot-wrap{ bottom:-12px !important; }
-.mascot-marker{ height:26px !important; }
+.mascot-wrap{ bottom:3px !important; }
+.rt-door.current .rt-q{ opacity:0; }
+.mascot-marker{ height:46px !important; }
+
+/* ======== 1.32.57: Pocket is moss green (no longer teal like Guard's Skill); armed Skill lights the class zone ======== */
+.util-btn.rail-pocket{ background:#5f6f2e !important; color:#f4f1d2 !important; }
+@keyframes zone-armed{ 0%,100%{ box-shadow:inset 0 0 0 5px rgba(20,10,4,.55), inset 0 0 16px 4px color-mix(in srgb, var(--class-color,#fff) 85%, transparent), 0 0 8px 1px color-mix(in srgb, var(--class-color,#fff) 70%, transparent); }
+  50%{ box-shadow:inset 0 0 0 5px rgba(20,10,4,.35), inset 0 0 26px 9px color-mix(in srgb, var(--class-color,#fff) 100%, transparent), 0 0 18px 5px color-mix(in srgb, var(--class-color,#fff) 90%, transparent); } }
+@keyframes zone-armed-bob{ 0%,100%{ transform:scale(1.03); } 50%{ transform:scale(1.07); } }
+.tray.ability-armed > *{ transition:filter .25s, opacity .25s; }
+.tray.ability-armed > *:not(.zone-cell){ filter:brightness(.45) saturate(.5); }
+.tray.ability-armed > .zone-cell{ outline:4px solid #fff3d6 !important; outline-offset:-4px; position:relative; z-index:2; cursor:crosshair;
+  animation:zone-armed 1.1s ease-in-out infinite, zone-armed-bob 1.1s ease-in-out infinite !important; }
+.reduced-motion .tray.ability-armed > .zone-cell{ animation:none !important; box-shadow:0 0 14px 4px var(--class-color,#fff), inset 0 0 18px 6px var(--class-color,#fff); }
