@@ -2438,3 +2438,7 @@ body.is-resolving .hall-fx i{ opacity:0; }
 /* 1.32.70: the shrine keeps the dice box on screen (inert, no combat) so the room doesn't go blank under the doorway */
 .tray-idle{ pointer-events:none; }
 .tray-idle .die{ filter:saturate(.8) brightness(.9); }
+
+/* 1.32.77: no pull-to-refresh / rubber-band bounce when installed as an app; pages that are taller than the screen still scroll normally */
+html, body{ overscroll-behavior:none; overscroll-behavior-y:none; }
+body{ -webkit-tap-highlight-color:transparent; }
