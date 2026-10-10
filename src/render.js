@@ -530,6 +530,21 @@ function syncRoomFloor(card){
     });
   }catch(err){}
 }
+// Layout can shift after decorateArch ran (monster art finishing loading, chips/labels changing during a turn, new room swapping in),
+// which left the floor's horizon out of step with the wall ledge. Re-sync whenever the card or the app is resized or an image inside lands.
+let ROOM_RO = null, ROOM_RAF = 0, ROOM_WATCHED = null;
+function watchRoomFloor(card){
+  try{
+    const resync = ()=>{ if(ROOM_RAF) return; ROOM_RAF = requestAnimationFrame(()=>{ ROOM_RAF = 0;
+      const c = document.querySelector('#enc-panel .fo-arch'); if(c && document.getElementById('app')) syncRoomFloor(c); }); };
+    if(typeof ResizeObserver!=='undefined'){
+      if(!ROOM_RO) ROOM_RO = new ResizeObserver(resync);
+      ROOM_RO.disconnect(); ROOM_RO.observe(card); const app = document.getElementById('app'); if(app) ROOM_RO.observe(app);
+    }
+    card.querySelectorAll('img').forEach(im=>{ if(!im.complete) im.addEventListener('load', resync, {once:true}); });
+    ROOM_WATCHED = card;
+  }catch(e){}
+}
 function decorateArch(){
   try{
     const card = document.querySelector('#enc-panel .fo-arch');
@@ -540,6 +555,7 @@ function decorateArch(){
     const w = Math.round(card.offsetWidth), h = Math.round(card.offsetHeight+10);
     const lvl = Math.min(3,(S.floorIdx||0)+1);
     syncRoomFloor(card);
+    watchRoomFloor(card);
     card.insertAdjacentHTML('beforeend', `<svg class="fo-frame" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">${archFrameSVG(w,h,lvl)}</svg>`);
     try{ document.body.classList.toggle('is-resolving', !!S.transitioning); }catch(e){}
     syncIdleBreath(); syncMascotHop(); rollHpNumbers();
