@@ -2390,7 +2390,7 @@ body.is-resolving .hall-fx i{ opacity:0; }
 .rt-tick{ font-size:16px; }
 .mascot-wrap{ bottom:3px !important; }
 .rt-door.current .rt-q{ opacity:0; }
-.mascot-marker{ height:46px !important; }
+.mascot-marker{ height:36px !important; }
 
 /* ======== 1.32.57: Pocket is moss green (no longer teal like Guard's Skill); armed Skill lights the class zone ======== */
 .util-btn.rail-pocket{ background:#5f6f2e !important; color:#f4f1d2 !important; }
