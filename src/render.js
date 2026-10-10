@@ -387,8 +387,10 @@ function syncMascotHop(){
   try{
     const m = document.querySelector('.route-wrap .mascot-wrap'); if(!m) return;
     const left = parseFloat(m.style.left);
+    // a new floor (or run) starts fresh: never hop in from where the last floor's marker ended up
+    if(S._mascotFloor !== S.floorIdx){ S._mascotFloor = S.floorIdx; S._mascotLeft = null; }
     const prev = S._mascotLeft; S._mascotLeft = left;
-    if(prev==null || prev===left || !m.animate) return;
+    if(prev==null || prev>=left || !m.animate) return; // the marker only ever hops forward
     if(typeof PREFS!=='undefined' && PREFS.reducedMotion) return;
     const w = m.parentElement.getBoundingClientRect().width;
     const dx = (prev-left)/100*w;
