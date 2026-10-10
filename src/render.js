@@ -451,7 +451,8 @@ function bossArcBarHTML(o){
   const H=T+D+T, seg=(a,len)=>`stroke-dasharray="0 ${Math.max(0,a).toFixed(2)} ${Math.max(0,len).toFixed(2)} 300"`;
   const fx = hpFillHTML('enemy','hp',o.hpPct,true);
   const hp = Math.max(0,Math.min(100,fx.pct));
-  let s = `<path class="ba-out" d="${P}"/><path class="ba-track" d="${P}"/>`;
+  const head = `<path class="ba-out" d="${P}"/><path class="ba-track" d="${P}"/>`;
+  let s = '';
   if(fx.ghost){ s += `<path class="ba-seg ba-ghost" pathLength="100" d="${P}" ${seg(hp,fx.ghost.from-hp)} style="stroke:${fx.ghost.color}; animation-delay:-${fx.ghost.delay}ms"/>`; }
   const healCls = fx.heal ? ' ba-heal' : '';
   const healStyle = fx.heal ? ` style="--from:${fx.heal.from}; --to:${hp}; animation-delay:-${fx.heal.delay}ms"` : '';
@@ -460,6 +461,17 @@ function bossArcBarHTML(o){
   if(o.shieldVal>0){ const sh = shieldBarHTML(o.shieldVal,o.shieldMax,hp,'enemy'); const m = /shield-seg( sh-\w+)?" style="left:([\d.]+)%; width:([\d.]+)%; ([^"]*)"/.exec(sh);
     if(m) s += `<path class="ba-seg ba-shield${m[1]||''}" pathLength="100" d="${P}" ${seg(+m[2],+m[3])} style="${m[4]}"/>`; }
   if(o.prevW>0){ s += `<path class="ba-seg ba-prev" pathLength="100" d="${P}" ${seg(o.prevLeft,o.prevW)}/><path class="ba-seg ba-prev-end" pathLength="100" d="${P}" ${seg(o.prevLeft+o.prevW-1.2,1.2)}/>`; }
+  // round the fill's outer ends to the track's rounded caps
+  { // butt-capped segments leave the bar's two ends square: add round end caps in the colour of whichever segment touches that end
+    const ends = [{c:'#ff3b3b', a:0, b:hp}];
+    if(o.questW>0) ends.push({c:'#ffc83d', a:o.questLeft, b:o.questLeft+o.questW});
+    const mS = o.shieldVal>0 ? /left:([\d.]+)%; width:([\d.]+)%/.exec(shieldBarHTML(o.shieldVal,o.shieldMax,hp,'enemy')||'') : null;
+    if(mS) ends.push({c:'#5fa8d8', a:+mS[1], b:+mS[1]+ +mS[2]});
+    const startC = ends.find(e=>e.a<0.5 && e.b>0.5), endC = ends.slice().reverse().find(e=>e.b>99.5);
+    if(startC) s = `<circle cx="10" cy="${mid}" r="7" fill="${startC.c}"/>` + s;
+    if(endC) s = `<circle cx="${W-10}" cy="${mid}" r="7" fill="${endC.c}"/>` + s;
+  }
+  s = `<mask id="ba-mask" maskUnits="userSpaceOnUse" x="-20" y="-20" width="${W+40}" height="${H+40}"><path d="${P}" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round"/></mask>` + head + `<g mask="url(#ba-mask)">` + s + '</g>';
   // top-light highlight twins (the straight bars are light on top, darker below)
   s = s.replace(/<path class="ba-seg (ba-hp|ba-quest|ba-shield)([^"]*)"([^>]*)\/>/g, (m,k,rest,attrs)=> m + `<path class="ba-seg ba-hl ba-hl-${k.slice(3)}${rest}"${attrs}/>`);
   return `<div class="bar bar-arc ${o.cls||''}"><svg viewBox="0 0 ${W} ${H}" width="100%" aria-hidden="true">${s}</svg>${o.numHTML}</div>`;
