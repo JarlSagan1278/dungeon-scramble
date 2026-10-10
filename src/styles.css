@@ -2418,3 +2418,11 @@ body.is-resolving .hall-fx i{ opacity:0; }
 #app.has-room-floor .enc-card.fo-arch{ z-index:2 !important; }
 #room-floor ~ .panel, #room-floor ~ .enc-panel{ z-index:2; }
 .hall-fx{ transform:translateZ(0); }
+
+/* 1.32.63: the room is lit as one thing. Floor torchlight breathes on the same clock as the wall glow, freezes with it during a turn,
+   and no kill flash is allowed to hit only the wall (nothing filters the whole card any more). */
+@keyframes rf-breathe{ 0%,100%{ opacity:.62; } 22%{ opacity:.95; } 48%{ opacity:.75; } 71%{ opacity:1; } }
+#room-floor .rf-light{ animation:rf-breathe 3.1s ease-in-out infinite; animation-delay:var(--ld,0ms); }
+body.is-resolving #room-floor .rf-light{ animation:none !important; opacity:.8; }
+.reduced-motion #room-floor .rf-light{ animation:none; opacity:.8; }
+.enc-card-col.enc-death{ animation:none !important; filter:none !important; }

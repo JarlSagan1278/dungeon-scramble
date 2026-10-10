@@ -513,6 +513,7 @@ function syncRoomFloor(card){
     const xl = Math.round(appL + c.l + edge), xr = Math.round(appL + c.l + cw - edge);
     const fl = document.createElement('div'); fl.id = 'room-floor';
     fl.style.cssText = `left:${-appL}px;width:${vw}px;top:${hy}px;bottom:-30px;clip-path:polygon(${xl}px 0,${xr}px 0,${xr}px ${yb}px,100% ${yb}px,100% 100%,0 100%,0 ${yb}px,${xl}px ${yb}px);`;
+    fl.style.setProperty('--ld', '-'+Math.round(performance.now()%3100)+'ms');
     fl.innerHTML = '<div class="rf-plane"></div><div class="rf-fade"></div><div class="rf-light"></div><div class="rf-vig"></div>';
     app.insertBefore(fl, app.firstChild);
     // Ground shadows: a feet shadow plus a tall soft pool running down through the health bar, name and chips.
