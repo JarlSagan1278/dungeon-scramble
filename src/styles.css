@@ -2265,7 +2265,7 @@ body.hit-stop .fo-enemy .fo-fig{ filter:brightness(2.4) saturate(.35); }
 .idle-breath.idle-e{ animation-name:idle-glint-e !important; animation-timing-function:ease-in-out !important; }
 
 /* While a path is resolving, pause purely decorative loops so phones spend the frame budget on the hit sequence */
-body.is-resolving .hall-fx i, body.is-resolving .hall-fx .hf-glow, body.is-resolving .tray-wrap .tray::before,
+body.is-resolving .hall-fx i, body.is-resolving .tray-wrap .tray::before,
 body.is-resolving .idle-breath, body.is-resolving .chest-lock *, body.is-resolving .combo-ring, body.is-resolving .icon-svg svg.combo-ring *{ animation:none !important; }
 body.is-resolving .hall-fx i{ opacity:0; }
 
@@ -2423,7 +2423,6 @@ body.is-resolving .hall-fx i{ opacity:0; }
    and no kill flash is allowed to hit only the wall (nothing filters the whole card any more). */
 @keyframes rf-breathe{ 0%,100%{ opacity:.62; } 22%{ opacity:.95; } 48%{ opacity:.75; } 71%{ opacity:1; } }
 #room-floor .rf-light{ animation:rf-breathe 3.1s ease-in-out infinite; animation-delay:var(--ld,0ms); }
-body.is-resolving #room-floor .rf-light{ animation:none !important; opacity:.8; }
 .reduced-motion #room-floor .rf-light{ animation:none; opacity:.8; }
 .enc-card-col.enc-death{ animation:none !important; filter:none !important; }
 
