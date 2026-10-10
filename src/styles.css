@@ -2411,3 +2411,10 @@ body.is-resolving .hall-fx i{ opacity:0; }
    visibly slid on every hit. Now only the fighters take the punch; the room itself stays rock steady. */
 .enc-card-col.enc-impact{ animation:none !important; filter:none !important; }
 .enc-card-col.enc-impact .fo-arch .fo-enemy, .enc-card-col.enc-impact .fo-arch .fo-player{ animation:enc-impact-kf var(--impact-dur,0.2s) ease-out; transform-origin:50% 80%; }
+
+/* 1.32.62: deterministic layering so the room never re-orders under a screen shake / kill burst: floor at 0 (own layer), card + panels explicitly above */
+#room-floor{ z-index:0 !important; isolation:isolate; transform:translateZ(0); backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+#room-floor .rf-plane{ backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+#app.has-room-floor .enc-card.fo-arch{ z-index:2 !important; }
+#room-floor ~ .panel, #room-floor ~ .enc-panel{ z-index:2; }
+.hall-fx{ transform:translateZ(0); }
