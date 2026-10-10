@@ -460,6 +460,8 @@ function bossArcBarHTML(o){
   if(o.shieldVal>0){ const sh = shieldBarHTML(o.shieldVal,o.shieldMax,hp,'enemy'); const m = /shield-seg( sh-\w+)?" style="left:([\d.]+)%; width:([\d.]+)%; ([^"]*)"/.exec(sh);
     if(m) s += `<path class="ba-seg ba-shield${m[1]||''}" pathLength="100" d="${P}" ${seg(+m[2],+m[3])} style="${m[4]}"/>`; }
   if(o.prevW>0){ s += `<path class="ba-seg ba-prev" pathLength="100" d="${P}" ${seg(o.prevLeft,o.prevW)}/><path class="ba-seg ba-prev-end" pathLength="100" d="${P}" ${seg(o.prevLeft+o.prevW-1.2,1.2)}/>`; }
+  // top-light highlight twins (the straight bars are light on top, darker below)
+  s = s.replace(/<path class="ba-seg (ba-hp|ba-quest|ba-shield)([^"]*)"([^>]*)\/>/g, (m,k,rest,attrs)=> m + `<path class="ba-seg ba-hl ba-hl-${k.slice(3)}${rest}"${attrs}/>`);
   return `<div class="bar bar-arc ${o.cls||''}"><svg viewBox="0 0 ${W} ${H}" width="100%" aria-hidden="true">${s}</svg>${o.numHTML}</div>`;
 }
 // ---- Stone-floor room: the doorway's back wall (brick, above a horizon ledge) and one flagstone floor that

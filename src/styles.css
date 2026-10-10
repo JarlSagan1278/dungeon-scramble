@@ -2426,3 +2426,12 @@ body.is-resolving .hall-fx i{ opacity:0; }
 body.is-resolving #room-floor .rf-light{ animation:none !important; opacity:.8; }
 .reduced-motion #room-floor .rf-light{ animation:none; opacity:.8; }
 .enc-card-col.enc-death{ animation:none !important; filter:none !important; }
+
+/* 1.32.64: boss arc matches the straight bars: 20px outer / 14px inner (3px rim) and the same light-top gradient */
+.bar-arc .ba-out{ stroke-width:20; }
+.bar-arc .ba-track{ stroke-width:14; }
+.bar-arc .ba-seg{ stroke-width:14; }
+.bar-arc .ba-hp{ stroke:#ff3b3b; }
+.bar-arc .ba-hl{ stroke-width:5; transform:translate(0,-3px); }
+.bar-arc .ba-hl-hp{ stroke:#ff8a8a; } .bar-arc .ba-hl-quest{ stroke:#f2dc8f; } .bar-arc .ba-hl-shield{ stroke:#a6d3ef; }
+.bar-arc .ba-hl{ opacity:.7; stroke-width:6; }
