@@ -2375,3 +2375,18 @@ body.is-resolving .hall-fx i{ opacity:0; }
   box-shadow:inset 0 0 0 1.5px #d9c9a3, 0 2px 0 rgba(0,0,0,.6) !important; }
 .boss-cycle-item.enemy-action-badge:not(.next){ opacity:.45; }
 .boss-cycle-row .boss-cycle-item.enemy-action-badge.next:not(:only-child){ box-shadow:inset 0 0 0 1.5px #f4ead0, inset 0 0 0 3px rgba(12,7,5,.9), 0 0 8px 1px rgba(235,220,185,.4), 0 2px 0 rgba(0,0,0,.6) !important; }
+
+/* ======== Room tracker v2 (1.32.55): little arched doorways floating in the dark ======== */
+.route{ border:0 !important; box-shadow:none !important; border-radius:0 !important; overflow:visible !important; gap:5px; padding:0 4px; }
+.route .node.rt-door{ background:transparent !important; border:0 !important; padding:0 !important; filter:none !important; box-shadow:none !important; }
+.rt-arch{ display:flex; align-items:center; justify-content:center; width:100%; max-width:46px; height:40px; font-style:normal; box-sizing:border-box;
+  border-radius:22px 22px 2px 2px; background:linear-gradient(#1a120c,#0c0705); border:2px solid #5a4630; border-bottom-width:3px; color:#7a6347; font-size:18px; font-weight:800; font-family:Georgia,serif; }
+.rt-arch .icon, .rt-arch svg{ width:20px; height:20px; opacity:.75; }
+.rt-door.current .rt-arch{ border-color:#e8a33d; color:#ffd58a; background:radial-gradient(ellipse at 50% 85%, #7a3a10, #1a0e07 75%); box-shadow:0 0 10px rgba(255,150,50,.55), inset 0 0 8px rgba(255,150,50,.35); }
+.rt-door.current .rt-arch .icon, .rt-door.current .rt-arch svg{ opacity:1; }
+.rt-door.done .rt-arch{ border-color:#3a2d20; color:#c9b88f; background:#0f0a06; opacity:.7; }
+.rt-door.rt-boss .rt-arch{ border-color:#7a2a22; }
+.rt-door.rt-boss.current .rt-arch{ border-color:#e8553d; box-shadow:0 0 10px rgba(230,80,50,.55), inset 0 0 8px rgba(230,80,50,.35); }
+.rt-tick{ font-size:16px; }
+.mascot-wrap{ bottom:-12px !important; }
+.mascot-marker{ height:26px !important; }

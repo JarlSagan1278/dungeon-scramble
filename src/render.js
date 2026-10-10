@@ -1106,10 +1106,10 @@ function renderRoute(){
   html += '<div class="route">';
   S.route.forEach((step,i)=>{
     const cls = i<S.routeStep?'done':(i===S.routeStep?'current':'');
-    const icon = iconSpan(step==='camp'?'camp':(step==='boss'?'boss':'door'));
+    const icon = step==='camp'?iconSpan('camp'):(step==='boss'?iconSpan('boss'):(i<S.routeStep?'<span class="rt-tick">\u2713</span>':'<span class="rt-q">?</span>'));
     const statusSuffix = cls==='done' ? ' (cleared)' : (cls==='current' ? ' (current)' : ' (ahead)');
     const tip = (ROUTE_STEP_DESC[step]||'') + statusSuffix;
-    html += `<div class="node ${floorCls} ${cls} route-tooltip-target" title="${tip}">${icon}</div>`;
+    html += `<div class="node rt-door rt-${step==='camp'?'camp':(step==='boss'?'boss':'room')} ${floorCls} ${cls} route-tooltip-target" title="${tip}"><i class="rt-arch">${icon}</i></div>`;
   });
   html += '</div>';
   const leftPct = ((Math.min(S.routeStep, n-1) + 0.5) / n * 100).toFixed(2);
