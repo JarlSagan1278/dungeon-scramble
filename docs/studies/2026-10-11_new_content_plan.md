@@ -50,20 +50,24 @@ Phase 2, **Leap Year**, at half HP: the Toadtaur Warrior joins.
 - Swap and Reroll don't exist.
 - Attack-heavy Magic dice have no way to answer a telegraph.
 
-**Draft rules for the returning faces** (from Face Effects 0.002: Reroll value 3, Swap value 2). Like a class ability, both are used by tapping the die before you build your path, once per turn each:
-- **Reroll:** reroll every other unused die on your tray (Minions stay put).
-- **Swap:** pick two dice on your tray and swap their places, to set up a path.
+**Rules for the returning faces (Jeremy, Oct 11):**
+- **Reroll:** reroll ONE die of your choice.
+- **Swap:** swap the Swap face's die with one die of your choice (they trade places).
+
+Claude's assumption, to confirm: tap it before building the path; the die is then spent for the turn.
 
 Draft dice (Magic 12 → 16):
 | Die | Faces | Hole it fills |
 |---|---|---|
-| **Absolute Zero** | Freeze, Freeze, Hit 3, Hit 3, Combo 2, blank | Freeze for attack builds |
-| **Möbius Strip** | Swap, Swap, Combo 3, Combo 2, Pivot, blank | pathing that sets up big Combos |
-| **Law of Large Numbers** | Reroll, Reroll, Hit 3, Boost 3, Block 3, blank | fishing for an answer to a wind-up |
-| **Commutative Cuirass** | Swap, Block 4, Block 4, Freeze, Heal 3, blank | a defensive answer, plus some healing (point 2 in section 1) |
+| **Absolute Zero Elixir** (gnome) | Freeze, Freeze, Hit 3, Hit 3, Combo 2, blank | Freeze for attack builds |
+| **Commutative Changeling** (pixie) | Swap, Swap, Combo 3, Combo 2, Pivot, blank | pathing that sets up big Combos |
+| **Law of Large Numbers** (dwarf) | Reroll, Reroll, Hit 3, Boost 3, Block 3, blank | fishing for an answer to a wind-up |
+| **Icebox Pi** (halfling) | Swap, Block 4, Block 4, Freeze, Heal 3, blank | a defensive answer, plus some healing (point 2 in section 1) |
 
 ## Questions for Jeremy
 1. Slot picks in section 2: OK as drafted? Any names on different slots?
 2. Toadtaur Wizard as the third Big Boss, with the Toadtaur Warrior joining in phase 2?
-3. Are the Swap and Reroll rules right, or did they work differently in the board game?
-4. The Strike-Breaker: drop it to 4 damage, or keep it as the run-ender?
+3. ~~Swap and Reroll rules~~: answered (see above).
+4. ~~The Strike-Breaker~~: dropped to 4 damage in 1.37.1 (now ends 16% of the runs that meet it).
+
+Names, stats, quests and flavor for all of the above are in the names sheet (blue cells), with faction themes: dwarves math/3D printing/engineering/mining, gnomes sorcery/biochemistry/illusions/grafting, halflings hillbillies/food, pixies illusions/trickery/old magic.

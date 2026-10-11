@@ -76,3 +76,11 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - **No universal "brace"** mechanic unless we are backed into a corner. Builds that block, freeze, outheal or nuke a boss down fast are fine.
 - **Magic dice fill the action holes:** more Freeze sources should come from the new Magic loot dice; find the gaps in action coverage and use them as the mechanical bones of the needed Magic dice. Ties into bringing back Swap and Reroll faces.
 - Shipped in 1.37.0: bosses evened to within about 15% per floor (bot HP lost per fight: F1 8-9, F2 9-11, F3 13-15); herald minions for The Necrorancher's Stampede and Myceleus's Mycelial Burst. New move names follow the math-pun theme (Dead Reckoning, Fractal Rind).
+
+## Oct 11, 2026 (later): Strike-Breaker, telegraphs, Swap/Reroll, faction themes
+- **The Strike-Breaker** (Floor 2 Deadly) drops to 4 damage (8 on heavy turns); shipped in 1.37.1. It now ends about 16% of the runs that meet it (was 34%), about boss level.
+- **Telegraphs stay** even when there isn't always a counter: the warning helps the player plan in general and adds good tension (agreed by Jeremy and Claude).
+- **Swap and Reroll rules (Jeremy):** Reroll lets you reroll ONE die of your choice. Swap lets you swap the Swap face's die with one die of your choice (they trade places on the tray). Claude's assumption, to confirm: each is used by tapping it before building your path, and the die is then spent for the turn.
+- **Faction naming themes (Jeremy):** dwarves = math, 3D printing, engineering, mining. Gnomes = sorcery, biochemistry, illusions, grafting. Halflings = hillbillies, food. Pixies = illusions, trickery, old magic. Use these, plus the math-pun theme, for new names and flavor.
+- The names sheet now holds Claude's drafted names, stats, quests and flavor for the new content (blue cells): the 7 new monsters, Toadtaur Wizard, Co-consul of Hexes (third Big Boss), and four Magic dice (Law of Large Numbers, Commutative Changeling, Absolute Zero Elixir, Icebox Pi).
+- Origin strength (bot, 250 runs per origin × class, 1.37.1): Halfling 67% wins, Dwarf 58%, Gnome 49%, Pixie 46%. Classes: Dungeoneer 61%, Arcanist 58%, Armsmaster 51%, Guard 50%. Healing (Halfling's Bonus Breakfast) is the strongest starting tool.

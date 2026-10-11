@@ -7,6 +7,7 @@
 4. **Sound / music** and 5. **art**, worked in parallel.
 
 ## Other items
+- **Origin balance:** bot win rate by origin (1.37.1): Halfling 67%, Dwarf 58%, Gnome 49%, Pixie 46%. Gnome and Pixie need help (Pixie leans on Maneuvers, which ties to the on-hold Maneuver meta). Check against real play data.
 - **Design-consistency audit**, plus a rewrite of the quest descriptions.
 - **Sound effect pass:** audit the actions and cut redundancy; one consistent theme; a rising-note melody for tension/success; dice materials change the roll sound; stronger enemy-turn and shrine sounds; airier Maneuver/dodge sounds.
 - **Background music pass:** heavy klezmer harmonic-minor battle music; success/loot music; different orchestration per floor.

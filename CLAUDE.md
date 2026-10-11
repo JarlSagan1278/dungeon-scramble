@@ -35,5 +35,7 @@ Digital prototype of Jeremy's board game (Boggle-style dice-path dungeon crawler
 - "Heat" difficulty was renamed **depth**; class badge shows highest depth cleared.
 - Boss action cycle rework is approved (Oct 11): bosses should be much more challenging and strategic around the next-turn info. Don't add Boost to Maneuver dice unless asked (last resort only); Maneuver meta is on hold pending more play data.
 
+- Naming: heavy math and math-pun theme, plus faction flavor (dwarves: math, 3D printing, engineering, mining; gnomes: sorcery, biochemistry, illusions, grafting; halflings: hillbillies, food; pixies: illusions, trickery, old magic). Mark Claude-made names blue in the names sheet.
+
 ## Open to-do list
 See `docs/TODO.md` (prioritized).

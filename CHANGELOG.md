@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.37.1
+- The Strike-Breaker (Floor 2 Deadly) hits for 4 (8 on heavy turns), down from 6 (12): it ended a third of the runs that met it.
+
 ## 1.37.0
 - Bosses evened out per floor (HP lost per fight now within about 15% on every floor): Rogue Golemancer's Golem Slam 7 and Brace 4; Heating Elemental's Flashover and Grosteque Grafter's Stitch-Rip 5; Bellicose Biomancer's Overgrowth Slam 8; Ceramic Golem's Shatterpour 7; Extruzeon base attack 3 (4 in Meltdown) and Waste Crush 8 (9 in Meltdown).
 - The Necrorancher: 48 health (was 35); new move Dead Reckoning (2 D.O.T.); Cull 7; Stampede now brings its herd with the warning.
