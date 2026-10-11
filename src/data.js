@@ -546,24 +546,24 @@ const HEAVY_EVERY = {elite:3, deadly:2};
 const BOSS_KITS = {
   'Rogue Golemancer':{ each:[{type:'dmg',value:1}], specials:[
     {name:'Summon Golems', acts:[{type:'minion',value:2}]},
-    {name:'Golem Slam', windup:true, acts:[{type:'dmg',value:7}]},
+    {name:'Golem Lemma', windup:true, acts:[{type:'dmg',value:7}]},
     {name:'Brace', acts:[{type:'shield',value:4}]} ]},
   'Heating Elemental':{ each:[{type:'dmg',value:1}], specials:[
-    {name:'Stoke', acts:[{type:'hot',value:2}]},
-    {name:'Flashover', windup:true, acts:[{type:'dmg',value:5}]},
+    {name:'Pre-heat', acts:[{type:'hot',value:2}]},
+    {name:'Melting Point', windup:true, acts:[{type:'dmg',value:5}]},
     {name:'Scorch', acts:[{type:'dot',value:2}]} ]},
   'Grosteque Grafter':{ each:[{type:'dmg',value:1}], specials:[
-    {name:'Graft Plating', acts:[{type:'shield',value:5}]},
-    {name:'Stitch-Rip', windup:true, acts:[{type:'dmg',value:5}]},
+    {name:'Grafted Plate', acts:[{type:'shield',value:5}]},
+    {name:'Pruning', windup:true, acts:[{type:'dmg',value:5}]},
     {name:'Harvest', acts:[{type:'heal',value:4}]} ]},
   // herald: Minions that land with the warning (v1.37.0), one turn to clear them.
   'The Necrorancher':{ each:[{type:'dmg',value:2}], specials:[
-    {name:'Dead Reckoning', acts:[{type:'dot',value:2}]},
+    {name:'Grazing', acts:[{type:'dot',value:2}]},
     {name:'Stampede', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:2}]},
     {name:'Cull', acts:[{type:'dmg',value:7}]} ]},
   'Bellicose Biomancer':{ each:[{type:'dmg',value:2}], specials:[
     {name:'Mutagen', acts:[{type:'hot',value:2}]},
-    {name:'Overgrowth Slam', windup:true, acts:[{type:'dmg',value:8}]},
+    {name:'Slammerhand', windup:true, acts:[{type:'dmg',value:8}]},
     {name:'Spore Cloud', acts:[{type:'dot',value:2}]} ]},
   'Ceramic Golem':{ each:[{type:'dmg',value:2}], specials:[
     {name:'Glaze', acts:[{type:'shield',value:5}]},
@@ -571,26 +571,26 @@ const BOSS_KITS = {
     {name:'Seep', acts:[{type:'dot',value:2}]} ]},
   'Extruzeon, Co-consul of Waste':{ each:[{type:'dmg',value:3}], specials:[
     {name:'Compactor', acts:[{type:'shield',value:4}]},
-    {name:'Waste Crush', windup:true, acts:[{type:'dmg',value:8}]},
+    {name:'Extrue-damage', windup:true, acts:[{type:'dmg',value:8}]},
     {name:'Recycle', acts:[{type:'hot',value:2}]} ],
     phase2:{ name:'Meltdown', each:[{type:'dmg',value:4}], specials:[
-      {name:'Waste Crush', windup:true, acts:[{type:'dmg',value:9}]},
-      {name:'Slag Spray', acts:[{type:'minion',value:2},{type:'dot',value:2}]} ]}},
+      {name:'Atomic Pull', windup:true, acts:[{type:'dmg',value:9}]},
+      {name:'Excessive Extrusion', acts:[{type:'minion',value:2},{type:'dot',value:2}]} ]}},
   'Myceleus, Co-consul of Rot':{ each:[{type:'dmg',value:5}], specials:[
-    {name:'Rot', acts:[{type:'dot',value:3}]},
-    {name:'Fractal Rind', acts:[{type:'shield',value:4}]},
-    {name:'Mycelial Burst', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]} ],
+    {name:'R.O.T.', acts:[{type:'dot',value:3}]},
+    {name:'Spore-Up', acts:[{type:'shield',value:4}]},
+    {name:'Be Fruitful and Multiply!', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]} ],
     phase2:{ name:'Fruiting Body', each:[{type:'dmg',value:4},{type:'minion',value:1}], specials:[
-      {name:'Rot', acts:[{type:'dot',value:3}]},
-      {name:'Mycelial Burst', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]} ]}},
+      {name:'R.O.T.', acts:[{type:'dot',value:3}]},
+      {name:'Be Fruitful and Multiply!', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]} ]}},
   // v1.39.0: the third Big Boss. Phase 2 (Leap Year): the Toadtaur Warrior joins.
   'Toadtaur Wizard, Assistant to the Co-consul':{ each:[{type:'dmg',value:4}], specials:[
-    {name:'Hex Factor', acts:[{type:'dot',value:2}]},
-    {name:'Square Root', acts:[{type:'shield',value:5}]},
-    {name:'Exponential Croak', windup:true, acts:[{type:'dmg',value:10}]} ],
+    {name:'Toxic Trample', acts:[{type:'dot',value:2}]},
+    {name:'Lilly Padding', acts:[{type:'shield',value:5}]},
+    {name:'Chimeronslaught', windup:true, acts:[{type:'dmg',value:10}]} ],
     phase2:{ name:'Leap Year', each:[{type:'dmg',value:4},{type:'minion',value:1}], specials:[
-      {name:'Lily Pad Lemma', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]},
-      {name:'Exponential Croak', windup:true, acts:[{type:'dmg',value:10}]} ]}},
+      {name:'Lilly Pod', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]},
+      {name:'Chimeronslaught', windup:true, acts:[{type:'dmg',value:10}]} ]}},
 };
 
 // Stand-in art for the v1.36.0 shrines until Jeremy's own art exists: each

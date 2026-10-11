@@ -239,6 +239,7 @@ function render(){
   if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); decorateArch(); maybeAutosave(); maybeScreenTransition('shrine'); return; }
   renderGame();
   decorateArch();
+  fitFoChips();
   maybeAutosave();
   maybeScreenTransition('game');
 }
@@ -596,7 +597,7 @@ function tuckCampCog(){
   } catch(err){}
 }
 document.addEventListener('animationend', ev=>{ if(ev.target && ev.target.classList && ev.target.classList.contains('fo-arch')) decorateArch(); }, true);
-window.addEventListener('resize', ()=>{ if(document.querySelector('#enc-panel .fo-arch')) decorateArch(); else if(S && S.screen==='camp') tuckCampCog(); });
+window.addEventListener('resize', ()=>{ if(document.querySelector('#enc-panel .fo-arch')){ decorateArch(); fitFoChips(); } else if(S && S.screen==='camp') tuckCampCog(); });
 
 function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
 
@@ -2080,6 +2081,19 @@ function markSymbolSeen(k){
   try{ localStorage.setItem(SYMBOLS_SEEN_KEY, JSON.stringify([...SYMBOLS_SEEN])); }catch(e){}
 }
 // Park the 'vs' mark at the vertical midpoint between the two health bars.
+// v1.39.0: a long boss move name (e.g. "Be Fruitful and Multiply!") can make the
+// enemy's chip row wider than its half of the face-off. Instead of clipping,
+// shift that row left so it ends at the column edge, spilling into the empty space under the hero.
+function fitFoChips(){
+  try{
+    document.querySelectorAll('.fo-chips').forEach(c=>{
+      c.style.transform = '';
+      const p = c.parentElement; if(!p || !c.children.length) return;
+      const dx = c.getBoundingClientRect().right - p.getBoundingClientRect().right;
+      if(dx > 1) c.style.transform = `translateX(${-Math.ceil(dx)}px)`;
+    });
+  }catch(e){}
+}
 function placeVs(){
   try{
     const vs = document.querySelector('.fo-arch .fo-vs');
