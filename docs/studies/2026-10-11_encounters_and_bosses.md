@@ -147,3 +147,24 @@ Every boss makes its **base attack every turn** plus the **special shown for thi
 | Myceleus (75) | Base 3. Sporulate: 3 minions → Rot: you gain 3 D.O.T. → **Mycelial Burst: 2 damage per minion on your tray** | "Fruiting Body": base 3, 1 extra minion every turn, specials as phase 1 |
 
 The bold specials are the wind-ups. "Damage per minion" specials (Stampede, Mycelial Burst) make clearing minions before the telegraphed turn the strategic answer.
+
+## 6. Shipped in 1.35.0 — measured results
+
+Built as approved in section 5 with these tuning changes after measuring: Floor 1 boss base attacks 2 → 1, Flashover 7 → 6; Floor 2 boss base attacks 3 → 2, Overgrowth Slam 10 → 9, Glaze 6 → 5, Mutagen H.O.T. 3 → 2, Raise the Herd 3 → 4 minions; Myceleus base 3 → 4 and Mycelial Burst 2 → 3 per Minion. Shrines take an easy/standard room 40% of the time (max one per segment), which keeps roughly today's shrine count.
+
+The study bot now values Block against the enemy's previewed next-turn damage (`intentAware`), so it braces for wind-ups the way a player would.
+
+`python3 tools/balance/study_tiers_bosses.py 300 1500` (4 combos × 300 runs):
+
+| | Before (1.34.0) | 1.35.0 |
+|---|---|---|
+| Win % (avg) | 74 | 59 (dwarf/guard 61, gnome/armsmaster 44, halfling/dungeoneer 79, pixie/arcanist 52) |
+| Deaths F1 / F2 / F3 | 11 / 190 / 104 | 74 / 356 / 64 |
+| HP lost per boss fight F1 · F2 · F3 | 3.8 · 3.4 · 2.6 | 9.3 · 9.5 · 14.6 |
+| Boss fights that end the run F1 · F2 · F3 | under 1% | 6% · 13% · 5% |
+
+Per boss (HP lost per fight / share of fights that end the run): Rogue Golemancer 7.4 / 2%, Heating Elemental 10.6 / 11%, Grosteque Grafter 10.1 / 5%; The Necrorancher 5.3 / 4%, Bellicose Biomancer 11.3 / 20%, Ceramic Golem 12.4 / 15%; Extruzeon 20.9 / 6%, Myceleus 8.1 / 3%.
+
+By tier (HP lost per fight): Floor 1 easy 2.1, standard 3.0, elite 3.7; Floor 2 easy 4.8, standard 4.2, elite 6.1, deadly 13.9 (29% of Strike-Breaker fights end the run); Floor 3 easy 1.9, standard 2.5, elite 5.0, deadly 7.1.
+
+Open questions for playtesting: Floor 2 now holds most deaths; Floor 1 regular rooms are close to harmless while its bosses are the main threat; Floor 2 "easy" cards hit harder than its standard ones (4.8 vs 4.2), so the Floor 2 split may need a second look; Myceleus is much softer than Extruzeon.

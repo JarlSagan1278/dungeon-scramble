@@ -909,45 +909,51 @@ function pickLootNUnused(pool, n){
   return avail.concat(repeats);
 }
 
+// Which tier this room is (v1.35.0): the floor's slot pattern (ROOM_TIER_SLOTS,
+// data.js), shifted up by the Gauntlet depth modifier.
+function roomTierForStep(step){
+  const order = ['easy','standard','elite'];
+  let t = ROOM_TIER_SLOTS[step] || 'standard';
+  const up = depthRank('gauntlet');
+  if(up>0 && t!=='elite'){ const i = order.indexOf(t); t = order[Math.min(i+up, 2)]; }
+  return t;
+}
+
+// Draws the card for a regular room. Shrines may take an easy or standard
+// room (at most one per segment, never the run's very first room); the
+// first room of the run is always a plain Enemy; at most one Trap per
+// segment. A deadly card occasionally takes an elite room on Floors 2-3.
+// No repeats within a run until a tier's pool runs dry, then the nearest
+// tier fills in.
+function drawRoomCard(floor){
+  const isVeryFirstEncounter = S.floorIdx===0 && S.routeStep===1;
+  let tier = roomTierForStep(S.routeStep);
+  const unused = c => !S.usedCards.has(c.name);
+  if(!isVeryFirstEncounter && tier!=='elite' && !S.segmentShrineUsed && floor.shrines.length && Math.random() < SHRINE_SLOT_CHANCE){
+    const sh = floor.shrines.filter(unused);
+    return pick(sh.length ? sh : floor.shrines);
+  }
+  const fights = floor.enemies.concat(isVeryFirstEncounter || S.segmentTrapUsed ? [] : floor.traps);
+  if(tier==='elite'){
+    const deadly = fights.filter(c=>encounterTier(c)==='deadly' && unused(c));
+    if(deadly.length && Math.random() < DEADLY_CHANCE + 0.12*depthRank('dread')) return pick(deadly);
+  }
+  const fallback = {easy:['easy','standard','elite'], standard:['standard','easy','elite'], elite:['elite','standard','easy']}[tier];
+  for(const t of fallback){
+    const pool = fights.filter(c=>encounterTier(c)===t && unused(c));
+    if(pool.length) return pick(pool);
+  }
+  const any = fights.filter(c=>encounterTier(c)!=='deadly');
+  return pick(any.length ? any : fights); // every eligible card already seen this run -- last resort repeat
+}
+
 function drawEncounter(kind){
   const floor = FLOORS[S.floorIdx];
   let e;
   if(kind==='boss'){
     e = clone(pickUnused(S.floorIdx===2 ? BIG_BOSSES : floor.bosses));
   } else {
-    // Category odds match this floor's actual card counts (as if all its
-    // Enemy/Trap/Shrine cards were shuffled into one deck), capped at one
-    // Shrine and one Trap per segment (the stretch of rooms between two
-    // Camps, or between a Camp and the Boss) -- once a segment has drawn
-    // one, further rooms in that same segment only draw Enemies (or the
-    // other still-available type).
-    // The very first encounter of the whole run (Floor 1, right out of the
-    // starting Camp) is always a plain Enemy -- a Shrine or Trap as the
-    // player's first-ever room is a bad first impression (an anticlimax, or
-    // a punish before they've seen a single real fight), so Trap/Shrine are
-    // excluded here regardless of the segment's usual one-each allowance.
-    const isVeryFirstEncounter = S.floorIdx===0 && S.routeStep===1;
-    const candidates = [{pool:floor.enemies}];
-    if(!isVeryFirstEncounter){
-      if(!S.segmentTrapUsed) candidates.push({pool:floor.traps});
-      if(!S.segmentShrineUsed) candidates.push({pool:floor.shrines});
-    }
-    const totalCards = candidates.reduce((sum,c)=>sum+c.pool.length, 0);
-    let roll = rand(totalCards);
-    let categoryPool = candidates[0].pool;
-    for(const c of candidates){
-      if(roll < c.pool.length){ categoryPool = c.pool; break; }
-      roll -= c.pool.length;
-    }
-    // if this category is used up, fall back to this segment's other still-
-    // allowed pools before ever allowing an outright repeat
-    let avail = categoryPool.filter(c=>!S.usedCards.has(c.name));
-    if(avail.length===0){
-      const segmentAllowed = candidates.reduce((arr,c)=>arr.concat(c.pool), []);
-      avail = segmentAllowed.filter(c=>!S.usedCards.has(c.name));
-      if(avail.length===0) avail = segmentAllowed; // segment's allowed pool exhausted -- last resort
-    }
-    e = clone(pick(avail));
+    e = clone(drawRoomCard(floor));
     if(e.type==='Trap') S.segmentTrapUsed = true;
     if(e.type==='Shrine') S.segmentShrineUsed = true;
   }
@@ -967,12 +973,11 @@ function drawEncounter(kind){
   clearAllMinions();
   e._lastHealth = e.curHealth; // baseline for the heal/damage flash effect
   if(e.type==='Boss' || e.type==='Big Boss'){
-    // Bosses cycle one action at a time through whichever of their stats are
-    // non-zero, rather than applying all of them simultaneously every turn.
-    e.actionCycle = ['dmg','minion','shield','hot','heal','dot']
-      .filter(stat => e[stat]>0)
-      .map(stat => ({type:stat, value:e[stat]}));
-    e.cycleIndex = 0;
+    // Bosses (v1.35.0): base attack every turn plus the next special from
+    // their move kit, shown a turn ahead -- see BOSS_KITS (data.js).
+    initEnemyTurnState(e);
+  } else if(e.type!=='Shrine'){
+    initEnemyTurnState(e);
   }
   return e;
 }
@@ -1790,43 +1795,121 @@ function placePendingMinions(n){
 // Bosses cycle one action at a time through their action list (built in
 // drawEncounter from whichever stats are non-zero) instead of applying every
 // stat simultaneously every turn, per the manual's Boss Encounter Cards.
-function applyBossCycleAction(e){
-  const action = e.actionCycle[e.cycleIndex % e.actionCycle.length];
-  e.cycleIndex++;
-  switch(action.type){
-    case 'dmg': return dealEncounterDamage(e, action.value);
-    case 'minion': return spawnMinions(e, action.value) || `${e.name} tries to summon minions, but your Tray has no room.`;
-    case 'shield': e.curShield += action.value; return `${e.name} gains ${action.value} shield.`;
-    case 'heal': e.curHealth = cap(e.curHealth+action.value, e.maxHealth); return `${e.name} heals ${action.value}.`;
-    case 'hot': e.curHOT += action.value; return `${e.name} channels ${action.value} H.O.T.`;
-    case 'dot': S.playerDOT += action.value; return `You gain ${action.value} D.O.T.`;
+// ---- Enemy turns (v1.35.0) ----
+// Sets up a boss's move kit or a regular enemy's tier. Also upgrades an
+// encounter restored from a pre-1.35 save (no kit/tier yet) the first time
+// it is shown or acts.
+function initEnemyTurnState(e){
+  if(!e || e.type==='Shrine') return;
+  if(e.type==='Boss' || e.type==='Big Boss'){
+    if(e.kit) return;
+    e.kit = clone(BOSS_KITS[e.name] || {each:[{type:'dmg',value:e.dmg||1}], specials:[{name:'Strike', windup:true, acts:[{type:'dmg',value:(e.dmg||1)*2}]}]});
+    e.phase = 1; e.specialIdx = 0;
+    delete e.actionCycle; delete e.cycleIndex;
+  } else if(e.tier===undefined){
+    e.tier = encounterTier(e); e.turnsActed = e.turnsActed||0;
   }
-  return `${e.name} takes no action.`;
+}
+// One enemy "act" (see BOSS_KITS, data.js). Returns the log/toast line.
+function applyEnemyAct(e, act){
+  const v = act.value||0;
+  switch(act.type){
+    case 'dmg': return dealEncounterDamage(e, v);
+    case 'minion': return spawnMinions(e, v) || `${e.name} tries to summon minions, but your Tray has no room.`;
+    case 'shield': e.curShield += v; return `${e.name} gains ${v} shield.`;
+    case 'heal': e.curHealth = cap(e.curHealth+v, e.maxHealth); return `${e.name} heals ${v}.`;
+    case 'hot': e.curHOT += v; return `${e.name} channels ${v} H.O.T.`;
+    case 'dot': S.playerDOT += v; return `You gain ${v} D.O.T.`;
+    case 'dmgPerMinion': {
+      const n = S.tray.filter(c=>c.minion).length;
+      return n>0 ? dealEncounterDamage(e, v*n) : `${e.name} finds no Minions on your Tray.`;
+    }
+    case 'dropShield': e.curShield = 0; return `${e.name} drops its Shield.`;
+  }
+  return '';
 }
 
+function bossKitNow(e){ return (e.phase===2 && e.kit.phase2) ? e.kit.phase2 : e.kit; }
+function bossNextSpecial(e){ const k = bossKitNow(e); return k.specials[(e.specialIdx||0) % k.specials.length]; }
+
+// A boss turn: its base attack (kit.each) always lands; the telegraphed
+// special lands too unless Freeze cancelled it. A boss with a phase 2 enters
+// it after the first turn that ends at or below half HP, so the special the
+// player saw coming is always the one that happens.
+function bossTakeTurn(e, frozen){
+  const kit = bossKitNow(e);
+  const parts = kit.each.map(a=>applyEnemyAct(e, a));
+  const sp = bossNextSpecial(e);
+  e.specialIdx = (e.specialIdx||0) + 1;
+  if(frozen){ parts.push(`${e.name} is frozen: ${sp.name} is cancelled.`); logMsg('sys', `${e.name} is frozen: ${sp.name} is cancelled.`); }
+  else { parts.push(`${sp.name}!`); sp.acts.forEach(a=>{ const t = applyEnemyAct(e, a); if(t) parts.push(t); }); }
+  teleLog('boss_move', {name:sp.name, frozen:!!frozen, phase:e.phase||1});
+  if(kit===e.kit && e.kit.phase2 && e.curHealth>0 && e.curHealth <= e.maxHealth/2){
+    e.phase = 2; e.specialIdx = 0;
+    const t = `${e.name} enters ${e.kit.phase2.name}!`;
+    logMsg('sys', t); parts.push(t);
+    if(typeof screenShake==='function') screenShake('small');
+    if(typeof playTone==='function') playTone('closeCall');
+    teleLog('boss_phase', {name:e.name, phase:2});
+  }
+  return parts.join(' ');
+}
+
+// Elite/deadly enemies telegraph a heavy turn every HEAVY_EVERY[tier] turns.
+function enemyHeavyNext(e){ const n = HEAVY_EVERY[e.tier]; return !!n && ((e.turnsActed||0)+1) % n === 0; }
+// What a heavy turn doubles: the attack, or (no attack) the biggest of Minions/D.O.T./Shield.
+function enemyHeavyStat(e){
+  if(e.dmg>0) return 'dmg';
+  let best = null;
+  ['minion','dot','shield'].forEach(k=>{ if(e[k]>0 && (!best || e[k]>e[best])) best = k; });
+  return best;
+}
 
 function runEncounterAction(){
   const e = S.encounter;
-  if(S.freezeNext){
-    S.freezeNext = false;
+  initEnemyTurnState(e);
+  const frozen = !!S.freezeNext;
+  S.freezeNext = false;
+  if(e.kit) return bossTakeTurn(e, frozen);
+  const heavy = enemyHeavyNext(e);
+  e.turnsActed = (e.turnsActed||0) + 1;
+  if(frozen && !heavy){
     const text = `${e.name} is frozen and skips its action.`;
     logMsg('sys', text);
     return text;
   }
-  if((e.type==='Boss'||e.type==='Big Boss') && e.actionCycle && e.actionCycle.length){
-    return applyBossCycleAction(e);
-  }
+  const hs = (heavy && !frozen) ? enemyHeavyStat(e) : null;
+  const x = k => (k===hs ? 2 : 1);
   const parts = [];
-  if(e.dmg>0) parts.push(dealEncounterDamage(e, e.dmg));
-  if(e.shield>0){ e.curShield += e.shield; parts.push(`${e.name} gains ${e.shield} shield.`); }
+  if(heavy) parts.push(frozen ? `${e.name} is frozen: its heavy turn is cancelled.` : 'Heavy turn!');
+  if(e.dmg>0) parts.push(dealEncounterDamage(e, e.dmg*x('dmg')));
+  if(e.shield>0){ e.curShield += e.shield*x('shield'); parts.push(`${e.name} gains ${e.shield*x('shield')} shield.`); }
   if(e.heal>0){ e.curHealth = cap(e.curHealth+e.heal, e.maxHealth); parts.push(`${e.name} heals ${e.heal}.`); }
   if(e.hot>0){ e.curHOT += e.hot; parts.push(`${e.name} channels ${e.hot} H.O.T.`); }
-  if(e.dot>0){ S.playerDOT += e.dot; parts.push(`You gain ${e.dot} D.O.T.`); }
+  if(e.dot>0){ S.playerDOT += e.dot*x('dot'); parts.push(`You gain ${e.dot*x('dot')} D.O.T.`); }
   if(e.minion>0){
-    const t = spawnMinions(e, e.minion);
+    const t = spawnMinions(e, e.minion*x('minion'));
     if(t) parts.push(t);
   }
+  if(heavy) teleLog('heavy_turn', {name:e.name, frozen});
   return parts.length ? parts.join(' ') : `${e.name} takes no action.`;
+}
+
+// Preview of the enemy's coming turn, for the face-off chips and the bot:
+// {heavy, special, dmg} where dmg is the total direct damage it will deal
+// (before your Block), counting Minions currently on your tray.
+function enemyNextTurnPreview(e){
+  if(!e) return {dmg:0};
+  initEnemyTurnState(e);
+  const mins = S.tray ? S.tray.filter(c=>c.minion).length : 0;
+  const dmgOf = acts => acts.reduce((a,x)=>a + (x.type==='dmg' ? x.value : x.type==='dmgPerMinion' ? x.value*mins : 0), 0);
+  if(e.kit){
+    const sp = bossNextSpecial(e), kit = bossKitNow(e);
+    return {special:sp, heavy:!!sp.windup, dmg: dmgOf(kit.each) + (S.freezeNext ? 0 : dmgOf(sp.acts))};
+  }
+  const heavy = enemyHeavyNext(e) && !S.freezeNext;
+  if(S.freezeNext && !enemyHeavyNext(e)) return {heavy:false, dmg:0};
+  return {heavy, heavyStat: heavy ? enemyHeavyStat(e) : null, dmg: (e.dmg||0) * (heavy && enemyHeavyStat(e)==='dmg' ? 2 : 1)};
 }
 
 function upgradeOneBasicDie(cat){

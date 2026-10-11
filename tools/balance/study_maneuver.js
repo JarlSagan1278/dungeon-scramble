@@ -11,11 +11,12 @@
 //     fxAdd {dot,hot,minion,shield,heal:[..]} raises an effect the enemy already has (bosses: matching actionCycle steps).
 //   pivotFace: 'pivot' (default) | 'boost' | 'blank' -- replaces the Pivot faces on Maneuver II/III (Boost = Boost1, x2).
 //   manLevel: 1 (default) | 2 | 3 -- starting Maneuver dice begin at this level, to isolate the face change.
-//   bossMode (test-only): 'cycle' (today: one cycle step per turn) | 'attackPlus' (boss also hits for its base damage
+//   intentAware (default true, needs build >=1.35.0): Block is valued against the enemy's previewed next-turn damage.
+//   bossMode (test-only, builds <1.35.0 only): 'cycle' (today: one cycle step per turn) | 'attackPlus' (boss also hits for its base damage
 //     every turn the cycle step isn't the attack) | 'attackPlusPhase' (attackPlus, and at <=50% HP it takes two cycle steps a turn)
 // usage: node study_maneuver.js '<json config>'
 let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node22/lib/node_modules/playwright')); }
-const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{}, pivotFace:'pivot', manLevel:1, bossMode:'cycle' }, JSON.parse(process.argv[2]||'{}'));
+const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{}, pivotFace:'pivot', manLevel:1, bossMode:'cycle', intentAware:true }, JSON.parse(process.argv[2]||'{}'));
 (async()=>{
 const b=await chromium.launch();const page=await b.newPage();
 page.on('pageerror',e=>console.log('PAGEERR',e.message));
@@ -128,7 +129,12 @@ let res = await page.evaluate((cfg)=>{
     const missing = S.maxHealth - S.health;
     const need = e.curHealth + (e.curShield||0);
     let dmg = ef.totalDamage + (cfg.questAware ? questBonus(ef) : 0); const overshoot = Math.max(0, dmg-need);
-    let v = dmg - 0.6*overshoot + (ef.dotToEncounter||0)*1.2 + Math.min(ef.healGain||0, missing)*0.9*(missing>3?1:0.5) + (ef.blockGain||0)*0.45 + (ef.hotToPlayer||0)*0.8;
+    let blockV = (ef.blockGain||0)*0.45;
+    if(cfg.intentAware && typeof enemyNextTurnPreview==='function' && dmg<need){
+      const inc = Math.max(0, enemyNextTurnPreview(e).dmg - (S.playerBlock||0));
+      blockV = Math.min(ef.blockGain||0, inc)*1.0 + Math.max(0,(ef.blockGain||0)-inc)*0.1;
+    }
+    let v = dmg - 0.6*overshoot + (ef.dotToEncounter||0)*1.2 + Math.min(ef.healGain||0, missing)*0.9*(missing>3?1:0.5) + blockV + (ef.hotToPlayer||0)*0.8;
     // killing is worth a lot (ends the enemy's counterattack)
     if(dmg>=need) v += 6;
     return v;

@@ -1391,34 +1391,47 @@ function renderEncounterCard(e, mode){
   // treatment as the boss cycle row (all badges "active", since none of
   // them are held back for a future turn) -- easier to read at a glance,
   // and visually consistent between boss and regular encounter cards.
+  const nextTurn = enemyNextTurnPreview(e);
   const regularActionsRow = (!isBoss) ? (()=>{
+    // v1.35.0: elite/deadly enemies telegraph a heavy turn (one stat doubled).
+    const hs = nextTurn.heavy ? nextTurn.heavyStat : null;
     const items = [];
-    if(e.dmg) items.push({type:'hit', label:'Hit', val:e.dmg});
-    if(e.minion) items.push({type:'minion', label:'Minion', val:e.minion});
-    if(e.shield) items.push({type:'block', label:'Shield', val:e.shield});
-    if(e.heal) items.push({type:'heal', label:'Heal', val:e.heal});
-    if(e.hot) items.push({type:'hot', label:'H.O.T.', val:e.hot});
-    if(e.dot) items.push({type:'dot', label:'D.O.T.', val:e.dot});
+    if(e.dmg) items.push({type:'hit', stat:'dmg', label:'Hit', val:e.dmg});
+    if(e.minion) items.push({type:'minion', stat:'minion', label:'Minion', val:e.minion});
+    if(e.shield) items.push({type:'block', stat:'shield', label:'Shield', val:e.shield});
+    if(e.heal) items.push({type:'heal', stat:'heal', label:'Heal', val:e.heal});
+    if(e.hot) items.push({type:'hot', stat:'hot', label:'H.O.T.', val:e.hot});
+    if(e.dot) items.push({type:'dot', stat:'dot', label:'D.O.T.', val:e.dot});
     if(!items.length) return '';
-    const chips = items.map(it=>`<span class="boss-cycle-item next enemy-action-badge" title="${enemyActionTooltip(it.type, it.val)}">${iconSpan(it.type, ICON_VALUE_SLOT.has(it.type)?it.val:null)} ${it.label}${!ICON_VALUE_SLOT.has(it.type)?' '+it.val:''}</span>`).join('');
+    const chips = items.map(it=>{ const v = it.stat===hs ? it.val*2 : it.val; return `<span class="boss-cycle-item next enemy-action-badge${it.stat===hs?' heavy':''}" title="${it.stat===hs?'Heavy turn: doubled. ':''}${enemyActionTooltip(it.type, v)}">${iconSpan(it.type, ICON_VALUE_SLOT.has(it.type)?v:null)} ${it.label}${!ICON_VALUE_SLOT.has(it.type)?' '+v:''}</span>`; }).join('');
     return `<div class="boss-cycle-row"><span class="hint" style="margin:0;">Each turn:</span>${chips}</div>`;
   })() : '';
   const art = ART_WRONG.has(e.name) ? null : MONSTER_ART[e.name];
-  const bossCycle = (isBoss && e.actionCycle && e.actionCycle.length) ? (()=>{
-    const labels = {dmg:'Hit', minion:'Minion', shield:'Shield', heal:'Heal', hot:'H.O.T.', dot:'D.O.T.'};
-    const iconKey = {dmg:'hit', minion:'minion', shield:'block', heal:'heal', hot:'hot', dot:'dot'};
-    const items = e.actionCycle.map((a,i)=>{
-      const isNext = i === (e.cycleIndex % e.actionCycle.length);
-      const showVal = ICON_VALUE_SLOT.has(iconKey[a.type]) ? null : a.value;
-    return `<span class="boss-cycle-item ${isNext?'next':''} enemy-action-badge" title="${enemyActionTooltip(iconKey[a.type], a.value)}">${iconSpan(iconKey[a.type], ICON_VALUE_SLOT.has(iconKey[a.type])?a.value:null)} ${labels[a.type]}${showVal!=null?' '+showVal:''}</span>`;
-    }).join('');
-    return `<div class="boss-cycle-row"><span class="hint" style="margin:0;">Cycles through:</span>${items}</div>`;
+  // v1.35.0: a boss's base attack (every turn) plus its next special, named.
+  const bossCycle = (isBoss && e.kit) ? (()=>{
+    const iconKey = {dmg:'hit', dmgPerMinion:'hit', minion:'minion', shield:'block', heal:'heal', hot:'hot', dot:'dot'};
+    const actText = a => a.type==='dmgPerMinion' ? `${a.value} per Minion on your Tray` : a.type==='dropShield' ? 'drops its Shield' : enemyActionTooltip(iconKey[a.type], a.value);
+    const chip = (a, extraCls, label) => {
+      const ik = iconKey[a.type]; if(!ik) return '';
+      const inSlot = ICON_VALUE_SLOT.has(ik) && a.type!=='dmgPerMinion';
+      const valTxt = a.type==='dmgPerMinion' ? ` ${a.value}/Minion` : (!inSlot ? ' '+a.value : '');
+      return `<span class="boss-cycle-item next enemy-action-badge ${extraCls}" title="${label?label+': ':''}${actText(a)}">${iconSpan(ik, inSlot?a.value:null)}${label?' '+label:''}${valTxt}</span>`;
+    };
+    const kit = bossKitNow(e), sp = nextTurn.special;
+    const base = kit.each.map(a=>chip(a,'','')).join('');
+    const frozen = !!S.freezeNext;
+    const spMain = sp.acts.find(a=>iconKey[a.type]) || sp.acts[0];
+    const spTip = `${sp.name}: ${sp.acts.map(actText).join(', ')}${frozen?' (cancelled by Freeze)':''}`;
+    const special = `<span class="boss-cycle-item next enemy-action-badge boss-special${sp.windup&&!frozen?' heavy':''}${frozen?' frozen':''}" title="${spTip}">${iconKey[spMain.type]?iconSpan(iconKey[spMain.type], ICON_VALUE_SLOT.has(iconKey[spMain.type])?spMain.value:null):''} ${sp.name}${spMain.type==='dmgPerMinion'?' &times;'+iconSpan('minion'):(!ICON_VALUE_SLOT.has(iconKey[spMain.type]||'')&&spMain.value?' '+spMain.value:'')}</span>`;
+    return `<div class="boss-cycle-row${kit.each.length>1?' crowded':''}"><span class="hint" style="margin:0;">Next turn:</span>${base}${special}</div>`;
   })() : '';
   if(mode==='faceoff'){
     // The doorway face-off: your hero on the left, the monster (mirrored to face you) on the
     // right, each with their own health bar underneath. See decorateArch() for the stone frame.
     const chipsOnly = (isBoss ? bossCycle : regularActionsRow).replace(/<span class="hint"[^>]*>[^<]*<\/span>/,'');
-    const typeTag = (e.type && e.type!=='Enemy') ? `<small class="fo-type${isBoss?' fo-type-inline':''}">${e.type}</small>` : '';
+    const tierWord = (e.tier==='elite'||e.tier==='deadly') ? (e.tier==='elite'?'Elite':'Deadly') : '';
+    const typeWord = isBoss ? (e.type + '') : [tierWord, e.type!=='Enemy'?e.type:''].filter(Boolean).join(' ');
+    const typeTag = typeWord ? `<small class="fo-type${isBoss?' fo-type-inline':''}${e.tier==='deadly'?' fo-type-deadly':''}">${typeWord}</small>` : '';
     const questLine = (e.quests && e.quests.length)
       ? `<div class="fo-quests-float" style="animation-delay:-${Math.round(performance.now()%3100)}ms" title="Complete these during the fight for bonus rewards"><div class="fo-quests-label">Quests</div><div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, e.questsDone[i])}</span>`; }).join('')}</div></div>` : '';
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
@@ -1450,7 +1463,7 @@ function renderEncounterCard(e, mode){
             </div>`}${fx.deltaHTML}${tickFloatersHTML('enemy')}<div class="kill-hint fo-hint ${killHint?'kill-hint-'+killHint.state:''}" ${killHint?`data-hint="${killHint.state}"`:''}>${killHint?killHint.text:'&nbsp;'}</div></div>
           <div class="fo-name" ${e.flavor?`title="${e.flavor.replace(/"/g,'&quot;')}"`:''}>${typeTag}${e.name}</div>
           <div class="fo-chips fo-buffs">${hudChips(statuses)}</div>
-          ${chipsOnly?`<div class="fo-turnlabel" title="${isBoss?'Bosses cycle through these actions, one per turn (the lit one is next).':'The enemy does all of these every turn.'}">${isBoss?'Cycles through':'Every turn'}</div>`:''}
+          ${chipsOnly?`<div class="fo-turnlabel${nextTurn.heavy?' heavy':''}" title="${isBoss?'Every turn the boss makes its base attack plus the special shown (Freeze cancels the special).':(HEAVY_EVERY[e.tier]?'The enemy does all of these every turn. Every '+HEAVY_EVERY[e.tier]+(HEAVY_EVERY[e.tier]===2?'nd':'rd')+' turn is a heavy turn that doubles one of them (Freeze cancels it).':'The enemy does all of these every turn.')}">${isBoss?(e.phase===2?(nextTurn.heavy?'Phase 2 &middot; Wind-up!':'Phase 2 &middot; Next turn'):(nextTurn.heavy?'Wind-up next!':'Next turn')):(nextTurn.heavy?'Heavy turn next!':(HEAVY_EVERY[e.tier]?'Heavy in '+(HEAVY_EVERY[e.tier]-((e.turnsActed||0)%HEAVY_EVERY[e.tier])):'Every turn'))}</div>`:''}
           <div class="fo-chips">${chipsOnly}</div>
         </div>
       </div>
@@ -2073,7 +2086,7 @@ function maybeShowSymbolIntro(){
       if(t && !SYMBOLS_PRELEARNED.includes(t) && !SYMBOLS_SEEN.has(t)){ key = t; break; }
     }
     const e = S.encounter;
-    if(!key && !SYMBOLS_SEEN.has('minion') && (e.minion>0 || (e.actionCycle||[]).includes('minion'))) key = 'minion';
+    if(!key && !SYMBOLS_SEEN.has('minion') && (e.minion>0 || (e.kit && [e.kit, e.kit.phase2].some(k=>k && k.each.concat(...k.specials.map(x=>x.acts)).some(x=>x.type==='minion'))))) key = 'minion';
     if(!key) return;
     markSymbolSeen(key);
     const isMinion = key==='minion';

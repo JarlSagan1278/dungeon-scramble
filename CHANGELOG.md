@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.35.0
+- Bosses reworked: base attack every turn plus a named special from each boss's own move list, shown a turn ahead; big telegraphed wind-ups (e.g. Waste Crush 12, Stampede 2 per Minion). Freeze cancels the special, not the base attack. Big Bosses enter Phase 2 at half HP (Extruzeon: Meltdown, Myceleus: Fruiting Body).
+- Encounter tiers on every floor (easy / standard / elite / deadly). Rooms follow easy -> standard -> elite, Camp, standard -> elite, Boss. Deadly cards (The Strike-Breaker, Self-Replicating Forge) rarely take an elite room on Floors 2-3. Shrines only appear in easy/standard rooms (40% each, max one per segment).
+- Elite enemies telegraph a heavy turn every 3rd turn, deadly every 2nd (double attack, or double their biggest effect); Freeze cancels it.
+- Morel Dilemma and Unventilated Workshop now attack (2) with H.O.T. 1; Self-Replicating Forge spawns 4 Minions (was 6).
+- New depth modifiers: Dread (more deadly rooms) and Gauntlet (rooms shift up a tier).
+- Face-off shows the boss's next special, heavy turns in red, and Elite/Deadly tags.
+
 ## 1.34.0 / 1.33.x (uncommitted before this file; see commit)
 - Minions: queued after the roll; leap/dodge/pivot onto covered spaces; reveal only during resolution; blank landing ends path; eyes + twitch; greyed like unreachable dice.
 - Camp: Organize dice area folds to two rows when it would scroll; relics below health bar; title screen shows only earned badges and the version number.

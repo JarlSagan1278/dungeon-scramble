@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.34.0';
+const GAME_VERSION = '1.35.0';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -371,7 +371,7 @@ const FLOOR2_ENEMIES = [
 const FLOOR2_TRAPS = [
   enc('Adhesive Pest Traps','Trap',30,{questHealth:20,dmg:2,minion:2,quests:['15 damage: 3 maneuvers','15 damage: 4 maneuvers','15 damage: 5 maneuvers'],flavor:'"Environmentally friendly snares for unfriendly environments"'}),
   enc('Ditched Heist','Trap',30,{questHealth:20,dmg:2,shield:3,quests:['15 damage: any 8 actions','15 damage: any 3 or fewer actions','20 damage: 8 blanks'],flavor:'Looks like the previous party spent too long describing their plans to finish them.'}),
-  enc('Unventilated Workshop','Trap',30,{questHealth:20,hot:2,quests:['15 damage: 2 block','15 damage: 4 maneuvers','nullify: 12+ damage'],flavor:'"Carol never wore her ventilator. Now she doesn\u2019t need it."'}),
+  enc('Unventilated Workshop','Trap',30,{questHealth:20,dmg:2,hot:1,quests:['15 damage: 2 block','15 damage: 4 maneuvers','nullify: 12+ damage'],flavor:'"Carol never wore her ventilator. Now she doesn\u2019t need it."'}),
   enc('The Strike-Breaker','Trap',30,{questHealth:20,dmg:6,quests:['5 damage: survive 2','10 damage: survive 4','15 damage: survive 6'],flavor:'Inevitably causes scabs.'}),
 ];
 const FLOOR2_SHRINES = [
@@ -391,7 +391,7 @@ const FLOOR2_BOSSES = [
 ];
 
 const FLOOR3_ENEMIES = [
-  enc('Morel Dilemma','Enemy',14,{minion:2,hot:2,flavor:'A fungal species that has stumped, and subsequently eaten, philosophers for generations.'}),
+  enc('Morel Dilemma','Enemy',14,{dmg:2,minion:2,hot:1,flavor:'A fungal species that has stumped, and subsequently eaten, philosophers for generations.'}),
   enc('Chimeric Sludge','Enemy',25,{questHealth:12,dmg:3,hot:2,quests:['12 damage: 4 maneuvers'],flavor:'Biological slag, made up of countless individual chimeras.'}),
   enc('Gnome Chomper','Enemy',28,{questHealth:6,dmg:6,quests:['6 damage: 3 maneuvers'],flavor:'"The Gnomish Chempire is the leading zealot state!"'}),
   enc('Parasite Seer','Enemy',20,{dmg:3,shield:3,flavor:'Sees into multiple parallel futures, though limited only to popular travel destinations.'}),
@@ -405,7 +405,7 @@ const FLOOR3_ENEMIES = [
 const FLOOR3_TRAPS = [
   enc('Anti-Euclidian Space','Trap',40,{questHealth:30,dmg:7,shield:2,quests:['10 damage: any 10 actions','15 damage: any 12 actions','20 damage: any 15 actions'],flavor:'Where forbidden postulates are illogically deduced from perfidious axioms.'}),
   enc('Ergot Eruption','Trap',40,{questHealth:30,dmg:3,hot:3,quests:['15 damage: 4 maneuvers','20 damage: 3 pivot','3 hot: 15+ damage'],flavor:'"Fortune favors the mold" — Plinthi the Eldar before death.'}),
-  enc('Self-Replicating Forge','Trap',40,{questHealth:30,dmg:3,minion:6,quests:['15 damage: 4 maneuvers','20 damage: 3 boosts','1 freeze: 15+ damage'],flavor:'Hydra-aulic systems rebuild themselves stronger when damaged.'}),
+  enc('Self-Replicating Forge','Trap',40,{questHealth:30,dmg:3,minion:4,quests:['15 damage: 4 maneuvers','20 damage: 3 boosts','1 freeze: 15+ damage'],flavor:'Hydra-aulic systems rebuild themselves stronger when damaged.'}),
   enc('Bio-Mutant Escape','Trap',40,{questHealth:30,dmg:4,minion:4,quests:['15 damage: 2 nullify','20 damage: 4 support actions','20 damage: survive 4'],flavor:'No weapon known to gnome can stop 30-50 feral mutants.'}),
 ];
 const FLOOR3_SHRINES = [
@@ -424,6 +424,90 @@ const FLOORS = [
   {enemies:FLOOR2_ENEMIES, traps:FLOOR2_TRAPS, shrines:FLOOR2_SHRINES, bosses:FLOOR2_BOSSES, lootPool:GILDED, lootName:'Gilded'},
   {enemies:FLOOR3_ENEMIES, traps:FLOOR3_TRAPS, shrines:FLOOR3_SHRINES, bosses:[], lootPool:MAGIC, lootName:'Magic'},
 ];
+
+// ---- Encounter tiers (v1.35.0) ----
+// Every Enemy/Trap has a difficulty tier. Each floor's rooms follow a slot
+// pattern (see ROOM_TIER_SLOTS) instead of a pure random draw, so a floor
+// always builds: easy -> standard -> elite, Camp, standard -> elite, Boss.
+// 'deadly' cards are the rare spawns: one occasionally takes an elite slot
+// on Floors 2-3 (DEADLY_CHANCE, raised by the Dread depth modifier).
+// Starting assignment from the Oct 11 2026 bot study
+// (docs/studies/2026-10-11_encounters_and_bosses.md).
+const ENCOUNTER_TIER = {
+  // Floor 1
+  'Filement Bunny':'easy','Wooden Golem':'easy','Beaker Breakers':'easy','United Separatists':'easy',
+  'Rigged Sporks':'easy','Unauthorized Transfusion':'easy',
+  'Feral Pet Rock':'standard','Viscous Orb':'standard','Grafted Grifter':'standard','Displacer Lair':'standard',
+  'Amanitabomination':'elite','Leper Colonizers':'elite','Unbound Automa':'elite','Leper Con-Trap':'elite',
+  // Floor 2
+  'Unventilated Workshop':'easy','Adhesive Pest Traps':'easy','The Warcart':'easy','Armored Gear-Pest':'easy',
+  'Rogue Technician':'standard','Displacer Kitty':'standard','Blastogenesis Engine':'standard','Ditched Heist':'standard',
+  'Half-life Host':'elite','Rusty Golem':'elite','Illegal Operation':'elite','Lichen-Thrope':'elite','Fungal Flayer':'elite',
+  'The Strike-Breaker':'deadly',
+  // Floor 3
+  'Morel Dilemma':'easy','Parasite Seer':'easy','Gestalt Network':'easy',"Oilephant's Foot":'easy',
+  'Chimeric Sludge':'standard','Ergot Eruption':'standard','Profane Geometry':'standard','Extractnid Matriarch':'standard',
+  'Anti-Euclidian Space':'elite','Bio-Mutant Escape':'elite','Gnome Chomper':'elite','The Punished':'elite','Sacred(?) Geometry':'elite',
+  'Self-Replicating Forge':'deadly',
+};
+function encounterTier(e){ return (e && ENCOUNTER_TIER[e.name]) || 'standard'; }
+// Room tier by route step (buildRoute(): camp, enc, enc, enc, camp, enc, enc, boss).
+const ROOM_TIER_SLOTS = {1:'easy', 2:'standard', 3:'elite', 5:'standard', 6:'elite'};
+const DEADLY_CHANCE = 0.12;      // per elite slot, Floors 2-3 (Floor 1 has no deadly cards)
+const SHRINE_SLOT_CHANCE = 0.4;  // per easy/standard slot, max one Shrine per segment
+// Elite and deadly enemies telegraph a heavy turn every Nth turn (double attack,
+// or double their biggest effect if they don't attack).
+const HEAVY_EVERY = {elite:3, deadly:2};
+
+// ---- Boss move kits (v1.35.0) ----
+// Every turn a boss does everything in `each` (its base attack) PLUS the next
+// special in `specials`, shown a turn ahead. Specials loop in order. Bold
+// "wind-up" specials (windup:true) are the big telegraphed turns. Freeze
+// cancels that turn's special but not the base attack. A boss with `phase2`
+// switches to it after the first enemy turn that ends at or below half HP.
+// Act types: dmg, minion, shield, heal, hot, dot (to you), dmgPerMinion
+// (value x Minions on your tray), dropShield (loses all its Shield).
+const BOSS_KITS = {
+  'Rogue Golemancer':{ each:[{type:'dmg',value:1}], specials:[
+    {name:'Summon Golems', acts:[{type:'minion',value:2}]},
+    {name:'Golem Slam', windup:true, acts:[{type:'dmg',value:6}]},
+    {name:'Brace', acts:[{type:'shield',value:3}]} ]},
+  'Heating Elemental':{ each:[{type:'dmg',value:1}], specials:[
+    {name:'Stoke', acts:[{type:'hot',value:2}]},
+    {name:'Flashover', windup:true, acts:[{type:'dmg',value:6}]},
+    {name:'Scorch', acts:[{type:'dot',value:2}]} ]},
+  'Grosteque Grafter':{ each:[{type:'dmg',value:1}], specials:[
+    {name:'Graft Plating', acts:[{type:'shield',value:5}]},
+    {name:'Stitch-Rip', windup:true, acts:[{type:'dmg',value:6}]},
+    {name:'Harvest', acts:[{type:'heal',value:4}]} ]},
+  'The Necrorancher':{ each:[{type:'dmg',value:2}], specials:[
+    {name:'Raise the Herd', acts:[{type:'minion',value:4}]},
+    {name:'Stampede', windup:true, acts:[{type:'dmgPerMinion',value:2}]},
+    {name:'Cull', acts:[{type:'dmg',value:4}]} ]},
+  'Bellicose Biomancer':{ each:[{type:'dmg',value:2}], specials:[
+    {name:'Mutagen', acts:[{type:'hot',value:2}]},
+    {name:'Overgrowth Slam', windup:true, acts:[{type:'dmg',value:9}]},
+    {name:'Spore Cloud', acts:[{type:'dot',value:2}]} ]},
+  'Ceramic Golem':{ each:[{type:'dmg',value:2}], specials:[
+    {name:'Glaze', acts:[{type:'shield',value:5}]},
+    {name:'Shatterpour', windup:true, acts:[{type:'dmg',value:9},{type:'dropShield'}]},
+    {name:'Seep', acts:[{type:'dot',value:2}]} ]},
+  'Extruzeon, Co-consul of Waste':{ each:[{type:'dmg',value:4}], specials:[
+    {name:'Compactor', acts:[{type:'shield',value:4}]},
+    {name:'Waste Crush', windup:true, acts:[{type:'dmg',value:12}]},
+    {name:'Recycle', acts:[{type:'hot',value:2}]} ],
+    phase2:{ name:'Meltdown', each:[{type:'dmg',value:5}], specials:[
+      {name:'Waste Crush', windup:true, acts:[{type:'dmg',value:12}]},
+      {name:'Slag Spray', acts:[{type:'minion',value:2},{type:'dot',value:2}]} ]}},
+  'Myceleus, Co-consul of Rot':{ each:[{type:'dmg',value:4}], specials:[
+    {name:'Sporulate', acts:[{type:'minion',value:3}]},
+    {name:'Rot', acts:[{type:'dot',value:3}]},
+    {name:'Mycelial Burst', windup:true, acts:[{type:'dmgPerMinion',value:3}]} ],
+    phase2:{ name:'Fruiting Body', each:[{type:'dmg',value:4},{type:'minion',value:1}], specials:[
+      {name:'Sporulate', acts:[{type:'minion',value:3}]},
+      {name:'Rot', acts:[{type:'dot',value:3}]},
+      {name:'Mycelial Burst', windup:true, acts:[{type:'dmgPerMinion',value:3}]} ]}},
+};
 
 // ---- Monster presence: how large each monster is drawn in the face-off (1 = standard ~89px tall).
 // Under 1 = small/scuttling things; over 1 = hulking things that loom behind their own health bar.
