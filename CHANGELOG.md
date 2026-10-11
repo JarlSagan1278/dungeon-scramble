@@ -7,6 +7,10 @@
 - Dread now also gives Floor 1 its own Deadly card.
 - Jeremy's boss move names: Golem Lemma, Pre-heat, Melting Point, Grafted Plate, Pruning, Grazing, Slammerhand, Extrue-damage, Atomic Pull, Excessive Extrusion, R.O.T., Spore-Up, Be Fruitful and Multiply!, Toxic Trample, Lily Padding, Chimeronslaught, Lily Pod. The third Big Boss is Toadtaur Wizard, Assistant to the Co-consul. New flavor for Myceleus and the Wizard.
 - Long boss move names shift the warning chips left instead of running off the screen.
+- Floor 3 is no longer a breather: +1 attack for every Floor 3 standard and elite card, +2 for Morel Dilemma, Chimeric Sludge, Extractnid Matriarch, The Punished and Sacred(?) Geometry. Myceleus 106 health; Chimeronslaught 9.
+- Gnomish Mushroom Cap: both D.O.T. 1 faces are now D.O.T. 2 (Gnome bot win rate 46% → 55%).
+- Geometry quests are mirror rules: at Profane Geometry, every H.O.T. you gain also lands as D.O.T. on it; at Sacred(?) Geometry, every D.O.T. it takes also gives you H.O.T. (capped at 10).
+- Sound palette: each action has its own instrument (sword hit, wooden Block knock, Heal/H.O.T. bell, D.O.T. pluck, glassy Freeze, Nullify swell, Boost whistle, airy Maneuver whoosh, Swap flip) and every path step climbs the scale. The enemy turn has sound now: a drum as it acts, a clank for Shield or a fully Blocked hit, a bell for its heals, squeaks for Minions, and a rising rumble when a wind-up or heavy turn is telegraphed. Your H.O.T. ticks and camp rests chime.
 - Quest fixes: 13 quests that could never complete now work ("20+ damage", "8 damage/turn", "survive turn 4", combos/H.O.T./D.O.T. counts, Freeze rewards); "Bank 5 Block" checks Block actually banked; "2 nullify" needs 2.
 
 ## 1.38.1

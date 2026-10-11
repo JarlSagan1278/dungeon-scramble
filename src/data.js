@@ -251,7 +251,7 @@ function originRelicFor(originId){ return RELICS.find(r=>r.origin===originId); }
 // ---- Origin dice ----
 const ORIGINS = [
   {id:'dwarf', name:'Dwarf', die:'Dwarven Doohickie', blurb:'Shield up, then pop it for a big Hit.', faces:faces(['Hit2','Boost1','Boost1','Pivot','Block2','Block2'])},
-  {id:'gnome', name:'Gnome', die:'Gnomish Mushroom Cap', blurb:'Continuous damage and self-sustain over time.', faces:faces(['Combo1','Boost1','DOT1','DOT1','Leech1','Dodge'])},
+  {id:'gnome', name:'Gnome', die:'Gnomish Mushroom Cap', blurb:'Continuous damage and self-sustain over time.', faces:faces(['Combo1','Boost1','DOT2','DOT2','Leech1','Dodge'])},
   {id:'halfling', name:'Halfling', die:'Bonus Breakfast', blurb:'Second breakfast and good cheer -- healing and buffs to keep the party going.', faces:faces(['Combo1','Boost1','Heal2','Heal2','HOT1','Nullify'])},
   {id:'pixie', name:'Pixie', die:'Pixie Powder', blurb:'Blinks past trouble and leaves a little mischief behind.', faces:faces(['Combo2','Boost1','DOT2','Swap','Leap','Freeze'])},
 ];
@@ -446,22 +446,22 @@ const FLOOR2_BOSSES = [
 ];
 
 const FLOOR3_ENEMIES = [
-  enc('Morel Dilemma','Enemy',14,{dmg:2,minion:2,hot:1,flavor:'A fungal species that has stumped, and subsequently eaten, philosophers for generations.'}),
-  enc('Chimeric Sludge','Enemy',25,{questHealth:12,dmg:3,hot:2,quests:['12 damage: 4 maneuvers'],flavor:'Biological slag, made up of countless individual chimeras.'}),
-  enc('Gnome Chomper','Enemy',28,{questHealth:6,dmg:6,quests:['6 damage: 3 maneuvers'],flavor:'"The Gnomish Chempire is the leading zealot state!"'}),
+  enc('Morel Dilemma','Enemy',14,{dmg:4,minion:2,hot:1,flavor:'A fungal species that has stumped, and subsequently eaten, philosophers for generations.'}),
+  enc('Chimeric Sludge','Enemy',25,{questHealth:12,dmg:5,hot:2,quests:['12 damage: 4 maneuvers'],flavor:'Biological slag, made up of countless individual chimeras.'}),
+  enc('Gnome Chomper','Enemy',28,{questHealth:6,dmg:7,quests:['6 damage: 3 maneuvers'],flavor:'"The Gnomish Chempire is the leading zealot state!"'}),
   enc('Parasite Seer','Enemy',20,{dmg:3,shield:3,flavor:'Sees into multiple parallel futures, though limited only to popular travel destinations.'}),
   enc('Gestalt Network','Enemy',20,{dmg:3,dot:2,flavor:'"You will join us. Our population is mushrooming."'}),
   enc("Oilephant's Foot",'Enemy',30,{questHealth:15,dmg:2,hot:3,quests:['15 damage: 4 support actions'],flavor:'"An Oilephant never forgets" refers to the long-lasting effects of radiation.'}),
-  enc('Extractnid Matriarch','Enemy',22,{dmg:3,minion:3,quests:['nullify: 10+ damage'],flavor:'Undisturbed for eons, this primordial weaver and its brood now stir and hunger for glass.'}),
-  enc('The Punished','Enemy',36,{dmg:3,minion:1,flavor:'Those foolish enough to try and harness forms they are unable to comprehend.'}),
-  enc('Profane Geometry','Enemy',35,{questHealth:10,dmg:3,hot:2,quests:['10 damage: adventurer H.O.T. = D.O.T.'],flavor:'A simulacrum of the divine, insatiable as the curiosity by which it was conjured.'}),
-  enc('Sacred(?) Geometry','Enemy',38,{questHealth:10,dmg:3,dot:2,quests:['10 damage: encounter D.O.T. = H.O.T.'],flavor:'A mere reflection of the divine geometry. The impossible beauty pains your eyes.'}),
+  enc('Extractnid Matriarch','Enemy',22,{dmg:5,minion:3,quests:['nullify: 10+ damage'],flavor:'Undisturbed for eons, this primordial weaver and its brood now stir and hunger for glass.'}),
+  enc('The Punished','Enemy',36,{dmg:5,minion:1,flavor:'Those foolish enough to try and harness forms they are unable to comprehend.'}),
+  enc('Profane Geometry','Enemy',35,{questHealth:10,dmg:4,hot:2,quests:['10 damage: adventurer H.O.T. = D.O.T.'],flavor:'A simulacrum of the divine, insatiable as the curiosity by which it was conjured.'}),
+  enc('Sacred(?) Geometry','Enemy',38,{questHealth:10,dmg:5,dot:2,quests:['10 damage: encounter D.O.T. = H.O.T.'],flavor:'A mere reflection of the divine geometry. The impossible beauty pains your eyes.'}),
   enc('Eelagator Escapee','Enemy',44,{questHealth:10,dmg:4,shield:2,quests:['10 damage: 2 nullify'],flavor:'"Such a successful grafting that it escaped of its own measure!"'}),
-  enc('Toadtaur Warrior','Enemy',30,{questHealth:8,dmg:5,quests:['8 damage: 3 maneuvers'],flavor:'"Definitely a \'can we\' vs. a \'should we\' decision, looking back."'}),
+  enc('Toadtaur Warrior','Enemy',30,{questHealth:8,dmg:6,quests:['8 damage: 3 maneuvers'],flavor:'"Definitely a \'can we\' vs. a \'should we\' decision, looking back."'}),
 ];
 const FLOOR3_TRAPS = [
-  enc('Anti-Euclidian Space','Trap',40,{questHealth:30,dmg:7,shield:2,quests:['10 damage: any 10 actions','15 damage: any 12 actions','20 damage: any 15 actions'],flavor:'Where forbidden postulates are illogically deduced from perfidious axioms.'}),
-  enc('Ergot Eruption','Trap',40,{questHealth:30,dmg:3,hot:3,quests:['15 damage: 4 maneuvers','20 damage: 3 pivot','3 hot: 15+ damage'],flavor:'"Fortune favors the mold" — Plinthi the Eldar before death.'}),
+  enc('Anti-Euclidian Space','Trap',40,{questHealth:30,dmg:8,shield:2,quests:['10 damage: any 10 actions','15 damage: any 12 actions','20 damage: any 15 actions'],flavor:'Where forbidden postulates are illogically deduced from perfidious axioms.'}),
+  enc('Ergot Eruption','Trap',40,{questHealth:30,dmg:4,hot:3,quests:['15 damage: 4 maneuvers','20 damage: 3 pivot','3 hot: 15+ damage'],flavor:'"Fortune favors the mold" — Plinthi the Eldar before death.'}),
   enc('Self-Replicating Forge','Trap',40,{questHealth:30,dmg:3,minion:4,quests:['15 damage: 4 maneuvers','20 damage: 3 boosts','1 freeze: 15+ damage'],flavor:'Hydra-aulic systems rebuild themselves stronger when damaged.'}),
   enc('Bio-Mutant Escape','Trap',40,{questHealth:30,dmg:4,minion:4,quests:['15 damage: 2 nullify','20 damage: 4 support actions','20 damage: survive 4'],flavor:'No weapon known to gnome can stop 30-50 feral mutants.'}),
 ];
@@ -487,7 +487,7 @@ const FLOOR3_SHRINES = [
 const BIG_BOSSES = [
   enc('Extruzeon, Co-consul of Waste','Big Boss',90,{questHealth:60,dmg:6,shield:2,hot:1,quests:['30 damage: 3 boosts','30 damage: 6 maneuvers in a single turn','freeze: 20+ damage'],flavor:'"And to think\u2026I hesitated."'}),
   enc('Toadtaur Wizard, Assistant to the Co-consul','Big Boss',78,{questHealth:60,dmg:4,quests:['30 damage: 3 leaps','30 damage: 6 maneuvers in a single turn','freeze: 15+ damage'],flavor:'"The wizdom of the toads flows through my three-chambered heart!"'}),
-  enc('Myceleus, Co-consul of Rot','Big Boss',96,{questHealth:60,dmg:2,minion:2,dot:1,hot:2,quests:['30 damage: 3 combos','30 damage: 6 maneuvers in a single turn','nullify: 15+ damage'],flavor:'"All must rot away to naught!"'}),
+  enc('Myceleus, Co-consul of Rot','Big Boss',106,{questHealth:60,dmg:2,minion:2,dot:1,hot:2,quests:['30 damage: 3 combos','30 damage: 6 maneuvers in a single turn','nullify: 15+ damage'],flavor:'"All must rot away to naught!"'}),
 ];
 
 const FLOORS = [
@@ -587,10 +587,10 @@ const BOSS_KITS = {
   'Toadtaur Wizard, Assistant to the Co-consul':{ each:[{type:'dmg',value:4}], specials:[
     {name:'Toxic Trample', acts:[{type:'dot',value:2}]},
     {name:'Lily Padding', acts:[{type:'shield',value:5}]},
-    {name:'Chimeronslaught', windup:true, acts:[{type:'dmg',value:10}]} ],
+    {name:'Chimeronslaught', windup:true, acts:[{type:'dmg',value:9}]} ],
     phase2:{ name:'Leap Year', each:[{type:'dmg',value:4},{type:'minion',value:1}], specials:[
       {name:'Lily Pod', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]},
-      {name:'Chimeronslaught', windup:true, acts:[{type:'dmg',value:10}]} ]}},
+      {name:'Chimeronslaught', windup:true, acts:[{type:'dmg',value:9}]} ]}},
 };
 
 // Stand-in art for the v1.36.0 shrines until Jeremy's own art exists: each

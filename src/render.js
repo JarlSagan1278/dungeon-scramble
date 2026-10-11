@@ -50,10 +50,26 @@ function describeStepFx(step){
 
 // The sound half of describeStepFx()'s bucket -- silent for plain movement
 // so a long Dodge/Leap/Pivot chain doesn't turn into a rattle of blips.
-function playStepTone(fx, pitchStep){
-  if(!fx || fx.pulse==='move') return;
-  const kind = {dmg:'hit', heal:'heal', block:'block', status:'status'}[fx.pulse];
-  if(kind) playTone(kind, kind==='hit' ? pitchStep : 0);
+function playStepTone(fx, pitchStep, step){
+  if(!fx) return;
+  // v1.39.0: one instrument per action family (see TONE_SEQUENCES).
+  const t = step && step.type;
+  if(step && step.dmg>0) return playTone('hit', pitchStep);
+  const kind = {block:'woodKnock', heal:'bell', hot:'bell', dot:'pluck', leech:'pluck', freeze:'glass', nullify:'swell',
+    boost:'whistle', fumble:'sour'}[t];
+  if(kind) return playTone(kind, pitchStep);
+  if(t==='dodge' || t==='leap' || t==='pivot' || t==='swap' || t==='reroll') return playWhoosh(pitchStep);
+  if(fx.pulse==='move') return;
+  const old = {heal:'heal', block:'block', status:'status'}[fx.pulse];
+  if(old) playTone(old, 0);
+}
+// An airy whoosh for Maneuvers: a short band-passed noise sweep, a touch higher each step.
+function playWhoosh(pitchStep){
+  if(!PREFS.sound) return;
+  const ctx = getAudioCtx(); if(!ctx) return;
+  const now = ctx.currentTime, f = 900*Math.pow(2, Math.min(10, pitchStep||0)*0.12);
+  playNoiseBurst(ctx, now, 0.14, 0.09, 'bandpass', f, 1.4);
+  playNoiseBurst(ctx, now+0.04, 0.1, 0.05, 'bandpass', f*1.6, 1.8);
 }
 
 function updateHeaderMeta(){
@@ -2235,10 +2251,6 @@ const TONE_SEQUENCES = {
               {freq:784, start:0.05, dur:0.26, type:'sine',     gain:0.16}],
   heal:      [{freq:520, start:0,    dur:0.12, type:'sine',     gain:0.14},
               {freq:660, start:0.09, dur:0.16, type:'sine',     gain:0.14}],
-  victory:   [{freq:392, start:0,    dur:0.14, type:'triangle', gain:0.2},
-              {freq:494, start:0.13, dur:0.14, type:'triangle', gain:0.2},
-              {freq:587, start:0.26, dur:0.14, type:'triangle', gain:0.2},
-              {freq:784, start:0.39, dur:0.32, type:'triangle', gain:0.22}],
   defeat:    [{freq:220, start:0,    dur:0.2,  type:'sawtooth', gain:0.16},
               {freq:160, start:0.18, dur:0.34, type:'sawtooth', gain:0.16}],
   heartbeat: [{freq:80,  start:0,    dur:0.1,  type:'sine',     gain:0.24},
@@ -2323,6 +2335,40 @@ const TONE_SEQUENCES = {
                  {freq:659, start:0.14, dur:0.16, type:'triangle', gain:0.22},
                  {freq:784, start:0.28, dur:0.16, type:'triangle', gain:0.22},
                  {freq:1047,start:0.42, dur:0.45, type:'triangle', gain:0.26}],
+  // ---- v1.39.0 sound palette (docs/studies/2026-10-12_todo_studies.md s.4):
+  // wood, metal and bells, one instrument per action family. Path steps all
+  // ride the pentatonic ladder (pitchStep) so a long path keeps climbing.
+  woodKnock: [{freq:190, freqTo:150, start:0, dur:0.07, type:'triangle', gain:0.2},
+              {freq:420, start:0, dur:0.03, type:'square', gain:0.05}],
+  bell:      [{freq:880, start:0, dur:0.5, type:'sine', gain:0.11},
+              {freq:1760, start:0, dur:0.3, type:'sine', gain:0.04},
+              {freq:2640, start:0.005, dur:0.18, type:'sine', gain:0.02}],
+  pluck:     [{freq:233, freqTo:196, start:0, dur:0.16, type:'triangle', gain:0.16},
+              {freq:466, start:0, dur:0.06, type:'sine', gain:0.05}],
+  glass:     [{freq:2093, start:0, dur:0.45, type:'sine', gain:0.07},
+              {freq:2117, start:0.01, dur:0.4, type:'sine', gain:0.05},
+              {freq:3136, start:0.03, dur:0.3, type:'sine', gain:0.04}],
+  swell:     [{freq:300, freqTo:900, start:0, dur:0.22, type:'sine', gain:0.1}],
+  whistle:   [{freq:620, freqTo:1500, start:0, dur:0.14, type:'sine', gain:0.1}],
+  sour:      [{freq:150, freqTo:110, start:0, dur:0.14, type:'sawtooth', gain:0.08}],
+  swapFlip:  [{freq:330, start:0, dur:0.05, type:'triangle', gain:0.14},
+              {freq:494, start:0.07, dur:0.06, type:'triangle', gain:0.14}],
+  // Enemy turn: a low drum as it acts, then what it did.
+  enemyDrum: [{freq:95, freqTo:60, start:0, dur:0.16, type:'sine', gain:0.24},
+              {freq:180, freqTo:90, start:0, dur:0.05, type:'triangle', gain:0.08}],
+  clank:     [{freq:620, start:0, dur:0.12, type:'square', gain:0.07},
+              {freq:931, start:0.005, dur:0.1, type:'square', gain:0.05},
+              {freq:1480, start:0.01, dur:0.06, type:'triangle', gain:0.05}],
+  enemyBell: [{freq:440, start:0, dur:0.35, type:'sine', gain:0.09},
+              {freq:660, start:0.02, dur:0.25, type:'sine', gain:0.04}],
+  squeak:    [{freq:900, freqTo:1500, start:0, dur:0.06, type:'triangle', gain:0.08},
+              {freq:1100, freqTo:1700, start:0.08, dur:0.06, type:'triangle', gain:0.07},
+              {freq:1000, freqTo:1600, start:0.16, dur:0.06, type:'triangle', gain:0.06}],
+  windup:    [{freq:65, freqTo:130, start:0, dur:0.55, type:'sawtooth', gain:0.07},
+              {freq:130, freqTo:260, start:0.1, dur:0.45, type:'sine', gain:0.06}],
+  restChord: [{freq:262, start:0, dur:0.6, type:'sine', gain:0.09},
+              {freq:330, start:0.08, dur:0.55, type:'sine', gain:0.08},
+              {freq:392, start:0.16, dur:0.5, type:'sine', gain:0.08}],
   // A bright ascending "item get" twinkle for the instant a Loot die is
   // actually picked on the loot-reveal screen (renderLootModal/
   // pickLootOption) -- a Zelda-ish sparkle, distinct from the later 'equip'

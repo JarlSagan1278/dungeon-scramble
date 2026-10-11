@@ -1272,7 +1272,7 @@ function doTraySwap(i, j, token){
   if(token) S.swapTokens = Math.max(0,(S.swapTokens||0)-1);
   (S.swapLog = S.swapLog||[]).push({i, j, token:!!token});
   S.justSwappedIdx = [i, j];
-  if(typeof playTone==='function') playTone('pathTick', 0);
+  if(typeof playTone==='function') playTone('swapFlip');
   logMsg('sys', `Swapped ${A.die.name} and ${B.die.name}.`);
   teleLog('tray_swap', {token:!!token, a:A.die.name, b:B.die.name});
 }
@@ -1533,8 +1533,8 @@ function applyPathStep(step){
     S.stats.damageDealt += step.dmg;
     S.resolveTotal = (S.resolveTotal||0) + step.dmg;
   }
-  if(step.dotToEncounter) e.curDOT += step.dotToEncounter;
-  if(step.hotToPlayer) addPlayerHOT(step.hotToPlayer);
+  if(step.dotToEncounter){ e.curDOT += step.dotToEncounter; geometryMirror(e, 'dot', step.dotToEncounter); }
+  if(step.hotToPlayer){ addPlayerHOT(step.hotToPlayer); geometryMirror(e, 'hot', step.hotToPlayer); }
   if(step.blockGain) S.playerBlock += step.blockGain;
   if(step.healGain) healPlayer(step.healGain);
   if(step.selfDot) S.playerDOT += step.selfDot;
@@ -1618,12 +1618,36 @@ function checkQuests(e, ctx){
   });
 }
 
+// The Geometry quests are passive mirror rules (Jeremy, Oct 12), not
+// one-shot checks: Profane Geometry's "adventurer H.O.T. = D.O.T." -- every
+// H.O.T. you gain also lands as that much D.O.T. on it; Sacred(?) Geometry's
+// "encounter D.O.T. = H.O.T." -- every D.O.T. it takes also gives you that
+// much H.O.T. The quest's reward number caps the total mirrored; the quest
+// shows complete once the cap is reached.
+function geometryMirror(e, kind, n){
+  if(!e || !(n>0) || !e.quests) return;
+  e.quests.forEach((q,i)=>{
+    if(e.questsDone[i]) return;
+    const {rewardText, cond} = parseQuestSpec(q);
+    const isProfane = /adventurer h\.?o\.?t\.? = d\.?o\.?t/.test(cond), isSacred = /encounter d\.?o\.?t\.? = h\.?o\.?t/.test(cond);
+    if(!(kind==='hot' && isProfane) && !(kind==='dot' && isSacred)) return;
+    const capM = (rewardText||'').match(/(\d+)/); const cap = capM ? parseInt(capM[1]) : Infinity;
+    e.questMirror = e.questMirror || {};
+    const used = e.questMirror[i]||0, amt = Math.min(n, cap-used);
+    if(amt<=0) return;
+    e.questMirror[i] = used+amt;
+    if(isProfane){ e.curDOT += amt; logMsg('sys', `${e.name}: your H.O.T. mirrors as ${amt} D.O.T. on it.`, 'good'); }
+    else { addPlayerHOT(amt); logMsg('sys', `${e.name}: its D.O.T. mirrors as ${amt} H.O.T. for you.`, 'good'); }
+    if(e.questMirror[i] >= cap){ e.questsDone[i] = true; logMsg('sys', `Quest complete: "${q}"`, 'good'); if(typeof fxQuest==='function') fxQuest(e.name, i); }
+  });
+}
+
 function applyQuestReward(e, rewardText){
   if(!rewardText) return;
   const m = rewardText.match(/(\d+(\.\d+)?)/);
   const amt = m? parseFloat(m[1]) : 0;
   const low = rewardText.toLowerCase();
-  if(low.includes('dot')) { e.curDOT += amt; }
+  if(low.includes('dot')) { e.curDOT += amt; geometryMirror(e, 'dot', amt); }
   else if(low.includes('hot')) { addPlayerHOT(amt); }
   else if(low.includes('nullify')) { applyNullify(); }
   else if(low.includes('freeze')) { S.freezeNext = true; logMsg('sys', `Quest reward: ${e.name} will skip its next action.`); }
@@ -1716,8 +1740,8 @@ function runPlayerPathSteps(steps, i, path, effects){
   // last one this turn (first hit at base pitch, climbing from there),
   // so a multi-hit path builds like a rising combo instead of every hit
   // sounding identical.
-  const pitchStep = step.dmg>0 ? S._hitStreak++ : 0;
-  if(typeof playStepTone==='function') playStepTone(S.resolvingFx, pitchStep);
+  const pitchStep = S._hitStreak++; // v1.39.0: every step climbs the ladder, not just hits
+  if(typeof playStepTone==='function') playStepTone(S.resolvingFx, pitchStep, step);
   render();
   if(step.dmg>0 && typeof lungeFigure==='function') lungeFigure('player', step.dmg);
   // Impact tier from the die's own damage; bigger hits also linger a beat
@@ -1809,6 +1833,7 @@ function runEnemyBeat(i, noWind){
         e.curHealth = cap(e.curHealth+e.curHOT, e.maxHealth);
         e.curHOT = Math.max(0, e.curHOT-1);
       }
+      if(typeof playTone==='function') playTone('enemyDrum');
       const t = runEncounterAction();
       if(t) showToastIfAvailable(t, 'bad');
       if(e.curHealth<=0) return {stop:'encounterDefeated'};
@@ -1850,6 +1875,8 @@ function endTurn(){
   scrambleTray();
   placePendingMinions(pm);
   render();
+  // v1.39.0: a rising rumble when a wind-up / heavy turn is now telegraphed.
+  if(S.encounter && typeof playTone==='function' && enemyNextTurnPreview(S.encounter).heavy) setTimeout(()=>playTone('windup'), 650);
 }
 
 // One tap resolves the ENTIRE remaining sequence, not just the current
@@ -1879,6 +1906,7 @@ function runPlayerUpkeep(){
     const t = `You recover ${S.playerHOT} from H.O.T.`;
     logMsg('heal', t); parts.push(t);
     if(typeof fxTick==='function') fxTick('player','hot',S.playerHOT);
+    if(typeof playTone==='function') playTone('bell');
     S.playerHOT = Math.max(0, S.playerHOT-1);
   }
   return parts.join(' ');
@@ -1894,6 +1922,7 @@ function dealEncounterDamage(e, amount){
   if(amount>0 && blocked>0 && dealt===0 && hasRelic('spite_thorns') && e.curHealth>0){ e.curHealth = capUpper(e.curHealth-absorbWithShield(e, 2), e.maxHealth); fireRelic('spite_thorns','2 back'); }
   S.health = cap(S.health-dealt, S.maxHealth);
   if(dealt>0 && typeof playPlayerHitSound==='function') playPlayerHitSound();
+  else if(amount>0 && blocked>0 && typeof playTone==='function') playTone('clank'); // v1.39.0: a fully Blocked hit clanks
   // A big hit landing gets the same small screen-shake as an Overkill, on
   // top of the existing portrait shake/flash -- a meaningful chunk of your
   // own health bar deserves to register physically too, not just the
@@ -1945,16 +1974,23 @@ function initEnemyTurnState(e){
     e.tier = encounterTier(e); e.turnsActed = e.turnsActed||0;
   }
 }
+// v1.39.0: enemy action sounds, staggered so several acts don't land at once.
+function enemySound(kind){
+  if(typeof playTone!=='function') return;
+  const n = (S._enemySoundN = (S._enemySoundN||0)+1);
+  setTimeout(()=>playTone(kind), 120 + (n-1)*110);
+  clearTimeout(S._enemySoundReset); S._enemySoundReset = setTimeout(()=>{ S._enemySoundN = 0; }, 600);
+}
 // One enemy "act" (see BOSS_KITS, data.js). Returns the log/toast line.
 function applyEnemyAct(e, act){
   const v = act.value||0;
   switch(act.type){
     case 'dmg': return dealEncounterDamage(e, v);
-    case 'minion': return spawnMinions(e, v) || `${e.name} tries to summon minions, but your Tray has no room.`;
-    case 'shield': e.curShield += v; return `${e.name} gains ${v} shield.`;
-    case 'heal': e.curHealth = cap(e.curHealth+v, e.maxHealth); return `${e.name} heals ${v}.`;
-    case 'hot': e.curHOT += v; return `${e.name} channels ${v} H.O.T.`;
-    case 'dot': S.playerDOT += v; return `You gain ${v} D.O.T.`;
+    case 'minion': enemySound('squeak'); return spawnMinions(e, v) || `${e.name} tries to summon minions, but your Tray has no room.`;
+    case 'shield': enemySound('clank'); e.curShield += v; return `${e.name} gains ${v} shield.`;
+    case 'heal': enemySound('enemyBell'); e.curHealth = cap(e.curHealth+v, e.maxHealth); return `${e.name} heals ${v}.`;
+    case 'hot': enemySound('enemyBell'); e.curHOT += v; return `${e.name} channels ${v} H.O.T.`;
+    case 'dot': enemySound('pluck'); S.playerDOT += v; return `You gain ${v} D.O.T.`;
     case 'dmgPerMinion': {
       const n = S.tray.filter(c=>c.minion).length;
       return n>0 ? dealEncounterDamage(e, v*n) : `${e.name} finds no Minions on your Tray.`;
@@ -2032,11 +2068,12 @@ function runEncounterAction(){
   const parts = [];
   if(heavy) parts.push(frozen ? `${e.name} is frozen: its heavy turn is cancelled.` : 'Heavy turn!');
   if(e.dmg>0) parts.push(dealEncounterDamage(e, e.dmg*x('dmg')));
-  if(e.shield>0){ e.curShield += e.shield*x('shield'); parts.push(`${e.name} gains ${e.shield*x('shield')} shield.`); }
-  if(e.heal>0){ e.curHealth = cap(e.curHealth+e.heal, e.maxHealth); parts.push(`${e.name} heals ${e.heal}.`); }
-  if(e.hot>0){ e.curHOT += e.hot; parts.push(`${e.name} channels ${e.hot} H.O.T.`); }
-  if(e.dot>0){ S.playerDOT += e.dot*x('dot'); parts.push(`You gain ${e.dot*x('dot')} D.O.T.`); }
+  if(e.shield>0){ enemySound('clank'); e.curShield += e.shield*x('shield'); parts.push(`${e.name} gains ${e.shield*x('shield')} shield.`); }
+  if(e.heal>0){ enemySound('enemyBell'); e.curHealth = cap(e.curHealth+e.heal, e.maxHealth); parts.push(`${e.name} heals ${e.heal}.`); }
+  if(e.hot>0){ enemySound('enemyBell'); e.curHOT += e.hot; parts.push(`${e.name} channels ${e.hot} H.O.T.`); }
+  if(e.dot>0){ enemySound('pluck'); S.playerDOT += e.dot*x('dot'); parts.push(`You gain ${e.dot*x('dot')} D.O.T.`); }
   if(e.minion>0){
+    enemySound('squeak');
     const t = spawnMinions(e, e.minion*x('minion'));
     if(t) parts.push(t);
   }
@@ -2493,6 +2530,7 @@ function campRest(){
   if(typeof UIFX!=='undefined' && S.health>hpFrom) UIFX.campHeal = {from:hpFrom, to:S.health, at:performance.now(), dur:900+Math.min(heal,10)*120};
   S.campRested = true;
   logMsg('heal', `Rested: scrambled ${count} actions, healed ${heal}.`, 'good');
+  if(heal>0 && typeof playTone==='function') playTone('restChord');
   render();
 }
 function campLeave(){
