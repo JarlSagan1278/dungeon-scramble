@@ -71,3 +71,15 @@ Draft dice (Magic 12 → 16):
 4. ~~The Strike-Breaker~~: dropped to 4 damage in 1.37.1 (now ends 16% of the runs that meet it).
 
 Names, stats, quests and flavor for all of the above are in the names sheet (blue cells), with faction themes: dwarves math/3D printing/engineering/mining, gnomes sorcery/biochemistry/illusions/grafting, halflings hillbillies/food, pixies illusions/trickery/old magic.
+
+## 5. Swap and Reroll: edge cases and recommended defaults (for Jeremy's sanity check)
+Confirmed: tap before building the path; the die is spent for the turn; shrine tokens work the same way.
+1. **The spent die** acts as a blank for the rest of the turn (a path can't land on it). That's the cost, and it keeps Swap positional: the good die moves in and the spent Swap die sits where the good one was.
+2. **Token versions have no die to move.** A Swap token swaps any two dice; a Reroll token rerolls one die of choice.
+3. **No targeting Minion-covered dice** with either face, otherwise Reroll and Swap would scout hidden faces.
+4. **Chains are bounded:** each die can use its Swap/Reroll face once per turn, and spent dice can't be targeted. A die rerolled onto Reroll can still be used. That's fine, because chains end when the dice run out.
+5. **A reroll always shows a different face**, so it never feels wasted (repeated faces like Hit 3 / Hit 3 can still match).
+6. **They are not path actions:** Boost doesn't multiply them, and they don't count toward "maneuvers" or "any actions" quests.
+7. **Class zones interact on purpose:** move a die into your zone, then convert it (Armsmaster/Guard). A converted face moves with its die.
+8. **No undo once done;** you can cancel between the first and second tap of a Swap.
+9. **Plumbing:** spent state is saved for resume; the crash sim and bug hunt bots must use both faces, or bugs hide; icons and a "New action" tutorial card for each.
