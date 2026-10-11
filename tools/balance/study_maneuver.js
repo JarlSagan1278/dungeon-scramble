@@ -9,9 +9,13 @@
 //   Enemy-pressure knobs (per floor, [F1,F2,F3]): hitAdd adds to EVERY enemy hit, bosses included (harness's dmgAdd
 //     only changes e.dmg, which bosses ignore: they use actionCycle); bigBossHitAdd adds to Big Boss hits only;
 //     fxAdd {dot,hot,minion,shield,heal:[..]} raises an effect the enemy already has (bosses: matching actionCycle steps).
+//   pivotFace: 'pivot' (default) | 'boost' | 'blank' -- replaces the Pivot faces on Maneuver II/III (Boost = Boost1, x2).
+//   manLevel: 1 (default) | 2 | 3 -- starting Maneuver dice begin at this level, to isolate the face change.
+//   bossMode (test-only): 'cycle' (today: one cycle step per turn) | 'attackPlus' (boss also hits for its base damage
+//     every turn the cycle step isn't the attack) | 'attackPlusPhase' (attackPlus, and at <=50% HP it takes two cycle steps a turn)
 // usage: node study_maneuver.js '<json config>'
 let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node22/lib/node_modules/playwright')); }
-const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{} }, JSON.parse(process.argv[2]||'{}'));
+const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{}, pivotFace:'pivot', manLevel:1, bossMode:'cycle' }, JSON.parse(process.argv[2]||'{}'));
 (async()=>{
 const b=await chromium.launch();const page=await b.newPage();
 page.on('pageerror',e=>console.log('PAGEERR',e.message));
@@ -86,6 +90,21 @@ let res = await page.evaluate((cfg)=>{
     const qd=(e.questDamageDealt||0)-q0; if(qd>0){ window.__man.questDmg+=qd; window.__man.questTurns++; }
     return r;
   };
+  if(cfg.pivotFace!=='pivot'){
+    BASIC_DICE.filter(d=>d.cat==='maneuver').forEach(d=>{ d.faces=d.faces.map(f=>f.type==='pivot'?(cfg.pivotFace==='boost'?face('Boost1'):{type:'blank'}):f); });
+  }
+  window.__end={manII:0};
+  if(cfg.bossMode!=='cycle'){
+    const origCyc = applyBossCycleAction;
+    window.applyBossCycleAction = function(e){
+      const next = e.actionCycle[e.cycleIndex % e.actionCycle.length];
+      const parts=[];
+      if(next.type!=='dmg' && e.dmg>0) parts.push(dealEncounterDamage(e, e.dmg));
+      parts.push(origCyc(e));
+      if(cfg.bossMode==='attackPlusPhase' && e.curHealth<=e.maxHealth/2) parts.push(origCyc(e));
+      return parts.join(' ');
+    };
+  }
   const origDraw = drawEncounter;
   window.drawEncounter = function(kind){
     const e = origDraw(kind);
@@ -159,6 +178,7 @@ let res = await page.evaluate((cfg)=>{
   const runs=[];
   for(let r=0;r<cfg.runs;r++){
     newGame(cfg.origin, cfg.klass, null, '', cfg.depthMods||{});
+    if(cfg.manLevel>1){ S.tray.forEach(c=>{ if(c.die.cat==='maneuver') c.die=clone(Object.assign({},basic('maneuver',cfg.manLevel),{level:cfg.manLevel})); }); }
     if(cfg.swapManeuver){ S.tray.forEach(c=>{ if(c.die.cat==='maneuver') c.die=clone(basic('attack',c.die.level)); }); }
     const rec={fights:[],result:'TIMEOUT',floor:1,turns:0};
     const log={turns:0};
@@ -177,10 +197,11 @@ let res = await page.evaluate((cfg)=>{
       if(log.turns>cfg.maxTurns) break;
     }
     if(rec.result==='GAMEOVER' && cur && !cur.done){ cur.died=true; }
+    window.__end.manII += S.tray.filter(c=>c.die.cat==='maneuver'&&c.die.level>=2).length;
     rec.floor=S.floorIdx+1; rec.turns=log.turns; rec.maxHp=S.maxHealth;
     runs.push(rec);
   }
-  return {runs, turns:window.__turns, man:window.__man};
+  return {runs, turns:window.__turns, man:Object.assign(window.__man,window.__end)};
 }, cfg);
 const turnsData=res.turns, man=res.man; res=res.runs;
 require('fs').writeFileSync('' + __dirname + '/out_'+(cfg.label||'x')+'.json', JSON.stringify({cfg,res}));
@@ -190,6 +211,6 @@ const byFloor=[1,2,3].map(f=>{const fs=res.flatMap(r=>r.fights).filter(x=>x.floo
 const reached=[1,2,3].map(f=>res.filter(r=>r.floor>=f).length);
 const td=[1,2,3].map(f=>{const t=turnsData.filter(x=>x.f===f&&!x.boss);const m=a=>a.reduce((x,y)=>x+y,0)/Math.max(1,a.length);const d=t.map(x=>x.dmg).sort((a,b)=>a-b);return {f,avgLen:m(t.map(x=>x.len)).toFixed(1),avgDmg:m(d).toFixed(1),p50:d[d.length>>1],p90:d[Math.floor(d.length*.9)]};});
 const deaths=[1,2,3].map(f=>res.filter(r=>r.result==='GAMEOVER'&&r.floor===f).length);
-const manStats={manPerTurn:(man.manSteps/Math.max(1,man.turns)).toFixed(2),pathLen:(man.steps/Math.max(1,man.turns)).toFixed(2),questDmgPerRun:(man.questDmg/n).toFixed(1)};
+const manStats={manPerTurn:(man.manSteps/Math.max(1,man.turns)).toFixed(2),pathLen:(man.steps/Math.max(1,man.turns)).toFixed(2),questDmgPerRun:(man.questDmg/n).toFixed(1),manIIplusAtEnd:(man.manII/n).toFixed(2)};
 console.log(JSON.stringify({label:cfg.label,manStats,deaths,td,skill:cfg.skill,runs:n,winRate:(wins/n*100).toFixed(0)+'%',reachedF2_F3:reached.slice(1),avgTurns:(res.reduce((a,r)=>a+r.turns,0)/n).toFixed(0),byFloor}));
 await b.close();})();

@@ -1,9 +1,10 @@
 # Dungeon Scramble — TODO
 
 ## Priority order
-1. **Maneuver-dice payoff.** Studied Oct 11 (`docs/studies/2026-10-11_maneuver_study.md`): Maneuver dice are a net loss today, and the v1.32.76 tester dropped them first. **On hold:** Jeremy wants more play data before changing the Maneuver meta. Leading candidate is Dodge Block (each Dodge gives 1 Block); Momentum is the alternative. Boost on an upgraded Maneuver die is a last resort only.
-2. **Shrine overhaul.**
-3. **Sound / music** and 4. **art**, worked in parallel.
+1. **Boss rework + encounter tiers** (approved Oct 11). Proposal: `docs/studies/2026-10-11_encounters_and_bosses.md` — base attack every turn plus telegraphed specials, phase 2, easy/standard/deadly/elite tiers with a slot pattern per floor, Forge and Strike-Breaker as rare elites, intents for deadly enemies. Awaiting Jeremy's picks on the options.
+2. **Maneuver-dice payoff.** Studied Oct 11 (`docs/studies/2026-10-11_maneuver_study.md`): Maneuver dice are a net loss today, and the v1.32.76 tester dropped them first. **On hold:** Jeremy wants more play data before changing the Maneuver meta. Leading candidate is Dodge Block (each Dodge gives 1 Block); Momentum is the alternative. Boost on an upgraded Maneuver die is a last resort only.
+3. **Shrine overhaul.**
+4. **Sound / music** and 5. **art**, worked in parallel.
 
 ## Other items
 - **Design-consistency audit**, plus a rewrite of the quest descriptions.
