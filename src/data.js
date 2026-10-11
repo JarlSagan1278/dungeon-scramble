@@ -586,10 +586,10 @@ const BOSS_KITS = {
   // v1.39.0: the third Big Boss. Phase 2 (Leap Year): the Toadtaur Warrior joins.
   'Toadtaur Wizard, Assistant to the Co-consul':{ each:[{type:'dmg',value:4}], specials:[
     {name:'Toxic Trample', acts:[{type:'dot',value:2}]},
-    {name:'Lilly Padding', acts:[{type:'shield',value:5}]},
+    {name:'Lily Padding', acts:[{type:'shield',value:5}]},
     {name:'Chimeronslaught', windup:true, acts:[{type:'dmg',value:10}]} ],
     phase2:{ name:'Leap Year', each:[{type:'dmg',value:4},{type:'minion',value:1}], specials:[
-      {name:'Lilly Pod', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]},
+      {name:'Lily Pod', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]},
       {name:'Chimeronslaught', windup:true, acts:[{type:'dmg',value:10}]} ]}},
 };
 

@@ -5,7 +5,7 @@
 - Third Big Boss: Toadtaur Wizard, Assistant to the Co-consul (78 health; Hex Factor, Square Root, Exponential Croak; phase 2 Leap Year, where the Toadtaur Warrior joins with Lily Pad Lemma). Floor 3 Big Bosses now cost 11.8-13.3 HP per fight for the bot.
 - Four new Magic dice: Law of Large Numbers (Reroll), Commutative Changeling (Swap), Absolute Zero Elixir (Freeze), Icebox Pi (Swap, Block, Freeze, Heal).
 - Dread now also gives Floor 1 its own Deadly card.
-- Jeremy's boss move names: Golem Lemma, Pre-heat, Melting Point, Grafted Plate, Pruning, Grazing, Slammerhand, Extrue-damage, Atomic Pull, Excessive Extrusion, R.O.T., Spore-Up, Be Fruitful and Multiply!, Toxic Trample, Lilly Padding, Chimeronslaught, Lilly Pod. The third Big Boss is Toadtaur Wizard, Assistant to the Co-consul. New flavor for Myceleus and the Wizard.
+- Jeremy's boss move names: Golem Lemma, Pre-heat, Melting Point, Grafted Plate, Pruning, Grazing, Slammerhand, Extrue-damage, Atomic Pull, Excessive Extrusion, R.O.T., Spore-Up, Be Fruitful and Multiply!, Toxic Trample, Lily Padding, Chimeronslaught, Lily Pod. The third Big Boss is Toadtaur Wizard, Assistant to the Co-consul. New flavor for Myceleus and the Wizard.
 - Long boss move names shift the warning chips left instead of running off the screen.
 
 ## 1.38.1
