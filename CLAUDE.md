@@ -2,6 +2,8 @@
 
 Digital prototype of Jeremy's board game (Boggle-style dice-path dungeon crawler). Plain HTML/CSS/JS, no framework. Single owner/designer: Jeremy (playtests on his phone, 395x769 game card — it must not grow taller).
 
+**Every session: read `docs/PROJECT_CONTEXT.md` and `docs/TODO.md` first.** Whenever Jeremy makes a design decision, update `docs/PROJECT_CONTEXT.md` to record it (and commit).
+
 ## Commands
 - `node build.js` → `dist/dungeon_scramble.html` (single file) + `dist/web/` (installable PWA; art extracted to `dist/web/art/`). Also syncs package.json version.
 - `node sim.js` → 5-combination crash smoke test (random-legal bot, one run per origin/class combo listed in sim.js; not full coverage). Fails only on JS errors (TIMEOUT/GAMEOVER are fine). Run after ANY logic/data change.
