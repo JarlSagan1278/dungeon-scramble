@@ -58,6 +58,8 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 ## Shrines
 - They lack presence in animation, timing and execution. Keep rarity but greatly increase quantity as a way to add more relics. Relic idea: conversion (e.g. 1 damage per Shield gained).
 
+- **Shrine overhaul decisions (Oct 11, 2026):** full shrine ritual (shrine entrance, press-and-hold activation, rewards land where they live); about 10 shrine cards per floor with roughly half giving relics (themed relic shrines); bargain shrines (a relic for a price) yes; keep all 12 new relics for now but balance them later, especially against the origin-unlocked relics; shrine frequency stays at today's base and rises as a run goes on (by floor) and with depth.
+- Shipped in 1.36.0: 30 shrines (16 new, using stand-in art borrowed from related shrines until his art exists), 23 general relics, shrine chance 40% / 45% / 50% per eligible room on Floors 1/2/3, +3% per depth level above 1 (max 70%).
 ## Working style
 - He prefers decisions presented with clear options and a recommendation, then fast iteration; he gives precise visual feedback (sizes, blur, timing) and expects exact adjustments.
 - He wants to be reminded of circle-back items. Do not set up weekly scheduled tasks.

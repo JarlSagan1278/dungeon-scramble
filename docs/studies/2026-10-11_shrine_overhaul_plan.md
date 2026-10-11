@@ -74,3 +74,8 @@ That takes the general pool from 11 to 23. Glimmer Dust (Pixie) already overlaps
 3. Bargain shrines (relic for a price): yes or no?
 4. Which new relics to keep, cut or change? Any names to change?
 5. Frequency: keep 40% per room, or raise it?
+
+## Decisions and what shipped (1.36.0)
+Jeremy chose: full ritual; about 10 shrines per floor with half giving relics; bargain shrines yes; keep all 12 relics for now and balance later (especially against origin relics); keep today's frequency as the base and raise it as the run goes on and with depth.
+
+Built as drafted, with: shrine chance 40% / 45% / 50% per eligible room on Floors 1/2/3 plus 3% per depth level above 1 (max 70%); themed relic shrines draw from their theme and top up from the general pool; Shrine Bell also adds a choice to loot-trade shrines; the 16 new shrines borrow related shrines' art (`SHRINE_ART_STANDIN`, data.js) until real art exists.

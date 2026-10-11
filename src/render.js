@@ -2115,8 +2115,9 @@ function showRoomCallout(fx, onDismiss){
   if(old && old.parentNode) old.parentNode.removeChild(old);
   const oldScrim = document.getElementById('room-callout-scrim');
   if(oldScrim && oldScrim.parentNode) oldScrim.parentNode.removeChild(oldScrim);
-  const introCls = fx.boss ? 'intro boss' : 'intro';
-  const introText = fx.boss ? 'Boss Encounter' : 'A new room...';
+  const isShrine = fx.type==='Shrine';
+  const introCls = fx.boss ? 'intro boss' : (isShrine ? 'intro shrine' : 'intro');
+  const introText = fx.boss ? 'Boss Encounter' : (isShrine ? 'A shrine hums in the dark…' : 'A new room...');
   const nameCls = fx.boss ? 'name boss' : 'name';
   const node = el(`<div id="room-callout">
       <div class="room-callout-box">
@@ -2271,6 +2272,14 @@ const TONE_SEQUENCES = {
   // A soft magical chime for a Shrine actually granting its blessing --
   // gentle high sine notes, deliberately quieter/softer than any combat or
   // reward tone so a Shrine visit reads as a calm moment, not another hit.
+  // v1.36.0 shrine ritual: a soft, airy entrance chime and a bright release
+  // when the hold completes (the hold itself climbs the pathTick ladder).
+  shrineEnter: [{freq:523, start:0,    dur:0.35, type:'sine', gain:0.08},
+                {freq:784, start:0.18, dur:0.4,  type:'sine', gain:0.08},
+                {freq:1047,start:0.38, dur:0.6,  type:'sine', gain:0.07}],
+  shrineBurst: [{freq:1047,start:0,    dur:0.12, type:'triangle', gain:0.12},
+                {freq:1319,start:0.06, dur:0.14, type:'sine', gain:0.12},
+                {freq:1568,start:0.12, dur:0.35, type:'sine', gain:0.13}],
   blessing: [{freq:784,  start:0,    dur:0.18, type:'sine', gain:0.12},
              {freq:988,  start:0.12, dur:0.18, type:'sine', gain:0.12},
              {freq:1319, start:0.26, dur:0.3,  type:'sine', gain:0.14}],
@@ -3351,10 +3360,85 @@ function renderSwapModal(){
   };
 }
 
+// ---- Shrine ritual (v1.36.0) ----
+// Press and hold the shrine (its figure or the button) for SHRINE_HOLD_MS: the
+// art lifts and glows, the pathTick ladder climbs, and on completion the
+// shrine bursts and grants its boon. Letting go early cancels.
+const SHRINE_HOLD_MS = 650;
+function attachShrineHold(){
+  const btn = document.getElementById('shrine-hold-btn');
+  if(!btn) return;
+  const fig = document.querySelector('.fo-shrine .fo-enemy .fo-fig');
+  let timers = [], done = false;
+  const cancel = ()=>{ if(done) return; timers.forEach(clearTimeout); timers = []; btn.classList.remove('charging'); if(fig) fig.classList.remove('shrine-charging'); };
+  const start = (ev)=>{
+    if(done || timers.length) return;
+    if(ev && ev.cancelable) ev.preventDefault();
+    btn.classList.add('charging'); if(fig) fig.classList.add('shrine-charging');
+    [0,1,2].forEach(k=> timers.push(setTimeout(()=>{ if(typeof playTone==='function') playTone('pathTick', k*2); }, k*SHRINE_HOLD_MS/3)));
+    timers.push(setTimeout(()=>{
+      done = true;
+      if(fig){ fig.classList.remove('shrine-charging'); fig.classList.add('shrine-burst'); }
+      if(typeof playTone==='function') playTone('shrineBurst');
+      if(typeof vibrate==='function') vibrate([20,30,40]);
+      spawnParticleBurstAtEl('.fo-shrine .fo-enemy .fo-fig', ['#ffe9a8','#8fd0ff','#fff5d6','#d4af64']);
+      setTimeout(()=> applyShrineBoon(S.encounter), PREFS.reducedMotion ? 0 : 280);
+    }, SHRINE_HOLD_MS));
+  };
+  [btn, fig].forEach(n=>{
+    if(!n) return;
+    n.addEventListener('pointerdown', start);
+    ['pointerup','pointerleave','pointercancel'].forEach(t=> n.addEventListener(t, cancel));
+  });
+  btn.addEventListener('keydown', ev=>{ if(ev.key==='Enter' || ev.key===' ') start(ev); });
+  btn.addEventListener('keyup', cancel);
+  btn.addEventListener('contextmenu', ev=> ev.preventDefault());
+}
+
+// The reward lands where it lives: a relic flies into the relic strip, health
+// stretches the HP bar with a big number, an upgraded die flips on the tray,
+// tokens drop onto the Item button. One-shot per grant (S.shrineFx).
+function playShrineFx(){
+  const fx = S.shrineFx;
+  if(!fx || fx._played) return;
+  fx._played = true;
+  const floatAt = (node, text, cls)=>{
+    if(!node) return;
+    const r = node.getBoundingClientRect();
+    const f = el(`<div class="shrine-float ${cls||''}">${text}</div>`);
+    f.style.left = (r.left + r.width/2) + 'px'; f.style.top = (r.top - 6) + 'px';
+    document.body.appendChild(f); setTimeout(()=> f.remove(), 1500);
+  };
+  if(fx.kind==='relic'){
+    const target = document.querySelector(`.fo-shrine .relic-strip [data-relic="${fx.id}"]`);
+    const src = document.querySelector('.fo-shrine .fo-enemy .fo-fig');
+    const r = relicById(fx.id);
+    if(target && src && r && !PREFS.reducedMotion){
+      const a = src.getBoundingClientRect(), b = target.getBoundingClientRect();
+      const ghost = el(`<div class="relic-flyer">${relicBadgeHTML(r,'relic-badge-lg')}</div>`);
+      ghost.style.left = (a.left + a.width/2) + 'px'; ghost.style.top = (a.top + a.height/2) + 'px';
+      document.body.appendChild(ghost);
+      target.style.visibility = 'hidden';
+      requestAnimationFrame(()=> requestAnimationFrame(()=>{ ghost.style.transform = `translate(${b.left + b.width/2 - (a.left + a.width/2)}px, ${b.top + b.height/2 - (a.top + a.height/2)}px) translate(-50%,-50%) scale(.55)`; }));
+      setTimeout(()=>{ ghost.remove(); target.style.visibility = ''; target.classList.add('relic-arrive'); if(typeof playTone==='function') playTone('lootPick'); }, 720);
+    } else if(target){ target.classList.add('relic-arrive'); }
+  } else if(fx.kind==='hp' || fx.kind==='heal'){
+    const bar = document.querySelector('.fo-shrine .fo-player .bar');
+    if(bar){ bar.classList.add('flash-heal'); if(fx.kind==='hp') bar.classList.add('hp-stretch'); }
+    floatAt(bar, fx.text, 'heal');
+  } else if(fx.kind==='die'){
+    const cell = document.querySelectorAll('#tray .die')[fx.idx];
+    if(cell){ cell.classList.add('shaking','glint-strong','shrine-die-up'); floatAt(cell, 'Lv 2', 'gold'); }
+  } else if(fx.kind==='token'){
+    const item = document.querySelector('.fo-shrine') ? document.querySelector('.rail-item') : null;
+    if(item){ item.classList.add('shrine-token-pulse'); floatAt(item, fx.text, 'gold'); }
+  }
+}
+
 function renderShrineEncounter(){
   const e = S.encounter;
   const roomEnterCls = S.newRoomFx ? 'room-enter' : '';
-  const art = MONSTER_ART[e.name];
+  const art = MONSTER_ART[e.name] || MONSTER_ART[SHRINE_ART_STANDIN[e.name]];
   const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
   const heroFig = portrait.placeholder ? mysteryFigureHTML('width:60px; height:60px;') : `<img class="fo-img" src="${portrait.img}" alt="${S.origin.name}">`;
   const hpPct = Math.max(0, Math.min(100, S.health/S.maxHealth*100));
@@ -3366,8 +3450,9 @@ function renderShrineEncounter(){
     </div>
     <div class="panel enc-panel-arch" id="enc-panel" style="margin-bottom:8px;">
       <div class="enc-rail-row"><div class="enc-card-col">
-        <div class="enc-card fo-arch fo-shrine fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${roomEnterCls}">
+        <div class="enc-card fo-arch fo-shrine fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${roomEnterCls} ${S.newRoomFx?'shrine-awaken':''}">
           ${hallFxHTML()}
+          <div class="shrine-motes" aria-hidden="true">${[0,1,2,3,4,5,6,7,8].map(i=>`<i style="--x:${8+i*10.5}%;--d:${(i*0.37)%2.4}s;--t:${3.2+(i%3)*0.7}s"></i>`).join('')}</div>
           <svg class="fo-sconce fo-sconce-l" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><path d="M5 9.2 Q4.3 18 5.1 30 Q7.2 31.6 9.2 30 Q9.7 19 9 9.2Z" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/><path d="M1.6 15.4 Q7 13.9 12.4 15.2 Q13 17.6 12.2 19 Q7 20.3 1.8 19 Q1.1 17 1.6 15.4Z" fill="#55555e" stroke="#0c0705" stroke-width="1.5" stroke-linejoin="round"/><path d="M1.2 1.9 Q7 -0.7 12.8 1.7 Q12.2 6.6 9.7 9.7 Q7 10.7 4.4 9.5 Q2 6.6 1.2 1.9Z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-l"></div><svg class="fo-sconce fo-sconce-r" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><path d="M5 9.2 Q4.3 18 5.1 30 Q7.2 31.6 9.2 30 Q9.7 19 9 9.2Z" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/><path d="M1.6 15.4 Q7 13.9 12.4 15.2 Q13 17.6 12.2 19 Q7 20.3 1.8 19 Q1.1 17 1.6 15.4Z" fill="#55555e" stroke="#0c0705" stroke-width="1.5" stroke-linejoin="round"/><path d="M1.2 1.9 Q7 -0.7 12.8 1.7 Q12.2 6.6 9.7 9.7 Q7 10.7 4.4 9.5 Q2 6.6 1.2 1.9Z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-r"></div>
           <div class="fo-hud"></div>
           <div class="fo-band">
@@ -3385,10 +3470,12 @@ function renderShrineEncounter(){
               <div class="fo-quests" style="text-align:center;">${e.boon}</div>
             </div>
           </div>
+          ${S.shrineResult ? `<div class="shrine-result-banner"><div class="srb-title">${S.shrineResult.title}</div><div class="srb-text">${S.shrineResult.text}</div></div>` : ''}
         </div>
       </div></div>
     </div>
-    ${waiting ? `<div class="panel">${S.newRoomFx ? '<p class="hint" style="text-align:center;">Revealing the shrine\'s boon...</p>' : '<button class="primary" id="shrine-reveal-btn" style="width:100%;">Reveal the boon</button>'}</div>` : ''}
+    ${waiting ? `<div class="panel">${S.newRoomFx ? '<p class="hint" style="text-align:center;">The shrine stirs…</p>' : '<button class="primary shrine-hold-btn" id="shrine-hold-btn" style="width:100%;"><span class="shrine-hold-fill"></span><span class="shrine-hold-label">Hold to receive the boon</span></button>'}</div>` : ''}
+    ${S.shrineResult ? '<div class="panel"><button class="primary" id="shrine-result-continue" style="width:100%;">Continue</button></div>' : ''}
     <div class="panel tray-panel tray-idle">
       <div class="enc-rail-row">
         <div class="enc-card-col">
@@ -3415,17 +3502,22 @@ function renderShrineEncounter(){
   if(S.lootChoice) renderLootModal();
   if(S.shrineChoice) renderShrineChoiceModal();
   if(S.relicChoice) renderRelicChoiceModal();
-  if(S.shrineResult) renderShrineResultModal();
+  if(S.shrineResult){
+    if(!S.shrineResult._logged){ S.shrineResult._logged = true; teleLog('shrine_result', {shrine:S.shrineResult.title, text:String(S.shrineResult.text).replace(/<[^>]+>/g,'').slice(0,160), hp:S.health, maxHp:S.maxHealth}); }
+    const cb = document.getElementById('shrine-result-continue');
+    if(cb) cb.onclick = ()=>{ S.shrineFx = null; continueFromShrine(); };
+  }
   if(S.pendingLootDie) renderSwapModal();
-  // Safety net: if the screen is reached with no pending boon UI and no room callout (e.g. a resumed save),
-  // the player always has a way forward.
-  { const rb = document.getElementById('shrine-reveal-btn'); if(rb) rb.onclick = ()=> applyShrineBoon(S.encounter); }
+  // The ritual (v1.36.0): hold the shrine (or the button) to receive its boon.
+  // Also the way forward for a resumed save that lands here with nothing pending.
+  attachShrineHold();
+  playShrineFx();
   attachLongPressTooltips('.route-tooltip-target');
   if(S.newRoomFx){
     // Defer the boon reveal until the player taps past "A new room... Shrine"
     // -- see the comment in advanceRoute()'s Shrine branch (logic.js).
-    showRoomCallout(S.newRoomFx, ()=> applyShrineBoon(S.encounter));
-    if(typeof playTone==='function') playTone('roomEnter');
+    showRoomCallout(S.newRoomFx, ()=> render()); // the boon now waits for the hold ritual
+    if(typeof playTone==='function') playTone('shrineEnter');
     S.newRoomFx = null; // consumed -- plays once, on the render right after advanceRoute() set it
   }
 }

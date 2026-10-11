@@ -63,8 +63,9 @@ const TICK_FN = () => {
     return { done: false, note: 'camp-leave' };
   }
   if (S.screen === 'shrine') {
-    // Waiting on the shrine boon to resolve (applyShrineBoon runs sync in
-    // most cases, but give it a beat if not).
+    // No pending shrine UI: a player would hold the shrine to activate it
+    // (v1.36.0 ritual), so trigger the boon directly.
+    if (!S.relicChoice && !S.lootChoice && !S.pendingLootDie) { applyShrineBoon(S.encounter); return { done: false, note: 'shrine-activate' }; }
     return { done: false, note: 'shrine-wait' };
   }
   if (S.screen === 'game') {

@@ -104,6 +104,16 @@ function applyRelicsToSteps(steps, path){
     }
     if(hasRelic('spore_satchel') && s.type==='leech'){ s.dotToEncounter += 2; s.hotToPlayer += 1; tag(s,'spore_satchel','+2 DOT'); }
   });
+  // v1.36.0 relics
+  if(hasRelic('barbed_buckler') || hasRelic('dodger_cloak') || hasRelic('leaper_spurs')){
+    let spur = 0;
+    steps.forEach(s=>{
+      if(s.type==='dodge' && hasRelic('dodger_cloak')){ s.blockGain += 1; tag(s,'dodger_cloak','+1 Block'); }
+      if(s.blockGain>0 && hasRelic('barbed_buckler')){ s.dmg += s.blockGain; tag(s,'barbed_buckler','+'+s.blockGain); }
+      if(s.type==='leap' && hasRelic('leaper_spurs')) spur++;
+      else if(s.dmg>0 && spur){ s.dmg += spur; tag(s,'leaper_spurs','+'+spur); spur = 0; }
+    });
+  }
   if(hasRelic('echo_chime') && steps.length>=5){ const t = lastDmgStep(); if(t){ t.dmg += 3; tag(t,'echo_chime','+3'); } }
   if(hasRelic('glimmer_dust')){
     const m = steps.filter(s=>s.type==='dodge'||s.type==='leap'||s.type==='pivot').length;
@@ -919,6 +929,11 @@ function roomTierForStep(step){
   return t;
 }
 
+// v1.36.0: shrines get more common deeper in a run and at higher depth.
+function shrineSlotChance(){
+  return Math.min(SHRINE_CHANCE_MAX, (SHRINE_SLOT_CHANCE[S.floorIdx]||SHRINE_SLOT_CHANCE[0]) + SHRINE_CHANCE_PER_DEPTH*(currentDepth()-1));
+}
+
 // Draws the card for a regular room. Shrines may take an easy or standard
 // room (at most one per segment, never the run's very first room); the
 // first room of the run is always a plain Enemy; at most one Trap per
@@ -929,7 +944,7 @@ function drawRoomCard(floor){
   const isVeryFirstEncounter = S.floorIdx===0 && S.routeStep===1;
   let tier = roomTierForStep(S.routeStep);
   const unused = c => !S.usedCards.has(c.name);
-  if(!isVeryFirstEncounter && tier!=='elite' && !S.segmentShrineUsed && floor.shrines.length && Math.random() < SHRINE_SLOT_CHANCE){
+  if(!isVeryFirstEncounter && tier!=='elite' && !S.segmentShrineUsed && floor.shrines.length && Math.random() < shrineSlotChance()){
     const sh = floor.shrines.filter(unused);
     return pick(sh.length ? sh : floor.shrines);
   }
@@ -1066,6 +1081,7 @@ function advanceRoute(){
     S.newRoomFx = {name: drawn.name, type: drawn.type, boss:false};
   } else if(step==='boss'){
     S.encounter = drawEncounter('boss');
+    if(hasRelic('frost_charm')){ S.freezeTokens = (S.freezeTokens||0) + 1; fireRelic('frost_charm','+1 Freeze'); }
     scrambleTray();
     S.screen='game';
     S._roomStartedAt = teleActiveMs();
@@ -1173,6 +1189,7 @@ function canSelect(idx){
   else if(lastFace.type==='leap') allowed = adjLeap(a,b);
   else if(lastFace.type==='pivot') allowed = adjPivot(a,b);
   else allowed = adjNormal(a,b);
+  if(!allowed && lastFace.type==='pivot' && hasRelic('pivot_compass')) allowed = true; // v1.36.0
 
   // class zone bonuses
   if(!allowed && S.klass.wrap && inZone(lastIdx) && inZone(idx)){
@@ -1229,7 +1246,9 @@ const COMBO_NEIGHBOR_TYPES = new Set(['hit','combo','block','hot','dot']);
 function attackNeighborIndices(idx){
   const {r,c} = trayRC(idx);
   const out = [];
-  [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([rr,cc])=>{
+  const dirs = [[r-1,c],[r+1,c],[r,c-1],[r,c+1]];
+  if(hasRelic('combo_gauntlet')) dirs.push([r-1,c-1],[r-1,c+1],[r+1,c-1],[r+1,c+1]); // v1.36.0
+  dirs.forEach(([rr,cc])=>{
     if(inBounds(rr,cc)){
       const j = trayIdx(rr,cc);
       const f = getFaceForIdx(j);
@@ -1320,6 +1339,7 @@ function computePathEffects(path){
     dotToEncounter = st.reduce((a,x)=>a+x.dotToEncounter,0);
     healGain = st.reduce((a,x)=>a+x.healGain,0);
     hotToPlayer = st.reduce((a,x)=>a+x.hotToPlayer,0);
+    blockGain = st.reduce((a,x)=>a+x.blockGain,0);
   }
   const blankCount = S.tray.filter((c,i)=>!path.includes(i) && getFaceForIdx(i).type==='blank').length;
 
@@ -1377,9 +1397,17 @@ function computePathSteps(path){
 // die as it resolves (see applyPathStep()) rather than all at once, so a
 // path with 2 Hits still clears exactly 2 minions, just spread across the
 // moment each Hit actually lands instead of after the fact.
+// Heals the player; with Overflow Chalice (v1.36.0) healing past max becomes Block.
+function healPlayer(n){
+  const over = S.health + n - S.maxHealth;
+  S.health = cap(S.health+n, S.maxHealth);
+  if(over>0 && hasRelic('overflow_chalice')){ S.playerBlock += over; fireRelic('overflow_chalice','+'+over+' Block'); }
+}
+// Grave Tally (v1.36.0): each Minion the player clears gives 1 Block.
+function graveTally(n){ if(n>0 && hasRelic('grave_tally')){ S.playerBlock += n; fireRelic('grave_tally','+'+n+' Block'); } }
 function clearOneMinion(){
   const cell = S.tray.find(c=>c.minion);
-  if(cell){ cell.minion=false; cell.die=cell.coveredDie||cell.die; cell.coveredDie=null; cell.blank=true; if(S.encounter && S.encounter.minionsSpawned>0) S.encounter.minionsSpawned--; }
+  if(cell){ graveTally(1); cell.minion=false; cell.die=cell.coveredDie||cell.die; cell.coveredDie=null; cell.blank=true; if(S.encounter && S.encounter.minionsSpawned>0) S.encounter.minionsSpawned--; }
 }
 
 // Clears one SPECIFIC Minion-covered cell -- as opposed to clearOneMinion()'s
@@ -1387,7 +1415,7 @@ function clearOneMinion(){
 // it (see computePathSteps()'s step.leapClearIdx, above).
 function clearMinionAt(idx){
   const cell = S.tray[idx];
-  if(cell && cell.minion){ cell.minion=false; cell.die=cell.coveredDie||cell.die; cell.coveredDie=null; cell.blank=true; if(S.encounter && S.encounter.minionsSpawned>0) S.encounter.minionsSpawned--; }
+  if(cell && cell.minion){ graveTally(1); cell.minion=false; cell.die=cell.coveredDie||cell.die; cell.coveredDie=null; cell.blank=true; if(S.encounter && S.encounter.minionsSpawned>0) S.encounter.minionsSpawned--; }
 }
 
 // Applies exactly one die's contribution (see computePathSteps()) to live
@@ -1416,7 +1444,7 @@ function applyPathStep(step){
   if(step.dotToEncounter) e.curDOT += step.dotToEncounter;
   if(step.hotToPlayer) addPlayerHOT(step.hotToPlayer);
   if(step.blockGain) S.playerBlock += step.blockGain;
-  if(step.healGain) S.health = cap(S.health+step.healGain, S.maxHealth);
+  if(step.healGain) healPlayer(step.healGain);
   if(step.selfDot) S.playerDOT += step.selfDot;
   if(step.freeze) S.freezeNext = true;
   if(step.nullify) applyNullify();
@@ -1445,6 +1473,7 @@ function applyNullify(){
   const cleared = [];
   if(e.minionsSpawned>0){
     e.minionsSpawned = 0;
+    graveTally(S.tray.filter(c=>c.minion).length);
     S.tray.forEach(cell=>{ if(cell.minion){ cell.minion=false; cell.die=cell.coveredDie; cell.coveredDie=null; cell.blank=true; } });
     cleared.push('minions');
   }
@@ -1618,6 +1647,7 @@ function finishPlayerPath(path, effects){
   });
   { const tt = Math.round(S.resolveTotal||0);
     if(tt > (S.stats.bestTurn||0)){ S.stats.bestTurn = tt; S.stats.bestTurnFoe = e.name; } }
+  if(hasRelic('bloodletter')){ const n = Math.floor((S.resolveTotal||0)/6); if(n>0){ healPlayer(n); fireRelic('bloodletter','+'+n+' HP'); } }
   if(e.curHealth<=0){ S.transitioning=false; onEncounterDefeated(); return; }
   // Near-miss: the swing left the foe barely standing. Name the exact number
   // (it motivates "one more turn") and give it its own cue.
@@ -1742,7 +1772,7 @@ function runPlayerUpkeep(){
     S.playerDOT = Math.max(0, S.playerDOT-1);
   }
   if(S.playerHOT>0){
-    S.health = cap(S.health+S.playerHOT, S.maxHealth);
+    healPlayer(S.playerHOT);
     const t = `You recover ${S.playerHOT} from H.O.T.`;
     logMsg('heal', t); parts.push(t);
     if(typeof fxTick==='function') fxTick('player','hot',S.playerHOT);
@@ -1753,10 +1783,12 @@ function runPlayerUpkeep(){
 
 function dealEncounterDamage(e, amount){
   if(amount>0 && depthRank('fury')) amount += depthRank('fury');
+  if(amount>0 && S._wardHalf){ amount = Math.ceil(amount/2); fireRelic('warding_bell','Half'); }
   if(amount>0 && hasRelic('gambeson')){ amount = Math.max(0, amount-1); fireRelic('gambeson','-1'); }
   const blocked = Math.min(S.playerBlock, amount);
   S.playerBlock -= blocked;
   const dealt = amount-blocked;
+  if(amount>0 && blocked>0 && dealt===0 && hasRelic('spite_thorns') && e.curHealth>0){ e.curHealth = capUpper(e.curHealth-absorbWithShield(e, 2), e.maxHealth); fireRelic('spite_thorns','2 back'); }
   S.health = cap(S.health-dealt, S.maxHealth);
   if(dealt>0 && typeof playPlayerHitSound==='function') playPlayerHitSound();
   // A big hit landing gets the same small screen-shake as an Overkill, on
@@ -1842,7 +1874,12 @@ function bossTakeTurn(e, frozen){
   const sp = bossNextSpecial(e);
   e.specialIdx = (e.specialIdx||0) + 1;
   if(frozen){ parts.push(`${e.name} is frozen: ${sp.name} is cancelled.`); logMsg('sys', `${e.name} is frozen: ${sp.name} is cancelled.`); }
-  else { parts.push(`${sp.name}!`); sp.acts.forEach(a=>{ const t = applyEnemyAct(e, a); if(t) parts.push(t); }); }
+  else {
+    parts.push(`${sp.name}!`);
+    S._wardHalf = !!(sp.windup && hasRelic('warding_bell') && !e._wardUsed); if(S._wardHalf) e._wardUsed = true;
+    sp.acts.forEach(a=>{ const t = applyEnemyAct(e, a); if(t) parts.push(t); });
+    S._wardHalf = false;
+  }
   teleLog('boss_move', {name:sp.name, frozen:!!frozen, phase:e.phase||1});
   if(kit===e.kit && e.kit.phase2 && e.curHealth>0 && e.curHealth <= e.maxHealth/2){
     e.phase = 2; e.specialIdx = 0;
@@ -1879,6 +1916,7 @@ function runEncounterAction(){
     return text;
   }
   const hs = (heavy && !frozen) ? enemyHeavyStat(e) : null;
+  S._wardHalf = !!(hs && hasRelic('warding_bell') && !e._wardUsed); if(S._wardHalf) e._wardUsed = true;
   const x = k => (k===hs ? 2 : 1);
   const parts = [];
   if(heavy) parts.push(frozen ? `${e.name} is frozen: its heavy turn is cancelled.` : 'Heavy turn!');
@@ -1891,6 +1929,7 @@ function runEncounterAction(){
     const t = spawnMinions(e, e.minion*x('minion'));
     if(t) parts.push(t);
   }
+  S._wardHalf = false;
   if(heavy) teleLog('heavy_turn', {name:e.name, frozen});
   return parts.length ? parts.join(' ') : `${e.name} takes no action.`;
 }
@@ -1915,11 +1954,12 @@ function enemyNextTurnPreview(e){
 function upgradeOneBasicDie(cat){
   // Look in the tray first, then the Back Pocket, for a level-1 basic die of
   // the given category to upgrade to level 2. Returns true if one was found.
-  for(const cell of S.tray){
+  for(let i=0;i<S.tray.length;i++){
+    const cell = S.tray[i];
     if(cell.die.cat===cat && cell.die.level===1){
       cell.die = clone(basic(cat,2));
       cell.faceIdx = 0;
-      return true;
+      return {idx:i}; // truthy; the shrine flips this die on the tray (v1.36.0)
     }
   }
   for(let i=0;i<S.backPocket.length;i++){
@@ -1947,7 +1987,7 @@ function runShrineEffect(e, effect){
   // when an option is picked, via chooseShrineOption -> option.action() ->
   // this same function with that option's effect) -- so the blessing cue
   // plays for every other, actually-granting effect type only.
-  if(effect.type!=='choice'){
+  if(effect.type!=='choice' && effect.type!=='bargain' && effect.type!=='leave'){
     if(typeof playTone==='function') playTone('blessing');
     if(typeof spawnParticleBurstAtEl==='function') spawnParticleBurstAtEl('.panel', ['#8fd0ff','#ffd76a','#fff5d6']);
   }
@@ -1956,6 +1996,7 @@ function runShrineEffect(e, effect){
       S.maxHealth += effect.amount;
       S.health = cap(S.health+effect.amount, S.maxHealth);
       const t = `Max health +${effect.amount}.`;
+      S.shrineFx = {kind:'hp', text:`+${effect.amount} Max HP`};
       logMsg('sys', `${e.name}: ${t}`);
       S.shrineResult = { title: e.name, text: t };
       render(); return;
@@ -1963,6 +2004,7 @@ function runShrineEffect(e, effect){
     case 'heal': {
       S.health = cap(S.health+effect.amount, S.maxHealth);
       const t = `Healed ${effect.amount}.`;
+      S.shrineFx = {kind:'heal', text:`+${effect.amount}`};
       logMsg('heal', `${e.name}: ${t}`);
       S.shrineResult = { title: e.name, text: t };
       render(); return;
@@ -1971,12 +2013,15 @@ function runShrineEffect(e, effect){
       const ok = upgradeOneBasicDie(effect.cat);
       const label = effect.cat.charAt(0).toUpperCase()+effect.cat.slice(1);
       const t = ok ? `Upgraded a level 1 ${label} Die to level 2.` : `No level 1 ${label} Die left to upgrade.`;
+      if(ok && ok.idx!=null) S.shrineFx = {kind:'die', idx:ok.idx};
       logMsg('sys', `${e.name}: ${t}`);
       S.shrineResult = { title: e.name, text: t };
       render(); return;
     }
     case 'relicChoice': {
       const pool = RELICS.filter(r=>!r.origin && !hasRelic(r.id));
+      const want = (effect.count||3) + (hasRelic('shrine_bell') ? 1 : 0);
+      if(hasRelic('shrine_bell') && pool.length) fireRelic('shrine_bell','+1 choice');
       if(!pool.length){
         S.health = cap(S.health+10, S.maxHealth);
         const t = 'You already hold every relic -- the altar heals 10 instead.';
@@ -1984,12 +2029,16 @@ function runShrineEffect(e, effect){
         S.shrineResult = { title: e.name, text: t };
         render(); return;
       }
-      S.relicChoice = { name:e.name, options: pickN(pool, Math.min(3, pool.length)).map(r=>r.id) };
+      // Themed shrines draw from their theme first, topped up from the general pool.
+      const themed = effect.theme ? pool.filter(r=>(r.tags||[]).includes(effect.theme) || (effect.theme==='loot' && (r.tags||[]).includes('tempo'))) : pool;
+      let picks = pickN(themed, Math.min(want, themed.length));
+      if(picks.length < want) picks = picks.concat(pickN(pool.filter(r=>!picks.includes(r)), Math.min(want-picks.length, pool.length-picks.length)));
+      S.relicChoice = { name:e.name, options: picks.map(r=>r.id) };
       S.relicChoice.options.forEach(markRelicFound);
       render(); return;
     }
     case 'tradeLoot': {
-      S.lootChoice = { options: pickLootNUnused(lootPoolByName(effect.pool), 3), lootName: effect.pool, overkill:false, fromShrine:true };
+      S.lootChoice = { options: pickLootNUnused(lootPoolByName(effect.pool), 3 + (hasRelic('shrine_bell') ? 1 : 0)), lootName: effect.pool, overkill:false, fromShrine:true };
       if(typeof markDiceDiscovered==='function') S.lootChoice.fresh = peekFreshDice(S.lootChoice.options);
       render(); return;
     }
@@ -2008,8 +2057,20 @@ function runShrineEffect(e, effect){
       else if(effect.token==='freeze') S.freezeTokens += effect.charges;
       else if(effect.token==='boost'){ S.boostTokenValue = effect.value; S.boostTokenCharges += effect.charges; }
       const t = `Gained ${effect.charges} use(s) of a ${effect.token==='boost'?'x'+effect.value+' Boost':effect.token} token.`;
+      S.shrineFx = {kind:'token', text:`+${effect.charges} ${effect.token==='boost'?'x'+effect.value+' Boost':effect.token.charAt(0).toUpperCase()+effect.token.slice(1)}`};
       logMsg('sys', `${e.name}: ${t}`);
       S.shrineResult = { title: e.name, text: t };
+      render(); return;
+    }
+    case 'bargain': {
+      const p = effect.price||{};
+      if(p.maxHp){ S.maxHealth = Math.max(1, S.maxHealth-p.maxHp); S.health = Math.min(S.health, S.maxHealth); logMsg('sys', `${e.name}: paid ${p.maxHp} maximum health.`); }
+      if(p.skipRest){ S.skipNextRest = true; logMsg('sys', `${e.name}: your next camp rest is forfeit.`); }
+      teleLog('shrine_bargain', {shrine:e.name, price:p});
+      runShrineEffect(e, effect.then); return;
+    }
+    case 'leave': {
+      S.shrineResult = { title: e.name, text: 'You leave the offering untouched.' };
       render(); return;
     }
     case 'choice': {
@@ -2050,6 +2111,7 @@ function chooseRelic(id){
   S.relicChoice = null;
   grantRelic(id, {silent:true, via:'shrine'});
   const r = relicById(id);
+  S.shrineFx = {kind:'relic', id};
   S.shrineResult = { title: name, text: `Gained relic: ${r.name}. ${r.desc}` };
   render();
 }
@@ -2311,6 +2373,7 @@ function campRest(){
   S.tray.forEach(c=>{ if(currentFace(c).type!=='blank') count++; });
   let heal = Math.ceil(count/2) + (hasRelic('kettle') ? 3 : 0);
   if(depthRank('rest')) heal = Math.max(1, Math.round(heal*(1-0.25*depthRank('rest'))));
+  if(S.skipNextRest){ heal = 0; S.skipNextRest = false; logMsg('sys', 'Your rest is forfeit to the Hungry Idol.', 'bad'); }
   if(hasRelic('kettle')) fireRelic('kettle','+3 HP');
   const hpFrom = S.health;
   S.health = cap(S.health+heal, S.maxHealth);

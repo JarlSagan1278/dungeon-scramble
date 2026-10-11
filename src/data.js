@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.35.2';
+const GAME_VERSION = '1.36.0';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -207,17 +207,32 @@ function basic(cat, level){ return BASIC_DICE.find(d=>d.cat===cat && d.level===l
 // section.
 const RELICS = [
   // General pool (Relic Shrine offers)
-  {id:'whetstone',  name:'Whetstone',          mono:'WS', desc:'Your first Hit each turn deals +2 damage.'},
-  {id:'iron_rations',name:'Iron Rations',      mono:'IR', desc:'Heal 2 after every victory.'},
-  {id:'gambeson',   name:'Padded Gambeson',    mono:'PG', desc:'Every enemy attack deals 1 less damage.'},
-  {id:'lucky_coin', name:'Lucky Coin',         mono:'LC', desc:'Loot rewards offer +1 die to choose from.'},
-  {id:'kettle',     name:'Campfire Kettle',    mono:'CK', desc:'Resting at Camp heals 3 extra.'},
-  {id:'banner',     name:'Vanguard Banner',    mono:'VB', desc:'Start every fight with 3 Block.'},
-  {id:'flask',      name:'Bottomless Flask',   mono:'BF', desc:'+8 maximum health, right now.'},
-  {id:'echo_chime', name:'Echo Chime',         mono:'EC', desc:'A Path of 5 or more dice deals +3 damage.'},
-  {id:'venom_vial', name:'Venom Vial',         mono:'VV', desc:'Every D.O.T. face you play adds +1 D.O.T.'},
-  {id:'hungry_blade',name:'Hungry Blade',      mono:'HB', desc:'Overkill triggers at 6 extra damage instead of 10.'},
-  {id:'tincture',   name:'Tincture Kit',       mono:'TK', desc:'Every Heal face you play heals +1.'},
+  {id:'whetstone',  name:'Whetstone',          mono:'WS', desc:'Your first Hit each turn deals +2 damage.', tags:['offense']},
+  {id:'iron_rations',name:'Iron Rations',      mono:'IR', desc:'Heal 2 after every victory.', tags:['defense','loot']},
+  {id:'gambeson',   name:'Padded Gambeson',    mono:'PG', desc:'Every enemy attack deals 1 less damage.', tags:['defense']},
+  {id:'lucky_coin', name:'Lucky Coin',         mono:'LC', desc:'Loot rewards offer +1 die to choose from.', tags:['loot']},
+  {id:'kettle',     name:'Campfire Kettle',    mono:'CK', desc:'Resting at Camp heals 3 extra.', tags:['defense','loot']},
+  {id:'banner',     name:'Vanguard Banner',    mono:'VB', desc:'Start every fight with 3 Block.', tags:['defense']},
+  {id:'flask',      name:'Bottomless Flask',   mono:'BF', desc:'+8 maximum health, right now.', tags:['defense']},
+  {id:'echo_chime', name:'Echo Chime',         mono:'EC', desc:'A Path of 5 or more dice deals +3 damage.', tags:['offense','path']},
+  {id:'venom_vial', name:'Venom Vial',         mono:'VV', desc:'Every D.O.T. face you play adds +1 D.O.T.', tags:['offense']},
+  {id:'hungry_blade',name:'Hungry Blade',      mono:'HB', desc:'Overkill triggers at 6 extra damage instead of 10.', tags:['offense','loot']},
+  {id:'tincture',   name:'Tincture Kit',       mono:'TK', desc:'Every Heal face you play heals +1.', tags:['defense']},
+  // v1.36.0 additions. Conversion family:
+  {id:'barbed_buckler', name:'Barbed Buckler',  mono:'BB', desc:'Each Block you gain from your path also deals 1 damage.', tags:['offense','defense']},
+  {id:'overflow_chalice',name:'Overflow Chalice',mono:'OC', desc:'Healing past your maximum health becomes Block.', tags:['defense']},
+  {id:'bloodletter',  name:"Bloodletter's Fang",mono:'BL', desc:'Every 6 damage you deal in one turn heals 1.', tags:['offense','defense']},
+  {id:'spite_thorns', name:'Spite Thorns',      mono:'ST', desc:'When you fully block an enemy attack, it takes 2 damage.', tags:['defense','offense']},
+  {id:'grave_tally',  name:'Grave Tally',       mono:'GT', desc:'Each Minion you clear gives 1 Block.', tags:['defense']},
+  // Movement family (lets players try Maneuver payoffs without changing the base dice):
+  {id:'dodger_cloak', name:"Dodger's Cloak",    mono:'DC', desc:'Each Dodge in your path gives 1 Block.', tags:['path','defense']},
+  {id:'leaper_spurs', name:"Leaper's Spurs",    mono:'LS', desc:'Each Leap adds +1 damage to the next damaging die in your path.', tags:['path','offense']},
+  {id:'pivot_compass',name:'Pivot Compass',     mono:'PC', desc:'After a Pivot, your path may continue to any die.', tags:['path']},
+  // Boss and tempo:
+  {id:'frost_charm',  name:'Frost Charm',       mono:'FC', desc:'Start each boss fight with a Freeze token.', tags:['loot','tempo']},
+  {id:'warding_bell', name:'Warding Bell',      mono:'WB', desc:'The first heavy turn or boss wind-up each fight deals half damage.', tags:['defense','tempo']},
+  {id:'shrine_bell',  name:'Shrine Bell',       mono:'SB', desc:'Relic and loot shrines offer one extra choice.', tags:['loot']},
+  {id:'combo_gauntlet',name:'Combo Gauntlet',   mono:'CG', desc:'Combo dice also count diagonal neighbors.', tags:['offense','path']},
   // Origin signature relics (never offered at shrines)
   {id:'forgeplate', name:'Forgeplate',         mono:'FP', origin:'dwarf',    desc:'Start every fight with 5 Block.'},
   {id:'spore_satchel',name:'Spore Satchel',    mono:'SS', origin:'gnome',    desc:'Leech faces also add +2 D.O.T. and heal +1 more.'},
@@ -349,6 +364,15 @@ const FLOOR1_SHRINES = [
     {label:'+5 Max Health', effect:{type:'maxHealthUp', amount:5}},
   ]}}),
   enc('Scroll Dispenser: CLEAR','Shrine',0,{boon:'Gain a one-use Nullify token (x3).', effect:{type:'grantToken', token:'nullify', charges:3}}),
+  // v1.36.0 relic shrines
+  enc('Forge Altar','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
+  enc('Hearth Idol','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
+  enc("Wayfarer's Cairn",'Shrine',0,{boon:'Choose one of three path and movement Relics.', effect:{type:'relicChoice', theme:'path'}}),
+  enc("Hoarder's Niche",'Shrine',0,{boon:'Choose one of three loot and tempo Relics.', effect:{type:'relicChoice', theme:'loot'}}),
+  enc('Blood Bargain','Shrine',0,{boon:'Pay 3 maximum health to choose one of three Relics.', effect:{type:'choice', options:[
+    {label:'Pay 3 max health: choose a Relic', effect:{type:'bargain', price:{maxHp:3}, then:{type:'relicChoice'}}},
+    {label:'Walk away', effect:{type:'leave'}},
+  ]}}),
 ];
 const FLOOR1_BOSSES = [
   enc('Rogue Golemancer','Boss',24,{dmg:2,minion:1,flavor:'"You cannot handle my golems, adventurer."'}),
@@ -383,6 +407,18 @@ const FLOOR2_SHRINES = [
     {label:'+10 Max Health', effect:{type:'maxHealthUp', amount:10}},
   ]}}),
   enc('Scroll Dispenser: BIG','Shrine',0,{boon:'Gain a one-use x4 Boost token (x2).', effect:{type:'grantToken', token:'boost', value:4, charges:2}}),
+  // v1.36.0
+  enc('Anvil of Wrath','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
+  enc('Warm Hearthstone','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
+  enc('Signpost Shrine','Shrine',0,{boon:'Choose one of three path and movement Relics.', effect:{type:'relicChoice', theme:'path'}}),
+  enc('Hungry Idol','Shrine',0,{boon:'Give up your next camp rest to choose one of three Relics.', effect:{type:'choice', options:[
+    {label:'Skip next camp rest: choose a Relic', effect:{type:'bargain', price:{skipRest:true}, then:{type:'relicChoice'}}},
+    {label:'Walk away', effect:{type:'leave'}},
+  ]}}),
+  enc('Wishing Well','Shrine',0,{boon:'Heal 8 OR gain a one-use Freeze token.', effect:{type:'choice', options:[
+    {label:'Heal 8', effect:{type:'heal', amount:8}},
+    {label:'Freeze token', effect:{type:'grantToken', token:'freeze', charges:1}},
+  ]}}),
 ];
 const FLOOR2_BOSSES = [
   enc('The Necrorancher','Boss',35,{dmg:2,minion:2,quests:['nullify: deal 12 damage in a single turn'],flavor:'Herder of the haunted, granger of the ghoulish, planter of the parasitic.'}),
@@ -413,6 +449,19 @@ const FLOOR3_SHRINES = [
   enc("Heron's Fountain",'Shrine',0,{boon:'Upgrade Player Maximum Health by 15.', effect:{type:'maxHealthUp', amount:15}}),
   enc('Storied Emporium','Shrine',0,{boon:'Choose one of three Relics.', effect:{type:'relicChoice'}}),
   enc('Scroll Dispenser: STOP','Shrine',0,{boon:'Gain a one-use Freeze token.', effect:{type:'grantToken', token:'freeze', charges:1}}),
+  // v1.36.0
+  enc('Crucible of Ruin','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
+  enc('Sanctum Lantern','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
+  enc("Pilgrim's Arch",'Shrine',0,{boon:'Choose one of three path and movement Relics.', effect:{type:'relicChoice', theme:'path'}}),
+  enc('Magpie Nest','Shrine',0,{boon:'Choose one of three loot and tempo Relics.', effect:{type:'relicChoice', theme:'loot'}}),
+  enc("Devil's Ledger",'Shrine',0,{boon:'Pay 5 maximum health to choose one of four Relics.', effect:{type:'choice', options:[
+    {label:'Pay 5 max health: choose from four Relics', effect:{type:'bargain', price:{maxHp:5}, then:{type:'relicChoice', count:4}}},
+    {label:'Walk away', effect:{type:'leave'}},
+  ]}}),
+  enc('Reliquary Font','Shrine',0,{boon:'Heal 20 OR Upgrade Player Maximum Health by 10.', effect:{type:'choice', options:[
+    {label:'Heal 20', effect:{type:'heal', amount:20}},
+    {label:'+10 Max Health', effect:{type:'maxHealthUp', amount:10}},
+  ]}}),
 ];
 const BIG_BOSSES = [
   enc('Extruzeon, Co-consul of Waste','Big Boss',90,{questHealth:60,dmg:6,shield:2,hot:1,quests:['30 damage: 3 boosts','30 damage: 6 maneuvers in a single turn','freeze: 20+ damage'],flavor:'"And to think\u2026I hesitated."'}),
@@ -454,7 +503,10 @@ function encounterTier(e){ return (e && ENCOUNTER_TIER[e.name]) || 'standard'; }
 // Room tier by route step (buildRoute(): camp, enc, enc, enc, camp, enc, enc, boss).
 const ROOM_TIER_SLOTS = {1:'easy', 2:'standard', 3:'elite', 5:'standard', 6:'elite'};
 const DEADLY_CHANCE = 0.12;      // per elite slot, Floors 2-3 (Floor 1 has no deadly cards)
-const SHRINE_SLOT_CHANCE = 0.4;  // per easy/standard slot, max one Shrine per segment
+// Chance a Shrine takes an easy/standard slot (max one per segment): rises by
+// floor and with depth (v1.36.0). See shrineSlotChance() in logic.js.
+const SHRINE_SLOT_CHANCE = [0.40, 0.45, 0.50];
+const SHRINE_CHANCE_PER_DEPTH = 0.03, SHRINE_CHANCE_MAX = 0.7;
 // Elite and deadly enemies telegraph a heavy turn every Nth turn (double attack,
 // or double their biggest effect if they don't attack).
 const HEAVY_EVERY = {elite:3, deadly:2};
@@ -507,6 +559,18 @@ const BOSS_KITS = {
       {name:'Sporulate', acts:[{type:'minion',value:3}]},
       {name:'Rot', acts:[{type:'dot',value:3}]},
       {name:'Mycelial Burst', windup:true, acts:[{type:'dmgPerMinion',value:3}]} ]}},
+};
+
+// Stand-in art for the v1.36.0 shrines until Jeremy's own art exists: each
+// borrows a related existing shrine's picture. Delete an entry once its real
+// art is in MONSTER_ART.
+const SHRINE_ART_STANDIN = {
+  'Forge Altar':'Enchanted Anvil','Anvil of Wrath':'Enchanted Anvil','Crucible of Ruin':'Enchanted Anvil',
+  'Hearth Idol':'Sacred Bellows','Warm Hearthstone':'Sacred Bellows','Sanctum Lantern':'Alchemists Stone',
+  "Wayfarer's Cairn":'Expediting Spores','Signpost Shrine':'Expediting Spores',"Pilgrim's Arch":'Department Spore',
+  "Hoarder's Niche":'Ecclectrical Outlet','Magpie Nest':'Storied Emporium',
+  'Blood Bargain':'Scrying Spheroid','Hungry Idol':'Scrying Spheroid',"Devil's Ledger":'Scrying Spheroid',
+  'Wishing Well':'Half-Full Fountain','Reliquary Font':"Heron's Fountain",
 };
 
 // ---- Monster presence: how large each monster is drawn in the face-off (1 = standard ~89px tall).

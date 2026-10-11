@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.36.0
+- Shrine ritual: shrines get their own entrance ("A shrine hums in the dark…", soft chime, warming torches, rising motes); press and hold the shrine or its button to receive the boon (rising notes, the shrine lifts and bursts); rewards land where they live (relics fly into the relic strip, health stretches the bar with a big number, upgraded dice flip on the tray, tokens drop on the Item button). Simple results show in the arch instead of a popup; relic and boon choices fan in.
+- 30 shrines (was 14), 10 per floor, about half giving relics: themed relic shrines (offense, defense, path and movement, loot and tempo) and bargain shrines (Blood Bargain: 3 max health; Hungry Idol: skip your next camp rest; Devil's Ledger: 5 max health for a choice of four), plus Wishing Well and Reliquary Font. New shrines use stand-in art for now.
+- 12 new relics: Barbed Buckler, Overflow Chalice, Bloodletter's Fang, Spite Thorns, Grave Tally, Dodger's Cloak, Leaper's Spurs, Pivot Compass, Frost Charm, Warding Bell, Shrine Bell, Combo Gauntlet.
+- Shrines get more common deeper in a run (40% / 45% / 50% per eligible room on Floors 1-3) and with depth (+3% per level, max 70%).
+- Crash sim and bug hunt now activate shrines instead of stalling on them.
+
 ## 1.35.2
 - First-time icon cards now say "New action" instead of "New symbol".
 
