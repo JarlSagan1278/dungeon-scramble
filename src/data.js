@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.38.0';
+const GAME_VERSION = '1.38.1';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -253,7 +253,7 @@ const ORIGINS = [
   {id:'dwarf', name:'Dwarf', die:'Dwarven Doohickie', blurb:'Shield up, then pop it for a big Hit.', faces:faces(['Hit2','Boost1','Boost1','Pivot','Block2','Block2'])},
   {id:'gnome', name:'Gnome', die:'Gnomish Mushroom Cap', blurb:'Continuous damage and self-sustain over time.', faces:faces(['Combo1','Boost1','DOT1','DOT1','Leech1','Dodge'])},
   {id:'halfling', name:'Halfling', die:'Bonus Breakfast', blurb:'Second breakfast and good cheer -- healing and buffs to keep the party going.', faces:faces(['Combo1','Boost1','Heal2','Heal2','HOT1','Nullify'])},
-  {id:'pixie', name:'Pixie', die:'Pixie Powder', blurb:'Blinks past trouble and leaves a little mischief behind.', faces:faces(['Combo1','Boost1','DOT1','Swap','Leap','Freeze'])},
+  {id:'pixie', name:'Pixie', die:'Pixie Powder', blurb:'Blinks past trouble and leaves a little mischief behind.', faces:faces(['Combo2','Boost1','DOT2','Swap','Leap','Freeze'])},
 ];
 
 // ---- Classes ----

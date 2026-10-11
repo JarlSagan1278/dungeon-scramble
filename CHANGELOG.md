@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.38.1
+- Pixie Powder: Combo 1 → Combo 2 and D.O.T. 1 → D.O.T. 2 (bot win rate 47% → 54%).
+- Jeremy's retouched Batch B loot art: Grappling Set, Legendary Sheath, N-th Dimensional Printer, Pixie Powder, Warp Crossbow.
+
 ## 1.38.0
 - New actions, Swap and Reroll: tap a Swap or Reroll face before you build your path, then tap a die. Swap trades the two dice's places; Reroll rerolls the chosen die to a different face. The Swap/Reroll die is used up for the turn (it acts as a blank). Clear undoes Swaps; Rerolls are final. Minion-covered dice can't be targeted, and mid-path the faces are plain steps.
 - Pixie Powder: Dodge becomes Swap.
