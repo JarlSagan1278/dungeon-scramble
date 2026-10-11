@@ -2,12 +2,16 @@
 //   questAware (default true): bot scores the quest bonus a path would earn (harness.js ignores quests,
 //     which undervalues Maneuvers since most Maneuver value comes from 'N maneuvers' quests).
 //   swapManeuver: every starting Maneuver die becomes an Attack die of the same level; camp upgrades Attack only.
-//   payoff: hypothetical Maneuver payoff, test-only (not in the game):
-//     'none' | 'momentum' (each Dodge/Leap/Pivot adds +1 to the next damaging die)
-//            | 'footwork' (each Dodge/Leap/Pivot gives 1 Block) | 'dodgeBlock' (each Dodge gives 1 Block) | 'both'
+//   payoff: hypothetical Maneuver payoffs, test-only (not in the game). 'none', or one or more of these joined by '+':
+//     momentum (each Dodge/Leap/Pivot adds +1 to the next damaging die), footwork (each Dodge/Leap/Pivot gives 1 Block),
+//     dodgeBlock / leapBlock / pivotBlock (that face gives 1 Block), leapMomentum / pivotMomentum (that face adds +1 to
+//     the next damaging die). 'both' = momentum+footwork. e.g. 'dodgeBlock+leapMomentum'
+//   Enemy-pressure knobs (per floor, [F1,F2,F3]): hitAdd adds to EVERY enemy hit, bosses included (harness's dmgAdd
+//     only changes e.dmg, which bosses ignore: they use actionCycle); bigBossHitAdd adds to Big Boss hits only;
+//     fxAdd {dot,hot,minion,shield,heal:[..]} raises an effect the enemy already has (bosses: matching actionCycle steps).
 // usage: node study_maneuver.js '<json config>'
 let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node22/lib/node_modules/playwright')); }
-const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none' }, JSON.parse(process.argv[2]||'{}'));
+const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{} }, JSON.parse(process.argv[2]||'{}'));
 (async()=>{
 const b=await chromium.launch();const page=await b.newPage();
 page.on('pageerror',e=>console.log('PAGEERR',e.message));
@@ -21,7 +25,7 @@ let res = await page.evaluate((cfg)=>{
   META.lifetime.victories=1; META.lifetime.bestFloorReached=3; META.achievements['origin_duo']={date:Date.now()};
   const origFns = {};
   // ---- encounter tuning hooks: scale enemies as they are drawn ----
-  window.__taken=0; const origDeal=dealEncounterDamage; window.dealEncounterDamage=function(e,a){ const h=S.health; const t=origDeal(e,a); let lost=Math.max(0,h-S.health); if(cfg.takenMul<1 && lost>0){ const keep=lost*cfg.takenMul; const k=Math.floor(keep)+(Math.random()<keep-Math.floor(keep)?1:0); S.health=Math.min(S.maxHealth, S.health+(lost-k)); lost=k;} window.__taken += lost; return t; };
+  window.__taken=0; const origDeal=dealEncounterDamage; window.dealEncounterDamage=function(e,a){ if(a>0){ a+=(cfg.hitAdd[S.floorIdx]||0); if(e.type==='Big Boss') a+=cfg.bigBossHitAdd; } const h=S.health; const t=origDeal(e,a); let lost=Math.max(0,h-S.health); if(cfg.takenMul<1 && lost>0){ const keep=lost*cfg.takenMul; const k=Math.floor(keep)+(Math.random()<keep-Math.floor(keep)?1:0); S.health=Math.min(S.maxHealth, S.health+(lost-k)); lost=k;} window.__taken += lost; return t; };
   const origStep=applyPathStep; window.applyPathStep=function(st){ if(cfg.dmgMul!==1 && st.dmg>0) st.dmg=Math.round(st.dmg*cfg.dmgMul); return origStep(st); };
   // ---- hypothetical Maneuver payoffs (test-only) ----
   const isMan = t => t==='dodge'||t==='leap'||t==='pivot';
@@ -29,12 +33,12 @@ let res = await page.evaluate((cfg)=>{
     const origRel = applyRelicsToSteps;
     window.applyRelicsToSteps = function(steps, path){
       steps = origRel(steps, path);
+      const P=new Set((cfg.payoff==='both'?'momentum+footwork':cfg.payoff).split('+'));
       let carry=0;
       steps.forEach(st=>{
         if(isMan(st.type)){
-          if(cfg.payoff==='momentum'||cfg.payoff==='both') carry++;
-          if(cfg.payoff==='footwork'||cfg.payoff==='both') st.blockGain += 1;
-          if(cfg.payoff==='dodgeBlock' && st.type==='dodge') st.blockGain += 1;
+          if(P.has('momentum') || P.has(st.type+'Momentum')) carry++;
+          if(P.has('footwork') || P.has(st.type+'Block')) st.blockGain += 1;
         } else if(st.dmg>0 && carry){ st.dmg += carry; carry=0; }
       });
       return steps;
@@ -90,6 +94,9 @@ let res = await page.evaluate((cfg)=>{
     let mul = (cfg.hpMul[fi]||1) * (boss ? (cfg.bossHpMul[fi]||1) : 1);
     const hp = Math.max(1, Math.round(e.health*mul + (cfg.hpAdd[fi]||0)));
     e.health = hp; e.maxHealth = hp; e.curHealth = hp;
+    for(const k in cfg.fxAdd){ const n=cfg.fxAdd[k][fi]||0; if(!n) continue;
+      if(boss && e.actionCycle) e.actionCycle=e.actionCycle.map(a=>a.type===k?Object.assign({},a,{value:a.value+n}):a);
+      else if(e[k]>0) e[k]+=n; }
     if(e.dmg>0 || boss) e.dmg = Math.max(0, e.dmg + (cfg.dmgAdd[fi]||0));
     return e;
   };

@@ -1,10 +1,9 @@
 # Dungeon Scramble — TODO
 
 ## Priority order
-1. **Maneuver-dice payoff.** Study whether Maneuver dice/actions are useful versus Attack, then design a payoff. Run the studies with `tools/balance`. Boost on an upgraded Maneuver die is a last resort only. First study done: see `docs/studies/2026-10-11_maneuver_study.md` (Maneuver dice are a net loss today; Momentum payoff recommended; awaiting Jeremy's decision).
-2. **Review the newest player run data** (v1.32.76 export; the second half of floor 3 is still unread).
-3. **Shrine overhaul.**
-4. **Sound / music** and 5. **art**, worked in parallel.
+1. **Maneuver-dice payoff.** Studied Oct 11 (`docs/studies/2026-10-11_maneuver_study.md`): Maneuver dice are a net loss today, and the v1.32.76 tester dropped them first. **On hold:** Jeremy wants more play data before changing the Maneuver meta. Leading candidate is Dodge Block (each Dodge gives 1 Block); Momentum is the alternative. Boost on an upgraded Maneuver die is a last resort only.
+2. **Shrine overhaul.**
+3. **Sound / music** and 4. **art**, worked in parallel.
 
 ## Other items
 - **Design-consistency audit**, plus a rewrite of the quest descriptions.
@@ -15,6 +14,6 @@
 - **Redesign the class depth badges** so each one represents its class visually.
 - **Art PNGs:** floor and archway bricks, relic art, and eventually a chest paintover (last priority).
 - **Layered cover art:** parked (original layers unavailable).
-- **Balance tuning and depth (heat) polish:** reduce one-shot kills on higher floors before tuning depth.
+- **Balance tuning and depth (heat) polish:** reduce one-shot kills on higher floors before tuning depth. Also from the v1.32.76 run review: floor 3's curve runs backwards (the first two rooms nearly killed the tester; the last three plus the Big Boss cost 2 HP total), and Extruzeon attacked only once (fully blocked) in 5 turns because its 3-step cycle plus the 20+ damage freeze leaves it nothing to threaten with. Raise the late-floor pressure, but don't rework the boss cycle without the owner's go-ahead. Enemy-pressure study (same report): raising enemy hit damage adds threat without lengthening fights; HP is the lever for one-turn kills; Big Boss hit damage can rise cheaply; Floor 3 needs per-encounter tuning (Self-Replicating Forge causes most bot deaths; Morel Dilemma, Myceleus and others deal almost nothing).
 - **Rulebook refresh** (rulebook is at build 1.32.28). Also: the unreproduced "thousands of enemy HP on resume" bug, and the Armsmaster red Skill vs red Clear question.
 - **Replay tool** for the tray/path telemetry, once playtesters have the new build.

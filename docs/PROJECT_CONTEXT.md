@@ -12,7 +12,12 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - Playtest builds ship as an installable web app (home-screen icon, dwarf portrait "icon A") on Netlify: https://dungeon-scramble-mobile.netlify.app/. He plays it on his phone.
 - Each Netlify upload costs him about 5% of his monthly token allotment, so make the web build/zip ONLY when he asks. Day-to-day previews go to a Claude Artifact (https://claude.ai/artifact/EgVZK1tuHgNfJpqhd92jPR).
 - Testers export play data from the gear menu (Export Play Data) and send the JSON. Telemetry includes per-turn tray, path, block, shrine/minion/damage-taken events and an active-time clock. A replay tool for this data is a to-do.
-- A new player's run data (v1.32.76 export) is only partly reviewed (floor 3 unread).
+- A new player's run data (v1.32.76 export: Dwarf/Armsmaster, victory, 101 turns, 36 min, tester note "Love it!") was fully reviewed on Oct 11, 2026. Findings:
+  - Floor 3 difficulty runs backwards. Sacred(?) Geometry took the player from 20 to 2 HP, and Ergot Eruption brought them to 1 HP while its stacking H.O.T. healed it from 14 back to 27. After the camp, Gestalt Network, Self-Replicating Forge and Extruzeon (Big Boss, 90 HP) together cost 2 HP, at 14–29 damage per turn.
+  - Extruzeon's cycle is dmg 6 → shield 2 → H.O.T. 1. Its one attack was fully blocked, and a 29-damage turn triggered the freeze quest, so it never acted again.
+  - Self-Replicating Forge's 6 minions per turn were cleared in full every turn. Minions don't matter once the player hits for 15+ damage.
+  - Maneuver dice were the first thing dropped. 8 of 16 loot equips replaced a Maneuver die, and the Dwarven Doohickie was swapped out on floor 2. This supports the Maneuver-payoff study.
+  - No crashes, and no sign of the inflated-enemy-HP-on-resume bug: no run was in progress and every enemy HP value looked sane. This export has no per-turn damage or path telemetry; that was added in 1.34.0.
 - Target phone: 395x769 game card in a 411x785 viewport; the card must never grow taller.
 
 ## Visual direction (settled)
@@ -28,7 +33,7 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - Loot dice join the Compendium the first time you get one; 3 copies (reduced from 5, "for now") unlock it as a Starting Boon, because boons were too strong and the game is already potentially too easy. End-of-run screens should announce newly unlocked boons.
 - Difficulty system is called **depth** (earlier "heat"; Hades-style). Class badge shows the highest depth cleared; dice finish upgrades unlock for all classes after a certain depth. He wants a "carrot": a score with a place for player names, plus scalable cosmetics. Balance tuning (reducing one-shot kills on higher floors) comes before depth.
 - Boss action cycle is a placeholder; do not rework without direction.
-- Maneuver dice: he worries Maneuver dice/actions have no point compared to Attack. A study is wanted. Adding Boost to an upgraded Maneuver die is a last resort only. Overlapping, stackable effects that cover slightly different stats are good design.
+- Maneuver dice: he worries Maneuver dice/actions have no point compared to Attack. Studied Oct 11, 2026 (docs/studies/2026-10-11_maneuver_study.md): they are a net loss today and the v1.32.76 tester dropped them first. **Decision (Oct 11): keep the analysis but wait on more play data before drastically changing the Maneuver meta.** Leading candidate when revisited: Dodge Block (each Dodge gives 1 Block); Leap Momentum (+1 to the next damaging die) is the smallest parity fix. Adding Boost to an upgraded Maneuver die is a last resort only. Overlapping, stackable effects that cover slightly different stats are good design.
 - Wants a way to compare dice in the loot "equip and choose which to replace" picker (later). Wants flavor text for loot dice (later; not in the test build). Add back reroll faces and swap faces.
 
 ## Art and licensing

@@ -13,6 +13,8 @@ variants = {
   'footwork':      {'payoff': 'footwork'},
   'dodgeBlock':    {'payoff': 'dodgeBlock'},
 }
+for a in (sys.argv[3].split(',') if len(sys.argv) > 3 else []):
+  if a not in variants: variants[a] = {'payoff': a}  # any payoff string, e.g. dodgeBlock+leapMomentum
 pick = sys.argv[3].split(',') if len(sys.argv) > 3 else ['baseline','noQuestAI','swapManeuver','momentum','footwork']
 def run(job):
   (o, k), v = job
