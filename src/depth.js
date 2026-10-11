@@ -16,7 +16,7 @@ const DEPTH_MODS = [
   { id:'swarm', name:'Swarm',          max:3, cost:1, desc:r=>`Minion spawns place ${r} extra die${r>1?'s':''}.` },
   { id:'slim',  name:'Slim Pickings',  max:2, cost:1, desc:r=> r===1 ? 'Overkills no longer add a loot option.' : 'Overkills add no loot option, and bosses offer one fewer.' },
   { id:'fury',  name:'Fury',           max:2, cost:2, desc:r=>`Every enemy hit deals +${r} damage.` },
-  { id:'dread', name:'Dread',          max:3, cost:1, desc:r=>`Deadly encounters are ${r*12}% more likely to take an Elite room (Floors 2-3).` },
+  { id:'dread', name:'Dread',          max:3, cost:1, desc:r=>`Deadly encounters are ${r*12}% more likely to take an Elite room, and Floor 1 gains its own Deadly card.` },
   { id:'gauntlet', name:'Gauntlet',    max:2, cost:2, desc:r=> r===1 ? 'Easy rooms become Standard rooms.' : 'Easy and Standard rooms become Elite rooms.' },
 ];
 const DEPTH_MOD_BY_ID = Object.fromEntries(DEPTH_MODS.map(m=>[m.id,m]));

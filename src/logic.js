@@ -954,7 +954,7 @@ function drawRoomCard(floor){
   }
   const fights = floor.enemies.concat(isVeryFirstEncounter || S.segmentTrapUsed ? [] : floor.traps);
   if(tier==='elite'){
-    const deadly = fights.filter(c=>encounterTier(c)==='deadly' && unused(c));
+    const deadly = fights.filter(c=>encounterTier(c)==='deadly' && unused(c) && (!c.dreadOnly || depthRank('dread'))); // v1.39.0: dreadOnly cards appear only with the Dread modifier
     if(deadly.length && Math.random() < DEADLY_CHANCE + 0.12*depthRank('dread')) return pick(deadly);
   }
   const fallback = {easy:['easy','standard','elite'], standard:['standard','easy','elite'], elite:['elite','standard','easy']}[tier];

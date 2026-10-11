@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.38.1';
+const GAME_VERSION = '1.39.0';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -337,6 +337,11 @@ const MAGIC = lootSet([
   ['Glacial Gorget', ['Freeze','Freeze','Block5','Block5','Nullify','Nullify']],
   ['Pre-handy-sile Tail', ['Combo2','Combo2','Combo2','Leech1','Leech1','Pivot']],
   ['Measurably Lucky Test Tube', ['Combo2','Pivot','Freeze','HOT2','HOT2','Nullify']],
+  // v1.39.0: fill the action holes (Freeze, Swap, Reroll); faction-themed names.
+  ['Law of Large Numbers', ['Reroll','Reroll','Hit3','Boost3','Block3','blank']],
+  ['Commutative Changeling', ['Swap','Swap','Combo3','Combo2','Pivot','blank']],
+  ['Absolute Zero Elixir', ['Freeze','Freeze','Hit3','Hit3','Combo2','blank']],
+  ['Icebox Pi', ['Swap','Block4','Block4','Freeze','Heal3','blank']],
 ], 'magic');
 
 // ---- Encounters (Cards 0.4 sheet -- the most complete/current tab) ----
@@ -354,6 +359,9 @@ const FLOOR1_ENEMIES = [
   enc('Amanitabomination','Enemy',14,{questHealth:6,dmg:2,shield:2,quests:['5 damage: 2 heals'],flavor:'"I was benevolent and good, misery made me a foe"'}),
   enc('Grafted Grifter','Enemy',15,{questHealth:6,dmg:2,shield:2,quests:['5 damage: 2 leap'],flavor:'Known to charge an arm and a leg.'}),
   enc('Leper Colonizers','Enemy',12,{dmg:2,shield:2,flavor:'"May our crustulant new Chempire outlast its crumbling citizens!"'}),
+  // v1.39.0: Jeremy's spare monsters from the Mechanics Document; stats from the evened tiers (docs/studies/2026-10-11_new_content_plan.md).
+  enc('Untamed Unicrows','Enemy',14,{questHealth:6,dmg:2,dot:1,quests:['5 damage: 2 dodge'],flavor:'"A murderous parliament, or a parliamentary murder?"'}),
+  enc('Prickly Porcupanther','Enemy',18,{questHealth:6,dmg:2,shield:1,dreadOnly:true,quests:['5 damage: 2 block'],flavor:'"Prickly of both texture and temperament."'}),
 ];
 const FLOOR1_TRAPS = [
   enc('Displacer Lair','Trap',25,{questHealth:15,dmg:3,quests:['10 damage: any 6 actions','10 damage: any 8 actions','10 damage: any 10 actions'],flavor:'"Move either very fast or very slow. Don\u2019t touch the bellies"'}),
@@ -398,6 +406,9 @@ const FLOOR2_ENEMIES = [
   enc('Lichen-Thrope','Enemy',24,{dmg:3,heal:1,flavor:'Under the luminance of the full bloom, this creature becomes a true hater.'}),
   enc('Fungal Flayer','Enemy',20,{questHealth:10,dmg:3,hot:2,quests:['16 damage: accumulate 5 block'],flavor:'It is, in fact, acceptable to hate the flayer.'}),
   enc('Illegal Operation','Enemy',19,{dmg:4,hot:1,flavor:'"Oh no, maybe we try multiplying by zero this time??"'}),
+  enc('Rabbid Rabbats','Enemy',18,{questHealth:6,dmg:2,minion:1,quests:['5 damage: 2 leap'],flavor:'"They multiply like rabbits and, as a group, have inverse operations."'}),
+  enc('Roudy Rinotter','Enemy',20,{questHealth:6,dmg:2,heal:1,quests:['5 damage: 2 heal'],flavor:'"Is that some cornbread on its tummy?"'}),
+  enc('Whence Wolf','Enemy',32,{questHealth:10,dmg:3,dot:1,quests:['10 damage: 3 maneuvers'],flavor:'"Why, Grandma, what uncertain provenance you have."'}),
 ];
 const FLOOR2_TRAPS = [
   enc('Adhesive Pest Traps','Trap',30,{questHealth:20,dmg:2,minion:2,quests:['15 damage: 3 maneuvers','15 damage: 4 maneuvers','15 damage: 5 maneuvers'],flavor:'"Environmentally friendly snares for unfriendly environments"'}),
@@ -445,6 +456,8 @@ const FLOOR3_ENEMIES = [
   enc('The Punished','Enemy',36,{dmg:3,minion:1,flavor:'Those foolish enough to try and harness forms they are unable to comprehend.'}),
   enc('Profane Geometry','Enemy',35,{questHealth:10,dmg:3,hot:2,quests:['10 damage: adventurer H.O.T. = D.O.T.'],flavor:'A simulacrum of the divine, insatiable as the curiosity by which it was conjured.'}),
   enc('Sacred(?) Geometry','Enemy',38,{questHealth:10,dmg:3,dot:2,quests:['10 damage: encounter D.O.T. = H.O.T.'],flavor:'A mere reflection of the divine geometry. The impossible beauty pains your eyes.'}),
+  enc('Eelagator Escapee','Enemy',44,{questHealth:10,dmg:4,shield:2,quests:['10 damage: 2 nullify'],flavor:'"Such a successful grafting that it escaped of its own measure!"'}),
+  enc('Toadtaur Warrior','Enemy',30,{questHealth:8,dmg:5,quests:['8 damage: 3 maneuvers'],flavor:'"Definitely a \'can we\' vs. a \'should we\' decision, looking back."'}),
 ];
 const FLOOR3_TRAPS = [
   enc('Anti-Euclidian Space','Trap',40,{questHealth:30,dmg:7,shield:2,quests:['10 damage: any 10 actions','15 damage: any 12 actions','20 damage: any 15 actions'],flavor:'Where forbidden postulates are illogically deduced from perfidious axioms.'}),
@@ -473,7 +486,8 @@ const FLOOR3_SHRINES = [
 ];
 const BIG_BOSSES = [
   enc('Extruzeon, Co-consul of Waste','Big Boss',90,{questHealth:60,dmg:6,shield:2,hot:1,quests:['30 damage: 3 boosts','30 damage: 6 maneuvers in a single turn','freeze: 20+ damage'],flavor:'"And to think\u2026I hesitated."'}),
-  enc('Myceleus, Co-consul of Rot','Big Boss',96,{questHealth:60,dmg:2,minion:2,dot:1,hot:2,quests:['30 damage: 3 combos','30 damage: 6 maneuvers in a single turn','nullify: 15+ damage'],flavor:'"Extinction is the rule. Your survival is the exception!"'}),
+  enc('Toadtaur Wizard, Assistant to the Co-consul','Big Boss',78,{questHealth:60,dmg:4,quests:['30 damage: 3 leaps','30 damage: 6 maneuvers in a single turn','freeze: 15+ damage'],flavor:'"The wizdom of the toads flows through my three-chambered heart!"'}),
+  enc('Myceleus, Co-consul of Rot','Big Boss',96,{questHealth:60,dmg:2,minion:2,dot:1,hot:2,quests:['30 damage: 3 combos','30 damage: 6 maneuvers in a single turn','nullify: 15+ damage'],flavor:'"All must rot away to naught!"'}),
 ];
 
 const FLOORS = [
@@ -494,10 +508,12 @@ const ENCOUNTER_TIER = {
   // Floor 1
   'Filement Bunny':'easy','Wooden Golem':'easy','Beaker Breakers':'easy','United Separatists':'easy',
   'Rigged Sporks':'easy','Unauthorized Transfusion':'easy',
+  'Untamed Unicrows':'standard','Prickly Porcupanther':'deadly',
   'Feral Pet Rock':'standard','Viscous Orb':'standard','Grafted Grifter':'standard','Displacer Lair':'standard',
   'Amanitabomination':'elite','Leper Colonizers':'elite','Unbound Automa':'elite','Leper Con-Trap':'elite',
   // Floor 2
   'Unventilated Workshop':'easy','Adhesive Pest Traps':'easy','The Warcart':'easy','Armored Gear-Pest':'easy',
+  'Rabbid Rabbats':'easy','Roudy Rinotter':'easy','Whence Wolf':'deadly',
   'Rogue Technician':'standard','Displacer Kitty':'standard','Blastogenesis Engine':'standard','Ditched Heist':'standard',
   'Half-life Host':'elite','Rusty Golem':'elite','Illegal Operation':'elite','Lichen-Thrope':'elite','Fungal Flayer':'elite',
   'The Strike-Breaker':'deadly',
@@ -505,12 +521,12 @@ const ENCOUNTER_TIER = {
   'Morel Dilemma':'easy','Parasite Seer':'easy','Gestalt Network':'easy',"Oilephant's Foot":'easy',
   'Chimeric Sludge':'standard','Ergot Eruption':'standard','Profane Geometry':'standard','Extractnid Matriarch':'standard',
   'Anti-Euclidian Space':'elite','Bio-Mutant Escape':'elite','Gnome Chomper':'elite','The Punished':'elite','Sacred(?) Geometry':'elite',
-  'Self-Replicating Forge':'deadly',
+  'Self-Replicating Forge':'deadly','Eelagator Escapee':'deadly','Toadtaur Warrior':'elite',
 };
 function encounterTier(e){ return (e && ENCOUNTER_TIER[e.name]) || 'standard'; }
 // Room tier by route step (buildRoute(): camp, enc, enc, enc, camp, enc, enc, boss).
 const ROOM_TIER_SLOTS = {1:'easy', 2:'standard', 3:'elite', 5:'standard', 6:'elite'};
-const DEADLY_CHANCE = 0.12;      // per elite slot, Floors 2-3 (Floor 1 has no deadly cards)
+const DEADLY_CHANCE = 0.12;      // per elite slot; Floor 1's only deadly card (Prickly Porcupanther) is dreadOnly
 // Chance a Shrine takes an easy/standard slot (max one per segment): rises by
 // floor and with depth (v1.36.0). See shrineSlotChance() in logic.js.
 const SHRINE_SLOT_CHANCE = [0.40, 0.45, 0.50];
@@ -567,6 +583,14 @@ const BOSS_KITS = {
     phase2:{ name:'Fruiting Body', each:[{type:'dmg',value:4},{type:'minion',value:1}], specials:[
       {name:'Rot', acts:[{type:'dot',value:3}]},
       {name:'Mycelial Burst', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]} ]}},
+  // v1.39.0: the third Big Boss. Phase 2 (Leap Year): the Toadtaur Warrior joins.
+  'Toadtaur Wizard, Assistant to the Co-consul':{ each:[{type:'dmg',value:4}], specials:[
+    {name:'Hex Factor', acts:[{type:'dot',value:2}]},
+    {name:'Square Root', acts:[{type:'shield',value:5}]},
+    {name:'Exponential Croak', windup:true, acts:[{type:'dmg',value:10}]} ],
+    phase2:{ name:'Leap Year', each:[{type:'dmg',value:4},{type:'minion',value:1}], specials:[
+      {name:'Lily Pad Lemma', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]},
+      {name:'Exponential Croak', windup:true, acts:[{type:'dmg',value:10}]} ]}},
 };
 
 // Stand-in art for the v1.36.0 shrines until Jeremy's own art exists: each
@@ -594,6 +618,7 @@ const ENCOUNTER_SIZE = {
   'Blastogenesis Engine':1.1,'Half-life Host':1.2,'Lichen-Thrope':1.15,'Fungal Flayer':1.15,
   'The Necrorancher':1.35,'Bellicose Biomancer':1.4,'Ceramic Golem':1.5,
   'Morel Dilemma':.62,'Chimeric Sludge':1.3,'Gnome Chomper':1,'Parasite Seer':1.05,'Gestalt Network':1.25,
-  "Oilephant's Foot":1.55,'Extractnid Matriarch':1.45,'The Punished':1.25,'Profane Geometry':1.35,'Sacred(?) Geometry':1.35
+  "Oilephant's Foot":1.55,
+  'Untamed Unicrows':.75,'Prickly Porcupanther':.95,'Rabbid Rabbats':.6,'Roudy Rinotter':.85,'Whence Wolf':1.1,'Eelagator Escapee':1.25,'Toadtaur Warrior':1.2,'Toadtaur Wizard, Assistant to the Co-consul':1.45,'Extractnid Matriarch':1.45,'The Punished':1.25,'Profane Geometry':1.35,'Sacred(?) Geometry':1.35
 };
 function encounterSize(e){ if(!e) return 1; const v = ENCOUNTER_SIZE[e.name]; return v || (/Boss/.test(e.type) ? 1.35 : 1); }

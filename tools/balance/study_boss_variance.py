@@ -11,12 +11,12 @@ from concurrent.futures import ThreadPoolExecutor
 runs = int(sys.argv[1]) if len(sys.argv) > 1 else 150
 combos = [('dwarf','guard'), ('gnome','armsmaster'), ('halfling','dungeoneer'), ('pixie','arcanist')]
 bosses = {1:['Rogue Golemancer','Heating Elemental','Grosteque Grafter'], 2:['The Necrorancher','Bellicose Biomancer','Ceramic Golem'],
-          3:['Extruzeon, Co-consul of Waste','Myceleus, Co-consul of Rot']}
+          3:['Extruzeon, Co-consul of Waste','Myceleus, Co-consul of Rot','Toadtaur Wizard, Assistant to the Co-consul']}
 levels = {'strong':{'skill':1500}, 'blind':{'skill':1500,'intentAware':False}, 'weak':{'skill':150}}
 force = [bosses[1], bosses[2], bosses[3]]
 jobs = []
 for i in range(3):  # force one boss per floor at a time: boss i on F1, i on F2, i%2 on F3
-  fb = [bosses[1][i], bosses[2][i], bosses[3][i % 2]]
+  fb = [bosses[1][i], bosses[2][i], bosses[3][i]]
   for lv in levels:
     for o, k in combos: jobs.append((tuple(fb), lv, o, k))
 def run(j):
