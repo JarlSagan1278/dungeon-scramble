@@ -1,7 +1,7 @@
 # Dungeon Scramble — TODO
 
 ## Priority order
-1. **Boss rework + encounter tiers** (approved Oct 11). Proposal: `docs/studies/2026-10-11_encounters_and_bosses.md` — base attack every turn plus telegraphed specials, phase 2, easy/standard/deadly/elite tiers with a slot pattern per floor, Forge and Strike-Breaker as rare elites, intents for deadly enemies. Awaiting Jeremy's picks on the options.
+1. **Boss rework + encounter tiers** (design approved Oct 11; see `docs/studies/2026-10-11_encounters_and_bosses.md` section 5). Next: Jeremy reviews the boss move lists, heavy-turn rule and tier reassignment drafts, then build: tier tags + slot pattern, boss move engine with phase 2, heavy turns for elite/deadly enemies, zero-threat fixes, Forge minions 6 → 4; re-measure with the harness.
 2. **Maneuver-dice payoff.** Studied Oct 11 (`docs/studies/2026-10-11_maneuver_study.md`): Maneuver dice are a net loss today, and the v1.32.76 tester dropped them first. **On hold:** Jeremy wants more play data before changing the Maneuver meta. Leading candidate is Dodge Block (each Dodge gives 1 Block); Momentum is the alternative. Boost on an upgraded Maneuver die is a last resort only.
 3. **Shrine overhaul.**
 4. **Sound / music** and 5. **art**, worked in parallel.
