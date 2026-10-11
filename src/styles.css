@@ -2442,3 +2442,386 @@ body.is-resolving .hall-fx i{ opacity:0; }
 /* 1.32.77: no pull-to-refresh / rubber-band bounce when installed as an app; pages that are taller than the screen still scroll normally */
 html, body{ overscroll-behavior:none; overscroll-behavior-y:none; }
 body{ -webkit-tap-highlight-color:transparent; }
+
+/* ---- Depth: setup menu, badges, victory seal ---- */
+.depth-card{ background:var(--b5); border:1px solid var(--line); border-radius:var(--r-lg); padding:10px; display:flex; flex-direction:column; gap:8px; }
+.depth-head{ display:flex; align-items:center; gap:12px; }
+.depth-num{ width:48px; height:48px; border-radius:50%; background:var(--b2); border:2px solid var(--gold); color:var(--gold); font:800 24px var(--font-ui); display:flex; align-items:center; justify-content:center; flex:none; }
+.depth-head-text{ font-size:13px; font-weight:800; color:var(--parchment); line-height:1.3; }
+.depth-limit{ font-size:11px; font-weight:600; color:var(--parchment-dim); }
+.depth-row{ display:flex; align-items:center; gap:10px; padding:7px 9px; background:var(--b3); border:1px solid var(--line); border-radius:var(--r-md); }
+.depth-row.on{ border-color:var(--gold); }
+.depth-row-text{ flex:1; min-width:0; }
+.depth-row-name{ font-size:13px; font-weight:800; color:var(--parchment); }
+.depth-cost{ font-size:10px; font-weight:700; color:var(--parchment-dim); margin-left:4px; }
+.depth-row-desc{ font-size:11px; color:var(--parchment-dim); line-height:1.3; }
+.depth-step{ display:flex; align-items:center; gap:6px; flex:none; font-size:12px; font-weight:800; color:var(--parchment); }
+.depth-step button{ width:30px; height:30px; padding:0; border-radius:50%; font-size:16px; line-height:1; }
+.depth-step button:disabled{ opacity:.35; }
+.depth-step span{ min-width:30px; text-align:center; }
+.class-showcase-badge{ flex:none; display:flex; align-items:center; }
+.depth-badge-wrap{ display:flex; flex-direction:column; align-items:center; }
+.depth-badge{ filter:drop-shadow(0 3px 4px rgba(0,0,0,.6)); display:block; }
+.depth-badge.empty{ opacity:.7; filter:none; }
+.depth-badge-pill{ margin-top:-4px; font:800 9.5px var(--font-ui); letter-spacing:.6px; color:var(--parchment); background:var(--b1); border:1.5px solid var(--line); border-radius:999px; padding:2px 8px; white-space:nowrap; }
+.title-badges{ display:flex; justify-content:center; gap:12px; margin:14px 0 0; }
+.title-badge{ display:flex; flex-direction:column; align-items:center; }
+.title-badge-name{ margin-top:-2px; font:800 9px var(--font-ui); letter-spacing:1px; text-transform:uppercase; color:var(--parchment-dim); }
+.depth-seal{ display:flex; align-items:center; gap:14px; margin:12px 0; padding:14px; border-radius:var(--r-lg); border:2px solid var(--gold); background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(0,0,0,.25)); box-shadow:0 0 18px rgba(255,200,58,.25); }
+.depth-seal-text{ min-width:0; }
+.depth-seal-kicker{ font-size:11px; letter-spacing:1.5px; font-weight:800; text-transform:uppercase; color:var(--parchment-dim); }
+.depth-seal-title{ font:800 20px var(--font-ui); color:var(--gold); line-height:1.15; margin:2px 0 6px; }
+.depth-seal-who{ font-size:14px; color:var(--parchment); }
+.depth-seal-score{ font-size:12px; color:var(--parchment-dim); margin-top:4px; }
+.seal-unlock{ margin-top:6px; font-size:12px; color:var(--gold); }
+
+/* ---- Setup headings: game-style banners, collapsible Depth, thicker seal ---- */
+.setup-panel .setup-label{ display:flex; align-items:center; justify-content:center; gap:10px; font-family:var(--font-display); font-size:13px; font-weight:400; letter-spacing:2.5px; color:var(--gold); text-shadow:0 2px 0 #0c0705, 0 0 10px rgba(255,200,58,.25); padding:0; margin:0 0 1px; }
+.setup-panel .setup-label::before, .setup-panel .setup-label::after{ content:''; flex:1; height:2px; border-radius:2px; background:linear-gradient(90deg, transparent, rgba(255,200,58,.7)); box-shadow:0 1px 0 #0c0705; }
+.setup-panel .setup-label::after{ background:linear-gradient(270deg, transparent, rgba(255,200,58,.7)); }
+.setup-panel .setup-label-sub{ font-family:var(--font-ui); font-size:10px; letter-spacing:.5px; font-style:italic; color:var(--parchment-dim); text-shadow:none; text-transform:none; }
+.depth-section{ gap:0 !important; }
+.depth-toggle{ display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:7px 10px; background:var(--b5); border:2px solid var(--line); border-radius:var(--r-lg); color:var(--parchment); cursor:pointer; font:inherit; box-shadow:var(--shadow-1); }
+.depth-toggle .depth-num{ width:38px; height:38px; font-size:20px; flex:none; }
+.depth-toggle-text{ display:flex; flex-direction:column; flex:1; min-width:0; line-height:1.15; }
+.depth-toggle-title{ font-family:var(--font-display); font-size:13px; letter-spacing:2.5px; text-transform:uppercase; color:var(--gold); text-shadow:0 2px 0 #0c0705; }
+.depth-toggle-sub{ font-size:11.5px; font-weight:700; color:var(--parchment-dim); }
+.depth-chevron{ flex:none; color:var(--gold); display:flex; transition:transform .2s; }
+.depth-toggle.open .depth-chevron{ transform:rotate(180deg); }
+.depth-body{ margin-top:6px; background:var(--b5); border:2px solid var(--line); border-radius:var(--r-lg); padding:8px; display:flex; flex-direction:column; gap:6px; }
+.depth-body[hidden]{ display:none; }
+.depth-body .depth-limit{ text-align:center; }
+.depth-seal{ border-width:3px !important; }
+.depth-badge-pill{ border-width:2px !important; }
+/* class card: keep the name readable beside the badge on narrow phones */
+.class-showcase{ gap:8px !important; }
+.class-showcase-badge{ margin-left:auto; }
+.class-showcase-text{ flex:1 1 0; min-width:0; overflow:visible !important; }
+.class-showcase-name{ white-space:nowrap; }
+.class-showcase .depth-badge-pill{ font-size:8.5px; padding:2px 6px; }
+
+/* Depth menu opens upward as an overlay (no added page height) */
+.depth-section{ position:relative; }
+.depth-body{ position:absolute !important; left:0; right:0; bottom:calc(100% + 6px); margin-top:0 !important; z-index:40; max-height:min(62vh, 470px); overflow-y:auto; box-shadow:0 -6px 18px rgba(0,0,0,.55), var(--shadow-2); overscroll-behavior:contain; }
+.depth-toggle .depth-chevron{ transform:rotate(180deg); }
+.depth-toggle.open .depth-chevron{ transform:rotate(0deg); }
+
+/* Available basic-die upgrades gently pulse so players notice them */
+.upgrade-btn.upgrade-ready:not(:disabled){ animation: upgradeReady 1.8s ease-in-out infinite; }
+@keyframes upgradeReady{
+  0%,100%{ box-shadow:0 0 0 0 rgba(255,215,106,0); filter:none; }
+  50%{ box-shadow:0 0 12px 3px rgba(255,215,106,.55); filter:brightness(1.18); }
+}
+@media (prefers-reduced-motion: reduce){ .upgrade-btn.upgrade-ready:not(:disabled){ animation:none; box-shadow:0 0 8px 2px rgba(255,215,106,.45); } }
+
+/* Quest paper: one-time glow when a room with bonus quests begins */
+.fo-quests-float.quest-flash{ animation: questFlash 1.5s ease-out 1 !important; }
+@keyframes questFlash{
+  0%{ filter:brightness(1); box-shadow:0 0 0 0 rgba(255,215,106,0); }
+  25%{ filter:brightness(1.35); box-shadow:0 0 22px 8px rgba(255,215,106,.85); }
+  100%{ filter:brightness(1); box-shadow:0 0 0 0 rgba(255,215,106,0); }
+}
+
+/* First-time symbol intro card */
+.symbol-intro{ position:fixed; left:50%; bottom:calc(14px + env(safe-area-inset-bottom,0px)); transform:translate(-50%,16px); opacity:0; z-index:9000;
+  width:min(340px, calc(100vw - 28px)); display:flex; gap:10px; align-items:center; padding:9px 12px; box-sizing:border-box;
+  background:var(--b2); border:2px solid var(--gold); border-radius:12px; box-shadow:0 4px 0 var(--line), 0 0 18px rgba(255,200,58,.35); color:var(--parchment);
+  transition:opacity .22s ease, transform .22s ease; cursor:pointer; }
+.symbol-intro.show{ opacity:1; transform:translate(-50%,0); }
+.symbol-intro-icon{ flex:0 0 44px; height:44px; display:flex; align-items:center; justify-content:center; background:#fff4d2; color:#241c10; border:2px solid var(--line); border-radius:10px; }
+.symbol-intro-icon svg, .symbol-intro-icon .icon{ width:30px; height:30px; }
+.symbol-intro-minion{ width:26px; height:26px; border-radius:6px; background:#5b3a7a; border:2px solid var(--line); }
+.symbol-intro-text{ display:flex; flex-direction:column; gap:1px; font-size:12px; line-height:1.3; min-width:0; }
+.symbol-intro-text strong{ font-family:var(--font-ui); font-size:14px; color:var(--gold); }
+.symbol-intro-kicker{ font-family:var(--font-ui); font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--parchment-dim); }
+
+/* Swap picker: face comparison */
+.swap-item.selected{ outline:3px solid var(--gold); outline-offset:2px; border-radius:10px; }
+.swap-compare{ display:flex; flex-direction:column; gap:6px; margin:10px 0 8px; padding:8px; background:var(--b1); border:2px solid var(--line); border-radius:10px; }
+.swap-compare-row{ display:flex; align-items:center; gap:8px; min-height:44px; }
+.swap-compare-label{ flex:0 0 68px; font-size:10px; line-height:1.25; text-transform:uppercase; letter-spacing:1px; color:var(--parchment-dim); }
+.swap-compare-label b{ display:block; color:var(--gold); font-size:11px; text-transform:none; letter-spacing:0; }
+.swap-compare-hint{ font-size:11px; color:var(--parchment-dim); font-style:italic; width:100%; text-align:center; }
+.swap-compare .faces-tiles{ flex:1 1 auto; min-width:0; }
+.swap-compare .faces-tiles{ display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:3px; }
+.swap-compare .mini-face{ width:100%; height:auto; aspect-ratio:1/1; }
+.swap-compare .mini-face small{ font-size:6.5px; }
+.swap-compare .mini-face .icon-svg{ width:18px; height:18px; }
+
+/* ⓘ info dot: explanatory text lives in a hover / tap bubble instead of inline copy */
+.info-dot{ display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; margin-left:4px; vertical-align:middle;
+  border:1.5px solid var(--b6); border-radius:50%; color:var(--parchment-dim); font:italic 700 11px/1 Georgia,serif; cursor:help; user-select:none; -webkit-tap-highlight-color:transparent; }
+.info-dot:hover,.info-dot:focus{ color:var(--gold); border-color:var(--gold); outline:none; }
+
+html,body{ overflow-x:clip; }
+/* Dice that an upgrade would consume, lit while its button is hovered */
+.camp-die-tile.fuse-hint{ outline:3px solid var(--gold); outline-offset:2px; box-shadow:0 0 14px 3px rgba(255,200,58,.7); transform:translateY(-2px) scale(1.05); transition:transform .12s ease; z-index:2; }
+
+/* Relics now sit under the player portrait with the other buffs */
+.fo-player .relic-strip{ position:static; transform:none; margin:3px 0 0; justify-content:center; gap:3px; flex-wrap:wrap; background:none; padding:0; }
+.fo-player .relic-badge{ width:20px; height:20px; font-size:9px; }
+
+.fo-buffs .relic-strip{ display:contents; }
+.fo-player .fo-buffs{ flex-wrap:wrap; justify-content:center; gap:3px; align-items:center; }
+.status-chip[title], .enemy-action-badge[title]{ cursor:pointer; }
+
+.fo-arch .fo-fig{ cursor:pointer; }
+
+.face-tooltip.flavor-bubble{ max-width:190px; text-align:center; font-size:12px; z-index:95; border-color:var(--gold); background:rgba(20,12,6,.94); box-shadow:0 3px 14px rgba(0,0,0,.65); }
+
+@keyframes poke-jerk-kf{
+  0%,100%{ transform:translate(0,0) rotate(0) scale(1); }
+  12%{ transform:translate(5px,-2px) rotate(4deg) scale(1.04,.96); }
+  26%{ transform:translate(-6px,1px) rotate(-5deg) scale(.97,1.03); }
+  42%{ transform:translate(4px,-1px) rotate(3deg); }
+  58%{ transform:translate(-3px,0) rotate(-2deg); }
+  75%{ transform:translate(2px,0) rotate(1deg); }
+}
+
+/* Kill-hint (Lethal / Almost...) sits just above the enemy health bar, free to overlap the portrait */
+.fo-enemy .fo-hpwrap > .kill-hint{ position:absolute !important; left:0; right:0; bottom:100%; top:auto; margin:0 0 1px !important; height:auto !important; line-height:12px; text-align:center; z-index:6; pointer-events:none; text-shadow:0 1px 0 #0c0705, 0 0 5px rgba(0,0,0,.9); }
+
+/* Swap picker comparison v2: on top, stacked label-over-faces, bigger dark-tile faces */
+.swap-compare{ margin:4px 0 10px; }
+.swap-compare-row{ flex-direction:column; align-items:stretch; gap:3px; min-height:84px; }
+.swap-compare-label{ flex:none; display:flex; align-items:baseline; gap:6px; font-size:10px; }
+.swap-compare-label b{ display:inline; font-size:12px; }
+.swap-compare .faces-tiles{ gap:4px; }
+.swap-compare .mini-face{ border-radius:8px; }
+.swap-compare .mini-face .icon-svg{ background:transparent !important; box-shadow:none !important; width:28px !important; height:28px !important; margin:0 !important; color:#241c10; }
+.swap-compare .mini-face small{ font-size:8.5px; margin-top:1px; }
+.swap-compare-hint{ align-self:center; margin:auto; }
+
+.mini-face{ position:relative; }
+.face-delta{ position:absolute; top:1px; right:2px; font-size:11px; line-height:1; font-weight:900; text-shadow:0 0 2px #0c0705, 0 1px 0 #0c0705; pointer-events:auto; }
+.face-delta.up{ color:#5dff7a; } .face-delta.down{ color:#ff5a4a; }
+/* comparison faces: tiles sized to their contents instead of stretching across the panel */
+.swap-compare .faces-tiles{ grid-template-columns:repeat(6,46px); justify-content:start; }
+.swap-compare .mini-face{ width:46px; height:46px; aspect-ratio:auto; }
+.swap-compare .mini-face .icon-svg{ width:24px !important; height:24px !important; }
+.swap-compare-row{ min-height:68px; }
+
+/* Equip window matches the game column width (not the full screen) */
+.swap-modal{ width:min(390px, calc(100vw - 24px)); max-width:390px !important; margin-left:auto; margin-right:auto; box-sizing:border-box; }
+.swap-compare .faces-tiles{ grid-template-columns:repeat(6,minmax(0,1fr)); }
+.swap-compare .mini-face{ width:100%; height:auto; aspect-ratio:1/1; }
+.swap-modal .swap-list{ justify-content:center; }
+/* Equip window: dice sit directly on the panel (no card behind each) */
+.swap-modal .swap-item{ background:none; border:2px solid transparent; box-shadow:none; padding:4px; border-radius:12px; }
+.swap-modal .swap-item:hover{ border-color:transparent; }
+.swap-modal .swap-item.selected{ outline:none; border-color:var(--gold); box-shadow:0 0 10px 2px rgba(255,200,58,.55); background:rgba(255,200,58,.08); }
+.swap-modal .swap-list{ gap:6px; }
+/* Equip window: four dice per row at the existing die size */
+.swap-modal .swap-list{ gap:4px 2px; padding-left:0; padding-right:0; }
+.swap-modal .swap-item{ width:76px; padding:2px; border:0; box-sizing:border-box; }
+.swap-modal .swap-item.selected{ border:0; }
+
+/* 'vs' mark: sits between the health bars, plays a short intro at the start of an encounter, then fades out */
+.fo-vs{ position:relative; margin-bottom:0 !important; }
+.fo-vs .fo-vs-txt{ position:absolute; left:50%; top:50%; transform:translateX(-50%); opacity:0; pointer-events:none; white-space:nowrap; font-size:15px; letter-spacing:1px; text-shadow:0 2px 0 #0c0705, 0 0 8px rgba(255,200,58,.0); }
+.fo-vs .fo-vs-txt.vs-intro{ animation: vsIntro 3.2s ease-out both; }
+@keyframes vsIntro{
+  0%{ opacity:0; transform:translateX(-50%) scale(2.6) rotate(-8deg); }
+  10%{ opacity:1; transform:translateX(-50%) scale(.9) rotate(0); text-shadow:0 2px 0 #0c0705, 0 0 14px rgba(255,200,58,.95); }
+  16%{ transform:translateX(-50%) scale(1.15); }
+  22%{ transform:translateX(-50%) scale(1); }
+  35%{ transform:translateX(-50%) scale(1.14); text-shadow:0 2px 0 #0c0705, 0 0 14px rgba(255,200,58,.9); }
+  50%{ transform:translateX(-50%) scale(1); }
+  65%{ transform:translateX(-50%) scale(1.14); text-shadow:0 2px 0 #0c0705, 0 0 14px rgba(255,200,58,.9); }
+  78%{ opacity:1; transform:translateX(-50%) scale(1); }
+  100%{ opacity:0; transform:translateX(-50%) scale(.85); }
+}
+.reduced-motion .fo-vs .fo-vs-txt.vs-intro{ animation:none; opacity:.9; }
+/* Equip window: the dice speak for themselves */
+.swap-modal .swap-item-label{ display:none; }
+
+/* Quest paper rows: condition -> reward badge */
+.fo-quests-float .fo-quest.q-row{ display:flex; align-items:center; gap:3px; text-align:left; padding:1px 0; }
+.fo-quests-float .q-mark{ flex:0 0 auto; font-size:8px; opacity:.8; }
+.fo-quests-float .q-cond{ flex:1 1 auto; min-width:0; font-size:9px; line-height:1.15; font-weight:700; text-wrap:balance; }
+.fo-quests-float .q-arrow{ flex:0 0 auto; font-size:10px; font-weight:900; color:#7a1f14; }
+.fo-quests-float .q-reward{ flex:0 0 auto; display:inline-flex; align-items:center; gap:1px; padding:1px 4px 1px 2px; border-radius:9px; background:#3a2410; color:#ffd76a; font-size:10px; font-weight:900; line-height:1; box-shadow:0 1px 0 rgba(0,0,0,.35); }
+.fo-quests-float .q-reward .icon-svg{ width:13px; height:13px; color:#ffd76a; }
+.fo-quests-float .q-reward b{ font-family:var(--font-ui); }
+.fo-quests-float .fo-quest.complete .q-cond{ text-decoration:line-through; }
+.fo-quests-float .fo-quest.complete .q-reward{ background:#2d6a2f; color:#e8ffe0; }
+.fo-quests-float .fo-quest.complete .q-arrow{ color:#2d6a2f; }
+
+.fo-quests-float .fo-quest.q-row{ gap:2px; }
+.fo-quests-float .q-mark{ font-size:7px; width:6px; }
+.fo-quests-float .q-cond{ font-size:8.5px; letter-spacing:-.1px; }
+.fo-quests-float .q-arrow{ font-size:9px; margin:0 -1px; }
+.fo-quests-float .q-reward{ padding:1px 3px 1px 1px; font-size:9px; }
+.fo-quests-float .q-reward .icon-svg{ width:11px; height:11px; }
+
+.fo-quests-float .fo-quests{ align-items:stretch !important; }
+.fo-quests-float .fo-quest.q-row{ width:100%; }
+.fo-quests-float .q-cond{ text-align:left; }
+.fo-quests-float .q-reward{ margin-left:auto; min-width:30px; justify-content:center; }
+.fo-quests-float .q-arrow{ margin-left:auto; margin-right:0; }
+.fo-quests-float .q-arrow + .q-reward{ margin-left:2px; }
+
+.fo-quests-float .q-reward{ min-width:0; }
+.fo-quests-float .q-cond{ font-size:8.5px; }
+
+/* ---- Loot die sheens: each metal gets its own idle sparkle (sits under the depth-finish filigree, z-index 2) ---- */
+.die-sheen{ position:absolute; inset:0; z-index:2; pointer-events:none; overflow:hidden; border-radius:inherit; }
+/* Gilded: the buckle's glint -- a skewed bright stripe sweeping across, then a long rest */
+.die-sheen.sheen-gilded::before{ content:''; position:absolute; top:-10%; bottom:-10%; left:0; width:30%; transform:translateX(-160%) skewX(-20deg);
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.75) 42%, rgba(255,255,255,.75) 58%, transparent); opacity:0;
+  animation:sheenGold 6.5s ease-in-out infinite; animation-delay:var(--sd,0s); }
+@keyframes sheenGold{ 0%,68%{ transform:translateX(-160%) skewX(-20deg); opacity:0; } 74%{ opacity:1; } 92%{ transform:translateX(420%) skewX(-20deg); opacity:1; } 100%{ transform:translateX(420%) skewX(-20deg); opacity:0; } }
+/* Alloy: rim light -- a bright arc travels once around the die's bevel (only the border ring is visible; the face stays clear) */
+.die-sheen.sheen-alloy{ padding:3px; box-sizing:border-box; border-radius:var(--r-md);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); mask-composite:exclude; }
+.die-sheen.sheen-alloy::before{ content:''; position:absolute; left:50%; top:50%; width:170%; aspect-ratio:1; margin:0; opacity:0;
+  background:conic-gradient(from 0deg, transparent 0 56%, rgba(255,255,255,.04) 62%, rgba(255,255,255,.12) 72%, rgba(255,255,255,.3) 83%, rgba(255,255,255,.62) 92%, rgba(255,255,255,1) 98.5%, transparent 100%);
+  transform:translate(-50%,-50%) rotate(0deg); animation:sheenAlloyRim 4.8s ease-in-out infinite; animation-delay:var(--sd,0s); }
+@keyframes sheenAlloyRim{ 0%{ opacity:0; transform:translate(-50%,-50%) rotate(var(--ra,0deg)); } 6%{ opacity:1; } 30%{ opacity:1; } 38%,100%{ opacity:0; transform:translate(-50%,-50%) rotate(calc(var(--ra,0deg) + 120deg)); } }
+.die-sheen.sheen-alloy{ --ra:20deg; }
+#tray > :nth-child(4n+2) .sheen-alloy{ --ra:110deg; }
+#tray > :nth-child(4n+3) .sheen-alloy{ --ra:200deg; }
+#tray > :nth-child(4n+4) .sheen-alloy{ --ra:290deg; }
+/* Magic: energy pulsing from inside -- a soft core glow breathing, with a ring expanding outward */
+.die-sheen.sheen-magic::before{ content:''; position:absolute; inset:0; mix-blend-mode:screen;
+  background:radial-gradient(circle at 50% 55%, rgba(236,206,255,.75), rgba(190,140,255,.25) 45%, transparent 70%);
+  animation:sheenMagic 2.8s ease-in-out infinite; animation-delay:var(--sd,0s); }
+.die-sheen.sheen-magic::after{ content:''; position:absolute; left:50%; top:50%; width:30%; aspect-ratio:1; border-radius:50%; transform:translate(-50%,-50%) scale(.4);
+  background:radial-gradient(circle, rgba(245,230,255,0) 38%, rgba(245,230,255,.55) 62%, rgba(245,230,255,0) 80%); filter:blur(2.5px); opacity:0; animation:sheenMagicRing 2.8s ease-out infinite; animation-delay:var(--sd,0s); }
+@keyframes sheenMagic{ 0%,100%{ opacity:.15; transform:scale(.85); } 45%{ opacity:.75; transform:scale(1.05); } }
+@keyframes sheenMagicRing{ 0%,35%{ opacity:0; transform:translate(-50%,-50%) scale(.4); } 45%{ opacity:.9; } 100%{ opacity:0; transform:translate(-50%,-50%) scale(3.2); } }
+.reduced-motion .die-sheen::before, .reduced-motion .die-sheen::after{ animation:none !important; opacity:0 !important; }
+
+.fo-buffs .status-chip{ display:inline-flex; align-items:center; gap:2px; }
+.fo-buffs .status-chip .icon-value-overlay{ display:none; }
+.fo-buffs .status-chip .chip-n{ font-family:var(--font-ui); font-size:11px; font-weight:900; line-height:1; }
+/* Kill callouts ("Boss Defeated" etc.): heavy dark outline drawn behind the fill so the letters stay crisp on any background */
+.kill-callout-line{ paint-order:stroke fill; -webkit-text-stroke:6px #120a04 !important; stroke-linejoin:round;
+  text-shadow:0 3px 0 #120a04, 0 0 12px rgba(0,0,0,.9), 0 0 26px rgba(0,0,0,.7) !important; }
+.kill-callout-line.boss{ -webkit-text-stroke:7px #120a04 !important; }
+
+.camp-hero{ cursor:pointer; }
+
+/* Class-ability zones: quiet colored halo (mat) idle; softer armed pulse */
+.zone-cell, #tray .zone-cell{ outline:none !important; animation:none;
+  box-shadow:0 0 0 4px color-mix(in srgb, var(--class-color,#fff) 55%, transparent), inset 0 3px 0 rgba(255,255,255,.3) !important; }
+@keyframes zoneSoft{
+  0%,100%{ box-shadow:inset 0 0 0 5px rgba(20,10,4,.45), inset 0 0 8px 1px color-mix(in srgb,var(--class-color,#fff) 55%,transparent); }
+  50%{ box-shadow:inset 0 0 0 5px rgba(20,10,4,.45), inset 0 0 12px 3px color-mix(in srgb,var(--class-color,#fff) 70%,transparent); } }
+.tray.ability-armed > .zone-cell{ animation:zoneSoft 2.8s ease-in-out infinite !important;
+  outline:3px solid color-mix(in srgb,var(--class-color,#fff) 55%,#fff3d6) !important; outline-offset:-3px; }
+.tray.ability-armed > *:not(.zone-cell){ filter:brightness(.62) saturate(.7); }
+.reduced-motion .tray.ability-armed > .zone-cell{ animation:none !important; }
+
+/* armed zone: a bit stronger than the softest pass */
+@keyframes zoneSoft{
+  0%,100%{ box-shadow:inset 0 0 0 5px rgba(20,10,4,.5), inset 0 0 12px 3px color-mix(in srgb,var(--class-color,#fff) 75%,transparent), 0 0 8px 1px color-mix(in srgb,var(--class-color,#fff) 55%,transparent); }
+  50%{ box-shadow:inset 0 0 0 5px rgba(20,10,4,.5), inset 0 0 18px 6px color-mix(in srgb,var(--class-color,#fff) 95%,transparent), 0 0 16px 4px color-mix(in srgb,var(--class-color,#fff) 80%,transparent); } }
+.tray.ability-armed > .zone-cell{ animation-duration:2s !important;
+  outline:4px solid color-mix(in srgb,var(--class-color,#fff) 40%,#fff3d6) !important; outline-offset:-4px; }
+.tray.ability-armed > *:not(.zone-cell){ filter:brightness(.5) saturate(.6); }
+
+/* armed zone: thinner line, slight pulse (box-shadow is !important at idle, so pulse via transform+filter) */
+@keyframes zonePulse{
+  0%,100%{ transform:scale(1); filter:drop-shadow(0 0 3px color-mix(in srgb,var(--class-color,#fff) 60%,transparent)); }
+  50%{ transform:scale(1.025); filter:drop-shadow(0 0 7px color-mix(in srgb,var(--class-color,#fff) 90%,transparent)); } }
+.tray.ability-armed > .zone-cell{ animation:zonePulse 1.8s ease-in-out infinite !important;
+  outline:2px solid color-mix(in srgb,var(--class-color,#fff) 40%,#fff3d6) !important; outline-offset:-2px;
+  box-shadow:inset 0 0 0 4px rgba(20,10,4,.45), inset 0 0 12px 3px color-mix(in srgb,var(--class-color,#fff) 75%,transparent), 0 0 0 3px color-mix(in srgb,var(--class-color,#fff) 55%,transparent) !important; }
+
+/* armed zone: crisp twitch instead of scale/filter pulse (those blurred the face) */
+@keyframes zoneTwitch{
+  0%,62%,100%{ transform:none; }
+  66%{ transform:translate(-1px,0) rotate(-1.5deg); }
+  70%{ transform:translate(1px,0) rotate(1.5deg); }
+  74%{ transform:translate(-1px,0) rotate(-1deg); }
+  78%{ transform:translate(1px,0) rotate(1deg); }
+  82%{ transform:none; } }
+.tray.ability-armed > .zone-cell{ animation:zoneTwitch 1.6s steps(1,end) infinite !important; filter:none; }
+.tray.ability-armed > .zone-cell:nth-child(2n){ animation-delay:-.5s !important; }
+.tray.ability-armed > .zone-cell:nth-child(3n){ animation-delay:-1.1s !important; }
+.reduced-motion .tray.ability-armed > .zone-cell{ animation:none !important; }
+
+/* armed zone: all twitch together, 3 quick twitches then ~8s rest */
+@keyframes zoneTwitch{
+  0%,12%,100%{ transform:none; }
+  1%{ transform:translate(-1px,0) rotate(-1.5deg); }
+  2%{ transform:translate(1px,0) rotate(1.5deg); }
+  3%{ transform:translate(-1px,0) rotate(-1deg); }
+  4%{ transform:none; }
+  5%{ transform:translate(1px,0) rotate(1.5deg); }
+  6%{ transform:translate(-1px,0) rotate(-1.5deg); }
+  7%{ transform:none; }
+  8%{ transform:translate(-1px,0) rotate(-1.5deg); }
+  9%{ transform:translate(1px,0) rotate(1.5deg); }
+  10%{ transform:none; } }
+.tray.ability-armed > .zone-cell,
+.tray.ability-armed > .zone-cell:nth-child(2n),
+.tray.ability-armed > .zone-cell:nth-child(3n){ animation:zoneTwitch 9s steps(1,end) infinite !important; animation-delay:0s !important; }
+.reduced-motion .tray.ability-armed > .zone-cell{ animation:none !important; }
+
+/* armed zone: ~1s twitch burst, ~4s rest (5s cycle) */
+@keyframes zoneTwitch{
+  0%,20%,100%{ transform:none; }
+  2%{ transform:translate(-1px,0) rotate(-1.5deg); }
+  4%{ transform:translate(1px,0) rotate(1.5deg); }
+  6%{ transform:translate(-1px,0) rotate(-1deg); }
+  8%{ transform:none; }
+  9%{ transform:translate(1px,0) rotate(1.5deg); }
+  11%{ transform:translate(-1px,0) rotate(-1.5deg); }
+  13%{ transform:none; }
+  14%{ transform:translate(-1px,0) rotate(-1.5deg); }
+  16%{ transform:translate(1px,0) rotate(1.5deg); }
+  18%{ transform:none; } }
+.tray.ability-armed > .zone-cell,
+.tray.ability-armed > .zone-cell:nth-child(2n),
+.tray.ability-armed > .zone-cell:nth-child(3n){ animation-duration:5s !important; }
+
+/* Minion dice: yellow slit-pupil eyes (the Pest/spider look), a blink, a glance, and a nervous twitch */
+.minion-eyes{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:12%; pointer-events:none; z-index:2; }
+.minion-eye{ position:relative; display:block; width:24%; height:34%; border-radius:50%; background:#f4cf3a; border:2px solid #1a1208;
+  box-shadow:inset 0 -3px 0 rgba(180,110,0,.45); overflow:hidden; transform-origin:50% 50%;
+  animation:minionBlink 5.2s infinite; animation-delay:calc(var(--md,0) * -1s); }
+.minion-eye::after{ content:''; position:absolute; left:50%; top:8%; width:26%; height:84%; margin-left:-13%; border-radius:50%; background:#1a1208;
+  animation:minionGlance 6.5s ease-in-out infinite; animation-delay:calc(var(--md,0) * -1s); }
+@keyframes minionBlink{ 0%,92%,100%{ transform:scaleY(1); } 95%{ transform:scaleY(.08); } }
+@keyframes minionGlance{ 0%,18%,100%{ transform:translateX(0); } 24%,44%{ transform:translateX(-35%); } 52%,70%{ transform:translateX(35%); } 78%{ transform:translateX(0); } }
+.die.minion:not(.shaking){ animation:minionTwitch 4.4s steps(1,end) infinite; animation-delay:calc(var(--md,0) * -1s); }
+@keyframes minionTwitch{
+  0%,86%,100%{ translate:0 0; rotate:0deg; }
+  87%{ translate:-1px 0; rotate:-2deg; } 89%{ translate:1px 0; rotate:2deg; }
+  91%{ translate:0 0; rotate:0deg; } 93%{ translate:1px -1px; rotate:1.5deg; } 95%{ translate:0 0; rotate:0deg; } }
+.reduced-motion .die.minion, .reduced-motion .minion-eye, .reduced-motion .minion-eye::after{ animation:none !important; }
+.die.minion.used{ opacity:.9; }
+.minion-eye{ box-shadow:inset 0 -3px 0 rgba(180,110,0,.45), 0 0 6px 1px rgba(255,210,60,.55); }
+.minion-eyes{ gap:10%; }
+.minion-eye{ width:17%; height:25%; border-width:1.5px; animation-duration:11s; }
+
+/* magic die: rarer pulse with a purple glow */
+.die-sheen.sheen-magic::before{ animation-duration:6.5s; }
+.die-sheen.sheen-magic::after{ animation-duration:6.5s;
+  background:radial-gradient(circle, rgba(190,120,255,0) 34%, rgba(190,120,255,.6) 60%, rgba(150,80,255,0) 82%);
+  box-shadow:0 0 14px 4px rgba(160,90,255,.55); }
+/* while a path is being built, unreachable minions dim like any other unreachable die */
+#tray:has(.in-path) .die.minion.used{ opacity:.32; }
+.die.minion.used{ transition:opacity .2s; }
+.minion-eye{ width:12%; height:18%; }
+.minion-eyes{ gap:8%; }
+.minion-eye{ width:14%; height:21%; border-width:2.5px; }
+.minion-eye{ box-shadow:inset 0 -3px 0 rgba(180,110,0,.45); background-clip:padding-box; }
+
+/* Back Pocket fold (Camp) */
+.pocket-more{ display:flex; align-items:center; justify-content:center; gap:5px; width:100%; margin-top:5px; padding:3px 0; background:transparent; border:0; border-top:1px dashed var(--line); color:var(--gold); font:inherit; font-size:12px; font-weight:700; cursor:pointer; }
+.pocket-more svg{ transform:rotate(0deg); }
+.pocket-more.up svg{ transform:rotate(180deg); }
+.camp-pocket.pocket-open{ box-shadow:0 -8px 22px rgba(0,0,0,.55); }
+
+/* upgrade-ready pulse keeps the button's drop-shadow thickness (the global button rule sets it via filter) */
+@keyframes upgradeReady{
+  0%,100%{ box-shadow:0 0 0 0 rgba(255,215,106,0); filter:drop-shadow(0 4px 0 var(--line)); }
+  50%{ box-shadow:0 0 12px 3px rgba(255,215,106,.55); filter:drop-shadow(0 4px 0 var(--line)) brightness(1.18); }
+}
+/* Organize Dice: item art shrunk to sit fully inside its tile */
+.camp-die-tile img{ position:absolute !important; inset:9% !important; width:82% !important; height:82% !important; object-fit:contain !important; }
+.pocket-more{ filter:none !important; transform:none !important; border:0 !important; border-top:1px dashed var(--line) !important; box-shadow:none !important; background:transparent !important; margin-bottom:0 !important; }

@@ -8,6 +8,8 @@ frameworks, no build tooling required to *play* it.
 
 ```
 src/
+  pwa/         icons + manifest source for the installable web app
+  depth.js     depth (difficulty) system and badges
   _head.html   <head> boilerplate (charset, title, Google Fonts link)
   _body.html   <body> shell (title bar + #app mount point)
   styles.css   all CSS
@@ -76,12 +78,17 @@ used to trace the icon set.
 - Boss action-cycle order/design is a placeholder (`dmg -> minion ->
   shield -> hot -> heal -> dot`, applied one action per turn) -- not
   finalized, don't rework without explicit direction.
-- No further art is coming for now (Halfling/Pixie portraits and most
-  monster illustrations use placeholder art) -- don't request or assume
-  new assets.
+- Art is being hand-retouched by Jeremy over time; many monsters/loot are still AI placeholders.
 
 ## Installable web app (v1.31+)
 `node build.js` also writes `dist/web/` (index.html, manifest, icons, sw.js). Upload that whole folder to any HTTPS static host
 (GitHub Pages / Netlify / Cloudflare Pages). Testers open the link and use "Add to Home Screen" (iOS Safari) or "Install app" (Android/desktop Chrome).
 The cache name is stamped with GAME_VERSION in data.js, so bump it every release. Icons live in `src/pwa/`.
 `dist/dungeon_scramble.html` remains the single-file build (no service worker).
+
+## Project docs
+- `CLAUDE.md` -- working notes, release routine, gotchas, design rules.
+- `CHANGELOG.md` -- version history.
+- `docs/` -- player rulebook (docx/pdf).
+- `tools/balance/` -- balance harness and studies; `tools/art/` -- art import/export scripts.
+- `bugsearch.js` -- extended bug hunt (see CLAUDE.md).

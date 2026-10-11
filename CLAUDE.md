@@ -1,0 +1,36 @@
+# Dungeon Scramble — project notes for Claude
+
+Digital prototype of Jeremy's board game (Boggle-style dice-path dungeon crawler). Plain HTML/CSS/JS, no framework. Single owner/designer: Jeremy (playtests on his phone, 395x769 game card — it must not grow taller).
+
+## Commands
+- `node build.js` → `dist/dungeon_scramble.html` (single file) + `dist/web/` (installable PWA; art extracted to `dist/web/art/`). Also syncs package.json version.
+- `node sim.js` → crash test across every origin/class with a random-legal bot. Fails only on JS errors (TIMEOUT/GAMEOVER are fine). Run after ANY logic/data change.
+- `node bugsearch.js` → broader bug hunt; can hang, run with `timeout`/nohup. Needs no stray `http.server` on 8765/8766.
+- `tools/balance/` → headless balance harness (`harness.js '{"runs":40,"skill":1500}'`, `study_*.js`). Outputs `out_*.json` are git-ignored.
+
+## Release routine
+1. Bump `GAME_VERSION` in `src/data.js` (cache name `ds-<ver>` follows it). 2. `node build.js && node sim.js`. 3. Publish preview to the Artifact (`dist/dungeon_scramble.html`, same URL, label <=60 chars). 4. Commit as `<ver>: <summary>`; add a CHANGELOG line.
+- **Netlify zip only when Jeremy asks** (each upload costs him ~5% of his monthly allotment): `cd dist/web && zip -qr /tmp/dungeon_scramble_web_<ver>.zip .` then SendUserFile.
+- Live: https://dungeon-scramble-mobile.netlify.app/ . Preview artifact: https://claude.ai/artifact/EgVZK1tuHgNfJpqhd92jPR
+- Commit regularly. The workspace is ephemeral and there is no git remote — send a `git bundle` if work is large and unpushed.
+
+## Layout
+`src/{data,assets,logic,depth,render,main}.js` + `styles.css` concatenated by build.js. `assets.js` is base64 art (3.3 MB). Global state `S`; `render()` rebuilds `#app`. Telemetry: `teleLog(...)`; export via the gear menu (Export Play Data).
+
+## Gotchas (learned the hard way)
+- Never replace a code slice by index without checking neighbors: a slice replace once deleted `applyBossCycleAction` (boss turns threw intermittently). Run sim several times after big logic edits.
+- Global `button` rule uses `filter: drop-shadow(0 4px 0 var(--line))` for thickness — any animation that sets `filter` must include it.
+- Idle `.zone-cell` has `box-shadow !important`; animate transform/filter instead (scale/blur makes dice faces blurry → use translate/rotate twitches).
+- Minions: cells have `minion`/`coveredDie`/`blank`; new minions queue in `S._pendingMinions` and are placed after the roll scramble. Real face revealed only during path resolution (`S._resolvingPath`, `pathFaceForIdx`) so maneuvers can't scout. Jumping over a minion clears it; a blank landing ends the path.
+- Service worker: hashed `/art/<sha1-12>.png|jpg` are cache-first, everything else network-first. Write regexes with `[/]` inside template literals.
+- Pocket/Organize fold in camp: measure positions after applying absolute positioning, cluster rows with ~16px tolerance.
+
+## Design rules Jeremy has set
+- Toy-like look: chunky outlines, dark-brown base with light-brown windows; never the same color next to itself; each button its own color; Metamorphous titles, plain serif elsewhere.
+- Every interaction should feel as good as possible; no room dressing (banners/skulls) for now; dice upgrades = filigree borders/emblazoned corners (no glows).
+- Rules: enemy Shield absorbs player damage; Block/statuses reset each room; minions clear one per damage dealt (+ Leap-over), never carry between fights; loot dice need 3 copies to unlock as Starting Boon.
+- "Heat" difficulty was renamed **depth**; class badge shows highest depth cleared.
+- Don't rework the boss action cycle or add Boost to Maneuver dice unless asked (last resort only).
+
+## Open to-do list
+See memory `/areas/dungeon-scramble.md` and the session task list: run-data review, Maneuver payoff study, shrine overhaul, sound + music passes, badge redesign, PNG art canvases, reroll/swap faces, rulebook refresh, design audit.

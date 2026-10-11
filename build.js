@@ -22,10 +22,11 @@ const body = read('_body.html');
 const data = read('data.js');
 const assets = read('assets.js');
 const logic = read('logic.js');
+const depth = read('depth.js');
 const render = read('render.js');
 const main = read('main.js');
 
-const scriptParts = [data, assets, logic, render, main].join('\n');
+const scriptParts = [data, assets, logic, depth, render, main].join('\n');
 
 const html = [
   head,
@@ -50,6 +51,8 @@ console.log(`Built ${OUT} (${(html.length / 1024).toFixed(1)} KB)`);
 // Same game, plus manifest + icons + a small offline cache. The single-file build
 // above is untouched (no manifest/service worker there).
 const VERSION = (data.match(/GAME_VERSION\s*=\s*'([^']+)'/) || [])[1] || 'dev';
+// Keep package.json's version in step with GAME_VERSION (single source of truth: src/data.js).
+try { const pj = path.join(__dirname, 'package.json'); const j = JSON.parse(fs.readFileSync(pj, 'utf8')); if (j.version !== VERSION && VERSION !== 'dev') { j.version = VERSION; fs.writeFileSync(pj, JSON.stringify(j, null, 2) + '\n'); } } catch (e) {}
 const WEB = path.join(DIST_DIR, 'web');
 fs.rmSync(WEB, { recursive: true, force: true });
 fs.mkdirSync(WEB, { recursive: true });
@@ -70,7 +73,20 @@ if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
 }
 </script>
 </body>`;
-const webHtml = html.replace('</head>', PWA_HEAD).replace('</body>', PWA_REG);
+// Web build only: pull the embedded base64 art out into real files (dist/web/art/<hash>.png|jpg) and point the
+// game at them. ~25% smaller than base64-in-HTML, loads faster, and the service worker pre-caches them for offline.
+const crypto = require('crypto');
+const ART_DIR = path.join(WEB, 'art'); fs.mkdirSync(ART_DIR, { recursive: true });
+const ART_FILES = new Set();
+const webAssets = assets.replace(/(["'])data:image\/(png|jpeg);base64,([A-Za-z0-9+\/=]+)\1/g, (m, q, type, b64) => {
+  const buf = Buffer.from(b64, 'base64');
+  const name = crypto.createHash('sha1').update(buf).digest('hex').slice(0, 12) + (type === 'png' ? '.png' : '.jpg');
+  if (!ART_FILES.has(name)) { fs.writeFileSync(path.join(ART_DIR, name), buf); ART_FILES.add(name); }
+  return '"art/' + name + '"';
+});
+const webScriptParts = [data, webAssets, logic, depth, render, main].join('\n');
+const webBase = html.replace(scriptParts, () => webScriptParts);
+const webHtml = webBase.replace('</head>', PWA_HEAD).replace('</body>', PWA_REG);
 fs.writeFileSync(path.join(WEB, 'index.html'), webHtml, 'utf8');
 const ICONS = ['icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png', 'favicon-48.png'];
 ICONS.forEach(f => fs.copyFileSync(path.join(SRC, 'pwa', f), path.join(WEB, f)));
@@ -87,7 +103,7 @@ fs.writeFileSync(path.join(WEB, 'manifest.webmanifest'), JSON.stringify({
 }, null, 2), 'utf8');
 const SW = `// Dungeon Scramble service worker -- cache name is stamped with the game version.
 const CACHE = 'ds-${VERSION}';
-const FILES = ['./', 'index.html', 'manifest.webmanifest'].concat(${JSON.stringify(ICONS)});
+const FILES = ['./', 'index.html', 'manifest.webmanifest'].concat(${JSON.stringify(ICONS)}).concat(${JSON.stringify([...ART_FILES].map(f => 'art/' + f))});
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
 });
@@ -98,7 +114,10 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  if (url.origin === location.origin) {
+  if (url.origin === location.origin && /[/]art[/][0-9a-f]{12}[.](png|jpg)$/.test(url.pathname)) {
+    // Art files are content-hashed (never change under the same name): cache first, instant on every launch.
+    e.respondWith(caches.match(req).then(m => m || fetch(req).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put(req, copy)); return r; })));
+  } else if (url.origin === location.origin) {
     // Game files: network first (so testers get new builds), cache when offline.
     e.respondWith(fetch(req).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put(req, copy)); return r; })
       .catch(() => caches.match(req).then(m => m || caches.match('index.html'))));

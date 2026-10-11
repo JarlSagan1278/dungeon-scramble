@@ -1,0 +1,358 @@
+# Changelog
+
+## 1.34.0 / 1.33.x (uncommitted before this file; see commit)
+- Minions: queued after the roll; leap/dodge/pivot onto covered spaces; reveal only during resolution; blank landing ends path; eyes + twitch; greyed like unreachable dice.
+- Camp: Organize dice area folds to two rows when it would scroll; relics below health bar; title screen shows only earned badges and the version number.
+- Class zones twitch when a Skill is armed; magic die purple pulse; upgrade button keeps button thickness.
+- Web build: art extracted to cached /art files (offline verified); richer turn telemetry (tray, path, block).
+
+## History (from commits)
+- 1.32.77: block pull-to-refresh/overscroll bounce
+- 1.32.76: loot dice join Compendium when taken; 3 copies unlock as Starting Boon; end-of-run announcement
+- 1.32.74: telemetry: active-time clock, shrine/minion/damage-taken events, 1-based turns
+- 1.32.73: one minion cleared per damage dealt
+- 1.32.72: minion debuff under the player, live count, restore dice reliably
+- 1.32.71: minions cleared between fights
+- 1.32.70: shrines keep the dice box visible
+- 1.32.69: torch light keeps breathing during the dice path (no dim at end)
+- 1.32.68: tracker marker never hops in from the right
+- 1.32.67: rounded boss bar ends, shorter DOT/HOT tooltips
+- 1.32.64: boss arc same thickness and gradient as normal bars
+- 1.32.63: unified wall/floor lighting
+- 1.32.62: deterministic room layering under shake/kill
+- 1.32.61: hit punch only moves fighters, room stays steady
+- 1.32.61: keep room floor horizon in sync after layout shifts
+- 1.32.60: quest paper outline
+- 1.32.59: mid-size hero marker
+- 1.32.58: Batch D floor 1 trap art
+- 1.32.57: moss Pocket button, armed Skill lights class zone, bigger hero marker
+- 1.32.56: Batch C floor 1 monster art; arched-door room tracker with ? rooms
+- Steady lock when ready; action badges dark ink + bone rim (1.32.54)
+- Enemy action badges: stone slab (1.32.52)
+- Skill button takes class color (1.32.51)
+- Horizon clears the longest quest note; floor widens exactly at pillar bottoms (1.32.50)
+- Floor hard-cut at app width (1.32.49)
+- Stone-floor room, brick back wall, ground shadows, solid class zone outlines, solid disabled Go (1.32.48)
+- Room tracker floats without panel (1.32.47)
+- Torch-lit quest note; infrequent idle moves (1.32.46)
+- Quest note: aged parchment, no ruled lines (1.32.45)
+- Warmer hallway floor, slate Round badge (1.32.44)
+- Brown palette: 7-step tokenized ramp (1.32.43)
+- Camp heal fills gradually; flames lose dark outline (1.32.42)
+- Pause decorative loops while a path resolves (1.32.40)
+- Slow path resolution beats (1.32.39)
+- Idle v2: still bodies, glint pulse, player ready lean (1.32.38)
+- Slow idle twitch cycle (1.32.37)
+- Micro twitches (1.32.36)
+- Distinct player/enemy idle twitches (1.32.35)
+- Idle motion: twitches instead of breathing (1.32.34)
+- Passive atmosphere: torch glow, dust motes, chest interior glow (1.32.33)
+- Trim doubled effects: no tally shake/burst on killing blow, shake on boss rooms only
+- Juice pass 3: quest stamp, D.O.T./H.O.T. tick floaters, door kick, kill hit-stop, camp dice fly-in, fire flare
+- Add bugsearch.js (invariants, DOM/layout checks, save/resume fuzz)
+- Don't persist animation clocks in saves; clamp HP roll progress
+- Health bar segments meet in flat edges
+- Crisp star-shaped combo rings with gap; remove first-Block bonus
+- Rulebook update to build 1.32.26 (star combo outline, HOT cap, Nullify, Block, chest, skin tones)
+- Star-shaped combo outline; balance: HOT cap 6, Nullify clears all, first Block +1
+- Keep screen within 769px target after chest: shrink doorway min-height
+- Chest lock animations, trimmed chest height
+- Dice tray: oak-and-iron chest
+- Dice tray styled as a runed vault chest
+- Finish importing sealed outline art
+- Outline pass: seal thin tinted hairlines inside the ink band
+- Outline pass: repaint old colored rims black, clear specks
+- Room, boss and floor callouts as ribbon banners
+- Rounder, wonkier torch sconces
+- Wall sconces under the torch flames
+- Dark hallway lighting: torch foci, warmer brighter glow, near-black edges
+- Arch: outlined bricks with subtle shade variation
+- Shared outline pass (25 assets + one ink colour in the UI), bosses shrunk into the arc pocket
+- Quest notice: two nails, narrower, balanced wrapping
+- Quest box as pinned paper notice behind fighters
+- Quests float above the vs in a labeled plate
+- Normal enemies: bar/portrait lowered (kill-hint floats); boss portraits raised
+- Boss arc spacing matches player bar; name shown as 'Name, Origin Class'
+- Boss health bar as a U-shaped arc with inline BOSS tag
+- Revert boss health bar plate (back to normal line thickness)
+- Lift big normal monsters off the health bar; dark plate behind boss health bars
+- Monster size: non-boss big ones sit above the health bar, bosses bigger, small ones smaller
+- Monster size: grow upward until the arch, then downward so feet show below the health bar
+- v1.32.19: per-monster size in the face-off (small ones shrink, big ones loom behind their health bar)
+- v1.32.18: import edited Dwarf portrait 5
+- v1.32.17: animation refinements (damage-scaled lunges, enemy wind-up timing, death, chest build-up, combo ripple, number drift, tray settle)
+- v1.32.16: remove loot chest pips
+- v1.32.15: shield amount shown in health bar text (14+4/20)
+- v1.32.14: heal fill sweep, shield feedback, enemy wind-up, mascot hop, rolling HP numbers
+- v1.32.13: idle breathing, attack lunges, health bar damage ghost
+- v1.32.12: keep enemy portrait visible until the path finishes dealing damage
+- v1.32.11: shield badge text only
+- v1.32.10: show Shield/Block as a blue segment + badge on health bars
+- v1.32.9: face-off arch frame matches tray panel width
+- v1.32.8: contrast pass (edges, disabled upgrade rows)
+- v1.32.7: flat dark brown page background
+- v1.32.6: remove leftover body radial gradient; flat background
+- v1.32.5: flat aubergine page background (no gradient) so it separates from the brown UI panels
+- v1.32.4: random skin tone per run (Original/Green/Blue/Purple/Gray) for Dwarf, Gnome, Halfling portraits
+- v1.32.3: import edited Dwarf portrait 1; outlined campfire logs
+- Art: import edited Dwarf portrait 0
+- v1.32.2: enemy Shield absorbs player damage; all statuses incl. Block reset each room; new video-game rulebook (docx/pdf) replaces old manual
+- Manual: add Digital Edition progression and run-records section
+- v1.32.1: re-encode all embedded art as clean 32-bit RGBA PNGs
+- v1.32.0: run highlights, origin relic reveal, chest anticipation pips, near-miss callouts
+- v1.31.12: upgrade-die preview popup uses loot-option style (die tile + face tiles)
+- v1.31.11: banners use UI font; Maneuver shortened to Mvr in camp organize and Back Pocket
+- v1.31.10: coin row reserves its height, tray no longer shifts when first coin appears
+- v1.31.9: enemy statuses under name, 'Every turn'/'Cycles through' label, HP numbers inside full-width bars
+- v1.31.8: ribbons keep slanted parallelogram shape with chunky outline
+- v1.31.7: ribbons restyled to match art (flat colour, chunky outline, button drop edge)
+- v1.31.6: title-case camp rest button
+- v1.31.5: Rest button reads 'Stay a while & rest'
+- v1.31.4: remove run-total dmg bubble; big outlined damage/heal numbers by portraits; use extra height on setup/camp/title
+- v1.31.2: fit real-device viewport (411x785): screen height follows dvh up to 769, card width 395, title panel full width, doorway scene scales into extra height
+- v1.31.1: manifest link sends credentials (works behind site password)
+- v1.31.0: installable web app build (manifest, icons, offline cache) in dist/web
+- v1.30.13: Parasite Seer uses gnome art; crow kept as unused
+- v1.30.12: mirror Necrorancher, Biomancer, Ceramic Golem, Chimeric Sludge
+- v1.30.11: Adhesive Pest Traps mirrored
+- v1.30.10: Con-Trap/Pest Traps art swapped; Alchemists Stone cube only
+- v1.30.9: mirror six more encounters
+- v1.30.8: Golemancer un-mirrored; Leper Con-Trap shows placeholder (wrong art)
+- v1.30.7: Unbound Automa art un-mirrored
+- v1.30.6: restore mirrored encounter art; NO_FLIP exceptions list (Viscous Orb)
+- v1.30.5: shrines shown in the doorway with their art
+- v1.30.4: tap the selected die again to cancel organizing
+- v1.30.3: no-op identical-die organize swap keeps selection; drop redundant damage ribbons
+- v1.30.2: Go on top, un-mirrored encounter art, ribbon motion along own axis with in/out easing
+- v1.30.1: remove ribbon speed streaks
+- v1.30.0: diagonal ribbons replace toasts (combat slash + separate gold notice ribbon)
+- v1.29.18: flavor text tooltip-only
+- v1.29.17: center room callout horizontally
+- v1.29.16: new-room callout centered in its own slot
+- v1.29.15: shrine Reveal the boon fallback (stuck screen), tooltips dismiss on tap/close
+- v1.29.14: remove frame lines around loot chest
+- v1.29.13: class-coloured zone cells and armed ability button
+- v1.29.12: reserved buff row, screen height 720 with larger doorway and fighters
+- v1.29.11: reserved kill-hint slot, uniform 222px arch, screen height 660
+- v1.29.10: arch frame sizing fix (animation scale), remove floor line, center quests, even top panel
+- v1.29.9: fix squished camp portrait
+- v1.29.8: hero portrait beside camp fire
+- v1.29.7: larger Enter the Dungeon button
+- v1.29.6: center rail button labels
+- v1.29.5: centered loot prompts, centered basic die icons, buffs under hero name, quests under enemy
+- v1.29.4: defeated monster stays gone, text-only Go/Skip/ability buttons, statuses+relics overlay the doorway (no height growth)
+- v1.29.3: camp cog tucked beside heading
+- v1.29.2: suppress OS long-press menu, delegated touch tooltips for all titled elements, monster-only death dissolve in face-off
+- v1.29.1: face-off hit/heal flash on silhouette, floating numbers above heads
+- v1.29.0: doorway face-off layout, floor-by-floor overgrown arch, health moves into the scene
+- v1.28.6: round badge height matches coins
+- v1.28.5: remove gap between Health label and bar
+- Fix GAME_VERSION string to 1.28.4
+- v1.28.4: unsquish loot tile name text
+- v1.28.3: item art on the loot picker's big die face
+- v1.28.2: loot picker as wide rows with bigger die and faces
+- v1.28.1: enemy portrait full height, flavor beside it
+- v1.28.0: contrast pass, unique button colors, Pocket/Item into rail, Key moved to Settings
+- v1.27.2: all screens normalized to one min height (640px)
+- v1.27.1: darker browns, setup label padding, portrait line removed, ability pulse no scale, damage bubble numeral, smoother path trail
+- v1.27.0: tester note in export, Send Play Data on end screens, title hint
+- v1.26.2: shorter Go, portrait restored to original overlapping size
+- v1.26.1: character portrait back in the side rail
+- v1.26.0: side-rail tray buttons with tall Go, shorter screen
+- v1.25.1: plain serif UI font; drop-shadow lips so highlights aren't overridden
+- v1.25.0: MedievalSharp + Metamorphous typography
+- v1.24.0: QA pass (character select layout, class mini tray, darker bg gradient, camp art, tray button row)
+- v1.23.10: loot modal hugs two options
+- v1.23.9: loot face tiles with clean glyphs (no chip-disc styling)
+- v1.23.8: loot faces as mini die tiles
+- v1.23.7: simplified loot face dots, centered Victory header
+- v1.23.6: center dice icons
+- v1.23.5: very dark camp status card
+- v1.23.4: highlight selected Origin/Class tabs
+- v1.23.3: fix character-select Back button
+- v1.23.2: coins without numbers; damage badge back up top
+- v1.23.1: path shown as overlapping coin stack beside Round badge
+- v1.23.0: toy theme (dark brown), larger dice, round badge moved out of tray, unified outline color
+- v1.22.1: style tighten (radius/ease/shadow/font tokens, unified UI numerals)
+- v1.22.0: juice pass 3 (kill hints, scramble polish, intensity/vibration prefs, UI ticks, NEW tags, floor card)
+- v1.21.0: juice pass 2 -- enemy death beat before chest, relic proc rings/floats, camp fuse flash + chord, run-end tally count-up
+- v1.20.0: juice pass 1 -- pentatonic pitch ladder, path tick sounds, tiered damage badge with rolling digits, hit-stop + impact punch, running damage tally, closing tally chord/shake
+- Manual: add Relics section (shrine relics, origin relics, Relic Shrines)
+- v1.19.0: Relics -- 11 shrine relics, 4 origin signature relics (start with it after a win), Relic Shrines, Relic Codex
+- v1.18.2: fix Camp organize/upgrade stale-selection crash; heal corrupted saves; log JS errors to play data
+- v1.18.1: export never claims a download succeeded; always offers copyable text
+- v1.18.0: anonymous on-device play telemetry + Settings > Export Play Data
+- v1.17.5: illustrated tier-colored loot chest
+- v1.17.4: bigger twitching chest
+- v1.17.3: narrow chest card, centered title, no tap-to-open label
+- v1.17.2: compact loot screen so burst effects read; damage badge no longer blocks taps on top-right die
+- Restore pointer cursor on loot cards
+- Drop the per-card check button; tap a loot card to take it again
+- Give the player a chest to tap after a fight before the loot appears
+- Take loot with a check button instead of tapping the whole card
+- Bring the loot-reveal animation mockup into the real loot screen
+- Fix path-trail line drawing over the damage-total badge
+- Fix stacked-dice count badge clipping and merge-glyph's open bottom die
+- Use origin green for the Origin tab's selected glow
+- Add distinct preview highlight for locked Origin tabs
+- Fix Origin showcase panel height varying between Origins
+- Replace Origin's circular face-icon picker with text tabs, matching Class
+- Face-zoom the Origin picker circles; grow the showcase portrait to 150%
+- Show when the class Skill button is armed, before a die is picked
+- Fix cut-off feet on character-select portraits
+- Fix clipped upgrade-row dice icon; add buffer below campfire
+- Make Rest and Break Camp & Continue buttons equal width
+- Fix: character-select die-face tooltips didn't work on touch devices
+- Remove dev-facing art-coverage note; add hover tips to character-select die faces
+- Camp layout cleanup + remove Log buttons, move Log into Settings
+- Restructure New Room pop-up: name promoted to the big line
+- Simplify Camp Rest button label
+- Enlarge Origin showcase portrait on Setup screen
+- No repeat Loot dice within a single run
+- Add a custom die-face favicon to the shipped HTML file
+- Fix stacked-die count badges getting cut off; unify the design everywhere
+- Fix the Combo ring rendering as an oval instead of a circle
+- Reorder Classes (Armsmaster before Guard) and sharpen the Combo ring
+- Default-select Dwarf/Guard instead of just previewing them
+- Give each Class its own identifying color in the Class picker
+- Shrink Back Pocket, fan out stacked dice, and add a live Combo glow
+- Redesign Camp Organize Dice as square card-stacks with a pocket UI
+- Clarify Camp's dice-swapping interface: merge glyph, grouped lists, connected swap cue (v1.4.0)
+- Make D.O.T./H.O.T. a depleting stack, not a flat standing effect (v1.3.0)
+- Enlarge the room-entry popup and fix cramped Organize Dice labels
+- Center the lock icon on locked Origin portraits in character select
+- Strip decorative emoji in favor of inked icons, add Reset Progress to Settings (v1.2.0)
+- Redesign Setup screen: WoW-style Origin/Class pickers, art-rich showcases, favorites, named runs (v1.1.0)
+- Fix debug-unlock leaving portraits silhouetted and no Starting Boon shown (v1.0.22)
+- Debug mode now really unlocks Origins, Achievements & Dice Compendium (v1.0.21)
+- Turn the die-swap screen into a bottom-anchored pop-up (v1.0.20)
+- Leaping clean over a Minion die now clears it (v1.0.19)
+- Setup screen polish: drop lock emoji, silhouette locked Origins, raise callouts (v1.0.18)
+- Unify toasts, kill callouts, and room callouts into one overlay spot (v1.0.17)
+- Add achievement-gated Origin unlocks and Starting Boon picker (v1.0.16)
+- Toast notifications: quick sweep-across banner instead of slow fade bubble
+- Let the path-total badge overlap and grow instead of clipping
+- Restyle flat list chips as inked game tokens, not app tags
+- Fix white halo/bleed on monster and loot art; add art export/import tools
+- Replace the Red Cross emblem on healing items with a heart
+- Fix hard-to-read face chips on the loot screen
+- Shrink the Camp screen's Upgrade Dice section and tighten overall spacing
+- Pull the title button column up to overlap the cover art
+- Revert title screen to full-height big art, shrink the button column
+- Shrink title screen to 80% of viewport height, centered
+- Make the title screen fill the whole phone viewport
+- Remove top bar from all screens, use floating Settings button everywhere
+- Remove the top bar entirely on the main game screen; move Settings into the util-rail
+- Bump version to 1.0.2
+- Collapse the top bar to just the Settings gear during encounters
+- Add a visible semantic version number (v1.0.1)
+- Remove emoji from character-select section headers
+- Center-justify origin cards on the character-select screen
+- Separate origin name from die name on character-select cards
+- Write original flavor blurbs for Halfling and Pixie origins
+- Move each origin card's labels above the art they name
+- Flip mirrored dwarf portrait to match the other origins' orientation
+- Fix remaining white halo on character portraits
+- Re-randomize character-select portraits on every New Run
+- Persist character-select portrait pick across page reloads
+- Recolor the white-robed dwarf portrait to teal
+- Properly fix halo artifacts across all art (previous fix was incomplete)
+- Fix white halo around character portraits at small render sizes
+- Increase combat-screen player portrait size by 50%
+- Flip player portrait to face the dice tray during combat
+- Fix two more monster-art bleed/wrong-crop issues found during art review
+- Fix lingering neighbor-bleed on 38 monster-art entries
+- Drop "more art is on the way" from Dice Compendium header
+- Add origin starting-die art; fix path trail drifting on scroll
+- Add hand-drawn loot-die art for all 52 Alloy/Gilded/Magic dice
+- Fix portrait bleed/white-fringe and add 16 more monsters/shrines from new sheet
+- Replace Dwarf/Gnome portrait pools instead of appending to them
+- Fix monster-art mapping for the fungal/mycology row per labeled reference
+- Replace all monster/origin art with new hand-drawn style, add Halfling/Pixie portraits
+- Shrink and wrap enemy flavor text instead of truncating it
+- Animate modal open/close instead of popping in and snapping away
+- Fix shrine boon revealing before the room-entry callout is seen
+- Replace all placeholder art with a CSS-only "mystery figure", like the campfire
+- Main combat screen UI polish: framed portrait, tactile util-rail buttons
+- General UI polish pass: icons on section headers, tactile button/card hovers
+- UI/UX pass: real Camp screen, consistent modal chrome
+- Cover the title's "1-4 Player Adventures" text by shifting buttons, not darkening
+- Narrow/shift title buttons to hide cover text; silence camp-entry roll; add shrine room intro
+- Add Dice Compendium to title screen; gate Loot die details behind discovery
+- Let the title art show through behind the buttons; narrow the buttons
+- Add cover art to title screen; give regular encounter kills a sound
+- Add shrine-blessing chime and Victory confetti rain
+- Add more juice moments: equip, floor transition, big player hits
+- Add a proper title/landing screen ahead of character creation
+- Add lifetime Achievements and combat screen-shake/particle juice
+- Remove procedural dwarf portrait; fix setup/in-game portrait mismatch
+- Fix stray fragment artifacts in portraits after outline thickening
+- Remove white edge fringe from dwarf/gnome portraits, thicken outline
+- Fit character-select screen to mobile viewport, add new dwarf portrait
+- Shrink the app's max width to match its actual content
+- Give the dice tray a minimum size so it never squishes
+- Make the dice-scramble rattle louder
+- Match Shrine entrance log text to combat encounters
+- Carry one highest-tier die into your next run after a defeat
+- Compact origin cards, crash-style damage sound, better dice rattle, swap die labels
+- Realistic dice-rattle sound on tray scramble; curved Leap trail segments
+- Add a sound for when the player takes damage
+- Show tray dice as real die tiles in the swap/replace screen
+- Faster per-die path playback; loot options wrap instead of scrolling
+- Pitch-escalating hit tone, forcedFace cleanup fix, minion tooltip, status tooltips, swap UI improvements
+- Sword-slash hit sound; center the log-event toasts
+- Guarantee the very first encounter is never a Shrine or Trap
+- Replace the turn-resolution modal with per-die animated playback
+- Move the new-room banner onto the dice tray
+- Hide the Debug class behind a secret trigger, add an in-run Win button
+- Give the room-entry banner a solid background
+- Make entering a new room more noticeable
+- Code cleanup pass: remove variable-name shadowing of global helpers
+- Add whole-tray rattle that plays alongside the per-die flip wave
+- Fix portrait dmg/heal-flash overlay sticking fully opaque after animating
+- Include the actual magnitude in enemy-action tooltips
+- Add a conversion flourish to the class Skill ability
+- Give Combo chains a visible ripple across the tiles that fed them
+- Add a fade+rise transition between screens (Setup/Camp/Encounter/Victory/...)
+- Turn the tray-reroll jitter-shake into an actual dice flip
+- Make the encounter and player portraits react to hits/heals
+- Fix stale dice tray carrying over into the next encounter
+- Add an animated path trail line connecting tapped dice
+- Give Boss kills and Overkill their own sound + callout, distinct from a normal kill
+- Revert hand-drawn SVG art for 3 encounters + 4 loot dice, keep placeholders
+- Fix shading/linework overlap in vector art; rebuild Rogue Golemancer as a dwarf
+- Add first batch of vector monster/loot art, driven by the source docs
+- Add persisted run history
+- Fix remaining die icon/name-tag overlap
+- Audit pass: remove dead code, unify overlay dedup, fix shrine-choice styling regression
+- Add short first-run tutorial + manual "How to Play" access
+- Fix shrine/loot popups stacking into duplicates
+- Loot picker: die previews look like real tray dice; move Overkill badge
+- Round fractional boss stats to whole numbers
+- Collapse post-turn popup to 2 beats; make Skip resolve instantly
+- Route bar tooltips, remove first-tip popup, fix die icon/name overlap
+- Add a mouseover/long-press tooltip listing active status effects on health bars
+- Simplify post-turn popup titles and text
+- Bigger die-name text; tray panel no longer reserves empty space below
+- Consolidate post-turn popups into one growing log
+- Bigger die-name text; align util-rail portrait to tray bottom
+- Arc die-name text along the top edge instead of truncating it
+- Restore route-bar portrait alongside new util-rail character icon
+- Enemy ability tooltips, drop Shrine/Trap chips, relocate character icon, add campfire placeholder
+- Rework the Camp screen: drop the embedded log, fix text bunching, match game-screen height
+- Fix stale Boost/Block wording in the manual
+- Add a face preview to Camp die upgrades
+- Add sound/haptics, reduced motion, keyboard shortcuts, magnitude-scaled damage numbers, and clearer regular-encounter action badges
+- Add sequential path resolution reveal for multi-die paths
+- Add a low-health warning vignette
+- Add die-face tooltips, a forced-face highlight, and a Boost-target badge
+- Add live damage-preview on the health bar and a Settings/Restart menu
+- Add toast notifications, reducing reliance on the Log
+- Five quality-of-life fixes: legal-move cue, camp confirm, save preview, segment status, Clear confirm
+- Fix Boost being a no-op at its base tier; restore Block boost
+- Boost no longer applies to Block
+- Encounter card cleanup: quest health as a bar segment, tighter layout
+- Shrink the Skill button and the enemy card height
+- Move die name label to top, keep the effect at the bottom of the tile
+- Fix dice overflowing the tray's bounding box
+- Migrate Dungeon Scramble from single-file prototype to Claude Code project

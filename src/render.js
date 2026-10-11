@@ -222,6 +222,7 @@ let preGameScreen = 'title';
 
 function render(){
   hideFaceTooltip();
+  if(typeof applyDiceFinish==='function') applyDiceFinish();
   document.body.classList.remove('cog-arch');
   { const a = document.getElementById('app'); if(a) a.classList.remove('has-room-floor'); }
   updateHeaderMeta();
@@ -753,7 +754,9 @@ function renderTitle(){
             <button id="title-compendium-btn">Dice Compendium</button>
             <button id="title-howto-btn">How to Play</button>
           </div>
+          ${(()=>{ const earned = CLASSES.filter(k=>!k.debug && DEPTH_BEST.byClass[k.id] && DEPTH_BEST.byClass[k.id].depth); return earned.length ? `<div class="title-badges">${earned.map(k=>`<div class="title-badge">${depthBadgeSVG(k.color, DEPTH_BEST.byClass[k.id].depth, 52)}</div>`).join('')}</div>` : ''; })()}
           <p class="hint" style="text-align:center; margin:10px 0 0; font-size:12px;">Playtesting? After a few runs, tap the gear &rarr; Export Play Data and send the file.</p>
+          <p class="hint" style="text-align:center; margin:6px 0 0; font-size:13px; font-weight:700; opacity:.8;">v${GAME_VERSION}</p>
         </div>
       </div>
     </div>
@@ -912,6 +915,7 @@ function classShowcaseHTML(k){
       </div>
       <div class="class-showcase-ability">${k.ability}</div>
     </div>
+    <div class="class-showcase-badge">${classBadgeHTML(k, 48, true)}</div>
   `;
 }
 
@@ -967,9 +971,13 @@ function renderSetup(){
         ` : `<p class="hint">You've unlocked Starting Boon tier${boonTiers.length>1?'s':''} (${boonTiers.map(t=>BOON_TIER_LABELS[t]).join(', ')}), but no die is ready yet -- take the same loot die in ${BOON_COPIES_NEEDED} runs (see the Dice Compendium) to make it pickable here.</p>`}
       </div>` : ''}
 
+      ${depthMenuUnlocked() ? depthMenuHTML() : ''}
+
       <button class="primary" id="start-btn" disabled>Enter the Dungeon</button>
     </div>
   `;
+  const depthState = { mods:{} };
+  wireDepthMenu(depthState);
   document.getElementById('setup-back-btn').onclick = ()=>{ preGameScreen='title'; render(); };
 
   // chosenOrigin/chosenClass hold whatever is actually selected -- what
@@ -1089,7 +1097,7 @@ function renderSetup(){
   }
 
   function checkReady(){ document.getElementById('start-btn').disabled = !(chosenOrigin&&chosenClass); }
-  document.getElementById('start-btn').onclick=()=>{ newGame(chosenOrigin, chosenClass, chosenBoonName, charName); };
+  document.getElementById('start-btn').onclick=()=>{ newGame(chosenOrigin, chosenClass, chosenBoonName, charName, depthState.mods); };
   // Secret debug trigger: 5 clicks on "Choose Your Class" within a short
   // window. No visible button, so it can't be stumbled into by a normal
   // player, but stays quick to reach for testing. Two-step, since it does
@@ -1197,6 +1205,13 @@ function nameTagSVG(name, idx){
   </svg>`;
 }
 
+// Each minion gets its own eye placement/skew, stable for the turn but different per die and per turn.
+function minionEyeStyle(idx){
+  const h = n => { const x = Math.sin((idx+1)*12.9898 + (S.turnNumber||0)*78.233 + n*37.719) * 43758.5453; return x - Math.floor(x); };
+  const x = Math.round((h(1)-.5)*34), y = Math.round((h(2)-.5)*30), rot = Math.round((h(3)-.5)*44), sk = Math.round((h(4)-.5)*20);
+  return `transform:translate(${x}%,${y}%) rotate(${rot}deg) skewX(${sk}deg)`;
+}
+
 function renderDie(cell, idx){
   const f = cell.forcedFace || currentFace(cell);
   const isBlank = f.type==='blank';
@@ -1229,6 +1244,7 @@ function renderDie(cell, idx){
   if(strongGlint) styleParts.push(`--glint-delay:${idx*18+400}ms`);
   else if(rippleEntry) styleParts.push(`animation-delay:${rippleEntry.order*90}ms`);
   if(resolveFx) styleParts.push(`--resolve-color:${RESOLVE_PULSE_COLORS[resolveFx.pulse]||RESOLVE_PULSE_COLORS.move}`);
+  if(cell.minion) styleParts.push(`--md:${((idx*37)%50)/10}`);
   const shakeDelay = styleParts.length ? `style="${styleParts.join(';')}"` : '';
   // The die's own color is fixed by what it physically IS (dietype-attack/
   // maneuver/origin/alloy/gilded/magic) -- it never changes with the face
@@ -1265,10 +1281,12 @@ function renderDie(cell, idx){
   return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${strongGlint?'glint-strong':''} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${resolveCls} ${minionClearCls} ${comboActiveCls}"
             data-idx="${idx}" title="${isLastMove?'Click to undo this move':(cell.minion?'Minion die':cell.die.name)}" ${shakeDelay}>
             ${num?`<div class="pathnum">${num}</div>`:''}
+            ${cell.minion?`<div class="minion-eyes" aria-hidden="true" style="${minionEyeStyle(idx)}"><i class="minion-eye"></i><i class="minion-eye"></i></div>`:''}
             ${(cell.forcedFace || boostTargetCls) ? `<div class="corner-badges">
               ${cell.forcedFace?`<span class="forced-badge ${justConverted?'badge-pop-in':''}" title="Converted by a class ability">✦</span>`:''}
               ${boostTargetCls?`<span class="boost-target-badge" title="Your armed Boost token will apply to this action">${iconSpan('boost')}</span>`:''}
             </div>` : ''}
+            ${(!cell.minion && !cell.blank && ['gilded','alloy','magic'].includes(cell.die.cat)) ? `<span class="die-sheen sheen-${cell.die.cat}" style="--sd:${(idx*0.37).toFixed(2)}s"></span>` : ''}
             ${nameTag}
             ${comboRingHTML ? label.replace('<span class="icon-svg">','<span class="icon-svg">'+comboRingHTML) : label}
             ${resolveFx && resolveFx.text ? `<span class="delta-float ${resolveFx.cls}" ${resolveFx.size?`style="font-size:${resolveFx.size}px;"`:''}>${resolveFx.text}</span>` : ''}
@@ -1402,7 +1420,7 @@ function renderEncounterCard(e, mode){
     const chipsOnly = (isBoss ? bossCycle : regularActionsRow).replace(/<span class="hint"[^>]*>[^<]*<\/span>/,'');
     const typeTag = (e.type && e.type!=='Enemy') ? `<small class="fo-type${isBoss?' fo-type-inline':''}">${e.type}</small>` : '';
     const questLine = (e.quests && e.quests.length)
-      ? `<div class="fo-quests-float" style="animation-delay:-${Math.round(performance.now()%3100)}ms" title="Complete these during the fight for bonus rewards"><div class="fo-quests-label">Quests</div><div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls}"${qs.style}>${e.questsDone[i]?'✔':'○'} ${q}</span>`; }).join('')}</div></div>` : '';
+      ? `<div class="fo-quests-float" style="animation-delay:-${Math.round(performance.now()%3100)}ms" title="Complete these during the fight for bonus rewards"><div class="fo-quests-label">Quests</div><div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, e.questsDone[i])}</span>`; }).join('')}</div></div>` : '';
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
     const sz = encounterSize(e);
     const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz}"/>`
@@ -1412,16 +1430,16 @@ function renderEncounterCard(e, mode){
     <div class="enc-card fo-arch fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${roomEnterCls}">
       ${hallFxHTML()}
       <svg class="fo-sconce fo-sconce-l" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><path d="M5 9.2 Q4.3 18 5.1 30 Q7.2 31.6 9.2 30 Q9.7 19 9 9.2Z" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/><path d="M1.6 15.4 Q7 13.9 12.4 15.2 Q13 17.6 12.2 19 Q7 20.3 1.8 19 Q1.1 17 1.6 15.4Z" fill="#55555e" stroke="#0c0705" stroke-width="1.5" stroke-linejoin="round"/><path d="M1.2 1.9 Q7 -0.7 12.8 1.7 Q12.2 6.6 9.7 9.7 Q7 10.7 4.4 9.5 Q2 6.6 1.2 1.9Z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-l"></div><svg class="fo-sconce fo-sconce-r" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><path d="M5 9.2 Q4.3 18 5.1 30 Q7.2 31.6 9.2 30 Q9.7 19 9 9.2Z" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/><path d="M1.6 15.4 Q7 13.9 12.4 15.2 Q13 17.6 12.2 19 Q7 20.3 1.8 19 Q1.1 17 1.6 15.4Z" fill="#55555e" stroke="#0c0705" stroke-width="1.5" stroke-linejoin="round"/><path d="M1.2 1.9 Q7 -0.7 12.8 1.7 Q12.2 6.6 9.7 9.7 Q7 10.7 4.4 9.5 Q2 6.6 1.2 1.9Z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-r"></div>
-      <div class="fo-hud">${relicStripHTML()}</div>
+      <div class="fo-hud"></div>
       ${questLine}
       <div class="fo-band">
         <div class="fo-side fo-player">
           <div class="fo-fig ${p.figCls||''}" title="${S.origin.name} ${S.klass.name}">${p.figHTML||''}</div><div class="fo-floor"></div>
           <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}">${hpFillHTML('player','hp player',p.hpPct)}${shieldBarHTML(S.playerBlock, S.maxHealth, p.hpPct, 'player')}<span class="bar-num">${S.health}${shieldNumHTML(S.playerBlock)}/${S.maxHealth}</span></div>${p.deltaHTML||''}${tickFloatersHTML('player')}</div>
           <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim().replace(/</g,'&lt;')+', '+S.origin.name+' '+S.klass.name:S.origin.name+' '+S.klass.name}</div>
-          <div class="fo-chips fo-buffs">${hudChips(p.statusHTML)}</div>
+          <div class="fo-chips fo-buffs">${relicStripHTML()}${hudChips(p.statusHTML)}</div>
         </div>
-        <div class="fo-vs">vs</div>
+        <div class="fo-vs"><span class="fo-vs-txt${(performance.now()-UIFX.vsAt)<3400?' vs-intro':''}" style="animation-delay:-${Math.max(0,Math.round(performance.now()-UIFX.vsAt))}ms">vs</span></div>
         <div class="fo-side fo-enemy${isBoss?' fo-boss-side':''}">
           ${doorDustHTML}<div class="fo-fig enc-portrait ${sz>1.05?'fo-big ':''}${(sz>1.05&&/Boss/.test(e.type))?'fo-bossbig ':''}${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}" style="--sz:${sz}">${monsterFig}</div><div class="fo-floor"></div>
           <div class="fo-hpwrap status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;">${isBoss ? bossArcBarHTML({hpPct, questLeft:questSegLeftPct, questW:questSegWidthPct, prevLeft:dmgPreviewLeftPct, prevW:dmgPreviewWidthPct, shieldVal:e.curShield, shieldMax:e.maxHealth, cls:`${fx.cls} ${killHint?'bar-'+killHint.state:''}`, numHTML:`<span class="bar-num">${curHealthClamped.toFixed(0)}${shieldNumHTML(e.curShield)}/${e.maxHealth}</span>`}) : `<div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
@@ -1429,8 +1447,7 @@ function renderEncounterCard(e, mode){
               ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
               ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
               ${shieldBarHTML(e.curShield, e.maxHealth, hpPct, 'enemy')}<span class="bar-num">${curHealthClamped.toFixed(0)}${shieldNumHTML(e.curShield)}/${e.maxHealth}</span>
-            </div>`}${fx.deltaHTML}${tickFloatersHTML('enemy')}</div>
-          <div class="kill-hint fo-hint ${killHint?'kill-hint-'+killHint.state:''}" ${killHint?`data-hint="${killHint.state}"`:''}>${killHint?killHint.text:'&nbsp;'}</div>
+            </div>`}${fx.deltaHTML}${tickFloatersHTML('enemy')}<div class="kill-hint fo-hint ${killHint?'kill-hint-'+killHint.state:''}" ${killHint?`data-hint="${killHint.state}"`:''}>${killHint?killHint.text:'&nbsp;'}</div></div>
           <div class="fo-name" ${e.flavor?`title="${e.flavor.replace(/"/g,'&quot;')}"`:''}>${typeTag}${e.name}</div>
           <div class="fo-chips fo-buffs">${hudChips(statuses)}</div>
           ${chipsOnly?`<div class="fo-turnlabel" title="${isBoss?'Bosses cycle through these actions, one per turn (the lit one is next).':'The enemy does all of these every turn.'}">${isBoss?'Cycles through':'Every turn'}</div>`:''}
@@ -1615,7 +1632,7 @@ function renderGame(){
         </div>
         <div class="util-rail">
           <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning)?'disabled':''} ${emphasizeResolve?'pulse':''}" id="resolve-btn"><span>Go</span></div>
-          <div class="util-btn rail-pocket" id="open-backpocket-btn">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?`<span class="badge">${S.backPocket.length}</span>`:''}</div>
+          <div class="util-btn rail-pocket" id="open-backpocket-btn">${iconSpan('bag')}<span>Pocket</span></div>
           <div class="util-btn rail-item ${totalTokens?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Item</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
           <div class="util-btn danger-accent rail-clear ${S.transitioning?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
           ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''} ${abilityArmed?'armed':''}" id="ability-btn" style="--class-color:${S.klass.color||'#d4af52'}"><span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
@@ -1625,16 +1642,27 @@ function renderGame(){
     </div>
   `;
   document.getElementById('tray').innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join('');
+  placeVs();
   if(S.newRoomFx){
     showRoomCallout(S.newRoomFx);
     playTone(S.newRoomFx.boss ? 'bossRoomEnter' : 'roomEnter');
     if(S.newRoomFx.boss) vibrate([30,40,30]);
     if(S.newRoomFx.boss && typeof screenShake==='function') screenShake('big'); // ordinary rooms: the banner and door burst are enough
+    // Quest cue: a bright chime plus a one-time glow on the quest paper, so a
+    // room with bonus objectives announces them instead of leaving them as small print.
+    if(S.encounter && S.encounter.quests && S.encounter.quests.length){
+      const qEl = document.querySelector('.fo-quests-float');
+      if(qEl && !PREFS.reducedMotion) setTimeout(()=>{ qEl.classList.add('quest-flash'); setTimeout(()=>qEl.classList.remove('quest-flash'), 1550); }, 350);
+      setTimeout(()=> playTone('questStart'), 420);
+    }
+    maybeShowSymbolIntro();
     S.newRoomFx = null; // consumed -- plays once, on the render right after advanceRoute() set it
-  }
+  } else maybeShowSymbolIntro();
   if(S.justScrambled){
     const strong = document.querySelectorAll('#tray .glint-strong').length;
     if(strong && !PREFS.reducedMotion) setTimeout(()=> playTone('glint', Math.min(4, strong-1)), 520);
+    // each loot-die metal that landed on the tray gets its own soft shimmer cue (once per scramble)
+    ['gilded','alloy','magic'].forEach((cat,k)=>{ if(document.querySelector('#tray .sheen-'+cat) && !PREFS.reducedMotion) setTimeout(()=> playTone(cat+'Shine'), 700 + k*140); });
   }
   S.justScrambled = false;
   S.lastComboRipple = null; // consumed -- plays once, on the render right after runPlayerPathSteps() set it
@@ -1644,16 +1672,19 @@ function renderGame(){
     const idx = parseInt(node.dataset.idx);
     let pressTimer = null;
     let longPressed = false;
+    let pressTimerWasActive = false;
     const cancelPress = ()=>{
       if(pressTimer){ clearTimeout(pressTimer); pressTimer = null; }
-      hideFaceTooltip();
+      // only dismiss a bubble this die itself raised -- a plain pointerleave must not kill other tooltips (e.g. the enemy flavor bubble)
+      if(longPressed || pressTimerWasActive) hideFaceTooltip();
+      pressTimerWasActive = false;
       // Leave `longPressed` as-is here: pointerup fires just before the
       // synthetic click, and the click handler is what needs to see it was
       // a long-press (to swallow the click) before it gets cleared.
     };
     node.addEventListener('pointerdown', (ev)=>{
       if(S.transitioning) return;
-      longPressed = false;
+      longPressed = false; pressTimerWasActive = true;
       const rect = node.getBoundingClientRect();
       pressTimer = setTimeout(()=>{
         longPressed = true;
@@ -1687,6 +1718,8 @@ function renderGame(){
     }
     disarmClearConfirm();
     S.path=[];
+    restoreReveals(0);
+    restoreAbilityReveal();
     S.tray.forEach(c=>delete c.forcedFace);
     S.classAbilityUsed = false;
     abilityArmed = false;
@@ -1790,6 +1823,56 @@ function hideFaceTooltip(){
 // own tooltip -- this just adds the touch equivalent, reusing the same
 // fixed-position bubble as the die-face tooltip). Call after the elements
 // matching `selector` exist in the DOM.
+document.addEventListener('click', ev=>{
+  const d = ev.target && ev.target.closest ? ev.target.closest('.info-dot') : null;
+  if(!d) return;
+  ev.stopImmediatePropagation();
+  showFaceTooltip(d.getBoundingClientRect(), d.getAttribute('title'));
+  setTimeout(hideFaceTooltip, 4500);
+}, true);
+// Tap a status chip or enemy action badge -> a small popup about it (same idea as the relic strip's list).
+document.addEventListener('click', ev=>{
+  const chip = ev.target && ev.target.closest ? ev.target.closest('.status-chip[title], .enemy-action-badge[title], .boss-cycle-item[title]') : null;
+  if(!chip) return;
+  const t = chip.getAttribute('title') || '';
+  const i = t.indexOf(': ');
+  const head = i>0 ? t.slice(0,i) : chip.textContent.trim();
+  const body = i>0 ? t.slice(i+2) : t;
+  const m = openInfoModal(head, `<p style="text-align:left;">${body}</p>`);
+}, false);
+// Poke animations run through the Web Animations API on the individual translate/rotate properties, so they never
+// replace the element's own CSS animation (which would replay its entrance when the class came off).
+function pokeAnim(el, kind){
+  if(!el || !el.animate || (typeof PREFS!=='undefined' && PREFS.reducedMotion)) return;
+  const shake = [ {translate:'0 0',rotate:'0deg'}, {translate:'-5px 0',rotate:'-3deg',offset:.15}, {translate:'4px 0',rotate:'2deg',offset:.3}, {translate:'-3px 0',rotate:'-2deg',offset:.45}, {translate:'3px 0',rotate:'1deg',offset:.6}, {translate:'-1px 0',rotate:'0deg',offset:.8}, {translate:'0 0',rotate:'0deg'} ];
+  const jerk = [ {translate:'0 0',rotate:'0deg'}, {translate:'5px -2px',rotate:'4deg',offset:.12}, {translate:'-6px 1px',rotate:'-5deg',offset:.26}, {translate:'4px -1px',rotate:'3deg',offset:.42}, {translate:'-3px 0',rotate:'-2deg',offset:.58}, {translate:'2px 0',rotate:'1deg',offset:.75}, {translate:'0 0',rotate:'0deg'} ];
+  try{ el.animate(kind==='jerk'?jerk:shake, kind==='jerk' ? {duration:420, easing:'steps(7,end)'} : {duration:450, easing:'ease'}); }catch(e){}
+}
+// Poke the portraits: the hero gives a little shake; the enemy shows its flavor text for a few seconds.
+document.addEventListener('click', ev=>{
+  const hero = ev.target && ev.target.closest ? ev.target.closest('.camp-hero') : null;
+  if(hero){ pokeAnim(hero,'shake'); return; }
+  const fig = ev.target && ev.target.closest ? ev.target.closest('.fo-arch .fo-fig') : null;
+  if(!fig || !S || S.screen!=='game') return;
+  if(fig.closest('.fo-player')){
+    pokeAnim(fig,'shake');
+  } else if(fig.closest('.fo-enemy')){
+    pokeAnim(fig,'jerk');
+    if(!(S.encounter && S.encounter.flavor)) return;
+    const imgEl = fig.querySelector('.fo-img') || fig;
+    const r = imgEl.getBoundingClientRect();
+    showFaceTooltip(r, `<em>${S.encounter.flavor}</em>`);
+    // sit the bubble directly over the portrait, centered on it
+    if(faceTooltipEl){
+      faceTooltipEl.classList.add('flavor-bubble');
+      const bw = faceTooltipEl.offsetWidth, bh = faceTooltipEl.offsetHeight;
+      const card = fig.closest('.fo-arch'); const cr = card ? card.getBoundingClientRect() : {left:0,width:window.innerWidth};
+      faceTooltipEl.style.left = Math.max(6, Math.min(window.innerWidth-bw-6, cr.left + cr.width/2 - bw/2))+'px';
+      faceTooltipEl.style.top = Math.max(6, r.top + r.height/2 - bh/2 - 55)+'px';
+    }
+    clearTimeout(window._flavorT); window._flavorT = setTimeout(hideFaceTooltip, 4500);
+  }
+}, false);
 function attachLongPressTooltips(){ /* superseded by the delegated handler below */ }
 
 // Delegated touch tooltips: press-and-hold ANY element carrying a `title`
@@ -1941,6 +2024,79 @@ function showKillCallout(lines){
 // up until tapped (rather than timing itself out), so it can't slip by
 // unread. Triggered once per room by renderGame()/renderShrineEncounter()
 // off the one-shot S.newRoomFx flag set in advanceRoute() (logic.js). ----
+
+/* ---- First-time symbol intros: the first time a new face (or the enemy's Minion summon) turns
+   up in play, a small card names it once. Seen-state persists per device; players who already
+   had the tutorial before this existed start with everything marked seen. ---- */
+const SYMBOLS_SEEN_KEY = 'dungeonScrambleSymbolsSeen_v1';
+const SYMBOLS_PRELEARNED = ['hit','blank','dodge','pivot','block','heal']; // obvious or covered by the tutorial
+function loadSymbolsSeen(){
+  try{
+    const raw = localStorage.getItem(SYMBOLS_SEEN_KEY);
+    if(raw) return new Set(JSON.parse(raw));
+    if(hasSeenTutorial() && localStorage.getItem(TUTORIAL_SEEN_KEY)){
+      const all = Object.keys(LABEL).concat(['minion']);
+      localStorage.setItem(SYMBOLS_SEEN_KEY, JSON.stringify(all));
+      return new Set(all);
+    }
+  }catch(e){}
+  return new Set();
+}
+let SYMBOLS_SEEN = loadSymbolsSeen();
+function markSymbolSeen(k){
+  SYMBOLS_SEEN.add(k);
+  try{ localStorage.setItem(SYMBOLS_SEEN_KEY, JSON.stringify([...SYMBOLS_SEEN])); }catch(e){}
+}
+// Park the 'vs' mark at the vertical midpoint between the two health bars.
+function placeVs(){
+  try{
+    const vs = document.querySelector('.fo-arch .fo-vs');
+    const pb = document.querySelector('.fo-arch .fo-player .fo-hpwrap');
+    const eb = document.querySelector('.fo-arch .fo-enemy .fo-hpwrap');
+    if(!vs || !pb || !eb) return;
+    const t = vs.querySelector('.fo-vs-txt'); if(!t) return;
+    const a = pb.getBoundingClientRect(), b = eb.getBoundingClientRect(), v = vs.getBoundingClientRect();
+    const mid = ((a.top + a.height/2) + (b.top + b.height/2)) / 2;
+    t.style.top = (mid - v.top - t.offsetHeight/2) + 'px';
+  }catch(e){}
+}
+window.addEventListener('resize', ()=> placeVs());
+function maybeShowSymbolIntro(){
+  try{
+    if(document.getElementById('symbol-intro')) return;
+    if(document.querySelector('.modal-overlay')) return;
+    if(S.screen!=='game' || !S.encounter) return;
+    let key = null;
+    for(const c of S.tray){
+      if(c.minion || c.blank) continue;
+      const t = c.die.faces[c.faceIdx] && c.die.faces[c.faceIdx].type;
+      if(t && !SYMBOLS_PRELEARNED.includes(t) && !SYMBOLS_SEEN.has(t)){ key = t; break; }
+    }
+    const e = S.encounter;
+    if(!key && !SYMBOLS_SEEN.has('minion') && (e.minion>0 || (e.actionCycle||[]).includes('minion'))) key = 'minion';
+    if(!key) return;
+    markSymbolSeen(key);
+    const isMinion = key==='minion';
+    const name = isMinion ? 'Minions' : LABEL[key];
+    const desc = isMinion ? ENEMY_ACTION_DESC.minion : FACE_DESC[key];
+    const icon = isMinion ? '<span class="symbol-intro-minion"></span>' : iconSpan(key);
+    const delay = S.newRoomFx ? 1700 : 350;
+    let tries = 0;
+    const showCard = ()=>{
+      if(document.getElementById('symbol-intro') || S.screen!=='game') return;
+      // wait out the "A new room..." banner (it holds until tapped) and any open modal
+      if((document.getElementById('room-callout-scrim') || document.getElementById('room-callout') || document.querySelector('.modal-overlay')) && tries++ < 60){ setTimeout(showCard, 500); return; }
+      const card = el(`<div id="symbol-intro" class="symbol-intro" role="status"><div class="symbol-intro-icon">${icon}</div><div class="symbol-intro-text"><div class="symbol-intro-kicker">New symbol</div><strong>${name}</strong><span>${desc}</span></div></div>`);
+      document.body.appendChild(card);
+      requestAnimationFrame(()=> card.classList.add('show'));
+      const kill = ()=>{ card.classList.remove('show'); setTimeout(()=>card.remove(), 250); };
+      card.onclick = kill;
+      setTimeout(kill, 7000);
+    };
+    setTimeout(showCard, delay);
+  }catch(err){}
+}
+
 function showRoomCallout(fx, onDismiss){
   const old = document.getElementById('room-callout');
   if(old && old.parentNode) old.parentNode.removeChild(old);
@@ -1966,6 +2122,9 @@ function showRoomCallout(fx, onDismiss){
     node.style.top = mid+'px'; }
   const dismiss = ()=>{
     if(scrim.parentNode) scrim.parentNode.removeChild(scrim);
+    // the 'vs' mark plays its short intro once the room banner is out of the way
+    UIFX.vsAt = performance.now();
+    document.querySelectorAll('.fo-vs-txt').forEach(n=>{ n.classList.remove('vs-intro'); void n.offsetWidth; n.style.animationDelay='0ms'; n.classList.add('vs-intro'); });
     // When there's a follow-up (e.g. a Shrine revealing its boon), run it
     // right away -- it calls render() itself, but this node now lives
     // outside the templated app.innerHTML (in #fx-stack), so render()
@@ -2062,6 +2221,19 @@ const TONE_SEQUENCES = {
   // later once the fight actually begins.
   roomEnter: [{freq:246, start:0,    dur:0.1,  type:'sine',     gain:0.14},
               {freq:330, start:0.09, dur:0.16, type:'sine',     gain:0.16}],
+  // Loot-die shimmer cues (one per metal, played softly when the dice land): gold = bell, alloy = dry metallic tick, magic = rising shimmer
+  gildedShine: [{freq:1318, start:0,    dur:0.22, type:'sine',     gain:0.07},
+                {freq:1760, start:0.05, dur:0.3,  type:'sine',     gain:0.05}],
+  alloyShine:  [{freq:2200, start:0,    dur:0.05, type:'square',   gain:0.03},
+                {freq:1480, start:0.04, dur:0.07, type:'triangle', gain:0.05}],
+  magicShine:  [{freq:392,  freqTo:988, start:0,    dur:0.4,  type:'sine', gain:0.06},
+                {freq:1175, start:0.18, dur:0.3,  type:'sine', gain:0.04}],
+  // Quest cue: a bright three-note flourish (rising triad plus a sparkle) so
+  // bonus objectives are heard, distinct from the soft door knock.
+  questStart: [{freq:523, start:0,    dur:0.12, type:'triangle', gain:0.16},
+               {freq:659, start:0.09, dur:0.12, type:'triangle', gain:0.16},
+               {freq:784, start:0.18, dur:0.14, type:'triangle', gain:0.17},
+               {freq:1568,start:0.3,  dur:0.3,  type:'sine',     gain:0.09}],
   // A heavier, ominous version for a Boss room -- lower and a touch longer,
   // so it reads as a step up in stakes rather than just another door.
   bossRoomEnter: [{freq:110, start:0,    dur:0.16, type:'sawtooth', gain:0.18},
@@ -2260,7 +2432,7 @@ function screenShake(intensity){
 }
 
 // ---- Transient FX registry (cosmetic only -- never saved; timestamps are performance.now()) ----
-const UIFX = {ticks:[], quests:[], flareAt:-1e9};
+const UIFX = {ticks:[], quests:[], flareAt:-1e9, vsAt:-1e9};
 function fxTick(side,type,amt){ if(amt>0) UIFX.ticks.push({side,type,amt,t:performance.now()}); }
 function tickFloatersHTML(side){
   const now=performance.now(); UIFX.ticks=UIFX.ticks.filter(x=>now-x.t<1300);
@@ -2421,7 +2593,7 @@ function openSettingsModal(){
         ${settingsToggleRowHTML('pref-low-intensity', 'Gentler effects (smaller shakes, fewer sparks)', PREFS.lowIntensity)}
         ${settingsToggleRowHTML('pref-vibration', 'Vibration (phones)', PREFS.vibration!==false)}
       </div>
-      <p class="hint" style="text-align:left;">Keyboard: <strong>Enter</strong> Go &middot; <strong>Backspace</strong> Clear &middot; <strong>1234/qwer/asdf/zxcv</strong> tap a tray die (matches its grid position)</p>
+      <p class="hint" style="text-align:left;">Keyboard shortcuts ${infoDot('Enter = Go · Backspace = Clear · 1234/qwer/asdf/zxcv tap a tray die (matches its grid position)')}</p>
       <div class="small-btn-row" style="justify-content:center; flex-direction:column;">
         ${inRun ? '<button id="settings-log-btn">Log</button>' : ''}
         <button id="settings-how-to-play-btn">How to Play</button>
@@ -2713,10 +2885,10 @@ function keyCardHTML(){
 
 function backPocketViewHTML(){
   if(!S.backPocket.length){
-    return `<p class="hint">Empty — dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one. Visit Camp to swap them into your Tray.</p>`;
+    return `<p class="hint">Empty ${infoDot('Dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one. Visit Camp to swap them into your Tray.')}</p>`;
   }
   return `<div class="camp-dice-grid">${S.backPocket.map(d=>`<div class="die dietype-${d.cat} camp-die-tile" style="cursor:default;" title="${d.name}"><span class="camp-die-label">${d.name.replace(/^Maneuver\b/,'Mvr').replace(/^Attack\b/,'Atk')}</span></div>`).join('')}</div>
-    <p class="hint" style="margin-top:8px;">Visit Camp to swap these into your Tray.</p>`;
+    <p class="hint" style="margin-top:8px;">${infoDot('Visit Camp to swap these into your Tray.')}</p>`;
 }
 
 function logViewHTML(){
@@ -2969,7 +3141,11 @@ function relicBadgeHTML(r, extraCls){
 // A compact row of the relics held this run (game board + Camp); tap for details.
 // Status chips shown over the doorway are icon + number only (full wording lives in the tooltip).
 function hudChips(h){
-  return (h||'').replace(/ (DOT|HOT|Block|Shield|Boost x\d+ armed)<\/span>/g,'</span>').replace(/Minions (\d+)<\/span>/g,'👥$1</span>'.replace('👥','Min '));
+  // icon + the amount as plain text (the in-icon overlay number is too small to read at chip size)
+  return (h||'')
+    .replace(/(<span class="status-chip[^>]*title="[^"]*? (\d+(?:\.\d+)?):[^"]*"[^>]*>)([\s\S]*?) (?:DOT|HOT|Block|Shield)<\/span>/g, '$1$3<b class="chip-n">$2</b></span>')
+    .replace(/ Boost x(\d+) armed<\/span>/g, '<b class="chip-n">x$1</b></span>')
+    .replace(/Minions (\d+)<\/span>/g, 'Min <b class="chip-n">$1</b></span>');
 }
 function relicStripHTML(){
   if(!S.relics || !S.relics.length) return '';
@@ -3024,7 +3200,7 @@ function openRelicCodexModal(){
   const seenR = loadSeen();
   const section = (title, list)=>`<h3 class="camp-section-title" style="margin:10px 0 4px;">${title}</h3>${list.map(r=>relicRowHTML(r, !isFound(r), isFound(r) && !seenR.relics.has(r.id))).join('')}`;
   openInfoModal('Relic Codex',
-    `<p class="hint" style="text-align:left;">Relics are permanent perks for a single run. Find them at Relic Shrines. Win a run with an Origin and it will start every later run with its own signature relic.</p>`
+    `<p class="hint" style="text-align:left;">Relics ${infoDot('Permanent perks for a single run. Find them at Relic Shrines. Win a run with an Origin and it will start every later run with its own signature relic.')}</p>`
     + section('Origin Relics', RELICS.filter(r=>r.origin))
     + section('Shrine Relics', RELICS.filter(r=>!r.origin)));
   RELICS.forEach(r=>{ if(isFound(r)) seenR.relics.add(r.id); }); saveSeen(seenR);
@@ -3093,17 +3269,39 @@ function renderShrineResultModal(){
 // closer to the thumb than requiring a reach up the screen. Triggered
 // whenever S.pendingLootDie is set, same pattern as the lootChoice/
 // shrineChoice/shrineResult modals (see renderGame()/renderShrineEncounter()).
+function diceFacesRowHTML(die, other){
+  const incoming = other; // the die being compared against
+  const cat = die.cat || 'loot';
+  // When `incoming` is given, each face whose type also exists on the incoming die gets a corner arrow:
+  // green up = the swap would raise that value, red down = it would lower it.
+  const best = {};
+  if(incoming) incoming.faces.forEach(f=>{ if(f.type!=='blank') best[f.type] = Math.max(best[f.type]||0, f.value||0); });
+  const arrow = f=>{
+    if(!incoming || f.type==='blank' || !(f.type in best) || !f.value) return '';
+    if(best[f.type] < f.value) return '<span class="face-delta up" title="This face is stronger than your current die\'s">\u25B2</span>';
+    if(best[f.type] > f.value) return '<span class="face-delta down" title="This face is weaker than your current die\'s">\u25BC</span>';
+    return '';
+  };
+  return `<div class="faces-tiles">${die.faces.map(f=>f.type==='blank'
+    ? '<div class="mini-face mf-blank"></div>'
+    : `<div class="mini-face mf-${cat}" title="${LABEL[f.type]}${f.value?' '+f.value:''}">${iconSpan(f.type, f.value)}<small>${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</small>${arrow(f)}</div>`).join('')}</div>`;
+}
 function renderSwapModal(){
+  const incoming = S.pendingLootDie;
   const overlay = el(`<div class="modal-overlay modal-bottom"><div class="modal">
-      <h2>Equip ${S.pendingLootDie.name}</h2>
-      <p class="modal-lead">Choose which die in your tray to replace. The replaced die goes to your Back Pocket.</p>
+      <h2>Equip ${incoming.name} ${infoDot('Tap the die you want to replace. It goes to your Back Pocket.')}</h2>
+      <div class="swap-compare" id="swap-compare">
+        <div class="swap-compare-row swap-compare-in"><div class="swap-compare-label"><span>New</span> <b>${incoming.name}</b></div>${diceFacesRowHTML(incoming)}</div>
+        <div class="swap-compare-row swap-compare-out" id="swap-compare-out"><div class="swap-compare-hint">Select a die below to compare its faces.</div></div>
+      </div>
       <div class="swap-list" id="swap-list"></div>
+      <div class="small-btn-row" style="justify-content:center;"><button class="primary" id="swap-go" disabled>Replace</button></div>
     </div></div>`);
+  overlay.querySelector('.modal').classList.add('swap-modal');
   openUniqueOverlay('swap', overlay);
   const list = overlay.querySelector('#swap-list');
   // Group tray slots by die name -- identical dice show as one entry with a
-  // count instead of listing every individual slot; which specific slot
-  // gets replaced doesn't matter when they're the same die.
+  // count; which specific slot gets replaced doesn't matter when they're the same die.
   const groups = [];
   const byName = new Map();
   S.tray.forEach((cell,i)=>{
@@ -3115,42 +3313,29 @@ function renderSwapModal(){
     }
     byName.get(key).indices.push(i);
   });
+  let chosen = null;
+  const goBtn = overlay.querySelector('#swap-go');
   groups.forEach(g=>{
     const die = S.tray[g.indices[0]].die;
     const countBadge = g.indices.length>1 ? `<span class="swap-count-badge">${g.indices.length}</span>` : '';
     const item = el(`<div class="swap-item">${lootPreviewTileHTML(die, 'swap-'+g.indices[0])}${countBadge}<div class="swap-item-label">${die.name}</div></div>`);
-    const isBasic = die.cat==='attack' || die.cat==='maneuver';
     item.onclick = () => {
-      if(isBasic) closeModal(overlay, ()=> swapInLootDie(g.indices[0]));
-      else confirmDieReplace(g.indices[0], die.name, S.pendingLootDie.name, overlay);
+      chosen = g;
+      list.querySelectorAll('.swap-item').forEach(n=>n.classList.remove('selected'));
+      item.classList.add('selected');
+      overlay.querySelector('#swap-compare-out').innerHTML = `<div class="swap-compare-label"><span>Replacing</span> <b>${die.name}</b></div>${diceFacesRowHTML(die)}`;
+      overlay.querySelector('.swap-compare-in').innerHTML = `<div class="swap-compare-label"><span>New</span> <b>${incoming.name}</b></div>${diceFacesRowHTML(incoming, die)}`;
+      goBtn.disabled = false;
     };
     list.appendChild(item);
   });
-}
-
-// A basic Attack/Maneuver die is easily replaced (there are plenty of
-// copies), but an Origin or Loot die in the tray is comparatively precious --
-// losing one to an absent-minded tap stings. Confirm before sending anything
-// other than a basic die to the Back Pocket.
-function confirmDieReplace(trayIndex, oldName, newName, swapOverlay){
-  const overlay = openUniqueOverlay('confirm-swap', el(`<div class="modal-overlay modal-bottom"><div class="modal">
-      <h2 style="margin-top:0;">Replace ${oldName}?</h2>
-      <p>${oldName} will go to your Back Pocket, replaced in your Tray by ${newName}.</p>
-      <div class="small-btn-row">
-        <button class="danger" id="confirm-swap-yes">Replace it</button>
-        <button id="confirm-swap-no">Cancel</button>
-      </div>
-    </div></div>`));
-  const close = ()=> closeModal(overlay);
-  // Confirming closes both this confirmation and the swap picker underneath
-  // it (swapOverlay) before actually swapping -- otherwise the swap picker,
-  // which lives outside the templated app.innerHTML like every modal, would
-  // be left stranded in the DOM once S.pendingLootDie is cleared and no
-  // longer tells render() to draw it. Canceling only closes this
-  // confirmation, leaving the swap picker up so another die can be picked.
-  overlay.querySelector('#confirm-swap-yes').onclick = ()=> closeModal(overlay, ()=> closeModal(swapOverlay, ()=> swapInLootDie(trayIndex)));
-  overlay.querySelector('#confirm-swap-no').onclick = close;
-  overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
+  goBtn.onclick = () => {
+    if(!chosen) return;
+    const die = S.tray[chosen.indices[0]].die;
+    const isBasic = die.cat==='attack' || die.cat==='maneuver';
+    // The comparison above already shows exactly what is being traded, so the Replace button is the confirmation.
+    closeModal(overlay, ()=> swapInLootDie(chosen.indices[0]));
+  };
 }
 
 function renderShrineEncounter(){
@@ -3171,13 +3356,13 @@ function renderShrineEncounter(){
         <div class="enc-card fo-arch fo-shrine fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${roomEnterCls}">
           ${hallFxHTML()}
           <svg class="fo-sconce fo-sconce-l" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><path d="M5 9.2 Q4.3 18 5.1 30 Q7.2 31.6 9.2 30 Q9.7 19 9 9.2Z" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/><path d="M1.6 15.4 Q7 13.9 12.4 15.2 Q13 17.6 12.2 19 Q7 20.3 1.8 19 Q1.1 17 1.6 15.4Z" fill="#55555e" stroke="#0c0705" stroke-width="1.5" stroke-linejoin="round"/><path d="M1.2 1.9 Q7 -0.7 12.8 1.7 Q12.2 6.6 9.7 9.7 Q7 10.7 4.4 9.5 Q2 6.6 1.2 1.9Z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-l"></div><svg class="fo-sconce fo-sconce-r" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><path d="M5 9.2 Q4.3 18 5.1 30 Q7.2 31.6 9.2 30 Q9.7 19 9 9.2Z" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/><path d="M1.6 15.4 Q7 13.9 12.4 15.2 Q13 17.6 12.2 19 Q7 20.3 1.8 19 Q1.1 17 1.6 15.4Z" fill="#55555e" stroke="#0c0705" stroke-width="1.5" stroke-linejoin="round"/><path d="M1.2 1.9 Q7 -0.7 12.8 1.7 Q12.2 6.6 9.7 9.7 Q7 10.7 4.4 9.5 Q2 6.6 1.2 1.9Z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-r"></div>
-          <div class="fo-hud">${relicStripHTML()}</div>
+          <div class="fo-hud"></div>
           <div class="fo-band">
             <div class="fo-side fo-player">
               <div class="fo-fig" title="${S.origin.name} ${S.klass.name}">${heroFig}</div>
               <div class="fo-hpwrap" style="position:relative;"><div class="bar"><div class="bar-fill hp player" style="width:${hpPct}%"></div></div><span>${S.health}/${S.maxHealth}</span></div>
               <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim().replace(/</g,'&lt;')+', '+S.origin.name+' '+S.klass.name:S.origin.name+' '+S.klass.name}</div>
-              <div class="fo-chips fo-buffs"></div>
+              <div class="fo-chips fo-buffs">${relicStripHTML()}</div>
             </div>
             <div class="fo-vs">&nbsp;</div>
             <div class="fo-side fo-enemy">
@@ -3253,7 +3438,95 @@ function syncCampHeal(){
     step();
   }catch(err){ UIFX.campHeal=null; }
 }
+
+// ---- Quest paper rows: "do this  ->  get that". The data string is "REWARD: CONDITION"
+// (e.g. "5 damage: 3 maneuvers"); the paper shows the condition first, an arrow, then the reward as a badge. ----
+function questCondShort(cond){
+  const c = cond.toLowerCase().trim(); let m;
+  const cap = t=> t.charAt(0).toUpperCase()+t.slice(1);
+  if((m=c.match(/(\d+)\s*maneuvers?(?: in a single (?:turn|round))?/))) return `${m[1]} Maneuvers`;
+  if((m=c.match(/any (\d+) or fewer actions/))) return `≤${m[1]} Actions`;
+  if((m=c.match(/any (\d+) actions/))) return `${m[1]} Actions`;
+  if((m=c.match(/(\d+)\s*support actions/))) return `${m[1]} Support`;
+  if((m=c.match(/accumulate (\d+) block/))) return `Bank ${m[1]} Block`;
+  if((m=c.match(/survive (?:to )?(?:turn )?(\d+)/))) return /turn|to/.test(c)?`Survive to turn ${m[1]}`:`Survive ${m[1]} turns`;
+  if((m=c.match(/(?:deal )?(\d+)\+?\s*damage(?: in a single (turn|round))?/))) return `${m[1]}+ dmg${m[2]?'/turn':''}`;
+  if(/adventurer h\.?o\.?t\.? = d\.?o\.?t/.test(c)) return 'HOT = DOT';
+  if(/encounter d\.?o\.?t\.? = h\.?o\.?t/.test(c)) return 'Foe DOT = HOT';
+  if((m=c.match(/(\d+)\s*(blanks?|block|dodge|leap|pivot|heals?|boosts?|nullify|combos?|hot|dot)/))){
+    const nm = {hot:'H.O.T.', dot:'D.O.T.'}[m[2]] || cap(m[2]);
+    return `${m[1]} ${nm}`;
+  }
+  return cap(c);
+}
+function questRewardHTML(rewardText){
+  if(!rewardText) return '';
+  const t = rewardText.toLowerCase(); const m = t.match(/(\d+(?:\.\d+)?)/); const n = m? m[1] : '';
+  let type = 'hit';
+  if(t.includes('dot')) type='dot'; else if(t.includes('hot')) type='hot'; else if(t.includes('nullify')) type='nullify'; else if(t.includes('freeze')) type='freeze';
+  const num = (type==='nullify') ? '' : n;
+  return `<span class="q-reward q-reward-${type}" title="Reward: ${rewardText}">${iconSpan(type)}${num?`<b>${num}</b>`:''}</span>`;
+}
+function questRowHTML(q, done){
+  const {rewardText, cond} = parseQuestSpec(q);
+  return `<span class="q-cond">${questCondShort(cond)}</span><span class="q-arrow">→</span>${questRewardHTML(rewardText)}`;
+}
+function infoDot(text){ return `<span class="info-dot" title="${String(text).replace(/"/g,'&quot;')}" tabindex="0">i</span>`; }
+// If the Camp screen would scroll, fold the Back Pocket down to its first two rows;
+// tapping the fold grows the full pocket UP over the Tray rows above it.
+function campOverflows(from){
+  for(let el=from; el && el!==document.documentElement; el=el.parentElement){
+    const oy = getComputedStyle(el).overflowY;
+    if((oy==='auto'||oy==='scroll') && el.scrollHeight>el.clientHeight+2) return true;
+  }
+  const se = document.scrollingElement; return !!se && se.scrollHeight>window.innerHeight+2;
+}
+function applyPocketCollapse(){
+  const body = document.querySelector('.organize-body'), wrap = document.querySelector('.organize-wrap');
+  if(!body || !wrap) return;
+  const sec = wrap.closest('.camp-section'); sec.style.position='relative';
+  const tiles = [...body.querySelectorAll('.camp-die-tile')];
+  const bTop = body.getBoundingClientRect().top;
+  // cluster tile tops into rows (stacked tiles are tilted, so their tops differ by a few px)
+  const raw = tiles.map(x=>x.getBoundingClientRect().top - bTop).sort((a,b)=>a-b);
+  const tops = []; raw.forEach(v=>{ if(!tops.length || v - tops[tops.length-1] > 16) tops.push(v); });
+  const rowOf = x => { const v = x.getBoundingClientRect().top - bTop; let k=0; tops.forEach((tp,i)=>{ if(v >= tp-16) k=i; }); return k; };
+  if(tops.length<3) return;
+  if(!S._pocketOpen && !campOverflows(wrap)) return;
+  const row2Tiles = tiles.filter(x=>rowOf(x)<=1);
+  const h = Math.max(...row2Tiles.map(x=>x.getBoundingClientRect().bottom - bTop)) + 8;
+  const hidden = tiles.filter(x=>rowOf(x)>1).length;
+  const more = document.createElement('button');
+  more.className='pocket-more'; more.type='button';
+  const secCS = getComputedStyle(sec), secBg = secCS.backgroundColor;
+  const setOpen = open => {
+    S._pocketOpen = open;
+    wrap.classList.toggle('organize-open', open);
+    more.innerHTML = open ? `${chevronSVG(14)} Fold` : `${chevronSVG(14)} +${hidden} more`;
+    more.classList.toggle('up', !open);
+    const old = sec.querySelector('.pocket-spacer'); if(old) old.remove();
+    const oldT = wrap.querySelector('.organize-title-clone'); if(oldT) oldT.remove();
+    if(open){
+      const ttl = sec.querySelector('.camp-section-title'); if(ttl){ const c = ttl.cloneNode(true); c.classList.add('organize-title-clone'); c.style.margin='0 0 4px'; wrap.prepend(c); }
+      body.style.maxHeight='62vh'; body.style.overflowY='auto'; body.style.webkitMaskImage=body.style.maskImage='none';
+      const sp = document.createElement('div'); sp.className='pocket-spacer'; sp.style.height = wrap.dataset.collH+'px'; wrap.before(sp);
+      const bw = parseFloat(secCS.borderTopWidth)||0;
+      wrap.style.cssText = `position:absolute;left:${-bw}px;right:${-bw}px;bottom:${-bw}px;z-index:6;background:${secBg};padding:${secCS.paddingTop} ${secCS.paddingRight} 4px ${secCS.paddingLeft};border:${secCS.borderTopWidth} ${secCS.borderTopStyle} ${secCS.borderTopColor};border-radius:${secCS.borderTopLeftRadius};box-sizing:border-box;box-shadow:0 -8px 22px rgba(0,0,0,.55);`;
+    } else {
+      wrap.style.cssText='';
+      body.style.maxHeight = h+'px'; body.style.overflow='hidden';
+      body.style.webkitMaskImage = body.style.maskImage = 'linear-gradient(#000 82%, transparent)';
+    }
+  };
+  body.style.maxHeight = h+'px'; body.style.overflow='hidden';
+  wrap.appendChild(more);
+  wrap.dataset.collH = h + more.offsetHeight + 12;
+  more.onclick = e=>{ e.stopPropagation(); setOpen(!wrap.classList.contains('organize-open')); };
+  setOpen(!!S._pocketOpen);
+}
+
 function renderCamp(){
+  const baseCamp = S.floorIdx===0 && S.routeStep===0;
   const campFx = healthFX(S.health, S._lastPlayerHealth);
   S._lastPlayerHealth = S.health;
   const organizeSel = S.organizeSelection;
@@ -3269,7 +3542,7 @@ function renderCamp(){
       const needsBackfill = count>=3 && !canUpgrade(cat,level);
       const upgradeTitle = needsBackfill ? 'Needs more spare dice to backfill' : `Combine 3 ${label} ${ROMAN[level]} into 1 ${label} ${ROMAN[level+1]}`;
       upgradeRows.push(`<div class="upgrade-row">
-          <button class="upgrade-btn" id="upgrade-${cat}-${level}" ${disabled?'disabled':''} title="${upgradeTitle}">${label} ${ROMAN[level]} ${mergeGlyphSVG(16)} ${ROMAN[level+1]} <span class="token-count">${count}</span></button>
+          <button class="upgrade-btn${(eligible && !baseCamp)?' upgrade-ready':''}" id="upgrade-${cat}-${level}" ${disabled?'disabled':''} title="${upgradeTitle}">${label} ${ROMAN[level]} ${mergeGlyphSVG(16)} ${ROMAN[level+1]} <span class="token-count">${count}</span></button>
           <button id="preview-${cat}-${level}" class="upgrade-preview-btn" title="Preview the resulting die's faces">?</button>
         </div>`);
     });
@@ -3277,12 +3550,12 @@ function renderCamp(){
   app.innerHTML = `
     <div class="panel">
       ${renderRoute()}
-      <h2 style="margin-bottom:4px;">Camp</h2>
-      <p class="hint" style="margin:0 0 6px;">Rest and prepare before pressing onward.</p>
+      <h2 style="margin-bottom:6px;">${baseCamp?'Base Camp':'Camp'} ${infoDot(baseCamp?'Your adventure begins here. Tinker with your dice if you like, then set out — nothing here is required.':'Rest and prepare before pressing onward.')}</h2>
+      ${baseCamp?'<p class="hint" style="margin:0 0 6px;">Nothing here is required — set out whenever you like.</p>':''}
 
       <div class="camp-section camp-status-card">
-        ${relicStripHTML()}
         <div class="bar-row" style="position:relative;"><span style="flex:0 0 auto;">Health</span><div class="bar ${campFx.cls}"><div class="bar-fill hp player camp-hp-fill" style="width:${S.health/S.maxHealth*100}%"></div></div><span class="camp-hp-num">${S.health}/${S.maxHealth}</span>${campFx.deltaHTML}</div>
+        ${relicStripHTML()}
         <div class="camp-fire-wrap ${(performance.now()-UIFX.flareAt)<900?'flare':''}" style="--fl:-${Math.max(0,Math.round(performance.now()-UIFX.flareAt))}ms">
           <div class="camp-hero" title="${S.origin.name} ${S.klass.name}">${(S.portrait&&!S.portrait.placeholder)?`<img src="${S.portrait.img}" alt="${S.origin.name}">`:mysteryFigureHTML('width:56px; height:56px;')}</div>
           <div class="campfire-glow"></div>
@@ -3291,28 +3564,32 @@ function renderCamp(){
           <div class="campfire-flame flame-front"></div>
         </div>
         <div class="small-btn-row">
-          <button id="rest-btn" ${S.campRested?'disabled':''} title="Scramble your Tray's faces, then heal for half the non-blank faces showing">${S.campRested?'Rested':'Stay a While &amp; Rest'}</button>
-          <button id="leave-btn" class="primary">Break Camp &amp; Continue</button>
+          ${baseCamp?'':`<button id="rest-btn" ${S.campRested?'disabled':''} title="Scramble your Tray's faces, then heal for half the non-blank faces showing">${S.campRested?'Rested':'Stay a While &amp; Rest'}</button>`}
+          <button id="leave-btn" class="primary">${baseCamp?'Start Your Adventure':'Break Camp &amp; Continue'}</button>
         </div>
       </div>
 
       <div class="camp-section">
-        <h3 class="camp-section-title">Upgrade Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(1 Attack + 1 Maneuver per Camp)</span></h3>
+        <h3 class="camp-section-title">Upgrade Dice ${infoDot('Combine 3 matching Basic dice into 1 of the next tier. You can upgrade 1 Attack and 1 Maneuver die per Camp.')}</h3>
         <div class="upgrade-rows-col">${upgradeRows.length? upgradeRows.join('') : '<span class="hint">No matching sets of 3 Basic dice to combine right now.</span>'}</div>
       </div>
 
       <div class="camp-section">
-        <h3 class="camp-section-title">Organize Dice <span style="color:var(--parchment-dim); font-weight:normal; font-size:11px;">(tap one in each area to swap)</span></h3>
+        <h3 class="camp-section-title">Organize Dice ${infoDot('Tap a die in your Tray, then one in your Back Pocket, to swap them.')}</h3>
+        <div class="organize-wrap"><div class="organize-body">
         <div class="camp-dice-grid ${organizeSel && organizeSel.type==='bp' ? 'organize-target':''} ${organizeSel && organizeSel.type==='tray' ? 'organize-source':''}" id="organize-tray"></div>
         ${organizeSwapArrowHTML()}
         <div class="camp-pocket ${organizeSel && organizeSel.type==='tray' ? 'organize-target':''} ${organizeSel && organizeSel.type==='bp' ? 'organize-source':''}">
-          ${S.backPocket.length ? `<span class="camp-pocket-count" title="Back Pocket">${S.backPocket.length}</span><div class="camp-dice-grid" id="organize-bp"></div>` : '<p class="hint camp-empty-hint" style="margin:0;">Empty — dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one.</p>'}
+          ${S.backPocket.length ? `<span class="camp-pocket-count" title="Back Pocket">${S.backPocket.length}</span><div class="camp-dice-grid" id="organize-bp"></div>` : `<p class="hint camp-empty-hint" style="margin:0;">Back Pocket empty ${infoDot('Dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one.')}</p>`}
         </div>
+        </div></div>
       </div>
     </div>`;
-  document.getElementById('rest-btn').onclick = campRest;
+  const restBtn = document.getElementById('rest-btn');
+  if(restBtn) restBtn.onclick = campRest;
   syncCampHeal();
   document.getElementById('leave-btn').onclick = ()=>{
+    if(baseCamp){ campLeave(); return; }
     const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
         <h2>Break Camp?</h2>
         <p>You can't come back to rest or upgrade dice until the next Camp.</p>
@@ -3330,6 +3607,13 @@ function renderCamp(){
     [1,2].forEach(level=>{
       const btn = document.getElementById(`upgrade-${cat}-${level}`);
       if(btn) btn.onclick = ()=> flyDiceToFuse(cat, level, ()=> campUpgrade(cat, level));
+      if(btn){
+        // Hovering (or focusing / touching) an upgrade lights up the dice stacks it would consume.
+        const nm = basic(cat,level).name;
+        const lit = on => document.querySelectorAll('.camp-die-tile').forEach(t=>{ if((t.title||'').startsWith(nm)) t.classList.toggle('fuse-hint', on); });
+        ['mouseenter','focus','touchstart'].forEach(ev=> btn.addEventListener(ev, ()=>lit(true), {passive:true}));
+        ['mouseleave','blur','touchend','touchcancel'].forEach(ev=> btn.addEventListener(ev, ()=>lit(false), {passive:true}));
+      }
       const previewBtn = document.getElementById(`preview-${cat}-${level}`);
       if(previewBtn) previewBtn.onclick = ()=>{
         const resultDie = basic(cat, level+1);
@@ -3349,6 +3633,7 @@ function renderCamp(){
   });
   document.getElementById('organize-tray').innerHTML = campDiceGridHTML(S.tray.map((c,i)=>({die:c.die, idx:i})), 'tray');
   if(S.backPocket.length) document.getElementById('organize-bp').innerHTML = campDiceGridHTML(S.backPocket.map((d,i)=>({die:d, idx:i})), 'bp');
+  applyPocketCollapse();
   [...document.querySelectorAll('.camp-die-tile')].forEach(tile=>{
     tile.onclick = ()=> selectOrganize(tile.dataset.campType, parseInt(tile.dataset.campIdx));
   });
@@ -3507,6 +3792,7 @@ function renderVictory(){
     if(S.newOriginRelic) setTimeout(()=>{ if(typeof playTone==='function') playTone('relicProc'); }, 700);
   }
   app.innerHTML = `<div class="panel"><h2>Dungeon Conquered!</h2><p>You defeated the Big Boss and cleared all three floors. Well fought, Adventurer.</p>
+    ${depthSealHTML()}
     ${originRelicEarnedHTML()}
     ${newAchievementsHTML(S.newAchievements)}
     ${newBoonsHTML()}

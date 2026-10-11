@@ -246,6 +246,7 @@ function getRunHistory(){
 // Called once when a run ends (victory or defeat), before the save file is
 // cleared, so it can pull the run's final stats off S.
 function recordRunHistory(outcome){
+  recordDepthResult(outcome);
   finalizeTelemetry(outcome);
   try{
     const list = getRunHistory();
@@ -262,6 +263,8 @@ function recordRunHistory(outcome){
       shrinesVisited: S.stats.shrinesVisited,
       overkills: S.stats.overkills,
       lootCollected: S.stats.lootCollected,
+      depth: currentDepth(),
+      score: (S.depthResult && S.depthResult.score) || 0,
     });
     if(list.length > MAX_RUN_HISTORY) list.length = MAX_RUN_HISTORY;
     localStorage.setItem(RUN_HISTORY_KEY, JSON.stringify(list));
@@ -411,6 +414,7 @@ function resetAllProgress(){
   try{ localStorage.removeItem(META_KEY); } catch(e){}
   try{ localStorage.removeItem(DISCOVERED_DICE_KEY); } catch(e){}
   try{ localStorage.removeItem(DIE_COPIES_KEY); } catch(e){}
+  try{ localStorage.setItem('dungeonScrambleSymbolsSeen_v1','[]'); } catch(e){} // relearn symbols after a full reset
   DIE_COPIES = {};
 }
 
@@ -576,6 +580,8 @@ function hasSeenTutorial(){
 }
 function markTutorialSeen(){
   try{ localStorage.setItem(TUTORIAL_SEEN_KEY, '1'); } catch(e){}
+  // new devices start learning symbols from zero (devices that predate symbol intros are seeded as all-seen instead)
+  try{ if(!localStorage.getItem('dungeonScrambleSymbolsSeen_v1')) localStorage.setItem('dungeonScrambleSymbolsSeen_v1','[]'); } catch(e){}
 }
 
 // A lightweight look at the saved run for the setup screen's "Continue"
@@ -746,7 +752,9 @@ function getSetupPreviewPortrait(originId){
   return setupPortraitCache[originId];
 }
 
-function newGame(originId, classId, boonDieName, charName){
+function newGame(originId, classId, boonDieName, charName, depthMods){
+  depthMods = depthMods || {};
+  const startHp = Math.max(8, 20 - 3*(depthMods.frail||0));
   // Defense in depth: the Setup screen is the only place that offers an
   // Origin choice, and it already refuses to let a locked one be selected,
   // but falling back here too means a stale/tampered call can't bypass the
@@ -801,7 +809,8 @@ function newGame(originId, classId, boonDieName, charName){
     charName: (charName||'').trim().slice(0,24),
     origin, klass,
     portrait: getSetupPreviewPortrait(origin.id),
-    maxHealth:20, health:20,
+    depth: depthFromMods(depthMods), depthMods: {...depthMods},
+    maxHealth:startHp, health:startHp,
     playerDOT:0, playerHOT:0, playerBlock:0,
     tray: shuffled.map(d=>({die:d, faceIdx:0, minion:false, coveredDie:null})),
     backPocket: [],
@@ -833,7 +842,7 @@ function newGame(originId, classId, boonDieName, charName){
     // drop can't immediately hand them a second copy of their own Boon or
     // carryover die.
     usedLootNames: new Set([carryDie && carryDie.name, appliedBoonName].filter(Boolean)),
-    _lastPlayerHealth: 20, // for the heal/damage flash effect on the health bar
+    _lastPlayerHealth: startHp, // for the heal/damage flash effect on the health bar
     stats: { turnsTaken:0, damageDealt:0, encountersDefeated:0, shrinesVisited:0, overkills:0, lootCollected:0, bestTurn:0, bestTurnFoe:'', bestOverBy:0, bestOverFoe:'', longestPath:0, nearMisses:0 },
     tele: newTelemetry(),
     campRested: false,
@@ -843,7 +852,7 @@ function newGame(originId, classId, boonDieName, charName){
   };
   // An Origin that has won a run starts every later run holding its signature relic.
   { const oc = originRelicFor(origin.id); if(oc && (META.lifetime.victoriesByOrigin[origin.id]||0)>=1) grantRelic(oc.id, {silent:true, via:'origin'}); }
-  teleLog('run_start', {skin:(S.portrait&&S.portrait.tone)||'original', relics:S.relics.slice(), origin:origin.name, klass:klass.name, carry:carryDie?carryDie.name:null, boon:boonDieName||null, tray:S.tray.map(c=>c.die.name)});
+  teleLog('run_start', {depth:S.depth, depthMods:S.depthMods, skin:(S.portrait&&S.portrait.tone)||'original', relics:S.relics.slice(), origin:origin.name, klass:klass.name, carry:carryDie?carryDie.name:null, boon:boonDieName||null, tray:S.tray.map(c=>c.die.name)});
   logMsg('sys', `A ${origin.name} ${klass.name} descends into the dungeon...`);
   if(carryDie) logMsg('sys', `${carryDie.name} joins your tray, carried over from your last run.`, 'good');
   if(boonDieName && !klass.debug && findLootDieByName(boonDieName)) logMsg('sys', `${boonDieName} joins your tray as your Starting Boon.`, 'good');
@@ -943,6 +952,7 @@ function drawEncounter(kind){
     if(e.type==='Shrine') S.segmentShrineUsed = true;
   }
   S.usedCards.add(e.name);
+  if(e.health>0){ e.health = Math.max(1, Math.round(e.health * floorHpMul(S.floorIdx))); if(e.maxHealth!==undefined) e.maxHealth = e.health; }
   e.curHealth = e.health;
   e.curDOT = 0; e.curHOT = 0; e.curShield = 0; e.turn = 0;
   // Your own D.O.T./H.O.T. don't carry from one encounter into the next
@@ -1074,12 +1084,15 @@ function trayIdx(r,c){ return r*4+c; }
 function inBounds(r,c){ return r>=0&&r<4&&c>=0&&c<4; }
 
 function currentFace(cell){
-  if(cell.minion) return {type:'blank'};
+  if(cell.minion || cell.blank) return {type:'blank'};
   return cell.die.faces[cell.faceIdx];
 }
 
 function scrambleTray(){
-  S.tray.forEach(cell=>{ cell.faceIdx = rand(6); });
+  S._abilityReveal = null;
+  S._reveals = [];
+  S._pendingMinions = 0;
+  S.tray.forEach(cell=>{ cell.faceIdx = rand(6); cell.blank = false; });
   S.path = [];
   S.classAbilityUsed = false;
   abilityArmed = false;
@@ -1102,13 +1115,52 @@ function adjWrap(a,b){
   return a.r===b.r && Math.abs(a.c-b.c)===3;
 }
 
+// Leap / Dodge / Pivot may land ON a Minion-covered space: the landing die (and, for a Leap, any Minion
+// on the space jumped over) is uncovered for the rest of this round.
+function leapOntoMinion(idx){
+  if(!S.path.length) return false;
+  const cell = S.tray[idx];
+  if(!cell || !cell.minion) return false;
+  const last = S.path[S.path.length-1];
+  const t = getFaceForIdx(last).type, a = trayRC(last), b = trayRC(idx);
+  if(t==='leap') return adjLeap(a,b);
+  if(t==='dodge') return adjDiag(a,b);
+  if(t==='pivot') return adjPivot(a,b);
+  return false;
+}
+function revealMinionAt(idx, rec){
+  const cell = S.tray[idx];
+  if(!cell || !cell.minion) return;
+  cell.minion=false; cell.die=cell.coveredDie||cell.die; cell.coveredDie=null; cell.blank=false;
+  if(S.encounter && S.encounter.minionsSpawned>0) S.encounter.minionsSpawned--;
+  if(rec) rec.push(idx);
+}
+// Uncovered minions are only uncovered while the path that uncovered them
+// stands: undoing that step (or Clear) puts them back, so a path can't be
+// used to scout the board.
+function blankReveal(idx){ const c=S.tray[idx]; if(c) c.blank=false; }
+function restoreAbilityReveal(){
+  const i = S._abilityReveal; S._abilityReveal = null;
+  if(i==null) return;
+  const c = S.tray[i]; if(!c || c.minion) return;
+  c.coveredDie=c.die; c.minion=true; c.blank=false; if(S.encounter) S.encounter.minionsSpawned=(S.encounter.minionsSpawned||0)+1;
+}
+function restoreReveals(keepLen){
+  if(!S._reveals) { S._reveals=[]; return; }
+  while(S._reveals.length && S._reveals[S._reveals.length-1].pathLen > keepLen){
+    const r = S._reveals.pop();
+    r.idxs.forEach(i=>{ const c=S.tray[i]; if(!c||c.minion) return; c.coveredDie=c.die; c.minion=true; c.blank=false; if(S.encounter) S.encounter.minionsSpawned=(S.encounter.minionsSpawned||0)+1; });
+  }
+}
+
 function canSelect(idx){
   if(S.path.includes(idx)) return false;
   const f = getFaceForIdx(idx);
-  if(f.type==='blank') return false;
+  if(f.type==='blank' && !leapOntoMinion(idx)) return false;
   if(S.path.length===0) return true;
   const lastIdx = S.path[S.path.length-1];
   const lastFace = getFaceForIdx(lastIdx);
+  if(lastFace.type==='blank') return false; // ended on an uncovered blank: the path goes no further
   const a = trayRC(lastIdx), b = trayRC(idx);
 
   let allowed = false;
@@ -1136,6 +1188,7 @@ function toggleSelect(idx){
   if(S.path.length && S.path[S.path.length-1]===idx){
     // clicking the most-recently-chosen die again steps back one move
     S.path.pop();
+    restoreReveals(S.path.length);
     render();
     return;
   }
@@ -1151,6 +1204,7 @@ function useClassAbility(idx){
   if(S.classAbilityUsed) return;
   if(!inZone(idx)) return;
   const cell = S.tray[idx];
+  if(cell.minion){ revealMinionAt(idx); blankReveal(idx); S._abilityReveal = idx; } // the converted die shakes off its Minion
   cell.forcedFace = clone(S.klass.convertTo);
   S.classAbilityUsed = true;
   S.justConvertedIdx = idx; // one-shot: a conversion flourish on this tile for the very next render only, see renderDie()/renderGame()
@@ -1204,6 +1258,13 @@ function buildComboRipple(path){
   });
   return ripple.length ? ripple : null;
 }
+// During resolution only: a covered (Minion) die that a maneuver landed on shows
+// its real face. Previews never use this, so a path can't scout covered dice.
+function pathFaceForIdx(idx){
+  const cell = S.tray[idx];
+  if(S._resolvingPath && cell.minion && !cell.forcedFace) return cell.die.faces[cell.faceIdx];
+  return getFaceForIdx(idx);
+}
 function getFaceForIdx(idx){
   const cell = S.tray[idx];
   if(cell.forcedFace) return cell.forcedFace;
@@ -1219,7 +1280,7 @@ function computePathEffects(path){
       dodgeCount=0, leapCount=0, pivotCount=0, maneuverCount=0, supportCount=0;
 
   path.forEach(idx=>{
-    const f = getFaceForIdx(idx);
+    const f = pathFaceForIdx(idx);
     const val = f.value||0;
     switch(f.type){
       case 'hit': hitCount++; totalDamage += val*boostMult; break;
@@ -1270,7 +1331,7 @@ function computePathEffects(path){
 function computePathSteps(path){
   let boostMult = S.pendingFreeBoost>0 ? S.pendingFreeBoost : 1;
   const steps = path.map((idx,i)=>{
-    const f = getFaceForIdx(idx);
+    const f = pathFaceForIdx(idx);
     const val = f.value||0;
     const step = {idx, type:f.type, dmg:0, dotToEncounter:0, hotToPlayer:0, blockGain:0, healGain:0, selfDot:0, freeze:false, nullify:false, boostMultApplied:0, leapClearIdx:null};
     // A Leap jumps clean over the cell between its start and end (the
@@ -1286,6 +1347,7 @@ function computePathSteps(path){
       const overIdx = trayIdx((a.r+b.r)/2, (a.c+b.c)/2);
       if(S.tray[overIdx] && S.tray[overIdx].minion) step.leapClearIdx = overIdx;
     }
+    if(S.tray[idx].minion && S._resolvingPath) step.revealIdx = idx; // a maneuver landed on a covered die: uncovered as this step resolves
     switch(f.type){
       case 'hit': step.dmg = val*boostMult; break;
       case 'combo': step.dmg = val*(1+attackNeighborsCount(idx))*boostMult; break;
@@ -1312,7 +1374,7 @@ function computePathSteps(path){
 // moment each Hit actually lands instead of after the fact.
 function clearOneMinion(){
   const cell = S.tray.find(c=>c.minion);
-  if(cell){ cell.minion=false; cell.die=cell.coveredDie||cell.die; cell.coveredDie=null; if(S.encounter && S.encounter.minionsSpawned>0) S.encounter.minionsSpawned--; }
+  if(cell){ cell.minion=false; cell.die=cell.coveredDie||cell.die; cell.coveredDie=null; cell.blank=true; if(S.encounter && S.encounter.minionsSpawned>0) S.encounter.minionsSpawned--; }
 }
 
 // Clears one SPECIFIC Minion-covered cell -- as opposed to clearOneMinion()'s
@@ -1320,7 +1382,7 @@ function clearOneMinion(){
 // it (see computePathSteps()'s step.leapClearIdx, above).
 function clearMinionAt(idx){
   const cell = S.tray[idx];
-  if(cell && cell.minion){ cell.minion=false; cell.die=cell.coveredDie||cell.die; cell.coveredDie=null; if(S.encounter && S.encounter.minionsSpawned>0) S.encounter.minionsSpawned--; }
+  if(cell && cell.minion){ cell.minion=false; cell.die=cell.coveredDie||cell.die; cell.coveredDie=null; cell.blank=true; if(S.encounter && S.encounter.minionsSpawned>0) S.encounter.minionsSpawned--; }
 }
 
 // Applies exactly one die's contribution (see computePathSteps()) to live
@@ -1339,6 +1401,7 @@ function absorbWithShield(e, dmg){
 
 function applyPathStep(step){
   const e = S.encounter;
+  if(step.revealIdx!=null) revealMinionAt(step.revealIdx);
   if(step.relicFx) step.relicFx.forEach(r=>fireRelic(r.id, r.text));
   if(step.dmg>0){
     e.curHealth = capUpper(e.curHealth-absorbWithShield(e, step.dmg), e.maxHealth);
@@ -1370,14 +1433,14 @@ function addPlayerHOT(n){ S.playerHOT = Math.min(PLAYER_HOT_CAP, (S.playerHOT||0
 // Minions never outlive the fight that spawned them.
 function clearAllMinions(){
   if(!S.tray) return;
-  S.tray.forEach(cell=>{ if(cell.minion){ cell.minion=false; cell.die=cell.coveredDie||cell.die; cell.coveredDie=null; } });
+  S.tray.forEach(cell=>{ if(cell.minion){ cell.minion=false; cell.die=cell.coveredDie||cell.die; cell.coveredDie=null; cell.blank=true; } });
 }
 function applyNullify(){
   const e = S.encounter;
   const cleared = [];
   if(e.minionsSpawned>0){
     e.minionsSpawned = 0;
-    S.tray.forEach(cell=>{ if(cell.minion){ cell.minion=false; cell.die=cell.coveredDie; cell.coveredDie=null; } });
+    S.tray.forEach(cell=>{ if(cell.minion){ cell.minion=false; cell.die=cell.coveredDie; cell.coveredDie=null; cell.blank=true; } });
     cleared.push('minions');
   }
   if(S.playerDOT>0){ S.playerDOT = 0; cleared.push('your D.O.T.'); }
@@ -1475,11 +1538,22 @@ function startTurnTransition(){
   S._hitStreak = 0; // climbing pitch for consecutive damage-dealing dice this turn -- see playStepTone()
   S.stats.turnsTaken++;
   S.stats.longestPath = Math.max(S.stats.longestPath||0, S.path.length);
-  teleLog('turn', {n:S.turnNumber, len:S.path.length, hp:S.health, enemy:S.encounter?S.encounter.name:null, enemyHp:S.encounter?Math.round(S.encounter.curHealth):null});
+  // Compact tray snapshot so rolls/paths can be replayed offline: one token per cell, "<die code><face>",
+  // e.g. "A:h2" (Attack die, hit 2); "M" = covered by a Minion; "_" = blank. Die codes: A attack, M maneuver
+  // (lowercase letters = the die's category initial), O origin, L alloy, G gilded, X magic.
+  let trayTele = null;
+  try{
+    const dc = {attack:'A', maneuver:'V', origin:'O', alloy:'L', gilded:'G', magic:'X'};
+    const fc = {hit:'h', combo:'c', heal:'+', block:'b', shield:'s', boost:'B', leap:'l', dodge:'d', pivot:'p', nullify:'n', freeze:'z', dot:'t', hot:'o', leech:'e', fumble:'f', blank:'_'};
+    trayTele = S.tray.map(c=>{ if(c.minion) return 'M'; const f = c.forcedFace || currentFace(c); return (dc[c.die.cat]||'?') + ':' + (fc[f.type]||f.type) + (f.value||''); }).join(' ');
+  }catch(e){}
+  teleLog('turn', {n:S.turnNumber, len:S.path.length, hp:S.health, enemy:S.encounter?S.encounter.name:null, enemyHp:S.encounter?Math.round(S.encounter.curHealth):null, tray:trayTele, path:S.path.slice(), block:S.playerBlock||0});
   S.pendingFreeBoost = 0; // a free Boost token is spent by end of turn whether or not it landed on anything
   const path = S.path.slice();
+  S._resolvingPath = true;
   const steps = computePathSteps(path);
   const effects = computePathEffects(path); // aggregate counts, for the quest check once the path finishes
+  S._resolvingPath = false;
   runPlayerPathSteps(steps, 0, path, effects);
 }
 
@@ -1501,7 +1575,7 @@ function runPlayerPathSteps(steps, i, path, effects){
   // One-shot flag so renderGame()/renderDie() can flash the specific cell a
   // Leap just cleared (a different tile than the one resolving above --
   // see step.leapClearIdx, computePathSteps()).
-  S.lastMinionClearIdx = step.leapClearIdx;
+  S.lastMinionClearIdx = step.leapClearIdx!=null ? step.leapClearIdx : (step.revealIdx!=null ? step.revealIdx : null);
   // Each die that actually deals damage plays a little higher than the
   // last one this turn (first hit at base pitch, climbing from there),
   // so a multi-hit path builds like a rising combo instead of every hit
@@ -1634,7 +1708,9 @@ function endTurn(){
   S.path = [];
   S.classAbilityUsed = false;
   S.tray.forEach(c=>delete c.forcedFace);
+  const pm = S._pendingMinions||0;
   scrambleTray();
+  placePendingMinions(pm);
   render();
 }
 
@@ -1671,6 +1747,7 @@ function runPlayerUpkeep(){
 }
 
 function dealEncounterDamage(e, amount){
+  if(amount>0 && depthRank('fury')) amount += depthRank('fury');
   if(amount>0 && hasRelic('gambeson')){ amount = Math.max(0, amount-1); fireRelic('gambeson','-1'); }
   const blocked = Math.min(S.playerBlock, amount);
   S.playerBlock -= blocked;
@@ -1688,18 +1765,26 @@ function dealEncounterDamage(e, amount){
   return t;
 }
 
+// Minions are QUEUED when the enemy acts and actually placed by endTurn()
+// right after the new roll, so the player never sees what was rolled under them.
 function spawnMinions(e, n){
-  let placed=0;
+  n = Math.round(n) + depthRank('swarm');
+  const free = S.tray.filter(c=>!c.minion).length - (S._pendingMinions||0);
+  const placed = Math.max(0, Math.min(Math.round(n), free));
+  S._pendingMinions = (S._pendingMinions||0) + placed;
+  if(placed>0){ const t = `${placed} Minion die${placed>1?'s':''} clog your tray!`; logMsg('sys', t); return t; }
+  return null;
+}
+function placePendingMinions(n){
+  const e = S.encounter; if(!e || !(n>0)) return;
   const free = S.tray.map((c,i)=>i).filter(i=>!S.tray[i].minion);
-  pickN(free, Math.min(Math.round(n), free.length)).forEach(i=>{
+  let placed=0;
+  pickN(free, Math.min(n, free.length)).forEach(i=>{
     const cell = S.tray[i];
-    cell.coveredDie = cell.die; cell.minion = true;
-    placed++;
+    cell.coveredDie = cell.die; cell.minion = true; placed++;
   });
   e.minionsSpawned = (e.minionsSpawned||0)+placed;
   if(placed>0) teleLog('minions', {enemy:e.name, placed, onTray:S.tray.filter(c=>c.minion).length});
-  if(placed>0){ const t = `${placed} Minion die${placed>1?'s':''} clog your tray!`; logMsg('sys', t); return t; }
-  return null;
 }
 
 // Bosses cycle one action at a time through their action list (built in
@@ -1718,6 +1803,7 @@ function applyBossCycleAction(e){
   }
   return `${e.name} takes no action.`;
 }
+
 
 function runEncounterAction(){
   const e = S.encounter;
@@ -1912,8 +1998,8 @@ function onEncounterDefeated(){
   const nearMiss = (okMiss>=1 && okMiss<=3) ? okMiss : 0;
   if(nearMiss) S.stats.nearMisses = (S.stats.nearMisses||0) + 1;
   const isBoss = e.type==='Boss' || e.type==='Big Boss';
-  let drawCount = isBoss ? 3 : 2;
-  if(overkill) drawCount += 1;
+  let drawCount = (isBoss && depthRank('slim')<2) ? 3 : 2;
+  if(overkill && !depthRank('slim')) drawCount += 1;
   if(hasRelic('lucky_coin')){ drawCount += 1; fireRelic('lucky_coin','+1 option'); }
   if(hasRelic('iron_rations')){ S.health = cap(S.health+2, S.maxHealth); logMsg('heal', 'Iron Rations: healed 2.', 'good'); fireRelic('iron_rations','+2 HP'); }
   const options = pickLootNUnused(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
@@ -2140,7 +2226,8 @@ function campRest(){
   scrambleTray();
   let count=0;
   S.tray.forEach(c=>{ if(currentFace(c).type!=='blank') count++; });
-  const heal = Math.ceil(count/2) + (hasRelic('kettle') ? 3 : 0);
+  let heal = Math.ceil(count/2) + (hasRelic('kettle') ? 3 : 0);
+  if(depthRank('rest')) heal = Math.max(1, Math.round(heal*(1-0.25*depthRank('rest'))));
   if(hasRelic('kettle')) fireRelic('kettle','+3 HP');
   const hpFrom = S.health;
   S.health = cap(S.health+heal, S.maxHealth);
