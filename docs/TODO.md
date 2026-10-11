@@ -1,7 +1,7 @@
 # Dungeon Scramble — TODO
 
 ## Priority order
-1. **Maneuver-dice payoff.** Study whether Maneuver dice/actions are useful versus Attack, then design a payoff. Run the studies with `tools/balance`. Boost on an upgraded Maneuver die is a last resort only.
+1. **Maneuver-dice payoff.** Study whether Maneuver dice/actions are useful versus Attack, then design a payoff. Run the studies with `tools/balance`. Boost on an upgraded Maneuver die is a last resort only. First study done: see `docs/studies/2026-10-11_maneuver_study.md` (Maneuver dice are a net loss today; Momentum payoff recommended; awaiting Jeremy's decision).
 2. **Review the newest player run data** (v1.32.76 export; the second half of floor 3 is still unread).
 3. **Shrine overhaul.**
 4. **Sound / music** and 5. **art**, worked in parallel.
