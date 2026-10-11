@@ -51,7 +51,9 @@ renders fine if that fails to load, e.g. offline).
 plays it with a bot that takes random-but-legal actions, calling the
 game's own functions directly (`newGame`, `toggleSelect`, `skipTransition`,
 `campRest`, `chooseLoot`, etc.) rather than clicking through the DOM. It
-runs one game per Origin/Class combo (plus the Debug class) and reports
+runs one game for each of 5 fixed Origin/Class combos (one per origin, plus
+the Debug class; the list is in `sim.js`) -- a crash smoke test, not full
+coverage -- and reports
 `VICTORY` / `GAMEOVER` / `TIMEOUT` for each. The suite only fails on an
 actual JS error/exception -- TIMEOUT is an expected outcome for some
 class/origin pairings against a purely random bot, not a bug.
@@ -89,6 +91,6 @@ The cache name is stamped with GAME_VERSION in data.js, so bump it every release
 ## Project docs
 - `CLAUDE.md` -- working notes, release routine, gotchas, design rules.
 - `CHANGELOG.md` -- version history.
-- `docs/` -- player rulebook (docx/pdf).
+- `docs/` -- `PROJECT_CONTEXT.md` (design decisions), `TODO.md` (priorities), player rulebook (docx/pdf), art inventory (xlsx).
 - `tools/balance/` -- balance harness and studies; `tools/art/` -- art import/export scripts.
 - `bugsearch.js` -- extended bug hunt (see CLAUDE.md).

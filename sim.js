@@ -5,7 +5,8 @@
  * Loads the built dist/dungeon_scramble.html in a headless browser and
  * drives real games via the game's own in-page functions (newGame,
  * toggleSelect, skipTransition, etc.) with a simple random-but-legal bot,
- * for every Origin/Class combo plus the Debug class. Reports
+ * once for each of the 5 Origin/Class combos listed in main() (one per
+ * origin, plus the Debug class; not full coverage). Reports
  * VICTORY / GAMEOVER / TIMEOUT / ERROR for each run.
  *
  * Usage: node sim.js [--turns=2000] [--file=dist/dungeon_scramble.html]
