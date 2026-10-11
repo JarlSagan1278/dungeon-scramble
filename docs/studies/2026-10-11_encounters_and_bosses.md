@@ -168,3 +168,31 @@ Per boss (HP lost per fight / share of fights that end the run): Rogue Golemance
 By tier (HP lost per fight): Floor 1 easy 2.1, standard 3.0, elite 3.7; Floor 2 easy 4.8, standard 4.2, elite 6.1, deadly 13.9 (29% of Strike-Breaker fights end the run); Floor 3 easy 1.9, standard 2.5, elite 5.0, deadly 7.1.
 
 Open questions for playtesting: Floor 2 now holds most deaths; Floor 1 regular rooms are close to harmless while its bosses are the main threat; Floor 2 "easy" cards hit harder than its standard ones (4.8 vs 4.2), so the Floor 2 split may need a second look; Myceleus is much softer than Extruzeon.
+
+## 7. Are the bosses fun-variation uneven or coin-flip uneven? (Oct 11, build 1.36.0)
+
+`tools/balance/study_boss_variance.py 150`: each boss forced onto its floor in otherwise identical runs, 4 combos × 150 runs, at three bot levels: strong (skill 1500, blocks before previewed wind-ups), blind (same, ignores the preview) and weak (skill 150).
+
+| Boss | HP lost per fight, strong (sd) | blind | weak | Fights that end the run, strong / blind / weak |
+|---|---|---|---|---|
+| F1 Rogue Golemancer | 7.1 (3.7) | 7.1 | 7.5 | 2% / 2% / 3% |
+| F1 Heating Elemental | 10.3 (4.0) | 10.2 | 10.5 | 9% / 11% / 11% |
+| F1 Grosteque Grafter | 10.5 (5.2) | 10.5 | 10.5 | 8% / 8% / 11% |
+| F2 The Necrorancher | 5.7 (4.4) | 5.6 | 5.8 | 6% / 5% / 6% |
+| F2 Bellicose Biomancer | 11.8 (6.2) | 11.5 | 12.1 | 18% / 20% / 22% |
+| F2 Ceramic Golem | 12.3 (6.7) | 12.6 | 12.7 | 19% / 19% / 28% |
+| F3 Extruzeon | 20.7 (11.6) | 20.4 | 21.5 | 4% / 7% / 10% |
+| F3 Myceleus | 7.7 (5.5) | 7.6 | 8.6 | 4% / 5% / 4% |
+
+By build (strong bot), HP lost per fight: Dwarf/Guard, the build with real Block (origin die Block faces plus the Guard skill), does only 1 to 3 HP better than the others against every boss.
+
+**Verdict: coin-flip uneven, as the game stands.**
+- Which boss you draw decides the fight far more than how you play: on Floor 2, drawing Ceramic Golem or Bellicose Biomancer instead of The Necrorancher doubles HP lost and triples the chance the run ends there; on Floor 3, Extruzeon costs nearly 3× what Myceleus does.
+- Reading the telegraph barely helps (strong vs blind differ by under 0.5 HP) because most trays have almost no way to answer it: Attack and Maneuver dice have no Block faces, Freeze and Nullify come only from a few dice, tokens and shrines.
+- The minion wind-ups (Stampede, Mycelial Burst) resolve themselves: ordinary damage already clears minions, so there's no decision.
+- Caveat: the bot plans one turn at a time; a human can bank burst damage to kill before a wind-up. Real play data should confirm, but the build comparison points the same way.
+
+**To make it fun variation:**
+1. Bring each floor's bosses within about 15% of each other in average HP lost (raise The Necrorancher and Myceleus, trim Ceramic Golem, Biomancer and Extruzeon), so the draw changes *how* the fight plays, not *whether* you survive it.
+2. Give every build a way to answer a telegraph, so wind-ups become decisions. Options: a universal "brace" (dice you leave out of your path on a wind-up turn give Block), Block faces on some basic dice, or more Freeze sources.
+3. Make the minion wind-ups count something the player has to choose to deal with (e.g. minions placed after the telegraph, or Stampede counting minions plus blanks).

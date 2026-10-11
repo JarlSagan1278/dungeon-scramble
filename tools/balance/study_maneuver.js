@@ -14,9 +14,10 @@
 //   intentAware (default true, needs build >=1.35.0): Block is valued against the enemy's previewed next-turn damage.
 //   bossMode (test-only, builds <1.35.0 only): 'cycle' (today: one cycle step per turn) | 'attackPlus' (boss also hits for its base damage
 //     every turn the cycle step isn't the attack) | 'attackPlusPhase' (attackPlus, and at <=50% HP it takes two cycle steps a turn)
+//   forceBoss: boss name (or array of names); every boss room on that boss's floor draws it.
 // usage: node study_maneuver.js '<json config>'
 let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node22/lib/node_modules/playwright')); }
-const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{}, pivotFace:'pivot', manLevel:1, bossMode:'cycle', intentAware:true }, JSON.parse(process.argv[2]||'{}'));
+const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{}, pivotFace:'pivot', manLevel:1, bossMode:'cycle', intentAware:true, forceBoss:null }, JSON.parse(process.argv[2]||'{}'));
 (async()=>{
 const b=await chromium.launch();const page=await b.newPage();
 page.on('pageerror',e=>console.log('PAGEERR',e.message));
@@ -107,8 +108,13 @@ let res = await page.evaluate((cfg)=>{
     };
   }
   const origDraw = drawEncounter;
+  const forced = cfg.forceBoss ? [].concat(cfg.forceBoss) : [];
   window.drawEncounter = function(kind){
-    const e = origDraw(kind);
+    let e;
+    const pool = kind==='boss' ? (S.floorIdx===2 ? BIG_BOSSES : FLOORS[S.floorIdx].bosses) : null;
+    const pick = pool && pool.filter(b=>forced.includes(b.name));
+    if(pick && pick.length){ const saved = pool.splice(0, pool.length, ...pick); e = origDraw(kind); pool.splice(0, pool.length, ...saved); }
+    else e = origDraw(kind);
     const fi = S.floorIdx;
     const boss = (e.type==='Boss'||e.type==='Big Boss');
     let mul = (cfg.hpMul[fi]||1) * (boss ? (cfg.bossHpMul[fi]||1) : 1);
