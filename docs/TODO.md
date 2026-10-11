@@ -3,7 +3,7 @@
 ## Priority order
 1. **Playtest 1.35.0 (boss rework + encounter tiers)** and collect play data. Watch Floor 2 (bot deaths concentrate there: Ceramic Golem, Bellicose Biomancer, elite rooms), Heating Elemental on Floor 1 (11% of bot runs die there), and Myceleus vs Extruzeon (8 vs 21 HP lost per fight). Re-measure tiers after real data; `tools/balance/study_tiers_bosses.py`.
 2. **Maneuver-dice payoff.** Studied Oct 11 (`docs/studies/2026-10-11_maneuver_study.md`): Maneuver dice are a net loss today, and the v1.32.76 tester dropped them first. **On hold:** Jeremy wants more play data before changing the Maneuver meta. Leading candidate is Dodge Block (each Dodge gives 1 Block); Momentum is the alternative. Boost on an upgraded Maneuver die is a last resort only.
-3. **Shrine overhaul.**
+3. **Shrine overhaul.** Plan with options drafted: `docs/studies/2026-10-11_shrine_overhaul_plan.md` (shrine ritual presence, ~10 shrine cards per floor with half giving relics, bargain shrines, 12 new relics incl. conversion and movement families). Awaiting Jeremy's picks.
 4. **Sound / music** and 5. **art**, worked in parallel.
 
 ## Other items
