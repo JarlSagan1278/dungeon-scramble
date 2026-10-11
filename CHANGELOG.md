@@ -11,6 +11,7 @@
 - Gnomish Mushroom Cap: both D.O.T. 1 faces are now D.O.T. 2 (Gnome bot win rate 46% → 55%).
 - Geometry quests are mirror rules: at Profane Geometry, every H.O.T. you gain also lands as D.O.T. on it; at Sacred(?) Geometry, every D.O.T. it takes also gives you H.O.T. (capped at 10).
 - Sound palette: each action has its own instrument (sword hit, wooden Block knock, Heal/H.O.T. bell, D.O.T. pluck, glassy Freeze, Nullify swell, Boost whistle, airy Maneuver whoosh, Swap flip) and every path step climbs the scale. The enemy turn has sound now: a drum as it acts, a clank for Shield or a fully Blocked hit, a bell for its heals, squeaks for Minions, and a rising rumble when a wind-up or heavy turn is telegraphed. Your H.O.T. ticks and camp rests chime.
+- Gnomeowners Association replaces Parasite Seer on Floor 3 (same stats; stand-in art).
 - Quest fixes: 13 quests that could never complete now work ("20+ damage", "8 damage/turn", "survive turn 4", combos/H.O.T./D.O.T. counts, Freeze rewards); "Bank 5 Block" checks Block actually banked; "2 nullify" needs 2.
 
 ## 1.38.1

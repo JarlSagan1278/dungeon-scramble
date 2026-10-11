@@ -449,7 +449,8 @@ const FLOOR3_ENEMIES = [
   enc('Morel Dilemma','Enemy',14,{dmg:4,minion:2,hot:1,flavor:'A fungal species that has stumped, and subsequently eaten, philosophers for generations.'}),
   enc('Chimeric Sludge','Enemy',25,{questHealth:12,dmg:5,hot:2,quests:['12 damage: 4 maneuvers'],flavor:'Biological slag, made up of countless individual chimeras.'}),
   enc('Gnome Chomper','Enemy',28,{questHealth:6,dmg:7,quests:['6 damage: 3 maneuvers'],flavor:'"The Gnomish Chempire is the leading zealot state!"'}),
-  enc('Parasite Seer','Enemy',20,{dmg:3,shield:3,flavor:'Sees into multiple parallel futures, though limited only to popular travel destinations.'}),
+  // v1.39.0: replaces Parasite Seer (its art was a cropped copy of another gnome); Jeremy's idea, same slot and stats.
+  enc('Gnomeowners Association','Enemy',20,{dmg:3,shield:3,flavor:'"Your hat exceeds the permitted height by 3.14 inches. Please remit a fine."'}),
   enc('Gestalt Network','Enemy',20,{dmg:3,dot:2,flavor:'"You will join us. Our population is mushrooming."'}),
   enc("Oilephant's Foot",'Enemy',30,{questHealth:15,dmg:2,hot:3,quests:['15 damage: 4 support actions'],flavor:'"An Oilephant never forgets" refers to the long-lasting effects of radiation.'}),
   enc('Extractnid Matriarch','Enemy',22,{dmg:5,minion:3,quests:['nullify: 10+ damage'],flavor:'Undisturbed for eons, this primordial weaver and its brood now stir and hunger for glass.'}),
@@ -518,7 +519,7 @@ const ENCOUNTER_TIER = {
   'Half-life Host':'elite','Rusty Golem':'elite','Illegal Operation':'elite','Lichen-Thrope':'elite','Fungal Flayer':'elite',
   'The Strike-Breaker':'deadly',
   // Floor 3
-  'Morel Dilemma':'easy','Parasite Seer':'easy','Gestalt Network':'easy',"Oilephant's Foot":'easy',
+  'Morel Dilemma':'easy','Gnomeowners Association':'easy','Gestalt Network':'easy',"Oilephant's Foot":'easy',
   'Chimeric Sludge':'standard','Ergot Eruption':'standard','Profane Geometry':'standard','Extractnid Matriarch':'standard',
   'Anti-Euclidian Space':'elite','Bio-Mutant Escape':'elite','Gnome Chomper':'elite','The Punished':'elite','Sacred(?) Geometry':'elite',
   'Self-Replicating Forge':'deadly','Eelagator Escapee':'deadly','Toadtaur Warrior':'elite',
@@ -617,7 +618,7 @@ const ENCOUNTER_SIZE = {
   'Displacer Kitty':.62,'Armored Gear-Pest':.53,'Rusty Golem':1.3,'Rogue Technician':1,'The Warcart':1.4,
   'Blastogenesis Engine':1.1,'Half-life Host':1.2,'Lichen-Thrope':1.15,'Fungal Flayer':1.15,
   'The Necrorancher':1.35,'Bellicose Biomancer':1.4,'Ceramic Golem':1.5,
-  'Morel Dilemma':.62,'Chimeric Sludge':1.3,'Gnome Chomper':1,'Parasite Seer':1.05,'Gestalt Network':1.25,
+  'Morel Dilemma':.62,'Chimeric Sludge':1.3,'Gnome Chomper':1,'Gnomeowners Association':1.05,'Gestalt Network':1.25,
   "Oilephant's Foot":1.55,
   'Untamed Unicrows':.75,'Prickly Porcupanther':.95,'Rabbid Rabbats':.6,'Roudy Rinotter':.85,'Whence Wolf':1.1,'Eelagator Escapee':1.25,'Toadtaur Warrior':1.2,'Toadtaur Wizard, Assistant to the Co-consul':1.45,'Extractnid Matriarch':1.45,'The Punished':1.25,'Profane Geometry':1.35,'Sacred(?) Geometry':1.35
 };
