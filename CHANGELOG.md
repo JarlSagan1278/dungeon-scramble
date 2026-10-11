@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.35.1
+- "New symbol" cards show the whole icon (the icon's clipping box stayed at text size, so only a corner of e.g. Leap showed).
+
 ## 1.35.0
 - Bosses reworked: base attack every turn plus a named special from each boss's own move list, shown a turn ahead; big telegraphed wind-ups (e.g. Waste Crush 12, Stampede 2 per Minion). Freeze cancels the special, not the base attack. Big Bosses enter Phase 2 at half HP (Extruzeon: Meltdown, Myceleus: Fruiting Body).
 - Encounter tiers on every floor (easy / standard / elite / deadly). Rooms follow easy -> standard -> elite, Camp, standard -> elite, Boss. Deadly cards (The Strike-Breaker, Self-Replicating Forge) rarely take an elite room on Floors 2-3. Shrines only appear in easy/standard rooms (40% each, max one per segment).
