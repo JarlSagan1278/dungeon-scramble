@@ -25,7 +25,7 @@ Digital prototype of Jeremy's board game (Boggle-style dice-path dungeon crawler
 - Idle `.zone-cell` has `box-shadow !important`; animate transform/filter instead (scale/blur makes dice faces blurry → use translate/rotate twitches).
 - Minions: cells have `minion`/`coveredDie`/`blank`; new minions queue in `S._pendingMinions` and are placed after the roll scramble. Real face revealed only during path resolution (`S._resolvingPath`, `pathFaceForIdx`) so maneuvers can't scout. Jumping over a minion clears it; a blank landing ends the path.
 - Service worker: hashed `/art/<sha1-12>.png|jpg` are cache-first, everything else network-first. Write regexes with `[/]` inside template literals.
-- Bosses (1.35.0+) use `e.kit` from `BOSS_KITS` (data.js): `each` acts every turn + `specials` looped by `e.specialIdx`, `phase2` after a turn ending at <=50% HP; `actionCycle` is gone. Regular enemies have `e.tier`/`e.turnsActed` (heavy turns, `HEAVY_EVERY`). `enemyNextTurnPreview(e)` drives the face-off chips and the study bot. Old harness knobs that edit `e.dmg` don't touch bosses.
+- Bosses (1.35.0+) use `e.kit` from `BOSS_KITS` (data.js): `each` acts every turn + `specials` looped by `e.specialIdx`, `phase2` after a turn ending at <=50% HP; `actionCycle` is gone. Regular enemies have `e.tier`/`e.turnsActed` (heavy turns, `HEAVY_EVERY`). A special's `herald` act (1.37.0, `bossHerald`) fires when that special becomes the next one, so its Minions land with the warning. `enemyNextTurnPreview(e)` drives the face-off chips and the study bot. Old harness knobs that edit `e.dmg` don't touch bosses.
 - Pocket/Organize fold in camp: measure positions after applying absolute positioning, cluster rows with ~16px tolerance.
 
 ## Design rules Jeremy has set

@@ -1889,7 +1889,15 @@ function bossTakeTurn(e, frozen){
     if(typeof playTone==='function') playTone('closeCall');
     teleLog('boss_phase', {name:e.name, phase:2});
   }
+  { const t = bossHerald(e); if(t) parts.push(t); }
   return parts.join(' ');
+}
+// v1.37.0: a special with a "herald" brings its Minions along with its
+// warning (they land right after the roll the player sees the telegraph on),
+// so the player has exactly one turn to clear them before e.g. Stampede.
+function bossHerald(e){
+  const sp = bossNextSpecial(e); if(!sp || !sp.herald) return null;
+  return applyEnemyAct(e, sp.herald);
 }
 
 // Elite/deadly enemies telegraph a heavy turn every HEAVY_EVERY[tier] turns.

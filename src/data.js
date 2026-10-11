@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.36.0';
+const GAME_VERSION = '1.37.0';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -421,7 +421,7 @@ const FLOOR2_SHRINES = [
   ]}}),
 ];
 const FLOOR2_BOSSES = [
-  enc('The Necrorancher','Boss',35,{dmg:2,minion:2,quests:['nullify: deal 12 damage in a single turn'],flavor:'Herder of the haunted, granger of the ghoulish, planter of the parasitic.'}),
+  enc('The Necrorancher','Boss',48,{dmg:2,minion:2,quests:['nullify: deal 12 damage in a single turn'],flavor:'Herder of the haunted, granger of the ghoulish, planter of the parasitic.'}),
   enc('Bellicose Biomancer','Boss',50,{questHealth:25,dmg:4,hot:2,quests:['20 damage: 3 hot','20 damage: 5 dot'],flavor:'Not content with creating life, this relentless innovator seeks new ways to destroy it.'}),
   enc('Ceramic Golem','Boss',70,{questHealth:40,dmg:3,shield:3,quests:['8 dot: deal 15+ damage in a single round','30 damage: 5 maneuvers'],flavor:'The bespoke sommelier of the Co-Consul, now cracked and seeping with drink.'}),
 ];
@@ -465,7 +465,7 @@ const FLOOR3_SHRINES = [
 ];
 const BIG_BOSSES = [
   enc('Extruzeon, Co-consul of Waste','Big Boss',90,{questHealth:60,dmg:6,shield:2,hot:1,quests:['30 damage: 3 boosts','30 damage: 6 maneuvers in a single turn','freeze: 20+ damage'],flavor:'"And to think\u2026I hesitated."'}),
-  enc('Myceleus, Co-consul of Rot','Big Boss',75,{questHealth:60,dmg:2,minion:2,dot:1,hot:2,quests:['30 damage: 3 combos','30 damage: 6 maneuvers in a single turn','nullify: 15+ damage'],flavor:'"Extinction is the rule. Your survival is the exception!"'}),
+  enc('Myceleus, Co-consul of Rot','Big Boss',96,{questHealth:60,dmg:2,minion:2,dot:1,hot:2,quests:['30 damage: 3 combos','30 damage: 6 maneuvers in a single turn','nullify: 15+ damage'],flavor:'"Extinction is the rule. Your survival is the exception!"'}),
 ];
 
 const FLOORS = [
@@ -522,43 +522,43 @@ const HEAVY_EVERY = {elite:3, deadly:2};
 const BOSS_KITS = {
   'Rogue Golemancer':{ each:[{type:'dmg',value:1}], specials:[
     {name:'Summon Golems', acts:[{type:'minion',value:2}]},
-    {name:'Golem Slam', windup:true, acts:[{type:'dmg',value:6}]},
-    {name:'Brace', acts:[{type:'shield',value:3}]} ]},
+    {name:'Golem Slam', windup:true, acts:[{type:'dmg',value:7}]},
+    {name:'Brace', acts:[{type:'shield',value:4}]} ]},
   'Heating Elemental':{ each:[{type:'dmg',value:1}], specials:[
     {name:'Stoke', acts:[{type:'hot',value:2}]},
-    {name:'Flashover', windup:true, acts:[{type:'dmg',value:6}]},
+    {name:'Flashover', windup:true, acts:[{type:'dmg',value:5}]},
     {name:'Scorch', acts:[{type:'dot',value:2}]} ]},
   'Grosteque Grafter':{ each:[{type:'dmg',value:1}], specials:[
     {name:'Graft Plating', acts:[{type:'shield',value:5}]},
-    {name:'Stitch-Rip', windup:true, acts:[{type:'dmg',value:6}]},
+    {name:'Stitch-Rip', windup:true, acts:[{type:'dmg',value:5}]},
     {name:'Harvest', acts:[{type:'heal',value:4}]} ]},
+  // herald: Minions that land with the warning (v1.37.0), one turn to clear them.
   'The Necrorancher':{ each:[{type:'dmg',value:2}], specials:[
-    {name:'Raise the Herd', acts:[{type:'minion',value:4}]},
-    {name:'Stampede', windup:true, acts:[{type:'dmgPerMinion',value:2}]},
-    {name:'Cull', acts:[{type:'dmg',value:4}]} ]},
+    {name:'Dead Reckoning', acts:[{type:'dot',value:2}]},
+    {name:'Stampede', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:2}]},
+    {name:'Cull', acts:[{type:'dmg',value:7}]} ]},
   'Bellicose Biomancer':{ each:[{type:'dmg',value:2}], specials:[
     {name:'Mutagen', acts:[{type:'hot',value:2}]},
-    {name:'Overgrowth Slam', windup:true, acts:[{type:'dmg',value:9}]},
+    {name:'Overgrowth Slam', windup:true, acts:[{type:'dmg',value:8}]},
     {name:'Spore Cloud', acts:[{type:'dot',value:2}]} ]},
   'Ceramic Golem':{ each:[{type:'dmg',value:2}], specials:[
     {name:'Glaze', acts:[{type:'shield',value:5}]},
-    {name:'Shatterpour', windup:true, acts:[{type:'dmg',value:9},{type:'dropShield'}]},
+    {name:'Shatterpour', windup:true, acts:[{type:'dmg',value:7},{type:'dropShield'}]},
     {name:'Seep', acts:[{type:'dot',value:2}]} ]},
-  'Extruzeon, Co-consul of Waste':{ each:[{type:'dmg',value:4}], specials:[
+  'Extruzeon, Co-consul of Waste':{ each:[{type:'dmg',value:3}], specials:[
     {name:'Compactor', acts:[{type:'shield',value:4}]},
-    {name:'Waste Crush', windup:true, acts:[{type:'dmg',value:12}]},
+    {name:'Waste Crush', windup:true, acts:[{type:'dmg',value:8}]},
     {name:'Recycle', acts:[{type:'hot',value:2}]} ],
-    phase2:{ name:'Meltdown', each:[{type:'dmg',value:5}], specials:[
-      {name:'Waste Crush', windup:true, acts:[{type:'dmg',value:12}]},
+    phase2:{ name:'Meltdown', each:[{type:'dmg',value:4}], specials:[
+      {name:'Waste Crush', windup:true, acts:[{type:'dmg',value:9}]},
       {name:'Slag Spray', acts:[{type:'minion',value:2},{type:'dot',value:2}]} ]}},
-  'Myceleus, Co-consul of Rot':{ each:[{type:'dmg',value:4}], specials:[
-    {name:'Sporulate', acts:[{type:'minion',value:3}]},
+  'Myceleus, Co-consul of Rot':{ each:[{type:'dmg',value:5}], specials:[
     {name:'Rot', acts:[{type:'dot',value:3}]},
-    {name:'Mycelial Burst', windup:true, acts:[{type:'dmgPerMinion',value:3}]} ],
+    {name:'Fractal Rind', acts:[{type:'shield',value:4}]},
+    {name:'Mycelial Burst', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]} ],
     phase2:{ name:'Fruiting Body', each:[{type:'dmg',value:4},{type:'minion',value:1}], specials:[
-      {name:'Sporulate', acts:[{type:'minion',value:3}]},
       {name:'Rot', acts:[{type:'dot',value:3}]},
-      {name:'Mycelial Burst', windup:true, acts:[{type:'dmgPerMinion',value:3}]} ]}},
+      {name:'Mycelial Burst', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]} ]}},
 };
 
 // Stand-in art for the v1.36.0 shrines until Jeremy's own art exists: each

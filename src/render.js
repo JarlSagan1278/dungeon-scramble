@@ -1421,7 +1421,7 @@ function renderEncounterCard(e, mode){
     const base = kit.each.map(a=>chip(a,'','')).join('');
     const frozen = !!S.freezeNext;
     const spMain = sp.acts.find(a=>iconKey[a.type]) || sp.acts[0];
-    const spTip = `${sp.name}: ${sp.acts.map(actText).join(', ')}${frozen?' (cancelled by Freeze)':''}`;
+    const spTip = `${sp.name}: ${sp.herald?`(brought ${sp.herald.value} Minions with its warning) `:''}${sp.acts.map(actText).join(', ')}${frozen?' (cancelled by Freeze)':''}`;
     const special = `<span class="boss-cycle-item next enemy-action-badge boss-special${sp.windup&&!frozen?' heavy':''}${frozen?' frozen':''}" title="${spTip}">${iconKey[spMain.type]?iconSpan(iconKey[spMain.type], ICON_VALUE_SLOT.has(iconKey[spMain.type])?spMain.value:null):''} ${sp.name}${spMain.type==='dmgPerMinion'?' &times;'+iconSpan('minion'):(!ICON_VALUE_SLOT.has(iconKey[spMain.type]||'')&&spMain.value?' '+spMain.value:'')}</span>`;
     return `<div class="boss-cycle-row${kit.each.length>1?' crowded':''}"><span class="hint" style="margin:0;">Next turn:</span>${base}${special}</div>`;
   })() : '';

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.37.0
+- Bosses evened out per floor (HP lost per fight now within about 15% on every floor): Rogue Golemancer's Golem Slam 7 and Brace 4; Heating Elemental's Flashover and Grosteque Grafter's Stitch-Rip 5; Bellicose Biomancer's Overgrowth Slam 8; Ceramic Golem's Shatterpour 7; Extruzeon base attack 3 (4 in Meltdown) and Waste Crush 8 (9 in Meltdown).
+- The Necrorancher: 48 health (was 35); new move Dead Reckoning (2 D.O.T.); Cull 7; Stampede now brings its herd with the warning.
+- Myceleus: 96 health (was 75), base attack 5; new move Fractal Rind (4 Shield) replaces Sporulate; Mycelial Burst now brings its spores with the warning.
+- Herald minions: a boss's minion wind-up (Stampede, Mycelial Burst) places its Minions on the same roll that shows the warning, so you get exactly one turn to clear them, Leap them or brace for the hit.
+
 ## 1.36.0
 - Shrine ritual: shrines get their own entrance ("A shrine hums in the dark…", soft chime, warming torches, rising motes); press and hold the shrine or its button to receive the boon (rising notes, the shrine lifts and bursts); rewards land where they live (relics fly into the relic strip, health stretches the bar with a big number, upgraded dice flip on the tray, tokens drop on the Item button). Simple results show in the arch instead of a popup; relic and boon choices fan in.
 - 30 shrines (was 14), 10 per floor, about half giving relics: themed relic shrines (offense, defense, path and movement, loot and tempo) and bargain shrines (Blood Bargain: 3 max health; Hungry Idol: skip your next camp rest; Devil's Ledger: 5 max health for a choice of four), plus Wishing Well and Reliquary Font. New shrines use stand-in art for now.

@@ -199,7 +199,7 @@ let res = await page.evaluate((cfg)=>{
     for(let t=0;t<cfg.maxTurns*8;t++){
       if(S.screen==='game' && S.encounter && curEnc!==S.encounter){
         curEnc=S.encounter;
-        cur={name:S.encounter.name,type:S.encounter.type,floor:S.floorIdx+1,hp0:S.encounter.maxHealth,php0:S.health,turns:0,tk0:window.__taken,minhp:S.health};
+        cur={name:S.encounter.name,type:S.encounter.type,tier:S.encounter.tier,floor:S.floorIdx+1,hp0:S.encounter.maxHealth,php0:S.health,pmax0:S.maxHealth,turns:0,tk0:window.__taken,minhp:S.health,loot:S.tray.map(c=>c.die).concat(S.backPocket||[]).filter(d=>d&&/alloy|gilded|magic/.test(d.cat)).map(d=>d.name),relics:(S.relics||[]).slice()};
         rec.fights.push(cur);
       }
       const res=tick(log);

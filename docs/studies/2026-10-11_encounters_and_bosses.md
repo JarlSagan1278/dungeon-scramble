@@ -196,3 +196,22 @@ By build (strong bot), HP lost per fight: Dwarf/Guard, the build with real Block
 1. Bring each floor's bosses within about 15% of each other in average HP lost (raise The Necrorancher and Myceleus, trim Ceramic Golem, Biomancer and Extruzeon), so the draw changes *how* the fight plays, not *whether* you survive it.
 2. Give every build a way to answer a telegraph, so wind-ups become decisions. Options: a universal "brace" (dice you leave out of your path on a wind-up turn give Block), Block faces on some basic dice, or more Freeze sources.
 3. Make the minion wind-ups count something the player has to choose to deal with (e.g. minions placed after the telegraph, or Stampede counting minions plus blanks).
+
+## 8. Bosses evened out (1.37.0)
+`tools/balance/study_boss_variance.py 150` after the changes (strong / blind / weak bot):
+| Boss | HP lost per fight, strong | blind | weak | Fights that end the run, strong / blind / weak |
+|---|---|---|---|---|
+| F1 Rogue Golemancer | 8.2 | 8.3 | 8.2 | 4% / 4% / 4% |
+| F1 Heating Elemental | 9.0 | 9.1 | 9.4 | 7% / 10% / 9% |
+| F1 Grosteque Grafter | 8.9 | 9.4 | 9.5 | 6% / 5% / 7% |
+| F2 The Necrorancher | 9.3 | 8.6 | 9.4 | 18% / 21% / 25% |
+| F2 Bellicose Biomancer | 10.7 | 10.8 | 11.0 | 18% / 18% / 19% |
+| F2 Ceramic Golem | 10.6 | 10.5 | 11.2 | 16% / 19% / 19% |
+| F3 Extruzeon | 14.7 | 15.2 | 15.7 | 3% / 3% / 5% |
+| F3 Myceleus | 12.7 | 12.9 | 14.2 | 14% / 14% / 18% |
+
+- Each floor's bosses are now within about 15% of each other in HP lost (F1 9%, F2 14%, F3 14%).
+- On Floor 2 the run-ending rates match (16-18% for the strong bot).
+- Myceleus ends more runs than Extruzeon despite costing less on average. Its burst is spikier: a base 5 plus 3 per Minion.
+- Skill still barely matters (under 1 HP), because most trays can't answer a telegraph. The Magic-dice plan in `2026-10-11_new_content_plan.md` targets that.
+- Quick re-check tool: `tools/balance/study_boss_even.py [runs]` (strong bot only, about 40 s at 100 runs).

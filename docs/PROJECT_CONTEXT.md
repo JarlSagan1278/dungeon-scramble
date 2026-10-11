@@ -68,3 +68,11 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - He prefers decisions presented with clear options and a recommendation, then fast iteration; he gives precise visual feedback (sizes, blur, timing) and expects exact adjustments.
 - He wants to be reminded of circle-back items. Do not set up weekly scheduled tasks.
 - Don't claim something is verified unless it was run; run `node sim.js` after logic changes.
+
+## Boss evening-out and new content (Oct 11, 2026)
+- **Even out each floor's bosses to within about 15%** of each other (HP lost per fight and run-ending rate), then use those balanced profiles as the stat and move "bones" for the new monsters and the third Big Boss.
+- **All his spare monster names are approved** for the new slots: Roudy Rinotter, Untamed Unicrows, Rabbid Rabbats, Eelagator Escapee, Toadtaur Warrior, Whence Wolf, Prickly Porcupanther, Toadtaur Wizard (Whence Wolf, Roudy Rinotter and Escaped Eelagator already have art in DS Assets).
+- **Minion wind-ups:** for the dangerous minion situations (boss specials that scale with minions, dangerous minion enemies), place the minions after the telegraph so the player sees them coming. Weaker enemies' minions stay a soft cap on actions per turn.
+- **No universal "brace"** mechanic unless we are backed into a corner. Builds that block, freeze, outheal or nuke a boss down fast are fine.
+- **Magic dice fill the action holes:** more Freeze sources should come from the new Magic loot dice; find the gaps in action coverage and use them as the mechanical bones of the needed Magic dice. Ties into bringing back Swap and Reroll faces.
+- Shipped in 1.37.0: bosses evened to within about 15% per floor (bot HP lost per fight: F1 8-9, F2 9-11, F3 13-15); herald minions for The Necrorancher's Stampede and Myceleus's Mycelial Burst. New move names follow the math-pun theme (Dead Reckoning, Fractal Rind).
