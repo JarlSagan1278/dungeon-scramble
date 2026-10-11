@@ -4,15 +4,15 @@ Digital prototype of Jeremy's board game (Boggle-style dice-path dungeon crawler
 
 ## Commands
 - `node build.js` → `dist/dungeon_scramble.html` (single file) + `dist/web/` (installable PWA; art extracted to `dist/web/art/`). Also syncs package.json version.
-- `node sim.js` → crash test across every origin/class with a random-legal bot. Fails only on JS errors (TIMEOUT/GAMEOVER are fine). Run after ANY logic/data change.
-- `node bugsearch.js` → broader bug hunt; can hang, run with `timeout`/nohup. Needs no stray `http.server` on 8765/8766.
+- `node sim.js` → 5-combination crash smoke test (random-legal bot, one run per origin/class combo listed in sim.js; not full coverage). Fails only on JS errors (TIMEOUT/GAMEOVER are fine). Run after ANY logic/data change.
+- `node bugsearch.js` → the broader bug hunt; can hang, run with `timeout`/nohup. Needs no stray `http.server` on 8765/8766.
 - `tools/balance/` → headless balance harness (`harness.js '{"runs":40,"skill":1500}'`, `study_*.js`). Outputs `out_*.json` are git-ignored.
 
 ## Release routine
-1. Bump `GAME_VERSION` in `src/data.js` (cache name `ds-<ver>` follows it). 2. `node build.js && node sim.js`. 3. Publish preview to the Artifact (`dist/dungeon_scramble.html`, same URL, label <=60 chars). 4. Commit as `<ver>: <summary>`; add a CHANGELOG line.
-- **Netlify zip only when Jeremy asks** (each upload costs him ~5% of his monthly allotment): `cd dist/web && zip -qr /tmp/dungeon_scramble_web_<ver>.zip .` then SendUserFile.
+1. Bump `GAME_VERSION` in `src/data.js` (cache name `ds-<ver>` follows it). 2. `node build.js && node sim.js`. 3. Publish preview to the Artifact (`dist/dungeon_scramble.html`, same URL, label <=60 chars). 4. Commit as `<ver>: <summary>`; add a CHANGELOG line. 5. Push to origin.
+- **Netlify zips are made only when the owner (Jeremy) asks**, and previews are published separately from them (a preview publish never implies a zip). Each upload costs him ~5% of his monthly allotment. Zip: `cd dist/web && zip -qr /tmp/dungeon_scramble_web_<ver>.zip .` then SendUserFile.
 - Live: https://dungeon-scramble-mobile.netlify.app/ . Preview artifact: https://claude.ai/artifact/EgVZK1tuHgNfJpqhd92jPR
-- Commit regularly. The workspace is ephemeral and there is no git remote — send a `git bundle` if work is large and unpushed.
+- GitHub origin (`main`) is the source of truth. Commit regularly and push after each release commit.
 
 ## Layout
 `src/{data,assets,logic,depth,render,main}.js` + `styles.css` concatenated by build.js. `assets.js` is base64 art (3.3 MB). Global state `S`; `render()` rebuilds `#app`. Telemetry: `teleLog(...)`; export via the gear menu (Export Play Data).
@@ -33,4 +33,4 @@ Digital prototype of Jeremy's board game (Boggle-style dice-path dungeon crawler
 - Don't rework the boss action cycle or add Boost to Maneuver dice unless asked (last resort only).
 
 ## Open to-do list
-See memory `/areas/dungeon-scramble.md` and the session task list: run-data review, Maneuver payoff study, shrine overhaul, sound + music passes, badge redesign, PNG art canvases, reroll/swap faces, rulebook refresh, design audit.
+See `docs/TODO.md` (prioritized).
