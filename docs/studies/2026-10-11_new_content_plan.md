@@ -83,3 +83,26 @@ Confirmed: tap before building the path; the die is spent for the turn; shrine t
 7. **Class zones interact on purpose:** move a die into your zone, then convert it (Armsmaster/Guard). A converted face moves with its die.
 8. **No undo once done;** you can cancel between the first and second tap of a Swap.
 9. **Plumbing:** spent state is saved for resume; the crash sim and bug hunt bots must use both faces, or bugs hide; icons and a "New action" tutorial card for each.
+
+## 6. Undo, and existing dice that could carry Swap/Reroll (Oct 11)
+Jeremy approved defaults 1 (the used die acts as a blank) and 2 (a Swap token swaps any two dice).
+
+**What can be undone today:**
+- Path steps: tap the last die.
+- Clear: undoes the whole path and the class ability.
+- Nothing else can be undone: Nullify, Freeze and Boost tokens are final once used, and so is pressing Resolve.
+
+**Recommendation:**
+- Swap undoable with Clear. It reveals nothing, so undoing it is safe.
+- Reroll final, like tokens. Undoing it would let you fish for faces, unless each die's reroll result were fixed for the turn.
+- Optional consistency fix: let Clear also refund an unused Freeze or Boost token. Nullify stays final, because it reveals the faces under Minions.
+
+**Existing dice with redundant faces that could carry the new faces (themed):**
+| Die | Change | Theme |
+|---|---|---|
+| Portable RNGenerator (Gilded) | blank → Reroll | a random number generator |
+| Cool Whip (Gilded) | one of three Combo 1 → Swap | the whip yanks a die into place |
+| Genetic Drifter (Gilded) | one of two Pivot → Swap | genetic crossover (gnome biochemistry) |
+| Eye-Frame (Gilded) | one of two Dodge → Reroll | take a second look |
+| Mining Mines (Gilded) | one blank → Reroll | blast and re-sort (dwarf mining) |
+| Tarot Deck (Alloy, bonus) | blank → Reroll | reshuffle the deck (pixie old magic) |
