@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.35.2
+- First-time icon cards now say "New action" instead of "New symbol".
+
 ## 1.35.1
 - "New symbol" cards show the whole icon (the icon's clipping box stayed at text size, so only a corner of e.g. Leap showed).
 
