@@ -51,6 +51,9 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - Layered cover art is parked: the original layers don't exist (it came from ChatGPT); waiting for better image tools.
 - Licensing awareness (not legal advice): purely AI-generated images may not be copyrightable and some stores require AI disclosure; hand retouching strengthens his claim. docs/ART_INVENTORY (spreadsheet) tracks every image's source and status.
 
+- **Names review sheet (Oct 11, 2026):** "Dungeon Scramble Names Review (build 1.36.0)" in the shared Dungeon Scramble Drive folder (https://docs.google.com/spreadsheets/d/1sT6kFeTvl_V7g3Mmwp2hrTC0FtQEdgsfgYSUDmJrLCE/edit). Every player-facing name and text (monsters, bosses, boss moves, shrines, relics, dice, origins/classes/depth, game text) with yellow "new name / notes" columns, empty flavor-text columns for dice, relics and shrines, a Proposed New Content tab and an Art Needed tab with exact file names. When he says he's filled it in, read it and apply every change everywhere the name is used (tiers, sizes, stand-in art map, art keys in assets.js).
+- **Art drop folders:** DS Assets / Needed art / {Shrines, Relics, New content}. DS Assets naming: MONSTER_ART__Name.png (monsters, bosses and shrines), LOOT_ART__Name.png, RELIC__id.png. 15 relic images already exist in DS Assets (RELIC__whetstone.png etc.) but the game still shows two-letter relic badges.
+
 ## Audio plan (not started)
 - Sound effect pass: audit which actions make sound and any redundancy; one consistent theme; a rising-note melody tied to musical tension and success; dice materials change roll sound and quantity; stronger enemy-turn and shrine sounds; airier Maneuver/dodge sounds.
 - Background music: heavy klezmer harmonic-minor battle music, success/loot music, different orchestration per floor, MIDI instruments via GarageBand.
