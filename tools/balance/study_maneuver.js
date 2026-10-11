@@ -159,7 +159,35 @@ let res = await page.evaluate((cfg)=>{
     S.path=[]; dfs(); S.path=[];
     return best;
   }
+  // v1.38.0 Swap/Reroll: reroll blank dice first, then try every Swap target and keep the best path.
+  function useTrayActs(){
+    if(cfg.trayActs===false || typeof trayActFaceAt!=='function') return;
+    const blanks = () => S.tray.map((c,i)=>i).filter(i=>{ const c=S.tray[i]; return !c.minion && !c.spent && currentFace(c).type==='blank'; });
+    for(let g=0; g<4; g++){
+      const src = S.tray.findIndex((c,i)=>trayActFaceAt(i)==='reroll');
+      const useTok = src<0 && (S.rerollTokens||0)>0 && g===0;
+      const b = blanks().filter(i=>i!==src);
+      if((src<0 && !useTok) || !b.length) break;
+      armTrayAct('reroll', useTok?null:src, useTok); trayActTap(b[Math.floor(Math.random()*b.length)]);
+    }
+    for(let g=0; g<3; g++){
+      const src = S.tray.findIndex((c,i)=>trayActFaceAt(i)==='swap');
+      if(src<0) break;
+      let bestJ=-1, bestV=pathValue(bestPath(Math.ceil(cfg.skill/3))||[]) + 0.5;
+      for(let j=0;j<16;j++){
+        if(j===src || S.tray[j].minion || S.tray[j].spent) continue;
+        doTraySwap(src, j, false);
+        const bp = bestPath(Math.ceil(cfg.skill/3)); const v = bp.length ? pathValue(bp) : -1e9;
+        undoTraySwaps();
+        if(v>bestV){ bestV=v; bestJ=j; }
+      }
+      if(bestJ<0) break;
+      doTraySwap(src, bestJ, false); S.swapLog = [];
+      (window.__tray=window.__tray||{swaps:0,rerolls:0}).swaps++;
+    }
+  }
   function doTurn(){
+    useTrayActs();
     const p = bestPath(cfg.skill);
     (window.__turns=window.__turns||[]).push({f:S.floorIdx+1,len:p.length,dmg:Math.round(computePathEffects(p).totalDamage),boss:(S.encounter.type!=='Enemy'&&S.encounter.type!=='Trap')});
     S.path = [];

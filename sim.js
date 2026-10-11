@@ -96,6 +96,12 @@ const TICK_FN = () => {
     // path length, then resolve. If no first move is legal, end turn with
     // an empty path (some tray states / class zones can be very
     // restrictive, but resolvePath on an empty path is a no-op turn).
+    // v1.38.0: sometimes spend Swap/Reroll tokens, and sometimes Clear (undoes swaps).
+    if ((S.swapTokens||0) > 0 && Math.random() < 0.4) { armTrayAct('swap', null, true); }
+    else if ((S.rerollTokens||0) > 0 && Math.random() < 0.4) { armTrayAct('reroll', null, true); }
+    for (let k = 0; k < 6 && S.trayAct; k++) toggleSelect(Math.floor(Math.random() * 16));
+    if (S.trayAct) cancelTrayAct();
+    if ((S.swapLog||[]).length && Math.random() < 0.3) clearPathAll();
     const maxLen = 1 + Math.floor(Math.random() * 4);
     let steps = 0;
     while (S.path.length < maxLen && steps < 20) {
@@ -104,6 +110,9 @@ const TICK_FN = () => {
       for (let i = 0; i < 16; i++) if (canSelect(i)) legal.push(i);
       if (!legal.length) break;
       toggleSelect(legal[Math.floor(Math.random() * legal.length)]);
+      // an armed Swap/Reroll face (tapped as the first die) takes the next tap(s)
+      for (let k = 0; k < 6 && S.trayAct; k++) toggleSelect(Math.floor(Math.random() * 16));
+      if (S.trayAct) cancelTrayAct();
     }
     endTurnButton();
     return { done: false, note: 'turn' };

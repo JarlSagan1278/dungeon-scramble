@@ -1218,7 +1218,13 @@ function renderDie(cell, idx){
   const inPath = S.path.includes(idx);
   const isLastMove = S.path.length && S.path[S.path.length-1]===idx;
   const selectable = canSelect(idx);
-  const clickable = selectable || isLastMove;
+  // v1.38.0 Swap/Reroll: while one is armed, only its targets (and the armed die, to back out) take taps.
+  const ta = S.trayAct;
+  const taSrc = !!ta && (idx===ta.src || idx===ta.first);
+  const taTarget = !!ta && !taSrc && trayActTargetOk(idx);
+  const taReady = !ta && !!trayActFaceAt(idx);
+  const clickable = ta ? (taSrc || taTarget) : (selectable || isLastMove);
+  const trayActCls = `${taSrc?'trayact-src':''} ${taTarget?'trayact-target':''} ${taReady?'trayact-ready':''} ${cell.spent?'spent':''} ${S.justRerolledIdx===idx?'just-rerolled':''} ${(S.justSwappedIdx||[]).includes(idx)?'just-swapped':''}`;
   const num = inPath ? S.path.indexOf(idx)+1 : null;
   const zoneCls = inZone(idx) ? 'zone-cell' : '';
   const shakeCls = S.justScrambled ? 'shaking' : '';
@@ -1278,8 +1284,8 @@ function renderDie(cell, idx){
     const rings = ring('cr'+lvl+'a',1.3,1.0) + (lvl>=2 ? ring('cr'+lvl+'b',2.8,1.0) : '');
     return `<svg class="combo-ring combo-ring-${lvl}" viewBox="-8 -8 40 40" aria-hidden="true">${rings}</svg>`;
   })();
-  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${strongGlint?'glint-strong':''} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${resolveCls} ${minionClearCls} ${comboActiveCls}"
-            data-idx="${idx}" title="${isLastMove?'Click to undo this move':(cell.minion?'Minion die':cell.die.name)}" ${shakeDelay}>
+  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${strongGlint?'glint-strong':''} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${resolveCls} ${minionClearCls} ${comboActiveCls} ${trayActCls}"
+            data-idx="${idx}" title="${isLastMove?'Click to undo this move':(cell.minion?'Minion die':(taReady?`Tap to ${LABEL[trayActFaceAt(idx)]}`:cell.die.name))}" ${shakeDelay}>
             ${num?`<div class="pathnum">${num}</div>`:''}
             ${cell.minion?`<div class="minion-eyes" aria-hidden="true" style="${minionEyeStyle(idx)}"><i class="minion-eye"></i><i class="minion-eye"></i></div>`:''}
             ${(cell.forcedFace || boostTargetCls) ? `<div class="corner-badges">
@@ -1565,6 +1571,9 @@ function tokensRowHTML(){
   const btns = [];
   if(S.nullifyTokens>0) btns.push(`<button id="use-nullify-token">${iconSpan('nullify')} Use Nullify Token <span class="token-count">${S.nullifyTokens}</span></button>`);
   if(S.freezeTokens>0) btns.push(`<button id="use-freeze-token">${iconSpan('freeze')} Use Freeze Token <span class="token-count">${S.freezeTokens}</span></button>`);
+  const noPath = S.path.length ? 'disabled title="Clear your path first: Swap and Reroll happen before you build it."' : '';
+  if((S.swapTokens||0)>0) btns.push(`<button id="use-swap-token" ${noPath}>${iconSpan('swap')} Use Swap Token <span class="token-count">${S.swapTokens}</span></button>`);
+  if((S.rerollTokens||0)>0) btns.push(`<button id="use-reroll-token" ${noPath}>${iconSpan('reroll')} Use Reroll Token <span class="token-count">${S.rerollTokens}</span></button>`);
   if(S.boostTokenCharges>0) btns.push(`<button id="use-boost-token" ${S.pendingFreeBoost?'disabled':''}>${iconSpan('boost')} Use x${S.boostTokenValue} Boost Token <span class="token-count">${S.boostTokenCharges}</span></button>`);
   if(!btns.length) return '';
   return `<div class="small-btn-row" style="margin-top:0; flex-direction:column;">${btns.join('')}</div>`;
@@ -1587,6 +1596,18 @@ function openTokensModal(){
     logMsg('sys', 'Freeze token used — the encounter will skip its next action.');
     closeModal(overlay, render);
   };
+  const swapBtn = overlay.querySelector('#use-swap-token');
+  if(swapBtn) swapBtn.onclick = ()=>{
+    if(S.transitioning || !S.encounter || !(S.swapTokens>0) || S.path.length) return;
+    armTrayAct('swap', null, true);
+    closeModal(overlay, render);
+  };
+  const rerollBtn = overlay.querySelector('#use-reroll-token');
+  if(rerollBtn) rerollBtn.onclick = ()=>{
+    if(S.transitioning || !S.encounter || !(S.rerollTokens>0) || S.path.length) return;
+    armTrayAct('reroll', null, true);
+    closeModal(overlay, render);
+  };
   const boostBtn = overlay.querySelector('#use-boost-token');
   if(boostBtn) boostBtn.onclick = ()=>{
     if(S.transitioning || !S.encounter || S.boostTokenCharges<=0 || S.pendingFreeBoost) return;
@@ -1606,7 +1627,7 @@ function renderGame(){
   const playerFx = healthFX(S.health, S._lastPlayerHealth);
   if(playerFx.cls==='flash-damage') vibrate(40);
   S._lastPlayerHealth = S.health;
-  const totalTokens = S.nullifyTokens + S.freezeTokens + S.boostTokenCharges;
+  const totalTokens = S.nullifyTokens + S.freezeTokens + S.boostTokenCharges + (S.swapTokens||0) + (S.rerollTokens||0);
   // One combined mouseover/long-press tooltip on the health bar, listing
   // every status currently affecting the player -- same idea as the
   // encounter card's health-bar tooltip.
@@ -1637,7 +1658,7 @@ function renderGame(){
           <div class="tray-float-wrap">
             <div class="tray-head"><span class="round-badge">Round ${S.turnNumber+1}</span><div class="path-strip" id="path-strip"></div></div>
             <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
-              <div class="tray ${S.newRoomFx?'tray-room-in':''} ${abilityArmed?'ability-armed':''}" id="tray" style="--class-color:${S.klass.color||'#ffffff'}; --gd:-${Math.round(performance.now()%4600)}ms"></div>
+              <div class="tray ${S.newRoomFx?'tray-room-in':''} ${abilityArmed?'ability-armed':''} ${S.trayAct?'trayact-armed':''}" id="tray" style="--class-color:${S.klass.color||'#ffffff'}; --gd:-${Math.round(performance.now()%4600)}ms"></div>
               ${chestTrimHTML()}
             </div>
             ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip</button>` : pathCounterHTML()}
@@ -1681,6 +1702,7 @@ function renderGame(){
   S.lastComboRipple = null; // consumed -- plays once, on the render right after runPlayerPathSteps() set it
   S.lastMinionClearIdx = null; // consumed -- plays once, on the render right after runPlayerPathSteps() set it
   S.justConvertedIdx = null; // consumed -- plays once, on the render right after useClassAbility() set it
+  S.justRerolledIdx = null; S.justSwappedIdx = null; // consumed (Swap/Reroll flourishes, v1.38.0)
   [...document.getElementById('tray').children].forEach(node=>{
     const idx = parseInt(node.dataset.idx);
     let pressTimer = null;
@@ -1730,12 +1752,7 @@ function renderGame(){
       return;
     }
     disarmClearConfirm();
-    S.path=[];
-    restoreReveals(0);
-    restoreAbilityReveal();
-    S.tray.forEach(c=>delete c.forcedFace);
-    S.classAbilityUsed = false;
-    abilityArmed = false;
+    clearPathAll();
     render();
   };
   document.getElementById('resolve-btn').onclick = ()=>{
@@ -1781,7 +1798,9 @@ function renderGame(){
   { // Path as a rightward-growing stack of overlapping coins, one per move (latest on top).
     const n = S.path.length;
     const step = n>1 ? Math.min(16, 180/(n-1)) : 16;
-    document.getElementById('path-strip').innerHTML = S.path.map((idx,k)=>{
+    const ta = S.trayAct;
+    if(ta){ document.getElementById('path-strip').innerHTML = `<span class="trayact-hint">${iconSpan(ta.kind)} ${ta.kind==='swap' ? (ta.token ? (ta.first==null ? 'Tap the first die to swap' : 'Tap the second die') : 'Tap a die to trade places') : 'Tap a die to reroll'}</span>`; }
+    else document.getElementById('path-strip').innerHTML = S.path.map((idx,k)=>{
       const f = getFaceForIdx(idx);
       const tip = `${k+1}. ${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?(' '+f.value):''}`;
       return `<span class="path-coin" style="${k?`margin-left:${(step-30).toFixed(1)}px;`:''}z-index:${k+1}" title="${tip}">${iconSpan(f.type, f.value)}</span>`;

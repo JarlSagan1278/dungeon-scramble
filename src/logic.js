@@ -837,6 +837,10 @@ function newGame(originId, classId, boonDieName, charName, depthMods){
     freezeNext:false,
     nullifyTokens:0,
     freezeTokens:0,
+    swapTokens:0,
+    rerollTokens:0,
+    swapLog:[],
+    trayAct:null,
     boostTokenCharges:0,
     boostTokenValue:0,
     pendingFreeBoost:0,
@@ -1007,7 +1011,8 @@ function advanceRoute(){
   // into the next room, or even the next fight if that next step is a Camp.
   // Clearing it here, on every room transition, closes that gap regardless
   // of which path led here.
-  S.tray.forEach(c=>delete c.forcedFace);
+  S.tray.forEach(c=>{ delete c.forcedFace; delete c.spent; });
+  S.swapLog = []; S.trayAct = null;
   if(S.routeStep >= S.route.length){
     // move to next floor
     if(S.floorIdx < FLOORS.length-1){
@@ -1105,7 +1110,7 @@ function trayIdx(r,c){ return r*4+c; }
 function inBounds(r,c){ return r>=0&&r<4&&c>=0&&c<4; }
 
 function currentFace(cell){
-  if(cell.minion || cell.blank) return {type:'blank'};
+  if(cell.minion || cell.blank || cell.spent) return {type:'blank'};
   return cell.die.faces[cell.faceIdx];
 }
 
@@ -1113,8 +1118,9 @@ function scrambleTray(){
   S._abilityReveal = null;
   S._reveals = [];
   S._pendingMinions = 0;
-  S.tray.forEach(cell=>{ cell.faceIdx = rand(6); cell.blank = false; });
+  S.tray.forEach(cell=>{ cell.faceIdx = rand(6); cell.blank = false; delete cell.spent; });
   S.path = [];
+  S.swapLog = []; S.trayAct = null;
   S.classAbilityUsed = false;
   abilityArmed = false;
   S.justScrambled = true;
@@ -1207,6 +1213,8 @@ function anyMoveAvailable(){
 }
 
 function toggleSelect(idx){
+  if(S.trayAct){ if(trayActTap(idx)) render(); return; } // v1.38.0: an armed Swap/Reroll takes the tap
+  if(!S.path.length){ const k = trayActFaceAt(idx); if(k){ armTrayAct(k, idx, false); render(); return; } }
   if(S.path.length && S.path[S.path.length-1]===idx){
     // clicking the most-recently-chosen die again steps back one move
     S.path.pop();
@@ -1220,6 +1228,90 @@ function toggleSelect(idx){
   if(S.path.length===1 && typeof lungeFigure==='function') lungeFigure('playerReady');
   if(typeof playTone==='function') playTone('pathTick', S.path.length-1); // rises up the pentatonic ladder as the path grows
   render();
+}
+
+// ---- Swap / Reroll (v1.38.0) ----
+// Tray actions used BEFORE the path is built. A Swap or Reroll face is tapped
+// (or a token from the Item menu is used), then a target die is tapped. The
+// face's own die is then spent for the turn (it acts as a blank). Swaps go in
+// S.swapLog so Clear can undo them (they reveal nothing); rerolls are final.
+// A die can't target Minion-covered cells (no scouting).
+function trayActFaceAt(idx){
+  if(S.path.length || S.transitioning) return null;
+  const c = S.tray[idx]; if(!c || c.minion || c.spent || c.forcedFace) return null;
+  const t = currentFace(c).type;
+  return (t==='swap' || t==='reroll') ? t : null;
+}
+function armTrayAct(kind, src, token){
+  S.trayAct = {kind, src: src==null ? null : src, token: !!token, first: null};
+  logMsg('sys', kind==='swap' ? (token ? 'Swap token: tap two dice to trade their places.' : 'Swap: tap a die to trade places with it.') : 'Reroll: tap a die to reroll it.');
+}
+function cancelTrayAct(){ S.trayAct = null; }
+function trayActTargetOk(idx){
+  const a = S.trayAct; if(!a) return false;
+  const c = S.tray[idx]; if(!c || c.minion || c.spent) return false;
+  if(idx===a.src || idx===a.first) return false;
+  if(a.kind==='reroll' && c.forcedFace) return false; // a class-ability conversion holds
+  return true;
+}
+function trayActTap(idx){
+  const a = S.trayAct; if(!a) return false;
+  if(idx===a.src || idx===a.first){ cancelTrayAct(); return true; } // tap the armed die again to back out
+  if(!trayActTargetOk(idx)) return false;
+  if(a.kind==='swap'){
+    if(a.token && a.first==null){ a.first = idx; return true; }
+    doTraySwap(a.token ? a.first : a.src, idx, a.token);
+  } else doTrayReroll(idx, a.src, a.token);
+  S.trayAct = null;
+  return true;
+}
+function doTraySwap(i, j, token){
+  const A = S.tray[i], B = S.tray[j];
+  if(!token) A.spent = true; // the Swap die moves to j and is used up there
+  S.tray[i] = B; S.tray[j] = A;
+  if(token) S.swapTokens = Math.max(0,(S.swapTokens||0)-1);
+  (S.swapLog = S.swapLog||[]).push({i, j, token:!!token});
+  S.justSwappedIdx = [i, j];
+  if(typeof playTone==='function') playTone('pathTick', 0);
+  logMsg('sys', `Swapped ${A.die.name} and ${B.die.name}.`);
+  teleLog('tray_swap', {token:!!token, a:A.die.name, b:B.die.name});
+}
+function undoTraySwaps(){
+  const L = S.swapLog||[];
+  while(L.length){
+    const r = L.pop();
+    const A = S.tray[r.j], B = S.tray[r.i];
+    S.tray[r.i] = A; S.tray[r.j] = B;
+    if(r.token) S.swapTokens = (S.swapTokens||0)+1; else delete A.spent;
+  }
+}
+function doTrayReroll(idx, src, token){
+  const c = S.tray[idx];
+  const cur = c.die.faces[c.faceIdx];
+  const same = f => f.type===cur.type && (f.value||0)===(cur.value||0);
+  let opts = c.die.faces.map((f,k)=>k).filter(k=>k!==c.faceIdx && !same(c.die.faces[k]));
+  if(!opts.length) opts = c.die.faces.map((f,k)=>k).filter(k=>k!==c.faceIdx);
+  c.faceIdx = opts[rand(opts.length)];
+  if(token) S.rerollTokens = Math.max(0,(S.rerollTokens||0)-1);
+  else if(src!=null && S.tray[src]) S.tray[src].spent = true;
+  S.justRerolledIdx = idx;
+  if(typeof playDiceRollSound==='function') playDiceRollSound();
+  const nf = c.die.faces[c.faceIdx];
+  logMsg('sys', `Rerolled ${c.die.name}: ${LABEL[nf.type]}${nf.value?' '+nf.value:''}.`);
+  teleLog('tray_reroll', {token:!!token, die:c.die.name, face:nf.type+(nf.value||'')});
+}
+
+// Clear: drops the path, the class-ability conversion and any Swaps made
+// this turn (rerolls stay). Shared by the Clear button and the test bots.
+function clearPathAll(){
+  S.path=[];
+  restoreReveals(0);
+  restoreAbilityReveal();
+  S.tray.forEach(c=>delete c.forcedFace);
+  S.classAbilityUsed = false;
+  abilityArmed = false;
+  undoTraySwaps();
+  S.trayAct = null;
 }
 
 function useClassAbility(idx){
@@ -1548,6 +1640,7 @@ function applyQuestReward(e, rewardText){
    ========================================================================= */
 function endTurnButton(){
   if(!S.encounter || S.transitioning) return;
+  S.trayAct = null; S.swapLog = []; // swaps lock in once the turn resolves
   startTurnTransition();
 }
 
@@ -1578,7 +1671,7 @@ function startTurnTransition(){
   let trayTele = null;
   try{
     const dc = {attack:'A', maneuver:'V', origin:'O', alloy:'L', gilded:'G', magic:'X'};
-    const fc = {hit:'h', combo:'c', heal:'+', block:'b', shield:'s', boost:'B', leap:'l', dodge:'d', pivot:'p', nullify:'n', freeze:'z', dot:'t', hot:'o', leech:'e', fumble:'f', blank:'_'};
+    const fc = {hit:'h', combo:'c', heal:'+', block:'b', shield:'s', boost:'B', leap:'l', dodge:'d', pivot:'p', nullify:'n', freeze:'z', swap:'w', reroll:'r', dot:'t', hot:'o', leech:'e', fumble:'f', blank:'_'};
     trayTele = S.tray.map(c=>{ if(c.minion) return 'M'; const f = c.forcedFace || currentFace(c); return (dc[c.die.cat]||'?') + ':' + (fc[f.type]||f.type) + (f.value||''); }).join(' ');
   }catch(e){}
   teleLog('turn', {n:S.turnNumber, len:S.path.length, hp:S.health, enemy:S.encounter?S.encounter.name:null, enemyHp:S.encounter?Math.round(S.encounter.curHealth):null, tray:trayTele, path:S.path.slice(), block:S.playerBlock||0});
@@ -2063,6 +2156,8 @@ function runShrineEffect(e, effect){
     case 'grantToken': {
       if(effect.token==='nullify') S.nullifyTokens += effect.charges;
       else if(effect.token==='freeze') S.freezeTokens += effect.charges;
+      else if(effect.token==='swap') S.swapTokens = (S.swapTokens||0) + effect.charges;
+      else if(effect.token==='reroll') S.rerollTokens = (S.rerollTokens||0) + effect.charges;
       else if(effect.token==='boost'){ S.boostTokenValue = effect.value; S.boostTokenCharges += effect.charges; }
       const t = `Gained ${effect.charges} use(s) of a ${effect.token==='boost'?'x'+effect.value+' Boost':effect.token} token.`;
       S.shrineFx = {kind:'token', text:`+${effect.charges} ${effect.token==='boost'?'x'+effect.value+' Boost':effect.token.charAt(0).toUpperCase()+effect.token.slice(1)}`};

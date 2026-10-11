@@ -2878,3 +2878,18 @@ html,body{ overflow-x:clip; }
 .relic-choice-list .relic-choice-card:nth-child(3), #shrine-options .loot-opt:nth-child(3){ animation-delay:.16s; }
 .relic-choice-list .relic-choice-card:nth-child(4){ animation-delay:.24s; }
 @keyframes cardFanIn{ from{ transform:translateY(16px) rotate(-3deg) scale(.92); opacity:0; } to{ transform:none; opacity:1; } }
+
+/* ---- Swap / Reroll (v1.38.0) ---- */
+.die.trayact-ready .face-val{ animation: trayact-ready-bob 1.6s ease-in-out infinite; }
+@keyframes trayact-ready-bob{ 0%,100%{ transform:translateY(0) rotate(0); } 50%{ transform:translateY(-2px) rotate(-4deg); } }
+.tray.trayact-armed > *:not(.trayact-target):not(.trayact-src){ filter:brightness(.45) saturate(.5); transition:filter .25s; }
+.tray.trayact-armed > .trayact-target{ cursor:crosshair; outline:3px dashed #fff3d6; outline-offset:-5px; position:relative; z-index:2; }
+.tray.trayact-armed > .trayact-src{ outline:4px solid #fff3d6; outline-offset:-4px; position:relative; z-index:3; animation: zone-armed-bob 1.1s ease-in-out infinite; }
+.die.spent{ opacity:.45; }
+.die.just-rerolled{ animation: trayact-reroll .5s cubic-bezier(.2,1.4,.4,1); z-index:2; }
+@keyframes trayact-reroll{ 0%{ transform:rotate(-200deg) scale(.6); } 70%{ transform:rotate(12deg) scale(1.08); } 100%{ transform:rotate(0) scale(1); } }
+.die.just-swapped{ animation: trayact-swap .45s cubic-bezier(.2,1.4,.4,1); z-index:2; }
+@keyframes trayact-swap{ 0%{ transform:translateY(-10px) rotate(-6deg); } 60%{ transform:translateY(2px) rotate(3deg); } 100%{ transform:none; } }
+.trayact-hint{ display:inline-flex; align-items:center; gap:4px; font-size:13px; color:#fff3d6; white-space:nowrap; }
+.trayact-hint .icon-svg{ width:16px; height:16px; }
+.reduced-motion .die.trayact-ready .face-val, .reduced-motion .die.just-rerolled, .reduced-motion .die.just-swapped, .reduced-motion .tray.trayact-armed > .trayact-src{ animation:none !important; }

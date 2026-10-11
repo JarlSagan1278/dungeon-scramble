@@ -2,3 +2,4 @@ node_modules/
 dist/
 *.log
 tools/balance/out_*.json
+tools/out_*

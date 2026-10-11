@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.38.0
+- New actions, Swap and Reroll: tap a Swap or Reroll face before you build your path, then tap a die. Swap trades the two dice's places; Reroll rerolls the chosen die to a different face. The Swap/Reroll die is used up for the turn (it acts as a blank). Clear undoes Swaps; Rerolls are final. Minion-covered dice can't be targeted, and mid-path the faces are plain steps.
+- Pixie Powder: Dodge becomes Swap.
+- Dice with new faces: Portable RNGenerator, Mining Mines and Tarot Deck (a blank becomes Reroll), Eye-Frame (a Dodge becomes Reroll), Cool Whip (a Combo 1 becomes Swap), Genetic Drifter (a Pivot becomes Swap).
+- Swap and Reroll tokens (Item menu): a Swap token swaps any two dice, and a Reroll token rerolls one. New shrines Scroll Dispenser: SWAP (Floor 1, 2 Swap tokens) and Scroll Dispenser: REDO (Floor 2, 2 Reroll tokens), with stand-in art.
+- New-action tutorial cards for both; test bots and the balance bot use them.
+
 ## 1.37.1
 - The Strike-Breaker (Floor 2 Deadly) hits for 4 (8 on heavy turns), down from 6 (12): it ended a third of the runs that met it.
 

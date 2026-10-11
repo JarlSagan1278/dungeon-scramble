@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.37.1';
+const GAME_VERSION = '1.38.0';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -16,6 +16,8 @@ function face(str){
   if(/^pivot$/i.test(s)) return {type:'pivot'};
   if(/^freeze$/i.test(s)) return {type:'freeze'};
   if(/^nullify$/i.test(s)) return {type:'nullify'};
+  if(/^swap$/i.test(s)) return {type:'swap'};
+  if(/^reroll$/i.test(s)) return {type:'reroll'};
   const m = s.match(/^([a-zA-Z.']+)\s*(\d+(\.\d+)?)?/);
   if(!m) return {type:'blank'};
   const nameMap = {hit:'hit',combo:'combo',boost:'boost',dot:'dot',leech:'leech',fumble:'fumble',heal:'heal',hot:'hot',block:'block'};
@@ -41,7 +43,7 @@ function faces(arr){ return arr.map(face); }
 
 
 const LABEL = { hit:'Hit', combo:'Combo', boost:'Boost', dot:'D.O.T.', leech:'Leech', fumble:'Fumble',
-  dodge:'Dodge', leap:'Leap', pivot:'Pivot', freeze:'Freeze', heal:'Heal', hot:'H.O.T.', block:'Block', nullify:'Nullify', blank:'—'};
+  dodge:'Dodge', leap:'Leap', pivot:'Pivot', freeze:'Freeze', swap:'Swap', reroll:'Reroll', heal:'Heal', hot:'H.O.T.', block:'Block', nullify:'Nullify', blank:'—'};
 
 // One-line, player-facing descriptions of what each face actually does when
 // it resolves -- shown on long-press so new players can learn the icon
@@ -57,6 +59,8 @@ const FACE_DESC = {
   leap: "A Maneuver action that lets your path jump to a non-adjacent die -- clears a Minion die if it jumps clean over one.",
   pivot: "A Maneuver action that lets your path change direction.",
   freeze: "The enemy skips its next action.",
+  swap: "Before you build your path, tap it, then tap any die: they trade places. This die is used up for the turn. Clear undoes it.",
+  reroll: "Before you build your path, tap it, then tap any die to reroll it to a different face. This die is used up for the turn.",
   heal: "Restores your health immediately.",
   hot: "Heals you over time. Your H.O.T. can stack up to 6.",
   block: "Gains Block, reducing the next hit you take.",
@@ -173,6 +177,8 @@ const ICON_SVG = {
   log: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 4a2 2 0 012-2h9l5 5v13a2 2 0 01-2 2H6a2 2 0 01-2-2V4z M14 3v4h4"/></svg>',
   use: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg>',
   key: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M8.5 2a5.5 5.5 0 105.19 7.3L15 10.6V13h2v2h2v-2.6l1-.4V9h-6.31A5.5 5.5 0 008.5 2zm0 2.5A3 3 0 118 10.44 3 3 0 018.5 4.5z"/></svg>',
+  swap: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M 2,4.5 L 15,4.5 L 15,1 L 22.5,6.25 L 15,11.5 L 15,8 L 2,8 Z M 22,16 L 9,16 L 9,12.5 L 1.5,17.75 L 9,23 L 9,19.5 L 22,19.5 Z"/></svg>',
+  reroll: '<svg viewBox="0 0 24 24"><path d="M 19.5,12 A 7.5,7.5 0 1 1 16.6,6.1" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><path fill="currentColor" d="M 21.5,1.5 L 21.5,10.5 L 12.5,10.5 Z"/></svg>',
   blank: '',
 };
 // Icons whose source art bakes the action's numeric value into the shape
@@ -247,7 +253,7 @@ const ORIGINS = [
   {id:'dwarf', name:'Dwarf', die:'Dwarven Doohickie', blurb:'Shield up, then pop it for a big Hit.', faces:faces(['Hit2','Boost1','Boost1','Pivot','Block2','Block2'])},
   {id:'gnome', name:'Gnome', die:'Gnomish Mushroom Cap', blurb:'Continuous damage and self-sustain over time.', faces:faces(['Combo1','Boost1','DOT1','DOT1','Leech1','Dodge'])},
   {id:'halfling', name:'Halfling', die:'Bonus Breakfast', blurb:'Second breakfast and good cheer -- healing and buffs to keep the party going.', faces:faces(['Combo1','Boost1','Heal2','Heal2','HOT1','Nullify'])},
-  {id:'pixie', name:'Pixie', die:'Pixie Powder', blurb:'Blinks past trouble and leaves a little mischief behind.', faces:faces(['Combo1','Boost1','DOT1','Dodge','Leap','Freeze'])},
+  {id:'pixie', name:'Pixie', die:'Pixie Powder', blurb:'Blinks past trouble and leaves a little mischief behind.', faces:faces(['Combo1','Boost1','DOT1','Swap','Leap','Freeze'])},
 ];
 
 // ---- Classes ----
@@ -281,7 +287,7 @@ const ALLOY = lootSet([
   ['Longbow', ['Hit2','Hit2','Boost1','Boost1','Block1','blank']],
   ['Unlabelled Mixture', ['Combo1','Boost1','Fumble1','HOT1','Nullify','blank']],
   ['Healing Draught', ['Heal2','Heal2','HOT1','Nullify','blank','blank']],
-  ['Tarot Deck', ['Boost1','Dodge','Leap','Pivot','Block1','blank']],
+  ['Tarot Deck', ['Boost1','Dodge','Leap','Pivot','Block1','Reroll']],
   ['Lance', ['Hit1','Hit1','Combo1','Combo1','Leap','blank']],
   ['Greataxe', ['Hit2','Hit2','DOT2','blank','blank','blank']],
   ['Claymore', ['Hit2','Hit2','Combo2','Fumble1','blank','blank']],
@@ -300,20 +306,20 @@ const GILDED = lootSet([
   ['Greaterhammer', ['Hit3','Hit3','Hit3','Combo2','blank','blank']],
   ['Hataxe', ['Hit2','DOT2','Block3','Block3','blank','blank']],
   ['Triage Turret', ['Hit2','Boost2','DOT2','Heal2','Heal2','blank']],
-  ['Eye-Frame', ['Combo2','Combo2','Dodge','Dodge','Leap','Leap']],
+  ['Eye-Frame', ['Combo2','Combo2','Dodge','Reroll','Leap','Leap']],
   ["Drafter's Draught", ['Boost2','Boost2','Boost2','Freeze','Nullify','blank']],
   ['Thorned Bulwark', ['Hit1','Hit1','Block3','Block3','Block3','blank']],
-  ['Cool Whip', ['Hit1','Combo2','Combo1','Combo1','Combo1','blank']],
+  ['Cool Whip', ['Hit1','Combo2','Combo1','Combo1','Swap','blank']],
   ['Humor-inverter', ['Fumble1','Fumble1','HOT2','HOT2','HOT2','blank']],
   ['Winged Boots', ['Combo3','Dodge','Leap','Pivot','Nullify','blank']],
   ['Drill Shield', ['Hit2','Hit2','Block3','Block3','Nullify','blank']],
   ['Maximum Capacitor', ['Fumble1','Leap','Boost2','Boost3','Boost3','blank']],
-  ['Mining Mines', ['Pivot','Combo2','Combo2','Boost2','blank','blank']],
+  ['Mining Mines', ['Pivot','Combo2','Combo2','Boost2','Reroll','blank']],
   ['Charge-Atlatl', ['Hit2','Hit2','Combo2','Combo1','Boost2','blank']],
-  ['Portable RNGenerator', ['Combo1','Leech1','Freeze','HOT1','Nullify','blank']],
+  ['Portable RNGenerator', ['Combo1','Leech1','Freeze','HOT1','Nullify','Reroll']],
   ['Poison Sword', ['Hit2','Hit2','Combo2','DOT2','blank','blank']],
   ['Sporific Staff', ['DOT1','Leech1','Leech1','Pivot','HOT1','blank']],
-  ['Genetic Drifter', ['Combo1','Leech1','Pivot','Pivot','Nullify','blank']],
+  ['Genetic Drifter', ['Combo1','Leech1','Pivot','Swap','Nullify','blank']],
   ['Leeching Lance', ['Hit1','Combo1','DOT2','Leech1','Pivot','blank']],
   ['Pleasant Parasite?', ['Combo1','Combo1','Fumble1','Heal2','Heal2','HOT2']],
 ], 'gilded');
@@ -364,6 +370,7 @@ const FLOOR1_SHRINES = [
     {label:'+5 Max Health', effect:{type:'maxHealthUp', amount:5}},
   ]}}),
   enc('Scroll Dispenser: CLEAR','Shrine',0,{boon:'Gain a one-use Nullify token (x3).', effect:{type:'grantToken', token:'nullify', charges:3}}),
+  enc('Scroll Dispenser: SWAP','Shrine',0,{boon:'Gain a one-use Swap token (x2): swap any two dice before you build your path.', effect:{type:'grantToken', token:'swap', charges:2}}),
   // v1.36.0 relic shrines
   enc('Forge Altar','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
   enc('Hearth Idol','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
@@ -407,6 +414,7 @@ const FLOOR2_SHRINES = [
     {label:'+10 Max Health', effect:{type:'maxHealthUp', amount:10}},
   ]}}),
   enc('Scroll Dispenser: BIG','Shrine',0,{boon:'Gain a one-use x4 Boost token (x2).', effect:{type:'grantToken', token:'boost', value:4, charges:2}}),
+  enc('Scroll Dispenser: REDO','Shrine',0,{boon:'Gain a one-use Reroll token (x2): reroll any one die before you build your path.', effect:{type:'grantToken', token:'reroll', charges:2}}),
   // v1.36.0
   enc('Anvil of Wrath','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
   enc('Warm Hearthstone','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
@@ -570,6 +578,7 @@ const SHRINE_ART_STANDIN = {
   "Wayfarer's Cairn":'Expediting Spores','Signpost Shrine':'Expediting Spores',"Pilgrim's Arch":'Department Spore',
   "Hoarder's Niche":'Ecclectrical Outlet','Magpie Nest':'Storied Emporium',
   'Blood Bargain':'Scrying Spheroid','Hungry Idol':'Scrying Spheroid',"Devil's Ledger":'Scrying Spheroid',
+  'Scroll Dispenser: SWAP':'Scroll Dispenser: CLEAR','Scroll Dispenser: REDO':'Scroll Dispenser: BIG',
   'Wishing Well':'Half-Full Fountain','Reliquary Font':"Heron's Fountain",
 };
 

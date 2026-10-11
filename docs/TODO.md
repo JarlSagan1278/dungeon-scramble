@@ -12,7 +12,7 @@
 - **Sound effect pass:** audit the actions and cut redundancy; one consistent theme; a rising-note melody for tension/success; dice materials change the roll sound; stronger enemy-turn and shrine sounds; airier Maneuver/dodge sounds.
 - **Background music pass:** heavy klezmer harmonic-minor battle music; success/loot music; different orchestration per floor.
 - **Shrine overhaul:** more presence in animation and timing; many more shrines, as a way to add relics; conversion-relic idea (e.g. 1 damage per Shield gained).
-- **Add back reroll faces and swap faces** (draft rules and 4 Magic dice in `docs/studies/2026-10-11_new_content_plan.md`, waiting on Jeremy).
+- **Swap/Reroll shipped in 1.38.0.** Still to do: the four drafted Magic dice (waiting on the names sheet), and art for the two new Scroll Dispenser shrines.
 - **Redesign the class depth badges** so each one represents its class visually.
 - **Art PNGs:** floor and archway bricks, relic art, and eventually a chest paintover (last priority).
 - **Layered cover art:** parked (original layers unavailable).
