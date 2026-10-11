@@ -8,8 +8,8 @@
 
 ## Other items
 - **Origin balance:** bot win rate by origin (1.38.1): Halfling 71%, Dwarf 60%, Pixie 54% (buffed), Gnome 48%. Some imbalance is fine (Jeremy); Gnome is now the weakest. Check against real play data.
-- **Design-consistency audit**, plus a rewrite of the quest descriptions.
-- **Sound effect pass:** audit the actions and cut redundancy; one consistent theme; a rising-note melody for tension/success; dice materials change the roll sound; stronger enemy-turn and shrine sounds; airier Maneuver/dodge sounds.
+- **Design-consistency audit**, plus a rewrite of the quest descriptions. Quest audit done Oct 12 (`docs/studies/2026-10-12_todo_studies.md`): 13 broken quests fixed; the two Geometry "H.O.T. = D.O.T." quests need Jeremy's rule.
+- **Sound effect pass** (audit + proposed palette: `docs/studies/2026-10-12_todo_studies.md` section 4): audit the actions and cut redundancy; one consistent theme; a rising-note melody for tension/success; dice materials change the roll sound; stronger enemy-turn and shrine sounds; airier Maneuver/dodge sounds.
 - **Background music pass:** heavy klezmer harmonic-minor battle music; success/loot music; different orchestration per floor.
 - **Shrine overhaul:** more presence in animation and timing; many more shrines, as a way to add relics; conversion-relic idea (e.g. 1 damage per Shield gained).
 - **Swap/Reroll shipped in 1.38.0.** Still to do: the four drafted Magic dice (waiting on the names sheet), and art for the two new Scroll Dispenser shrines.

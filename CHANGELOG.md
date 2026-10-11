@@ -7,6 +7,7 @@
 - Dread now also gives Floor 1 its own Deadly card.
 - Jeremy's boss move names: Golem Lemma, Pre-heat, Melting Point, Grafted Plate, Pruning, Grazing, Slammerhand, Extrue-damage, Atomic Pull, Excessive Extrusion, R.O.T., Spore-Up, Be Fruitful and Multiply!, Toxic Trample, Lily Padding, Chimeronslaught, Lily Pod. The third Big Boss is Toadtaur Wizard, Assistant to the Co-consul. New flavor for Myceleus and the Wizard.
 - Long boss move names shift the warning chips left instead of running off the screen.
+- Quest fixes: 13 quests that could never complete now work ("20+ damage", "8 damage/turn", "survive turn 4", combos/H.O.T./D.O.T. counts, Freeze rewards); "Bank 5 Block" checks Block actually banked; "2 nullify" needs 2.
 
 ## 1.38.1
 - Pixie Powder: Combo 1 → Combo 2 and D.O.T. 1 → D.O.T. 2 (bot win rate 47% → 54%).

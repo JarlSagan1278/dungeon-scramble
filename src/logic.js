@@ -1393,7 +1393,7 @@ function computePathEffects(path){
   let totalDamage=0, boostMult = S.pendingFreeBoost>0 ? S.pendingFreeBoost : 1;
   let dotToEncounter=0, hotToPlayer=0, blockGain=0, healGain=0, selfDot=0, freeze=false, nullifyCount=0;
   let hitCount=0, comboCount=0, healCount=0, blockCount=0, boostCount=0,
-      dodgeCount=0, leapCount=0, pivotCount=0, maneuverCount=0, supportCount=0;
+      dodgeCount=0, leapCount=0, pivotCount=0, maneuverCount=0, supportCount=0, hotCount=0, dotCount=0;
 
   path.forEach(idx=>{
     const f = pathFaceForIdx(idx);
@@ -1401,10 +1401,10 @@ function computePathEffects(path){
     switch(f.type){
       case 'hit': hitCount++; totalDamage += val*boostMult; break;
       case 'combo': { comboCount++; const nAdj=attackNeighborsCount(idx); totalDamage += val*(1+nAdj)*boostMult; break; }
-      case 'dot': dotToEncounter += val*boostMult; break;
+      case 'dot': dotCount++; dotToEncounter += val*boostMult; break;
       case 'leech': dotToEncounter += val*boostMult; hotToPlayer += val*boostMult; break;
       case 'heal': supportCount++; healCount++; healGain += val*boostMult; break;
-      case 'hot': supportCount++; hotToPlayer += val*boostMult; break;
+      case 'hot': supportCount++; hotCount++; hotToPlayer += val*boostMult; break;
       case 'block': supportCount++; blockCount++; blockGain += val*boostMult; break;
       case 'boost': boostCount++; boostMult *= val; break;
       case 'fumble': selfDot += val; break;
@@ -1437,7 +1437,7 @@ function computePathEffects(path){
 
   return { totalDamage, dotToEncounter, hotToPlayer, blockGain, healGain, selfDot, freeze, nullifyCount,
     hitCount, comboCount, healCount, blockCount, boostCount, dodgeCount, leapCount, pivotCount,
-    maneuverCount, supportCount, totalActions: path.length, blankCount };
+    maneuverCount, supportCount, hotCount, dotCount, totalActions: path.length, blankCount };
 }
 
 // Mirrors computePathEffects()'s own loop (same math, same Boost-carry
@@ -1588,8 +1588,11 @@ function checkQuests(e, ctx){
     const {rewardText, cond} = parseQuestSpec(q);
     let done = false;
     let m;
-    if((m=cond.match(/survive (?:to turn |)(\d+)/))) done = ctx.turnNumber >= parseInt(m[1]);
-    else if((m=cond.match(/(\d+)\+?\s*damage in a single (round|turn)/))) done = ctx.totalDamageThisRound >= parseInt(m[1]);
+    // v1.39.0 quest audit: every phrasing the quest card shows now has a check
+    // ("20+ damage", "8 damage/turn", "survive turn 4", combos, hot, dot,
+    // "accumulate N block", "2 nullify"). See docs/studies/2026-10-12_quest_audit.md.
+    if((m=cond.match(/survive (?:to )?(?:turn )?(\d+)/))) done = ctx.turnNumber >= parseInt(m[1]);
+    else if((m=cond.match(/(\d+)\+?\s*damage/))) done = ctx.totalDamageThisRound >= parseInt(m[1]);
     else if((m=cond.match(/any (\d+)(?:\s*or fewer)? actions/))) done = cond.includes('or fewer') ? (ctx.totalActions>0 && ctx.totalActions<=parseInt(m[1])) : ctx.totalActions>=parseInt(m[1]);
     else if((m=cond.match(/(\d+)\s*blanks/))) done = ctx.blankCount >= parseInt(m[1]);
     else if((m=cond.match(/(\d+)\s*maneuvers/))) done = ctx.maneuverCount >= parseInt(m[1]);
@@ -1597,9 +1600,14 @@ function checkQuests(e, ctx){
     else if((m=cond.match(/(\d+)\s*leap/))) done = ctx.leapCount >= parseInt(m[1]);
     else if((m=cond.match(/(\d+)\s*pivot/))) done = ctx.pivotCount >= parseInt(m[1]);
     else if((m=cond.match(/(\d+)\s*heal/))) done = ctx.healCount >= parseInt(m[1]);
+    else if((m=cond.match(/accumulate (\d+) block/))) done = (S.playerBlock||0) >= parseInt(m[1]);
     else if((m=cond.match(/(\d+)\s*block/))) done = ctx.blockCount >= parseInt(m[1]);
+    else if((m=cond.match(/(\d+)\s*combos?/))) done = ctx.comboCount >= parseInt(m[1]);
+    else if((m=cond.match(/(\d+)\s*hot\b/))) done = (ctx.hotCount||0) >= parseInt(m[1]);
+    else if((m=cond.match(/(\d+)\s*dot\b/))) done = (ctx.dotCount||0) >= parseInt(m[1]);
     else if((m=cond.match(/(\d+)\s*boost/))) done = ctx.boostCount >= parseInt(m[1]);
     else if((m=cond.match(/(\d+)\s*support/))) done = ctx.supportCount >= parseInt(m[1]);
+    else if((m=cond.match(/(\d+)\s*nullify/))) done = ctx.nullifyCount >= parseInt(m[1]);
     else if(cond.includes('nullify')) done = ctx.nullifyCount>=1;
     if(done){
       e.questsDone[i] = true;
@@ -1618,6 +1626,7 @@ function applyQuestReward(e, rewardText){
   if(low.includes('dot')) { e.curDOT += amt; }
   else if(low.includes('hot')) { addPlayerHOT(amt); }
   else if(low.includes('nullify')) { applyNullify(); }
+  else if(low.includes('freeze')) { S.freezeNext = true; logMsg('sys', `Quest reward: ${e.name} will skip its next action.`); }
   else if(amt>0){
     // questHealth is the total health this encounter can lose from quest
     // bonuses specifically, across the whole fight -- it caps the sum of
@@ -1736,7 +1745,8 @@ function finishPlayerPath(path, effects){
     turnNumber:S.turnNumber, totalDamageThisRound: effects.totalDamage, hitCount:effects.hitCount,
     comboCount:effects.comboCount, healCount:effects.healCount, blockCount:effects.blockCount,
     boostCount:effects.boostCount, dodgeCount:effects.dodgeCount, leapCount:effects.leapCount,
-    pivotCount:effects.pivotCount, nullifyCount:effects.nullifyCount, supportCount:effects.supportCount
+    pivotCount:effects.pivotCount, nullifyCount:effects.nullifyCount, supportCount:effects.supportCount,
+    hotCount:effects.hotCount, dotCount:effects.dotCount
   });
   { const tt = Math.round(S.resolveTotal||0);
     if(tt > (S.stats.bestTurn||0)){ S.stats.bestTurn = tt; S.stats.bestTurnFoe = e.name; } }
