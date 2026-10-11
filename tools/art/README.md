@@ -76,3 +76,6 @@ you want changed (in any image editor) and upload the edited files (or
 the whole folder) back into the conversation. Ask Claude to run
 `import_art.py` against what you uploaded -- it'll only touch the files
 you actually changed, rebuild, and run the regression sim.
+
+## Repaint batches (Jeremy's iPad retouch)
+`make_batches.py` builds the 3x2 repaint canvases (pink name, dashed guide box, current art scaled up to fit). Jeremy paints over them and drops `BATCH_<letter>_..._done.png` into DS Assets. To bring one back: crop inside each guide box, clear the pink line only at the box edges (some art is purple/pink), scale to the image's original size, and run `import_art.py` on a folder with those PNGs plus their manifest entries. Batches so far: B loot, C floor 1 monsters, D floor 1 traps + Heating Elemental (done); A (with Jeremy); E/F/G floor 2 (sent Oct 11).
