@@ -2148,7 +2148,7 @@ function maybeShowSymbolIntro(){
       if(document.getElementById('symbol-intro') || S.screen!=='game') return;
       // wait out the "A new room..." banner (it holds until tapped) and any open modal
       if((document.getElementById('room-callout-scrim') || document.getElementById('room-callout') || document.querySelector('.modal-overlay')) && tries++ < 60){ setTimeout(showCard, 500); return; }
-      const card = el(`<div id="symbol-intro" class="symbol-intro" role="status"><div class="symbol-intro-icon">${icon}</div><div class="symbol-intro-text"><div class="symbol-intro-kicker">New action</div><strong>${name}</strong><span>${desc}</span></div></div>`);
+      const card = el(`<div id="symbol-intro" class="symbol-intro" role="status"><div class="symbol-intro-icon">${icon}</div><div class="symbol-intro-text"><div class="symbol-intro-kicker">New Action</div><strong>${name}</strong><span>${desc}</span></div></div>`);
       document.body.appendChild(card);
       requestAnimationFrame(()=> card.classList.add('show'));
       const kill = ()=>{ card.classList.remove('show'); setTimeout(()=>card.remove(), 250); };

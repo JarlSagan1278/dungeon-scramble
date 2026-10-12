@@ -414,7 +414,7 @@ const FLOOR2_TRAPS = [
   enc('Adhesive Pest Traps','Trap',30,{questHealth:20,dmg:2,minion:2,quests:['15 damage: 3 maneuvers','15 damage: 4 maneuvers','15 damage: 5 maneuvers'],flavor:'"Environmentally friendly snares for unfriendly environments"'}),
   enc('Ditched Heist','Trap',30,{questHealth:20,dmg:2,shield:3,quests:['15 damage: any 8 actions','15 damage: any 3 or fewer actions','20 damage: 8 blanks'],flavor:'Looks like the previous party spent too long describing their plans to finish them.'}),
   enc('Unventilated Workshop','Trap',30,{questHealth:20,dmg:2,hot:1,quests:['15 damage: 2 block','15 damage: 4 maneuvers','nullify: 12+ damage'],flavor:'"Carol never wore her ventilator. Now she doesn\u2019t need it."'}),
-  enc('The Strike-Breaker','Trap',30,{questHealth:20,dmg:4,quests:['5 damage: survive 2','10 damage: survive 4','15 damage: survive 6'],flavor:'Inevitably causes scabs.'}),
+  enc('The Strike/Break-er','Trap',30,{questHealth:20,dmg:4,quests:['5 damage: survive 2','10 damage: survive 4','15 damage: survive 6'],flavor:'Inevitably causes scabs.'}),
 ];
 const FLOOR2_SHRINES = [
   enc('Enchanted Anvil','Shrine',0,{boon:'Upgrade a lvl 1 Attack Die to a lvl 2 Attack Die.', effect:{type:'dieUpgrade', cat:'attack'}}),
@@ -517,7 +517,7 @@ const ENCOUNTER_TIER = {
   'Rabbid Rabbats':'easy','Roudy Rinotter':'easy','Whence Wolf':'deadly',
   'Rogue Technician':'standard','Displacer Kitty':'standard','Blastogenesis Engine':'standard','Ditched Heist':'standard',
   'Half-life Host':'elite','Rusty Golem':'elite','Illegal Operation':'elite','Lichen-Thrope':'elite','Fungal Flayer':'elite',
-  'The Strike-Breaker':'deadly',
+  'The Strike/Break-er':'deadly',
   // Floor 3
   'Morel Dilemma':'easy','Gnomeowners Association':'easy','Gestalt Network':'easy',"Oilephant's Foot":'easy',
   'Chimeric Sludge':'standard','Ergot Eruption':'standard','Profane Geometry':'standard','Extractnid Matriarch':'standard',

@@ -10,7 +10,7 @@
 const BASE_HP_MUL = [1, 1.5, 1.75];
 
 const DEPTH_MODS = [
-  { id:'foes',  name:'Tougher Foes',   max:4, cost:1, desc:r=>`Enemies and bosses have +${r*15}% HP.` },
+  { id:'foes',  name:'Tougher Scuffs', max:4, cost:1, desc:r=>`Enemies and bosses have +${r*15}% HP.` },
   { id:'rest',  name:'Hard Rations',   max:3, cost:1, desc:r=>`Camp rest heals ${r*25}% less.` },
   { id:'frail', name:'Frail',          max:3, cost:1, desc:r=>`Start with ${r*3} less max HP.` },
   { id:'swarm', name:'Swarm',          max:3, cost:1, desc:r=>`Minion spawns place ${r} extra die${r>1?'s':''}.` },
