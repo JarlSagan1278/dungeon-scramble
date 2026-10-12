@@ -377,14 +377,14 @@ const FLOOR1_SHRINES = [
     {label:'Heal 10', effect:{type:'heal', amount:10}},
     {label:'+5 Max Health', effect:{type:'maxHealthUp', amount:5}},
   ]}}),
-  enc('Scroll Dispenser: CLEAR','Shrine',0,{boon:'Gain a one-use Nullify token (x3).', effect:{type:'grantToken', token:'nullify', charges:3}}),
-  enc('Scroll Dispenser: SWAP','Shrine',0,{boon:'Gain a one-use Swap token (x2): swap any two dice before you build your path.', effect:{type:'grantToken', token:'swap', charges:2}}),
+  enc('Scroll Dispenser: CRELA','Shrine',0,{boon:'Gain a one-use Nullify token (x3).', effect:{type:'grantToken', token:'nullify', charges:3}}),
+  enc('Scroll Dispenser: AWSP','Shrine',0,{boon:'Gain a one-use Swap token (x2): swap any two dice before you build your path.', effect:{type:'grantToken', token:'swap', charges:2}}),
   // v1.36.0 relic shrines
-  enc('Forge Altar','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
-  enc('Hearth Idol','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
-  enc("Wayfarer's Cairn",'Shrine',0,{boon:'Choose one of three path and movement Relics.', effect:{type:'relicChoice', theme:'path'}}),
-  enc("Hoarder's Niche",'Shrine',0,{boon:'Choose one of three loot and tempo Relics.', effect:{type:'relicChoice', theme:'loot'}}),
-  enc('Blood Bargain','Shrine',0,{boon:'Pay 3 maximum health to choose one of three Relics.', effect:{type:'choice', options:[
+  enc('Surgery Community Theatre','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
+  enc('Healthy Hearth','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
+  enc('Ark of the Flood','Shrine',0,{boon:'Choose one of three path and movement Relics.', effect:{type:'relicChoice', theme:'path'}}),
+  enc('Loot-Diagonalizer','Shrine',0,{boon:'Choose one of three loot and tempo Relics.', effect:{type:'relicChoice', theme:'loot'}}),
+  enc('Blood-Drive Treats','Shrine',0,{boon:'Pay 3 maximum health to choose one of three Relics.', effect:{type:'choice', options:[
     {label:'Pay 3 max health: choose a Relic', effect:{type:'bargain', price:{maxHp:3}, then:{type:'relicChoice'}}},
     {label:'Walk away', effect:{type:'leave'}},
   ]}}),
@@ -424,17 +424,17 @@ const FLOOR2_SHRINES = [
     {label:'Heal 15', effect:{type:'heal', amount:15}},
     {label:'+10 Max Health', effect:{type:'maxHealthUp', amount:10}},
   ]}}),
-  enc('Scroll Dispenser: BIG','Shrine',0,{boon:'Gain a one-use x4 Boost token (x2).', effect:{type:'grantToken', token:'boost', value:4, charges:2}}),
-  enc('Scroll Dispenser: REDO','Shrine',0,{boon:'Gain a one-use Reroll token (x2): reroll any one die before you build your path.', effect:{type:'grantToken', token:'reroll', charges:2}}),
+  enc('Scroll Dispenser: GIB','Shrine',0,{boon:'Gain a one-use x4 Boost token (x2).', effect:{type:'grantToken', token:'boost', value:4, charges:2}}),
+  enc('Scroll Dispenser: DOER','Shrine',0,{boon:'Gain a one-use Reroll token (x2): reroll any one die before you build your path.', effect:{type:'grantToken', token:'reroll', charges:2}}),
   // v1.36.0
-  enc('Anvil of Wrath','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
-  enc('Warm Hearthstone','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
-  enc('Signpost Shrine','Shrine',0,{boon:'Choose one of three path and movement Relics.', effect:{type:'relicChoice', theme:'path'}}),
-  enc('Hungry Idol','Shrine',0,{boon:'Give up your next camp rest to choose one of three Relics.', effect:{type:'choice', options:[
+  enc('Blood of Spanneroth','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
+  enc('Ferrous Maiden','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
+  enc("Thom's Guide",'Shrine',0,{boon:'Choose one of three path and movement Relics.', effect:{type:'relicChoice', theme:'path'}}),
+  enc('Time-Intensive Shrine','Shrine',0,{boon:'Give up your next camp rest to choose one of three Relics.', effect:{type:'choice', options:[
     {label:'Skip next camp rest: choose a Relic', effect:{type:'bargain', price:{skipRest:true}, then:{type:'relicChoice'}}},
     {label:'Walk away', effect:{type:'leave'}},
   ]}}),
-  enc('Wishing Well','Shrine',0,{boon:'Heal 8 OR gain a one-use Freeze token.', effect:{type:'choice', options:[
+  enc('Cryotherapist','Shrine',0,{boon:'Heal 8 OR gain a one-use Freeze token.', effect:{type:'choice', options:[
     {label:'Heal 8', effect:{type:'heal', amount:8}},
     {label:'Freeze token', effect:{type:'grantToken', token:'freeze', charges:1}},
   ]}}),
@@ -470,17 +470,17 @@ const FLOOR3_SHRINES = [
   enc('Scrying Spheroid','Shrine',0,{boon:'Replace a loot die with a random Magic die.', effect:{type:'randomDieReplace', pool:'Magic'}}),
   enc("Heron's Fountain",'Shrine',0,{boon:'Upgrade Player Maximum Health by 15.', effect:{type:'maxHealthUp', amount:15}}),
   enc('Storied Emporium','Shrine',0,{boon:'Choose one of three Relics.', effect:{type:'relicChoice'}}),
-  enc('Scroll Dispenser: STOP','Shrine',0,{boon:'Gain a one-use Freeze token.', effect:{type:'grantToken', token:'freeze', charges:1}}),
+  enc('Scroll Dispenser: TSOP','Shrine',0,{boon:'Gain a one-use Freeze token.', effect:{type:'grantToken', token:'freeze', charges:1}}),
   // v1.36.0
-  enc('Crucible of Ruin','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
-  enc('Sanctum Lantern','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
-  enc("Pilgrim's Arch",'Shrine',0,{boon:'Choose one of three path and movement Relics.', effect:{type:'relicChoice', theme:'path'}}),
-  enc('Magpie Nest','Shrine',0,{boon:'Choose one of three loot and tempo Relics.', effect:{type:'relicChoice', theme:'loot'}}),
-  enc("Devil's Ledger",'Shrine',0,{boon:'Pay 5 maximum health to choose one of four Relics.', effect:{type:'choice', options:[
+  enc('Ruinous Rune Room','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
+  enc('Indoctrination Inoculation','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
+  enc('Charged Fae-Lines','Shrine',0,{boon:'Choose one of three path and movement Relics.', effect:{type:'relicChoice', theme:'path'}}),
+  enc('Madpie Nest','Shrine',0,{boon:'Choose one of three loot and tempo Relics.', effect:{type:'relicChoice', theme:'loot'}}),
+  enc('Faustian Spreadsheet','Shrine',0,{boon:'Pay 5 maximum health to choose one of four Relics.', effect:{type:'choice', options:[
     {label:'Pay 5 max health: choose from four Relics', effect:{type:'bargain', price:{maxHp:5}, then:{type:'relicChoice', count:4}}},
     {label:'Walk away', effect:{type:'leave'}},
   ]}}),
-  enc('Reliquary Font','Shrine',0,{boon:'Heal 20 OR Upgrade Player Maximum Health by 10.', effect:{type:'choice', options:[
+  enc('Correctly-Designed Fountain','Shrine',0,{boon:'Heal 20 OR Upgrade Player Maximum Health by 10.', effect:{type:'choice', options:[
     {label:'Heal 20', effect:{type:'heal', amount:20}},
     {label:'+10 Max Health', effect:{type:'maxHealthUp', amount:10}},
   ]}}),
@@ -598,13 +598,13 @@ const BOSS_KITS = {
 // borrows a related existing shrine's picture. Delete an entry once its real
 // art is in MONSTER_ART.
 const SHRINE_ART_STANDIN = {
-  'Forge Altar':'Enchanted Anvil','Anvil of Wrath':'Enchanted Anvil','Crucible of Ruin':'Enchanted Anvil',
-  'Hearth Idol':'Sacred Bellows','Warm Hearthstone':'Sacred Bellows','Sanctum Lantern':'Alchemists Stone',
-  "Wayfarer's Cairn":'Expediting Spores','Signpost Shrine':'Expediting Spores',"Pilgrim's Arch":'Department Spore',
-  "Hoarder's Niche":'Ecclectrical Outlet','Magpie Nest':'Storied Emporium',
-  'Blood Bargain':'Scrying Spheroid','Hungry Idol':'Scrying Spheroid',"Devil's Ledger":'Scrying Spheroid',
-  'Scroll Dispenser: SWAP':'Scroll Dispenser: CLEAR','Scroll Dispenser: REDO':'Scroll Dispenser: BIG',
-  'Wishing Well':'Half-Full Fountain','Reliquary Font':"Heron's Fountain",
+  'Surgery Community Theatre':'Enchanted Anvil','Blood of Spanneroth':'Enchanted Anvil','Ruinous Rune Room':'Enchanted Anvil',
+  'Healthy Hearth':'Sacred Bellows','Ferrous Maiden':'Sacred Bellows','Indoctrination Inoculation':'Alchemists Stone',
+  'Ark of the Flood':'Expediting Spores',"Thom's Guide":'Expediting Spores','Charged Fae-Lines':'Department Spore',
+  'Loot-Diagonalizer':'Ecclectrical Outlet','Madpie Nest':'Storied Emporium',
+  'Blood-Drive Treats':'Scrying Spheroid','Time-Intensive Shrine':'Scrying Spheroid','Faustian Spreadsheet':'Scrying Spheroid',
+  'Scroll Dispenser: AWSP':'Scroll Dispenser: CRELA','Scroll Dispenser: DOER':'Scroll Dispenser: GIB',
+  'Cryotherapist':'Half-Full Fountain','Correctly-Designed Fountain':"Heron's Fountain",
 };
 
 // ---- Monster presence: how large each monster is drawn in the face-off (1 = standard ~89px tall).

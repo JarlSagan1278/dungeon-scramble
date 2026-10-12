@@ -2523,7 +2523,7 @@ function campRest(){
   S.tray.forEach(c=>{ if(currentFace(c).type!=='blank') count++; });
   let heal = Math.ceil(count/2) + (hasRelic('kettle') ? 3 : 0);
   if(depthRank('rest')) heal = Math.max(1, Math.round(heal*(1-0.25*depthRank('rest'))));
-  if(S.skipNextRest){ heal = 0; S.skipNextRest = false; logMsg('sys', 'Your rest is forfeit to the Hungry Idol.', 'bad'); }
+  if(S.skipNextRest){ heal = 0; S.skipNextRest = false; logMsg('sys', 'Your rest is forfeit to the Time-Intensive Shrine.', 'bad'); }
   if(hasRelic('kettle')) fireRelic('kettle','+3 HP');
   const hpFrom = S.health;
   S.health = cap(S.health+heal, S.maxHealth);

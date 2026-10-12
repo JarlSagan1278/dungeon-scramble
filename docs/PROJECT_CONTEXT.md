@@ -99,3 +99,4 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - **The names sheet is the living database of game content** (Jeremy, Oct 12): even after his naming pass, keep it updated with every change to names, stats, faces, moves, quests, flavor and new content.
 - Idea from Jeremy: a "Gnomeowners Association" enemy to replace an enemy with missing or bad art.
 - **Gnomeowners Association (Oct 12):** replaces Parasite Seer (Floor 3 easy, same stats: 20 health, 3 attack, 3 Shield); uses the old Parasite Seer picture (a gnome) as a stand-in until Jeremy draws it. Flavor by Claude.
+- **Shrine names (Jeremy, Oct 12):** 21 renames applied (Scroll Dispensers use scrambled words: CRELA, GIB, TSOP, AWSP, DOER). "Innoculation" spelled "Inoculation". The other 11 shrine names approved as they were.

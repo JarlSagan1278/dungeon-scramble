@@ -13,6 +13,7 @@
 - Sound palette: each action has its own instrument (sword hit, wooden Block knock, Heal/H.O.T. bell, D.O.T. pluck, glassy Freeze, Nullify swell, Boost whistle, airy Maneuver whoosh, Swap flip) and every path step climbs the scale. The enemy turn has sound now: a drum as it acts, a clank for Shield or a fully Blocked hit, a bell for its heals, squeaks for Minions, and a rising rumble when a wind-up or heavy turn is telegraphed. Your H.O.T. ticks and camp rests chime.
 - Gnomeowners Association replaces Parasite Seer on Floor 3 (same stats), with Jeremy's new art.
 - Jeremy's retouched Batch A art: Anti-Euclidian Space, Displacer Lair, Grafted Grifter, Grosteque Grafter, Unventilated Workshop, a gnome portrait, and new art for Rogue Golemancer and The Necrorancher (their pictures were swapped).
+- Jeremy's shrine names: Scroll Dispenser: CRELA / GIB / TSOP / AWSP / DOER, Surgery Community Theatre, Healthy Hearth, Ark of the Flood, Loot-Diagonalizer, Blood-Drive Treats, Blood of Spanneroth, Ferrous Maiden, Thom's Guide, Time-Intensive Shrine, Cryotherapist, Ruinous Rune Room, Indoctrination Inoculation, Charged Fae-Lines, Madpie Nest, Faustian Spreadsheet, Correctly-Designed Fountain.
 - Quest fixes: 13 quests that could never complete now work ("20+ damage", "8 damage/turn", "survive turn 4", combos/H.O.T./D.O.T. counts, Freeze rewards); "Bank 5 Block" checks Block actually banked; "2 nullify" needs 2.
 
 ## 1.38.1
