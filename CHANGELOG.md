@@ -1,6 +1,7 @@
 # Changelog
 
 ## 1.39.4 (in progress)
+- Swarming rank 3 adds 6 depth (was 4).
 - Stronger Infill: start every fight with 1 Block (Jeremy; was 2 in 1.39.3, 5 before).
 - Zeal's extra damage now shows in the enemy's next-turn warning, so the numbers on the chips match the hit you take.
 

@@ -11,7 +11,7 @@ TAG = os.environ.get('RD_TAG', 'rd')
 XCFG = json.loads(os.environ.get('RD_CFG', '{}'))
 PAIRS = [('dwarf', 'guard'), ('gnome', 'armsmaster'), ('halfling', 'dungeoneer'), ('pixie', 'arcanist')]
 # (max rank, depth added by each rank) -- keep in step with DEPTH_MODS in src/depth.js
-MODS = {'foes': (4, [1,1,1,1]), 'rest': (2, [1,2]), 'frail': (3, [1,1,2]), 'swarm': (3, [1,3,4]), 'slim': (1, [1]), 'fury': (2, [3,1]), 'dread': (3, [1,1,1]), 'gauntlet': (2, [1,2])}
+MODS = {'foes': (4, [1,1,1,1]), 'rest': (2, [1,2]), 'frail': (3, [1,1,2]), 'swarm': (3, [1,3,6]), 'slim': (1, [1]), 'fury': (2, [3,1]), 'dread': (3, [1,1,1]), 'gauntlet': (2, [1,2])}
 PART = os.environ.get('RD_PART', '12')  # '1' = single modifiers only
 def depth(m): return 1 + sum(sum(MODS[k][1][:v]) for k, v in m.items())
 loads = [{}]
