@@ -56,7 +56,22 @@ const FILE = path.resolve(__dirname, '../dist/dungeon_scramble.html');
     S.trayAct = null;
     c.faceIdx = c.die.faces.findIndex(f => f.type === 'swap');
     const nb = [pix - 1, pix + 1, pix - 4, pix + 4].find(i => i >= 0 && i < 16 && Math.abs((i % 4) - (pix % 4)) <= 1 && currentFace(S.tray[i]).type !== 'blank' && !S.tray[i].minion);
-    if (nb != null) { S.tray[nb].forcedFace = { type: 'hit', value: 1 }; S.path = [nb]; toggleSelect(pix); ok(S.path.length === 2 && !S.trayAct, 'mid-path a Swap face is a plain step'); S.path = []; delete S.tray[nb].forcedFace; }
+    if (nb != null) { S.tray[nb].forcedFace = { type: 'hit', value: 1 }; S.path = [nb]; toggleSelect(pix); ok(S.path.length === 1 && S.trayAct && S.trayAct.kind === 'swap', 'mid-path, tapping a Swap face arms it (the path is kept)'); toggleSelect(nb); ok(S.trayAct && S.tray[nb].forcedFace, 'mid-path Swap cannot move a die already in the path'); cancelTrayAct(); S.path = []; delete S.tray[nb].forcedFace; }
+    // Reroll (Oct 12): always a non-blank face, and usable mid-path on a die outside the path
+    { const d = S.tray[3]; let nonBlank = true;
+      for (let t = 0; t < 60; t++) { doTrayReroll(3, null, false); if (currentFace(d).type === 'blank') nonBlank = false; }
+      ok(nonBlank, 'reroll never lands on a blank (60 tries)'); }
+    { S.trayAct = null; S.path = []; const R = S.tray[pix]; delete R.spent; R.die = clone(R.die); R.die.faces = R.die.faces.map(f => f); const ri = R.die.faces.findIndex(f => f.type === 'swap'); R.die.faces[ri] = { type: 'reroll' }; R.faceIdx = ri;
+      const step = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].find(i => i !== pix && currentFace(S.tray[i]).type !== 'blank' && !S.tray[i].minion && !S.tray[i].spent);
+      S.path = [step];
+      const tgt2 = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].find(i => i !== pix && i !== step && !S.tray[i].minion && !S.tray[i].spent);
+      toggleSelect(pix);
+      ok(S.trayAct && S.trayAct.kind === 'reroll' && S.path.length === 1, 'mid-path, tapping a Reroll face arms it (the path is kept)');
+      toggleSelect(step);
+      ok(S.trayAct && S.path.length === 1, 'mid-path Reroll cannot target a die already in the path');
+      toggleSelect(tgt2);
+      ok(!S.trayAct && R.spent && S.path.length === 1 && currentFace(S.tray[tgt2]).type !== 'blank', 'mid-path Reroll rerolled an outside die to a non-blank face and spent the Reroll die');
+      S.path = []; }
     // render with the Swap armed for a screenshot
     toggleSelect(pix); render();
     return out;

@@ -1588,9 +1588,8 @@ function tokensRowHTML(){
   const btns = [];
   if(S.nullifyTokens>0) btns.push(`<button id="use-nullify-token">${iconSpan('nullify')} Use Nullify Token <span class="token-count">${S.nullifyTokens}</span></button>`);
   if(S.freezeTokens>0) btns.push(`<button id="use-freeze-token">${iconSpan('freeze')} Use Freeze Token <span class="token-count">${S.freezeTokens}</span></button>`);
-  const noPath = S.path.length ? 'disabled title="Clear your path first: Swap and Reroll happen before you build it."' : '';
-  if((S.swapTokens||0)>0) btns.push(`<button id="use-swap-token" ${noPath}>${iconSpan('swap')} Use Swap Token <span class="token-count">${S.swapTokens}</span></button>`);
-  if((S.rerollTokens||0)>0) btns.push(`<button id="use-reroll-token" ${noPath}>${iconSpan('reroll')} Use Reroll Token <span class="token-count">${S.rerollTokens}</span></button>`);
+  if((S.swapTokens||0)>0) btns.push(`<button id="use-swap-token">${iconSpan('swap')} Use Swap Token <span class="token-count">${S.swapTokens}</span></button>`);
+  if((S.rerollTokens||0)>0) btns.push(`<button id="use-reroll-token">${iconSpan('reroll')} Use Reroll Token <span class="token-count">${S.rerollTokens}</span></button>`);
   if(S.boostTokenCharges>0) btns.push(`<button id="use-boost-token" ${S.pendingFreeBoost?'disabled':''}>${iconSpan('boost')} Use x${S.boostTokenValue} Boost Token <span class="token-count">${S.boostTokenCharges}</span></button>`);
   if(!btns.length) return '';
   return `<div class="small-btn-row" style="margin-top:0; flex-direction:column;">${btns.join('')}</div>`;
@@ -1615,13 +1614,13 @@ function openTokensModal(){
   };
   const swapBtn = overlay.querySelector('#use-swap-token');
   if(swapBtn) swapBtn.onclick = ()=>{
-    if(S.transitioning || !S.encounter || !(S.swapTokens>0) || S.path.length) return;
+    if(S.transitioning || !S.encounter || !(S.swapTokens>0)) return;
     armTrayAct('swap', null, true);
     closeModal(overlay, render);
   };
   const rerollBtn = overlay.querySelector('#use-reroll-token');
   if(rerollBtn) rerollBtn.onclick = ()=>{
-    if(S.transitioning || !S.encounter || !(S.rerollTokens>0) || S.path.length) return;
+    if(S.transitioning || !S.encounter || !(S.rerollTokens>0)) return;
     armTrayAct('reroll', null, true);
     closeModal(overlay, render);
   };

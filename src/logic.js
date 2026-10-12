@@ -1214,7 +1214,7 @@ function anyMoveAvailable(){
 
 function toggleSelect(idx){
   if(S.trayAct){ if(trayActTap(idx)) render(); return; } // v1.38.0: an armed Swap/Reroll takes the tap
-  if(!S.path.length){ const k = trayActFaceAt(idx); if(k){ armTrayAct(k, idx, false); render(); return; } }
+  if(!S.path.includes(idx)){ const k = trayActFaceAt(idx); if(k){ armTrayAct(k, idx, false); render(); return; } } // Swap/Reroll also work mid-path (Oct 12)
   if(S.path.length && S.path[S.path.length-1]===idx){
     // clicking the most-recently-chosen die again steps back one move
     S.path.pop();
@@ -1231,13 +1231,13 @@ function toggleSelect(idx){
 }
 
 // ---- Swap / Reroll (v1.38.0) ----
-// Tray actions used BEFORE the path is built. A Swap or Reroll face is tapped
+// Swap and Reroll work any time, even mid-path (Jeremy, Oct 12), but never on a die already in the path. A Swap or Reroll face is tapped
 // (or a token from the Item menu is used), then a target die is tapped. The
 // face's own die is then spent for the turn (it acts as a blank). Swaps go in
 // S.swapLog so Clear can undo them (they reveal nothing); rerolls are final.
 // A die can't target Minion-covered cells (no scouting).
 function trayActFaceAt(idx){
-  if(S.path.length || S.transitioning) return null;
+  if(S.transitioning || S.path.includes(idx)) return null;
   const c = S.tray[idx]; if(!c || c.minion || c.spent || c.forcedFace) return null;
   const t = currentFace(c).type;
   return (t==='swap' || t==='reroll') ? t : null;
@@ -1251,6 +1251,7 @@ function trayActTargetOk(idx){
   const a = S.trayAct; if(!a) return false;
   const c = S.tray[idx]; if(!c || c.minion || c.spent) return false;
   if(idx===a.src || idx===a.first) return false;
+  if(S.path.includes(idx)) return false; // never move or change a step already in the path
   if(a.kind==='reroll' && c.forcedFace) return false; // a class-ability conversion holds
   return true;
 }
@@ -1289,8 +1290,11 @@ function doTrayReroll(idx, src, token){
   const c = S.tray[idx];
   const cur = c.die.faces[c.faceIdx];
   const same = f => f.type===cur.type && (f.value||0)===(cur.value||0);
-  let opts = c.die.faces.map((f,k)=>k).filter(k=>k!==c.faceIdx && !same(c.die.faces[k]));
-  if(!opts.length) opts = c.die.faces.map((f,k)=>k).filter(k=>k!==c.faceIdx);
+  // Always a non-blank face (Jeremy, Oct 12), and a different one whenever the die has one.
+  const all = c.die.faces.map((f,k)=>k), nb = all.filter(k=>c.die.faces[k].type!=='blank');
+  let opts = nb.filter(k=>k!==c.faceIdx && !same(c.die.faces[k]));
+  if(!opts.length) opts = nb.filter(k=>k!==c.faceIdx);
+  if(!opts.length) opts = nb.length ? nb : all.filter(k=>k!==c.faceIdx);
   c.faceIdx = opts[rand(opts.length)];
   if(token) S.rerollTokens = Math.max(0,(S.rerollTokens||0)-1);
   else if(src!=null && S.tray[src]) S.tray[src].spent = true;

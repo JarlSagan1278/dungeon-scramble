@@ -59,8 +59,8 @@ const FACE_DESC = {
   leap: "Continues your path to a non-adjacent die -- clears a Minion die if it jumps clean over one.",
   pivot: "Continues your path in any adjacent direction.",
   freeze: "The enemy skips its next action.",
-  swap: "Tap it, then tap any die: they trade places. This die is used up for the turn. Clear undoes it.",
-  reroll: "Tap it, then tap any die to reroll it to a different face. This die is then used up for the turn.",
+  swap: "Tap it, then tap any die: they trade places (works mid-path too, on dice outside the path). This die is used up for the turn. Clear undoes it.",
+  reroll: "Tap it, then tap any die to reroll it to a different non-blank face (works mid-path too, on dice outside the path). This die is then used up for the turn.",
   heal: "Restores your health immediately.",
   hot: "Heals you over time. Your H.O.T. can stack up to 6.",
   block: "Gain Block, which reduces the next hit you take.",
@@ -611,15 +611,17 @@ const SHRINE_ART_STANDIN = {
 // Under 1 = small/scuttling things; over 1 = hulking things that loom behind their own health bar.
 // Anything unlisted is 1 (Bosses default to 1.3).
 const ENCOUNTER_SIZE = {
-  'Viscous Orb':.49,'Filement Bunny':.75,'Feral Pet Rock':.6,'Beaker Breakers':.9,'Leper Colonizers':.95,
-  'Wooden Golem':1.1,'Amanitabomination':1.3,
-  'Displacer Lair':1.2,'Rigged Sporks':.95,'Leper Con-Trap':1.05,
-  'Rogue Golemancer':1.3,'Heating Elemental':1.4,'Grosteque Grafter':1.45,
-  'Displacer Kitty':.62,'Armored Gear-Pest':.53,'Rusty Golem':1.3,'Rogue Technician':1,'The Warcart':1.4,
-  'Blastogenesis Engine':1.1,'Half-life Host':1.2,'Lichen-Thrope':1.15,'Fungal Flayer':1.15,
-  'The Necrorancher':1.35,'Bellicose Biomancer':1.4,'Ceramic Golem':1.5,
-  'Morel Dilemma':.62,'Chimeric Sludge':1.3,'Gnome Chomper':1,'Gnomeowners Association':1.05,'Gestalt Network':1.25,
-  "Oilephant's Foot":1.55,
-  'Untamed Unicrows':.75,'Prickly Porcupanther':.95,'Rabbid Rabbats':.6,'Roudy Rinotter':.85,'Whence Wolf':1.1,'Eelagator Escapee':1.25,'Toadtaur Warrior':1.2,'Toadtaur Wizard, Assistant to the Co-consul':1.45,'Extractnid Matriarch':1.45,'The Punished':1.25,'Profane Geometry':1.35,'Sacred(?) Geometry':1.35
+  'Viscous Orb':0.55,'Filement Bunny':.75,'Feral Pet Rock':0.65,'Beaker Breakers':0.7,'Leper Colonizers':1.1,
+  'Wooden Golem':1.1,'Amanitabomination':1.35,
+  'Displacer Lair':1.1,'Rigged Sporks':0.75,'Leper Con-Trap':1.05,
+  'Rogue Golemancer':1.1,'Heating Elemental':1.2,'Grosteque Grafter':1.45,
+  'Displacer Kitty':.62,'Armored Gear-Pest':0.6,'Rusty Golem':1,'Rogue Technician':0.8,'The Warcart':1.45,
+  'Blastogenesis Engine':1.05,'Half-life Host':1.1,'Lichen-Thrope':1.3,'Fungal Flayer':1.15,
+  'The Necrorancher':1.15,'Bellicose Biomancer':1.2,'Ceramic Golem':1.3,
+  'Morel Dilemma':0.7,'Chimeric Sludge':1.3,'Gnome Chomper':1.15,'Gnomeowners Association':1.2,'Gestalt Network':1.3,
+  "Oilephant's Foot":1.3,
+  'Untamed Unicrows':0.65,'Prickly Porcupanther':0.75,'Rabbid Rabbats':0.7,'Roudy Rinotter':0.75,'Whence Wolf':0.9,'Eelagator Escapee':0.95,'Toadtaur Warrior':1.25,'Toadtaur Wizard, Assistant to the Co-consul':1.25,'Extractnid Matriarch':1.2,'The Punished':1.25,'Profane Geometry':1.15,'Sacred(?) Geometry':1,
+  // line-thickness pass (Oct 12): bosses that used the 1.35 default
+  "Extruzeon, Co-consul of Waste":1.15,"Myceleus, Co-consul of Rot":1.15
 };
 function encounterSize(e){ if(!e) return 1; const v = ENCOUNTER_SIZE[e.name]; return v || (/Boss/.test(e.type) ? 1.35 : 1); }
