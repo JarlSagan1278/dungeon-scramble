@@ -611,7 +611,7 @@ const SHRINE_ART_STANDIN = {
 // Under 1 = small/scuttling things; over 1 = hulking things that loom behind their own health bar.
 // Anything unlisted is 1 (Bosses default to 1.3).
 const ENCOUNTER_SIZE = {
-  'Viscous Orb':.49,'Filement Bunny':.53,'Feral Pet Rock':.6,'Beaker Breakers':.9,'Leper Colonizers':.95,
+  'Viscous Orb':.49,'Filement Bunny':.75,'Feral Pet Rock':.6,'Beaker Breakers':.9,'Leper Colonizers':.95,
   'Wooden Golem':1.1,'Amanitabomination':1.3,
   'Displacer Lair':1.2,'Rigged Sporks':.95,'Leper Con-Trap':1.05,
   'Rogue Golemancer':1.3,'Heating Elemental':1.4,'Grosteque Grafter':1.45,
