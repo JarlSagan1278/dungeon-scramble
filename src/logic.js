@@ -1325,6 +1325,7 @@ function useClassAbility(idx){
   if(cell.minion){ revealMinionAt(idx); blankReveal(idx); S._abilityReveal = idx; } // the converted die shakes off its Minion
   cell.forcedFace = clone(S.klass.convertTo);
   S.classAbilityUsed = true;
+  teleLog('class_ability', {klass:S.klass.id, turn:S.turnNumber, floor:S.floorIdx+1}); // Oct 12: is the ability used every turn in real play?
   S.justConvertedIdx = idx; // one-shot: a conversion flourish on this tile for the very next render only, see renderDie()/renderGame()
   logMsg('sys', `${S.klass.name} ability used: converted a die in the zone to ${LABEL[S.klass.convertTo.type]} ${S.klass.convertTo.value}.`);
   render();
