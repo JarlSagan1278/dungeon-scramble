@@ -58,6 +58,8 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 ## Audio plan (not started)
 - Sound effect pass: audit which actions make sound and any redundancy; one consistent theme; a rising-note melody tied to musical tension and success; dice materials change roll sound and quantity; stronger enemy-turn and shrine sounds; airier Maneuver/dodge sounds.
 - Background music: heavy klezmer harmonic-minor battle music, success/loot music, different orchestration per floor, MIDI instruments via GarageBand.
+- **Music direction (Jeremy, Oct 12):** toy-like, over a lonely, driving bass line in the spirit of the **Zelda II Palace theme** (a relentless ostinato; inspiration, not a copy). Lead melody in **harmonic minor**, klezmer flavored: sad and hopeless in downtime, frantic and stressful in action. Pieces: uptime and downtime for each floor (slightly different orchestrations), victory, treasure, camp, shrine. Jeremy composes in GarageBand with MIDI; Claude can supply a music spec, MIDI sketches, klezmer vocabulary (freygish, doina, freylekhs/bulgar 3+3+2, krekhts ornaments), integration advice (uptime/downtime as crossfadable layers with the same tempo, key and loop length; .m4a loops; size budget; ducking under SFX), and can retune the major-pentatonic SFX ladder to each floor's key. Nothing built yet.
+
 
 ## Shrines
 - They lack presence in animation, timing and execution. Keep rarity but greatly increase quantity as a way to add more relics. Relic idea: conversion (e.g. 1 damage per Shield gained).
