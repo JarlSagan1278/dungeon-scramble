@@ -3496,6 +3496,21 @@ function renderSwapModal(){
 // art lifts and glows, the pathTick ladder climbs, and on completion the
 // shrine bursts and grants its boon. Letting go early cancels.
 const SHRINE_HOLD_MS = 650;
+// The shrine's hold / Continue button floats over the bottom of the shrine scene, just above the tray, like the
+// room callout: it no longer takes a row of its own, so the dice stay where they are (Jeremy, Oct 12).
+function placeShrineFloat(){
+  const f = document.getElementById('shrine-float'), tray = document.querySelector('.tray-panel');
+  if(!f || !tray) return;
+  // sits in the tray's header row, right of the "Shrine" badge (empty on a shrine), so it covers no dice and no boon text
+  const strip = tray.querySelector('.tray-head') || tray.querySelector('.tray-wrap'), badge = tray.querySelector('.round-badge');
+  const r = (strip || tray).getBoundingClientRect(), bR = badge ? badge.getBoundingClientRect() : null;
+  const left = bR ? bR.right + 8 : r.left, right = r.right;
+  f.style.width = Math.max(170, right - left) + 'px';
+  f.style.left = ((left + right) / 2) + 'px';
+  const row = bR || r;
+  f.style.top = Math.max(8, row.top + row.height/2 - f.offsetHeight/2) + 'px';
+}
+window.addEventListener('resize', ()=>{ if(typeof placeShrineFloat==='function') placeShrineFloat(); });
 function attachShrineHold(){
   const btn = document.getElementById('shrine-hold-btn');
   if(!btn) return;
@@ -3605,8 +3620,8 @@ function renderShrineEncounter(){
         </div>
       </div></div>
     </div>
-    ${waiting ? `<div class="panel">${S.newRoomFx ? '<p class="hint" style="text-align:center;">The shrine stirs…</p>' : '<button class="primary shrine-hold-btn" id="shrine-hold-btn" style="width:100%;"><span class="shrine-hold-fill"></span><span class="shrine-hold-label">Hold to receive the boon</span></button>'}</div>` : ''}
-    ${S.shrineResult ? '<div class="panel"><button class="primary" id="shrine-result-continue" style="width:100%;">Continue</button></div>' : ''}
+    ${waiting ? `<div class="shrine-float" id="shrine-float">${S.newRoomFx ? '<p class="hint shrine-float-hint">The shrine stirs…</p>' : '<button class="primary shrine-hold-btn" id="shrine-hold-btn" style="width:100%;"><span class="shrine-hold-fill"></span><span class="shrine-hold-label">Hold to receive the boon</span></button>'}</div>` : ''}
+    ${S.shrineResult ? '<div class="shrine-float" id="shrine-float"><button class="primary" id="shrine-result-continue" style="width:100%;">Continue</button></div>' : ''}
     <div class="panel tray-panel tray-idle">
       <div class="enc-rail-row">
         <div class="enc-card-col">
@@ -3642,6 +3657,7 @@ function renderShrineEncounter(){
   // The ritual (v1.36.0): hold the shrine (or the button) to receive its boon.
   // Also the way forward for a resumed save that lands here with nothing pending.
   attachShrineHold();
+  placeShrineFloat();
   playShrineFx();
   attachLongPressTooltips('.route-tooltip-target');
   if(S.newRoomFx){

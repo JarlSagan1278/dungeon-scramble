@@ -2906,3 +2906,10 @@ html,body{ overflow-x:clip; }
 .fo-player > .relic-strip{ position:absolute; left:2px; top:-4px; z-index:3; margin:0; padding:0; background:none; border:none; display:flex; flex-direction:column; flex-wrap:wrap; align-content:flex-start;
   max-height:var(--relic-col-h, 118px); gap:2px 3px; justify-content:flex-start; }
 .fo-player > .relic-strip .relic-badge{ width:18px; height:18px; filter:drop-shadow(0 0 1.5px #0c0705) drop-shadow(0 2px 1px rgba(0,0,0,.7)); }
+
+/* Shrine hold / Continue button floats above the tray (Oct 12): out of the page flow so the dice don't move. */
+.shrine-float{ position:fixed; z-index:40; transform:translateX(-50%); pointer-events:none; }
+.shrine-float button{ padding-top:8px; padding-bottom:8px; font-size:15px; }
+.shrine-float > *{ pointer-events:auto; }
+.shrine-float button{ box-shadow:0 6px 18px rgba(0,0,0,.55); }
+.shrine-float-hint{ text-align:center; margin:0; padding:8px 12px; border-radius:12px; background:rgba(10,7,5,.85); border:2px solid var(--line); }

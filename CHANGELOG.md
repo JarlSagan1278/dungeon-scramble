@@ -1,6 +1,7 @@
 # Changelog
 
 ## 1.39.2 (in progress)
+- Shrine "Hold to receive the boon" and Continue buttons float in the tray's header row instead of taking their own row, so the dice no longer get pushed down (Jeremy).
 - Relic gating (Jeremy): the strongest shrine relics are quietly held back. Tier A (Evasion Tank, Perfect Fifth, Mandated Lunch Break, Prime Edge, Combonatorics) joins shrine offers after your first victory; tier S (Scavenger's Acumen, Minus-One Mantra, Hard Hat Act) after you clear depth 2. Locked relics stay "???" in the Codex.
 
 ## 1.39.1 (released Oct 12, 2026; bug hunt clean, 24 setups)
