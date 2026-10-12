@@ -30,5 +30,22 @@
 - **Defense is worth more than offense:** Guard beats Armsmaster by 22 points. This matches the relic study, where sustain decided runs.
 - **The bot is not the cause:** it plays the movement abilities through the game's own move rules (`canSelect`), so wrap and diagonal paths are fully searched.
 
-## Class tuning tests
-See the "Class tuning" section below, filled in once the variant runs finish.
+## Class tuning tests (after Jeremy's Guard Block 1 and Dungeoneer every-row wrap)
+- **Depth:** the same depth-7 loadout, but with the reshaped depth modifiers, which make it harder: Rationing Rations 2 is now two thirds less rest, and Dread adds Elite HP.
+- **Runs:** 300 runs × 2 origins (Halfling, Pixie) per row.
+- **Tool:** `tools/balance/study_classvar.py`.
+
+| Variant | Win |
+|---|---|
+| Guard (Block 1) | 69% |
+| Armsmaster | 55% |
+| Dungeoneer (wraps every row) | 43% |
+| Arcanist as-is | 29% |
+| Arcanist: both diagonals are the zone | 34% |
+| Arcanist: diagonal step allowed if either end is in the zone | 36% |
+| **Arcanist: both diagonals + either end** | **53%** |
+| Arcanist + once/turn zone die → Dodge | 40% |
+| Arcanist + once/turn zone die → Leap | 44% |
+
+- The two Arcanist movement changes are weak alone but strong together: diagonal moves become available from 8 squares, into all their neighbours.
+- That combination lands next to Armsmaster.
