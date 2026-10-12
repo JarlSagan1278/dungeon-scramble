@@ -16,11 +16,15 @@
 //     every turn the cycle step isn't the attack) | 'attackPlusPhase' (attackPlus, and at <=50% HP it takes two cycle steps a turn)
 //   forceBoss: boss name (or array of names); every boss room on that boss's floor draws it.
 //   forceRelics: relic ids granted at the start of every run (relic study, Oct 12).
+//   unlockAllRelics (default true): relic gating (RELIC_TIER) is lifted so shrine offers draw from every relic.
+//   tokens (default true, Oct 12): the bot spends Freeze, Nullify, Boost and Swap tokens (Reroll tokens were already used).
+//   lootV2 (default true, Oct 12): loot and the die it replaces are scored by face value with sustain weighted up,
+//     so extra loot choices help instead of hurting. false = the old dieScore heuristic.
 //   relicLock (default false): the bot declines every relic shrine offer and walks away from bargain shrines,
 //     so the forced relics are the only ones held (a clean with/without comparison).
 // usage: node study_maneuver.js '<json config>'
 let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node22/lib/node_modules/playwright')); }
-const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{}, pivotFace:'pivot', manLevel:1, bossMode:'cycle', intentAware:true, forceBoss:null, forceRelics:[], relicLock:false }, JSON.parse(process.argv[2]||'{}'));
+const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{}, pivotFace:'pivot', manLevel:1, bossMode:'cycle', intentAware:true, forceBoss:null, forceRelics:[], relicLock:false, tokens:true, lootV2:true }, JSON.parse(process.argv[2]||'{}'));
 (async()=>{
 const b=await chromium.launch();const page=await b.newPage();
 page.on('pageerror',e=>console.log('PAGEERR',e.message));
@@ -31,6 +35,7 @@ let res = await page.evaluate((cfg)=>{
   const noop=()=>{};
   ['render','showToast','playTone','playDiceRollSound','playPlayerHitSound','spawnParticleBurstAtPortrait','spawnParticleBurstAtEl','spawnConfettiRain','screenShake','impactPulse','lungeFigure','vibrate','hitStop','showKillCallout','showRoomCallout','fxTick','fxQuest','playStepTone','pulseDie','maybeAutosave','saveGame','autosave'].forEach(n=>{ try{ window[n]=noop; }catch(e){} });
   try{ PREFS.reducedMotion=true; }catch(e){}
+  if(cfg.unlockAllRelics!==false){ try{ DEPTH_BEST.overall=Math.max(DEPTH_BEST.overall||0,2); }catch(e){} } // Oct 12 gating: studies see every relic unless unlockAllRelics:false
   META.lifetime.victories=1; META.lifetime.bestFloorReached=3; META.achievements['origin_duo']={date:Date.now()};
   const origFns = {};
   // ---- encounter tuning hooks: scale enemies as they are drawn ----
@@ -130,8 +135,14 @@ let res = await page.evaluate((cfg)=>{
     return e;
   };
   // ---- policy ----
-  const dieScore = d => d.faces.reduce((a,f)=>a + ({hit:1,combo:1.6,heal:.6,block:.6,shield:.6,boost:.8,leap:.3,dodge:.3,pivot:.3,nullify:.4}[f.type]||.2)*(f.value||0.5),0)/ (d.faces.length||1);
-  const lootScore = o => dieScore(o) + (o.cat==='attack'?0.2:0);
+  const dieScoreV1 = d => d.faces.reduce((a,f)=>a + ({hit:1,combo:1.6,heal:.6,block:.6,shield:.6,boost:.8,leap:.3,dodge:.3,pivot:.3,nullify:.4}[f.type]||.2)*(f.value||0.5),0)/ (d.faces.length||1);
+  // v2 (Oct 12): per-face value, sustain weighted up (the relic study showed sustain decides runs)
+  const FV = {hit:1, combo:1.5, dot:1.25, leech:2.1, heal:1.0, hot:1.1, block:1.0, shield:1.0, dodge:0.5, leap:0.6, pivot:0.6, fumble:-1.2, blank:0};
+  const FLAT = {freeze:3.2, nullify:1.6, swap:1.4, reroll:1.4};
+  const faceV = f => FLAT[f.type]!=null ? FLAT[f.type] : f.type==='boost' ? Math.max(0,(f.value||2)-1)*1.7 : (FV[f.type]!=null?FV[f.type]:0.3)*(f.value||1);
+  const dieScoreV2 = d => d.faces.reduce((a,f)=>a+faceV(f),0)/(d.faces.length||1);
+  const dieScore = d => cfg.lootV2 ? dieScoreV2(d) : dieScoreV1(d);
+  const lootScore = o => cfg.lootV2 ? dieScore(o) : dieScore(o) + (o.cat==='attack'?0.2:0);
   function pathValue(path){
     const ef = computePathEffects(path);
     const e = S.encounter;
@@ -189,9 +200,34 @@ let res = await page.evaluate((cfg)=>{
       (window.__tray=window.__tray||{swaps:0,rerolls:0}).swaps++;
     }
   }
+  // Oct 12: token policy (Freeze before a big hit, Nullify a pile-up, Boost when it pays, Swap token on the best pair)
+  function useTokens(){
+    if(!cfg.tokens || !S.encounter) return;
+    const e = S.encounter, pv = (typeof enemyNextTurnPreview==='function') ? enemyNextTurnPreview(e) : {dmg:e.dmg||0};
+    const inc = Math.max(0, (pv.dmg||0) - (S.playerBlock||0));
+    if(S.freezeTokens>0 && !S.freezeNext && (inc >= Math.max(5, S.health*0.3) || inc >= S.health)){ S.freezeTokens--; S.freezeNext = true; (window.__tok=window.__tok||{}).freeze=(window.__tok.freeze||0)+1; }
+    const minions = S.tray.filter(c=>c.minion).length;
+    if(S.nullifyTokens>0 && ((S.playerDOT||0)>=3 || minions>=3 || (e.curHOT||0)>=3)){ S.nullifyTokens--; applyNullify(); (window.__tok=window.__tok||{}).nullify=(window.__tok.nullify||0)+1; }
+    if((S.swapTokens||0)>0){
+      const base = pathValue(bestPath(Math.ceil(cfg.skill/4))||[]); let best=null, bv=base+3;
+      const ok = i => !S.tray[i].minion && !S.tray[i].spent;
+      for(let t=0;t<40;t++){ const i=Math.floor(Math.random()*16), j=Math.floor(Math.random()*16); if(i===j||!ok(i)||!ok(j)) continue;
+        const A=S.tray[i]; S.tray[i]=S.tray[j]; S.tray[j]=A; const bp=bestPath(Math.ceil(cfg.skill/4)); const v=bp.length?pathValue(bp):-1e9; S.tray[j]=S.tray[i]; S.tray[i]=A;
+        if(v>bv){ bv=v; best=[i,j]; } }
+      if(best){ doTraySwap(best[0], best[1], true); S.swapLog=[]; (window.__tok=window.__tok||{}).swap=(window.__tok.swap||0)+1; }
+    }
+  }
+  function boostTokenMaybe(p){
+    if(!cfg.tokens || !(S.boostTokenCharges>0) || S.pendingFreeBoost || !p.length) return p;
+    const v0 = pathValue(p); S.pendingFreeBoost = S.boostTokenValue; const p2 = bestPath(cfg.skill); const v1 = p2.length ? pathValue(p2) : -1e9;
+    const e = S.encounter, need = e.curHealth + (e.curShield||0), kills = computePathEffects(p2).totalDamage >= need && computePathEffects(p).totalDamage < need;
+    if(v1 - v0 >= 4 || kills){ S.boostTokenCharges--; (window.__tok=window.__tok||{}).boost=(window.__tok.boost||0)+1; return p2; }
+    S.pendingFreeBoost = 0; return p;
+  }
   function doTurn(){
     useTrayActs();
-    const p = bestPath(cfg.skill);
+    useTokens();
+    const p = boostTokenMaybe(bestPath(cfg.skill));
     (window.__turns=window.__turns||[]).push({f:S.floorIdx+1,len:p.length,dmg:Math.round(computePathEffects(p).totalDamage),boss:(S.encounter.type!=='Enemy'&&S.encounter.type!=='Trap')});
     S.path = [];
     p.forEach(i=>{ S.path.push(i); });
@@ -246,10 +282,10 @@ let res = await page.evaluate((cfg)=>{
     rec.floor=S.floorIdx+1; rec.turns=log.turns; rec.maxHp=S.maxHealth;
     runs.push(rec);
   }
-  return {runs, turns:window.__turns, man:Object.assign(window.__man,window.__end)};
+  return {runs, turns:window.__turns, man:Object.assign(window.__man,window.__end), tok:window.__tok||{}};
 }, cfg);
-const turnsData=res.turns, man=res.man; res=res.runs;
-require('fs').writeFileSync('' + __dirname + '/out_'+(cfg.label||'x')+'.json', JSON.stringify({cfg,res}));
+const turnsData=res.turns, man=res.man, tokUse=res.tok; res=res.runs;
+require('fs').writeFileSync('' + __dirname + '/out_'+(cfg.label||'x')+'.json', JSON.stringify({cfg,res,tokUse}));
 // summarize
 const n=res.length, wins=res.filter(r=>r.result==='VICTORY').length;
 const byFloor=[1,2,3].map(f=>{const fs=res.flatMap(r=>r.fights).filter(x=>x.floor===f&&x.done);const nt=fs.map(x=>x.turns);return {f, fights:fs.length, avgTurns:(nt.reduce((a,x)=>a+x,0)/Math.max(1,nt.length)).toFixed(2), oneTurn:(nt.filter(x=>x<=1).length/Math.max(1,nt.length)*100).toFixed(0)+'%', taken:(fs.reduce((a,x)=>a+(x.taken||0),0)/Math.max(1,fs.length)).toFixed(1)};});

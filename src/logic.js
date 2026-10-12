@@ -2171,7 +2171,7 @@ function runShrineEffect(e, effect){
       render(); return;
     }
     case 'relicChoice': {
-      const pool = RELICS.filter(r=>!r.origin && !hasRelic(r.id));
+      const pool = RELICS.filter(r=>!r.origin && !hasRelic(r.id) && relicUnlocked(r)); // gated tiers stay out until unlocked
       const want = (effect.count||3) + (hasRelic('shrine_bell') ? 1 : 0);
       if(hasRelic('shrine_bell') && pool.length) fireRelic('shrine_bell','+1 choice');
       if(!pool.length){

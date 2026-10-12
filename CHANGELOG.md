@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.39.2 (in progress)
+- Relic gating (Jeremy): the strongest shrine relics are quietly held back. Tier A (Evasion Tank, Perfect Fifth, Mandated Lunch Break, Prime Edge, Combonatorics) joins shrine offers after your first victory; tier S (Scavenger's Acumen, Minus-One Mantra, Hard Hat Act) after you clear depth 2. Locked relics stay "???" in the Codex.
+
 ## 1.39.1 (released Oct 12, 2026; bug hunt clean, 24 setups)
 - Swap and Reroll work mid-path (Jeremy): tap the face any time; neither can touch a die already in the path. Swap/Reroll tokens too.
 - Reroll always lands on a non-blank face (a different one whenever the die has one).

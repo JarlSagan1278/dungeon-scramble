@@ -246,6 +246,19 @@ const RELICS = [
   {id:'glimmer_dust',name:'Faerie Fire',      mono:'FF', origin:'pixie',    desc:'Each Dodge, Leap or Pivot in your Path adds +1 damage to its last damaging die.'},
 ];
 function relicById(id){ return RELICS.find(r=>r.id===id); }
+// Relic gating (Jeremy, Oct 12; tiers from the Oct 12 relic study): the strongest shrine relics are quietly held
+// back so power arrives over many runs. A locked relic never appears in a shrine offer, and the Codex keeps it
+// as "???" (it is only marked found when offered). Tier A: after the first victory. Tier S: after clearing depth 2.
+// Everything else (and every origin relic) is available from the first run.
+const RELIC_TIER = { bloodletter:'S', gambeson:'S', banner:'S',
+  dodger_cloak:'A', echo_chime:'A', iron_rations:'A', whetstone:'A', combo_gauntlet:'A' };
+function relicUnlocked(r){
+  const t = RELIC_TIER[r.id];
+  if(!t || r.origin) return true;
+  if(t==='A') return ((typeof META!=='undefined' && META.lifetime && META.lifetime.victories)||0) >= 1;
+  if(t==='S') return ((typeof DEPTH_BEST!=='undefined' && DEPTH_BEST.overall)||0) >= 2;
+  return true;
+}
 function originRelicFor(originId){ return RELICS.find(r=>r.origin===originId); }
 
 // ---- Origin dice ----

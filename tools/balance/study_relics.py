@@ -11,21 +11,25 @@ SHRINE = ['whetstone','iron_rations','gambeson','lucky_coin','kettle','banner','
           'barbed_buckler','overflow_chalice','bloodletter','spite_thorns','grave_tally','dodger_cloak','leaper_spurs','pivot_compass',
           'frost_charm','warding_bell','shrine_bell','combo_gauntlet']
 ORIGIN = {'dwarf':'forgeplate', 'gnome':'spore_satchel', 'halfling':'picnic_basket', 'pixie':'glimmer_dust'}
-EXTRA = json.loads(os.environ.get('RS_PAIRS', '[]'))  # optional relic pairs, e.g. [["glimmer_dust","leaper_spurs"]]
+EXTRA = json.loads(os.environ.get('RS_PAIRS', '[]'))
+TAG = os.environ.get('RS_TAG', 'rs')            # output prefix, so reruns with a new bot don't reuse old files
+XCFG = json.loads(os.environ.get('RS_CFG', '{}'))  # extra bot config for every cell, e.g. {"depthMods":{"foes":2}}
+ONLY = json.loads(os.environ.get('RS_ONLY', 'null'))  # optional subset of relic ids to run  # optional relic pairs, e.g. [["glimmer_dust","leaper_spurs"]]
 
 cells = []
 for o, k in PAIRS:
     cells.append((o, k, []))
-    for r in SHRINE: cells.append((o, k, [r]))
-    cells.append((o, k, [ORIGIN[o]]))
+    for r in SHRINE:
+        if ONLY is None or r in ONLY: cells.append((o, k, [r]))
+    if ONLY is None or ORIGIN[o] in ONLY: cells.append((o, k, [ORIGIN[o]]))
     for pr in EXTRA: cells.append((o, k, pr))
 
 def run(cell):
     o, k, rel = cell
-    label = 'rs_%s_%s' % (o, '+'.join(rel) or 'none')
+    label = '%s_%s_%s' % (TAG, o, '+'.join(rel) or 'none')
     path = os.path.join(HERE, 'out_' + label + '.json')
     if not os.path.exists(path):
-        cfg = dict(runs=RUNS, origin=o, klass=k, forceRelics=rel, relicLock=True, label=label)
+        cfg = dict(runs=RUNS, origin=o, klass=k, forceRelics=rel, relicLock=True, label=label); cfg.update(XCFG)
         subprocess.run(['node', os.path.join(HERE, 'study_maneuver.js'), json.dumps(cfg)], cwd=HERE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=3600)
     d = json.load(open(path))['res']
     n = len(d); wins = sum(1 for r in d if r['result'] == 'VICTORY')
@@ -45,7 +49,7 @@ for r in res:
     r['dWin'] = r['win'] - b['win']
     r['dTaken'] = {fl: r['taken'][fl] - b['taken'][fl] for fl in r['taken']}
     r['dTurns'] = r['turns'] - b['turns']
-json.dump(res, open(os.path.join(HERE, 'out_relics_summary.json'), 'w'), indent=1)
+json.dump(res, open(os.path.join(HERE, 'out_relics_summary_%s.json' % TAG), 'w'), indent=1)
 # table: mean over origins
 rows = {}
 for r in res:
