@@ -450,7 +450,7 @@ const FLOOR3_ENEMIES = [
   enc('Chimeric Sludge','Enemy',25,{questHealth:12,dmg:5,hot:2,quests:['12 damage: 4 maneuvers'],flavor:'Biological slag, made up of countless individual chimeras.'}),
   enc('Gnome Chomper','Enemy',28,{questHealth:6,dmg:7,quests:['6 damage: 3 maneuvers'],flavor:'"The Gnomish Chempire is the leading zealot state!"'}),
   // v1.39.0: replaces Parasite Seer (its art was a cropped copy of another gnome); Jeremy's idea, same slot and stats.
-  enc('Gnomeowners Association','Enemy',20,{dmg:3,shield:3,flavor:'"Your hat exceeds the permitted height by 3.14 inches. Please remit a fine."'}),
+  enc('Gnomeowners Association','Enemy',20,{dmg:3,shield:3,flavor:'"Only good and gracious hosts are allowed in this neighborhood."'}),
   enc('Gestalt Network','Enemy',20,{dmg:3,dot:2,flavor:'"You will join us. Our population is mushrooming."'}),
   enc("Oilephant's Foot",'Enemy',30,{questHealth:15,dmg:2,hot:3,quests:['15 damage: 4 support actions'],flavor:'"An Oilephant never forgets" refers to the long-lasting effects of radiation.'}),
   enc('Extractnid Matriarch','Enemy',22,{dmg:5,minion:3,quests:['nullify: 10+ damage'],flavor:'Undisturbed for eons, this primordial weaver and its brood now stir and hunger for glass.'}),
