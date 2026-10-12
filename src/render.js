@@ -608,14 +608,16 @@ function decorateArch(){
     const key = w+'x'+h+'x'+lvl+'x'+PX;
     if(!decorateArch._c || decorateArch._c.key !== key){
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w+2*PX}" height="${h+2*PY}" viewBox="${-PX} ${-PY} ${w+2*PX} ${h+2*PY}">${archFrameSVG(w,h,lvl)}</svg>`;
-      if(decorateArch._c && decorateArch._c.blob) URL.revokeObjectURL(decorateArch._c.src);
-      // a short blob: URL (not a 100KB+ data: URL that the HTML parser would re-read on every render)
-      let src, blob = false;
-      try{ src = URL.createObjectURL(new Blob([svg], {type:'image/svg+xml'})); blob = true; }
-      catch(e){ src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); }
-      decorateArch._c = { key, src, blob };
+      // one <img> element, built once and moved into each new card: no re-parsing and it stays decoded
+      // (a blob: URL was tried first and is refused on file:// pages)
+      const img = document.createElement('img');
+      img.className = 'fo-frame'; img.alt = ''; img.setAttribute('aria-hidden', 'true');
+      img.width = w+2*PX; img.height = h+2*PY;
+      img.style.cssText = `left:${-5-PX}px;top:${-10-PY}px;max-width:none`;
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+      decorateArch._c = { key, img };
     }
-    card.insertAdjacentHTML('beforeend', `<img class="fo-frame" alt="" aria-hidden="true" width="${w+2*PX}" height="${h+2*PY}" style="left:${-5-PX}px;top:${-10-PY}px;max-width:none" src="${decorateArch._c.src}">`);
+    card.appendChild(decorateArch._c.img);
     try{ document.body.classList.toggle('is-resolving', !!S.transitioning); }catch(e){}
     syncIdleBreath(); syncMascotHop(); rollHpNumbers();
     // Headroom above the monster (offset sizes again), so big monsters grow upward only until the arch would hide them.
