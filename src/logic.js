@@ -764,7 +764,7 @@ function getSetupPreviewPortrait(originId){
 
 function newGame(originId, classId, boonDieName, charName, depthMods){
   depthMods = depthMods || {};
-  const startHp = Math.max(8, 20 - 3*(depthMods.frail||0));
+  const startHp = Math.max(8, 20 - 4*(depthMods.frail||0));
   // Defense in depth: the Setup screen is the only place that offers an
   // Origin choice, and it already refuses to let a locked one be selected,
   // but falling back here too means a stale/tampered call can't bypass the
@@ -977,7 +977,7 @@ function drawEncounter(kind){
     if(e.type==='Shrine') S.segmentShrineUsed = true;
   }
   S.usedCards.add(e.name);
-  if(e.health>0){ e.health = Math.max(1, Math.round(e.health * floorHpMul(S.floorIdx))); if(e.maxHealth!==undefined) e.maxHealth = e.health; }
+  if(e.health>0){ e.health = Math.max(1, Math.round(e.health * floorHpMul(S.floorIdx) * (/^(elite|deadly)$/.test(encounterTier(e)) ? 1 + DREAD_HP*depthRank('dread') : 1))); if(e.maxHealth!==undefined) e.maxHealth = e.health; }
   e.curHealth = e.health;
   e.curDOT = 0; e.curHOT = 0; e.curShield = 0; e.turn = 0;
   // Your own D.O.T./H.O.T. don't carry from one encounter into the next
@@ -1917,7 +1917,7 @@ function runPlayerUpkeep(){
 }
 
 function dealEncounterDamage(e, amount){
-  if(amount>0 && depthRank('fury')) amount += depthRank('fury');
+  if(amount>0 && (depthRank('fury')>=2 || (depthRank('fury') && S._heavyHit))) amount += 1; // Zeal: rank 1 = heavy turns/boss specials, rank 2 = every hit
   if(amount>0 && S._wardHalf){ amount = Math.ceil(amount/2); fireRelic('warding_bell','Half'); }
   if(amount>0 && hasRelic('gambeson')){ amount = Math.max(0, amount-1); fireRelic('gambeson','-1'); }
   const blocked = Math.min(S.playerBlock, amount);
@@ -2020,8 +2020,9 @@ function bossTakeTurn(e, frozen){
   else {
     parts.push(`${sp.name}!`);
     S._wardHalf = !!(sp.windup && hasRelic('warding_bell') && !e._wardUsed); if(S._wardHalf) e._wardUsed = true;
+    S._heavyHit = true;
     sp.acts.forEach(a=>{ const t = applyEnemyAct(e, a); if(t) parts.push(t); });
-    S._wardHalf = false;
+    S._wardHalf = false; S._heavyHit = false;
   }
   teleLog('boss_move', {name:sp.name, frozen:!!frozen, phase:e.phase||1});
   if(kit===e.kit && e.kit.phase2 && e.curHealth>0 && e.curHealth <= e.maxHealth/2){
@@ -2071,7 +2072,9 @@ function runEncounterAction(){
   const x = k => (k===hs ? 2 : 1);
   const parts = [];
   if(heavy) parts.push(frozen ? `${e.name} is frozen: its heavy turn is cancelled.` : 'Heavy turn!');
+  S._heavyHit = !!hs;
   if(e.dmg>0) parts.push(dealEncounterDamage(e, e.dmg*x('dmg')));
+  S._heavyHit = false;
   if(e.shield>0){ enemySound('clank'); e.curShield += e.shield*x('shield'); parts.push(`${e.name} gains ${e.shield*x('shield')} shield.`); }
   if(e.heal>0){ enemySound('enemyBell'); e.curHealth = cap(e.curHealth+e.heal, e.maxHealth); parts.push(`${e.name} heals ${e.heal}.`); }
   if(e.hot>0){ enemySound('enemyBell'); e.curHOT += e.hot; parts.push(`${e.name} channels ${e.hot} H.O.T.`); }
@@ -2297,8 +2300,9 @@ function onEncounterDefeated(){
   const nearMiss = (okMiss>=1 && okMiss<=3) ? okMiss : 0;
   if(nearMiss) S.stats.nearMisses = (S.stats.nearMisses||0) + 1;
   const isBoss = e.type==='Boss' || e.type==='Big Boss';
-  let drawCount = (isBoss && depthRank('slim')<2) ? 3 : 2;
+  let drawCount = isBoss ? 3 : 2;
   if(overkill && !depthRank('slim')) drawCount += 1;
+  if(depthRank('slim')) drawCount = Math.max(1, drawCount - depthRank('slim')); // Burden of Choice
   if(hasRelic('lucky_coin')){ drawCount += 1; fireRelic('lucky_coin','+1 option'); }
   if(hasRelic('iron_rations')){ S.health = cap(S.health+2, S.maxHealth); logMsg('heal', relicById('iron_rations').name+': healed 2.', 'good'); fireRelic('iron_rations','+2 HP'); }
   const options = pickLootNUnused(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
@@ -2526,7 +2530,7 @@ function campRest(){
   let count=0;
   S.tray.forEach(c=>{ if(currentFace(c).type!=='blank') count++; });
   let heal = Math.ceil(count/2) + (hasRelic('kettle') ? 3 : 0);
-  if(depthRank('rest')) heal = Math.max(1, Math.round(heal*(1-0.25*depthRank('rest'))));
+  if(depthRank('rest')) heal = Math.max(0, Math.round(heal*(1-depthRank('rest')/3)));
   if(S.skipNextRest){ heal = 0; S.skipNextRest = false; logMsg('sys', 'Your rest is forfeit to the Time-Intensive Shrine.', 'bad'); }
   if(hasRelic('kettle')) fireRelic('kettle','+3 HP');
   const hpFrom = S.health;

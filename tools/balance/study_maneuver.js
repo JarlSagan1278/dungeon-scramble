@@ -39,6 +39,8 @@ let res = await page.evaluate((cfg)=>{
   ['render','showToast','playTone','playDiceRollSound','playPlayerHitSound','spawnParticleBurstAtPortrait','spawnParticleBurstAtEl','spawnConfettiRain','screenShake','impactPulse','lungeFigure','vibrate','hitStop','showKillCallout','showRoomCallout','fxTick','fxQuest','playStepTone','pulseDie','maybeAutosave','saveGame','autosave'].forEach(n=>{ try{ window[n]=noop; }catch(e){} });
   try{ PREFS.reducedMotion=true; }catch(e){}
   if(cfg.unlockAllRelics!==false){ try{ DEPTH_BEST.overall=Math.max(DEPTH_BEST.overall||0,2); }catch(e){} } // Oct 12 gating: studies see every relic unless unlockAllRelics:false
+  // classPatch (Oct 12 class study): {"guard":{"convertTo":{"type":"block","value":1}}, "arcanist":{"zone":"(r,c)=>r===c||r+c===3"}}; zone given as source text
+  Object.entries(cfg.classPatch||{}).forEach(([id,p])=>{ const k=CLASSES.find(x=>x.id===id); Object.entries(p).forEach(([f,v])=>{ k[f] = (f==='zone') ? eval(v) : v; }); });
   META.lifetime.victories=1; META.lifetime.bestFloorReached=3; META.achievements['origin_duo']={date:Date.now()};
   const origFns = {};
   // ---- encounter tuning hooks: scale enemies as they are drawn ----

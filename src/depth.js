@@ -9,21 +9,26 @@
 // Floor-by-floor enemy HP multiplier for the base game (Depth 1).
 const BASE_HP_MUL = [1, 1.5, 1.75];
 
+// v1.39.3 (Oct 12 depth study): ranks reshaped/recosted so each point of depth is worth about the same
+// (~6 win points for a skilled player). costs[] = depth added by each rank, in order.
 const DEPTH_MODS = [
-  { id:'foes',  name:'Tougher Scuffs', max:4, cost:1, desc:r=>`Enemies and bosses have +${r*15}% HP.` },
-  { id:'rest',  name:'Rationing Rations', max:3, cost:1, desc:r=>`Camp rest heals ${r*25}% less.` },
-  { id:'frail', name:'Clumsy',         max:3, cost:1, desc:r=>`Start with ${r*3} less max HP.` },
-  { id:'swarm', name:'Swarming',       max:3, cost:1, desc:r=>`Minion spawns place ${r} extra die${r>1?'s':''}.` },
-  { id:'slim',  name:'Burden of Choice', max:2, cost:1, desc:r=> r===1 ? 'Overkills no longer add a loot option.' : 'Overkills add no loot option, and bosses offer one fewer.' },
-  { id:'fury',  name:'Zeal',           max:2, cost:2, desc:r=>`Every enemy hit deals +${r} damage.` },
-  { id:'dread', name:'Dread',          max:3, cost:1, desc:r=>`Deadly encounters are ${r*12}% more likely to take an Elite room, and Floor 1 gains its own Deadly card.` },
-  { id:'gauntlet', name:'Night Shift', max:2, cost:2, desc:r=> r===1 ? 'Easy rooms become Standard rooms.' : 'Easy and Standard rooms become Elite rooms.' },
+  { id:'foes',  name:'Tougher Scuffs', max:4, costs:[1,1,1,1], desc:r=>`Enemies and bosses have +${r*15}% HP.` },
+  { id:'rest',  name:'Rationing Rations', max:3, costs:[1,1,1], desc:r=> r===3 ? 'Camp rest heals nothing.' : `Camp rest heals ${['','a third','two thirds'][r]} less.` },
+  { id:'frail', name:'Clumsy',         max:3, costs:[1,1,1], desc:r=>`Start with ${r*4} less max HP.` },
+  { id:'swarm', name:'Swarming',       max:3, costs:[1,3,4], desc:r=>`Minion spawns place ${r} extra die${r>1?'s':''}.` },
+  { id:'slim',  name:'Burden of Choice', max:2, costs:[1,1], desc:r=> r===1 ? 'Overkills add no loot option, and every loot reward offers one fewer die.' : 'Overkills add no loot option, and every loot reward offers two fewer dice (never fewer than one).' },
+  { id:'fury',  name:'Zeal',           max:2, costs:[2,2], desc:r=> r===1 ? 'Heavy turns and boss specials hit for +1 damage.' : 'Every enemy hit deals +1 damage.' },
+  { id:'dread', name:'Dread',          max:3, costs:[1,1,1], desc:r=>`Deadly encounters are ${r*12}% more likely to take an Elite room, Elite and Deadly foes have +${Math.round(r*DREAD_HP*100)}% HP, and Floor 1 gains its own Deadly card.` },
+  { id:'gauntlet', name:'Night Shift', max:2, costs:[2,2], desc:r=> r===1 ? 'Easy rooms become Standard rooms.' : 'Easy and Standard rooms become Elite rooms.' },
 ];
 const DEPTH_MOD_BY_ID = Object.fromEntries(DEPTH_MODS.map(m=>[m.id,m]));
 
+const DREAD_HP = 0.2; // Dread: extra HP per rank on Elite/Deadly foes
+// Depth added by the first r ranks of modifier m.
+function depthModCost(m, r){ let d = 0; for(let i=0;i<r;i++) d += m.costs[Math.min(i, m.costs.length-1)]; return d; }
 function depthFromMods(mods){
   let d = 1;
-  DEPTH_MODS.forEach(m=>{ d += ((mods&&mods[m.id])||0) * m.cost; });
+  DEPTH_MODS.forEach(m=>{ d += depthModCost(m, (mods&&mods[m.id])||0); });
   return d;
 }
 function depthRank(id){ return (S && S.depthMods && S.depthMods[id]) || 0; }
@@ -199,8 +204,9 @@ function wireDepthMenu(state){
     document.getElementById('depth-limit').textContent = d>=maxSelectableDepth() ? `Clear depth ${maxSelectableDepth()} to unlock deeper.` : `Up to depth ${maxSelectableDepth()} unlocked.`;
     rows.innerHTML = DEPTH_MODS.map(m=>{
       const r = state.mods[m.id]||0;
-      const canUp = r<m.max && (d + m.cost) <= maxSelectableDepth();
-      return `<div class="depth-row ${r?'on':''}"><div class="depth-row-text"><div class="depth-row-name">${m.name} <span class="depth-cost">+${m.cost}/rank</span></div><div class="depth-row-desc">${r?m.desc(r):m.desc(1)}</div></div>
+      const next = r<m.max ? m.costs[r] : m.costs[m.max-1];
+      const canUp = r<m.max && (d + next) <= maxSelectableDepth();
+      return `<div class="depth-row ${r?'on':''}"><div class="depth-row-text"><div class="depth-row-name">${m.name} <span class="depth-cost">+${next}${r<m.max?'':' each'}</span></div><div class="depth-row-desc">${r?m.desc(r):m.desc(1)}</div></div>
         <div class="depth-step"><button type="button" data-id="${m.id}" data-dir="-1" ${r?'':'disabled'}>&minus;</button><span>${r}/${m.max}</span><button type="button" data-id="${m.id}" data-dir="1" ${canUp?'':'disabled'}>+</button></div></div>`;
     }).join('');
     rows.querySelectorAll('button').forEach(b=>{

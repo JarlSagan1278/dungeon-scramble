@@ -10,18 +10,20 @@ JOBS = int(sys.argv[2]) if len(sys.argv) > 2 else 4
 TAG = os.environ.get('RD_TAG', 'rd')
 XCFG = json.loads(os.environ.get('RD_CFG', '{}'))
 PAIRS = [('dwarf', 'guard'), ('gnome', 'armsmaster'), ('halfling', 'dungeoneer'), ('pixie', 'arcanist')]
-MODS = {'foes': (4, 1), 'rest': (3, 1), 'frail': (3, 1), 'swarm': (3, 1), 'slim': (2, 1), 'fury': (2, 2), 'dread': (3, 1), 'gauntlet': (2, 2)}
-def depth(m): return 1 + sum(MODS[k][1]*v for k, v in m.items())
+# (max rank, depth added by each rank) -- keep in step with DEPTH_MODS in src/depth.js
+MODS = {'foes': (4, [1,1,1,1]), 'rest': (3, [1,1,1]), 'frail': (3, [1,1,1]), 'swarm': (3, [1,3,4]), 'slim': (2, [1,1]), 'fury': (2, [2,2]), 'dread': (3, [1,1,1]), 'gauntlet': (2, [2,2])}
+PART = os.environ.get('RD_PART', '12')  # '1' = single modifiers only
+def depth(m): return 1 + sum(sum(MODS[k][1][:v]) for k, v in m.items())
 loads = [{}]
 for k, (mx, c) in MODS.items():
     for r in range(1, mx+1): loads.append({k: r})
 rnd = random.Random(12)
-for target in (3, 5, 7, 9, 11, 13, 16):
+for target in ((3, 5, 7, 9, 11, 13, 16) if '2' in PART else ()):
     for t in range(3):
         m = {}
         while depth(m) < target:
             k = rnd.choice([k for k in MODS if m.get(k, 0) < MODS[k][0]])
-            if depth(m) + MODS[k][1] > target: continue
+            if depth(m) + MODS[k][1][m.get(k, 0)] > target: continue
             m[k] = m.get(k, 0) + 1
         loads.append(m)
 def name(m): return '+'.join('%s%d' % (k, v) for k, v in sorted(m.items())) or 'none'
