@@ -13,13 +13,13 @@ const BASE_HP_MUL = [1, 1.5, 1.75];
 // (~6 win points for a skilled player). costs[] = depth added by each rank, in order.
 const DEPTH_MODS = [
   { id:'foes',  name:'Tougher Scuffs', max:4, costs:[1,1,1,1], desc:r=>`Enemies and bosses have +${r*15}% HP.` },
-  { id:'rest',  name:'Rationing Rations', max:3, costs:[1,1,1], desc:r=> r===3 ? 'Camp rest heals nothing.' : `Camp rest heals ${['','a third','two thirds'][r]} less.` },
-  { id:'frail', name:'Clumsy',         max:3, costs:[1,1,1], desc:r=>`Start with ${r*4} less max HP.` },
+  { id:'rest',  name:'Rationing Rations', max:2, costs:[1,2], desc:r=> r===2 ? 'Camp rest heals nothing.' : 'Camp rest heals half as much.' },
+  { id:'frail', name:'Clumsy',         max:3, costs:[1,1,2], desc:r=>`Start with ${r*4} less max HP.` },
   { id:'swarm', name:'Swarming',       max:3, costs:[1,3,4], desc:r=>`Minion spawns place ${r} extra die${r>1?'s':''}.` },
-  { id:'slim',  name:'Burden of Choice', max:2, costs:[1,1], desc:r=> r===1 ? 'Overkills add no loot option, and every loot reward offers one fewer die.' : 'Overkills add no loot option, and every loot reward offers two fewer dice (never fewer than one).' },
-  { id:'fury',  name:'Zeal',           max:2, costs:[2,2], desc:r=> r===1 ? 'Heavy turns and boss specials hit for +1 damage.' : 'Every enemy hit deals +1 damage.' },
+  { id:'slim',  name:'Burden of Choice', max:1, costs:[1], desc:r=> 'Overkills add no loot option, and every loot reward offers one fewer die.' },
+  { id:'fury',  name:'Zeal',           max:2, costs:[3,1], desc:r=> r===1 ? 'Every enemy hit deals +1 damage.' : 'Every enemy hit deals +1 damage, and heavy turns and boss specials +1 more.' },
   { id:'dread', name:'Dread',          max:3, costs:[1,1,1], desc:r=>`Deadly encounters are ${r*12}% more likely to take an Elite room, Elite and Deadly foes have +${Math.round(r*DREAD_HP*100)}% HP, and Floor 1 gains its own Deadly card.` },
-  { id:'gauntlet', name:'Night Shift', max:2, costs:[2,2], desc:r=> r===1 ? 'Easy rooms become Standard rooms.' : 'Easy and Standard rooms become Elite rooms.' },
+  { id:'gauntlet', name:'Night Shift', max:2, costs:[1,2], desc:r=> r===1 ? 'Easy rooms become Standard rooms.' : 'Easy and Standard rooms become Elite rooms.' },
 ];
 const DEPTH_MOD_BY_ID = Object.fromEntries(DEPTH_MODS.map(m=>[m.id,m]));
 

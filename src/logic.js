@@ -1918,7 +1918,7 @@ function runPlayerUpkeep(){
 }
 
 function dealEncounterDamage(e, amount){
-  if(amount>0 && (depthRank('fury')>=2 || (depthRank('fury') && S._heavyHit))) amount += 1; // Zeal: rank 1 = heavy turns/boss specials, rank 2 = every hit
+  if(amount>0 && depthRank('fury')) amount += 1 + ((depthRank('fury')>=2 && S._heavyHit) ? 1 : 0); // Zeal: rank 1 = every hit +1, rank 2 = heavy turns/boss specials +1 more
   if(amount>0 && S._wardHalf){ amount = Math.ceil(amount/2); fireRelic('warding_bell','Half'); }
   if(amount>0 && hasRelic('gambeson')){ amount = Math.max(0, amount-1); fireRelic('gambeson','-1'); }
   const blocked = Math.min(S.playerBlock, amount);
@@ -2535,7 +2535,7 @@ function campRest(){
   let count=0;
   S.tray.forEach(c=>{ if(currentFace(c).type!=='blank') count++; });
   let heal = Math.ceil(count/2) + (hasRelic('kettle') ? 3 : 0);
-  if(depthRank('rest')) heal = Math.max(0, Math.round(heal*(1-depthRank('rest')/3)));
+  if(depthRank('rest')) heal = depthRank('rest')>=2 ? 0 : Math.round(heal/2); // Rationing Rations: half, then nothing
   if(S.skipNextRest){ heal = 0; S.skipNextRest = false; logMsg('sys', 'Your rest is forfeit to the Time-Intensive Shrine.', 'bad'); }
   if(hasRelic('kettle')) fireRelic('kettle','+3 HP');
   const hpFrom = S.health;
