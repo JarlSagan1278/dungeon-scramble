@@ -228,7 +228,7 @@ const RELICS = [
   {id:'barbed_buckler', name:"Nature's Thorns",  mono:'NT', desc:'Each Block you gain from your path also deals 1 damage.', tags:['offense','defense']},
   {id:'overflow_chalice',name:'Power Word: Safe',mono:'PW', desc:'Healing past your maximum health becomes Block.', tags:['defense']},
   {id:'bloodletter',  name:"Scavenger's Acumen",mono:'SA', desc:'Every 6 damage you deal in one turn heals 1.', tags:['offense','defense']},
-  {id:'spite_thorns', name:'Equal and Opposite',      mono:'EO', desc:'When you fully block an enemy attack, it takes 2 damage.', tags:['offense','defense']},
+  {id:'spite_thorns', name:'Equal and Opposite',      mono:'EO', reflect:'full', desc:'When you fully block an enemy attack, it takes 2 damage.', tags:['offense','defense']},
   {id:'grave_tally',  name:'Strength in Mooks',       mono:'SM', desc:'Each Minion you clear gives 1 Block.', tags:['defense']},
   // Movement family (lets players try Maneuver payoffs without changing the base dice):
   {id:'dodger_cloak', name:'Evasion Tank',    mono:'ET', desc:'Each Dodge in your path gives 1 Block.', tags:['path','defense']},

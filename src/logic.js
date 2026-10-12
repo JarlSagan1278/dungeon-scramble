@@ -1418,7 +1418,7 @@ function computePathEffects(path){
       case 'combo': { comboCount++; const nAdj=attackNeighborsCount(idx); totalDamage += val*(1+nAdj)*boostMult; break; }
       case 'dot': dotCount++; dotToEncounter += val*boostMult; break;
       case 'leech': dotToEncounter += val*boostMult; hotToPlayer += val*boostMult; break;
-      case 'heal': supportCount++; healCount++; healGain += val*boostMult; break;
+      case 'heal': supportCount++; healCount++; healGain += Math.max(1, val - depthRank('round'))*boostMult; break;
       case 'hot': supportCount++; hotCount++; hotToPlayer += val*boostMult; break;
       case 'block': supportCount++; blockCount++; blockGain += val*boostMult; break;
       case 'boost': boostCount++; boostMult *= val; break;
@@ -1485,7 +1485,7 @@ function computePathSteps(path){
       case 'combo': step.dmg = val*(1+attackNeighborsCount(idx))*boostMult; break;
       case 'dot': step.dotToEncounter = val*boostMult; break;
       case 'leech': step.dotToEncounter = val*boostMult; step.hotToPlayer = val*boostMult; break;
-      case 'heal': step.healGain = val*boostMult; break;
+      case 'heal': step.healGain = Math.max(1, val - depthRank('round'))*boostMult; break; // Rounding Error: Heal faces heal 1 less (never below 1)
       case 'hot': step.hotToPlayer = val*boostMult; break;
       case 'block': step.blockGain = val*boostMult; break;
       case 'boost': step.boostMultApplied = val; boostMult *= val; break;
@@ -1934,7 +1934,9 @@ function dealEncounterDamage(e, amount){
   const blocked = Math.min(S.playerBlock, amount);
   S.playerBlock -= blocked;
   const dealt = amount-blocked;
-  if(amount>0 && blocked>0 && dealt===0 && hasRelic('spite_thorns') && e.curHealth>0){ e.curHealth = capUpper(e.curHealth-absorbWithShield(e, 2), e.maxHealth); fireRelic('spite_thorns','2 back'); }
+  const eo = relicById('spite_thorns'); // Equal and Opposite: reflect 'full' = 2 back on a fully Blocked hit (live), 'any' = 2 back when Block absorbs any of a hit, 'blocked' = the amount Blocked back (Oct 12 tests)
+  const eoBack = eo.reflect==='blocked' ? blocked : 2;
+  if(amount>0 && blocked>0 && (eo.reflect==='full' ? dealt===0 : true) && hasRelic('spite_thorns') && e.curHealth>0){ e.curHealth = capUpper(e.curHealth-absorbWithShield(e, eoBack), e.maxHealth); fireRelic('spite_thorns',eoBack+' back'); }
   S.health = cap(S.health-dealt, S.maxHealth);
   if(blocked>0){ // Oct 12 (Jeremy): make prevented damage visible -- a Block floater on your HP bar + a run total
     S.stats.damageBlocked = (S.stats.damageBlocked||0) + blocked;
@@ -2272,6 +2274,7 @@ function continueFromShrine(){
 }
 
 function applyShrineBoon(e){
+  if(depthRank('dues') && e.effect){ const was = S.health; S.health = Math.max(1, S.health-2); if(S.health<was) logMsg('dmg', `Union Dues: the shrine takes ${was-S.health} HP.`, 'bad'); }
   if(!e.effect){
     const t = `${e.name} has no coded effect yet (boon: "${e.boon}") -- log-only for now.`;
     logMsg('sys', t);
