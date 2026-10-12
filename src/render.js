@@ -2637,7 +2637,7 @@ const UIFX = {ticks:[], quests:[], flareAt:-1e9, vsAt:-1e9};
 function fxTick(side,type,amt){ if(amt>0) UIFX.ticks.push({side,type,amt,t:performance.now()}); }
 function tickFloatersHTML(side){
   const now=performance.now(); UIFX.ticks=UIFX.ticks.filter(x=>now-x.t<1300);
-  return UIFX.ticks.filter(x=>x.side===side).map((x,k)=>`<span class="tick-float tf-${x.type}" style="animation-delay:-${Math.round(now-x.t)}ms; --k:${k%3}">${iconSpan(x.type)}<b>${x.type==='dot'?'-':'+'}${x.amt}</b></span>`).join('');
+  return UIFX.ticks.filter(x=>x.side===side).map((x,k)=>`<span class="tick-float tf-${x.type}" style="animation-delay:-${Math.round(now-x.t)}ms; --k:${k%3}">${iconSpan(x.type)}${x.type==='block'?`<b>${x.amt}</b>&nbsp;blocked`:`<b>${x.type==='dot'?'-':'+'}${x.amt}</b>`}</span>`).join('');
 }
 function fxQuest(name,i){
   UIFX.quests.push({name,i,t:performance.now()});
@@ -4070,6 +4070,7 @@ function summaryStatsHTML(){
         <span class="status-chip sum-chip">Damage dealt: <b class="sum-count" data-to="${Math.round(st.damageDealt)}">${Math.round(st.damageDealt)}</b></span>
         <span class="status-chip sum-chip">Encounters defeated: <b class="sum-count" data-to="${st.encountersDefeated}">${st.encountersDefeated}</b></span>
         <span class="status-chip sum-chip">Shrines visited: <b class="sum-count" data-to="${st.shrinesVisited}">${st.shrinesVisited}</b></span>
+        <span class="status-chip sum-chip">Damage blocked: <b class="sum-count" data-to="${st.damageBlocked||0}">${st.damageBlocked||0}</b></span>
         <span class="status-chip sum-chip">Overkills: <b class="sum-count" data-to="${st.overkills}">${st.overkills}</b></span>
         <span class="status-chip sum-chip">Loot Dice collected: <b class="sum-count" data-to="${st.lootCollected}">${st.lootCollected}</b></span>
         ${(S.relics||[]).map(id=>`<span class="status-chip">Relic: ${relicById(id).name}</span>`).join('')}

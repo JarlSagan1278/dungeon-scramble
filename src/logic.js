@@ -857,7 +857,7 @@ function newGame(originId, classId, boonDieName, charName, depthMods){
     // carryover die.
     usedLootNames: new Set([carryDie && carryDie.name, appliedBoonName].filter(Boolean)),
     _lastPlayerHealth: startHp, // for the heal/damage flash effect on the health bar
-    stats: { turnsTaken:0, damageDealt:0, encountersDefeated:0, shrinesVisited:0, overkills:0, lootCollected:0, bestTurn:0, bestTurnFoe:'', bestOverBy:0, bestOverFoe:'', longestPath:0, nearMisses:0 },
+    stats: { turnsTaken:0, damageDealt:0, encountersDefeated:0, shrinesVisited:0, overkills:0, lootCollected:0, bestTurn:0, bestTurnFoe:'', bestOverBy:0, bestOverFoe:'', longestPath:0, nearMisses:0, damageBlocked:0 },
     tele: newTelemetry(),
     campRested: false,
     shrineResult: null,
@@ -1926,6 +1926,10 @@ function dealEncounterDamage(e, amount){
   const dealt = amount-blocked;
   if(amount>0 && blocked>0 && dealt===0 && hasRelic('spite_thorns') && e.curHealth>0){ e.curHealth = capUpper(e.curHealth-absorbWithShield(e, 2), e.maxHealth); fireRelic('spite_thorns','2 back'); }
   S.health = cap(S.health-dealt, S.maxHealth);
+  if(blocked>0){ // Oct 12 (Jeremy): make prevented damage visible -- a Block floater on your HP bar + a run total
+    S.stats.damageBlocked = (S.stats.damageBlocked||0) + blocked;
+    if(typeof fxTick==='function') fxTick('player','block',blocked);
+  }
   if(dealt>0 && typeof playPlayerHitSound==='function') playPlayerHitSound();
   else if(amount>0 && blocked>0 && typeof playTone==='function') playTone('clank'); // v1.39.0: a fully Blocked hit clanks
   // A big hit landing gets the same small screen-shake as an Overkill, on

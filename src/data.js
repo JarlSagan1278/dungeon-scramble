@@ -282,8 +282,8 @@ const CLASSES = [
     zone:(r,c)=> (r===1||r===2) && (c===2||c===3), convertTo:{type:'block', value:1}}, // Block 2 -> 1 (Jeremy, Oct 12 class study: Guard won 89% vs 40-67%)
   {id:'dungeoneer', name:'Dungeoneer', color:'#d4812e', ability:'Your zone (the left and right edges) wraps left-to-right when building a Path, on every row.',
     zone:(r,c)=> c===0 || c===3, wrap:true}, // every row wraps (Jeremy, Oct 12; was the two middle rows)
-  {id:'arcanist', name:'Arcanist', color:'#b4419a', ability:'Within your zone (the rising diagonal), you may move diagonally as if using Dodge.',
-    zone:(r,c)=> r+c===3, diagonalZone:true},
+  {id:'arcanist', name:'Arcanist', color:'#b4419a', ability:'Your zone is both diagonals. Any step into or out of your zone may go diagonally, as if using Dodge.',
+    zone:(r,c)=> r===c || r+c===3, diagonalZone:'either'}, // both diagonals + either end (Jeremy, Oct 12 class study: 29% -> 53%)
   {id:'debug', name:'Debug', color:'#9aa3ab', ability:'No class ability. Starting tray is a random assortment of every die type in the game, for testing.',
     zone:(r,c)=> false, debug:true},
 ];
