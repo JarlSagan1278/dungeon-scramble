@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.39.0
+## 1.39.0 (released Oct 12, 2026; bug hunt clean, 24 setups)
 - Seven new monsters from Jeremy's Mechanics Document, with his flavor text and the original art already in the game: Untamed Unicrows (Floor 1 standard), Prickly Porcupanther (Floor 1 Deadly, only with the Dread modifier), Rabbid Rabbats and Roudy Rinotter (Floor 2 easy), Whence Wolf (Floor 2 Deadly), Eelagator Escapee (Floor 3 Deadly), Toadtaur Warrior (Floor 3 elite). Each was tuned to sit inside its tier.
 - Third Big Boss: Toadtaur Wizard, Assistant to the Co-consul (78 health; Hex Factor, Square Root, Exponential Croak; phase 2 Leap Year, where the Toadtaur Warrior joins with Lily Pad Lemma). Floor 3 Big Bosses now cost 11.8-13.3 HP per fight for the bot.
 - Four new Magic dice (names by Jeremy): Axiom of Choice (Reroll), Domesticated Displacer (Swap), 273.15 Kelvin Box (Freeze), Exile Elixir (Swap, Block, Freeze, Heal).
