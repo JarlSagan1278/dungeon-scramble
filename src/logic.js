@@ -1219,7 +1219,7 @@ function toggleSelect(idx){
     // clicking the most-recently-chosen die again steps back one move
     S.path.pop();
     restoreReveals(S.path.length);
-    render();
+    if(typeof renderPathOnly==='function') renderPathOnly(); else render();
     return;
   }
   if(S.path.includes(idx)) return; // only the last move can be undone this way
@@ -1227,7 +1227,7 @@ function toggleSelect(idx){
   S.path.push(idx);
   if(S.path.length===1 && typeof lungeFigure==='function') lungeFigure('playerReady');
   if(typeof playTone==='function') playTone('pathTick', S.path.length-1); // rises up the pentatonic ladder as the path grows
-  render();
+  if(typeof renderPathOnly==='function') renderPathOnly(); else render();
 }
 
 // ---- Swap / Reroll (v1.38.0) ----

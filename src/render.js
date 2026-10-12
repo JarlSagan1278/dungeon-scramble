@@ -1713,6 +1713,7 @@ function renderGame(){
     </div>
   `;
   document.getElementById('tray').innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join('');
+  renderGame._minions = S.tray.filter(c=>c.minion).length;
   { const c = document.querySelector('#enc-panel .fo-arch'); if(c && syncRoomFloor._hz) c.style.setProperty('--hz', syncRoomFloor._hz+'px'); }
   // placeVs() runs after the path strip is written (below): reading layout here and writing the strip after it
   // forced a second full layout on every path tap (Oct 12)
@@ -1742,43 +1743,7 @@ function renderGame(){
   S.lastMinionClearIdx = null; // consumed -- plays once, on the render right after runPlayerPathSteps() set it
   S.justConvertedIdx = null; // consumed -- plays once, on the render right after useClassAbility() set it
   S.justRerolledIdx = null; S.justSwappedIdx = null; // consumed (Swap/Reroll flourishes, v1.38.0)
-  [...document.getElementById('tray').children].forEach(node=>{
-    const idx = parseInt(node.dataset.idx);
-    let pressTimer = null;
-    let longPressed = false;
-    let pressTimerWasActive = false;
-    const cancelPress = ()=>{
-      if(pressTimer){ clearTimeout(pressTimer); pressTimer = null; }
-      // only dismiss a bubble this die itself raised -- a plain pointerleave must not kill other tooltips (e.g. the enemy flavor bubble)
-      if(longPressed || pressTimerWasActive) hideFaceTooltip();
-      pressTimerWasActive = false;
-      // Leave `longPressed` as-is here: pointerup fires just before the
-      // synthetic click, and the click handler is what needs to see it was
-      // a long-press (to swallow the click) before it gets cleared.
-    };
-    node.addEventListener('pointerdown', (ev)=>{
-      if(S.transitioning) return;
-      longPressed = false; pressTimerWasActive = true;
-      const rect = node.getBoundingClientRect();
-      pressTimer = setTimeout(()=>{
-        longPressed = true;
-        const cell = S.tray[idx];
-        if(cell.minion){
-          showFaceTooltip(rect, `<strong>Minion die</strong> — clogs this space; each damage you deal clears one, or Leap clean over it.`);
-          return;
-        }
-        const f = cell.forcedFace || currentFace(cell);
-        showFaceTooltip(rect, `<strong>${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</strong> — ${FACE_DESC[f.type]||''}`);
-      }, 420);
-    });
-    ['pointerup','pointerleave','pointercancel'].forEach(evt=> node.addEventListener(evt, cancelPress));
-    node.onclick = ()=> {
-      if(S.transitioning) return;
-      if(longPressed){ longPressed = false; return; } // long-press consumed this interaction
-      if(node.classList.contains('used') && !node.classList.contains('undoable')) return;
-      toggleSelect(idx);
-    };
-  });
+  bindTrayDice();
   document.getElementById('clear-path-btn').onclick = ()=>{
     if(S.transitioning) return;
     // A built-up path is a few taps of work -- require a confirming second
@@ -1834,17 +1799,7 @@ function renderGame(){
     if(!S.encounter || S.transitioning) return;
     debugWinEncounter();
   };
-  { // Path as a rightward-growing stack of overlapping coins, one per move (latest on top).
-    const n = S.path.length;
-    const step = n>1 ? Math.min(16, 180/(n-1)) : 16;
-    const ta = S.trayAct;
-    if(ta){ document.getElementById('path-strip').innerHTML = `<span class="trayact-hint">${iconSpan(ta.kind)} ${ta.kind==='swap' ? (ta.token ? (ta.first==null ? 'Tap the first die to swap' : 'Tap the second die') : 'Tap a die to trade places') : 'Tap a die to reroll'}</span>`; }
-    else document.getElementById('path-strip').innerHTML = S.path.map((idx,k)=>{
-      const f = getFaceForIdx(idx);
-      const tip = `${k+1}. ${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?(' '+f.value):''}`;
-      return `<span class="path-coin" style="${k?`margin-left:${(step-30).toFixed(1)}px;`:''}z-index:${k+1}" title="${tip}">${iconSpan(f.type, f.value)}</span>`;
-    }).join('');
-  }
+  renderPathStrip();
   if(S.transitioning){
     const skipBtn = document.getElementById('skip-transition-btn');
     if(skipBtn) skipBtn.onclick = skipTransition;
@@ -1859,6 +1814,88 @@ function renderGame(){
   if(S.shrineChoice) renderShrineChoiceModal();
   if(S.relicChoice) renderRelicChoiceModal();
   if(S.pendingLootDie) renderSwapModal();
+}
+
+// Tray dice: long-press shows the face, a tap builds the path. Shared by renderGame() and renderPathOnly().
+function bindTrayDice(){
+  [...document.getElementById('tray').children].forEach(node=>{
+    const idx = parseInt(node.dataset.idx);
+    let pressTimer = null;
+    let longPressed = false;
+    let pressTimerWasActive = false;
+    const cancelPress = ()=>{
+      if(pressTimer){ clearTimeout(pressTimer); pressTimer = null; }
+      // only dismiss a bubble this die itself raised -- a plain pointerleave must not kill other tooltips (e.g. the enemy flavor bubble)
+      if(longPressed || pressTimerWasActive) hideFaceTooltip();
+      pressTimerWasActive = false;
+      // Leave `longPressed` as-is here: pointerup fires just before the
+      // synthetic click, and the click handler is what needs to see it was
+      // a long-press (to swallow the click) before it gets cleared.
+    };
+    node.addEventListener('pointerdown', (ev)=>{
+      if(S.transitioning) return;
+      longPressed = false; pressTimerWasActive = true;
+      const rect = node.getBoundingClientRect();
+      pressTimer = setTimeout(()=>{
+        longPressed = true;
+        const cell = S.tray[idx];
+        if(cell.minion){
+          showFaceTooltip(rect, `<strong>Minion die</strong> — clogs this space; each damage you deal clears one, or Leap clean over it.`);
+          return;
+        }
+        const f = cell.forcedFace || currentFace(cell);
+        showFaceTooltip(rect, `<strong>${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</strong> — ${FACE_DESC[f.type]||''}`);
+      }, 420);
+    });
+    ['pointerup','pointerleave','pointercancel'].forEach(evt=> node.addEventListener(evt, cancelPress));
+    node.onclick = ()=> {
+      if(S.transitioning) return;
+      if(longPressed){ longPressed = false; return; } // long-press consumed this interaction
+      if(node.classList.contains('used') && !node.classList.contains('undoable')) return;
+      toggleSelect(idx);
+    };
+  });
+}
+function renderPathStrip(){
+  { // Path as a rightward-growing stack of overlapping coins, one per move (latest on top).
+    const n = S.path.length;
+    const step = n>1 ? Math.min(16, 180/(n-1)) : 16;
+    const ta = S.trayAct;
+    if(ta){ document.getElementById('path-strip').innerHTML = `<span class="trayact-hint">${iconSpan(ta.kind)} ${ta.kind==='swap' ? (ta.token ? (ta.first==null ? 'Tap the first die to swap' : 'Tap the second die') : 'Tap a die to trade places') : 'Tap a die to reroll'}</span>`; }
+    else document.getElementById('path-strip').innerHTML = S.path.map((idx,k)=>{
+      const f = getFaceForIdx(idx);
+      const tip = `${k+1}. ${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?(' '+f.value):''}`;
+      return `<span class="path-coin" style="${k?`margin-left:${(step-30).toFixed(1)}px;`:''}z-index:${k+1}" title="${tip}">${iconSpan(f.type, f.value)}</span>`;
+    }).join('');
+  }
+}
+// Fast update for a plain path tap (Oct 12, performance): only what a path step changes is redrawn -- the dice,
+// the path coins, the damage counter, Go, the chest lock and the enemy health bar's preview -- instead of the
+// whole screen. Anything unusual falls back to the full render().
+function renderPathOnly(){
+  const tray = document.getElementById('tray');
+  if(!S || S.screen!=='game' || !S.encounter || S.transitioning || S.trayAct || abilityArmed || S.newRoomFx || !tray
+     || S.lootChoice || S.shrineChoice || S.relicChoice || S.pendingLootDie) return render();
+  const minions = S.tray.filter(c=>c.minion).length;
+  if(minions !== renderGame._minions) return render(); // a step uncovered a Minion: the scene's Minion chip changes too
+  hideFaceTooltip();
+  tray.innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join('');
+  bindTrayDice();
+  renderPathStrip();
+  const wrap = document.querySelector('.tray-float-wrap');
+  if(wrap){ wrap.querySelectorAll('.path-counter-float').forEach(n=>n.remove()); wrap.insertAdjacentHTML('beforeend', pathCounterHTML()); }
+  const go = document.getElementById('resolve-btn');
+  if(go){ const canExtend = anyMoveAvailable(), disabled = S.path.length===0 && canExtend;
+    go.classList.toggle('disabled', disabled); go.classList.toggle('pulse', !disabled && !canExtend); }
+  const lock = document.querySelector('.chest-lock');
+  if(lock){ let ready = false; try{ if(S.path.length) ready = pcfTierFor(computePathEffects(S.path).totalDamage) >= 2; }catch(e){} lock.classList.toggle('ready', ready); }
+  // enemy health bar (damage preview + Lethal/Overkill hint): rebuilt from the card markup, only that node swapped
+  const old = document.querySelector('#enc-panel .fo-enemy .fo-hpwrap');
+  if(old){ const t = document.createElement('div'); t.innerHTML = renderEncounterCard(S.encounter,'faceoff');
+    const nw = t.querySelector('.fo-enemy .fo-hpwrap'); if(nw) old.replaceWith(nw); }
+  updatePathTrail();
+  rollPathCounter();
+  killHintFx();
 }
 
 function pickPreviewFace(dieFaces){

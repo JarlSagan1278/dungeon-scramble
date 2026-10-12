@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1.39.2 (in progress)
-- Faster path taps (about 11% on a typical tap, 18% on slow ones, at phone-like speed): the stone arch is drawn once into a cached image instead of being rebuilt every tap, and the room floor no longer forces a second full layout per tap.
+- Much faster path taps: about 2.5x (median ~119 ms -> ~47 ms per tap, slowest 10% ~175 -> ~63 ms, at phone-like speed). A path tap now redraws only what it changes (dice, path coins, damage counter, Go, chest lock, the enemy bar's damage preview) instead of the whole screen; the stone arch is a cached image; the room floor no longer forces a second layout. `tools/test_pathrender.js` checks the fast update matches a full redraw.
 - Relic gem families evened out (Jeremy): Equal and Opposite is now offense; Perfect Fifth and Combonatorics are path; Percolation Theory, Mandated Lunch Break and Bisection Method are loot/tempo. Families: 6 offense, 6 defense, 5 path, 6 loot/tempo. Effects unchanged.
 - Shrine "Hold to receive the boon" and Continue buttons float in the tray's header row instead of taking their own row, so the dice no longer get pushed down (Jeremy).
 - Relic gating (Jeremy): the strongest shrine relics are quietly held back. Tier A (Evasion Tank, Perfect Fifth, Mandated Lunch Break, Prime Edge, Combonatorics) joins shrine offers after your first victory; tier S (Scavenger's Acumen, Minus-One Mantra, Hard Hat Act) after you clear depth 2. Locked relics stay "???" in the Codex.
