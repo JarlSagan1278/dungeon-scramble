@@ -7,6 +7,7 @@
 4. **Sound / music** and 5. **art**, worked in parallel.
 
 ## Other items
+- **Tap responsiveness (Jeremy noticed lag in 1.39.1, Oct 12):** measured at phone-like speed (CPU x4): ~110 ms per path tap in 1.39.0, ~123 ms in 1.39.1 (the 2x art adds ~10%). Every tap re-renders the whole screen. Tried keeping the face-off scene, floor and arch in place on taps: no measurable gain and it broke the HP number roll, so it was reverted. Options: art at 1.5x instead of 2x; or a real tray-only update path on taps (bigger refactor).
 - **Origin balance:** bot win rate by origin (1.38.1): Halfling 71%, Dwarf 60%, Gnome about 55% (D.O.T. 2s in 1.39.0), Pixie 54%. Some imbalance is fine (Jeremy), but Pixie should be strong. Check against real play data.
 - **Design-consistency audit**, plus a rewrite of the quest descriptions. Quest audit done Oct 12 (`docs/studies/2026-10-12_todo_studies.md`): all broken quests fixed, Geometry mirror quests built to Jeremy's rule (1.39.0).
 - **Sound effect pass** (audit + proposed palette: `docs/studies/2026-10-12_todo_studies.md` section 4): audit the actions and cut redundancy; one consistent theme; a rising-note melody for tension/success; dice materials change the roll sound; stronger enemy-turn and shrine sounds; airier Maneuver/dodge sounds.
