@@ -14,11 +14,11 @@ VARIANTS = [
     ('armsmaster as-is', 'armsmaster', {}),
     ('dungeoneer as-is', 'dungeoneer', {}),
     ('arcanist as-is', 'arcanist', {}),
-    ('guard Block 1', 'guard', {'convertTo': {'type': 'block', 'value': 1}}),
-    ('guard zone = right column middle 2', 'guard', {'zone': '(r,c)=>(r===1||r===2)&&c===3'}),
-    ('dungeoneer wraps on every row', 'dungeoneer', {'zone': '(r,c)=>c===0||c===3'}),
     ('arcanist zone = both diagonals', 'arcanist', {'zone': '(r,c)=>r===c||r+c===3'}),
-    ('arcanist zone = middle 2x2 + rising diag', 'arcanist', {'zone': '(r,c)=>r+c===3||((r===1||r===2)&&(c===1||c===2))'}),
+    ('arcanist diagonal step into or out of zone', 'arcanist', {'diagonalZone': 'either'}),
+    ('arcanist both diagonals + into/out of zone', 'arcanist', {'zone': '(r,c)=>r===c||r+c===3', 'diagonalZone': 'either'}),
+    ('arcanist + once/turn zone die -> Dodge', 'arcanist', {'convertTo': {'type': 'dodge'}}),
+    ('arcanist + once/turn zone die -> Leap', 'arcanist', {'convertTo': {'type': 'leap'}}),
 ]
 VARIANTS = [v for v in VARIANTS if not os.environ.get('RC_ONLY') or v[0] in os.environ['RC_ONLY'].split('|')]
 def slug(s): return ''.join(ch if ch.isalnum() else '_' for ch in s)

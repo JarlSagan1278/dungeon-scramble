@@ -278,10 +278,10 @@ const ORIGINS = [
 const CLASSES = [
   {id:'armsmaster', name:'Armsmaster', color:'#c0392f', ability:'Once per turn, turn any Action or Blank in your zone (right column) into a Hit (2).',
     zone:(r,c)=> c===3, convertTo:{type:'hit', value:2}},
-  {id:'guard', name:'Guard', color:'#2fb8b8', ability:'Once per turn, turn any Action or Blank in your zone (middle-right block) into a Block (2).',
-    zone:(r,c)=> (r===1||r===2) && (c===2||c===3), convertTo:{type:'block', value:2}},
-  {id:'dungeoneer', name:'Dungeoneer', color:'#d4812e', ability:'Your zone (the two middle squares on the left and right edges) wraps left-to-right when building a Path.',
-    zone:(r,c)=> (r===1||r===2) && (c===0||c===3), wrap:true},
+  {id:'guard', name:'Guard', color:'#2fb8b8', ability:'Once per turn, turn any Action or Blank in your zone (middle-right block) into a Block (1).',
+    zone:(r,c)=> (r===1||r===2) && (c===2||c===3), convertTo:{type:'block', value:1}}, // Block 2 -> 1 (Jeremy, Oct 12 class study: Guard won 89% vs 40-67%)
+  {id:'dungeoneer', name:'Dungeoneer', color:'#d4812e', ability:'Your zone (the left and right edges) wraps left-to-right when building a Path, on every row.',
+    zone:(r,c)=> c===0 || c===3, wrap:true}, // every row wraps (Jeremy, Oct 12; was the two middle rows)
   {id:'arcanist', name:'Arcanist', color:'#b4419a', ability:'Within your zone (the rising diagonal), you may move diagonally as if using Dodge.',
     zone:(r,c)=> r+c===3, diagonalZone:true},
   {id:'debug', name:'Debug', color:'#9aa3ab', ability:'No class ability. Starting tray is a random assortment of every die type in the game, for testing.',

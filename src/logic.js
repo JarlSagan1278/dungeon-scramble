@@ -1201,7 +1201,7 @@ function canSelect(idx){
   if(!allowed && S.klass.wrap && inZone(lastIdx) && inZone(idx)){
     allowed = adjWrap(a,b) || adjNormal(a,b);
   }
-  if(!allowed && S.klass.diagonalZone && inZone(lastIdx) && inZone(idx)){
+  if(!allowed && S.klass.diagonalZone && (S.klass.diagonalZone==='either' ? (inZone(lastIdx) || inZone(idx)) : (inZone(lastIdx) && inZone(idx)))){
     allowed = adjDiag(a,b);
   }
   return allowed;
