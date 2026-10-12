@@ -67,14 +67,16 @@ Optional later: a boss layer (an extra track added on top of that floor's action
   - The V is always A *major* (with C#). That's what makes it harmonic minor.
 
 ## What's in this folder
-| File | What it is |
-|---|---|
-| `midi/01_bass_palace_pump_Dm_140.mid` | Driving octave-eighths bass (4 bars) |
-| `midi/02_bass_stairs_Dm_140.mid` | Broken-chord bass, lighter (4 bars) |
-| `midi/03_bass_bulgar_Afreygish_140.mid` | Bulgar 3+3+2 bass in A freygish (4 bars) |
-| `midi/04_bass_lonely_Dm_140.mid` | Downtime bass: held notes, gaps (4 bars, same harmony as 01) |
-| `midi/05_downtime_sketch_Dm_140.mid` | Lonely bass + sad melody (8 bars) |
-| `midi/06_action_sketch_Dm_140.mid` | Pump bass + frantic melody + toy drums (8 bars, layers with 05) |
+These are **sketches for Floor 1 only**: raw material to build the Floor 1 pair from, not finished pieces. Nothing here is for treasure, victory, camp or shrine yet.
+
+| File | What it is | Where it would play |
+|---|---|---|
+| `midi/01_bass_palace_pump_Dm_140.mid` | Driving octave-eighths bass (4 bars) | Bass option for Floor 1 fights |
+| `midi/02_bass_stairs_Dm_140.mid` | Broken-chord bass, lighter (4 bars) | Alternative bass for Floor 1 fights |
+| `midi/03_bass_bulgar_Afreygish_140.mid` | Bulgar 3+3+2 bass in A freygish (4 bars) | Alternative fight bass; also a candidate for the shrine mood |
+| `midi/04_bass_lonely_Dm_140.mid` | Downtime bass: held notes, gaps (4 bars, same harmony as 01) | Bass for Floor 1 downtime |
+| `midi/05_downtime_sketch_Dm_140.mid` | Lonely bass + sad melody (8 bars) | Floor 1 downtime: the route between rooms, room arrivals and the loot screen |
+| `midi/06_action_sketch_Dm_140.mid` | Pump bass + frantic melody + toy drums (8 bars, layers with 05) | Floor 1 fights; crossfades in from 05 when a fight starts |
 | `preview.html` | Hear them on your phone, swap sounds, try the downtime ⇄ action crossfade |
 
 Import into GarageBand:
