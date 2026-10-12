@@ -655,6 +655,10 @@
      third (support/utility) group its own tint finishes the set: every
      tile in the key is now the same kind of object, just three colors. */
   .key-item.blk-support{ background:#bcdcec; }
+  .key-item{ cursor:pointer; }
+  .key-item.on{ outline:3px solid var(--gold); outline-offset:-1px; }
+  .key-desc{ margin-top:10px; min-height:44px; padding:8px 10px; border-radius:var(--r-md); background:var(--b3); border:2px solid var(--line); font-size:13px; color:var(--parchment); text-align:left; }
+  .key-desc b{ color:var(--gold); }
   .key-item.blk-maneuver .key-icon, .key-item.blk-maneuver .key-label,
   .key-item.blk-attack .key-icon, .key-item.blk-attack .key-label,
   .key-item.blk-support .key-icon, .key-item.blk-support .key-label{ color:#141414; }

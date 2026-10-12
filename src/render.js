@@ -2166,7 +2166,7 @@ function showRoomCallout(fx, onDismiss){
   if(oldScrim && oldScrim.parentNode) oldScrim.parentNode.removeChild(oldScrim);
   const isShrine = fx.type==='Shrine';
   const introCls = fx.boss ? 'intro boss' : (isShrine ? 'intro shrine' : 'intro');
-  const introText = fx.boss ? 'Boss Encounter' : (isShrine ? 'A shrine hums in the dark…' : 'A new room...');
+  const introText = fx.boss ? 'You scramble into a hostile room...' : (isShrine ? 'You scramble into a welcoming room...' : 'You scramble into a mysterious room...');
   const nameCls = fx.boss ? 'name boss' : 'name';
   const node = el(`<div id="room-callout">
       <div class="room-callout-box">
@@ -2955,33 +2955,29 @@ function openInfoModal(title, bodyHTML){
   return overlay;
 }
 
+// One source of truth: every cell shows FACE_DESC (the same text as the die long-press), and a tap shows it
+// below the grid -- tooltips never fire on a phone.
+const KEY_CELLS = [
+  ['dodge','maneuver',1,1],['leap','maneuver',1,2],['pivot','maneuver',1,3],
+  ['hit','attack',2,1],['combo','attack',3,1],['dot','attack',2,2],['leech','attack',3,2],
+  ['boost','support',4,1],['block','support',4,2],['nullify','support',2,3],['hot','support',3,3],['heal','support',4,3],
+  ['freeze','support',2,4],['fumble','support',3,4],['swap','support',4,4],['reroll','support',1,4],
+];
 function keyCardHTML(){
   return `
     <div class="key-card" style="margin-top:0;">
       <div class="key-grid">
-        <div class="key-item blk-maneuver" style="grid-column:1;grid-row:1;" title="Next move: diagonal only"><span class="key-icon">${iconSpan('dodge')}</span><span class="key-label">Dodge</span></div>
-        <div class="key-item blk-maneuver" style="grid-column:1;grid-row:2;" title="Next move: skip one, same direction -- clears a Minion jumped clean over"><span class="key-icon">${iconSpan('leap')}</span><span class="key-label">Leap</span></div>
-        <div class="key-item blk-maneuver" style="grid-column:1;grid-row:3;" title="Next move: adjacent or diagonal"><span class="key-icon">${iconSpan('pivot')}</span><span class="key-label">Pivot</span></div>
-
-        <div class="key-item blk-attack" style="grid-column:2;grid-row:1;" title="Deal damage equal to the Action Value"><span class="key-icon">${iconSpan('hit')}</span><span class="key-label">Hit</span></div>
-        <div class="key-item blk-attack" style="grid-column:3;grid-row:1;" title="Damage + 1x per adjacent Hit, Combo, Shield, H.O.T. or D.O.T. die"><span class="key-icon">${iconSpan('combo')}</span><span class="key-label">Combo</span></div>
-        <div class="key-item blk-attack" style="grid-column:2;grid-row:2;" title="Damage over time, ticks each Encounter Upkeep"><span class="key-icon">${iconSpan('dot')}</span><span class="key-label">D.O.T.</span></div>
-        <div class="key-item blk-attack" style="grid-column:3;grid-row:2;" title="D.O.T. to the encounter + H.O.T. to you"><span class="key-icon">${iconSpan('leech')}</span><span class="key-label">Leech</span></div>
-
-        <div class="key-item blk-support" style="grid-column:4;grid-row:1;" title="Multiplies the next Attack/Support action"><span class="key-icon">${iconSpan('boost')}</span><span class="key-label">Boost</span></div>
-        <div class="key-item blk-support" style="grid-column:4;grid-row:2;" title="Reduce the next incoming damage"><span class="key-icon">${iconSpan('block')}</span><span class="key-label">Block</span></div>
-        <div class="key-item blk-support" style="grid-column:2;grid-row:3;" title="Clear a status effect"><span class="key-icon">${iconSpan('nullify')}</span><span class="key-label">Nullify</span></div>
-        <div class="key-item blk-support" style="grid-column:3;grid-row:3;" title="Heal over time, ticks each Adventurer Upkeep"><span class="key-icon">${iconSpan('hot')}</span><span class="key-label">H.O.T.</span></div>
-        <div class="key-item blk-support" style="grid-column:4;grid-row:3;" title="Restore health"><span class="key-icon">${iconSpan('heal')}</span><span class="key-label">Heal</span></div>
-        <div class="key-item blk-support" style="grid-column:2;grid-row:4;" title="Encounter skips its next action"><span class="key-icon">${iconSpan('freeze')}</span><span class="key-label">Freeze</span></div>
-        <div class="key-item blk-support" style="grid-column:3;grid-row:4;" title="Take D.O.T. yourself; path continues"><span class="key-icon">${iconSpan('fumble')}</span><span class="key-label">Fumble</span></div>
-        <div style="grid-column:1;grid-row:4; display:flex; align-items:flex-end; justify-content:center;">
-          <span class="key-title">Action Key</span>
-        </div>
+        ${KEY_CELLS.map(([t,blk,c,r])=>`<div class="key-item blk-${blk}" style="grid-column:${c};grid-row:${r};" data-key="${t}" onclick="keyShow(this)"><span class="key-icon">${iconSpan(t)}</span><span class="key-label">${LABEL[t]||t}</span></div>`).join('')}
       </div>
+      <div class="key-desc" id="key-desc">Tap an action to see what it does.</div>
     </div>
     ${S && S.klass ? `<p class="hint" style="margin-top:8px;">${S.klass.name} zone highlighted with dashed outline on the Tray. ${S.klass.ability}</p>` : ''}
   `;
+}
+function keyShow(cell){
+  const t = cell.dataset.key, box = document.getElementById('key-desc'); if(!box) return;
+  document.querySelectorAll('.key-item.on').forEach(n=>n.classList.remove('on')); cell.classList.add('on');
+  box.innerHTML = `<b>${LABEL[t]||t}:</b> ${FACE_DESC[t]||''}`;
 }
 
 function backPocketViewHTML(){

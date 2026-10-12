@@ -55,16 +55,16 @@ const FACE_DESC = {
   dot: "Applies stacking damage-over-time to the enemy.",
   leech: "Damages the enemy and heals you the same amount, over time.",
   fumble: "Backfires: applies damage-over-time to you.",
-  dodge: "A Maneuver action -- no direct effect, but some quests ask for these.",
-  leap: "A Maneuver action that lets your path jump to a non-adjacent die -- clears a Minion die if it jumps clean over one.",
-  pivot: "A Maneuver action that lets your path change direction.",
+  dodge: "Continues the path in an adjacent diagonal direction.",
+  leap: "Continues your path to a non-adjacent die -- clears a Minion die if it jumps clean over one.",
+  pivot: "Continues your path in any adjacent direction.",
   freeze: "The enemy skips its next action.",
-  swap: "Before you build your path, tap it, then tap any die: they trade places. This die is used up for the turn. Clear undoes it.",
-  reroll: "Before you build your path, tap it, then tap any die to reroll it to a different face. This die is used up for the turn.",
+  swap: "Tap it, then tap any die: they trade places. This die is used up for the turn. Clear undoes it.",
+  reroll: "Tap it, then tap any die to reroll it to a different face. This die is then used up for the turn.",
   heal: "Restores your health immediately.",
   hot: "Heals you over time. Your H.O.T. can stack up to 6.",
-  block: "Gains Block, reducing the next hit you take.",
-  nullify: "Clears every active effect it can -- Minions, your D.O.T. and the enemy's H.O.T.",
+  block: "Gain Block, which reduces the next hit you take.",
+  nullify: "Clears every harmful effect it can -- Minions, your D.O.T. and the enemy's H.O.T.",
   blank: "No effect this turn.",
 };
 
@@ -74,7 +74,7 @@ const FACE_DESC = {
 // dice you're playing.
 const ENEMY_ACTION_DESC = {
   hit: "Deals damage to you.",
-  minion: "Summons Minion dice that clog your Tray. Each damage you deal clears one, or Leap clean over them.",
+  minion: "Summons Minion dice that clog your Tray.",
   block: "The enemy gains Shield, which absorbs damage before its health does.",
   heal: "The enemy restores its own health.",
   hot: "The enemy gains healing over time (H.O.T.).",
@@ -104,12 +104,12 @@ function enemyActionTooltip(type, val){
 // listing every status currently in effect on it -- Block/D.O.T./H.O.T. and
 // anything else -- rather than requiring a separate hover per status chip.
 const STATUS_DESC = {
-  dot: "Damage each turn, then drops by 1.",
+  dot: "Deals damage each turn, then drops by 1.",
   hot: "Heals each turn, then drops by 1.",
-  block: "Absorbs the next hit(s) taken before health is touched.",
-  shield: "Absorbs the next hit(s) the enemy takes before its health is touched.",
+  block: "Absorbs the next hit(s) taken before health is lost.",
+  shield: "Absorbs the next hit(s) the enemy takes before its health is lost.",
   minions: "Minion dice clog your tray. Each point of damage you deal clears one; a Leap clean over one clears it too.",
-  boost: "Your next played action's value will be multiplied.",
+  boost: "Your very next played action's value will be multiplied.",
 };
 
 // Plain-language descriptions for each kind of route-bar node, shown on
@@ -117,8 +117,8 @@ const STATUS_DESC = {
 // "enc" nodes cover monster/trap/shrine encounters -- which one it'll
 // actually be isn't decided until you reach it, so the tooltip says so.
 const ROUTE_STEP_DESC = {
-  camp: "Camp -- rest, reroll your tray, and spend upgrades.",
-  enc: "Encounter -- a monster, trap, or shrine (which one isn't revealed until you arrive).",
+  camp: "Camp -- rest, organize your tray, and upgrade.",
+  enc: "Encounter -- Reveal a monster, trap, or shrine.",
   boss: "Boss -- the floor's final, toughest fight.",
 };
 
@@ -130,15 +130,15 @@ const ROUTE_STEP_DESC = {
 const TUTORIAL_STEPS = [
   {
     title: "Welcome, Adventurer",
-    body: "Build a path across your dice tray each turn to fight, heal, and move. Clear all three floors -- and their Boss -- to win.",
+    body: "Build a path across your dice tray each turn to fight, heal, and move. Clear all three floors to win.",
   },
   {
     title: "Your Tray",
-    body: "Tap a die to start a path, then tap an adjacent die to extend it (some dice let you jump or change direction). Longer paths combo for bigger effects. Long-press any die to see what its face does.",
+    body: "Tap a die to start a path, then tap an adjacent die to extend it (some dice let you jump or change direction!). Longer paths combo for bigger effects. Long-press any die to see what its face does.",
   },
   {
     title: "The Route",
-    body: "The bar at the top shows what's ahead this floor: Camps to rest and upgrade, Encounters (monster/trap/shrine), and a Boss at the end. Long-press a node to see what it means.",
+    body: "The bar at the top shows this floor. There are campsites to rest and upgrade, both Boons and Banes to encounter, and a Boss at the end. Long-press a node to see more.",
   },
   {
     title: "One More Thing",
