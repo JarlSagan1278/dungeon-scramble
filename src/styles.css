@@ -2903,6 +2903,6 @@ html,body{ overflow-x:clip; }
 .relic-badge.relic-gem svg{ width:100%; height:100%; overflow:visible; display:block; }
 /* In a fight the gems stand in a column beside the hero, so the buffs row stays free and the hero keeps its room. */
 .fo-player{ position:relative; }
-.fo-player > .relic-strip{ position:absolute; left:-2px; top:-6px; z-index:3; margin:0; display:flex; flex-direction:column; flex-wrap:wrap; max-height:142px; gap:2px;
-  padding:3px; background:rgba(28,17,9,.75); border:2px solid var(--line); border-radius:10px; justify-content:flex-start; }
-.fo-player > .relic-strip .relic-badge{ width:18px; height:18px; }
+.fo-player > .relic-strip{ position:absolute; left:2px; top:-4px; z-index:3; margin:0; padding:0; background:none; border:none; display:flex; flex-direction:column; flex-wrap:wrap; align-content:flex-start;
+  max-height:var(--relic-col-h, 118px); gap:2px 3px; justify-content:flex-start; }
+.fo-player > .relic-strip .relic-badge{ width:18px; height:18px; filter:drop-shadow(0 0 1.5px #0c0705) drop-shadow(0 2px 1px rgba(0,0,0,.7)); }

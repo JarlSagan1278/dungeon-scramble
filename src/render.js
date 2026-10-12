@@ -3304,6 +3304,9 @@ function relicStripHTML(){
 }
 function attachRelicStrip(){
   document.querySelectorAll('.relic-strip').forEach(n=>{ n.onclick = openRunRelicsModal; });
+  // The fight's gem column stops above the HP bar; extra gems wrap into a second column.
+  const col = document.querySelector('.fo-player > .relic-strip'), hp = col && col.parentNode.querySelector('.fo-hpwrap');
+  if(col && hp){ const h = hp.getBoundingClientRect().top - col.getBoundingClientRect().top - 4; if(h > 40) col.style.setProperty('--relic-col-h', h+'px'); }
   consumeRelicPulses();
 }
 
