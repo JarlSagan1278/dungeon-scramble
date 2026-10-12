@@ -49,3 +49,43 @@ Mixed loadouts at the same depth spread very widely:
    - Dwarf Guard barely notices depth: 97% at Tougher Foes 4, against 39% for Pixie Arcanist. Guard's Block 2 every turn plus Dwarf's Block dice adds up.
    - This needs a class-by-origin pass at about depth 7. These four pairs mix class and origin, so they can't tell the two apart.
 3. **For the relic study:** a loadout near 50% is depth 7 (Dread 1, Tougher Foes 2, Rationing Rations 2, Swarm 1), at 56%. Tier S relics should be tested at about depth 11 (Dread 3, Tougher Foes 4, Clumsy 1, Burden of Choice 1, Swarm 1), at 39%.
+
+## Recalibration (Oct 12, after the class changes and two recost rounds)
+- **Classes:** Guard Block 1, Dungeoneer wraps on every row, Arcanist uses both diagonals plus either-end steps.
+- **Runs:** 250 per setup, with the same 4 pairs.
+- **Raw results:** `out_depth_summary_rd4.json`.
+- **Baseline:** depth 1 now wins 97%.
+
+### Each modifier alone, final shape
+| Modifier (ranks; depth per rank) | Win by rank | Cost per depth point |
+|---|---|---|
+| Tougher Scuffs (4; 1 each) | 92 → 86 → 79 → 67% | −5 to −7.5 (yardstick) |
+| Rationing Rations (half rest, then none; 1, 2) | 94 → 84% | −3.3, −4.2 |
+| Clumsy (−4 max HP per rank; 1, 1, 2) | 94 → 86 → 70% | −3, −5, −6.7 |
+| Swarming (+1 Minion die per rank; 1, 3, 4) | 93 → 77 → 56% | −4 to −5 |
+| Burden of Choice (1 rank; 1) | 93% | −4 |
+| Zeal (+1 on every hit, then +1 more on heavy turns and specials; 3, 1) | 80 → 73% | −5.7, −6.0 |
+| Dread (1 each) | 94 → 86 → 80% | −2.4, −5.3, −5.7 |
+| Night Shift (1, 2) | 92 → 81% | −5.2, −5.4 |
+
+- Every rank now costs −4 to −7.5 win points per depth point.
+- The exceptions are a few first ranks, which look soft partly because the 97% baseline has little room to drop.
+
+### Mixed loadouts
+| Depth | Win rates | Before the recost |
+|---|---|---|
+| 3 | 81–89% | |
+| 5 | 55–69% | |
+| 7 | 27–46% | 35–56% |
+| 9 | 10–20% | 20–53% |
+| 11 | 12–29% | 28–65% |
+| 13 | 3–9% | |
+| 16 | 0–2% | 3–11% |
+
+- **Spread at the same depth is about half what it was.**
+- **Modifiers compound:** each one alone looks gentle, but stacked they bite harder. Depth 9 or more is now hard even for the skilled bot.
+- **The one cheap stack left is Swarming 3:** at depth 13 it wins 29% (with Zeal 1 and Burden of Choice), against 3–9% for other depth-13 mixes.
+
+### Loadouts chosen for the relic study
+- **About depth 7:** Tougher Scuffs 1, Zeal 1, Rationing Rations 1, Swarming 1 (46%).
+- **Deep, for tier S/A:** depth 11, Dread 1, Tougher Scuffs 1, Clumsy 1, Rationing Rations 2, Swarming 2 (29%).
