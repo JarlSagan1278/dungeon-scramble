@@ -1,6 +1,7 @@
 # Changelog
 
 ## 1.39.2 (in progress)
+- Relic gem families evened out (Jeremy): Equal and Opposite is now offense; Perfect Fifth and Combonatorics are path; Percolation Theory, Mandated Lunch Break and Bisection Method are loot/tempo. Families: 6 offense, 6 defense, 5 path, 6 loot/tempo. Effects unchanged.
 - Shrine "Hold to receive the boon" and Continue buttons float in the tray's header row instead of taking their own row, so the dice no longer get pushed down (Jeremy).
 - Relic gating (Jeremy): the strongest shrine relics are quietly held back. Tier A (Evasion Tank, Perfect Fifth, Mandated Lunch Break, Prime Edge, Combonatorics) joins shrine offers after your first victory; tier S (Scavenger's Acumen, Minus-One Mantra, Hard Hat Act) after you clear depth 2. Locked relics stay "???" in the Codex.
 
