@@ -924,7 +924,7 @@ function pickLootNUnused(pool, n){
 }
 
 // Which tier this room is (v1.35.0): the floor's slot pattern (ROOM_TIER_SLOTS,
-// data.js), shifted up by the Gauntlet depth modifier.
+// data.js), shifted up by the Night Shift (gauntlet) depth modifier.
 function roomTierForStep(step){
   const order = ['easy','standard','elite'];
   let t = ROOM_TIER_SLOTS[step] || 'standard';

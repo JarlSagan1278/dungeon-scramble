@@ -11,13 +11,13 @@ const BASE_HP_MUL = [1, 1.5, 1.75];
 
 const DEPTH_MODS = [
   { id:'foes',  name:'Tougher Scuffs', max:4, cost:1, desc:r=>`Enemies and bosses have +${r*15}% HP.` },
-  { id:'rest',  name:'Hard Rations',   max:3, cost:1, desc:r=>`Camp rest heals ${r*25}% less.` },
-  { id:'frail', name:'Frail',          max:3, cost:1, desc:r=>`Start with ${r*3} less max HP.` },
-  { id:'swarm', name:'Swarm',          max:3, cost:1, desc:r=>`Minion spawns place ${r} extra die${r>1?'s':''}.` },
-  { id:'slim',  name:'Slim Pickings',  max:2, cost:1, desc:r=> r===1 ? 'Overkills no longer add a loot option.' : 'Overkills add no loot option, and bosses offer one fewer.' },
-  { id:'fury',  name:'Fury',           max:2, cost:2, desc:r=>`Every enemy hit deals +${r} damage.` },
+  { id:'rest',  name:'Rationing Rations', max:3, cost:1, desc:r=>`Camp rest heals ${r*25}% less.` },
+  { id:'frail', name:'Clumsy',         max:3, cost:1, desc:r=>`Start with ${r*3} less max HP.` },
+  { id:'swarm', name:'Swarming',       max:3, cost:1, desc:r=>`Minion spawns place ${r} extra die${r>1?'s':''}.` },
+  { id:'slim',  name:'Burden of Choice', max:2, cost:1, desc:r=> r===1 ? 'Overkills no longer add a loot option.' : 'Overkills add no loot option, and bosses offer one fewer.' },
+  { id:'fury',  name:'Zeal',           max:2, cost:2, desc:r=>`Every enemy hit deals +${r} damage.` },
   { id:'dread', name:'Dread',          max:3, cost:1, desc:r=>`Deadly encounters are ${r*12}% more likely to take an Elite room, and Floor 1 gains its own Deadly card.` },
-  { id:'gauntlet', name:'Gauntlet',    max:2, cost:2, desc:r=> r===1 ? 'Easy rooms become Standard rooms.' : 'Easy and Standard rooms become Elite rooms.' },
+  { id:'gauntlet', name:'Night Shift', max:2, cost:2, desc:r=> r===1 ? 'Easy rooms become Standard rooms.' : 'Easy and Standard rooms become Elite rooms.' },
 ];
 const DEPTH_MOD_BY_ID = Object.fromEntries(DEPTH_MODS.map(m=>[m.id,m]));
 
