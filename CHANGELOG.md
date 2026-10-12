@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.39.1 (in progress)
+## 1.39.1 (released Oct 12, 2026; bug hunt clean, 24 setups)
 - Swap and Reroll work mid-path (Jeremy): tap the face any time; neither can touch a die already in the path. Swap/Reroll tokens too.
 - Reroll always lands on a non-blank face (a different one whenever the die has one).
 - Jeremy's repaints (batches A-D, 27 pictures) re-imported from his canvases at twice the resolution, so they stay sharp on phone screens (the first import had scaled them down to the old picture size).
