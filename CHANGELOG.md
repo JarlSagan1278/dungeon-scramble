@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.39.5 (in progress)
+- Swap and Reroll (Jeremy): once used, the die becomes a Pivot for the rest of the turn instead of a blank that ends your path.
+- Guard's zone is a 3-square L on the middle right (was a 2x2 block).
+- Depth numbers start at 0 (Jeremy): the base dungeon is Depth 0, so the badges sit at 0, 3, 6 and 10. Your saved progress is unchanged; only the numbers shown are one lower.
+
 ## 1.39.4 (Oct 12, 2026)
 - Fix: Go works right after building a path. Since 1.39.2 the Go button only responded after something forced a full redraw (like using the class ability), so the ability felt mandatory (Jeremy). `tools/test_pathrender.js` now clicks Go after path taps.
 - Swarming rank 3 adds 6 depth (was 4).

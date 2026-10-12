@@ -1234,12 +1234,12 @@ function toggleSelect(idx){
 // ---- Swap / Reroll (v1.38.0) ----
 // Swap and Reroll work any time, even mid-path (Jeremy, Oct 12), but never on a die already in the path. A Swap or Reroll face is tapped
 // (or a token from the Item menu is used), then a target die is tapped. The
-// face's own die is then spent for the turn (it acts as a blank). Swaps go in
+// face's own die is then used up for the turn (it becomes a Pivot: see TRAYACT_AFTER). Swaps go in
 // S.swapLog so Clear can undo them (they reveal nothing); rerolls are final.
 // A die can't target Minion-covered cells (no scouting).
-// What a Swap/Reroll die becomes once used (Oct 12 test switch): 'blank' (spent, ends a path; live rule),
+// What a Swap/Reroll die becomes once used (Oct 12 switch): 'blank' (spent, ends a path; the old rule),
 // 'step' (stays a plain step you can walk across), 'pivot' (becomes a Pivot for the rest of the turn).
-let TRAYACT_AFTER = 'blank';
+let TRAYACT_AFTER = 'pivot'; // Jeremy, Oct 12: a used Swap/Reroll die works as a Pivot for the rest of the turn
 function markTrayActUsed(c){
   if(!c) return;
   if(TRAYACT_AFTER==='blank'){ c.spent = true; return; }

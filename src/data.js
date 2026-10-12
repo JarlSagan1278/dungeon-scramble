@@ -59,8 +59,8 @@ const FACE_DESC = {
   leap: "Continues your path to a non-adjacent die -- clears a Minion die if it jumps clean over one.",
   pivot: "Continues your path in any adjacent direction.",
   freeze: "The enemy skips its next action.",
-  swap: "Tap it, then tap any die: they trade places (works mid-path too, on dice outside the path). This die is used up for the turn. Clear undoes it.",
-  reroll: "Tap it, then tap any die to reroll it to a different non-blank face (works mid-path too, on dice outside the path). This die is then used up for the turn.",
+  swap: "Tap it, then tap any die: they trade places (works mid-path too, on dice outside the path). This die then becomes a Pivot for the rest of the turn. Clear undoes it.",
+  reroll: "Tap it, then tap any die to reroll it to a different non-blank face (works mid-path too, on dice outside the path). This die then becomes a Pivot for the rest of the turn.",
   heal: "Restores your health immediately.",
   hot: "Heals you over time. Your H.O.T. can stack up to 6.",
   block: "Gain Block, which reduces the next hit you take.",
@@ -248,7 +248,7 @@ const RELICS = [
 function relicById(id){ return RELICS.find(r=>r.id===id); }
 // Relic gating (Jeremy, Oct 12; tiers from the Oct 12 relic study): the strongest shrine relics are quietly held
 // back so power arrives over many runs. A locked relic never appears in a shrine offer, and the Codex keeps it
-// as "???" (it is only marked found when offered). Tier A: after the first victory. Tier S: after clearing depth 2.
+// as "???" (it is only marked found when offered). Tier A: after the first victory. Tier S: after clearing depth 2 (shown as Depth 1).
 // Everything else (and every origin relic) is available from the first run.
 // Re-tiered Oct 12 from the depth-7 relic study (win-rate gain, player-like bot): S >= +30, A +20..30.
 const RELIC_TIER = { bloodletter:'S', dodger_cloak:'S', gambeson:'S',
@@ -279,8 +279,8 @@ const ORIGINS = [
 const CLASSES = [
   {id:'armsmaster', name:'Armsmaster', color:'#c0392f', ability:'Once per turn, turn any Action or Blank in your zone (right column) into a Hit (2).',
     zone:(r,c)=> c===3, convertTo:{type:'hit', value:2}},
-  {id:'guard', name:'Guard', color:'#2fb8b8', ability:'Once per turn, turn any Action or Blank in your zone (middle-right block) into a Block (1).',
-    zone:(r,c)=> (r===1||r===2) && (c===2||c===3), convertTo:{type:'block', value:1}}, // Block 2 -> 1 (Jeremy, Oct 12 class study: Guard won 89% vs 40-67%)
+  {id:'guard', name:'Guard', color:'#2fb8b8', ability:'Once per turn, turn any Action or Blank in your zone (an L of three squares, middle right) into a Block (1).',
+    zone:(r,c)=> (r===1 && (c===2||c===3)) || (r===2 && c===3), convertTo:{type:'block', value:1}}, // 3-square L (Jeremy, Oct 12: 2x2 -> L, 63% -> 58% at depth 7) // Block 2 -> 1 (Jeremy, Oct 12 class study: Guard won 89% vs 40-67%)
   {id:'dungeoneer', name:'Dungeoneer', color:'#d4812e', ability:'Your zone (the left and right edges) wraps left-to-right when building a Path, on every row.',
     zone:(r,c)=> c===0 || c===3, wrap:true}, // every row wraps (Jeremy, Oct 12; was the two middle rows)
   {id:'arcanist', name:'Arcanist', color:'#b4419a', ability:'Your zone is both diagonals. Any step into or out of your zone may go diagonally, as if using Dodge.',

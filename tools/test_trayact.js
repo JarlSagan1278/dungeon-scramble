@@ -26,10 +26,10 @@ const FILE = path.resolve(__dirname, '../dist/dungeon_scramble.html');
     toggleSelect(pix);
     ok(S.trayAct && S.trayAct.kind === 'swap' && S.path.length === 0, 'tapping the Swap face arms it (no path started)');
     toggleSelect(tgt);
-    ok(S.tray[tgt] === A && S.tray[pix] === B && A.spent && currentFace(A).type === 'blank', 'swap traded places and spent the Swap die');
-    ok(!canSelect(tgt), 'spent die is not pathable');
+    ok(S.tray[tgt] === A && S.tray[pix] === B && A.actUsed && getFaceForIdx(tgt).type === 'pivot', 'swap traded places and the used Swap die became a Pivot');
+    ok(canSelect(tgt) && !trayActFaceAt(tgt), 'used Swap die is pathable (as a Pivot) and cannot be used again');
     clearPathAll();
-    ok(S.tray[pix] === A && S.tray[tgt] === B && !A.spent, 'Clear undid the swap');
+    ok(S.tray[pix] === A && S.tray[tgt] === B && !A.actUsed && !A.forcedFace, 'Clear undid the swap');
     // cancel by tapping the armed die again
     toggleSelect(pix); toggleSelect(pix);
     ok(!S.trayAct && S.path.length === 0, 'tapping the armed die again backs out');
@@ -61,7 +61,7 @@ const FILE = path.resolve(__dirname, '../dist/dungeon_scramble.html');
     { const d = S.tray[3]; let nonBlank = true;
       for (let t = 0; t < 60; t++) { doTrayReroll(3, null, false); if (currentFace(d).type === 'blank') nonBlank = false; }
       ok(nonBlank, 'reroll never lands on a blank (60 tries)'); }
-    { S.trayAct = null; S.path = []; const R = S.tray[pix]; delete R.spent; R.die = clone(R.die); R.die.faces = R.die.faces.map(f => f); const ri = R.die.faces.findIndex(f => f.type === 'swap'); R.die.faces[ri] = { type: 'reroll' }; R.faceIdx = ri;
+    { S.trayAct = null; S.path = []; const R = S.tray[pix]; delete R.spent; delete R.actUsed; delete R.forcedFace; R.die = clone(R.die); R.die.faces = R.die.faces.map(f => f); const ri = R.die.faces.findIndex(f => f.type === 'swap'); R.die.faces[ri] = { type: 'reroll' }; R.faceIdx = ri;
       const step = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].find(i => i !== pix && currentFace(S.tray[i]).type !== 'blank' && !S.tray[i].minion && !S.tray[i].spent);
       S.path = [step];
       const tgt2 = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].find(i => i !== pix && i !== step && !S.tray[i].minion && !S.tray[i].spent);
@@ -70,7 +70,7 @@ const FILE = path.resolve(__dirname, '../dist/dungeon_scramble.html');
       toggleSelect(step);
       ok(S.trayAct && S.path.length === 1, 'mid-path Reroll cannot target a die already in the path');
       toggleSelect(tgt2);
-      ok(!S.trayAct && R.spent && S.path.length === 1 && currentFace(S.tray[tgt2]).type !== 'blank', 'mid-path Reroll rerolled an outside die to a non-blank face and spent the Reroll die');
+      ok(!S.trayAct && R.actUsed && getFaceForIdx(S.tray.indexOf(R)).type === 'pivot' && S.path.length === 1 && currentFace(S.tray[tgt2]).type !== 'blank', 'mid-path Reroll rerolled an outside die to a non-blank face and the Reroll die became a Pivot');
       S.path = []; }
     // render with the Swap armed for a screenshot
     toggleSelect(pix); render();

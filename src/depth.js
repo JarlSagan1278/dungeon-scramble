@@ -1,6 +1,6 @@
 /* ============================================================
    DEPTH -- optional difficulty menu + the cosmetics it unlocks.
-   Depth 1 is the base game (already tuned: BASE_HP_MUL below). Every
+   Depth 1 (shown to players as Depth 0) is the base game (already tuned: BASE_HP_MUL below). Every
    modifier rank you take adds its cost to the run's Depth. Winning at a
    given Depth records it per class (badge on Setup/Title) and across the
    account (dice finishes). Nothing here changes how dice/faces work.
@@ -36,6 +36,8 @@ function depthFromMods(mods){
 }
 function depthRank(id){ return (S && S.depthMods && S.depthMods[id]) || 0; }
 function currentDepth(){ return (S && S.depth) || 1; }
+// Shown depth (Jeremy, Oct 12): the base dungeon reads as Depth 0. Internally the base stays 1, so saves, badges and unlocks are unchanged.
+function depthLabel(d){ return (d||1) - 1; }
 function depthScoreMul(depth){ return 1 + 0.25*((depth||1)-1); }
 
 function floorHpMul(floorIdx){
@@ -59,7 +61,7 @@ function maxSelectableDepth(){ return Math.max(DEPTH_BEST.overall, 1) + 2; }
 function depthMenuUnlocked(){ return (META.lifetime.victories||0) >= 1 || (typeof debugArmed!=='undefined' && debugArmed); }
 
 /* ---- Finish tiers (dice borders), account-wide ---- */
-const FINISH_AT = [1, 4, 7, 11]; // best depth needed for tier 1..4
+const FINISH_AT = [1, 4, 7, 11]; // best depth needed for tier 1..4 (internal; shown as 0, 3, 6, 10)
 const FINISH_NAMES = ['', 'Bronze', 'Silver', 'Gold', 'Royal'];
 function finishTierFor(best){ let t = 0; FINISH_AT.forEach((d,i)=>{ if(best>=d) t = i+1; }); return t; }
 function currentFinishTier(){ return finishTierFor(DEPTH_BEST.overall); }
@@ -107,7 +109,7 @@ function depthBadgeSVG(classColor, depth, size){
 <circle cx="52" cy="48" r="30" fill="${classColor}" stroke="#0c0705" stroke-width="4.5"/>
 <ellipse cx="44" cy="34" rx="17" ry="9" fill="#fff" opacity=".16" transform="rotate(-25 44 34)"/>
 <text x="52" y="38" text-anchor="middle" font-family="Georgia,serif" font-size="10" font-weight="800" fill="#fff" fill-opacity=".9" letter-spacing="2">DEPTH</text>
-<text x="52" y="66" text-anchor="middle" font-family="Georgia,serif" font-size="${depth>9?26:32}" font-weight="800" fill="#fff" stroke="#0c0705" stroke-opacity=".75" stroke-width="1.6" paint-order="stroke">${depth}</text></svg>`;
+<text x="52" y="66" text-anchor="middle" font-family="Georgia,serif" font-size="${depthLabel(depth)>9?26:32}" font-weight="800" fill="#fff" stroke="#0c0705" stroke-opacity=".75" stroke-width="1.6" paint-order="stroke">${depthLabel(depth)}</text></svg>`;
 }
 function depthBadgeEmptySVG(size){
   size = size || 64;
@@ -168,7 +170,7 @@ function depthSealHTML(){
   return `<div class="depth-seal">
     ${depthBadgeSVG(c, r.depth, 92)}
     <div class="depth-seal-text">
-      <div class="depth-seal-kicker">${r.newClassBest ? 'New best depth' : 'Depth '+r.depth+' cleared'}</div>
+      <div class="depth-seal-kicker">${r.newClassBest ? 'New best depth' : 'Depth '+depthLabel(r.depth)+' cleared'}</div>
       <div class="depth-seal-title">${depthTitleFor(r.depth)}</div>
       <div class="depth-seal-who"><b>${S.charName||S.origin.name}</b> &middot; ${S.origin.name} ${S.klass.name}</div>
       <div class="depth-seal-score">Score <b>${r.score.toLocaleString()}</b> &middot; ${S.stats.turnsTaken} turns</div>
@@ -179,7 +181,7 @@ function depthSealHTML(){
 function depthMenuHTML(){
   return `<div class="setup-section depth-section" id="depth-section">
     <button type="button" class="depth-toggle" id="depth-toggle" aria-expanded="false">
-      <span class="depth-num" id="depth-num">1</span>
+      <span class="depth-num" id="depth-num">0</span>
       <span class="depth-toggle-text"><span class="depth-toggle-title">Depth</span><span class="depth-toggle-sub" id="depth-sub"></span></span>
       <span class="depth-chevron" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </button>
@@ -201,10 +203,10 @@ function wireDepthMenu(state){
   document.addEventListener('click', window._depthOutside);
   function draw(){
     const d = depthFromMods(state.mods);
-    document.getElementById('depth-num').textContent = d;
+    document.getElementById('depth-num').textContent = depthLabel(d);
     const n = Object.keys(state.mods).length;
     document.getElementById('depth-sub').innerHTML = d===1 ? 'Standard dungeon' : `${n} modifier${n>1?'s':''} &middot; score &times;${depthScoreMul(d).toFixed(2)}`;
-    document.getElementById('depth-limit').textContent = d>=maxSelectableDepth() ? `Clear depth ${maxSelectableDepth()} to unlock deeper.` : `Up to depth ${maxSelectableDepth()} unlocked.`;
+    document.getElementById('depth-limit').textContent = d>=maxSelectableDepth() ? `Clear depth ${depthLabel(maxSelectableDepth())} to unlock deeper.` : `Up to depth ${depthLabel(maxSelectableDepth())} unlocked.`;
     rows.innerHTML = DEPTH_MODS.map(m=>{
       const r = state.mods[m.id]||0;
       const next = r<m.max ? m.costs[r] : m.costs[m.max-1];
