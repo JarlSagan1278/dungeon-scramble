@@ -1368,7 +1368,7 @@ function renderEncounterCard(e, mode){
     dmgPreviewWidthPct = dmgAmt/e.maxHealth*100;
     dmgPreviewLeftPct = hpPct - dmgPreviewWidthPct;
     // Anticipation tied to real numbers: how this path stacks up against a
-    // kill and against the Overkill line (10 past dead, 6 with Hungry Blade).
+    // kill and against the Overkill line (10 past dead, 6 with Thirsty Blade).
     const thr = (typeof hasRelic==='function' && hasRelic('hungry_blade')) ? 5 : 9;
     const d = effDmg;
     const hp = e.curHealth;
@@ -1998,7 +1998,7 @@ function ensureFxStack(){
 // heals, blocks...) slash across the doorway scene, tilted toward whoever they happened to; everything
 // else (equips, relics, upgrades) gets its own smaller gold ribbon higher up, so the two never share a slot.
 // Both overlay the scene, so they can't change the screen height. ----
-const RB_NOTICE_RE = /^(Equipped|Relic|Upgraded|Swapped|Rested|— Floor|Iron Rations|Not enough|Locked|Debug|Origin|Unlock|Debug)|joins your tray/i;
+const RB_NOTICE_RE = /^(Equipped|Relic|Upgraded|Swapped|Rested|— Floor|Mandated Lunch Break|Not enough|Locked|Debug|Origin|Unlock|Debug)|joins your tray/i;
 function showToast(text, kind){
   // Plain damage/heal numbers are already shown by the floating numbers + health bars; skip the redundant ribbon.
   if(/^Path dealt|hits you for|takes \d+ D\.O\.T\. damage|You take \d+ D\.O\.T\. damage|You recover \d+ from H\.O\.T\.|heals \d+\./i.test(text)) return;

@@ -1489,13 +1489,13 @@ function computePathSteps(path){
 // die as it resolves (see applyPathStep()) rather than all at once, so a
 // path with 2 Hits still clears exactly 2 minions, just spread across the
 // moment each Hit actually lands instead of after the fact.
-// Heals the player; with Overflow Chalice (v1.36.0) healing past max becomes Block.
+// Heals the player; with Power Word: Safe (overflow_chalice) (v1.36.0) healing past max becomes Block.
 function healPlayer(n){
   const over = S.health + n - S.maxHealth;
   S.health = cap(S.health+n, S.maxHealth);
   if(over>0 && hasRelic('overflow_chalice')){ S.playerBlock += over; fireRelic('overflow_chalice','+'+over+' Block'); }
 }
-// Grave Tally (v1.36.0): each Minion the player clears gives 1 Block.
+// Mook Shield (grave_tally, v1.36.0): each Minion the player clears gives 1 Block.
 function graveTally(n){ if(n>0 && hasRelic('grave_tally')){ S.playerBlock += n; fireRelic('grave_tally','+'+n+' Block'); } }
 function clearOneMinion(){
   const cell = S.tray.find(c=>c.minion);
@@ -2296,7 +2296,7 @@ function onEncounterDefeated(){
   let drawCount = (isBoss && depthRank('slim')<2) ? 3 : 2;
   if(overkill && !depthRank('slim')) drawCount += 1;
   if(hasRelic('lucky_coin')){ drawCount += 1; fireRelic('lucky_coin','+1 option'); }
-  if(hasRelic('iron_rations')){ S.health = cap(S.health+2, S.maxHealth); logMsg('heal', 'Iron Rations: healed 2.', 'good'); fireRelic('iron_rations','+2 HP'); }
+  if(hasRelic('iron_rations')){ S.health = cap(S.health+2, S.maxHealth); logMsg('heal', relicById('iron_rations').name+': healed 2.', 'good'); fireRelic('iron_rations','+2 HP'); }
   const options = pickLootNUnused(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
   S.lootChoice = { options, lootName: floor.lootName, overkill, nearMiss };
   teleLog('room_win', {name:e.name, type:e.type, turns:S.turnNumber+1, ms:(S._roomStartedAt!=null)?Math.max(0,teleActiveMs()-S._roomStartedAt):null, overkill, overBy:Math.max(0,Math.round(-e.curHealth)), nearMiss, offered:options.length, hp:S.health});

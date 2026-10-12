@@ -163,9 +163,9 @@ ${tbl(['Floor','Shrine','Boon'],shr.map(s=>[s[0],`<b>${s[1]}</b>`,s[2]]))}
 // 7
 C+=ch(7,'After a Fight',`
 <p>When an Encounter reaches 0 Health it falls and a <b>loot chest</b> appears. The chest holds one pip for each die inside; tap it to open, then pick one die.</p>
-${tbl(['Source','Dice to choose from'],[['Enemy or Trap','2'],['Boss or Big Boss','3'],['Overkill','+1'],['Lucky Coin relic','+1']])}
+${tbl(['Source','Dice to choose from'],[['Enemy or Trap','2'],['Boss or Big Boss','3'],['Overkill','+1'],['Need Before Greed relic','+1']])}
 <p>Dice come from your floor's tier (Alloy, Gilded, Magic). You will not be offered a die you already own this run until the whole tier has been seen. Dice you've never seen carry a <span class="tag new">NEW</span> tag.</p>
-${call('tip','Overkill!','If the killing blow carries <b>10 or more</b> damage past what was needed (6 with the Hungry Blade relic), you score an Overkill: a callout banner, a bigger chest, and one extra die to choose from. While building a Path the game warns you in advance with a Lethal or Overkill hint.')}
+${call('tip','Overkill!','If the killing blow carries <b>10 or more</b> damage past what was needed (6 with the Thirsty Blade relic), you score an Overkill: a callout banner, a bigger chest, and one extra die to choose from. While building a Path the game warns you in advance with a Lethal or Overkill hint.')}
 <p><b>Taking the die.</b> After choosing, pick one Tray die to replace. It goes to your Back Pocket, not the bin, so you can swap it back at Camp. Unchosen dice return to the pool.</p>
 ${call('warn','No free healing','After loot, your Health is <b>not</b> restored. The route moves on to the next room or Camp.')}
 `,'c7');
@@ -221,8 +221,8 @@ C+=ch(12,'Quick Reference',`
 <div class="qr">
 <div><b>Start</b>20 Health · 16 dice · empty Pocket</div>
 <div><b>Floor</b>Camp · 3 rooms · Camp · 2 rooms · Boss</div>
-<div><b>Loot</b>2 dice (3 for Bosses) · +1 Overkill · +1 Lucky Coin</div>
-<div><b>Overkill</b>10+ past lethal (6 with Hungry Blade)</div>
+<div><b>Loot</b>2 dice (3 for Bosses) · +1 Overkill · +1 Need Before Greed</div>
+<div><b>Overkill</b>10+ past lethal (6 with Thirsty Blade)</div>
 <div><b>Rest</b>½ of non-blank faces, rounded up</div>
 <div><b>Upgrade</b>3 matching Basics → 1 a level higher</div>
 <div><b>Revive</b>Pocket die rolls Action → 5 Health</div>
