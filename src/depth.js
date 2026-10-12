@@ -206,7 +206,7 @@ function wireDepthMenu(state){
       const r = state.mods[m.id]||0;
       const next = r<m.max ? m.costs[r] : m.costs[m.max-1];
       const canUp = r<m.max && (d + next) <= maxSelectableDepth();
-      return `<div class="depth-row ${r?'on':''}"><div class="depth-row-text"><div class="depth-row-name">${m.name} <span class="depth-cost">+${next}${r<m.max?'':' each'}</span></div><div class="depth-row-desc">${r?m.desc(r):m.desc(1)}</div></div>
+      return `<div class="depth-row ${r?'on':''}"><div class="depth-row-text"><div class="depth-row-name">${m.name} <span class="depth-cost">${r<m.max ? '+'+next : '+'+depthModCost(m, r)+' total'}</span></div><div class="depth-row-desc">${r?m.desc(r):m.desc(1)}</div></div>
         <div class="depth-step"><button type="button" data-id="${m.id}" data-dir="-1" ${r?'':'disabled'}>&minus;</button><span>${r}/${m.max}</span><button type="button" data-id="${m.id}" data-dir="1" ${canUp?'':'disabled'}>+</button></div></div>`;
     }).join('');
     rows.querySelectorAll('button').forEach(b=>{
