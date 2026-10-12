@@ -602,9 +602,12 @@ function decorateArch(){
     watchRoomFloor(card);
     // The arch (thousands of brick/moss shapes) is drawn once per size+floor into a cached SVG image: one <img> to
     // lay out instead of rebuilding and laying out the whole SVG on every render, i.e. every path tap (Oct 12).
-    const key = w+'x'+h+'x'+lvl, P = 16;
+    // padding for moss that hangs past the frame (up to 8px), but never past the screen edge
+    const vw = document.documentElement.clientWidth || window.innerWidth;
+    const PX = Math.max(0, Math.min(8, Math.floor(r.left) - 5, Math.floor(vw - r.right) - 5)), PY = 8;
+    const key = w+'x'+h+'x'+lvl+'x'+PX;
     if(!decorateArch._c || decorateArch._c.key !== key){
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w+2*P}" height="${h+2*P}" viewBox="${-P} ${-P} ${w+2*P} ${h+2*P}">${archFrameSVG(w,h,lvl)}</svg>`;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w+2*PX}" height="${h+2*PY}" viewBox="${-PX} ${-PY} ${w+2*PX} ${h+2*PY}">${archFrameSVG(w,h,lvl)}</svg>`;
       if(decorateArch._c && decorateArch._c.blob) URL.revokeObjectURL(decorateArch._c.src);
       // a short blob: URL (not a 100KB+ data: URL that the HTML parser would re-read on every render)
       let src, blob = false;
@@ -612,7 +615,7 @@ function decorateArch(){
       catch(e){ src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); }
       decorateArch._c = { key, src, blob };
     }
-    card.insertAdjacentHTML('beforeend', `<img class="fo-frame" alt="" aria-hidden="true" width="${w+2*P}" height="${h+2*P}" style="left:${-5-P}px;top:${-10-P}px;max-width:none" src="${decorateArch._c.src}">`);
+    card.insertAdjacentHTML('beforeend', `<img class="fo-frame" alt="" aria-hidden="true" width="${w+2*PX}" height="${h+2*PY}" style="left:${-5-PX}px;top:${-10-PY}px;max-width:none" src="${decorateArch._c.src}">`);
     try{ document.body.classList.toggle('is-resolving', !!S.transitioning); }catch(e){}
     syncIdleBreath(); syncMascotHop(); rollHpNumbers();
     // Headroom above the monster (offset sizes again), so big monsters grow upward only until the arch would hide them.
