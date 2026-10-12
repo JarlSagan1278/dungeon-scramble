@@ -16,6 +16,9 @@
 //     every turn the cycle step isn't the attack) | 'attackPlusPhase' (attackPlus, and at <=50% HP it takes two cycle steps a turn)
 //   forceBoss: boss name (or array of names); every boss room on that boss's floor draws it.
 //   forceRelics: relic ids granted at the start of every run (relic study, Oct 12).
+//   playerLike (default true, Oct 12): closes four gaps with real players: uses the class ability (Armsmaster/Guard
+//     convert), picks shrine options and relics on purpose (relics by the Oct 12 study ranking), values Overkill
+//     (the extra loot choice) instead of penalizing extra damage, and counts D.O.T./H.O.T./Nullify/Freeze quest rewards.
 //   unlockAllRelics (default true): relic gating (RELIC_TIER) is lifted so shrine offers draw from every relic.
 //   tokens (default true, Oct 12): the bot spends Freeze, Nullify, Boost and Swap tokens (Reroll tokens were already used).
 //   lootV2 (default true, Oct 12): loot and the die it replaces are scored by face value with sustain weighted up,
@@ -24,7 +27,7 @@
 //     so the forced relics are the only ones held (a clean with/without comparison).
 // usage: node study_maneuver.js '<json config>'
 let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node22/lib/node_modules/playwright')); }
-const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{}, pivotFace:'pivot', manLevel:1, bossMode:'cycle', intentAware:true, forceBoss:null, forceRelics:[], relicLock:false, tokens:true, lootV2:true }, JSON.parse(process.argv[2]||'{}'));
+const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{}, pivotFace:'pivot', manLevel:1, bossMode:'cycle', intentAware:true, forceBoss:null, forceRelics:[], relicLock:false, tokens:true, lootV2:true, playerLike:true }, JSON.parse(process.argv[2]||'{}'));
 (async()=>{
 const b=await chromium.launch();const page=await b.newPage();
 page.on('pageerror',e=>console.log('PAGEERR',e.message));
@@ -73,8 +76,13 @@ let res = await page.evaluate((cfg)=>{
     e.quests.forEach((q,i)=>{
       if(e.questsDone[i] || room<=0) return;
       const {rewardText, cond} = parseQuestSpec(q); if(!rewardText) return;
-      const low=rewardText.toLowerCase(); if(low.includes('dot')||low.includes('hot')||low.includes('nullify')) return;
-      const amt=parseFloat((rewardText.match(/(\d+(\.\d+)?)/)||[0,0])[1]); let m, done=false;
+      const low=rewardText.toLowerCase();
+      if(!cfg.playerLike && (low.includes('dot')||low.includes('hot')||low.includes('nullify'))) return;
+      const amt0=parseFloat((rewardText.match(/(\d+(\.\d+)?)/)||[0,0])[1]);
+      // playerLike: non-damage rewards get a damage-equivalent value
+      const amt = !cfg.playerLike ? amt0 : low.includes('dot') ? amt0*1.2 : low.includes('hot') ? amt0*0.8*((S.maxHealth-S.health)>4?1:0.4) : low.includes('nullify') ? 2.5*(amt0||1) : low.includes('freeze') ? 4*(amt0||1) : amt0;
+      const flatReward = !cfg.playerLike || !/dot|hot|nullify|freeze/.test(low);
+      let m, done=false;
       if((m=cond.match(/(\d+)\+?\s*damage in a single (round|turn)/))) done = ef.totalDamage>=+m[1];
       else if((m=cond.match(/any (\d+)(?:\s*or fewer)? actions/))) done = cond.includes('or fewer') ? (ef.totalActions>0&&ef.totalActions<=+m[1]) : ef.totalActions>=+m[1];
       else if((m=cond.match(/(\d+)\s*blanks/))) done = ef.blankCount>=+m[1];
@@ -86,7 +94,7 @@ let res = await page.evaluate((cfg)=>{
       else if((m=cond.match(/(\d+)\s*block/))) done = ef.blockCount>=+m[1];
       else if((m=cond.match(/(\d+)\s*boost/))) done = ef.boostCount>=+m[1];
       else if((m=cond.match(/(\d+)\s*support/))) done = ef.supportCount>=+m[1];
-      if(done){ const a=Math.min(amt,room); bonus+=a; room-=a; }
+      if(done){ const a=flatReward?Math.min(amt,room):amt; bonus+=a; if(flatReward) room-=a; }
     });
     return bonus;
   }
@@ -154,7 +162,9 @@ let res = await page.evaluate((cfg)=>{
       const inc = Math.max(0, enemyNextTurnPreview(e).dmg - (S.playerBlock||0));
       blockV = Math.min(ef.blockGain||0, inc)*1.0 + Math.max(0,(ef.blockGain||0)-inc)*0.1;
     }
-    let v = dmg - 0.6*overshoot + (ef.dotToEncounter||0)*1.2 + Math.min(ef.healGain||0, missing)*0.9*(missing>3?1:0.5) + blockV + (ef.hotToPlayer||0)*0.8;
+    const okAt = hasRelic('hungry_blade') ? 6 : 10;
+    const okBonus = (cfg.playerLike && overshoot >= okAt) ? 4 : 0; // Overkill = one more loot choice
+    let v = dmg - (cfg.playerLike ? 0.3 : 0.6)*overshoot + okBonus + (ef.dotToEncounter||0)*1.2 + Math.min(ef.healGain||0, missing)*0.9*(missing>3?1:0.5) + blockV + (ef.hotToPlayer||0)*0.8;
     // killing is worth a lot (ends the enemy's counterattack)
     if(dmg>=need) v += 6;
     return v;
@@ -227,6 +237,7 @@ let res = await page.evaluate((cfg)=>{
   function doTurn(){
     useTrayActs();
     useTokens();
+    useAbility();
     const p = boostTokenMaybe(bestPath(cfg.skill));
     (window.__turns=window.__turns||[]).push({f:S.floorIdx+1,len:p.length,dmg:Math.round(computePathEffects(p).totalDamage),boss:(S.encounter.type!=='Enemy'&&S.encounter.type!=='Trap')});
     S.path = [];
@@ -234,14 +245,41 @@ let res = await page.evaluate((cfg)=>{
     endTurnButton();
     let guard=0; while(S.transitioning && guard++<50){ skipTransition(); }
   }
+  // playerLike shrine/relic choices (Oct 12). RELIC_PREF = win-rate gain per relic from the Oct 12 relic study
+  // (unmeasured relics get a middling guess).
+  const RELIC_PREF = {bloodletter:42,gambeson:33,banner:33,dodger_cloak:28,echo_chime:25,iron_rations:21,whetstone:21,combo_gauntlet:19,
+    flask:12,kettle:12,frost_charm:10,leaper_spurs:9,warding_bell:9,lucky_coin:8,barbed_buckler:7,shrine_bell:6,grave_tally:5,tincture:4,
+    venom_vial:2,pivot_compass:0,spite_thorns:-2,hungry_blade:-2,overflow_chalice:-3};
+  function pickShrineOption(opts){
+    const miss = S.maxHealth - S.health, L = o=>o.label||'';
+    const heal = opts.find(o=>/^Heal (\d+)/i.test(L(o)));
+    if(heal){ const n=+L(heal).match(/^Heal (\d+)/i)[1]; const other=opts.find(o=>o!==heal); return (miss >= n*0.7 || !other) ? heal : other; }
+    const pay = opts.find(o=>/Pay (\d+) max/i.test(L(o)));
+    if(pay){ const n=+L(pay).match(/Pay (\d+) max/i)[1]; return (S.maxHealth-n >= 20) ? pay : (opts.find(o=>/walk away/i.test(L(o)))||pay); }
+    const skip = opts.find(o=>/Skip next camp rest/i.test(L(o)));
+    if(skip) return (S.health >= S.maxHealth*0.6) ? skip : (opts.find(o=>/walk away/i.test(L(o)))||skip);
+    return opts.find(o=>!/walk away/i.test(L(o))) || opts[0];
+  }
+  // playerLike class ability: try converting each die in the zone, keep the best (Armsmaster Hit 2, Guard Block 2)
+  function useAbility(){
+    if(!cfg.playerLike || !S.klass.convertTo || S.classAbilityUsed) return;
+    const base = pathValue(bestPath(Math.ceil(cfg.skill/3))||[]); let best=-1, bv=base+0.5;
+    for(let i=0;i<16;i++){
+      if(!inZone(i)) continue; const c=S.tray[i]; if(c.minion||c.spent||c.forcedFace) continue;
+      const f=currentFace(c); if(f.type===S.klass.convertTo.type && (f.value||0)>=S.klass.convertTo.value) continue;
+      c.forcedFace = clone(S.klass.convertTo); const bp=bestPath(Math.ceil(cfg.skill/3)); const v=bp.length?pathValue(bp):-1e9; delete c.forcedFace;
+      if(v>bv){ bv=v; best=i; }
+    }
+    if(best>=0){ useClassAbility(best); (window.__tok=window.__tok||{}).ability=(window.__tok.ability||0)+1; }
+  }
   function tick(log){
     if(S.screen==='victory') return 'VICTORY';
     if(S.screen==='gameover') return 'GAMEOVER';
     if(S.transitioning){ skipTransition(); return null; }
     if(S.lootChoice){ const arr=S.lootChoice.options.slice().sort((a,b)=>lootScore(b)-lootScore(a)); const o = cfg.lootMode==='worst'?arr[arr.length-1]:(cfg.lootMode==='random'?arr[Math.floor(Math.random()*arr.length)]:arr[0]); chooseLoot(o); return null; }
-    if(S.shrineChoice){ const walk = cfg.relicLock && S.shrineChoice.options.find(o=>/walk away/i.test(o.label)); chooseShrineOption(walk || S.shrineChoice.options[Math.floor(Math.random()*S.shrineChoice.options.length)]); return null; }
+    if(S.shrineChoice){ const walk = cfg.relicLock && S.shrineChoice.options.find(o=>/walk away/i.test(o.label)); chooseShrineOption(walk || (cfg.playerLike ? pickShrineOption(S.shrineChoice.options) : S.shrineChoice.options[Math.floor(Math.random()*S.shrineChoice.options.length)])); return null; }
     if(S.relicChoice && cfg.relicLock){ S.relicChoice=null; S.shrineResult={title:'Relic', text:'(study: declined)'}; return null; }
-    if(S.relicChoice){ chooseRelic(S.relicChoice.options[Math.floor(Math.random()*S.relicChoice.options.length)]); return null; }
+    if(S.relicChoice){ const o=S.relicChoice.options; chooseRelic(cfg.playerLike ? o.slice().sort((a,b)=>(RELIC_PREF[b]||5)-(RELIC_PREF[a]||5))[0] : o[Math.floor(Math.random()*o.length)]); return null; }
     if(S.shrineResult){ continueFromShrine(); return null; }
     if(S.pendingLootDie){
       // replace the tray die we value least
