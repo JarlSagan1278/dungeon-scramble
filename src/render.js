@@ -2527,11 +2527,46 @@ function playDiceRollSound(){
   }
   // Landing click-clacks, timed to the tray's staggered settle (dice land
   // left-to-right), each a touch higher and crisper than the rattle.
+  // v1.39.3: each landing clack takes the material of a die in the tray (wood, Alloy metal,
+  // Gilded bright metal, Magic glass), so a tray full of loot sounds richer than the starting set.
+  const mats = diceMaterials();
   const clacks = juiceLow() ? 3 : 6;
   for(let i=0;i<clacks;i++){
     const at = 0.26 + i*(0.34/clacks) + Math.random()*0.02;
-    playNoiseBurst(ctx, now+at, 0.03, 0.2, 'highpass', 2400+i*350, 0.7);
+    playMaterialClack(ctx, now+at, mats[i % mats.length], i);
   }
+}
+// Loot tier of each die in the tray, best first, so the most special dice are heard first.
+function diceMaterials(){
+  const order = {magic:0, gilded:1, alloy:2};
+  const m = ((typeof S!=='undefined' && S && S.tray) ? S.tray : []).map(c=>c && c.die && order[c.die.cat]!=null ? c.die.cat : 'wood');
+  const special = m.filter(x=>x!=='wood').sort((a,b)=>order[a]-order[b]);
+  return special.length ? [...special.slice(0,3), 'wood', 'wood', 'wood'] : ['wood'];
+}
+// One die landing: wood = a short knock, alloy = a dull metal tick, gilded = a bright ring, magic = a glass chime.
+function playMaterialClack(ctx, t, mat, i){
+  const ping = (freq, dur, gain, type)=>{
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type||'sine'; o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(gain, t+0.004); g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+    o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+dur+0.02);
+  };
+  const j = 1 + (Math.random()-0.5)*0.08;
+  if(mat==='alloy'){ playNoiseBurst(ctx, t, 0.02, 0.12, 'highpass', 3000, 0.7); ping(1700*j, 0.12, 0.05, 'triangle'); ping(2550*j, 0.08, 0.025); }
+  else if(mat==='gilded'){ playNoiseBurst(ctx, t, 0.015, 0.1, 'highpass', 4000, 0.7); ping(2350*j, 0.3, 0.05); ping(3520*j, 0.22, 0.03); ping(5900*j, 0.12, 0.015); }
+  else if(mat==='magic'){ ping(1568*j, 0.4, 0.045); ping(2349*j, 0.35, 0.03); ping(3136*j, 0.3, 0.02); }
+  else playNoiseBurst(ctx, t, 0.03, 0.2, 'highpass', 2400+i*350, 0.7);
+}
+// v1.39.3: a single Reroll is one die, not the whole tray: two quick tumbles and a landing in that die's material.
+function playRerollSound(die){
+  if(!PREFS.sound) return;
+  const ctx = getAudioCtx();
+  if(!ctx) return;
+  const now = ctx.currentTime;
+  playNoiseBurst(ctx, now, 0.035, 0.18, 'bandpass', 1300, 1.2);
+  playNoiseBurst(ctx, now+0.07, 0.03, 0.15, 'bandpass', 1900, 1.2);
+  const cat = die && die.cat;
+  playMaterialClack(ctx, now+0.14, (cat==='alloy'||cat==='gilded'||cat==='magic') ? cat : 'wood', 2);
 }
 
 // A sharp, broadband noise "crash" (the breaking/clattering sound of a real

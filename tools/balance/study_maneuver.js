@@ -44,7 +44,7 @@ let res = await page.evaluate((cfg)=>{
   META.lifetime.victories=1; META.lifetime.bestFloorReached=3; META.achievements['origin_duo']={date:Date.now()};
   const origFns = {};
   // ---- encounter tuning hooks: scale enemies as they are drawn ----
-  window.__taken=0; const origDeal=dealEncounterDamage; window.dealEncounterDamage=function(e,a){ if(a>0){ a+=(cfg.hitAdd[S.floorIdx]||0); if(e.type==='Big Boss') a+=cfg.bigBossHitAdd; } const h=S.health; const t=origDeal(e,a); let lost=Math.max(0,h-S.health); if(cfg.takenMul<1 && lost>0){ const keep=lost*cfg.takenMul; const k=Math.floor(keep)+(Math.random()<keep-Math.floor(keep)?1:0); S.health=Math.min(S.maxHealth, S.health+(lost-k)); lost=k;} window.__taken += lost; return t; };
+  window.__taken=0; const origDeal=dealEncounterDamage; window.dealEncounterDamage=function(e,a){ if(a>0){ a+=(cfg.hitAdd[S.floorIdx]||0); if(e.type==='Big Boss') a+=cfg.bigBossHitAdd; } const h=S.health; const b0=S.playerBlock||0; const t=origDeal(e,a); { const B=(window.__tok=window.__tok||{}); const f=S.floorIdx; B.rawHit=B.rawHit||[0,0,0]; B.blocked=B.blocked||[0,0,0]; B.enemyTurns=B.enemyTurns||[0,0,0]; if(a>0){ B.rawHit[f]+=a; B.blocked[f]+=Math.max(0,b0-(S.playerBlock||0)); } } let lost=Math.max(0,h-S.health); if(cfg.takenMul<1 && lost>0){ const keep=lost*cfg.takenMul; const k=Math.floor(keep)+(Math.random()<keep-Math.floor(keep)?1:0); S.health=Math.min(S.maxHealth, S.health+(lost-k)); lost=k;} window.__taken += lost; return t; };
   const origStep=applyPathStep; window.applyPathStep=function(st){ if(cfg.dmgMul!==1 && st.dmg>0) st.dmg=Math.round(st.dmg*cfg.dmgMul); return origStep(st); };
   // ---- hypothetical Maneuver payoffs (test-only) ----
   const isMan = t => t==='dodge'||t==='leap'||t==='pivot';
@@ -264,7 +264,7 @@ let res = await page.evaluate((cfg)=>{
   }
   // playerLike class ability: try converting each die in the zone, keep the best (Armsmaster Hit 2, Guard Block 2)
   function useAbility(){
-    if(!cfg.playerLike || !S.klass.convertTo || S.classAbilityUsed) return;
+    if(!cfg.playerLike || cfg.noAbility || !S.klass.convertTo || S.classAbilityUsed) return;
     const base = pathValue(bestPath(Math.ceil(cfg.skill/3))||[]); let best=-1, bv=base+0.5;
     for(let i=0;i<16;i++){
       if(!inZone(i)) continue; const c=S.tray[i]; if(c.minion||c.spent||c.forcedFace) continue;

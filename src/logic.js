@@ -1299,7 +1299,7 @@ function doTrayReroll(idx, src, token){
   if(token) S.rerollTokens = Math.max(0,(S.rerollTokens||0)-1);
   else if(src!=null && S.tray[src]) S.tray[src].spent = true;
   S.justRerolledIdx = idx;
-  if(typeof playDiceRollSound==='function') playDiceRollSound();
+  if(typeof playRerollSound==='function') playRerollSound(c.die);
   const nf = c.die.faces[c.faceIdx];
   logMsg('sys', `Rerolled ${c.die.name}: ${LABEL[nf.type]}${nf.value?' '+nf.value:''}.`);
   teleLog('tray_reroll', {token:!!token, die:c.die.name, face:nf.type+(nf.value||'')});

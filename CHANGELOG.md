@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.39.3 (in progress)
+- Depth modifiers reshaped so each point of depth is worth about the same (depth study): Swarming ranks add 1, 3 and 4 depth; Zeal rank 1 is +1 damage on heavy turns and boss specials only, rank 2 is +1 on every hit; Dread also gives Elite and Deadly foes +20% HP per rank; Burden of Choice takes one loot option away per rank (never fewer than one); Rationing Rations is a third less rest per rank (rank 3: rest heals nothing); Clumsy is 4 max HP per rank.
+- Classes (Jeremy, after the class × origin study showed class carries the wins): Guard converts to Block 1 (was Block 2); Dungeoneer's path wraps on every row (was the two middle rows).
+- Sound: rolling the tray now lands each die in its own material (wood for the starting dice, a metal tick for Alloy, a bright ring for Gilded, a glass chime for Magic); a single Reroll has its own short tumble instead of the whole-tray rattle.
 ## 1.39.2 (released Oct 12, 2026; bug hunt clean, 24 setups)
 - Much faster path taps: about 2.5x (median ~119 ms -> ~47 ms per tap, slowest 10% ~175 -> ~63 ms, at phone-like speed). A path tap now redraws only what it changes (dice, path coins, damage counter, Go, chest lock, the enemy bar's damage preview) instead of the whole screen; the stone arch is a cached image; the room floor no longer forces a second layout. `tools/test_pathrender.js` checks the fast update matches a full redraw.
 - Relic gem families evened out (Jeremy): Equal and Opposite is now offense; Perfect Fifth and Combonatorics are path; Percolation Theory, Mandated Lunch Break and Bisection Method are loot/tempo. Families: 6 offense, 6 defense, 5 path, 6 loot/tempo. Effects unchanged.
