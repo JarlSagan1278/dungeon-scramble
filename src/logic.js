@@ -1919,7 +1919,7 @@ function runPlayerUpkeep(){
 }
 
 function dealEncounterDamage(e, amount){
-  if(amount>0 && depthRank('fury')) amount += 1 + ((depthRank('fury')>=2 && S._heavyHit) ? 1 : 0); // Zeal: rank 1 = every hit +1, rank 2 = heavy turns/boss specials +1 more
+  if(amount>0) amount += zealBonus(S._heavyHit);
   if(amount>0 && S._wardHalf){ amount = Math.ceil(amount/2); fireRelic('warding_bell','Half'); }
   if(amount>0 && hasRelic('gambeson')){ amount = Math.max(0, amount-1); fireRelic('gambeson','-1'); }
   const blocked = Math.min(S.playerBlock, amount);
@@ -2095,6 +2095,9 @@ function runEncounterAction(){
   return parts.length ? parts.join(' ') : `${e.name} takes no action.`;
 }
 
+// Zeal (depth modifier): rank 1 = every enemy hit +1, rank 2 = heavy turns and boss specials +1 more.
+// Used by the damage itself and by the next-turn preview/chips, so the warning shows the real number.
+function zealBonus(heavy){ const r = depthRank('fury'); return r ? 1 + ((r>=2 && heavy) ? 1 : 0) : 0; }
 // Preview of the enemy's coming turn, for the face-off chips and the bot:
 // {heavy, special, dmg} where dmg is the total direct damage it will deal
 // (before your Block), counting Minions currently on your tray.
@@ -2102,14 +2105,15 @@ function enemyNextTurnPreview(e){
   if(!e) return {dmg:0};
   initEnemyTurnState(e);
   const mins = S.tray ? S.tray.filter(c=>c.minion).length : 0;
-  const dmgOf = acts => acts.reduce((a,x)=>a + (x.type==='dmg' ? x.value : x.type==='dmgPerMinion' ? x.value*mins : 0), 0);
+  const hitOf = (v, hv) => v>0 ? v + zealBonus(hv) : 0;
+  const dmgOf = (acts, hv) => acts.reduce((a,x)=>a + (x.type==='dmg' ? hitOf(x.value, hv) : x.type==='dmgPerMinion' ? hitOf(x.value*mins, hv) : 0), 0);
   if(e.kit){
     const sp = bossNextSpecial(e), kit = bossKitNow(e);
-    return {special:sp, heavy:!!sp.windup, dmg: dmgOf(kit.each) + (S.freezeNext ? 0 : dmgOf(sp.acts))};
+    return {special:sp, heavy:!!sp.windup, dmg: dmgOf(kit.each, false) + (S.freezeNext ? 0 : dmgOf(sp.acts, true))};
   }
   const heavy = enemyHeavyNext(e) && !S.freezeNext;
   if(S.freezeNext && !enemyHeavyNext(e)) return {heavy:false, dmg:0};
-  return {heavy, heavyStat: heavy ? enemyHeavyStat(e) : null, dmg: (e.dmg||0) * (heavy && enemyHeavyStat(e)==='dmg' ? 2 : 1)};
+  return {heavy, heavyStat: heavy ? enemyHeavyStat(e) : null, dmg: hitOf((e.dmg||0) * (heavy && enemyHeavyStat(e)==='dmg' ? 2 : 1), heavy)};
 }
 
 function upgradeOneBasicDie(cat){

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.39.4 (in progress)
+- Stronger Infill: start every fight with 1 Block (Jeremy; was 2 in 1.39.3, 5 before).
+- Zeal's extra damage now shows in the enemy's next-turn warning, so the numbers on the chips match the hit you take.
+
 ## 1.39.3 (Oct 12, 2026)
 - Depth modifiers reshaped so each point of depth is worth about the same (depth study, two rounds): Swarming ranks add 1, 3 and 4 depth; Zeal rank 1 (cost 3) is +1 damage on every hit, rank 2 (+1) adds +1 more on heavy turns and boss specials; Dread also gives Elite and Deadly foes +20% HP per rank; Burden of Choice (one rank) removes the Overkill option and one option from every loot reward; Rationing Rations is half rest, then no rest (cost 1, then 2); Clumsy is 4 max HP per rank (rank 3 costs 2); Night Shift rank 1 costs 1.
 - Classes (Jeremy, after the class × origin study showed class carries the wins): Guard converts to Block 1 (was Block 2); Dungeoneer's path wraps on every row (was the two middle rows). Arcanist's zone is both diagonals, and any step into or out of it may go diagonally (was: diagonal moves only between squares of the rising diagonal); bot win rate at depth 7 went from 29% to 53%.

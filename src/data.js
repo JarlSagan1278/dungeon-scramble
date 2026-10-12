@@ -240,7 +240,7 @@ const RELICS = [
   {id:'shrine_bell',  name:'Inductive Step',       mono:'IS', desc:'Relic and loot shrines offer one extra choice.', tags:['loot']},
   {id:'combo_gauntlet',name:'Combonatorics',   mono:'CO', desc:'Combo dice also count diagonal neighbors.', tags:['path','offense']},
   // Origin signature relics (never offered at shrines)
-  {id:'forgeplate', name:'Stronger Infill',         mono:'SI', origin:'dwarf',    amt:2, desc:'Start every fight with 2 Block.'}, // was 5 (Oct 12 relic study: +37 -> +21)
+  {id:'forgeplate', name:'Stronger Infill',         mono:'SI', origin:'dwarf',    amt:1, desc:'Start every fight with 1 Block.'}, // was 5 (Oct 12 relic study: +37; 2 Block +21, 1 Block +9 -- Jeremy picked 1)
   {id:'spore_satchel',name:'Mycorrhizal Bond',    mono:'MB', origin:'gnome',    desc:'Leech faces also add +2 D.O.T. and heal +1 more.'},
   {id:'picnic_basket',name:'Coffee Break',    mono:'CB', origin:'halfling', heal:0, hot:1, desc:'H.O.T. faces add +1 H.O.T.'}, // was also Heal +2 (Oct 12 relic study: +46 -> +13)
   {id:'glimmer_dust',name:'Faerie Fire',      mono:'FF', origin:'pixie',    cap:2, desc:'Each Dodge, Leap or Pivot in your Path adds +1 damage to its last damaging die (at most +2 per path).'}, // cap added (Oct 12 relic study: +29 -> +12)

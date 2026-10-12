@@ -1452,7 +1452,7 @@ function renderEncounterCard(e, mode){
     if(e.hot) items.push({type:'hot', stat:'hot', label:'H.O.T.', val:e.hot});
     if(e.dot) items.push({type:'dot', stat:'dot', label:'D.O.T.', val:e.dot});
     if(!items.length) return '';
-    const chips = items.map(it=>{ const v = it.stat===hs ? it.val*2 : it.val; return `<span class="boss-cycle-item next enemy-action-badge${it.stat===hs?' heavy':''}" title="${it.stat===hs?'Heavy turn: doubled. ':''}${enemyActionTooltip(it.type, v)}">${iconSpan(it.type, ICON_VALUE_SLOT.has(it.type)?v:null)} ${it.label}${!ICON_VALUE_SLOT.has(it.type)?' '+v:''}</span>`; }).join('');
+    const chips = items.map(it=>{ const v = (it.stat===hs ? it.val*2 : it.val) + (it.stat==='dmg' ? zealBonus(!!hs) : 0); return `<span class="boss-cycle-item next enemy-action-badge${it.stat===hs?' heavy':''}" title="${it.stat===hs?'Heavy turn: doubled. ':''}${enemyActionTooltip(it.type, v)}">${iconSpan(it.type, ICON_VALUE_SLOT.has(it.type)?v:null)} ${it.label}${!ICON_VALUE_SLOT.has(it.type)?' '+v:''}</span>`; }).join('');
     return `<div class="boss-cycle-row"><span class="hint" style="margin:0;">Each turn:</span>${chips}</div>`;
   })() : '';
   const art = ART_WRONG.has(e.name) ? null : MONSTER_ART[e.name];
@@ -1460,7 +1460,8 @@ function renderEncounterCard(e, mode){
   const bossCycle = (isBoss && e.kit) ? (()=>{
     const iconKey = {dmg:'hit', dmgPerMinion:'hit', minion:'minion', shield:'block', heal:'heal', hot:'hot', dot:'dot'};
     const actText = a => a.type==='dmgPerMinion' ? `${a.value} per Minion on your Tray` : a.type==='dropShield' ? 'drops its Shield' : enemyActionTooltip(iconKey[a.type], a.value);
-    const chip = (a, extraCls, label) => {
+    const chip = (a0, extraCls, label) => {
+      const a = a0.type==='dmg' ? {...a0, value:a0.value + zealBonus(false)} : a0; // Zeal shows in the warning
       const ik = iconKey[a.type]; if(!ik) return '';
       const inSlot = ICON_VALUE_SLOT.has(ik) && a.type!=='dmgPerMinion';
       const valTxt = a.type==='dmgPerMinion' ? ` ${a.value}/Minion` : (!inSlot ? ' '+a.value : '');
@@ -1469,7 +1470,8 @@ function renderEncounterCard(e, mode){
     const kit = bossKitNow(e), sp = nextTurn.special;
     const base = kit.each.map(a=>chip(a,'','')).join('');
     const frozen = !!S.freezeNext;
-    const spMain = sp.acts.find(a=>iconKey[a.type]) || sp.acts[0];
+    const spMain0 = sp.acts.find(a=>iconKey[a.type]) || sp.acts[0];
+    const spMain = spMain0.type==='dmg' ? {...spMain0, value:spMain0.value + zealBonus(true)} : spMain0;
     const spTip = `${sp.name}: ${sp.herald?`(brought ${sp.herald.value} Minions with its warning) `:''}${sp.acts.map(actText).join(', ')}${frozen?' (cancelled by Freeze)':''}`;
     const special = `<span class="boss-cycle-item next enemy-action-badge boss-special${sp.windup&&!frozen?' heavy':''}${frozen?' frozen':''}" title="${spTip}">${iconKey[spMain.type]?iconSpan(iconKey[spMain.type], ICON_VALUE_SLOT.has(iconKey[spMain.type])?spMain.value:null):''} ${sp.name}${spMain.type==='dmgPerMinion'?' &times;'+iconSpan('minion'):(!ICON_VALUE_SLOT.has(iconKey[spMain.type]||'')&&spMain.value?' '+spMain.value:'')}</span>`;
     return `<div class="boss-cycle-row${kit.each.length>1?' crowded':''}"><span class="hint" style="margin:0;">Next turn:</span>${base}${special}</div>`;
