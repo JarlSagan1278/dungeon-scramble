@@ -3,6 +3,7 @@
 ## 1.39.1 (in progress)
 - Swap and Reroll work mid-path (Jeremy): tap the face any time; neither can touch a die already in the path. Swap/Reroll tokens too.
 - Reroll always lands on a non-blank face (a different one whenever the die has one).
+- Jeremy's repaints (batches A-D, 27 pictures) re-imported from his canvases at twice the resolution, so they stay sharp on phone screens (the first import had scaled them down to the old picture size).
 - Monster sizes set from line thickness: each picture's outline now renders at about the same thickness, so heavy-lined art shrinks (and is stretched less, so it is sharper) and thin-lined art grows a little. 37 sizes changed; the Filament Bunny keeps its new size.
 
 ## 1.39.0 (released Oct 12, 2026; bug hunt clean, 24 setups)

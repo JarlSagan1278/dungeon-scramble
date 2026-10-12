@@ -82,3 +82,6 @@ you actually changed, rebuild, and run the regression sim.
 
 ## Hand-drawn texture pass (test, Oct 12)
 `handdrawn.py in.png out.png [seed] [strength]` gives a flat, clean portrait the look of Jeremy's repaints: a slight outline wobble, a heavier near-black outline (only pixels darker than 42 on every channel, so dark hair or vests aren't swallowed), brush grain in the fills and a soft shadow toward the lower right. Tested on HALFLING_PORTRAITS[0] and GNOME_PORTRAITS[0]; not applied to the game yet.
+
+## High-resolution re-import (Oct 12)
+`reimport_hires.py <export_dir> <out_dir> BATCH_*_done.png ... [--scale 2]` finds every dashed guide box on returned canvases (joins boxes whose sides were painted over), clears the pink line, recognizes the picture by matching it against the current art, and rebuilds it at 2x the old size with the same padding, so it shows at exactly the same size but sharper. Then `import_art.py <out_dir>`. Use this (not a resize to the old size) for every returned batch from now on.
