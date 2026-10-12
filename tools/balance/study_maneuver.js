@@ -15,9 +15,12 @@
 //   bossMode (test-only, builds <1.35.0 only): 'cycle' (today: one cycle step per turn) | 'attackPlus' (boss also hits for its base damage
 //     every turn the cycle step isn't the attack) | 'attackPlusPhase' (attackPlus, and at <=50% HP it takes two cycle steps a turn)
 //   forceBoss: boss name (or array of names); every boss room on that boss's floor draws it.
+//   forceRelics: relic ids granted at the start of every run (relic study, Oct 12).
+//   relicLock (default false): the bot declines every relic shrine offer and walks away from bargain shrines,
+//     so the forced relics are the only ones held (a clean with/without comparison).
 // usage: node study_maneuver.js '<json config>'
 let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node22/lib/node_modules/playwright')); }
-const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{}, pivotFace:'pivot', manLevel:1, bossMode:'cycle', intentAware:true, forceBoss:null }, JSON.parse(process.argv[2]||'{}'));
+const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{}, pivotFace:'pivot', manLevel:1, bossMode:'cycle', intentAware:true, forceBoss:null, forceRelics:[], relicLock:false }, JSON.parse(process.argv[2]||'{}'));
 (async()=>{
 const b=await chromium.launch();const page=await b.newPage();
 page.on('pageerror',e=>console.log('PAGEERR',e.message));
@@ -200,7 +203,8 @@ let res = await page.evaluate((cfg)=>{
     if(S.screen==='gameover') return 'GAMEOVER';
     if(S.transitioning){ skipTransition(); return null; }
     if(S.lootChoice){ const arr=S.lootChoice.options.slice().sort((a,b)=>lootScore(b)-lootScore(a)); const o = cfg.lootMode==='worst'?arr[arr.length-1]:(cfg.lootMode==='random'?arr[Math.floor(Math.random()*arr.length)]:arr[0]); chooseLoot(o); return null; }
-    if(S.shrineChoice){ chooseShrineOption(S.shrineChoice.options[Math.floor(Math.random()*S.shrineChoice.options.length)]); return null; }
+    if(S.shrineChoice){ const walk = cfg.relicLock && S.shrineChoice.options.find(o=>/walk away/i.test(o.label)); chooseShrineOption(walk || S.shrineChoice.options[Math.floor(Math.random()*S.shrineChoice.options.length)]); return null; }
+    if(S.relicChoice && cfg.relicLock){ S.relicChoice=null; S.shrineResult={title:'Relic', text:'(study: declined)'}; return null; }
     if(S.relicChoice){ chooseRelic(S.relicChoice.options[Math.floor(Math.random()*S.relicChoice.options.length)]); return null; }
     if(S.shrineResult){ continueFromShrine(); return null; }
     if(S.pendingLootDie){
@@ -218,6 +222,7 @@ let res = await page.evaluate((cfg)=>{
   const runs=[];
   for(let r=0;r<cfg.runs;r++){
     newGame(cfg.origin, cfg.klass, null, '', cfg.depthMods||{});
+    (cfg.forceRelics||[]).forEach(id=>grantRelic(id,{silent:true, via:'study'}));
     if(cfg.manLevel>1){ S.tray.forEach(c=>{ if(c.die.cat==='maneuver') c.die=clone(Object.assign({},basic('maneuver',cfg.manLevel),{level:cfg.manLevel})); }); }
     if(cfg.swapManeuver){ S.tray.forEach(c=>{ if(c.die.cat==='maneuver') c.die=clone(basic('attack',c.die.level)); }); }
     const rec={fights:[],result:'TIMEOUT',floor:1,turns:0};
