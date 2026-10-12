@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.39.2';
+const GAME_VERSION = '1.39.3';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -240,18 +240,19 @@ const RELICS = [
   {id:'shrine_bell',  name:'Inductive Step',       mono:'IS', desc:'Relic and loot shrines offer one extra choice.', tags:['loot']},
   {id:'combo_gauntlet',name:'Combonatorics',   mono:'CO', desc:'Combo dice also count diagonal neighbors.', tags:['path','offense']},
   // Origin signature relics (never offered at shrines)
-  {id:'forgeplate', name:'Stronger Infill',         mono:'SI', origin:'dwarf',    desc:'Start every fight with 5 Block.'},
+  {id:'forgeplate', name:'Stronger Infill',         mono:'SI', origin:'dwarf',    amt:2, desc:'Start every fight with 2 Block.'}, // was 5 (Oct 12 relic study: +37 -> +21)
   {id:'spore_satchel',name:'Mycorrhizal Bond',    mono:'MB', origin:'gnome',    desc:'Leech faces also add +2 D.O.T. and heal +1 more.'},
-  {id:'picnic_basket',name:'Coffee Break',    mono:'CB', origin:'halfling', desc:'Heal faces heal +2 and H.O.T. faces add +1 H.O.T.'},
-  {id:'glimmer_dust',name:'Faerie Fire',      mono:'FF', origin:'pixie',    desc:'Each Dodge, Leap or Pivot in your Path adds +1 damage to its last damaging die.'},
+  {id:'picnic_basket',name:'Coffee Break',    mono:'CB', origin:'halfling', heal:0, hot:1, desc:'H.O.T. faces add +1 H.O.T.'}, // was also Heal +2 (Oct 12 relic study: +46 -> +13)
+  {id:'glimmer_dust',name:'Faerie Fire',      mono:'FF', origin:'pixie',    cap:2, desc:'Each Dodge, Leap or Pivot in your Path adds +1 damage to its last damaging die (at most +2 per path).'}, // cap added (Oct 12 relic study: +29 -> +12)
 ];
 function relicById(id){ return RELICS.find(r=>r.id===id); }
 // Relic gating (Jeremy, Oct 12; tiers from the Oct 12 relic study): the strongest shrine relics are quietly held
 // back so power arrives over many runs. A locked relic never appears in a shrine offer, and the Codex keeps it
 // as "???" (it is only marked found when offered). Tier A: after the first victory. Tier S: after clearing depth 2.
 // Everything else (and every origin relic) is available from the first run.
-const RELIC_TIER = { bloodletter:'S', gambeson:'S', banner:'S',
-  dodger_cloak:'A', echo_chime:'A', iron_rations:'A', whetstone:'A', combo_gauntlet:'A' };
+// Re-tiered Oct 12 from the depth-7 relic study (win-rate gain, player-like bot): S >= +30, A +20..30.
+const RELIC_TIER = { bloodletter:'S', dodger_cloak:'S', gambeson:'S',
+  banner:'A', echo_chime:'A', whetstone:'A' };
 function relicUnlocked(r){
   const t = RELIC_TIER[r.id];
   if(!t || r.origin) return true;

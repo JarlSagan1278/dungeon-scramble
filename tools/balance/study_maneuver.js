@@ -40,6 +40,7 @@ let res = await page.evaluate((cfg)=>{
   try{ PREFS.reducedMotion=true; }catch(e){}
   if(cfg.unlockAllRelics!==false){ try{ DEPTH_BEST.overall=Math.max(DEPTH_BEST.overall||0,2); }catch(e){} } // Oct 12 gating: studies see every relic unless unlockAllRelics:false
   // classPatch (Oct 12 class study): {"guard":{"convertTo":{"type":"block","value":1}}, "arcanist":{"zone":"(r,c)=>r===c||r+c===3"}}; zone given as source text
+  Object.entries(cfg.relicPatch||{}).forEach(([id,p])=>Object.assign(RELICS.find(r=>r.id===id),p)); // relic number tests, e.g. {"forgeplate":{"amt":2}}
   Object.entries(cfg.classPatch||{}).forEach(([id,p])=>{ const k=CLASSES.find(x=>x.id===id); Object.entries(p).forEach(([f,v])=>{ k[f] = (f==='zone') ? eval(v) : v; }); });
   META.lifetime.victories=1; META.lifetime.bestFloorReached=3; META.achievements['origin_duo']={date:Date.now()};
   const origFns = {};
@@ -249,9 +250,9 @@ let res = await page.evaluate((cfg)=>{
   }
   // playerLike shrine/relic choices (Oct 12). RELIC_PREF = win-rate gain per relic from the Oct 12 relic study
   // (unmeasured relics get a middling guess).
-  const RELIC_PREF = {bloodletter:42,gambeson:33,banner:33,dodger_cloak:28,echo_chime:25,iron_rations:21,whetstone:21,combo_gauntlet:19,
-    flask:12,kettle:12,frost_charm:10,leaper_spurs:9,warding_bell:9,lucky_coin:8,barbed_buckler:7,shrine_bell:6,grave_tally:5,tincture:4,
-    venom_vial:2,pivot_compass:0,spite_thorns:-2,hungry_blade:-2,overflow_chalice:-3};
+  const RELIC_PREF = {bloodletter:48,dodger_cloak:35,gambeson:34,banner:28,echo_chime:27,whetstone:20,iron_rations:17,barbed_buckler:17,
+    tincture:16,combo_gauntlet:14,frost_charm:13,leaper_spurs:12,grave_tally:10,warding_bell:9,flask:9,lucky_coin:8,venom_vial:6,kettle:5,
+    pivot_compass:3,shrine_bell:2,spite_thorns:2,overflow_chalice:2,hungry_blade:1}; // depth-7 relic study (rs7), Oct 12
   function pickShrineOption(opts){
     const miss = S.maxHealth - S.health, L = o=>o.label||'';
     const heal = opts.find(o=>/^Heal (\d+)/i.test(L(o)));

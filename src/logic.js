@@ -99,8 +99,9 @@ function applyRelicsToSteps(steps, path){
     if(hasRelic('venom_vial') && s.dotToEncounter>0){ s.dotToEncounter += 1; tag(s,'venom_vial','+1 DOT'); }
     if(hasRelic('tincture') && s.type==='heal'){ s.healGain += 1; tag(s,'tincture','+1'); }
     if(hasRelic('picnic_basket')){
-      if(s.type==='heal'){ s.healGain += 2; tag(s,'picnic_basket','+2'); }
-      if(s.type==='hot'){ s.hotToPlayer += 1; tag(s,'picnic_basket','+1'); }
+      const cb = relicById('picnic_basket');
+      if(s.type==='heal' && cb.heal){ s.healGain += cb.heal; tag(s,'picnic_basket','+'+cb.heal); }
+      if(s.type==='hot' && cb.hot){ s.hotToPlayer += cb.hot; tag(s,'picnic_basket','+'+cb.hot); }
     }
     if(hasRelic('spore_satchel') && s.type==='leech'){ s.dotToEncounter += 2; s.hotToPlayer += 1; tag(s,'spore_satchel','+2 DOT'); }
   });
@@ -116,7 +117,7 @@ function applyRelicsToSteps(steps, path){
   }
   if(hasRelic('echo_chime') && steps.length>=5){ const t = lastDmgStep(); if(t){ t.dmg += 3; tag(t,'echo_chime','+3'); } }
   if(hasRelic('glimmer_dust')){
-    const m = steps.filter(s=>s.type==='dodge'||s.type==='leap'||s.type==='pivot').length;
+    const m = Math.min(relicById('glimmer_dust').cap, steps.filter(s=>s.type==='dodge'||s.type==='leap'||s.type==='pivot').length);
     const t = lastDmgStep(); if(m>0 && t){ t.dmg += m; tag(t,'glimmer_dust','+'+m); }
   }
   return steps;
@@ -132,7 +133,7 @@ function fireRelic(id, text){
 function applyRelicsOnRoomStart(){
   let block = 0;
   if(hasRelic('banner')){ block += 3; fireRelic('banner','+3 Block'); }
-  if(hasRelic('forgeplate')){ block += 5; fireRelic('forgeplate','+5 Block'); }
+  if(hasRelic('forgeplate')){ const a = relicById('forgeplate').amt; block += a; fireRelic('forgeplate','+'+a+' Block'); }
   if(block>0){ S.playerBlock += block; logMsg('sys', `Relics grant ${block} Block.`, 'good'); }
 }
 

@@ -1,10 +1,16 @@
 # Changelog
 
-## 1.39.3 (in progress)
+## 1.39.3 (Oct 12, 2026)
 - Depth modifiers reshaped so each point of depth is worth about the same (depth study, two rounds): Swarming ranks add 1, 3 and 4 depth; Zeal rank 1 (cost 3) is +1 damage on every hit, rank 2 (+1) adds +1 more on heavy turns and boss specials; Dread also gives Elite and Deadly foes +20% HP per rank; Burden of Choice (one rank) removes the Overkill option and one option from every loot reward; Rationing Rations is half rest, then no rest (cost 1, then 2); Clumsy is 4 max HP per rank (rank 3 costs 2); Night Shift rank 1 costs 1.
 - Classes (Jeremy, after the class × origin study showed class carries the wins): Guard converts to Block 1 (was Block 2); Dungeoneer's path wraps on every row (was the two middle rows). Arcanist's zone is both diagonals, and any step into or out of it may go diagonally (was: diagonal moves only between squares of the rising diagonal); bot win rate at depth 7 went from 29% to 53%.
 - Prevented damage is visible (Jeremy): when Block absorbs an enemy hit, a blue "N blocked" floater rises from your HP bar, and the run summary counts Damage blocked.
 - Sound: rolling the tray now lands each die in its own material (wood for the starting dice, a metal tick for Alloy, a bright ring for Gilded, a glass chime for Magic); a single Reroll has its own short tumble instead of the whole-tray rattle.
+- Origin relics brought down to tier B (Jeremy): Stronger Infill starts fights with 2 Block (was 5); Coffee Break's H.O.T. faces add +1 H.O.T. (the Heal +2 is gone); Faerie Fire adds at most +2 damage per path. Measured at depth 7: +21, +13 and +12 win points (were +37, +46, +29); Mycorrhizal Bond +13 unchanged.
+- Relics re-tiered from the depth-7 relic study: tier S (unlocks after clearing depth 2) is Scavenger's Acumen, Evasion Tank and Minus-One Mantra; tier A (after your first victory) is Hard Hat Act, Perfect Fifth and Prime Edge. Mandated Lunch Break and Combonatorics are no longer gated.
+- Depth menu shows the depth each modifier's next rank adds (and the total once maxed).
+- Music groundwork (no music in the game yet): spec, six MIDI sketches and a preview page in docs/music.
+
+
 ## 1.39.2 (released Oct 12, 2026; bug hunt clean, 24 setups)
 - Much faster path taps: about 2.5x (median ~119 ms -> ~47 ms per tap, slowest 10% ~175 -> ~63 ms, at phone-like speed). A path tap now redraws only what it changes (dice, path coins, damage counter, Go, chest lock, the enemy bar's damage preview) instead of the whole screen; the stone arch is a cached image; the room floor no longer forces a second layout. `tools/test_pathrender.js` checks the fast update matches a full redraw.
 - Relic gem families evened out (Jeremy): Equal and Opposite is now offense; Perfect Fifth and Combonatorics are path; Percolation Theory, Mandated Lunch Break and Bisection Method are loot/tempo. Families: 6 offense, 6 defense, 5 path, 6 loot/tempo. Effects unchanged.

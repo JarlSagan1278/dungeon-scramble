@@ -71,3 +71,50 @@ Locked relics simply never appear in shrine offers, and the Codex shows "???" un
 - The bot doesn't use tokens.
 - The bot's loot picks are a heuristic.
 - Combos between relics haven't been tested yet. A second pass can add pairs with `RS_PAIRS`.
+
+## Rerun at depth 7 with the player-like bot (Oct 12, build 1.39.3 in progress)
+- **Depth:** depth 7 (Tougher Scuffs 1, Zeal 1, Rationing Rations 1, Swarming 1). This loadout wins 46% when the bot may pick relics.
+- **Method:**
+  - Each relic is forced at the start, and every other relic is declined.
+  - The no-relic baselines are Dwarf Guard 34%, Gnome Armsmaster 19%, Halfling Dungeoneer 18% and Pixie Arcanist 21%.
+- **Runs:** 300 per relic per pair.
+- **Tiers S and A again at depth 11** (Dread 1, Tougher Scuffs 1, Clumsy 1, Rationing Rations 2, Swarming 2), where the baselines are 11–24%.
+- **Raw results:** `out_relics_summary_rs7.json` and `out_relics_summary_rs11.json`.
+
+| Tier | Relic (win-rate gain at depth 7 / depth 11) |
+|---|---|
+| **S** (≥ +30) | Scavenger's Acumen +48 / +33, Evasion Tank +35 / +20, Minus-One Mantra +34 / +23 |
+| **A** (+20 to +30) | Hard Hat Act +28 / +15, Perfect Fifth +27 / +16, Prime Edge +20 / +15 |
+| **B** (+10 to +20) | Mandated Lunch Break +17 / +10, Nature's Thorns +17 (Dwarf Guard +43: it converts Block into damage), Union Health Plan +16, Combonatorics +14 / +8, Giant Killer +13, Terminal Velocity +12, Strength in Mooks +10 |
+| **C** (< +10) | Bisection Method +9, Klein Bottle +9, Need Before Greed +8, Exponential Decay +6, Percolation Theory +5, FTLeporter +3, Inductive Step +2, Equal and Opposite +2, Power Word: Safe +2, Bloodthirst +1 |
+
+- **Gating follows the tiers:**
+  - Tier A (Hard Hat Act, Perfect Fifth, Prime Edge) unlocks after your first victory.
+  - Tier S (Scavenger's Acumen, Evasion Tank, Minus-One Mantra) unlocks after clearing depth 2.
+- **Gating changes:**
+  - Evasion Tank moves up from A to S.
+  - Hard Hat Act moves down from S to A.
+  - Mandated Lunch Break and Combonatorics drop to B, which means always available.
+- **Sustain and damage avoidance still decide runs.** All three S relics prevent damage or heal.
+- **The bottom five barely move a run (≤ +3).** They're candidates for a rework when Jeremy wants one.
+
+### Origin relics (Jeremy: tier B or below)
+At depth 7, each measured with its own origin's pair:
+
+| Relic | Gain |
+|---|---|
+| Coffee Break | +46 |
+| Stronger Infill | +37 |
+| Faerie Fire | +29 |
+| Mycorrhizal Bond | +13 (fine) |
+
+Weaker versions were tested; see below.
+
+| Version tested | Gain |
+|---|---|
+| Stronger Infill: 1 / 2 / 3 / 5 Block (old) | +9 / **+21** / +29 / +37 |
+| Coffee Break: H.O.T. +1 only / Heal +1 only / Heal +1 and H.O.T. +1 / old | **+13** / +23 / +33 / +46 |
+| Faerie Fire capped at +1 / **+2** / uncapped (old) | +1 / **+12** / +29 |
+
+Shipped in 1.39.3: the bold versions.
+
