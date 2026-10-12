@@ -240,7 +240,9 @@ function render(){
   hideFaceTooltip();
   if(typeof applyDiceFinish==='function') applyDiceFinish();
   document.body.classList.remove('cog-arch');
-  { const a = document.getElementById('app'); if(a) a.classList.remove('has-room-floor'); }
+  // only screens without the room floor drop its class: removing and re-adding it on the game screen restyled the whole
+  // page on every path tap (Oct 12)
+  { const a = document.getElementById('app'); if(a && !(S && (S.screen==='game' || S.screen==='shrine'))) a.classList.remove('has-room-floor'); }
   updateHeaderMeta();
   updateLowHealthVignette();
   if(!S){
@@ -541,7 +543,8 @@ function syncRoomFloor(card){
     const appL = 0, vw = app.offsetWidth; // hard cutoff at the app's own width
     // Horizon: 38% down, but never above the bottom of the tallest possible quest note (about 122px) plus a margin.
     const hz = Math.round(Math.min(ch*0.6, Math.max(ch*ROOM_HORIZON, ROOM_MIN_HORIZON)));
-    card.style.setProperty('--hz', hz+'px');
+    if(card.style.getPropertyValue('--hz') !== hz+'px') card.style.setProperty('--hz', hz+'px');
+    syncRoomFloor._hz = hz; // renderGame pre-sets it on the next card, so this isn't a fresh style change every render
     // Where the doorway's stone pillars end (archPath stops 12px above the frame's bottom, which sits 5px above the card's top edge + 10px taller)
     const hy = Math.round(c.t + hz), yb = Math.round(ch - 7 - hz), edge = 3;
     const xl = Math.round(appL + c.l + edge), xr = Math.round(appL + c.l + cw - edge);
@@ -549,16 +552,22 @@ function syncRoomFloor(card){
     fl.style.cssText = `left:${-appL}px;width:${vw}px;top:${hy}px;bottom:-30px;clip-path:polygon(${xl}px 0,${xr}px 0,${xr}px ${yb}px,100% ${yb}px,100% 100%,0 100%,0 ${yb}px,${xl}px ${yb}px);`;
     fl.style.setProperty('--ld', '-'+Math.round(performance.now()%3100)+'ms');
     fl.innerHTML = '<div class="rf-plane"></div><div class="rf-fade"></div><div class="rf-light"></div><div class="rf-vig"></div>';
-    app.insertBefore(fl, app.firstChild);
     // Ground shadows: a feet shadow plus a tall soft pool running down through the health bar, name and chips.
-    const hf = card.querySelector('.hall-fx'); if(!hf) return;
-    const cr = card.getBoundingClientRect(), sc = cr.width/cw || 1;
-    ['.fo-enemy','.fo-player'].forEach(sel=>{
-      const side = card.querySelector(sel); const fig = side && side.querySelector('.fo-fig'); if(!fig) return;
-      const art = fig.querySelector('img,svg,.fo-img') || fig, r = art.getBoundingClientRect();
-      let B = r.bottom + 30;
-      side.querySelectorAll('.fo-name, .fo-chips, .fo-chips *, .fo-turnlabel').forEach(e=>{ B = Math.max(B, e.getBoundingClientRect().bottom); });
-      const cx = (r.left + r.width/2 - cr.left)/sc, fb = (r.bottom - cr.top)/sc, H = (B - r.bottom)/sc + 16;
+    // All measuring happens before anything is inserted, so this costs one layout, not two (Oct 12).
+    const hf = card.querySelector('.hall-fx');
+    const shadows = [];
+    if(hf){
+      const cr = card.getBoundingClientRect(), sc = cr.width/cw || 1;
+      ['.fo-enemy','.fo-player'].forEach(sel=>{
+        const side = card.querySelector(sel); const fig = side && side.querySelector('.fo-fig'); if(!fig) return;
+        const art = fig.querySelector('img,svg,.fo-img') || fig, r = art.getBoundingClientRect();
+        let B = r.bottom + 30;
+        side.querySelectorAll('.fo-name, .fo-chips, .fo-chips *, .fo-turnlabel').forEach(e=>{ B = Math.max(B, e.getBoundingClientRect().bottom); });
+        shadows.push({cx:(r.left + r.width/2 - cr.left)/sc, fb:(r.bottom - cr.top)/sc, H:(B - r.bottom)/sc + 16});
+      });
+    }
+    app.insertBefore(fl, app.firstChild);
+    shadows.forEach(({cx, fb, H})=>{
       const pool = document.createElement('div'); pool.className = 'rf-shadow rf-pool'; pool.style.cssText = `left:${cx-96}px;top:${fb-18}px;height:${H}px;`;
       const feet = document.createElement('div'); feet.className = 'rf-shadow rf-feet'; feet.style.cssText = `left:${cx-78}px;top:${fb-20}px;`;
       hf.appendChild(pool); hf.appendChild(feet);
@@ -591,7 +600,19 @@ function decorateArch(){
     const lvl = Math.min(3,(S.floorIdx||0)+1);
     syncRoomFloor(card);
     watchRoomFloor(card);
-    card.insertAdjacentHTML('beforeend', `<svg class="fo-frame" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">${archFrameSVG(w,h,lvl)}</svg>`);
+    // The arch (thousands of brick/moss shapes) is drawn once per size+floor into a cached SVG image: one <img> to
+    // lay out instead of rebuilding and laying out the whole SVG on every render, i.e. every path tap (Oct 12).
+    const key = w+'x'+h+'x'+lvl, P = 16;
+    if(!decorateArch._c || decorateArch._c.key !== key){
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w+2*P}" height="${h+2*P}" viewBox="${-P} ${-P} ${w+2*P} ${h+2*P}">${archFrameSVG(w,h,lvl)}</svg>`;
+      if(decorateArch._c && decorateArch._c.blob) URL.revokeObjectURL(decorateArch._c.src);
+      // a short blob: URL (not a 100KB+ data: URL that the HTML parser would re-read on every render)
+      let src, blob = false;
+      try{ src = URL.createObjectURL(new Blob([svg], {type:'image/svg+xml'})); blob = true; }
+      catch(e){ src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); }
+      decorateArch._c = { key, src, blob };
+    }
+    card.insertAdjacentHTML('beforeend', `<img class="fo-frame" alt="" aria-hidden="true" width="${w+2*P}" height="${h+2*P}" style="left:${-5-P}px;top:${-10-P}px;max-width:none" src="${decorateArch._c.src}">`);
     try{ document.body.classList.toggle('is-resolving', !!S.transitioning); }catch(e){}
     syncIdleBreath(); syncMascotHop(); rollHpNumbers();
     // Headroom above the monster (offset sizes again), so big monsters grow upward only until the arch would hide them.
@@ -1692,7 +1713,9 @@ function renderGame(){
     </div>
   `;
   document.getElementById('tray').innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join('');
-  placeVs();
+  { const c = document.querySelector('#enc-panel .fo-arch'); if(c && syncRoomFloor._hz) c.style.setProperty('--hz', syncRoomFloor._hz+'px'); }
+  // placeVs() runs after the path strip is written (below): reading layout here and writing the strip after it
+  // forced a second full layout on every path tap (Oct 12)
   if(S.newRoomFx){
     showRoomCallout(S.newRoomFx);
     playTone(S.newRoomFx.boss ? 'bossRoomEnter' : 'roomEnter');
@@ -1827,6 +1850,7 @@ function renderGame(){
     if(skipBtn) skipBtn.onclick = skipTransition;
   }
 
+  placeVs();
   updatePathTrail();
   rollPathCounter();
   killHintFx();

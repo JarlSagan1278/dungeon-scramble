@@ -2334,7 +2334,7 @@ body.is-resolving .hall-fx i{ opacity:0; }
 
 /* ======== Stone-floor room (v1.32.48): brick back wall above a horizon ledge, one flagstone floor under everything below ======== */
 #app.has-room-floor{ position:relative; }
-#room-floor ~ .panel{ position:relative; }
+#room-floor ~ .panel, #app.has-room-floor > .panel{ position:relative; } /* keyed to the app class too, so re-inserting the floor doesn't flip every panel's position (a full re-layout per tap; Oct 12) */
 #room-floor{ position:absolute; z-index:0; pointer-events:none; overflow:hidden; }
 #room-floor .rf-plane{ position:absolute; left:-40%; right:-40%; top:0; height:260%; background:var(--tex-floor) 0 0/170px auto; transform-origin:50% 0; transform:perspective(880px) rotateX(70deg); }
 #room-floor .rf-fade{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(10,6,4,.97) 0%, rgba(10,6,4,.6) 7%, rgba(10,6,4,.1) 26%, transparent 40%); }
