@@ -27,5 +27,10 @@ for title, names in batches:
         bx = cx + 380 - big.width//2; by = cy + 425 - big.height//2
         can.alpha_composite(big, (bx, by))
         dashed(d, bx-1, by-1, bx+big.width, by+big.height)
-        d.text((cx+65, cy+62), n, font=font, fill=MAG)
+        lines, cur = [], ''
+        for w in n.split(' '):  # wrap long names (e.g. the Toadtaur Wizard's title) so they stay in their cell
+            if cur and len(cur)+1+len(w) > 38: lines.append(cur); cur = w
+            else: cur = (cur+' '+w).strip()
+        lines.append(cur)
+        for j, ln in enumerate(lines): d.text((cx+65, cy+62-16*(len(lines)-1)+32*j), ln, font=font, fill=MAG)
     can.save(sys.argv[2]+'/'+title+'.png'); print(title, len(names))
