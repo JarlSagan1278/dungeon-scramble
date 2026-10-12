@@ -215,35 +215,35 @@ const RELICS = [
   // General pool (Relic Shrine offers)
   {id:'whetstone',  name:'Prime Edge',          mono:'PE', desc:'Your first Hit each turn deals +2 damage.', tags:['offense']},
   {id:'iron_rations',name:'Mandated Lunch Break',      mono:'LB', desc:'Heal 2 after every victory.', tags:['defense','loot']},
-  {id:'gambeson',   name:'Minus-One Mantle',    mono:'MM', desc:'Every enemy attack deals 1 less damage.', tags:['defense']},
+  {id:'gambeson',   name:'Minus-One Mantra',    mono:'MM', desc:'Every enemy attack deals 1 less damage.', tags:['defense']},
   {id:'lucky_coin', name:'Need Before Greed',         mono:'NG', desc:'Loot rewards offer +1 die to choose from.', tags:['loot']},
-  {id:'kettle',     name:'Campfire Percolator',    mono:'CP', desc:'Resting at Camp heals 3 extra.', tags:['defense','loot']},
+  {id:'kettle',     name:'Percolation Theory',    mono:'PT', desc:'Resting at Camp heals 3 extra.', tags:['defense','loot']},
   {id:'banner',     name:'Hard Hat Act',    mono:'HH', desc:'Start every fight with 3 Block.', tags:['defense']},
   {id:'flask',      name:'Klein Bottle',   mono:'KB', desc:'+8 maximum health, right now.', tags:['defense']},
-  {id:'echo_chime', name:'Pentatonic Chime',         mono:'PC', desc:'A Path of 5 or more dice deals +3 damage.', tags:['offense','path']},
-  {id:'venom_vial', name:'Exponential Decanter',         mono:'ED', desc:'Every D.O.T. face you play adds +1 D.O.T.', tags:['offense']},
-  {id:'hungry_blade',name:'Thirsty Blade',      mono:'TB', desc:'Overkill triggers at 6 extra damage instead of 10.', tags:['offense','loot']},
+  {id:'echo_chime', name:'Perfect Fifth',         mono:'PF', desc:'A Path of 5 or more dice deals +3 damage.', tags:['offense','path']},
+  {id:'venom_vial', name:'Exponential Decay',         mono:'ED', desc:'Every D.O.T. face you play adds +1 D.O.T.', tags:['offense']},
+  {id:'hungry_blade',name:'Bloodthirst',      mono:'BT', desc:'Overkill triggers at 6 extra damage instead of 10.', tags:['offense','loot']},
   {id:'tincture',   name:'Union Health Plan',       mono:'UH', desc:'Every Heal face you play heals +1.', tags:['defense']},
   // v1.36.0 additions. Conversion family:
   {id:'barbed_buckler', name:"Nature's Thorns",  mono:'NT', desc:'Each Block you gain from your path also deals 1 damage.', tags:['offense','defense']},
   {id:'overflow_chalice',name:'Power Word: Safe',mono:'PW', desc:'Healing past your maximum health becomes Block.', tags:['defense']},
   {id:'bloodletter',  name:"Scavenger's Acumen",mono:'SA', desc:'Every 6 damage you deal in one turn heals 1.', tags:['offense','defense']},
   {id:'spite_thorns', name:'Equal and Opposite',      mono:'EO', desc:'When you fully block an enemy attack, it takes 2 damage.', tags:['defense','offense']},
-  {id:'grave_tally',  name:'Mook Shield',       mono:'MS', desc:'Each Minion you clear gives 1 Block.', tags:['defense']},
+  {id:'grave_tally',  name:'Strength in Mooks',       mono:'SM', desc:'Each Minion you clear gives 1 Block.', tags:['defense']},
   // Movement family (lets players try Maneuver payoffs without changing the base dice):
   {id:'dodger_cloak', name:'Evasion Tank',    mono:'ET', desc:'Each Dodge in your path gives 1 Block.', tags:['path','defense']},
   {id:'leaper_spurs', name:'Terminal Velocity',    mono:'TV', desc:'Each Leap adds +1 damage to the next damaging die in your path.', tags:['path','offense']},
   {id:'pivot_compass',name:'FTLeporter',     mono:'FT', desc:'Your Pivots can teleport: the next step may go to any die.', tags:['path']},
   // Boss and tempo:
   {id:'frost_charm',  name:'Giant Killer',       mono:'GK', desc:'Start each boss fight with a Freeze token.', tags:['loot','tempo']},
-  {id:'warding_bell', name:'Bisection Bell',      mono:'BB', desc:'The first heavy turn or boss wind-up each fight deals half damage.', tags:['defense','tempo']},
-  {id:'shrine_bell',  name:'n+1 Button',       mono:'N1', desc:'Relic and loot shrines offer one extra choice.', tags:['loot']},
+  {id:'warding_bell', name:'Bisection Method',      mono:'BM', desc:'The first heavy turn or boss wind-up each fight deals half damage.', tags:['defense','tempo']},
+  {id:'shrine_bell',  name:'Inductive Step',       mono:'IS', desc:'Relic and loot shrines offer one extra choice.', tags:['loot']},
   {id:'combo_gauntlet',name:'Combonatorics',   mono:'CO', desc:'Combo dice also count diagonal neighbors.', tags:['offense','path']},
   // Origin signature relics (never offered at shrines)
   {id:'forgeplate', name:'Stronger Infill',         mono:'SI', origin:'dwarf',    desc:'Start every fight with 5 Block.'},
-  {id:'spore_satchel',name:'Mycorrhizal Satchel',    mono:'MY', origin:'gnome',    desc:'Leech faces also add +2 D.O.T. and heal +1 more.'},
-  {id:'picnic_basket',name:'Fine Coffee',    mono:'FC', origin:'halfling', desc:'Heal faces heal +2 and H.O.T. faces add +1 H.O.T.'},
-  {id:'glimmer_dust',name:'Faerie Fire Dust',      mono:'FF', origin:'pixie',    desc:'Each Dodge, Leap or Pivot in your Path adds +1 damage to its last damaging die.'},
+  {id:'spore_satchel',name:'Mycorrhizal Bond',    mono:'MB', origin:'gnome',    desc:'Leech faces also add +2 D.O.T. and heal +1 more.'},
+  {id:'picnic_basket',name:'Coffee Break',    mono:'CB', origin:'halfling', desc:'Heal faces heal +2 and H.O.T. faces add +1 H.O.T.'},
+  {id:'glimmer_dust',name:'Faerie Fire',      mono:'FF', origin:'pixie',    desc:'Each Dodge, Leap or Pivot in your Path adds +1 damage to its last damaging die.'},
 ];
 function relicById(id){ return RELICS.find(r=>r.id===id); }
 function originRelicFor(originId){ return RELICS.find(r=>r.origin===originId); }

@@ -2897,3 +2897,12 @@ html,body{ overflow-x:clip; }
 .trayact-hint{ display:inline-flex; align-items:center; gap:4px; font-size:13px; color:#fff3d6; white-space:nowrap; }
 .trayact-hint .icon-svg{ width:16px; height:16px; }
 .reduced-motion .die.trayact-ready .face-val, .reduced-motion .die.just-rerolled, .reduced-motion .die.just-swapped, .reduced-motion .tray.trayact-armed > .trayact-src{ animation:none !important; }
+
+/* ---- Relic gems (Oct 12): the badge circle becomes a drawn gem ---- */
+.relic-badge.relic-gem, .relic-badge.relic-gem.relic-origin{ background:none; border:none; border-radius:0; box-shadow:none; color:transparent; filter:drop-shadow(0 1px 1px rgba(0,0,0,.65)); }
+.relic-badge.relic-gem svg{ width:100%; height:100%; overflow:visible; display:block; }
+/* In a fight the gems stand in a column beside the hero, so the buffs row stays free and the hero keeps its room. */
+.fo-player{ position:relative; }
+.fo-player > .relic-strip{ position:absolute; left:-2px; top:-6px; z-index:3; margin:0; display:flex; flex-direction:column; flex-wrap:wrap; max-height:142px; gap:2px;
+  padding:3px; background:rgba(28,17,9,.75); border:2px solid var(--line); border-radius:10px; justify-content:flex-start; }
+.fo-player > .relic-strip .relic-badge{ width:18px; height:18px; }

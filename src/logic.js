@@ -1495,7 +1495,7 @@ function healPlayer(n){
   S.health = cap(S.health+n, S.maxHealth);
   if(over>0 && hasRelic('overflow_chalice')){ S.playerBlock += over; fireRelic('overflow_chalice','+'+over+' Block'); }
 }
-// Mook Shield (grave_tally, v1.36.0): each Minion the player clears gives 1 Block.
+// Strength in Mooks (grave_tally, v1.36.0): each Minion the player clears gives 1 Block.
 function graveTally(n){ if(n>0 && hasRelic('grave_tally')){ S.playerBlock += n; fireRelic('grave_tally','+'+n+' Block'); } }
 function clearOneMinion(){
   const cell = S.tray.find(c=>c.minion);

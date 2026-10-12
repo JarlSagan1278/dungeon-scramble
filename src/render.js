@@ -1368,7 +1368,7 @@ function renderEncounterCard(e, mode){
     dmgPreviewWidthPct = dmgAmt/e.maxHealth*100;
     dmgPreviewLeftPct = hpPct - dmgPreviewWidthPct;
     // Anticipation tied to real numbers: how this path stacks up against a
-    // kill and against the Overkill line (10 past dead, 6 with Thirsty Blade).
+    // kill and against the Overkill line (10 past dead, 6 with Bloodthirst).
     const thr = (typeof hasRelic==='function' && hasRelic('hungry_blade')) ? 5 : 9;
     const d = effDmg;
     const hp = e.curHealth;
@@ -1470,10 +1470,10 @@ function renderEncounterCard(e, mode){
       ${questLine}
       <div class="fo-band">
         <div class="fo-side fo-player">
-          <div class="fo-fig ${p.figCls||''}" title="${S.origin.name} ${S.klass.name}">${p.figHTML||''}</div><div class="fo-floor"></div>
+          ${relicStripHTML()}<div class="fo-fig ${p.figCls||''}" title="${S.origin.name} ${S.klass.name}">${p.figHTML||''}</div><div class="fo-floor"></div>
           <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}">${hpFillHTML('player','hp player',p.hpPct)}${shieldBarHTML(S.playerBlock, S.maxHealth, p.hpPct, 'player')}<span class="bar-num">${S.health}${shieldNumHTML(S.playerBlock)}/${S.maxHealth}</span></div>${p.deltaHTML||''}${tickFloatersHTML('player')}</div>
           <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim().replace(/</g,'&lt;')+', '+S.origin.name+' '+S.klass.name:S.origin.name+' '+S.klass.name}</div>
-          <div class="fo-chips fo-buffs">${relicStripHTML()}${hudChips(p.statusHTML)}</div>
+          <div class="fo-chips fo-buffs">${hudChips(p.statusHTML)}</div>
         </div>
         <div class="fo-vs"><span class="fo-vs-txt${(performance.now()-UIFX.vsAt)<3400?' vs-intro':''}" style="animation-delay:-${Math.max(0,Math.round(performance.now()-UIFX.vsAt))}ms">vs</span></div>
         <div class="fo-side fo-enemy${isBoss?' fo-boss-side':''}">
@@ -3231,8 +3231,62 @@ function pickLootOption(overlay, container, chosenCard, opt){
 }
 
 // ---- Relics UI ----
+// ---- Relic gems (Jeremy, Oct 12): each relic is a cut gem. The cut and color say its family, the glyph
+// etched on the table says which relic. Glyphs are 24x24 stroke drawings. No art files needed.
+const RELIC_FAM = {
+  offense:{c:'#c94a3a', d:'#7a241b', l:'#f28b74', pts:[[50,6],[94,86],[6,86]], cy:60, gs:1.15},
+  defense:{c:'#4a7a9e', d:'#22405a', l:'#9cc6e6', pts:[[14,8],[86,8],[94,16],[94,84],[86,92],[14,92],[6,84],[6,16]]},
+  path:   {c:'#4a8a5c', d:'#1f4a2b', l:'#9fd8a8', pts:[[50,4],[92,27],[92,73],[50,96],[8,73],[8,27]]},
+  loot:   {c:'#d4a017', d:'#7a5a08', l:'#ffe08a', pts:null},
+  origin: {c:'#8a5fb0', d:'#47296a', l:'#d4b3f2', pts:[[50,4],[80,26],[92,52],[50,96],[8,52],[20,26]]},
+};
+function relicFamily(r){ if(r.origin) return 'origin'; const t=(r.tags||[])[0]; return t==='tempo'?'loot':(RELIC_FAM[t]?t:'loot'); }
+const RELIC_GLYPH = {
+  whetstone:'<path d="M12 2.5 L15 13 L12 18 L9 13 Z"/><path d="M7 15.5 H17"/><path d="M12 18 V21.5"/>',
+  iron_rations:'<circle cx="12" cy="12" r="8.5"/><path d="M12 12 V6.5"/><path d="M12 12 L15.5 14"/>',
+  gambeson:'<path d="M12 3 L19.5 6 V12 C19.5 16.5 16 19.5 12 21 C8 19.5 4.5 16.5 4.5 12 V6 Z"/><path d="M8.5 12 H15.5"/>',
+  lucky_coin:'<circle cx="12" cy="12" r="8.5"/><path d="M12 6.5 L17 15.5 H7 Z"/><path d="M12 6.5 V15.5"/>',
+  kettle:'<path d="M12 3 C9 7 8 9 8 11 A4 4 0 0 0 16 11 C16 9 15 7 12 3 Z"/><path d="M6 17 C6 19 7.5 20.5 9 20.5"/><path d="M18 17 C18 19 16.5 20.5 15 20.5"/>',
+  banner:'<path d="M4 16.5 C4 10 7.5 6 12 6 C16.5 6 20 10 20 16.5"/><path d="M2.5 16.5 H21.5"/><path d="M12 6 V11"/>',
+  flask:'<path d="M9 21 C3 21 3 11 9 11 C11 11 11.5 9 11.5 7 V4"/><path d="M14.5 4 V7 C14.5 9.5 15 11 17 11.5 C21 12.5 21 21 15 21 H9"/>',
+  echo_chime:'<path d="M8 17 V5 L18 3.5 V15"/><circle cx="6" cy="17.5" r="2.4"/><circle cx="16" cy="15.5" r="2.4"/>',
+  venom_vial:'<path d="M4 4 C6 15 11 19 20 19.5"/><path d="M4 20 H20"/><circle cx="4" cy="4" r="1.3"/>',
+  hungry_blade:'<path d="M12 3 C8.5 8.5 6.5 11.5 6.5 14.5 A5.5 5.5 0 0 0 17.5 14.5 C17.5 11.5 15.5 8.5 12 3 Z"/><path d="M9.5 15 A2.5 2.5 0 0 0 12 17.5"/>',
+  tincture:'<path d="M9 4 H15 V9 H20 V15 H15 V20 H9 V15 H4 V9 H9 Z"/>',
+  barbed_buckler:'<path d="M5 19 C9 13 13 9 19 5"/><path d="M9 13.5 L7 11"/><path d="M12 10.5 L13 7.5"/><path d="M15 8 L17.5 9.5"/><path d="M7 16 L9.5 17.5"/>',
+  overflow_chalice:'<rect x="6" y="10.5" width="12" height="9" rx="2"/><path d="M8.5 10.5 V8 A3.5 3.5 0 0 1 15.5 8 V10.5"/><path d="M12 14 V16"/>',
+  bloodletter:'<path d="M2.5 12 C6 6.5 18 6.5 21.5 12 C18 17.5 6 17.5 2.5 12 Z"/><circle cx="12" cy="12" r="3"/>',
+  spite_thorns:'<path d="M3 9 H17"/><path d="M14 6 L17 9 L14 12"/><path d="M21 15 H7"/><path d="M10 12 L7 15 L10 18"/>',
+  grave_tally:'<path d="M6 5 V19"/><path d="M10 5 V19"/><path d="M14 5 V19"/><path d="M18 5 V19"/><path d="M3.5 16 L20.5 8"/>',
+  dodger_cloak:'<path d="M3 8 H14 A3 3 0 1 0 11 5"/><path d="M3 12.5 H18 A3 3 0 1 1 15 15.5"/><path d="M3 17 H9"/>',
+  leaper_spurs:'<path d="M12 3 V19"/><path d="M7 14 L12 19.5 L17 14"/><path d="M6.5 4 V9"/><path d="M17.5 4 V9"/>',
+  pivot_compass:'<path d="M4 18 Q12 1 20 18"/><path d="M16.5 16.5 L20 18 L20.8 14.2"/><circle cx="4" cy="18.5" r="1.6"/>',
+  frost_charm:'<path d="M12 3 V21"/><path d="M4.2 7.5 L19.8 16.5"/><path d="M4.2 16.5 L19.8 7.5"/><path d="M9.5 4.5 L12 7 L14.5 4.5"/><path d="M9.5 19.5 L12 17 L14.5 19.5"/>',
+  warding_bell:'<circle cx="12" cy="12" r="8.5"/><path d="M5 19 L19 5"/>',
+  shrine_bell:'<path d="M3 20 H9 V14 H15 V8 H21"/><path d="M15 4 L19 4 M17 2 V6"/>',
+  combo_gauntlet:'<circle cx="5" cy="5" r="1.6"/><circle cx="19" cy="5" r="1.6"/><circle cx="12" cy="12" r="2.4"/><circle cx="5" cy="19" r="1.6"/><circle cx="19" cy="19" r="1.6"/><path d="M6.5 6.5 L17.5 17.5 M17.5 6.5 L6.5 17.5"/>',
+  forgeplate:'<path d="M12 3 L19 7 V15 L12 19 L5 15 V7 Z"/><path d="M12 3 V19"/><path d="M5 7 L19 15"/><path d="M19 7 L5 15"/>',
+  spore_satchel:'<path d="M3.5 12 C3.5 6.5 7.5 3.5 12 3.5 C16.5 3.5 20.5 6.5 20.5 12 Z"/><path d="M10 12 V18 C10 20 14 20 14 18 V12"/><path d="M8 20.5 C6 21 4 20 3 18.5 M16 20.5 C18 21 20 20 21 18.5"/>',
+  picnic_basket:'<path d="M5 10 H16 V15 C16 18 14 20 10.5 20 C7 20 5 18 5 15 Z"/><path d="M16 11.5 C20 11.5 20 16 16 16"/><path d="M8.5 3.5 C7.5 5 9.5 6 8.5 7.5"/><path d="M12.5 3.5 C11.5 5 13.5 6 12.5 7.5"/>',
+  glimmer_dust:'<path d="M12 2.5 L13.8 10.2 L21.5 12 L13.8 13.8 L12 21.5 L10.2 13.8 L2.5 12 L10.2 10.2 Z"/>',
+};
+function relicGemSVG(r){
+  const fam = relicFamily(r), F = RELIC_FAM[fam], cx = 50, cy = F.cy||50, gs = F.gs||1.45;
+  let outer, table, facets = '';
+  if(F.pts){
+    outer = `<polygon points="${F.pts.map(p=>p.join(',')).join(' ')}" fill="url(#rg-${fam})" stroke="#0c0705" stroke-width="5" stroke-linejoin="round"/>`;
+    const tb = F.pts.map(([x,y])=>[cx+(x-cx)*0.52, cy+(y-cy)*0.52]);
+    table = `<polygon points="${tb.map(p=>p.map(v=>v.toFixed(1)).join(',')).join(' ')}" fill="${F.c}" stroke="${F.d}" stroke-width="2"/>`;
+    facets = F.pts.map((p,i)=>`<line x1="${p[0]}" y1="${p[1]}" x2="${tb[i][0].toFixed(1)}" y2="${tb[i][1].toFixed(1)}" stroke="${F.d}" stroke-width="2"/>`).join('');
+  } else {
+    outer = `<circle cx="50" cy="50" r="45" fill="url(#rg-${fam})" stroke="#0c0705" stroke-width="5"/>`;
+    const tb = []; for(let i=0;i<8;i++){ const a=i/8*Math.PI*2+Math.PI/8; tb.push([50+24*Math.cos(a),50+24*Math.sin(a)]); facets+=`<line x1="${tb[i][0].toFixed(1)}" y1="${tb[i][1].toFixed(1)}" x2="${(50+42*Math.cos(a)).toFixed(1)}" y2="${(50+42*Math.sin(a)).toFixed(1)}" stroke="${F.d}" stroke-width="2"/>`; }
+    table = `<polygon points="${tb.map(p=>p.map(v=>v.toFixed(1)).join(',')).join(' ')}" fill="${F.c}" stroke="${F.d}" stroke-width="2"/>`;
+  }
+  return `<svg viewBox="-6 -6 112 112" aria-hidden="true"><defs><radialGradient id="rg-${fam}" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="${F.l}"/><stop offset=".55" stop-color="${F.c}"/><stop offset="1" stop-color="${F.d}"/></radialGradient></defs>${outer}${facets}${table}<g transform="translate(${cx-12*gs} ${cy-12*gs}) scale(${gs})" fill="none" stroke="#fff1d6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${RELIC_GLYPH[r.id]||''}</g><path d="M24 26 L36 18" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".5"/></svg>`;
+}
 function relicBadgeHTML(r, extraCls){
-  return `<span data-relic="${r.id}" class="relic-badge ${r.origin?'relic-origin':''} ${extraCls||''}" title="${r.name}: ${r.desc}">${r.mono}</span>`;
+  return `<span data-relic="${r.id}" class="relic-badge relic-gem gem-${relicFamily(r)} ${extraCls||''}" title="${r.name}: ${r.desc}">${relicGemSVG(r)}</span>`;
 }
 
 // A compact row of the relics held this run (game board + Camp); tap for details.
