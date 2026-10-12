@@ -100,3 +100,4 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - Idea from Jeremy: a "Gnomeowners Association" enemy to replace an enemy with missing or bad art.
 - **Gnomeowners Association (Oct 12):** replaces Parasite Seer (Floor 3 easy, same stats: 20 health, 3 attack, 3 Shield); uses the old Parasite Seer picture (a gnome) as a stand-in until Jeremy draws it. Flavor by Claude.
 - **Shrine names (Jeremy, Oct 12):** 21 renames applied (Scroll Dispensers use scrambled words: CRELA, GIB, TSOP, AWSP, DOER). "Innoculation" spelled "Inoculation". The other 11 shrine names approved as they were.
+- **Names sheet workflow (Jeremy, Oct 12):** once his green-column entries are applied to the game and the sheet's main columns, Claude clears the green cells so they're empty for the next round of changes.
