@@ -1012,7 +1012,7 @@ function advanceRoute(){
   // into the next room, or even the next fight if that next step is a Camp.
   // Clearing it here, on every room transition, closes that gap regardless
   // of which path led here.
-  S.tray.forEach(c=>{ delete c.forcedFace; delete c.spent; });
+  S.tray.forEach(c=>{ delete c.forcedFace; delete c.spent; delete c.actUsed; });
   S.swapLog = []; S.trayAct = null;
   if(S.routeStep >= S.route.length){
     // move to next floor
@@ -1119,7 +1119,7 @@ function scrambleTray(){
   S._abilityReveal = null;
   S._reveals = [];
   S._pendingMinions = 0;
-  S.tray.forEach(cell=>{ cell.faceIdx = rand(6); cell.blank = false; delete cell.spent; });
+  S.tray.forEach(cell=>{ cell.faceIdx = rand(6); cell.blank = false; delete cell.spent; delete cell.actUsed; });
   S.path = [];
   S.swapLog = []; S.trayAct = null;
   S.classAbilityUsed = false;
@@ -1237,9 +1237,18 @@ function toggleSelect(idx){
 // face's own die is then spent for the turn (it acts as a blank). Swaps go in
 // S.swapLog so Clear can undo them (they reveal nothing); rerolls are final.
 // A die can't target Minion-covered cells (no scouting).
+// What a Swap/Reroll die becomes once used (Oct 12 test switch): 'blank' (spent, ends a path; live rule),
+// 'step' (stays a plain step you can walk across), 'pivot' (becomes a Pivot for the rest of the turn).
+let TRAYACT_AFTER = 'blank';
+function markTrayActUsed(c){
+  if(!c) return;
+  if(TRAYACT_AFTER==='blank'){ c.spent = true; return; }
+  c.actUsed = true;
+  if(TRAYACT_AFTER==='pivot') c.forcedFace = {type:'pivot', fromAct:true};
+}
 function trayActFaceAt(idx){
   if(S.transitioning || S.path.includes(idx)) return null;
-  const c = S.tray[idx]; if(!c || c.minion || c.spent || c.forcedFace) return null;
+  const c = S.tray[idx]; if(!c || c.minion || c.spent || c.actUsed || c.forcedFace) return null;
   const t = currentFace(c).type;
   return (t==='swap' || t==='reroll') ? t : null;
 }
@@ -1269,7 +1278,7 @@ function trayActTap(idx){
 }
 function doTraySwap(i, j, token){
   const A = S.tray[i], B = S.tray[j];
-  if(!token) A.spent = true; // the Swap die moves to j and is used up there
+  if(!token) markTrayActUsed(A); // the Swap die moves to j and is used up there
   S.tray[i] = B; S.tray[j] = A;
   if(token) S.swapTokens = Math.max(0,(S.swapTokens||0)-1);
   (S.swapLog = S.swapLog||[]).push({i, j, token:!!token});
@@ -1284,7 +1293,7 @@ function undoTraySwaps(){
     const r = L.pop();
     const A = S.tray[r.j], B = S.tray[r.i];
     S.tray[r.i] = A; S.tray[r.j] = B;
-    if(r.token) S.swapTokens = (S.swapTokens||0)+1; else delete A.spent;
+    if(r.token) S.swapTokens = (S.swapTokens||0)+1; else { delete A.spent; delete A.actUsed; if(A.forcedFace && A.forcedFace.fromAct) delete A.forcedFace; }
   }
 }
 function doTrayReroll(idx, src, token){
@@ -1298,7 +1307,7 @@ function doTrayReroll(idx, src, token){
   if(!opts.length) opts = nb.length ? nb : all.filter(k=>k!==c.faceIdx);
   c.faceIdx = opts[rand(opts.length)];
   if(token) S.rerollTokens = Math.max(0,(S.rerollTokens||0)-1);
-  else if(src!=null && S.tray[src]) S.tray[src].spent = true;
+  else if(src!=null && S.tray[src]) markTrayActUsed(S.tray[src]);
   S.justRerolledIdx = idx;
   if(typeof playRerollSound==='function') playRerollSound(c.die);
   const nf = c.die.faces[c.faceIdx];
@@ -1312,7 +1321,7 @@ function clearPathAll(){
   S.path=[];
   restoreReveals(0);
   restoreAbilityReveal();
-  S.tray.forEach(c=>delete c.forcedFace);
+  S.tray.forEach(c=>{ if(!(c.forcedFace && c.forcedFace.fromAct)) delete c.forcedFace; }); // a used Reroll die keeps its after-use face (rerolls stay)
   S.classAbilityUsed = false;
   abilityArmed = false;
   undoTraySwaps();
