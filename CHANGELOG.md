@@ -3,7 +3,7 @@
 ## 1.39.0
 - Seven new monsters from Jeremy's Mechanics Document, with his flavor text and the original art already in the game: Untamed Unicrows (Floor 1 standard), Prickly Porcupanther (Floor 1 Deadly, only with the Dread modifier), Rabbid Rabbats and Roudy Rinotter (Floor 2 easy), Whence Wolf (Floor 2 Deadly), Eelagator Escapee (Floor 3 Deadly), Toadtaur Warrior (Floor 3 elite). Each was tuned to sit inside its tier.
 - Third Big Boss: Toadtaur Wizard, Assistant to the Co-consul (78 health; Hex Factor, Square Root, Exponential Croak; phase 2 Leap Year, where the Toadtaur Warrior joins with Lily Pad Lemma). Floor 3 Big Bosses now cost 11.8-13.3 HP per fight for the bot.
-- Four new Magic dice: Law of Large Numbers (Reroll), Commutative Changeling (Swap), Absolute Zero Elixir (Freeze), Icebox Pi (Swap, Block, Freeze, Heal).
+- Four new Magic dice (names by Jeremy): Axiom of Choice (Reroll), Domesticated Displacer (Swap), 273.15 Kelvin Box (Freeze), Exile Elixir (Swap, Block, Freeze, Heal).
 - Dread now also gives Floor 1 its own Deadly card.
 - Jeremy's boss move names: Golem Lemma, Pre-heat, Melting Point, Grafted Plate, Pruning, Grazing, Slammerhand, Extrue-damage, Atomic Pull, Excessive Extrusion, R.O.T., Spore-Up, Be Fruitful and Multiply!, Toxic Trample, Lily Padding, Chimeronslaught, Lily Pod. The third Big Boss is Toadtaur Wizard, Assistant to the Co-consul. New flavor for Myceleus and the Wizard.
 - Long boss move names shift the warning chips left instead of running off the screen.

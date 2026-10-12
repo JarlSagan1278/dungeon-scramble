@@ -338,10 +338,10 @@ const MAGIC = lootSet([
   ['Pre-handy-sile Tail', ['Combo2','Combo2','Combo2','Leech1','Leech1','Pivot']],
   ['Measurably Lucky Test Tube', ['Combo2','Pivot','Freeze','HOT2','HOT2','Nullify']],
   // v1.39.0: fill the action holes (Freeze, Swap, Reroll); faction-themed names.
-  ['Law of Large Numbers', ['Reroll','Reroll','Hit3','Boost3','Block3','blank']],
-  ['Commutative Changeling', ['Swap','Swap','Combo3','Combo2','Pivot','blank']],
-  ['Absolute Zero Elixir', ['Freeze','Freeze','Hit3','Hit3','Combo2','blank']],
-  ['Icebox Pi', ['Swap','Block4','Block4','Freeze','Heal3','blank']],
+  ['Axiom of Choice', ['Reroll','Reroll','Hit3','Boost3','Block3','blank']],
+  ['Domesticated Displacer', ['Swap','Swap','Combo3','Combo2','Pivot','blank']],
+  ['273.15 Kelvin Box', ['Freeze','Freeze','Hit3','Hit3','Combo2','blank']],
+  ['Exile Elixir', ['Swap','Block4','Block4','Freeze','Heal3','blank']],
 ], 'magic');
 
 // ---- Encounters (Cards 0.4 sheet -- the most complete/current tab) ----
