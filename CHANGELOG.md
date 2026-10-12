@@ -1,6 +1,7 @@
 # Changelog
 
-## 1.39.4 (in progress)
+## 1.39.4 (Oct 12, 2026)
+- Fix: Go works right after building a path. Since 1.39.2 the Go button only responded after something forced a full redraw (like using the class ability), so the ability felt mandatory (Jeremy). `tools/test_pathrender.js` now clicks Go after path taps.
 - Swarming rank 3 adds 6 depth (was 4).
 - Stronger Infill: start every fight with 1 Block (Jeremy; was 2 in 1.39.3, 5 before).
 - Zeal's extra damage now shows in the enemy's next-turn warning, so the numbers on the chips match the hit you take.

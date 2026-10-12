@@ -1767,7 +1767,8 @@ function renderGame(){
     render();
   };
   document.getElementById('resolve-btn').onclick = ()=>{
-    if(resolveDisabled||S.transitioning) return;
+    // read the live path: path taps redraw with renderPathOnly(), which doesn't rebuild this handler (Oct 12 fix)
+    if(S.transitioning || (S.path.length===0 && anyMoveAvailable())) return;
     getAudioCtx(); // warm up/unlock audio inside this user gesture; later queued tones (from setTimeout-driven transition steps) then play fine
     chestLockFxAt = performance.now();
     { const lk=document.querySelector('.chest-lock'); if(lk) lk.classList.add('unlock'); }

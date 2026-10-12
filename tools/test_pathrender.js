@@ -40,6 +40,10 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
         if (fast !== full) { bad++; if (bad === 1) { const a = JSON.parse(fast), b = JSON.parse(full); Object.keys(a).filter(k => JSON.stringify(a[k]) !== JSON.stringify(b[k])).forEach(k => res.push('  ' + k + '\n    fast: ' + String(a[k]).slice(0, 300) + '\n    full: ' + String(b[k]).slice(0, 300))); } }
       }
       res.push((bad ? 'FAIL ' : 'ok   ') + `${o}/${k}: ${taps} taps, ${bad} mismatches`);
+      // Go must work after path taps alone (Oct 12 bug: its click handler kept the empty-path state from the last full render)
+      clearPathAll(); render();
+      for (let t = 0; t < 3; t++) { const l = [...Array(16).keys()].filter(i => canSelect(i) && !S.path.includes(i) && !trayActFaceAt(i)); if (l.length) toggleSelect(l[0]); }
+      if (S.path.length) { document.getElementById('resolve-btn').click(); res.push((S.transitioning ? 'ok   ' : 'FAIL ') + `${o}/${k}: Go after ${S.path.length} path taps ${S.transitioning ? 'starts the turn' : 'did nothing'}`); try { skipTransition(); } catch (e) {} S.transitioning = false; }
       clearPathAll();
     }
     return res;
