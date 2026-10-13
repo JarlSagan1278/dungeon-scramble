@@ -1,6 +1,8 @@
 # Changelog
 
 ## 1.39.6 (Oct 13, 2026)
+- After a fight, the downtime music restarts its cycle: bass alone for the rest of that block and two more rounds, then the melody rounds (Jeremy).
+- Camp rest: your hero gives a little shake as the healing fills in (Jeremy).
 - Grafted Grifter faces the other way in fights (Jeremy: horizontal flip).
 - Action music (Jeremy): Boss, Elite and Deadly fights switch to the action version on the next bar line -- the driving Palace-pump bass with the frantic melody on toy accordion the whole time; boss phase 2 brings in the toy drums. Winning the fight (or any other screen) drops back to the downtime version on the next bar. Both versions share one clock, so the beat never skips.
 

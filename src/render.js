@@ -3803,6 +3803,7 @@ function syncCampHeal(){
     const dur = h.dur, noAnim = (typeof PREFS!=='undefined' && PREFS.reducedMotion);
     if(noAnim || performance.now()-h.at >= dur){ UIFX.campHeal = null; return; }
     if(h.running) return; h.running = true;
+    if(!h.shook){ h.shook = true; setTimeout(()=>{ try{ pokeAnim(document.querySelector('.camp-hero'),'shake'); }catch(e){} }, 120); } // the hero gives a little shake as the rest heal fills in (Jeremy, Oct 13)
     const step = ()=>{
       const fill = document.querySelector('.camp-hp-fill'), num = document.querySelector('.camp-hp-num');
       const k = Math.max(0, Math.min(1, (performance.now()-h.at)/dur));

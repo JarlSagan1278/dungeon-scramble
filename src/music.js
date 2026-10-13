@@ -30,8 +30,8 @@ const MUSIC_VOLUME = 0.55;
 const LEAD_LEVEL = 0.09; // melody level under the bass (Jeremy: lower the melody)
 const DRUM_LEVEL = 0.6;
 const Music = { on:false, origin:0, gain:null, timer:null, mode:null, drums:false, drumsFrom:Infinity,
-  groups:{ down:{from:0, until:Infinity, gain:null, block:-1, events:null, idx:0},
-           act: {from:Infinity, until:0, gain:null, block:-1, events:null, idx:0} } };
+  groups:{ down:{from:0, until:Infinity, gain:null, block:-1, events:null, idx:0, arrBase:0},
+           act: {from:Infinity, until:0, gain:null, block:-1, events:null, idx:0, arrBase:0} } };
 function musicCtx(){ // music plays even with sound effects off, so it doesn't go through getAudioCtx()'s Sound check
   if(!audioCtx){ const C = window.AudioContext || window.webkitAudioContext; if(!C) return null; try{ audioCtx = new C(); }catch(e){ return null; } }
   if(audioCtx.state==='suspended') audioCtx.resume().catch(()=>{});
@@ -48,7 +48,7 @@ function musicStart(mode){
   Music.gain = ctx.createGain(); Music.gain.connect(ctx.destination);
   Music.gain.gain.setValueAtTime(0.0001, t); Music.gain.gain.exponentialRampToValueAtTime(MUSIC_VOLUME, t + 2.5); // gentle fade-in
   for(const k of ['down','act']){ const g = Music.groups[k]; g.gain = ctx.createGain(); g.gain.connect(Music.gain); g.block = -1; g.events = null; g.idx = 0;
-    g.from = (k===mode) ? t : Infinity; g.until = (k===mode) ? Infinity : 0; }
+    g.from = (k===mode) ? t : Infinity; g.until = (k===mode) ? Infinity : 0; g.arrBase = 0; }
   musicTick(); Music.timer = setInterval(musicTick, 50);
 }
 function musicStop(fast){
@@ -62,7 +62,10 @@ function musicSwitch(mode){
   const ctx = audioCtx; if(!ctx || !Music.on || Music.mode===mode) return;
   const bar = musicNextBar(ctx.currentTime), oldG = Music.groups[Music.mode], newG = Music.groups[mode];
   oldG.until = bar; try{ oldG.gain.gain.setValueAtTime(1, bar); oldG.gain.gain.linearRampToValueAtTime(0.0001, bar + 0.12); }catch(e){}
-  newG.from = bar; newG.until = Infinity; newG.block = -1; newG.events = null; try{ newG.gain.gain.cancelScheduledValues(0); newG.gain.gain.setValueAtTime(1, bar); }catch(e){}
+  newG.from = bar; newG.until = Infinity; newG.block = -1; newG.events = null;
+  // Jeremy (Oct 13): coming back to downtime after a fight restarts its cycle -- the rest of this block and the next two
+  // full rounds are bass only, then the melody rounds. Blocks before arrBase play bass only.
+  newG.arrBase = Math.floor((bar - Music.origin)/(MUSIC_BLOCK_BEATS*musicSpb()) + 1e-6) + 1; try{ newG.gain.gain.cancelScheduledValues(0); newG.gain.gain.setValueAtTime(1, bar); }catch(e){}
   if(mode!=='act'){ Music.drums = false; Music.drumsFrom = Infinity; }
   Music.mode = mode;
 }
@@ -81,7 +84,8 @@ function musicTick(){
     if(g.block < cur - 1 || g.block < 0){ g.block = cur; g.events = null; } // (re)joining: start from the current block
     for(let guard=0; guard<600; guard++){
       if(!g.events){
-        const parts = MUSIC_ARRANGE[k][g.block % MUSIC_ARRANGE[k].length];
+        const A = MUSIC_ARRANGE[k], r = g.block - g.arrBase;
+        const parts = r < 0 ? A[0] : A[r % A.length]; // before the cycle restarts: round 1's parts (bass only)
         g.events = parts.flatMap(p=>(MUSIC_NOTES[k][p]||[]).map(n=>({t:n[0], d:n[1], p:n[2], v:n[3], role:p}))).sort((a,b)=>a.t-b.t);
         g.idx = 0;
       }
