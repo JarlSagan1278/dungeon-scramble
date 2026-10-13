@@ -31,7 +31,12 @@ def seq(text, step, start=0.0, vel=84, acc=110, gate=0.9, scale=None):
         p = n(tok)
         if grace and scale:
             above = min(x for x in scale_notes(scale) if x > p)
-            out.append({'t': max(0, t - 0.12), 'd': 0.12, 'p': above, 'v': v - 15})
+            if t >= 0.12:
+                if out and out[-1]['t'] + out[-1]['d'] * gate > t - 0.12:  # let the previous note end before the grace starts
+                    out[-1]['d'] = max(0.05, (t - 0.12 - out[-1]['t']) / gate)
+                out.append({'t': t - 0.12, 'd': 0.12, 'p': above, 'v': v - 15})
+            else:  # no room before the note (start of a loop): play the grace first, then the note, so they never overlap
+                out.append({'t': t, 'd': 0.12, 'p': above, 'v': v - 15}); out.append({'t': t + 0.12, 'd': step - 0.12, 'p': p, 'v': v}); t += step; continue
         out.append({'t': t, 'd': step, 'p': p, 'v': v}); t += step
     for x in out: x['g'] = gate
     return out
