@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.1 (Oct 13, 2026)
+- Loot dice (Jeremy, from the loot-dice study; each change keeps the die's own identity): Claymore Hit 2 x3, Combo 2, Fumble, blank (a blank became Hit 2); Acid Potion D.O.T. 1s became 2s; Medsack one Heal 2 became Heal 1; Winged Boots blank became Boost x2; Genetic Drifter blank became a second Leech 1; Domesticated Displacer blank became Combo 2. All six now sit at or near their tier's median value (docs/studies/2026-10-13_loot_dice.md).
+
 ## 1.41.0 (Oct 13, 2026)
 - Maneuver dice scale with upgrades (Jeremy): Maneuver Die II = Dodge, Dodge, Leap, Leap, Pivot, Block 2 (the blank became Block 2); Maneuver Die III = Dodge, Dodge, Leap, Pivot, Block 1, Block 2. Regular bot with all starting Maneuver dice at that level: II 92% (Attack II 89%, old II 86%), III 95% (Attack III 95%, old III 91%).
 

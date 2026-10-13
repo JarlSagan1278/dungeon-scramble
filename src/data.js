@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.0';
+const GAME_VERSION = '1.41.1';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -311,15 +311,15 @@ const ALLOY = lootSet([
   ['Tarot Deck', ['Boost1','Dodge','Leap','Pivot','Block1','Reroll']],
   ['Lance', ['Hit1','Hit1','Combo1','Combo1','Leap','blank']],
   ['Greataxe', ['Hit2','Hit2','DOT2','blank','blank','blank']],
-  ['Claymore', ['Hit2','Hit2','Combo2','Fumble1','blank','blank']],
+  ['Claymore', ['Hit2','Hit2','Hit2','Combo2','Fumble1','blank']],
   ['Rapier', ['Hit1','Hit1','Hit1','Hit1','Combo1','Dodge']],
   ['Longsword', ['Hit1','Hit1','Hit1','Combo2','blank','blank']],
   ['Crossbow', ['Hit2','Hit2','Boost1','Dodge','Block1','blank']],
   ['Blunderbuss', ['Hit2','Hit2','Boost2','Fumble1','Leap','blank']],
   ['Ironskin Draught', ['HOT1','HOT1','Block1','Block2','blank','blank']],
-  ['Acid Potion', ['Hit1','Hit2','DOT1','DOT1','Fumble1','blank']],
+  ['Acid Potion', ['Hit1','Hit2','DOT2','DOT2','Fumble1','blank']],
   ['Grappling Set', ['Combo2','Dodge','Dodge','Leap','Leap','blank']],
-  ['Medsack', ['Heal2','Heal2','Heal2','Heal2','blank','blank']],
+  ['Medsack', ['Heal1','Heal2','Heal2','Heal2','blank','blank']],
 ], 'alloy');
 
 const GILDED = lootSet([
@@ -332,7 +332,7 @@ const GILDED = lootSet([
   ['Thorned Bulwark', ['Hit1','Hit1','Block3','Block3','Block3','blank']],
   ['Cool Whip', ['Hit1','Combo2','Combo1','Combo1','Swap','blank']],
   ['Humor-inverter', ['Fumble1','Fumble1','HOT2','HOT2','HOT2','blank']],
-  ['Winged Boots', ['Combo3','Dodge','Leap','Pivot','Nullify','blank']],
+  ['Winged Boots', ['Combo3','Dodge','Leap','Pivot','Nullify','Boost1']],
   ['Drill Shield', ['Hit2','Hit2','Block3','Block3','Nullify','blank']],
   ['Maximum Capacitor', ['Fumble1','Leap','Boost2','Boost3','Boost3','blank']],
   ['Mining Mines', ['Pivot','Combo2','Combo2','Boost2','Reroll','blank']],
@@ -340,7 +340,7 @@ const GILDED = lootSet([
   ['Portable RNGenerator', ['Combo1','Leech1','Freeze','HOT1','Nullify','Reroll']],
   ['Poison Sword', ['Hit2','Hit2','Combo2','DOT2','blank','blank']],
   ['Sporific Staff', ['DOT1','Leech1','Leech1','Pivot','HOT1','blank']],
-  ['Genetic Drifter', ['Combo1','Leech1','Pivot','Swap','Nullify','blank']],
+  ['Genetic Drifter', ['Combo1','Leech1','Leech1','Pivot','Swap','Nullify']],
   ['Leeching Lance', ['Hit1','Combo1','DOT2','Leech1','Pivot','blank']],
   ['Pleasant Parasite?', ['Combo1','Combo1','Fumble1','Heal2','Heal2','HOT2']],
 ], 'gilded');
@@ -360,7 +360,7 @@ const MAGIC = lootSet([
   ['Measurably Lucky Test Tube', ['Combo2','Pivot','Freeze','HOT2','HOT2','Nullify']],
   // v1.39.0: fill the action holes (Freeze, Swap, Reroll); faction-themed names.
   ['Axiom of Choice', ['Reroll','Reroll','Hit3','Boost3','Block3','blank']],
-  ['Domesticated Displacer', ['Swap','Swap','Combo3','Combo2','Pivot','blank']],
+  ['Domesticated Displacer', ['Swap','Swap','Combo3','Combo2','Pivot','Combo2']],
   ['273.15 Kelvin Box', ['Freeze','Freeze','Hit3','Hit3','Combo2','blank']],
   ['Exile Elixir', ['Swap','Block4','Block4','Freeze','Heal3','blank']],
 ], 'magic');
