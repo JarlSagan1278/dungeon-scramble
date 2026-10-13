@@ -185,8 +185,13 @@ const ICON_SVG = {
 // itself (a hole in the traced glyph, per the sticker's own design) --
 // these get the real per-die value overlaid there instead of a blank gap.
 const ICON_VALUE_SLOT = new Set(['hit','combo','leech','block','heal','dot','hot']);
-function iconSpan(type, value){
+// Small-tile versions of icons whose detail disappears below ~20px (Jeremy, Oct 13: the mini Dodge read as a plain X).
+const ICON_SVG_SMALL = {
+  dodge: '<svg viewBox="0 0 24 24"><path d="M7.2 7.2 L16.8 16.8 M16.8 7.2 L7.2 16.8" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><path fill="currentColor" d="M1 1 L11 2.6 L2.6 11 Z M23 1 L21.4 11 L13 2.6 Z M1 23 L2.6 13 L11 21.4 Z M23 23 L13 21.4 L21.4 13 Z"/></svg>',
+};
+function iconSpan(type, value, small){
   if(!ICON_SVG[type]) return '';
+  if(small && ICON_SVG_SMALL[type]) return `<span class="icon-svg">${ICON_SVG_SMALL[type]}</span>`;
   const overlay = (value!=null && ICON_VALUE_SLOT.has(type))
     ? `<span class="icon-value-overlay">${value}</span>` : '';
   return `<span class="icon-svg">${ICON_SVG[type]}${overlay}</span>`;

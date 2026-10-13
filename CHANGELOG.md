@@ -1,6 +1,8 @@
 # Changelog
 
 ## 1.39.5 (in progress)
+- Sound effects are in the music's key (Jeremy): every pitched sound sits in D harmonic minor, and the rising ladders (path steps, hits, heals, Block, D.O.T., Freeze...) climb the A freygish scale (A Bb C# D E F G) instead of a major pentatonic one. Happy sounds use A major (the bright chord inside the key); the victory fanfare ends on D major.
+- The small Dodge icon (loot compare rows) has bold arrowheads, so it no longer reads as a plain X (Jeremy).
 - Swap and Reroll (Jeremy): once used, the die becomes a Pivot for the rest of the turn instead of a blank that ends your path.
 - Guard's zone is a 3-square L on the middle right (was a 2x2 block).
 - Depth numbers start at 0 (Jeremy): the base dungeon is Depth 0, so the badges sit at 0, 3, 6 and 10. Your saved progress is unchanged; only the numbers shown are one lower.

@@ -2292,35 +2292,35 @@ const TONE_SEQUENCES = {
   // (the "swish" of the blade) with sharp metallic ping layered right on
   // top of its tail (the "clang" of it landing) -- see playTone()'s
   // freqTo handling for the sweep.
-  hit:       [{freq:1400, freqTo:140, start:0,    dur:0.1,  type:'sawtooth', gain:0.2},
-              {freq:1800,             start:0.045,dur:0.05, type:'square',   gain:0.14}],
+  hit:       [{freq:880, freqTo:110, start:0,    dur:0.1,  type:'sawtooth', gain:0.2},
+              {freq:1109,             start:0.045,dur:0.05, type:'square',   gain:0.14}],
   // Soft tick as each die joins the path (pitch climbs with path length via
   // playTone's pentatonic ladder); a brighter 3-note sparkle when the path's
   // damage badge crosses a tier; and the turn's closing 'tally' chord.
   relicProc: [{freq:1175,start:0,    dur:0.09, type:'sine',     gain:0.12},
               {freq:1568,start:0.06, dur:0.12, type:'sine',     gain:0.10}],
-  fuse:      [{freq:392, start:0,    dur:0.1,  type:'triangle', gain:0.16},
-              {freq:587, start:0.09, dur:0.1,  type:'triangle', gain:0.16},
-              {freq:784, start:0.18, dur:0.1,  type:'triangle', gain:0.16},
+  fuse:      [{freq:587, start:0,    dur:0.1,  type:'triangle', gain:0.16},
+              {freq:698, start:0.09, dur:0.1,  type:'triangle', gain:0.16},
+              {freq:880, start:0.18, dur:0.1,  type:'triangle', gain:0.16},
               {freq:1175,start:0.27, dur:0.3,  type:'sine',     gain:0.18}],
   uiTick:    [{freq:1500,start:0,    dur:0.03, type:'sine',     gain:0.05}],
-  glint:     [{freq:2093,start:0,    dur:0.07, type:'sine',     gain:0.07},
-              {freq:3136,start:0.05, dur:0.1,  type:'sine',     gain:0.06}],
+  glint:     [{freq:1760,start:0,    dur:0.07, type:'sine',     gain:0.07},
+              {freq:2637,start:0.05, dur:0.1,  type:'sine',     gain:0.06}],
   closeCall: [{freq:330, start:0,    dur:0.09, type:'sine',     gain:0.1},
               {freq:330, start:0.14, dur:0.12, type:'sine',     gain:0.1}],
-  pathTick:  [{freq:520, start:0,    dur:0.07, type:'sine',     gain:0.11},
-              {freq:1040,start:0.01, dur:0.05, type:'triangle', gain:0.05}],
-  tierUp:    [{freq:784, start:0,    dur:0.08, type:'triangle', gain:0.14},
-              {freq:1047,start:0.07, dur:0.08, type:'triangle', gain:0.14},
-              {freq:1568,start:0.14, dur:0.16, type:'triangle', gain:0.14}],
-  tally:     [{freq:392, start:0,    dur:0.16, type:'triangle', gain:0.18},
-              {freq:494, start:0,    dur:0.16, type:'triangle', gain:0.14},
-              {freq:587, start:0,    dur:0.16, type:'triangle', gain:0.14},
-              {freq:784, start:0.05, dur:0.26, type:'sine',     gain:0.16}],
-  heal:      [{freq:520, start:0,    dur:0.12, type:'sine',     gain:0.14},
-              {freq:660, start:0.09, dur:0.16, type:'sine',     gain:0.14}],
+  pathTick:  [{freq:440, start:0,    dur:0.07, type:'sine',     gain:0.11},
+              {freq:880, start:0.01, dur:0.05, type:'triangle', gain:0.05}],
+  tierUp:    [{freq:880, start:0,    dur:0.08, type:'triangle', gain:0.14},
+              {freq:1109,start:0.07, dur:0.08, type:'triangle', gain:0.14},
+              {freq:1319,start:0.14, dur:0.16, type:'triangle', gain:0.14}],
+  tally:     [{freq:440, start:0,    dur:0.16, type:'triangle', gain:0.18},
+              {freq:554, start:0,    dur:0.16, type:'triangle', gain:0.14},
+              {freq:659, start:0,    dur:0.16, type:'triangle', gain:0.14},
+              {freq:880, start:0.05, dur:0.26, type:'sine',     gain:0.16}],
+  heal:      [{freq:659, start:0,    dur:0.12, type:'sine',     gain:0.14},
+              {freq:880, start:0.09, dur:0.16, type:'sine',     gain:0.14}],
   defeat:    [{freq:220, start:0,    dur:0.2,  type:'sawtooth', gain:0.16},
-              {freq:160, start:0.18, dur:0.34, type:'sawtooth', gain:0.16}],
+              {freq:175, start:0.18, dur:0.34, type:'sawtooth', gain:0.16}],
   heartbeat: [{freq:80,  start:0,    dur:0.1,  type:'sine',     gain:0.24},
               {freq:70,  start:0.16, dur:0.12, type:'sine',     gain:0.2}],
   // A short rising fanfare for a Boss/Big Boss kill -- bigger than the flat
@@ -2328,8 +2328,8 @@ const TONE_SEQUENCES = {
   // shorter than the full 4-note 'victory' sting reserved for winning the
   // whole run.
   bossKill:  [{freq:294, start:0,    dur:0.12, type:'triangle', gain:0.22},
-              {freq:392, start:0.11, dur:0.12, type:'triangle', gain:0.22},
-              {freq:523, start:0.22, dur:0.30, type:'triangle', gain:0.24}],
+              {freq:440, start:0.11, dur:0.12, type:'triangle', gain:0.22},
+              {freq:587, start:0.22, dur:0.30, type:'triangle', gain:0.24}],
   // A light, bright two-note chime for winning a plain (non-Boss,
   // non-Overkill) encounter -- every kill now gets a distinct "you won"
   // cue of its own, instead of only the per-die 'hit' sound from whichever
@@ -2346,21 +2346,21 @@ const TONE_SEQUENCES = {
   // rising two-note knock, quieter and gentler than any combat tone so it
   // doesn't compete with the hit/heal sounds that start firing a moment
   // later once the fight actually begins.
-  roomEnter: [{freq:246, start:0,    dur:0.1,  type:'sine',     gain:0.14},
-              {freq:330, start:0.09, dur:0.16, type:'sine',     gain:0.16}],
+  roomEnter: [{freq:220, start:0,    dur:0.1,  type:'sine',     gain:0.14},
+              {freq:294, start:0.09, dur:0.16, type:'sine',     gain:0.16}],
   // Loot-die shimmer cues (one per metal, played softly when the dice land): gold = bell, alloy = dry metallic tick, magic = rising shimmer
   gildedShine: [{freq:1318, start:0,    dur:0.22, type:'sine',     gain:0.07},
                 {freq:1760, start:0.05, dur:0.3,  type:'sine',     gain:0.05}],
   alloyShine:  [{freq:2200, start:0,    dur:0.05, type:'square',   gain:0.03},
                 {freq:1480, start:0.04, dur:0.07, type:'triangle', gain:0.05}],
-  magicShine:  [{freq:392,  freqTo:988, start:0,    dur:0.4,  type:'sine', gain:0.06},
+  magicShine:  [{freq:392,  freqTo:880, start:0,    dur:0.4,  type:'sine', gain:0.06},
                 {freq:1175, start:0.18, dur:0.3,  type:'sine', gain:0.04}],
   // Quest cue: a bright three-note flourish (rising triad plus a sparkle) so
   // bonus objectives are heard, distinct from the soft door knock.
-  questStart: [{freq:523, start:0,    dur:0.12, type:'triangle', gain:0.16},
-               {freq:659, start:0.09, dur:0.12, type:'triangle', gain:0.16},
-               {freq:784, start:0.18, dur:0.14, type:'triangle', gain:0.17},
-               {freq:1568,start:0.3,  dur:0.3,  type:'sine',     gain:0.09}],
+  questStart: [{freq:440, start:0,    dur:0.12, type:'triangle', gain:0.16},
+               {freq:554, start:0.09, dur:0.12, type:'triangle', gain:0.16},
+               {freq:659, start:0.18, dur:0.14, type:'triangle', gain:0.17},
+               {freq:1760,start:0.3,  dur:0.3,  type:'sine',     gain:0.09}],
   // A heavier, ominous version for a Boss room -- lower and a touch longer,
   // so it reads as a step up in stakes rather than just another door.
   bossRoomEnter: [{freq:110, start:0,    dur:0.16, type:'sawtooth', gain:0.18},
@@ -2379,48 +2379,48 @@ const TONE_SEQUENCES = {
             {freq:1175,start:0.16, dur:0.18, type:'triangle', gain:0.2}],
   // A short ascending sparkle for reaching a new Floor -- celebratory, not
   // combat-weighted, so it reads as "level up" rather than another kill.
-  floorUp: [{freq:392, start:0,    dur:0.12, type:'triangle', gain:0.2},
-            {freq:523, start:0.1,  dur:0.12, type:'triangle', gain:0.2},
+  floorUp: [{freq:440, start:0,    dur:0.12, type:'triangle', gain:0.2},
+            {freq:554, start:0.1,  dur:0.12, type:'triangle', gain:0.2},
             {freq:659, start:0.2,  dur:0.26, type:'triangle', gain:0.22}],
   // A soft magical chime for a Shrine actually granting its blessing --
   // gentle high sine notes, deliberately quieter/softer than any combat or
   // reward tone so a Shrine visit reads as a calm moment, not another hit.
   // v1.36.0 shrine ritual: a soft, airy entrance chime and a bright release
   // when the hold completes (the hold itself climbs the pathTick ladder).
-  shrineEnter: [{freq:523, start:0,    dur:0.35, type:'sine', gain:0.08},
-                {freq:784, start:0.18, dur:0.4,  type:'sine', gain:0.08},
-                {freq:1047,start:0.38, dur:0.6,  type:'sine', gain:0.07}],
-  shrineBurst: [{freq:1047,start:0,    dur:0.12, type:'triangle', gain:0.12},
-                {freq:1319,start:0.06, dur:0.14, type:'sine', gain:0.12},
-                {freq:1568,start:0.12, dur:0.35, type:'sine', gain:0.13}],
-  blessing: [{freq:784,  start:0,    dur:0.18, type:'sine', gain:0.12},
-             {freq:988,  start:0.12, dur:0.18, type:'sine', gain:0.12},
-             {freq:1319, start:0.26, dur:0.3,  type:'sine', gain:0.14}],
+  shrineEnter: [{freq:440, start:0,    dur:0.35, type:'sine', gain:0.08},
+                {freq:659, start:0.18, dur:0.4,  type:'sine', gain:0.08},
+                {freq:932, start:0.38, dur:0.6,  type:'sine', gain:0.07}],
+  shrineBurst: [{freq:880, start:0,    dur:0.12, type:'triangle', gain:0.12},
+                {freq:1109,start:0.06, dur:0.14, type:'sine', gain:0.12},
+                {freq:1319,start:0.12, dur:0.35, type:'sine', gain:0.13}],
+  blessing: [{freq:659,  start:0,    dur:0.18, type:'sine', gain:0.12},
+             {freq:880,  start:0.12, dur:0.18, type:'sine', gain:0.12},
+             {freq:1109, start:0.26, dur:0.3,  type:'sine', gain:0.14}],
   // A bigger, grander flourish for clearing the whole dungeon, replacing
   // the plain 'victory' sting -- plays alongside the new confetti burst as
   // the Victory screen first appears.
-  grandVictory: [{freq:523, start:0,    dur:0.16, type:'triangle', gain:0.22},
-                 {freq:659, start:0.14, dur:0.16, type:'triangle', gain:0.22},
-                 {freq:784, start:0.28, dur:0.16, type:'triangle', gain:0.22},
-                 {freq:1047,start:0.42, dur:0.45, type:'triangle', gain:0.26}],
+  grandVictory: [{freq:294, start:0,    dur:0.16, type:'triangle', gain:0.22},
+                 {freq:370, start:0.14, dur:0.16, type:'triangle', gain:0.22},
+                 {freq:440, start:0.28, dur:0.16, type:'triangle', gain:0.22},
+                 {freq:587, start:0.42, dur:0.45, type:'triangle', gain:0.26}],
   // ---- v1.39.0 sound palette (docs/studies/2026-10-12_todo_studies.md s.4):
   // wood, metal and bells, one instrument per action family. Path steps all
   // ride the pentatonic ladder (pitchStep) so a long path keeps climbing.
-  woodKnock: [{freq:190, freqTo:150, start:0, dur:0.07, type:'triangle', gain:0.2},
+  woodKnock: [{freq:220, freqTo:175, start:0, dur:0.07, type:'triangle', gain:0.2},
               {freq:420, start:0, dur:0.03, type:'square', gain:0.05}],
   bell:      [{freq:880, start:0, dur:0.5, type:'sine', gain:0.11},
               {freq:1760, start:0, dur:0.3, type:'sine', gain:0.04},
               {freq:2640, start:0.005, dur:0.18, type:'sine', gain:0.02}],
-  pluck:     [{freq:233, freqTo:196, start:0, dur:0.16, type:'triangle', gain:0.16},
-              {freq:466, start:0, dur:0.06, type:'sine', gain:0.05}],
-  glass:     [{freq:2093, start:0, dur:0.45, type:'sine', gain:0.07},
-              {freq:2117, start:0.01, dur:0.4, type:'sine', gain:0.05},
-              {freq:3136, start:0.03, dur:0.3, type:'sine', gain:0.04}],
+  pluck:     [{freq:220, freqTo:196, start:0, dur:0.16, type:'triangle', gain:0.16},
+              {freq:440, start:0, dur:0.06, type:'sine', gain:0.05}],
+  glass:     [{freq:1760, start:0, dur:0.45, type:'sine', gain:0.07},
+              {freq:1780, rel:1.0115, start:0.01, dur:0.4, type:'sine', gain:0.05},
+              {freq:2637, start:0.03, dur:0.3, type:'sine', gain:0.04}],
   swell:     [{freq:300, freqTo:900, start:0, dur:0.22, type:'sine', gain:0.1}],
   whistle:   [{freq:620, freqTo:1500, start:0, dur:0.14, type:'sine', gain:0.1}],
   sour:      [{freq:150, freqTo:110, start:0, dur:0.14, type:'sawtooth', gain:0.08}],
   swapFlip:  [{freq:330, start:0, dur:0.05, type:'triangle', gain:0.14},
-              {freq:494, start:0.07, dur:0.06, type:'triangle', gain:0.14}],
+              {freq:440, start:0.07, dur:0.06, type:'triangle', gain:0.14}],
   // Enemy turn: a low drum as it acts, then what it did.
   enemyDrum: [{freq:95, freqTo:60, start:0, dur:0.16, type:'sine', gain:0.24},
               {freq:180, freqTo:90, start:0, dur:0.05, type:'triangle', gain:0.08}],
@@ -2434,17 +2434,29 @@ const TONE_SEQUENCES = {
               {freq:1000, freqTo:1600, start:0.16, dur:0.06, type:'triangle', gain:0.06}],
   windup:    [{freq:65, freqTo:130, start:0, dur:0.55, type:'sawtooth', gain:0.07},
               {freq:130, freqTo:260, start:0.1, dur:0.45, type:'sine', gain:0.06}],
-  restChord: [{freq:262, start:0, dur:0.6, type:'sine', gain:0.09},
-              {freq:330, start:0.08, dur:0.55, type:'sine', gain:0.08},
-              {freq:392, start:0.16, dur:0.5, type:'sine', gain:0.08}],
+  restChord: [{freq:294, start:0, dur:0.6, type:'sine', gain:0.09},
+              {freq:349, start:0.08, dur:0.55, type:'sine', gain:0.08},
+              {freq:440, start:0.16, dur:0.5, type:'sine', gain:0.08}],
   // A bright ascending "item get" twinkle for the instant a Loot die is
   // actually picked on the loot-reveal screen (renderLootModal/
   // pickLootOption) -- a Zelda-ish sparkle, distinct from the later 'equip'
   // ka-ching that plays once the die is actually slotted into the tray.
   lootPick: [{freq:659,  start:0,    dur:0.1,  type:'sine',     gain:0.18},
-             {freq:988,  start:0.08, dur:0.12, type:'sine',     gain:0.18},
-             {freq:1319, start:0.16, dur:0.24, type:'triangle', gain:0.2}],
+             {freq:880,  start:0.08, dur:0.12, type:'sine',     gain:0.18},
+             {freq:1109, start:0.16, dur:0.24, type:'triangle', gain:0.2}],
 };
+// Sound-effect key (v1.39.5): pitch classes of D harmonic minor (D E F G A Bb C#), the notes of A freygish.
+const SFX_KEY_PCS = [2,4,5,7,9,10,1];
+// Tones that keep their own pitch: percussion, metal, deliberate dissonance, and the victory's D-major (Picardy) ending.
+const SFX_FREE_PITCH = new Set(['clank','squeak','heartbeat','enemyDrum','windup','sour','overkill','alloyShine','grandVictory']);
+function sfxInScale(m){ return SFX_KEY_PCS.includes(((m%12)+12)%12); }
+function sfxInKey(freq, step){
+  const m0 = 69 + 12*Math.log2(freq/440);
+  let m = Math.round(m0);
+  if(!sfxInScale(m)){ const up = m+1, dn = m-1; m = sfxInScale(up) && (!sfxInScale(dn) || up-m0 <= m0-dn) ? up : (sfxInScale(dn) ? dn : m+2); }
+  for(let k=0;k<step;k++){ do{ m++; } while(!sfxInScale(m)); }
+  return 440*Math.pow(2,(m-69)/12);
+}
 function playTone(kind, pitchStep){
   if(!PREFS.sound) return;
   const ctx = getAudioCtx();
@@ -2460,16 +2472,23 @@ function playTone(kind, pitchStep){
   // Pitch ladder on a major-pentatonic scale (semitone offsets below), so a
   // run of rising notes always sounds in tune/pleasant instead of drifting
   // chromatically. Index 0 is the base note; capped at the top of the table.
-  const PENTA = [0,2,4,7,9,12,14,16,19,21,24];
-  const pitchMult = pitchStep ? Math.pow(2, PENTA[Math.min(Math.max(0,Math.floor(pitchStep)), PENTA.length-1)]/12) : 1;
+  // v1.39.5 (Jeremy): every pitched sound sits in the music's key, D harmonic minor (= A freygish, the
+  // "harmonic minor phrygian" of docs/music/MUSIC_SPEC.md). Each note snaps to the scale, and a ladder step
+  // climbs one scale tone, so a growing path plays the freygish scale up from A. Noisy/metal tones keep their pitch.
+  const step = pitchStep ? Math.min(Math.max(0, Math.floor(pitchStep)), 14) : 0;
+  const keep = SFX_FREE_PITCH.has(kind);
+  let first = null;
   notes.forEach(n=>{
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = n.type;
-    osc.frequency.setValueAtTime(n.freq*pitchMult, now+n.start);
+    let f = keep ? n.freq * Math.pow(2, step*1.7/12) : sfxInKey(n.freq, step);
+    if(n.rel && first) f = first * n.rel; // a deliberate detune (chorus shimmer) rides on the note before it
+    if(first==null) first = f;
+    osc.frequency.setValueAtTime(f, now+n.start);
     // Optional downward/upward sweep (e.g. the sword-slash "swish" in
-    // 'hit') -- exponentialRamp can't target 0, so freqTo is assumed >0.
-    if(n.freqTo) osc.frequency.exponentialRampToValueAtTime(n.freqTo*pitchMult, now+n.start+n.dur);
+    // 'hit') -- exponentialRamp can't target 0, so freqTo is assumed >0. The sweep keeps its shape.
+    if(n.freqTo) osc.frequency.exponentialRampToValueAtTime(n.freqTo*(f/n.freq), now+n.start+n.dur);
     gain.gain.setValueAtTime(0.0001, now+n.start);
     gain.gain.linearRampToValueAtTime(n.gain, now+n.start+0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, now+n.start+n.dur);
@@ -3541,7 +3560,7 @@ function diceFacesRowHTML(die, other){
   };
   return `<div class="faces-tiles">${die.faces.map(f=>f.type==='blank'
     ? '<div class="mini-face mf-blank"></div>'
-    : `<div class="mini-face mf-${cat}" title="${LABEL[f.type]}${f.value?' '+f.value:''}">${iconSpan(f.type, f.value)}<small>${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</small>${arrow(f)}</div>`).join('')}</div>`;
+    : `<div class="mini-face mf-${cat}" title="${LABEL[f.type]}${f.value?' '+f.value:''}">${iconSpan(f.type, f.value, true)}<small>${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</small>${arrow(f)}</div>`).join('')}</div>`;
 }
 function renderSwapModal(){
   const incoming = S.pendingLootDie;
