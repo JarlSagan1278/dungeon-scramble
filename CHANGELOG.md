@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.4 (Oct 13, 2026)
+- Music: end-of-run stings in the game's own synth, replacing the old fanfare and defeat sound effects. Run won: a fast freylekhs that opens with the Bb-C#-D sob, runs up the scale and lands on D major (Picardy third) with a snare roll and crash (~5.7 s). Run lost: a slow doina sigh down D harmonic minor over a falling bass, ending on a soft D minor chord (~5.9 s). The title theme fades back in after each. Both are on the music preview page.
+
 ## 1.41.3 (Oct 13, 2026)
 - Play data (from the balance literature review): each run records its lifetime run number and depth; every turn records whether the lethal warning was up at turn start and when Go was pressed; each death records whether it came from a hit or D.O.T. and whether it was warned; relic shrines log the three relics offered and the one taken; Restart Run saves the run as 'abandoned' (a quit point). The export now opens with a summary: where runs end by floor, the first-10-runs win rate, take rates for every offered loot die / relic / shrine option, and deaths split into warned at Go / warning cleared by the path / never warned.
 

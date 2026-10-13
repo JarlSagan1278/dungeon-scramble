@@ -39,6 +39,9 @@ button:active{ transform:translateY(2px); box-shadow:0 1px 0 var(--line); }
   <h2>Victory chimes</h2>
   <p class="note">They land on the next bar line when the dungeon music is playing, otherwise right away.</p>
   <div class="row"><button class="gold" data-chime="regular">Regular</button><button class="gold" data-chime="elite">Elite / Deadly</button><button class="gold" data-chime="boss">Boss</button></div>
+  <h2>End of run</h2>
+  <p class="note">Run won: a fast freylekhs landing on D major. Run lost: a slow sigh ending on D minor. In the game, the title theme fades back in after each.</p>
+  <div class="row"><button class="gold" data-sting="win">Run won</button><button class="alt" data-sting="lose">Run lost</button></div>
 </div>
 <div class="card">
   <h2>Loot chest burst</h2>
@@ -138,6 +141,26 @@ const MUSIC_FILL_UP = (()=>{
   out.push([0, 0.3, 36, 115, 'drums'], [0, 1, 49, 90, 'drums']);
   return out;
 })();
+// End-of-run stings (Oct 13, the spec's Victory / defeat stings). Beats at 140 bpm in D; roles pick the voice.
+// win: a fast freylekhs -- the Bb-C#-D sob as a pickup, a run up the scale, and a landing on D *major* (Picardy third).
+// lose: a slow doina sigh down the harmonic minor over a falling bass, ending on a soft D minor chord.
+const STINGS = (()=>{
+  const win = [];
+  [[0,.25,69],[.25,.25,70],[.5,.25,73],[.75,.7,74],[1.5,.25,76],[1.75,.25,77],[2,.25,79],[2.25,.45,81],[2.75,.25,82],[3,.25,81],[3.25,.25,79],[3.5,.45,77],
+   [4,.45,76],[4.5,.45,73],[5,.45,74],[5.5,.45,81],[6,.25,82],[6.25,.25,81],[6.5,.45,85],[7,.9,86]].forEach(([t,d,p],i)=>win.push([t,d,p,i%4===0?104:90,'lead']));
+  for(let t=7.5; t<8; t+=0.125) win.push([t,.1,t%0.25?88:86,84,'chime']); // a dreydlekh trill into the landing
+  [74,78,81,86].forEach((p,i)=>win.push([8,3.2,p,96-i*4,'chime']));    // D major: D F# A D
+  [[0,38],[1,45],[2,38],[3,45],[4,38],[5,45],[6,45],[7,49]].forEach(([t,p])=>win.push([t,.45,p,96,'bass']));
+  win.push([8,3.4,38,104,'bass'],[8,3.4,50,80,'bass']);
+  for(let i=0;i<8;i++) win.push([6+i*0.25,.2,38,44+i*9,'drums']);
+  win.push([8,.3,36,118,'drums'],[8,1,49,96,'drums']);
+  const lose = [];
+  [[0,1.4,81],[1.5,.5,82],[2,.9,81],[3,.9,79],[4,.9,77],[4.9,.1,77],[5,.9,76],[6,.9,73],[7,.5,74],[7.5,.5,73]].forEach(([t,d,p])=>lose.push([t,d,p,70,'lead']));
+  lose.push([8,3.5,74,74,'lead']);
+  [65,69].forEach(p=>lose.push([8,3.5,p,46,'acc']));                      // D minor under the last note
+  [[0,3.9,38],[4,1.9,34],[6,1.9,33],[8,3.6,26]].forEach(([t,d,p])=>lose.push([t,d,p,80,'bass']));
+  return { win, lose };
+})();
 // Per floor: key shift (semitones; D -> E -> F harmonic minor), tempo, and the extra layers (Jeremy: same tune, transposed).
 const MUSIC_FLOORS = [
   { shift:0, bpm:140, bassVoice:'tri' },
@@ -150,7 +173,7 @@ function musicVolume(){ const v = (typeof PREFS!=='undefined' && PREFS.musicVol!
 function musicSetVolume(){ const ctx = audioCtx; if(!ctx || !Music.gain) return; const t = ctx.currentTime; try{ Music.gain.gain.cancelScheduledValues(t); Music.gain.gain.setTargetAtTime(musicVolume(), t, 0.05); }catch(e){} }
 const LEAD_LEVEL = 0.09; // melody level under the bass (Jeremy: lower the melody)
 const DRUM_LEVEL = 0.6;
-const Music = { on:false, kind:null, floor:0, origin:0, bpm:140, blockBeats:32, barBeats:4, gain:null, timer:null, mode:null, drums:false, drumsFrom:Infinity, groups:{} };
+const Music = { holdUntil:0, on:false, kind:null, floor:0, origin:0, bpm:140, blockBeats:32, barBeats:4, gain:null, timer:null, mode:null, drums:false, drumsFrom:Infinity, groups:{} };
 function musicCtx(){ // music plays even with sound effects off, so it doesn't go through getAudioCtx()'s Sound check
   if(!audioCtx){ const C = window.AudioContext || window.webkitAudioContext; if(!C) return null; try{ audioCtx = new C(); }catch(e){ return null; } }
   if(audioCtx.state==='suspended') audioCtx.resume().catch(()=>{});
@@ -353,6 +376,30 @@ function musicChime(kind){
     else musicLead(ctx, p+shift, when, dur, v, out, LEAD_LEVEL*1.6);
   });
 }
+// Play an end-of-run sting, then let the title theme fade back in after it (musicUpdate waits until Music.holdUntil).
+function musicSting(kind){
+  if(typeof PREFS!=='undefined' && PREFS.sound===false && PREFS.music===false) return;
+  const ctx = musicCtx(); if(!ctx) return;
+  const notes = STINGS[kind]; if(!notes) return;
+  if(Music.on) musicStop(true);
+  const spb = 60/140, at = ctx.currentTime + 0.08, out = ctx.createGain();
+  const P = (typeof PREFS!=='undefined') ? PREFS : {};
+  out.gain.value = (P.music!==false) ? musicVolume() : MUSIC_VOLUME*((P.sfxVol!=null)?P.sfxVol:1); // music slider, or the effects slider with music off
+  out.connect(ctx.destination);
+  let end = 0;
+  notes.forEach(([t,d,p,v,role])=>{
+    const when = at + t*spb, dur = d*spb; end = Math.max(end, t+d);
+    if(role==='drums') musicDrum(ctx, p, when, v, out);
+    else if(role==='bass') musicBass(ctx, p, when, dur, v, out);
+    else if(role==='acc') musicLead(ctx, p, when, dur, v, out, 0.05);
+    else if(role==='chime') musicLead(ctx, p, when, dur, v, out, LEAD_LEVEL*1.4);
+    else musicLead(ctx, p, when, dur, v, out, LEAD_LEVEL*1.3);
+  });
+  const ms = Math.round((end*spb + 0.9)*1000);
+  Music.holdUntil = performance.now() + ms;
+  setTimeout(()=>{ try{ out.disconnect(); }catch(e){} }, ms + 3000);
+  setTimeout(()=>{ try{ musicUpdate(); }catch(e){} }, ms + 30);
+}
 // Which music fits right now (called on every render): camp lullaby at camp; in the dungeon, action for a live
 // Boss / Elite / Deadly fight, else downtime.
 function musicWanted(){
@@ -369,6 +416,7 @@ function musicWanted(){
 }
 function musicUpdate(){
   try{
+    if(Music.holdUntil && performance.now() < Music.holdUntil) return; // an end-of-run sting is still playing
     const w = musicWanted();
     if(!w){ if(Music.on) musicStop(); return; }
     if(!Music.on || Music.kind!==w.kind || ((w.kind==='dungeon' || w.kind==='shrine') && Music.floor!==musicFloorIdx())){ musicStart(w.kind, w.mode); return; } // new screen type or new floor: fade into it
@@ -408,6 +456,7 @@ $('dAct').onclick = ()=>{ dungeon('act'); };
 $('dDrums').onclick = ()=>{ dungeon('act'); musicSetDrums(true); label(); };
 $('dWin').onclick = ()=>{ if(!(Music.on && Music.kind==='dungeon')) dungeon('act'); musicChime(Music.drums ? 'boss' : 'regular'); musicSwitch('down'); musicSetDrums(false); label(); };
 document.querySelectorAll('[data-chime]').forEach(b=> b.onclick = ()=>{ musicCtx(); musicChime(b.dataset.chime); });
+document.querySelectorAll('[data-sting]').forEach(b=> b.onclick = ()=>{ musicCtx(); musicSting(b.dataset.sting); label(); });
 document.querySelectorAll('[data-burst]').forEach(b=> b.onclick = ()=> playBurst(b.dataset.burst));
 document.querySelectorAll('[data-kind]').forEach(b=> b.onclick = ()=>{ musicCtx(); musicStart(b.dataset.kind, b.dataset.kind); label(); });
 document.querySelectorAll('#floors button').forEach(b=> b.onclick = ()=>{

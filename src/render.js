@@ -4410,7 +4410,7 @@ function renderVictory(){
     recordRunHistory('victory');
     S.newAchievements = recordMetaProgress('victory');
     clearSave();
-    playTone('grandVictory');
+    if(typeof musicSting==='function') musicSting('win'); else playTone('grandVictory'); // Oct 13: the run-win sting
     if(typeof spawnConfettiRain==='function') spawnConfettiRain();
     if(S.newOriginRelic) setTimeout(()=>{ if(typeof playTone==='function') playTone('relicProc'); }, 700);
   }
@@ -4432,7 +4432,7 @@ function renderGameOver(){
     recordRunHistory('defeat');
     S.newAchievements = recordMetaProgress('defeat');
     clearSave();
-    playTone('defeat');
+    if(typeof musicSting==='function') musicSting('lose'); else playTone('defeat'); // Oct 13: the defeat sting
   }
   // Before the usual defeat screen, let the player pick one of their
   // current highest-tier dice (see highestTierTrayGroups() in logic.js) to

@@ -48,6 +48,9 @@ button:active{ transform:translateY(2px); box-shadow:0 1px 0 var(--line); }
   <h2>Victory chimes</h2>
   <p class="note">They land on the next bar line when the dungeon music is playing, otherwise right away.</p>
   <div class="row"><button class="gold" data-chime="regular">Regular</button><button class="gold" data-chime="elite">Elite / Deadly</button><button class="gold" data-chime="boss">Boss</button></div>
+  <h2>End of run</h2>
+  <p class="note">Run won: a fast freylekhs landing on D major. Run lost: a slow sigh ending on D minor. In the game, the title theme fades back in after each.</p>
+  <div class="row"><button class="gold" data-sting="win">Run won</button><button class="alt" data-sting="lose">Run lost</button></div>
 </div>
 <div class="card">
   <h2>Loot chest burst</h2>
@@ -85,6 +88,7 @@ $('dAct').onclick = ()=>{ dungeon('act'); };
 $('dDrums').onclick = ()=>{ dungeon('act'); musicSetDrums(true); label(); };
 $('dWin').onclick = ()=>{ if(!(Music.on && Music.kind==='dungeon')) dungeon('act'); musicChime(Music.drums ? 'boss' : 'regular'); musicSwitch('down'); musicSetDrums(false); label(); };
 document.querySelectorAll('[data-chime]').forEach(b=> b.onclick = ()=>{ musicCtx(); musicChime(b.dataset.chime); });
+document.querySelectorAll('[data-sting]').forEach(b=> b.onclick = ()=>{ musicCtx(); musicSting(b.dataset.sting); label(); });
 document.querySelectorAll('[data-burst]').forEach(b=> b.onclick = ()=> playBurst(b.dataset.burst));
 document.querySelectorAll('[data-kind]').forEach(b=> b.onclick = ()=>{ musicCtx(); musicStart(b.dataset.kind, b.dataset.kind); label(); });
 document.querySelectorAll('#floors button').forEach(b=> b.onclick = ()=>{
