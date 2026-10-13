@@ -52,3 +52,27 @@ document.addEventListener('keydown', (ev)=>{
 });
 
 render();
+
+// Splash (Jeremy, Oct 13): one tap before the title screen. Browsers keep audio locked until the player touches the
+// page, so this tap unlocks it and the title theme starts with the title. Automated test browsers skip it.
+(function showSplash(){
+  if(navigator.webdriver) return;
+  const sp = document.createElement('div');
+  sp.id = 'splash'; sp.setAttribute('role','button'); sp.setAttribute('aria-label','Tap to begin');
+  sp.innerHTML = `<div class="splash-inner">
+      <div class="splash-die" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="splash-title">Dungeon Scramble</div>
+      <div class="splash-tap">Tap to begin</div>
+      <div class="splash-hint">Sound on for music</div>
+    </div>`;
+  document.body.appendChild(sp);
+  let gone = false;
+  const go = ()=>{
+    if(gone) return; gone = true;
+    try{ if(typeof musicCtx==='function') musicCtx(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); }catch(e){}
+    try{ if(typeof musicUpdate==='function') musicUpdate(); }catch(e){}
+    sp.classList.add('splash-out'); setTimeout(()=> sp.remove(), 450);
+  };
+  sp.addEventListener('pointerdown', go); sp.addEventListener('keydown', go); sp.tabIndex = 0;
+})();
+
