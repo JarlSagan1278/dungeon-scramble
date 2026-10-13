@@ -149,3 +149,9 @@ print('\n'.join(s[0] for s in SKETCHES))
 # preview page: the template with the sketch notes embedded
 tpl = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'preview_template.html')).read()
 open(os.path.join(ROOT, 'preview.html'), 'w').write(tpl.replace('__SKETCHES__', json.dumps(js)))
+# One part per file for the multi-part sketches (GarageBand on iPad may put every part of a multi-track file on one track).
+os.makedirs(os.path.join(ROOT, 'midi', 'parts'), exist_ok=True)
+for fn, title, key, bpm, beats, parts, note in SKETCHES:
+    if len(parts) < 2: continue
+    for part in parts:
+        write_mid(os.path.join(ROOT, 'midi', 'parts', '%s__%s.mid' % (fn, part[0].lower().replace(' ', '_'))), bpm, beats, [part], '%s: %s' % (title, part[0]))
