@@ -304,8 +304,10 @@ let res = await page.evaluate((cfg)=>{
     const heal = opts.find(o=>/^Heal (\d+)/i.test(L(o)));
     if(heal){ const n=+L(heal).match(/^Heal (\d+)/i)[1]; const other=opts.find(o=>o!==heal); return (miss >= n*0.7 || !other) ? heal : other; }
     const pay = opts.find(o=>/Pay (\d+) max/i.test(L(o)));
+    if(pay && cfg.alwaysBargain) return pay; // Oct 13 shrine study: always take the deal
     if(pay){ const n=+L(pay).match(/Pay (\d+) max/i)[1]; return (S.maxHealth-n >= 20) ? pay : (opts.find(o=>/walk away/i.test(L(o)))||pay); }
     const skip = opts.find(o=>/Skip next camp rest/i.test(L(o)));
+    if(skip && cfg.alwaysBargain) return skip;
     if(skip) return (S.health >= S.maxHealth*0.6) ? skip : (opts.find(o=>/walk away/i.test(L(o)))||skip);
     return opts.find(o=>!/walk away/i.test(L(o))) || opts[0];
   }
