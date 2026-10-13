@@ -706,11 +706,29 @@
      right over the badge, cutting its number off. z-index is bumped too, as
      a second line of defense, so a stacked tile's fan+badge always paints
      above a plain neighbor even in a tighter spot. */
-  .camp-die-tile.stacked{ transform: rotate(-3deg); z-index:1;
-    box-shadow:1.5px 2px 0 0 rgba(0,0,0,0.55), 3px 4px 0 0 rgba(0,0,0,0.4), 4px 5px 0 0 rgba(0,0,0,0.25);
-    margin:0 9px 9px 2px; }
-  .camp-die-tile.stacked.organize-selected{ transform:none; z-index:2;
-    box-shadow:1.5px 2px 0 0 rgba(0,0,0,0.55), 3px 4px 0 0 rgba(0,0,0,0.4), 4px 5px 0 0 rgba(0,0,0,0.25), 0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
+  /* Oct 13 (Jeremy: "read like a stack of dice"): copies of the die peek out above-right of the top one, each in the
+     die's own color with the dark outline (box-shadow pairs: fill on top of a 1.5px-spread outline), slightly darker
+     the further back they sit. 1-3 layers by count (stk-1..3); margins leave room for the layers and the badge. */
+  .camp-die-tile.stacked{ z-index:1; --sk:#e4d7ad; --sk1:color-mix(in srgb, var(--sk) 88%, #000); --sk2:color-mix(in srgb, var(--sk) 76%, #000); --sk3:color-mix(in srgb, var(--sk) 64%, #000); }
+  .camp-die-tile.dietype-attack{ --sk:#ff5b5b; } .camp-die-tile.dietype-maneuver{ --sk:#ffe9a8; } .camp-die-tile.dietype-origin{ --sk:#4a8a5c; }
+  .camp-die-tile.dietype-alloy{ --sk:#9aa3ab; } .camp-die-tile.dietype-gilded{ --sk:#d4af52; } .camp-die-tile.dietype-magic{ --sk:#8a5fb0; }
+  .camp-die-tile.stacked{ --st:3px; }
+  .camp-pocket .camp-die-tile.stacked{ --st:2px; } /* small Back Pocket tiles: tighter layers so the die keeps its size */
+  .camp-die-tile.stk-1{ --stk: var(--st) calc(-1*var(--st)) 0 0 var(--sk1), var(--st) calc(-1*var(--st)) 0 1.5px var(--line);
+    margin: calc(var(--st) + 2px) calc(var(--st) + 2px) 7px 0; }
+  .camp-die-tile.stk-2{ --stk: var(--st) calc(-1*var(--st)) 0 0 var(--sk1), var(--st) calc(-1*var(--st)) 0 1.5px var(--line),
+    calc(2*var(--st)) calc(-2*var(--st)) 0 0 var(--sk2), calc(2*var(--st)) calc(-2*var(--st)) 0 1.5px var(--line);
+    margin: calc(2*var(--st) + 2px) calc(2*var(--st) + 2px) 7px 0; }
+  .camp-die-tile.stk-3{ --stk: var(--st) calc(-1*var(--st)) 0 0 var(--sk1), var(--st) calc(-1*var(--st)) 0 1.5px var(--line),
+    calc(2*var(--st)) calc(-2*var(--st)) 0 0 var(--sk2), calc(2*var(--st)) calc(-2*var(--st)) 0 1.5px var(--line),
+    calc(3*var(--st)) calc(-3*var(--st)) 0 0 var(--sk3), calc(3*var(--st)) calc(-3*var(--st)) 0 1.5px var(--line);
+    margin: calc(3*var(--st) + 2px) calc(3*var(--st) + 2px) 7px 0; }
+  /* every tile in a grid that has a stack shares the same top/right room, so singles and stacks stay one size */
+  .camp-pocket .camp-dice-grid{ padding-top:2px; }
+  .camp-pocket .camp-die-tile.stacked{ margin:0; }
+  .camp-pocket .camp-dice-grid{ row-gap:10px; column-gap:12px; }
+  .camp-die-tile.stacked{ box-shadow: var(--stk); }
+  .camp-die-tile.stacked.organize-selected{ z-index:2; box-shadow: var(--stk), 0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
   /* Pushed further past the tile's own edge (was -3px) so the badge visibly
      breaks out of the card stack it's counting instead of reading as just
      another corner decoration still inside the stack's silhouette -- the
@@ -718,7 +736,7 @@
      neighboring tile in the grid at the same 7px gap. */
   .camp-stack-badge{ position:absolute; bottom:-7px; right:-7px; background:var(--gold); color:#241c10;
     font-size:9px; font-weight:800; border-radius:var(--r-md); padding:1px 5px; min-width:13px; text-align:center;
-    border:1.5px solid var(--line); line-height:1.3; transform: rotate(3deg); z-index:1; }
+    border:1.5px solid var(--line); line-height:1.3; z-index:1; }
   /* Back Pocket as a visibly different, darker storage area rather than a
      second list that only a text heading told apart from Tray -- a sunken
      pouch shape (inset shadow, darker fill, bottom corners rounder than the

@@ -1,6 +1,7 @@
 # Changelog
 
 ## 1.39.6 (Oct 13, 2026)
+- Camp: duplicate dice now look like a pile -- copies of the die (in its own color and outline) peek out behind the top one, up to three layers for bigger stacks; stacked dice in the Back Pocket stay the same size as single ones (Jeremy).
 - After a fight, the downtime music restarts its cycle: bass alone for the rest of that block and two more rounds, then the melody rounds (Jeremy).
 - Camp rest: your hero gives a little shake as the healing fills in (Jeremy).
 - Grafted Grifter faces the other way in fights (Jeremy: horizontal flip).

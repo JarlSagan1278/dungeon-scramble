@@ -728,7 +728,8 @@ function campStackTileHTML(stack, type){
   const inner = isBasic
     ? `<span class="camp-die-basic-label">${die.cat==='attack'?'Atk':'Mvr'}<br>${ROMAN[die.level]}</span>`
     : (art ? `<img src="${art}" alt="${die.name}">` : `<span class="camp-die-basic-label">${die.name}</span>`);
-  return `<div class="die dietype-${die.cat} camp-die-tile ${indices.length>1?'stacked':''} ${isSelected?'organize-selected':''}" data-camp-type="${type}" data-camp-idx="${repIdx}" title="${die.name}${indices.length>1?` ×${indices.length}`:''}">
+  const layers = Math.min(3, indices.length-1); // dice drawn behind the top one (Jeremy, Oct 13: read as a pile of dice)
+  return `<div class="die dietype-${die.cat} camp-die-tile ${indices.length>1?'stacked stk-'+layers:''} ${isSelected?'organize-selected':''}" data-camp-type="${type}" data-camp-idx="${repIdx}" title="${die.name}${indices.length>1?` ×${indices.length}`:''}">
       ${inner}
       ${indices.length>1?`<span class="camp-stack-badge">${indices.length}</span>`:''}
     </div>`;
