@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.40.2 (Oct 13, 2026)
+- Equip picker: the Suggested die now appears only if you haven't tapped a die after 6 seconds (Jeremy), then fades in pre-compared. Tapping any die first cancels it.
+
 ## 1.40.1 (Oct 13, 2026)
 - Equip picker (Jeremy picked mockup A): your weakest die by face value gets a "Suggested" ribbon and opens already compared; Replace still needs a tap.
 - Balance bot: `manRider` test knob for level-scaled Maneuver faces (Riposte / Pounce).

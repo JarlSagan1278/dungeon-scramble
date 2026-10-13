@@ -35,7 +35,7 @@ Digital prototype of Jeremy's board game (Boggle-style dice-path dungeon crawler
 - Every interaction should feel as good as possible; no room dressing (banners/skulls) for now; dice upgrades = filigree borders/emblazoned corners (no glows).
 - Rules: enemy Shield absorbs player damage; Block/statuses reset each room; minions clear one per damage dealt (+ Leap-over), never carry between fights; loot dice need 3 copies to unlock as Starting Boon.
 - "Heat" difficulty was renamed **depth**; class badge shows highest depth cleared.
-- Boss action cycle rework is approved (Oct 11): bosses should be much more challenging and strategic around the next-turn info. Don't add Boost to Maneuver dice unless asked (last resort only); Maneuver meta is on hold pending more play data.
+- Boss action cycle rework is approved (Oct 11): bosses should be much more challenging and strategic around the next-turn info. Boost on Maneuver II/III is allowed now (Jeremy, Oct 13: it fits maneuvering); he prefers strong Block faces over passive riders for high Maneuver dice.
 
 - Naming: heavy math and math-pun theme, plus faction flavor (dwarves: math, 3D printing, engineering, mining; gnomes: sorcery, biochemistry, illusions, grafting; halflings: hillbillies, food; pixies: illusions, trickery, old magic). Mark Claude-made names blue in the names sheet.
 
