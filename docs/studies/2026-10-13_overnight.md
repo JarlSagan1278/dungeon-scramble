@@ -129,3 +129,43 @@ Win-rate gain over no relic (baselines 23-38%):
 - **All four origin relics are now tier B or below, as Jeremy asked:** Coffee Break +10, Faerie Fire +9, Mycorrhizal Bond +8, **Stronger Infill +2**. Stronger Infill at 1 Block is now the weakest by far; 2 Block measured +21 on Oct 12 (before the Guard changes), so 2 Block might now land around +10. Worth one quick re-test if Jeremy wants Dwarf's relic to matter.
 - **FTLeporter and Inductive Step measure slightly negative.** That's very likely the bot, not the relics: a teleporting Pivot gives the path search far more options to check in the same time, so the bot finds worse paths; Inductive Step's extra shrine choices go to the bot's simple shrine picker. Treat both as "about zero" for now.
 - Equal and Opposite with the reflect-the-Blocked-amount rule: +3 overall, +11 for Dwarf Guard. It pays off for Block builds, as intended, and stays tier C.
+
+## 8. Regular and new players at Depth 0 (Jeremy: balance where most people play)
+Two bot profiles, calibrated at Depth 0 (no player data yet, so these are plausible stand-ins, to re-tune once Jeremy's play data comes in):
+- **Regular player:** uses the class ability about a third of the turns, Swap/Reroll and tokens about a third of the time, picks loot at random 60% of the time, and searches paths less deeply. Wins 77%.
+- **New player:** about a fifth of the time for all of those, random loot 80%, short greedy paths. Wins 59%.
+
+### Classes: the ranking flips
+| Class | Expert, depth 7 | Regular, Depth 0 | New, Depth 0 |
+|---|---|---|---|
+| Guard | 60% | 74% | 49% |
+| Armsmaster | 52% | 72% | 52% |
+| Arcanist | 39% | 81% | 66% |
+| Dungeoneer | 33% | 81% | 69% |
+
+- **Guard and Armsmaster are only strong if you use the ability every turn.** Their power is all in the once-per-turn conversion; a player who forgets it gets nothing. Dungeoneer's wrap and Arcanist's diagonals are **always on**, so they help every player automatically. For new players the movement classes are the strong ones (69% and 66% against 49-52%).
+- So "Guard too strong, Dungeoneer too weak" is true for players like Jeremy (who uses the ability every turn) and false for newer players. **This argues against nerfing Guard or buffing Dungeoneer further**, and for **teaching the ability better** (see the suggestions at the end): the biggest gap between a new player and an expert is using it.
+- Origins: Halfling is the easiest for every profile (heals), Pixie the hardest at Depth 0 (72% regular, 55% new).
+
+### Floors: Floor 2 is the wall for everyone
+| Profile | Floor 1 ends | Floor 2 ends (of runs reaching it) | Floor 3 ends |
+|---|---|---|---|
+| Expert, depth 7 | 16% | 37% | 14% |
+| Regular, Depth 0 | 2% | 17% | 5% |
+| New, Depth 0 | 6% | 30% | 10% |
+
+- Every profile dies most on Floor 2, and Floor 3's regular rooms cost about the same or less than Floor 2's. **This is the most consistent finding of the night.**
+
+### Bosses: the outliers mostly belong to the expert-at-depth reading
+- At Depth 0 the three **Floor 2 bosses are even** (regular 8.7-9.1%, new 15-16%). The Necrorancher's outlier status (21%) only shows for the expert under depth modifiers, so it's not a priority.
+- **Extruzeon is toothless in every reading** (1.2-1.6% of runs that meet it), while **Myceleus is the Floor 3 boss that bites** (2.7% regular, 6.6% new). Extruzeon is the clearest boss fix.
+- Floor 1: Heating Elemental and Grosteque Grafter are a little harder than Rogue Golemancer for new players (6.6-6.8% vs 3.9%); fine for a first floor.
+
+### Deadliest regular rooms (all Floor 2, every profile)
+Whence Wolf (Deadly, ends 9-16% of the runs that meet it), The Strike/Break-er (Deadly, 10-15%), Rusty Golem (Elite, 4-9%), Half-life Host (Elite, 3-7%), plus Illegal Operation, Lichen-Thrope, Rogue Technician and Fungal Flayer for new players.
+
+### What this changes in the proposals
+1. **Top priority: Floor 2 vs Floor 3.** Soften Floor 2's hardest rooms (Whence Wolf, The Strike/Break-er, Rusty Golem, Half-life Host) and/or strengthen Floor 3's Easy/Standard rooms so the run gets harder, not easier, after Floor 2.
+2. **Extruzeon** needs a real threat.
+3. **Classes:** leave the numbers; help newer players use the ability (a first-fight prompt, a pulse on the button until it's used each turn for the first few runs).
+4. Bosses Heating Elemental / The Necrorancher: no change needed for most players.
