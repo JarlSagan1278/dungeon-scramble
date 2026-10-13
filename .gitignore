@@ -3,3 +3,6 @@ dist/
 *.log
 tools/balance/out_*.json
 tools/out_*
+
+# stray test screenshots at the repo root
+/*.png

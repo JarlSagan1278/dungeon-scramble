@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1.39.7 (Oct 13, 2026)
-- Splash screen (Jeremy): a "Tap to begin" screen before the title. The tap unlocks the browser's audio, so the title theme plays as soon as the title appears.
+- Splash screen (Jeremy): a "Tap to begin" screen before the title, with "© 2026 Jeremy and Katlynn Friedman. All rights reserved." at the bottom. The tap unlocks the browser's audio, so the title theme plays as soon as the title appears.
 - Shrine music: A freygish at 96 bpm -- a soft held drone under a glassy, shimmering melody that sighs through the Bb-C# "sob" and comes home to A (follows the floor's key).
 - Title / end theme: a 32-bar version of the whole Floor 1 story (lonely bass, sad melody, the action with drums, the action with the countermelody), looping on the title and setup screens and on the win and loss screens. It starts on your first tap (browsers keep audio locked until then).
 - All the game's music on one page: docs/music/game_music.html (built from the game's own music code by tools/music/build_game_preview.py).

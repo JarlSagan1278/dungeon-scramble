@@ -63,8 +63,8 @@ render();
       <div class="splash-die" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
       <div class="splash-title">Dungeon Scramble</div>
       <div class="splash-tap">Tap to begin</div>
-      <div class="splash-hint">Sound on for music</div>
-    </div>`;
+    </div>
+    <div class="splash-legal">&copy; 2026 Jeremy and Katlynn Friedman. All rights reserved.</div>`;
   document.body.appendChild(sp);
   let gone = false;
   const go = ()=>{
