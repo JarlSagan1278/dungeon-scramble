@@ -27,7 +27,7 @@
 //     so the forced relics are the only ones held (a clean with/without comparison).
 // usage: node study_maneuver.js '<json config>'
 let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node22/lib/node_modules/playwright')); }
-const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{}, pivotFace:'pivot', manLevel:1, bossMode:'cycle', intentAware:true, forceBoss:null, forceRelics:[], relicLock:false, tokens:true, lootV2:true, playerLike:true }, JSON.parse(process.argv[2]||'{}'));
+const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{}, pivotFace:'pivot', manLevel:1, bossMode:'cycle', intentAware:true, forceBoss:null, forceRelics:[], relicLock:false, tokens:true, lootV2:true, playerLike:true, abilityRate:1, trayActRate:1, tokenRate:1, lootRandomRate:0 }, JSON.parse(process.argv[2]||'{}'));
 (async()=>{
 const b=await chromium.launch();const page=await b.newPage();
 page.on('pageerror',e=>console.log('PAGEERR',e.message));
@@ -238,10 +238,12 @@ let res = await page.evaluate((cfg)=>{
     if(v1 - v0 >= 4 || kills){ S.boostTokenCharges--; (window.__tok=window.__tok||{}).boost=(window.__tok.boost||0)+1; return p2; }
     S.pendingFreeBoost = 0; return p;
   }
+  // Regular-player knobs (Oct 13, Jeremy: balance for the lower depths most people play): each skilled habit only
+  // happens some of the time. Defaults (1/1/1/0) are the expert bot.
   function doTurn(){
-    useTrayActs();
-    useTokens();
-    useAbility();
+    if(Math.random() < cfg.trayActRate) useTrayActs();
+    if(Math.random() < cfg.tokenRate) useTokens();
+    if(Math.random() < cfg.abilityRate) useAbility();
     const p = boostTokenMaybe(bestPath(cfg.skill));
     (window.__turns=window.__turns||[]).push({f:S.floorIdx+1,len:p.length,dmg:Math.round(computePathEffects(p).totalDamage),boss:(S.encounter.type!=='Enemy'&&S.encounter.type!=='Trap')});
     S.path = [];
@@ -280,7 +282,7 @@ let res = await page.evaluate((cfg)=>{
     if(S.screen==='victory') return 'VICTORY';
     if(S.screen==='gameover') return 'GAMEOVER';
     if(S.transitioning){ skipTransition(); return null; }
-    if(S.lootChoice){ const arr=S.lootChoice.options.slice().sort((a,b)=>lootScore(b)-lootScore(a)); const o = cfg.lootMode==='worst'?arr[arr.length-1]:(cfg.lootMode==='random'?arr[Math.floor(Math.random()*arr.length)]:arr[0]); chooseLoot(o); return null; }
+    if(S.lootChoice){ const arr=S.lootChoice.options.slice().sort((a,b)=>lootScore(b)-lootScore(a)); const o = cfg.lootMode==='worst'?arr[arr.length-1]:((cfg.lootMode==='random' || Math.random() < cfg.lootRandomRate)?arr[Math.floor(Math.random()*arr.length)]:arr[0]); chooseLoot(o); return null; }
     if(S.shrineChoice){ const walk = cfg.relicLock && S.shrineChoice.options.find(o=>/walk away/i.test(o.label)); chooseShrineOption(walk || (cfg.playerLike ? pickShrineOption(S.shrineChoice.options) : S.shrineChoice.options[Math.floor(Math.random()*S.shrineChoice.options.length)])); return null; }
     if(S.relicChoice && cfg.relicLock){ S.relicChoice=null; S.shrineResult={title:'Relic', text:'(study: declined)'}; return null; }
     if(S.relicChoice){ const o=S.relicChoice.options; chooseRelic(cfg.playerLike ? o.slice().sort((a,b)=>(RELIC_PREF[b]||5)-(RELIC_PREF[a]||5))[0] : o[Math.floor(Math.random()*o.length)]); return null; }
