@@ -95,3 +95,22 @@ Results are added below as each stage finishes.
 | Dungeoneer + once per turn, a zone die becomes a Pivot | 48% |
 
 - Either candidate lifts Dungeoneer by about 12-13 points, into Arcanist/Armsmaster range. All-edge wrap keeps it a pure movement class (no new button), so it's the cleaner fit. Jeremy said to keep Dungeoneer as is for now; this is here for when he revisits it.
+
+## 6. Depth curve on 1.39.7 (expert bot, 4 pairs x 250 runs; depths here are internal, shown in game one lower)
+**Each modifier alone, cost per depth point:** Tougher Scuffs -4.8 to -7.1, Clumsy -1.8/-5.4/-7.0, Swarming -3.2/-4.3/-4.3, Burden of Choice -4.5, Zeal -5.9/-5.9, Dread -3.9/-5.9/-6.4, Night Shift -5.9/-5.5, Rationing Rations -3.5/-4.5. **New levers: Union Dues -2.1 (a true cheap lever, as intended), Rounding Error -4.8 (a normal one).**
+
+**Mixed loadouts (shown depth = internal - 1):**
+
+| Shown depth | Expert win rate |
+|---|---|
+| 2 | 81-92% |
+| 4 | 58-72% |
+| 6 | 36-50% |
+| 8 | 15-27% |
+| 10 (top badge) | 8-24% |
+| 12 | 1-11% |
+| 15 | 0-4% |
+
+- The curve is smooth and steep, and the top badge at shown depth 10 is a real final challenge even for the expert bot, as Jeremy wanted.
+- **Swarming 3 is still the cheap stack:** alone at internal depth 11 it wins 54%, against 8-24% for mixed loadouts at that depth. Modifiers compound when mixed, and Swarming doesn't compound with the others as much. Options: rank 3 costs more again (+8 instead of +6), or cap Swarming at 2 ranks.
+- Union Dues makes a nice "filler" point: players can land on an exact depth without much extra pain.
