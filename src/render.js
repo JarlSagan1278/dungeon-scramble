@@ -1367,7 +1367,7 @@ function healthFX(current, last){
 // Encounter art is mirrored to face the hero by default; list any whose original art already faces left here.
 // Encounters whose current art is known to be the wrong picture: show the placeholder until the right art is supplied.
 const ART_WRONG = new Set([]);
-const ENCOUNTER_NO_FLIP = new Set(['Whence Wolf','Roudy Rinotter','Viscous Orb','Unbound Automa','Rogue Golemancer','Heating Elemental','Grosteque Grafter','Displacer Kitty','Armored Gear-Pest','Blastogenesis Engine','Half-life Host','Adhesive Pest Traps','The Necrorancher','Bellicose Biomancer','Ceramic Golem','Chimeric Sludge']);
+const ENCOUNTER_NO_FLIP = new Set(['Grafted Grifter','Whence Wolf','Roudy Rinotter','Viscous Orb','Unbound Automa','Rogue Golemancer','Heating Elemental','Grosteque Grafter','Displacer Kitty','Armored Gear-Pest','Blastogenesis Engine','Half-life Host','Adhesive Pest Traps','The Necrorancher','Bellicose Biomancer','Ceramic Golem','Chimeric Sludge']);
 let foPlayer = null; // the hero's half of the face-off band, set each renderGame()
 function renderEncounterCard(e, mode){
   const curHealthClamped = Math.max(0,e.curHealth);
