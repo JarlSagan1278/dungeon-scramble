@@ -37,6 +37,8 @@ Digital prototype of Jeremy's board game (Boggle-style dice-path dungeon crawler
 - "Heat" difficulty was renamed **depth**; class badge shows highest depth cleared.
 - Boss action cycle rework is approved (Oct 11): bosses should be much more challenging and strategic around the next-turn info. Boost on Maneuver II/III is allowed now (Jeremy, Oct 13: it fits maneuvering); he prefers strong Block faces over passive riders for high Maneuver dice.
 
+- **Balance philosophy (Oct 13):** single-player roguelike: variance, failing and luck are part of the fun; don't flatten content to the median. Over-strong player pieces (loot, relics, combos) are acceptable; over-strong enemies and unfair deaths are not. Use studies to find broken outliers and dead content. See PROJECT_CONTEXT "Balance philosophy".
+
 - Naming: heavy math and math-pun theme, plus faction flavor (dwarves: math, 3D printing, engineering, mining; gnomes: sorcery, biochemistry, illusions, grafting; halflings: hillbillies, food; pixies: illusions, trickery, old magic). Mark Claude-made names blue in the names sheet.
 
 ## Open to-do list

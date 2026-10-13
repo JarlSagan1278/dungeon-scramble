@@ -154,3 +154,8 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - **Decisions (Jeremy, Oct 13, after 1.41.0):** Maneuver Die I stays as it is (trailing Attack I is OK; no Maneuver I payoff). The ~11-point lower win rate at Depth 0 from the harder Floor 3 is OK. The Maneuver-payoff question is closed.
 - **Loot dice (Jeremy, Oct 13, 1.41.1):** fixes must keep each die's identity, not make it a copy of another die (dropping Claymore's Fumble would have made it the Greathammer). Shipped six identity-keeping tweaks (Claymore, Acid Potion, Medsack, Winged Boots, Genetic Drifter, Domesticated Displacer); all now near their tier's median.
 - **Swarming rank 2 costs 2 depth (Jeremy, Oct 13, 1.41.2).** Shrine value study requested and running.
+
+## Balance philosophy (Jeremy, Oct 13, 2026)
+- Dungeon Scramble is mostly single-player, so it does not need competitive-level balance. Some runs should peter out on bad loot; others should hit crazy combos, and those are what players remember. Learning, failing and pure luck are part of a roguelike; the experience should not be too smooth.
+- **Spikiness is fun, but the domain matters:** an over-strong player piece (loot die, relic, combo) is fine and often good; an over-strong enemy is much less fun. Cap enemy spikes and unfair deaths; leave player power spikes alone unless they break the game.
+- Use studies to find broken outliers and dead content (things nobody would pick), not to flatten everything to the median. Next: a literature review of the genre and industry on where balance is and is not needed.
