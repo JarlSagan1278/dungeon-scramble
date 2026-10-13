@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.40.3 (Oct 13, 2026)
+- Music: a 2-beat transition fill into the action music (a swelling snare roll and a bass walk-up, then a kick and a cymbal crash on the downbeat); the downtime part steps aside for it. If the next bar is closer than 2 beats, the switch waits one more bar.
+- Title/end theme is now the long version (Jeremy): 8-bar blocks of downtime bass x2, downtime full x2 (ending in the fill), action without drums, action + countermelody without drums, action full x2, action bass x2, looping (80 bars).
+
 ## 1.40.2 (Oct 13, 2026)
 - Equip picker: the Suggested die now appears only if you haven't tapped a die after 6 seconds (Jeremy), then fades in pre-compared. Tapping any die first cancels it.
 

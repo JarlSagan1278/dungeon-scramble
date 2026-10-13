@@ -40,7 +40,7 @@ button:active{ transform:translateY(2px); box-shadow:0 1px 0 var(--line); }
 </div>
 <div class="card">
   <h2>Dungeon: downtime and action</h2>
-  <p class="note">Downtime: two rounds of lonely bass, then two with the sad melody. Action (Boss, Elite, Deadly fights) switches in on the next bar. Boss phase 2 adds drums. "Win the fight" plays the chime and drops back to bass-only downtime.</p>
+  <p class="note">Downtime: two rounds of lonely bass, then two with the sad melody. Action (Boss, Elite, Deadly fights) comes in after a 2-beat fill (snare roll, bass walk-up, crash) on the next bar. Boss phase 2 adds drums. "Win the fight" plays the chime and drops back to bass-only downtime.</p>
   <div class="row"><button id="dPlay">Play downtime</button><button class="alt" id="dAct">Fight starts</button><button class="alt" id="dDrums">Boss phase 2</button><button class="gold" id="dWin">Win the fight</button></div>
   <p class="state" id="dState">Stopped</p>
 </div>
@@ -56,7 +56,7 @@ button:active{ transform:translateY(2px); box-shadow:0 1px 0 var(--line); }
 </div>
 <div class="card"><h2>Camp lullaby</h2><p class="note">3/4 at 84 bpm: triangle bass, music box, quiet accordion answers.</p><div class="row"><button data-kind="camp">Play camp</button></div></div>
 <div class="card"><h2>Shrine</h2><p class="note">A freygish at 96 bpm: a held drone under a glassy melody.</p><div class="row"><button data-kind="shrine">Play shrine</button></div></div>
-<div class="card"><h2>Title and end theme</h2><p class="note">32 bars: lonely bass, the sad melody, the action with drums, then the action with the countermelody. Loops.</p><div class="row"><button data-kind="theme">Play theme</button></div></div>
+<div class="card"><h2>Title and end theme</h2><p class="note">80 bars, looping: downtime bass x2, downtime full x2 (ending in the transition fill), action without drums, action + countermelody without drums, action full x2, action bass x2.</p><div class="row"><button data-kind="theme">Play theme</button></div></div>
 </main>
 <script>
 // --- the few game globals the music engine reads ---
