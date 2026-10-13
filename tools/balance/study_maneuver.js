@@ -52,7 +52,13 @@ let res = await page.evaluate((cfg)=>{
   META.lifetime.victories=1; META.lifetime.bestFloorReached=3; META.achievements['origin_duo']={date:Date.now()};
   const origFns = {};
   // ---- encounter tuning hooks: scale enemies as they are drawn ----
-  window.__taken=0; const origDeal=dealEncounterDamage; window.dealEncounterDamage=function(e,a){ if(a>0){ a+=(cfg.hitAdd[S.floorIdx]||0); if(e.type==='Big Boss') a+=cfg.bigBossHitAdd; } const h=S.health; const b0=S.playerBlock||0; const t=origDeal(e,a); { const B=(window.__tok=window.__tok||{}); const f=S.floorIdx; B.rawHit=B.rawHit||[0,0,0]; B.blocked=B.blocked||[0,0,0]; B.enemyTurns=B.enemyTurns||[0,0,0]; if(a>0){ B.rawHit[f]+=a; B.blocked[f]+=Math.max(0,b0-(S.playerBlock||0)); } } let lost=Math.max(0,h-S.health); if(cfg.takenMul<1 && lost>0){ const keep=lost*cfg.takenMul; const k=Math.floor(keep)+(Math.random()<keep-Math.floor(keep)?1:0); S.health=Math.min(S.maxHealth, S.health+(lost-k)); lost=k;} window.__taken += lost; return t; };
+  window.__taken=0; const origDeal=dealEncounterDamage; window.dealEncounterDamage=function(e,a){ if(a>0){ a+=(cfg.hitAdd[S.floorIdx]||0); if(e.type==='Big Boss') a+=cfg.bigBossHitAdd; } const h=S.health; const b0=S.playerBlock||0; const t=origDeal(e,a); { const B=(window.__tok=window.__tok||{}); const f=S.floorIdx; B.rawHit=B.rawHit||[0,0,0]; B.blocked=B.blocked||[0,0,0]; B.enemyTurns=B.enemyTurns||[0,0,0]; if(a>0){ B.rawHit[f]+=a; B.blocked[f]+=Math.max(0,b0-(S.playerBlock||0)); } } let lost=Math.max(0,h-S.health); if(cfg.takenMul<1 && lost>0){ const keep=lost*cfg.takenMul; const k=Math.floor(keep)+(Math.random()<keep-Math.floor(keep)?1:0); S.health=Math.min(S.maxHealth, S.health+(lost-k)); lost=k;} window.__taken += lost;
+    // Oct 13 big-hit study: per fight, the biggest single hit (after Block), the most lost to hits in one enemy turn,
+    // and the HP the player had at the start of that turn (a one-turn death from high HP = a one-shot).
+    { const cf = window.__curFight; if(cf && a>0){ if(cf._t!==S.turnNumber){ cf._t = S.turnNumber; cf._tl = 0; cf._th = h; }
+      cf._tl += lost; cf.maxHit = Math.max(cf.maxHit||0, lost); if(cf._tl > (cf.maxTurn||0)){ cf.maxTurn = cf._tl; cf.maxTurnHp0 = cf._th; cf.maxTurnPmax = S.maxHealth; }
+      if(S.health<=0){ cf.deathTurnHp0 = cf._th; cf.deathTurnLoss = cf._tl; } } }
+    return t; };
   const origStep=applyPathStep; window.applyPathStep=function(st){ if(cfg.dmgMul!==1 && st.dmg>0) st.dmg=Math.round(st.dmg*cfg.dmgMul); return origStep(st); };
   // ---- hypothetical Maneuver payoffs (test-only) ----
   const isMan = t => t==='dodge'||t==='leap'||t==='pivot';
@@ -333,6 +339,9 @@ let res = await page.evaluate((cfg)=>{
   for(let r=0;r<cfg.runs;r++){
     newGame(cfg.origin, cfg.klass, null, '', cfg.depthMods||{});
     (cfg.forceRelics||[]).forEach(id=>grantRelic(id,{silent:true, via:'study'}));
+    // forceLoot (Oct 13 loot-dice study): that loot die replaces one Attack Die I at the start of every run.
+    if(cfg.forceLoot){ const d = [...ALLOY, ...GILDED, ...MAGIC].find(x=>x.name===cfg.forceLoot); const c = S.tray.find(x=>x.die.name==='Attack Die I') || S.tray.find(x=>x.die.cat==='attack');
+      if(d && c){ c.die = clone(d); c.faceIdx = 0; S.usedLootNames.add(d.name); } }
     if(cfg.manLevel>1){ S.tray.forEach(c=>{ if(c.die.cat==='maneuver') c.die=clone(Object.assign({},basic('maneuver',cfg.manLevel),{level:cfg.manLevel})); }); }
     if(cfg.swapManeuver){ S.tray.forEach(c=>{ if(c.die.cat==='maneuver') c.die=clone(basic('attack',c.die.level)); }); }
     const rec={fights:[],result:'TIMEOUT',floor:1,turns:0};
@@ -343,7 +352,7 @@ let res = await page.evaluate((cfg)=>{
       if(S.screen==='game' && S.encounter && curEnc!==S.encounter){
         curEnc=S.encounter;
         cur={name:S.encounter.name,type:S.encounter.type,tier:S.encounter.tier,floor:S.floorIdx+1,hp0:S.encounter.maxHealth,php0:S.health,pmax0:S.maxHealth,turns:0,tk0:window.__taken,minhp:S.health,loot:S.tray.map(c=>c.die).concat(S.backPocket||[]).filter(d=>d&&/alloy|gilded|magic/.test(d.cat)).map(d=>d.name),relics:(S.relics||[]).slice()};
-        rec.fights.push(cur);
+        rec.fights.push(cur); window.__curFight = cur;
       }
       const res=tick(log);
       if(res){ rec.result=res; break; }
