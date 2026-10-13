@@ -1,12 +1,11 @@
 # Dungeon Scramble — TODO
 
 ## Priority order (updated Oct 13, after 1.40.0)
-0. **Waiting on Jeremy:** Maneuver I payoff (Leap Momentum ~ Attack parity, or non-stacking Momentum; Maneuver II/III now scale with Block since 1.41.0); whether the ~11-point win drop from the harder Floor 3 is OK at Depth 0.
 
 1. **Re-baseline balance on 1.39.7** (many rules changed Oct 12-13: classes, Swap/Reroll Pivot, origin relics, relic tiers, depth costs, Equal and Opposite, two new depth levers). One combined player-like-bot study: class x origin at depth 0 and depth 7, the depth curve (mixed loadouts), and per-floor / per-boss deaths. Every number before Oct 13 is out of date.
 2. **Class balance follow-ups:** Guard is still top (about 58-63% at depth 7 with the L zone) and Dungeoneer the weakest (about 34-52%, Jeremy: keep for now). Revisit with the re-baseline and Jeremy's playtests.
 3. **Floor and boss evenness with the player-like bot:** the old notes (Floor 2 the main killer, Floor 3's curve backwards, Extruzeon rarely threatening) came from the weaker bot. Re-run `study_boss_even.py` with the player-like bot before tuning anything.
-4. **Maneuver-dice payoff** (on hold for play data): re-measure first, since Swap/Reroll now leave a Pivot and the Arcanist moves diagonally far more.
+4. **Maneuver dice:** settled Oct 13 (1.41.0 Block ladder on II/III; Maneuver I stays as is).
 5. **Music edits (Jeremy is reviewing every piece)** and **art** in parallel; then a final bug hunt and the Netlify zip.
 
 ## Done Oct 12-13 (for reference)
