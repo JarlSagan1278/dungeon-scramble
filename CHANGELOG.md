@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.40.1 (Oct 13, 2026)
+- Equip picker (Jeremy picked mockup A): your weakest die by face value gets a "Suggested" ribbon and opens already compared; Replace still needs a tap.
+- Balance bot: `manRider` test knob for level-scaled Maneuver faces (Riposte / Pounce).
+
 ## 1.40.0 (Oct 13, 2026)
 - Floor 3 is harder than Floor 2 (Jeremy): attack +2 on every Floor 3 Easy, Standard and Deadly card, +1 on the Elites (doubled on heavy turns), +1 on all three Big Bosses' base attacks. Regular-player bot at Depth 0: HP lost per Floor 3 fight 7.2 -> 10.1 (Floor 2: 6.6), runs ending on Floor 3 6% -> 17% (Floor 2: 19%), overall win 77% -> 65%.
 - Extruzeon, Co-consul of Waste: new "Layer by Layer" base attack starts at 2 and grows by 1 every turn (by 2 in Meltdown; the layers carry into phase 2), shown in its warning chip with a small arrow. Fast, bursty fights beat it cheaply; long ones get expensive. Now as dangerous as the Toadtaur Wizard (bot: ends 4.0% of runs that meet it vs 4.9%, 18 HP per fight).

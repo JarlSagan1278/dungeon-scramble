@@ -28,7 +28,7 @@
 //     so the forced relics are the only ones held (a clean with/without comparison).
 // usage: node study_maneuver.js '<json config>'
 let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node22/lib/node_modules/playwright')); }
-const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{}, pivotFace:'pivot', manLevel:1, bossMode:'cycle', intentAware:true, forceBoss:null, forceRelics:[], relicLock:false, tokens:true, lootV2:true, playerLike:true, abilityRate:1, trayActRate:1, tokenRate:1, lootRandomRate:0 }, JSON.parse(process.argv[2]||'{}'));
+const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{}, pivotFace:'pivot', manLevel:1, manRider:null, bossMode:'cycle', intentAware:true, forceBoss:null, forceRelics:[], relicLock:false, tokens:true, lootV2:true, playerLike:true, abilityRate:1, trayActRate:1, tokenRate:1, lootRandomRate:0 }, JSON.parse(process.argv[2]||'{}'));
 (async()=>{
 const b=await chromium.launch();const page=await b.newPage();
 page.on('pageerror',e=>console.log('PAGEERR',e.message));
@@ -53,6 +53,29 @@ let res = await page.evaluate((cfg)=>{
   const origStep=applyPathStep; window.applyPathStep=function(st){ if(cfg.dmgMul!==1 && st.dmg>0) st.dmg=Math.round(st.dmg*cfg.dmgMul); return origStep(st); };
   // ---- hypothetical Maneuver payoffs (test-only) ----
   const isMan = t => t==='dodge'||t==='leap'||t==='pivot';
+  // manRider (Oct 13, Jeremy: Maneuver II/III should scale past Attack): test-only riders on BASIC Maneuver dice of level
+  // L >= 2. 'riposte' = Dodge also gives L-1 Block; 'pounce' = Leap adds L-1 to the next damaging die; 'both'.
+  if(cfg.manRider){
+    const R = new Set(cfg.manRider==='both' ? ['riposte','pounce'] : cfg.manRider.split('+'));
+    const origRel2 = applyRelicsToSteps;
+    window.applyRelicsToSteps = function(steps, path){
+      steps = origRel2(steps, path);
+      let carry = 0;
+      steps.forEach(st=>{
+        const d = S.tray[st.idx] && S.tray[st.idx].die, L = (d && d.cat==='maneuver' && /^Maneuver Die/.test(d.name)) ? d.level : 1;
+        if(L>=2 && st.type==='dodge' && R.has('riposte')) st.blockGain += L-1;
+        if(L>=2 && st.type==='leap' && R.has('pounce')) carry += L-1;
+        else if(st.dmg>0 && carry){ st.dmg += carry; carry = 0; }
+      });
+      return steps;
+    };
+    const origEff2 = computePathEffects;
+    window.computePathEffects = function(path){
+      const ef = origEff2(path), st = computePathSteps(path);
+      ef.totalDamage = st.reduce((a,x)=>a+x.dmg,0); ef.blockGain = st.reduce((a,x)=>a+x.blockGain,0);
+      return ef;
+    };
+  }
   if(cfg.payoff!=='none'){
     const origRel = applyRelicsToSteps;
     window.applyRelicsToSteps = function(steps, path){

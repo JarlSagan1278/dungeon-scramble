@@ -3702,6 +3702,14 @@ function diceFacesRowHTML(die, other){
     ? '<div class="mini-face mf-blank"></div>'
     : `<div class="mini-face mf-${cat}" title="${LABEL[f.type]}${f.value?' '+f.value:''}">${iconSpan(f.type, f.value, true)}<small>${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</small>${arrow(f)}</div>`).join('')}</div>`;
 }
+// Loot "replace which die?" suggestion (Oct 13, Jeremy picked mockup A): the tray die with the lowest face worth
+// (same weights as the balance bot's loot scoring) gets a Suggested ribbon and opens pre-compared. Replace still
+// needs a tap, and any other die can be picked.
+const DIE_FACE_WORTH = {hit:1, combo:1.5, dot:1.25, leech:2.1, heal:1.0, hot:1.1, block:1.0, shield:1.0, dodge:0.5, leap:0.6, pivot:0.6, fumble:-1.2, blank:0, freeze:3.2, nullify:1.6, swap:1.4, reroll:1.4};
+function dieWorth(d){
+  return d.faces.reduce((a,f)=>{ const w = DIE_FACE_WORTH[f.type]; if(f.type==='boost') return a + Math.max(0,(f.value||2)-1)*1.7;
+    if(f.type==='freeze'||f.type==='nullify'||f.type==='swap'||f.type==='reroll') return a + w; return a + (w!=null?w:0.3)*(f.value||1); }, 0) / (d.faces.length||1);
+}
 function renderSwapModal(){
   const incoming = S.pendingLootDie;
   const overlay = el(`<div class="modal-overlay modal-bottom"><div class="modal">
@@ -3731,10 +3739,16 @@ function renderSwapModal(){
   });
   let chosen = null;
   const goBtn = overlay.querySelector('#swap-go');
-  groups.forEach(g=>{
+  let suggestIdx = 0;
+  groups.forEach((g,i)=>{ const a = S.tray[g.indices[0]].die, b = S.tray[groups[suggestIdx].indices[0]].die;
+    if(dieWorth(a) < dieWorth(b) - 1e-9 || (Math.abs(dieWorth(a)-dieWorth(b))<1e-9 && (a.level||1) < (b.level||1))) suggestIdx = i; });
+  let suggestItem = null;
+  groups.forEach((g,gi)=>{
     const die = S.tray[g.indices[0]].die;
     const countBadge = g.indices.length>1 ? `<span class="swap-count-badge">${g.indices.length}</span>` : '';
-    const item = el(`<div class="swap-item">${lootPreviewTileHTML(die, 'swap-'+g.indices[0])}${countBadge}<div class="swap-item-label">${die.name}</div></div>`);
+    const sug = gi===suggestIdx;
+    const item = el(`<div class="swap-item${sug?' swap-suggest':''}"${sug?' title="Suggested: your weakest die by face value"':''}>${sug?'<span class="swap-suggest-ribbon">Suggested</span>':''}${lootPreviewTileHTML(die, 'swap-'+g.indices[0])}${countBadge}<div class="swap-item-label">${die.name}</div></div>`);
+    if(sug) suggestItem = item;
     item.onclick = () => {
       chosen = g;
       list.querySelectorAll('.swap-item').forEach(n=>n.classList.remove('selected'));
@@ -3745,6 +3759,7 @@ function renderSwapModal(){
     };
     list.appendChild(item);
   });
+  if(suggestItem) suggestItem.onclick(); // open pre-compared on the suggestion
   goBtn.onclick = () => {
     if(!chosen) return;
     const die = S.tray[chosen.indices[0]].die;
