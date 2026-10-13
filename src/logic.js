@@ -1202,6 +1202,7 @@ function canSelect(idx){
   if(!allowed && S.klass.wrap && inZone(lastIdx) && inZone(idx)){
     allowed = adjWrap(a,b) || adjNormal(a,b);
   }
+  if(!allowed && S.klass.wrapV && inZone(lastIdx) && inZone(idx) && a.c===b.c && Math.abs(a.r-b.r)===3) allowed = true; // test switch (Oct 13 study): top-bottom wrap; no class uses it
   if(!allowed && S.klass.diagonalZone && (S.klass.diagonalZone==='either' ? (inZone(lastIdx) || inZone(idx)) : (inZone(lastIdx) && inZone(idx)))){
     allowed = adjDiag(a,b);
   }

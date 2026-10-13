@@ -17,6 +17,7 @@ VARIANTS = [
     ('guard 3-zone L', 'guard', {'zone': '(r,c)=>(r===1&&(c===2||c===3))||(r===2&&c===3)'}),
     ('guard 3-zone row', 'guard', {'zone': '(r,c)=>r===1&&c>=1'}),
 ]
+if os.environ.get('RC_VARIANTS'): VARIANTS = [tuple(v) for v in json.loads(os.environ['RC_VARIANTS'])]
 VARIANTS = [v for v in VARIANTS if not os.environ.get('RC_ONLY') or v[0] in os.environ['RC_ONLY'].split('|')]
 def slug(s): return ''.join(ch if ch.isalnum() else '_' for ch in s)
 def run(cell):
