@@ -49,6 +49,11 @@ let res = await page.evaluate((cfg)=>{
   // lootFaces (Oct 13 loot-dice tweaks): {"<loot die name>": ["Hit2",...]} replaces that loot die's faces for the study.
   Object.entries(cfg.lootFaces||{}).forEach(([n,arr])=>{ const d = [...ALLOY, ...GILDED, ...MAGIC].find(x=>x.name===n); if(d) d.faces = faces(arr); });
   Object.entries(cfg.manFaces||{}).forEach(([lv,arr])=>{ const d = BASIC_DICE.find(x=>x.cat==='maneuver' && x.level===+lv); if(d) d.faces = faces(arr); });
+  // Shrine study (Oct 13): shrineAll = every eligible room is a shrine (amplifies the signal); forceShrine = that shrine
+  // replaces any shrine drawn on its own floor (the comparison is against the normal shrine mix).
+  if(cfg.shrineAll) window.shrineSlotChance = ()=>1;
+  if(cfg.forceShrine){ const origDraw = drawRoomCard; window.drawRoomCard = function(floor){ const c = origDraw(floor);
+    if(c && c.type==='Shrine'){ const f = floor.shrines.find(x=>x.name===cfg.forceShrine); if(f) return f; } return c; }; }
   // kitPatch (Oct 13): {"<boss name>": <full BOSS_KITS entry>} replaces that boss kit for the study.
   Object.entries(cfg.kitPatch||{}).forEach(([n,k])=>{ BOSS_KITS[n] = k; });
   META.lifetime.victories=1; META.lifetime.bestFloorReached=3; META.achievements['origin_duo']={date:Date.now()};
@@ -349,8 +354,9 @@ let res = await page.evaluate((cfg)=>{
     const rec={fights:[],result:'TIMEOUT',floor:1,turns:0};
     const log={turns:0};
     // fight tracker via wrapper around onEncounterDefeated
-    let cur=null, curEnc=null;
+    let cur=null, curEnc=null, curShrine=null;
     for(let t=0;t<cfg.maxTurns*8;t++){
+      if(S.screen==='shrine' && S.encounter && curShrine!==S.encounter){ curShrine=S.encounter; (rec.shrines=rec.shrines||[]).push({name:S.encounter.name, floor:S.floorIdx+1, hp:S.health}); } // Oct 13 shrine study
       if(S.screen==='game' && S.encounter && curEnc!==S.encounter){
         curEnc=S.encounter;
         cur={name:S.encounter.name,type:S.encounter.type,tier:S.encounter.tier,floor:S.floorIdx+1,hp0:S.encounter.maxHealth,php0:S.health,pmax0:S.maxHealth,turns:0,tk0:window.__taken,minhp:S.health,loot:S.tray.map(c=>c.die).concat(S.backPocket||[]).filter(d=>d&&/alloy|gilded|magic/.test(d.cat)).map(d=>d.name),relics:(S.relics||[]).slice()};
