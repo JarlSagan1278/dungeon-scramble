@@ -114,3 +114,18 @@ Results are added below as each stage finishes.
 - The curve is smooth and steep, and the top badge at shown depth 10 is a real final challenge even for the expert bot, as Jeremy wanted.
 - **Swarming 3 is still the cheap stack:** alone at internal depth 11 it wins 54%, against 8-24% for mixed loadouts at that depth. Modifiers compound when mixed, and Swarming doesn't compound with the others as much. Options: rank 3 costs more again (+8 instead of +6), or cap Swarming at 2 ranks.
 - Union Dues makes a nice "filler" point: players can land on an exact depth without much extra pain.
+
+## 7. Relic re-check on 1.39.7 (expert bot, depth-7 loadout, each relic forced, 4 pairs x 300 runs)
+Win-rate gain over no relic (baselines 23-38%):
+
+| Tier (by Oct 12 rule) | Relics |
+|---|---|
+| S (+30 or more) | Scavenger's Acumen +41, Minus-One Mantra +33, Evasion Tank +32 |
+| A (+20 to +30) | Hard Hat Act +26, Perfect Fifth +24 |
+| B (+10 to +20) | Mandated Lunch Break +15, **Prime Edge +14**, Union Health Plan +13, Nature's Thorns +11 (Dwarf Guard +32), Combonatorics +11, Coffee Break +10 |
+| C (under +10) | Faerie Fire +9, Terminal Velocity +9, Mycorrhizal Bond +8, Klein Bottle +7, Bisection Method +7, Giant Killer +5, Strength in Mooks +5, Percolation Theory +5, Need Before Greed +4, Equal and Opposite +3 (Dwarf Guard +11), **Stronger Infill +2**, Exponential Decay +1, Bloodthirst 0, Power Word: Safe 0, Inductive Step -4, FTLeporter -4 |
+
+- **The S and A tiers held.** One shift: **Prime Edge fell to +14 (tier B)**; it's gated as tier A today, so it could join the always-available pool.
+- **All four origin relics are now tier B or below, as Jeremy asked:** Coffee Break +10, Faerie Fire +9, Mycorrhizal Bond +8, **Stronger Infill +2**. Stronger Infill at 1 Block is now the weakest by far; 2 Block measured +21 on Oct 12 (before the Guard changes), so 2 Block might now land around +10. Worth one quick re-test if Jeremy wants Dwarf's relic to matter.
+- **FTLeporter and Inductive Step measure slightly negative.** That's very likely the bot, not the relics: a teleporting Pivot gives the path search far more options to check in the same time, so the bot finds worse paths; Inductive Step's extra shrine choices go to the bot's simple shrine picker. Treat both as "about zero" for now.
+- Equal and Opposite with the reflect-the-Blocked-amount rule: +3 overall, +11 for Dwarf Guard. It pays off for Block builds, as intended, and stays tier C.
