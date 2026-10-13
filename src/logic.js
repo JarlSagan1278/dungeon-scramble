@@ -211,6 +211,7 @@ function finalizeTelemetry(outcome){
     const rec = {
       runId: S.tele.runId, startedAt: S.tele.startedAt, endedAt: Date.now(), version: S.tele.version,
       origin: S.origin.name, klass: S.klass.name, outcome, floorReached: S.floorIdx+1,
+      runNo: ((S.tele.events.find(e=>e.e==='run_start')||{}).runNo) || null, depth: (typeof currentDepth==='function') ? currentDepth() : 1,
       stats: {...S.stats, damageDealt: Math.round(S.stats.damageDealt)},
       relics: (S.relics||[]).slice(),
       events: S.tele.events,
@@ -238,8 +239,36 @@ function buildPlayDataExport(){
     exportedAt: new Date().toISOString(), playerId: getTelePlayerId(),
     device: { viewport: [window.innerWidth, window.innerHeight], touch: ('ontouchstart' in window) },
     lifetime: META.lifetime, achievementsUnlocked: Object.keys(META.achievements||{}),
-    runs, inProgress,
+    summary: summarizePlayData(runs), runs, inProgress,
   };
+}
+// Headline numbers for a tester's export (Oct 13, from the balance literature review): where runs end by floor, the
+// win rate over the first 10 runs, how often each offered item is taken, and how deaths split between warned and
+// unwarned turns. Computed from the stored runs; abandoned runs (Restart Run) are counted separately.
+function summarizePlayData(runs){
+  try{
+    const done = runs.filter(r=>r.outcome==='victory' || r.outcome==='defeat');
+    const byFloor = {1:{reached:0,died:0},2:{reached:0,died:0},3:{reached:0,died:0}};
+    done.forEach(r=>{ for(let f=1; f<=Math.min(3, r.floorReached||1); f++) byFloor[f].reached++; if(r.outcome==='defeat') byFloor[Math.min(3, r.floorReached||1)].died++; });
+    const first = done.slice().sort((a,b)=>(a.runNo||1e9)-(b.runNo||1e9) || a.startedAt-b.startedAt).slice(0,10);
+    const take = {};
+    const note = (kind, offered, picked)=>{ (offered||[]).forEach(n=>{ const k = kind+': '+n; const t = take[k] || (take[k] = {offered:0, taken:0}); t.offered++; if(n===picked) t.taken++; }); };
+    // downs = times HP hit 0 (a Back Pocket roll can still save you). warningShownAtGo: the lethal warning was up when Go
+    // was pressed; warningClearedByPath: it was up at turn start, the sent path cleared it, and you still went down
+    // (a preview miss worth checking); neverWarned: no warning at all (the deaths that feel unfair).
+    const deaths = {downs:0, warningShownAtGo:0, warningClearedByPath:0, neverWarned:0, fromDot:0};
+    runs.forEach(r=>(r.events||[]).forEach(e=>{
+      if(e.e==='loot_pick') note('loot', e.offered, e.picked);
+      if(e.e==='relic_pick') note('relic', e.offered, e.picked);
+      if(e.e==='shrine_choice') note('shrine option', e.offered, e.picked);
+      if(e.e==='player_down'){ deaths.downs++; if(e.cause==='dot') deaths.fromDot++;
+        if(e.lethalGo) deaths.warningShownAtGo++; else if(e.lethalStart) deaths.warningClearedByPath++; else deaths.neverWarned++; }
+    }));
+    return { runsFinished: done.length, runsAbandoned: runs.filter(r=>r.outcome==='abandoned').length,
+      wins: done.filter(r=>r.outcome==='victory').length, floorFunnel: byFloor,
+      firstTenRuns: { runs: first.length, wins: first.filter(r=>r.outcome==='victory').length },
+      deaths, takeRates: take };
+  }catch(e){ return null; }
 }
 
 // ---- Run history -- a small persisted log of finished runs (win or lose),
@@ -882,7 +911,7 @@ function newGame(originId, classId, boonDieName, charName, depthMods){
   S.coachRun = META.classRuns[klass.id] <= ABILITY_COACH_RUNS;
   // An Origin that has won a run starts every later run holding its signature relic.
   { const oc = originRelicFor(origin.id); if(oc && (META.lifetime.victoriesByOrigin[origin.id]||0)>=1) grantRelic(oc.id, {silent:true, via:'origin'}); }
-  teleLog('run_start', {depth:S.depth, depthMods:S.depthMods, skin:(S.portrait&&S.portrait.tone)||'original', relics:S.relics.slice(), origin:origin.name, klass:klass.name, carry:carryDie?carryDie.name:null, boon:boonDieName||null, tray:S.tray.map(c=>c.die.name)});
+  teleLog('run_start', {runNo:(META.lifetime.runsPlayed||0)+1, classRunNo:(META.classRuns&&META.classRuns[klass.id])||1, depth:S.depth, depthMods:S.depthMods, skin:(S.portrait&&S.portrait.tone)||'original', relics:S.relics.slice(), origin:origin.name, klass:klass.name, carry:carryDie?carryDie.name:null, boon:boonDieName||null, tray:S.tray.map(c=>c.die.name)});
   logMsg('sys', `A ${origin.name} ${klass.name} descends into the dungeon...`);
   if(carryDie) logMsg('sys', `${carryDie.name} joins your tray, carried over from your last run.`, 'good');
   if(boonDieName && !klass.debug && findLootDieByName(boonDieName)) logMsg('sys', `${boonDieName} joins your tray as your Starting Boon.`, 'good');
@@ -1705,6 +1734,10 @@ function applyQuestReward(e, rewardText){
    ========================================================================= */
 function endTurnButton(){
   if(!S.encounter || S.transitioning) return;
+  // Play data (Oct 13, literature review): was the lethal warning up at the start of this turn (empty path), and was it
+  // still up for the path the player sent? Lets a death be read as warned-and-unavoidable, warned-and-missed, or unwarned.
+  try{ const p = S.path; S.path = []; const a = playerLethalRisk(); S.path = p; const b = playerLethalRisk();
+    S._lw = {start: a ? 1 : 0, go: b ? 1 : 0}; }catch(err){ S._lw = null; }
   S.trayAct = null; S.swapLog = []; // swaps lock in once the turn resolves
   startTurnTransition();
 }
@@ -1739,7 +1772,7 @@ function startTurnTransition(){
     const fc = {hit:'h', combo:'c', heal:'+', block:'b', shield:'s', boost:'B', leap:'l', dodge:'d', pivot:'p', nullify:'n', freeze:'z', swap:'w', reroll:'r', dot:'t', hot:'o', leech:'e', fumble:'f', blank:'_'};
     trayTele = S.tray.map(c=>{ if(c.minion) return 'M'; const f = c.forcedFace || currentFace(c); return (dc[c.die.cat]||'?') + ':' + (fc[f.type]||f.type) + (f.value||''); }).join(' ');
   }catch(e){}
-  teleLog('turn', {n:S.turnNumber, len:S.path.length, hp:S.health, enemy:S.encounter?S.encounter.name:null, enemyHp:S.encounter?Math.round(S.encounter.curHealth):null, tray:trayTele, path:S.path.slice(), block:S.playerBlock||0});
+  teleLog('turn', {n:S.turnNumber, len:S.path.length, hp:S.health, enemy:S.encounter?S.encounter.name:null, enemyHp:S.encounter?Math.round(S.encounter.curHealth):null, tray:trayTele, path:S.path.slice(), block:S.playerBlock||0, lethalStart:S._lw?S._lw.start:null, lethalGo:S._lw?S._lw.go:null});
   S.pendingFreeBoost = 0; // a free Boost token is spent by end of turn whether or not it landed on anything
   const path = S.path.slice();
   S._resolvingPath = true;
@@ -1881,6 +1914,7 @@ function runEnemyBeat(i, noWind){
   ];
   if(i>=beats.length){ endTurn(); return; }
   const hpBefore = S.health;
+  S._downBeat = i; // which beat a death happened in (1 = the enemy's action, 2 = your D.O.T. upkeep), for play data
   const result = beats[i]() || {};
   render();
   if(i===1 && typeof lungeFigure==='function' && S.health < hpBefore) lungeFigure('enemyStrike');
@@ -2335,6 +2369,7 @@ function applyShrineBoon(e){
 
 function chooseRelic(id){
   const e = S.encounter, name = (S.relicChoice && S.relicChoice.name) || (e&&e.name) || 'Relic';
+  teleLog('relic_pick', {shrine:name, picked:id, offered:(S.relicChoice&&S.relicChoice.options)||null});
   S.relicChoice = null;
   grantRelic(id, {silent:true, via:'shrine'});
   const r = relicById(id);
@@ -2467,7 +2502,8 @@ function swapInLootDie(trayIndex){
 }
 
 function onPlayerDefeated(){
-  teleLog('player_down', {enemy:S.encounter?S.encounter.name:null, enemyHp:S.encounter?Math.round(S.encounter.curHealth):null, backPocket:S.backPocket.length});
+  teleLog('player_down', {enemy:S.encounter?S.encounter.name:null, enemyHp:S.encounter?Math.round(S.encounter.curHealth):null, backPocket:S.backPocket.length,
+    cause: S._downBeat===2 ? 'dot' : 'hit', lethalStart: S._lw?S._lw.start:null, lethalGo: S._lw?S._lw.go:null, maxHp:S.maxHealth});
   if(S.backPocket.length>0){
     const idx = rand(S.backPocket.length);
     const d = S.backPocket.splice(idx,1)[0];

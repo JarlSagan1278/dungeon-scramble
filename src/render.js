@@ -2946,7 +2946,7 @@ function openSettingsModal(){
       </div></div>`);
     openModal(confirmOverlay);
     confirmOverlay.querySelector('#confirm-restart-cancel').onclick = ()=> closeModal(confirmOverlay);
-    confirmOverlay.querySelector('#confirm-restart-go').onclick = ()=>{ clearSave(); location.reload(); };
+    confirmOverlay.querySelector('#confirm-restart-go').onclick = ()=>{ try{ teleLog('run_abandon', {hp:S.health, maxHp:S.maxHealth}); finalizeTelemetry('abandoned'); }catch(e){} clearSave(); location.reload(); }; // play data: a quit point
     confirmOverlay.onclick = (ev)=>{ if(ev.target===confirmOverlay) closeModal(confirmOverlay); };
   };
   // Reset Progress: wipes lifetime stats, Achievements, the Dice

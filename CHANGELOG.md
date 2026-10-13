@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.3 (Oct 13, 2026)
+- Play data (from the balance literature review): each run records its lifetime run number and depth; every turn records whether the lethal warning was up at turn start and when Go was pressed; each death records whether it came from a hit or D.O.T. and whether it was warned; relic shrines log the three relics offered and the one taken; Restart Run saves the run as 'abandoned' (a quit point). The export now opens with a summary: where runs end by floor, the first-10-runs win rate, take rates for every offered loot die / relic / shrine option, and deaths split into warned at Go / warning cleared by the path / never warned.
+
 ## 1.41.2 (Oct 13, 2026)
 - Swarming rank 2 adds 2 depth instead of 3 (Jeremy; the 1.41.0 depth study found it the cheapest way to stack depth: -4.3 win points per depth point vs about -6.5 for the rest).
 - Balance bot: shrine study knobs (shrineAll, forceShrine) and a shrine visit log.
