@@ -82,8 +82,8 @@ const MUSIC_FILL_UP = (()=>{
 // Per floor: key shift (semitones; D -> E -> F harmonic minor), tempo, and the extra layers (Jeremy: same tune, transposed).
 const MUSIC_FLOORS = [
   { shift:0, bpm:140, bassVoice:'tri' },
-  { shift:2, bpm:150, bassVoice:'tri', counter:true, lowBass:true },
-  { shift:3, bpm:160, bassVoice:'pulse', counter:true, lowBass:true, wood:true, drumsAlways:true },
+  { shift:2, bpm:145, bassVoice:'tri', counter:true, lowBass:true },
+  { shift:3, bpm:150, bassVoice:'pulse', counter:true, lowBass:true, wood:true, drumsAlways:true }, // Oct 13 (Jeremy): was 150/160, ended too fast
 ];
 const MUSIC_VOLUME = 0.55;
 // Settings slider (Oct 13): PREFS.musicVol scales the whole mix (0-1).
