@@ -190,3 +190,36 @@ Whence Wolf (Deadly, ends 9-16% of the runs that meet it), The Strike/Break-er (
 | Dungeoneer + zone die -> Pivot | 82% |
 
 - For regular players Dungeoneer is already the strongest class, so **no Dungeoneer buff is needed**; the expert-only weakness is better answered by the ability-teaching idea than by a buff.
+
+## 10. Performance trace: one turn's playback (CPU x4, studies paused, ms)
+| Variant | script | style | layout | paint | raster | composite | commit |
+|---|---|---|---|---|---|---|---|
+| Today (2 runs) | ~1450-1500 | ~530-590 | ~270-290 | ~330-380 | ~640 | ~420-450 | ~100 |
+| No `filter` | 1694 | 632 | 321 | 332 | 573 | 440 | 99 |
+| No box/text shadows | 1426 | 665 | 251 | 207 | 458 | 228 | 58 |
+| No continuous animations | 1474 | 385 | 266 | 135 | 423 | 84 | 31 |
+| No room floor art | 1297 | 385 | 265 | 448 | 451 | 482 | 78 |
+
+- **Continuous animations (idle bobs, glows, pulses) drive most of the paint and compositing cost:** stopping them cuts paint by ~60% and compositing by ~80%.
+- **Shadows come second** (paint -40%, compositing -50%).
+- **`filter: drop-shadow` barely matters.** This corrects the earlier TODO guess that it was the main cost.
+- The room floor costs ~150 ms of style recalculation per turn.
+- Script (~1.4 s at CPU x4) is still the largest single bucket.
+- Next steps, in order:
+  1. Pause idle animations while a turn plays back (or during any redraw).
+  2. Move the busiest looping animations to transform/opacity only.
+  3. Look at the room floor's selectors.
+  4. Profile the script side of turn playback.
+
+## 11. Off-the-cuff suggestions (opinions, not study results)
+- **Teach the class ability:** a one-time prompt in the first fight ("Your Guard can turn a die into Block once per turn"), plus a soft pulse on the ability button until it's used each turn for the first few runs. The data says this is worth more to new players than any number change.
+- **Lethal warning that counts D.O.T.:** show a skull/red tint on the hp bar when the enemy's next turn plus bleed/poison would finish you.
+- **Camp rest preview:** show "+X HP" ghosted on the hp bar before you choose Rest.
+- **Loot "replace which die?" hint:** highlight the weakest die of the same type when a loot die is offered.
+- **Volume sliders** (music / effects) in place of on/off, now that there's a full soundtrack.
+- **Run summary card** on game over/victory: class, origin, depth, best path, dice bag, relics. Shareable as an image; it doubles as free marketing.
+- **Daily seed:** the same dungeon for everyone each day, with a simple local streak counter. Cheap to build on the existing seeded runs and gives a reason to come back.
+- **Floor 3 identity:** if Floor 3 gets stronger, a twist (e.g. minions start on the board, or one mutating die per room) may beat raising numbers.
+- **Extruzeon:** its theme (3D printing waste) suits a growing threat, such as a Minion "extruded" every turn that hits harder the longer it stays.
+- **Maneuver dice:** half-strength Momentum (a landed Maneuver gives the next Attack +1) reads clearly and is the size the studies support.
+- **Codex:** a small bestiary/relic book that fills in as you meet things. It's a natural home for the names-sheet flavor lines.
