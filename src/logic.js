@@ -309,12 +309,23 @@ function loadMeta(){
       achievements: parsed.achievements || {},
       favoriteBoons: Array.isArray(parsed.favoriteBoons) ? parsed.favoriteBoons : [],
       relicsFound: Array.isArray(parsed.relicsFound) ? parsed.relicsFound : [],
+      bestiary: (parsed.bestiary && typeof parsed.bestiary==='object') ? parsed.bestiary : {},
+      classRuns: (parsed.classRuns && typeof parsed.classRuns==='object') ? parsed.classRuns : {},
+      coachSeen: (parsed.coachSeen && typeof parsed.coachSeen==='object') ? parsed.coachSeen : {},
     };
   } catch(e){ return { lifetime: {...DEFAULT_LIFETIME}, achievements: {}, favoriteBoons: [], relicsFound: [] }; }
 }
 let META = loadMeta();
 function saveMeta(){
   try{ localStorage.setItem(META_KEY, JSON.stringify(META)); } catch(e){ /* best-effort, same as prefs/history */ }
+}
+// Bestiary (Oct 13): every monster/trap/boss you've met, beaten, or been beaten by (Codex -> Bestiary).
+const ABILITY_COACH_RUNS = 3;
+function bestiaryNote(name, field){
+  if(!name) return;
+  if(!META.bestiary) META.bestiary = {};
+  const b = META.bestiary[name] || (META.bestiary[name] = {met:0, won:0, lost:0});
+  b[field] = (b[field]||0) + 1; saveMeta();
 }
 
 // Each entry's check() runs against META.lifetime (the cumulative totals
@@ -563,7 +574,7 @@ function saveSeen(seen){
 // should survive across runs (including after a run ends and the save is
 // cleared). ----
 const PREFS_KEY = 'dungeonScramblePrefs_v1';
-const DEFAULT_PREFS = { sound: true, music: true, reducedMotion: false, lowIntensity: false, vibration: true };
+const DEFAULT_PREFS = { sound: true, music: true, reducedMotion: false, lowIntensity: false, vibration: true, sfxVol: 1, musicVol: 1 }; // volumes 0-1 (Oct 13 sliders; 0 also turns sound/music off)
 let PREFS = loadPrefs();
 function loadPrefs(){
   try{
@@ -865,6 +876,10 @@ function newGame(originId, classId, boonDieName, charName, depthMods){
     segmentShrineUsed: false,
     segmentTrapUsed: false,
   };
+  // Ability teaching (Oct 13): the Skill button pulses until used each turn for a class's first few runs.
+  if(!META.classRuns) META.classRuns = {};
+  META.classRuns[klass.id] = (META.classRuns[klass.id]||0) + 1; saveMeta();
+  S.coachRun = META.classRuns[klass.id] <= ABILITY_COACH_RUNS;
   // An Origin that has won a run starts every later run holding its signature relic.
   { const oc = originRelicFor(origin.id); if(oc && (META.lifetime.victoriesByOrigin[origin.id]||0)>=1) grantRelic(oc.id, {silent:true, via:'origin'}); }
   teleLog('run_start', {depth:S.depth, depthMods:S.depthMods, skin:(S.portrait&&S.portrait.tone)||'original', relics:S.relics.slice(), origin:origin.name, klass:klass.name, carry:carryDie?carryDie.name:null, boon:boonDieName||null, tray:S.tray.map(c=>c.die.name)});
@@ -978,6 +993,7 @@ function drawEncounter(kind){
     if(e.type==='Shrine') S.segmentShrineUsed = true;
   }
   S.usedCards.add(e.name);
+  if(e.type!=='Shrine') bestiaryNote(e.name, 'met');
   if(e.health>0){ e.health = Math.max(1, Math.round(e.health * floorHpMul(S.floorIdx) * (/^(elite|deadly)$/.test(encounterTier(e)) ? 1 + DREAD_HP*depthRank('dread') : 1))); if(e.maxHealth!==undefined) e.maxHealth = e.health; }
   e.curHealth = e.health;
   e.curDOT = 0; e.curHOT = 0; e.curShield = 0; e.turn = 0;
@@ -2007,7 +2023,13 @@ function enemySound(kind){
 function applyEnemyAct(e, act){
   const v = act.value||0;
   switch(act.type){
-    case 'dmg': return dealEncounterDamage(e, v);
+    case 'dmg': {
+      if(!act.grow) return dealEncounterDamage(e, v);
+      // Layer by Layer (Oct 13, Extruzeon): this attack grows by act.grow after every hit, through both phases.
+      const t = dealEncounterDamage(e, v + (e.layers||0));
+      e.layers = (e.layers||0) + act.grow;
+      return `${t} ${e.name} adds a layer: its attack grows to ${v + e.layers}.`;
+    }
     case 'minion': enemySound('squeak'); return spawnMinions(e, v) || `${e.name} tries to summon minions, but your Tray has no room.`;
     case 'shield': enemySound('clank'); e.curShield += v; return `${e.name} gains ${v} shield.`;
     case 'heal': enemySound('enemyBell'); e.curHealth = cap(e.curHealth+v, e.maxHealth); return `${e.name} heals ${v}.`;
@@ -2118,7 +2140,7 @@ function enemyNextTurnPreview(e){
   initEnemyTurnState(e);
   const mins = S.tray ? S.tray.filter(c=>c.minion).length : 0;
   const hitOf = (v, hv) => v>0 ? v + zealBonus(hv) : 0;
-  const dmgOf = (acts, hv) => acts.reduce((a,x)=>a + (x.type==='dmg' ? hitOf(x.value, hv) : x.type==='dmgPerMinion' ? hitOf(x.value*mins, hv) : 0), 0);
+  const dmgOf = (acts, hv) => acts.reduce((a,x)=>a + (x.type==='dmg' ? hitOf(x.value + (x.grow ? (e.layers||0) : 0), hv) : x.type==='dmgPerMinion' ? hitOf(x.value*mins, hv) : 0), 0);
   if(e.kit){
     const sp = bossNextSpecial(e), kit = bossKitNow(e);
     return {special:sp, heavy:!!sp.windup, dmg: dmgOf(kit.each, false) + (S.freezeNext ? 0 : dmgOf(sp.acts, true))};
@@ -2126,6 +2148,31 @@ function enemyNextTurnPreview(e){
   const heavy = enemyHeavyNext(e) && !S.freezeNext;
   if(S.freezeNext && !enemyHeavyNext(e)) return {heavy:false, dmg:0};
   return {heavy, heavyStat: heavy ? enemyHeavyStat(e) : null, dmg: hitOf((e.dmg||0) * (heavy && enemyHeavyStat(e)==='dmg' ? 2 : 1), heavy)};
+}
+
+// Lethal warning (Oct 13, Jeremy): would the enemy's coming turn, then your own D.O.T. tick, finish you? Follows the
+// real beat order (your path, the enemy's D.O.T. tick, its action against your Block, then your D.O.T. and H.O.T.)
+// and counts the path you're building (its Block, a kill, Freeze, Nullify). Returns null or the numbers for the tip.
+function playerLethalRisk(){
+  const e = S && S.encounter;
+  if(!e || e.type==='Shrine' || !(e.curHealth>0) || S.screen!=='game') return null;
+  let block = S.playerBlock||0, dot = S.playerDOT||0, hot = S.playerHOT||0, frozen = !!S.freezeNext, ef = null;
+  if(S.path && S.path.length){ try{ ef = computePathEffects(S.path); }catch(err){ ef = null; } }
+  if(ef){
+    if(ef.totalDamage >= e.curHealth + (e.curShield||0)) return null; // this path kills it first
+    block += ef.blockGain||0; dot += ef.selfDot||0; hot += ef.hotToPlayer||0;
+    if(ef.nullifyCount) dot = 0;
+    if(ef.freeze) frozen = true;
+  }
+  const hpAfterPath = S.health + (ef ? (ef.healGain||0) : 0);
+  if((e.curDOT||0) > 0 && e.curDOT >= e.curHealth - (ef ? ef.totalDamage : 0)) return null; // its own D.O.T. tick kills it
+  const was = S.freezeNext; S.freezeNext = frozen;
+  let pv; try{ pv = enemyNextTurnPreview(e); } finally { S.freezeNext = was; }
+  const hit = Math.max(0, (pv.dmg||0) - (hasRelic('gambeson') && pv.dmg>0 ? 1 : 0));
+  const taken = Math.max(0, hit - block);
+  if(hpAfterPath - taken <= 0) return {hit, block, dot:0, hot:0, hp:hpAfterPath};
+  if(hpAfterPath - taken - dot + hot <= 0) return {hit, block, dot, hot, hp:hpAfterPath};
+  return null;
 }
 
 function upgradeOneBasicDie(cat){
@@ -2307,6 +2354,7 @@ function onEncounterDefeated(){
   clearAllMinions();
   logMsg('sys', `${e.name} defeated!`);
   S.stats.encountersDefeated++;
+  bestiaryNote(e.name, 'won');
   // loot: draw dice from the floor pool, pick 1. Overkill (10+ damage beyond
   // what was needed) adds one extra option to choose from, per the manual's
   // "+1 to the Encounter Loot Reward value."
@@ -2433,6 +2481,7 @@ function onPlayerDefeated(){
       onPlayerDefeated();
     }
   } else {
+    if(S.encounter && S.encounter.type!=='Shrine'){ bestiaryNote(S.encounter.name, 'lost'); S.stats.killedBy = S.encounter.name; }
     S.carryoverOptions = highestTierTrayGroups();
     S.carryoverChosenName = null;
     S.screen='gameover';

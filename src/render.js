@@ -378,6 +378,22 @@ function syncIdleBreath(){
       el.style.animationDelay = '-'+Math.round(performance.now() % period)+'ms';
     });
   }catch(err){}
+  if(!glintTick._on){ glintTick._on = true; setInterval(glintTick, 200); }
+}
+// The art glint (Oct 13 perf pass): instead of a filter keyframe running all cycle long (which repaints every frame),
+// a cheap timer flags each figure's frame for just the glint window of its idle cycle (same clock as idle-breath).
+const GLINT_WIN = {p:[0.86, 0.95], e:[0.78, 0.90]};
+function glintTick(){
+  if(document.hidden || document.body.classList.contains('is-resolving') || (typeof PREFS!=='undefined' && (PREFS.reducedMotion || PREFS.lowIntensity))) return;
+  document.querySelectorAll('#enc-panel .fo-fig > .idle-breath').forEach(el=>{
+    const fig = el.parentNode, side = el.classList.contains('idle-e') ? 'e' : 'p', cls = 'glint-'+side;
+    if(!fig || fig.classList.contains(cls) || fig.classList.contains('fo-dead')) return;
+    const P = parseFloat(el.style.animationDuration) || 14000, ph = (performance.now() % P) / P, [a,b] = GLINT_WIN[side];
+    if(ph < a || ph >= b) return;
+    const ms = Math.round((b - ph) * P);
+    fig.style.setProperty('--gd', ms+'ms'); fig.classList.add(cls);
+    setTimeout(()=>{ fig.classList.remove(cls); }, ms + 30);
+  });
 }
 // One-shot lunge toward the other side (Web Animations API: never fights the CSS transforms).
 function lungeFigure(side, dmg){
@@ -794,9 +810,8 @@ function renderTitle(){
           <div class="title-btn-col">
             ${continueBtn}
             <button class="${saved?'':'primary'}" id="title-newrun-btn">${saved?'Start New Run':'New Run'}</button>
-            <button id="title-achievements-btn">Achievements</button>
-            <button id="title-history-btn">Run History</button>
-            <button id="title-compendium-btn">Dice Compendium</button>
+            <button id="title-codex-btn">Codex</button>
+            <button id="title-history-btn">Records</button>
             <button id="title-howto-btn">How to Play</button>
           </div>
           ${(()=>{ const earned = CLASSES.filter(k=>!k.debug && DEPTH_BEST.byClass[k.id] && DEPTH_BEST.byClass[k.id].depth); return earned.length ? `<div class="title-badges">${earned.map(k=>`<div class="title-badge">${depthBadgeSVG(k.color, DEPTH_BEST.byClass[k.id].depth, 52)}</div>`).join('')}</div>` : ''; })()}
@@ -822,9 +837,8 @@ function renderTitle(){
     overlay.querySelector('#title-newrun-go').onclick = ()=> closeModal(overlay, ()=>{ clearSave(); resetSetupPortraitPreviews(); preGameScreen='setup'; render(); });
     overlay.onclick = (ev)=>{ if(ev.target===overlay) closeModal(overlay); };
   };
-  document.getElementById('title-achievements-btn').onclick = openAchievementsModal;
-  document.getElementById('title-history-btn').onclick = openRunHistoryModal;
-  document.getElementById('title-compendium-btn').onclick = openDiceCompendiumModal;
+  document.getElementById('title-codex-btn').onclick = ()=> openCodexModal();
+  document.getElementById('title-history-btn').onclick = ()=> openRecordsModal();
   document.getElementById('title-howto-btn').onclick = ()=> openTutorialModal(0);
 }
 
@@ -1463,11 +1477,11 @@ function renderEncounterCard(e, mode){
     const iconKey = {dmg:'hit', dmgPerMinion:'hit', minion:'minion', shield:'block', heal:'heal', hot:'hot', dot:'dot'};
     const actText = a => a.type==='dmgPerMinion' ? `${a.value} per Minion on your Tray` : a.type==='dropShield' ? 'drops its Shield' : enemyActionTooltip(iconKey[a.type], a.value);
     const chip = (a0, extraCls, label) => {
-      const a = a0.type==='dmg' ? {...a0, value:a0.value + zealBonus(false)} : a0; // Zeal shows in the warning
+      const a = a0.type==='dmg' ? {...a0, value:a0.value + (a0.grow ? (e.layers||0) : 0) + zealBonus(false)} : a0; // Zeal (and Extruzeon's layers) show in the warning
       const ik = iconKey[a.type]; if(!ik) return '';
       const inSlot = ICON_VALUE_SLOT.has(ik) && a.type!=='dmgPerMinion';
       const valTxt = a.type==='dmgPerMinion' ? ` ${a.value}/Minion` : (!inSlot ? ' '+a.value : '');
-      return `<span class="boss-cycle-item next enemy-action-badge ${extraCls}" title="${label?label+': ':''}${actText(a)}">${iconSpan(ik, inSlot?a.value:null)}${label?' '+label:''}${valTxt}</span>`;
+      return `<span class="boss-cycle-item next enemy-action-badge ${extraCls}${a.grow?' grows':''}" title="${label?label+': ':''}${actText(a)}${a.grow?` (Layer by Layer: grows by ${a.grow} every turn)`:''}">${iconSpan(ik, inSlot?a.value:null)}${label?' '+label:''}${valTxt}</span>`;
     };
     const kit = bossKitNow(e), sp = nextTurn.special;
     const base = kit.each.map(a=>chip(a,'','')).join('');
@@ -1486,7 +1500,7 @@ function renderEncounterCard(e, mode){
     const typeWord = isBoss ? (e.type + '') : [tierWord, e.type!=='Enemy'?e.type:''].filter(Boolean).join(' ');
     const typeTag = typeWord ? `<small class="fo-type${isBoss?' fo-type-inline':''}${e.tier==='deadly'?' fo-type-deadly':''}">${typeWord}</small>` : '';
     const questLine = (e.quests && e.quests.length)
-      ? `<div class="fo-quests-float" style="animation-delay:-${Math.round(performance.now()%3100)}ms" title="Complete these during the fight for bonus rewards"><div class="fo-quests-label">Quests</div><div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, e.questsDone[i])}</span>`; }).join('')}</div></div>` : '';
+      ? `<div class="fo-quests-float" title="Complete these during the fight for bonus rewards"><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label">Quests</div><div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, e.questsDone[i])}</span>`; }).join('')}</div></div>` : '';
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
     const sz = encounterSize(e);
     const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz}"/>`
@@ -1715,7 +1729,7 @@ function renderGame(){
           <div class="util-btn rail-pocket" id="open-backpocket-btn">${iconSpan('bag')}<span>Pocket</span></div>
           <div class="util-btn rail-item ${totalTokens?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Item</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
           <div class="util-btn danger-accent rail-clear ${S.transitioning?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
-          ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''} ${abilityArmed?'armed':''}" id="ability-btn" style="--class-color:${S.klass.color||'#d4af52'}"><span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
+          ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''} ${abilityArmed?'armed':''} ${(S.coachRun && !S.classAbilityUsed && !S.transitioning && !abilityArmed)?'pulse coach-pulse':''}" id="ability-btn" style="--class-color:${S.klass.color||'#d4af52'}"><span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
             : S.klass.debug ? `<div class="util-btn rail-ability ${(!S.encounter||S.transitioning)?'disabled':''}" id="debug-win-btn"><span>Win</span></div>` : ''}
         </div>
       </div>
@@ -1816,6 +1830,8 @@ function renderGame(){
   }
 
   placeVs();
+  syncLethalWarning();
+  maybeAbilityCoach();
   updatePathTrail();
   rollPathCounter();
   killHintFx();
@@ -1882,6 +1898,46 @@ function renderPathStrip(){
 // Fast update for a plain path tap (Oct 12, performance): only what a path step changes is redrawn -- the dice,
 // the path coins, the damage counter, Go, the chest lock and the enemy health bar's preview -- instead of the
 // whole screen. Anything unusual falls back to the full render().
+// Class-ability coach (Oct 13, Jeremy): the first fight with each class explains its Skill once, in plain words,
+// placed high so the tray and its zone stay visible below it. Remembered per class in META.coachSeen.
+const ABILITY_COACH = {
+  armsmaster:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the right column) to turn it into a Hit (2). Use it every turn: it is free damage.',
+  guard:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the L of three squares, middle right) to turn it into a Block (1). Use it every turn: Block stops damage before it lands.',
+  dungeoneer:'Always on: your dashed zone is the left and right edges, and your path can wrap from one edge straight to the other on any row. Look for long paths that cross the sides.',
+  arcanist:'Always on: your dashed zone is both diagonals, and any step into or out of the zone may go diagonally. Look for paths that zig-zag through the X.',
+};
+function maybeAbilityCoach(){
+  if(!S || S.screen!=='game' || !S.encounter || S.encounter.type==='Shrine' || S.transitioning) return;
+  if(typeof navigator!=='undefined' && navigator.webdriver) return; // automated tests and the balance bot
+  const id = S.klass && S.klass.id; if(!ABILITY_COACH[id]) return;
+  if(!META.coachSeen) META.coachSeen = {};
+  if(META.coachSeen[id] || document.querySelector('.coach-overlay') || S.lootChoice || S.shrineChoice || S.relicChoice) return;
+  // wait for the room banner ("You scramble into...") to be tapped away first
+  if(document.getElementById('room-callout') || document.querySelector('.modal-overlay')){ clearTimeout(maybeAbilityCoach._t); maybeAbilityCoach._t = setTimeout(maybeAbilityCoach, 400); return; }
+  META.coachSeen[id] = Date.now(); saveMeta();
+  const overlay = el(`<div class="modal-overlay coach-overlay"><div class="modal coach-card" style="text-align:center; max-width:320px; --class-color:${S.klass.color||'#d4af52'}">
+      <h2 style="margin-top:0;">${S.klass.name} Skill</h2>
+      <p style="text-align:left;">${ABILITY_COACH[id]}</p>
+      <button class="primary" id="coach-ok">Got it</button>
+    </div></div>`);
+  openModal(overlay);
+  const done = ()=> closeModal(overlay);
+  overlay.querySelector('#coach-ok').onclick = done;
+  overlay.onclick = (ev)=>{ if(ev.target===overlay) done(); };
+}
+
+// Lethal warning on your HP bar (Oct 13): a red pulse and a skull tag when the enemy's next turn plus your
+// D.O.T. would finish you (playerLethalRisk, logic.js). Absolutely placed, so the card never grows.
+function syncLethalWarning(){
+  const pw = document.querySelector('#enc-panel .fo-player .fo-hpwrap'); if(!pw) return;
+  const L = (!S.transitioning && S.resolvingIdx==null) ? playerLethalRisk() : null;
+  pw.classList.toggle('lethal', !!L);
+  const old = pw.querySelector('.lethal-tag'); if(old) old.remove();
+  if(L){
+    const tip = `Lethal: hit ${L.hit}${L.block?` - Block ${L.block}`:''}${L.dot?` + D.O.T. ${L.dot}`:''}${L.hot?` - H.O.T. ${L.hot}`:''} vs your ${L.hp} HP. Block, heal, Freeze, Nullify, or kill it this turn.`;
+    pw.insertAdjacentHTML('beforeend', `<span class="lethal-tag" title="${tip}">&#9760; Lethal next turn</span>`);
+  }
+}
 function renderPathOnly(){
   const tray = document.getElementById('tray');
   if(!S || S.screen!=='game' || !S.encounter || S.transitioning || S.trayAct || abilityArmed || S.newRoomFx || !tray
@@ -1903,6 +1959,7 @@ function renderPathOnly(){
   const old = document.querySelector('#enc-panel .fo-enemy .fo-hpwrap');
   if(old){ const t = document.createElement('div'); t.innerHTML = renderEncounterCard(S.encounter,'faceoff');
     const nw = t.querySelector('.fo-enemy .fo-hpwrap'); if(nw) old.replaceWith(nw); }
+  syncLethalWarning();
   updatePathTrail();
   rollPathCounter();
   killHintFx();
@@ -2279,6 +2336,13 @@ function showRoomCallout(fx, onDismiss){
 // later tones queued from setTimeout-driven turn-transition steps still
 // play fine. ----
 let audioCtx = null;
+// Sound effects bus (Oct 13): every effect plays through one gain node so the Settings slider sets their volume.
+let sfxBus = null;
+function sfxOut(ctx){
+  if(!sfxBus || sfxBus.context!==ctx){ sfxBus = ctx.createGain(); sfxBus.connect(ctx.destination); }
+  sfxBus.gain.value = Math.max(0, Math.min(1, PREFS.sfxVol!=null ? PREFS.sfxVol : 1));
+  return sfxBus;
+}
 function getAudioCtx(){
   if(!PREFS.sound) return null;
   if(!audioCtx){
@@ -2504,7 +2568,7 @@ function playTone(kind, pitchStep){
     gain.gain.setValueAtTime(0.0001, now+n.start);
     gain.gain.linearRampToValueAtTime(n.gain, now+n.start+0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, now+n.start+n.dur);
-    osc.connect(gain).connect(ctx.destination);
+    osc.connect(gain).connect(sfxOut(ctx));
     osc.start(now+n.start);
     osc.stop(now+n.start+n.dur+0.02);
   });
@@ -2534,7 +2598,7 @@ function playNoiseBurst(ctx, startTime, dur, gainPeak, filterType, filterFreq, f
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(gainPeak, startTime);
   gain.gain.exponentialRampToValueAtTime(0.0001, startTime+dur);
-  src.connect(filter).connect(gain).connect(ctx.destination);
+  src.connect(filter).connect(gain).connect(sfxOut(ctx));
   src.start(startTime);
   src.stop(startTime+dur+0.01);
 }
@@ -2583,7 +2647,7 @@ function playMaterialClack(ctx, t, mat, i){
     const o = ctx.createOscillator(), g = ctx.createGain();
     o.type = type||'sine'; o.frequency.setValueAtTime(freq, t);
     g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(gain, t+0.004); g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
-    o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+dur+0.02);
+    o.connect(g).connect(sfxOut(ctx)); o.start(t); o.stop(t+dur+0.02);
   };
   const j = 1 + (Math.random()-0.5)*0.08;
   if(mat==='alloy'){ playNoiseBurst(ctx, t, 0.02, 0.12, 'highpass', 3000, 0.7); ping(1700*j, 0.12, 0.05, 'triangle'); ping(2550*j, 0.08, 0.025); }
@@ -2621,7 +2685,7 @@ function playPlayerHitSound(){
   oscGain.gain.setValueAtTime(0.0001, now);
   oscGain.gain.linearRampToValueAtTime(0.26, now+0.01);
   oscGain.gain.exponentialRampToValueAtTime(0.0001, now+0.18);
-  osc.connect(oscGain).connect(ctx.destination);
+  osc.connect(oscGain).connect(sfxOut(ctx));
   osc.start(now);
   osc.stop(now+0.2);
 }
@@ -2809,6 +2873,14 @@ function spawnConfettiRain(){
   }
 }
 
+function settingsSliderRowHTML(id, label, vol){
+  const v = Math.round(vol*100);
+  return `<label class="settings-toggle-row settings-slider-row" for="${id}">
+      <span>${label} <b class="settings-vol" id="${id}-val">${v ? v+'%' : 'Off'}</b></span>
+      <input type="range" id="${id}" min="0" max="100" step="5" value="${v}">
+    </label>`;
+}
+function settingsSliderLabel(sl){ const b = document.getElementById(sl.id+'-val'); if(b) b.textContent = +sl.value ? sl.value+'%' : 'Off'; }
 function settingsToggleRowHTML(id, label, checked){
   return `<label class="settings-toggle-row" for="${id}">
       <span>${label}</span>
@@ -2823,8 +2895,8 @@ function openSettingsModal(){
       <h2 style="margin-top:0;">Settings</h2>
       ${inRun ? `<p class="hint">${S.origin.name} ${S.klass.name} · Floor ${S.floorIdx+1}</p>` : ''}
       <div class="settings-toggles">
-        ${settingsToggleRowHTML('pref-sound', 'Sound effects', PREFS.sound)}
-        ${settingsToggleRowHTML('pref-music', 'Music', PREFS.music!==false)}
+        ${settingsSliderRowHTML('pref-sound', 'Sound effects', PREFS.sound ? (PREFS.sfxVol!=null?PREFS.sfxVol:1) : 0)}
+        ${settingsSliderRowHTML('pref-music', 'Music', PREFS.music!==false ? (PREFS.musicVol!=null?PREFS.musicVol:1) : 0)}
         ${settingsToggleRowHTML('pref-reduced-motion', 'Reduce motion', PREFS.reducedMotion)}
         ${settingsToggleRowHTML('pref-low-intensity', 'Gentler effects (smaller shakes, fewer sparks)', PREFS.lowIntensity)}
         ${settingsToggleRowHTML('pref-vibration', 'Vibration (phones)', PREFS.vibration!==false)}
@@ -2833,12 +2905,9 @@ function openSettingsModal(){
       <div class="small-btn-row" style="justify-content:center; flex-direction:column;">
         ${inRun ? '<button id="settings-log-btn">Log</button>' : ''}
         <button id="settings-how-to-play-btn">How to Play</button>
-        <button id="settings-run-history-btn">Run History</button>
-        <button id="settings-achievements-btn">Achievements</button>
-        <button id="settings-key-btn">Action Key</button>
+        <button id="settings-codex-btn">Codex <small class="hint">(Bestiary, Dice, Relics, Key)</small></button>
+        <button id="settings-records-btn">Records <small class="hint">(Run History, Achievements)</small></button>
         <button id="settings-export-data-btn">Export Play Data</button>
-        <button id="settings-dice-compendium-btn">Dice Compendium</button>
-        <button id="settings-relic-codex-btn">Relic Codex</button>
         ${inRun ? '<button id="settings-restart-btn" class="danger">Restart Run</button>' : ''}
         <button id="settings-reset-progress-btn" class="danger">Reset Progress</button>
         <button id="settings-close-btn">Close</button>
@@ -2852,15 +2921,15 @@ function openSettingsModal(){
   const logBtn = overlay.querySelector('#settings-log-btn');
   if(logBtn) logBtn.onclick = ()=>{ close(); openInfoModal('Log', logViewHTML()); };
   overlay.querySelector('#settings-how-to-play-btn').onclick = ()=>{ close(); openTutorialModal(0); };
-  overlay.querySelector('#settings-run-history-btn').onclick = ()=>{ close(); openRunHistoryModal(); };
-  overlay.querySelector('#settings-key-btn').onclick = ()=>{ close(); openInfoModal('Action Key', keyCardHTML()); };
+  overlay.querySelector('#settings-codex-btn').onclick = ()=>{ close(); openCodexModal(); };
+  overlay.querySelector('#settings-records-btn').onclick = ()=>{ close(); openRecordsModal(); };
   overlay.querySelector('#settings-export-data-btn').onclick = ()=>{ close(); openExportDataModal(); };
-  overlay.querySelector('#settings-achievements-btn').onclick = ()=>{ close(); openAchievementsModal(); };
-  overlay.querySelector('#settings-relic-codex-btn').onclick = ()=>{ close(); openRelicCodexModal(); };
-  overlay.querySelector('#settings-dice-compendium-btn').onclick = ()=>{ close(); openDiceCompendiumModal(); };
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
-  overlay.querySelector('#pref-sound').onchange = (ev)=>{ setPref('sound', ev.target.checked); if(ev.target.checked) playTone('hit'); };
-  overlay.querySelector('#pref-music').onchange = (ev)=>{ setPref('music', ev.target.checked); musicUpdate(); };
+  // Volume sliders (Oct 13): 0 turns that channel off; the effects slider plays a test tone when you let go.
+  const sfxSl = overlay.querySelector('#pref-sound'), musSl = overlay.querySelector('#pref-music');
+  sfxSl.oninput = ()=>{ const v = sfxSl.value/100; setPref('sfxVol', v); setPref('sound', v>0); settingsSliderLabel(sfxSl); };
+  sfxSl.onchange = ()=>{ if(PREFS.sound) playTone('hit'); };
+  musSl.oninput = ()=>{ const v = musSl.value/100; const was = PREFS.music!==false; setPref('musicVol', v); setPref('music', v>0); settingsSliderLabel(musSl); if(was!==(v>0)) musicUpdate(); else musicSetVolume(); };
   overlay.querySelector('#pref-reduced-motion').onchange = (ev)=> setPref('reducedMotion', ev.target.checked);
   overlay.querySelector('#pref-low-intensity').onchange = (ev)=> setPref('lowIntensity', ev.target.checked);
   overlay.querySelector('#pref-vibration').onchange = (ev)=>{ setPref('vibration', ev.target.checked); if(ev.target.checked) vibrate(30); };
@@ -2934,7 +3003,7 @@ function openTutorialModal(stepIdx){
 // A persisted log of past runs (see recordRunHistory/getRunHistory in
 // logic.js), reachable any time from Settings -- including from the
 // Victory/Game Over screens, since the settings gear lives outside #app.
-function openRunHistoryModal(){
+function runHistoryHTML(){
   const history = getRunHistory();
   const victories = history.filter(r=>r.outcome==='victory');
   const fastest = victories.length ? Math.min(...victories.map(r=>r.turnsTaken)) : null;
@@ -2956,30 +3025,16 @@ function openRunHistoryModal(){
         <span class="run-history-date">${dateStr}</span>
       </div>`;
   }).join('') : `<p class="hint">No runs recorded yet -- finish a run to see it here.</p>`;
-  const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:400px;">
-      <button class="modal-x-btn" id="run-history-x-btn" title="Close">✕</button>
-      <h2 style="margin-top:0;">Run History</h2>
-      ${summary}
-      <div class="run-history-list">${rows}</div>
-      <div class="small-btn-row" style="justify-content:center;">
-        ${history.length ? '<button id="run-history-clear-btn" class="danger">Clear History</button>' : ''}
-        <button class="primary" id="run-history-close-btn">Close</button>
-      </div>
-    </div></div>`);
-  openModal(overlay);
-  const close = ()=> closeModal(overlay);
-  overlay.querySelector('#run-history-x-btn').onclick = close;
-  overlay.querySelector('#run-history-close-btn').onclick = close;
-  overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
-  const clearBtn = overlay.querySelector('#run-history-clear-btn');
-  if(clearBtn) clearBtn.onclick = ()=>{ clearRunHistory(); closeModal(overlay, openRunHistoryModal); };
+  return `${summary}<div class="run-history-list">${rows}</div>
+    ${history.length ? '<div class="small-btn-row" style="justify-content:center;"><button id="run-history-clear-btn" class="danger">Clear History</button></div>' : ''}`;
 }
+function openRunHistoryModal(){ openRecordsModal('history'); }
 
 // Lifetime Achievements (ACHIEVEMENTS, logic.js) -- locked entries show
 // greyed-out with just name+desc; unlocked entries show the date earned.
 // Reachable from Settings at any time (not just post-run), same as Run
 // History and the Dice Compendium.
-function openAchievementsModal(){
+function achievementsHTML(){
   const unlockedCount = ACHIEVEMENTS.filter(a=>META.achievements[a.id]).length;
   const rows = ACHIEVEMENTS.map(a=>{
     const unlocked = META.achievements[a.id];
@@ -2993,21 +3048,30 @@ function openAchievementsModal(){
         ${unlocked ? `<span class="run-history-date">${dateStr}</span>` : ''}
       </div>`;
   }).join('');
-  const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:400px;">
-      <button class="modal-x-btn" id="achv-x-btn" title="Close">✕</button>
-      <h2 style="margin-top:0;">Achievements</h2>
-      <div class="statuses" style="justify-content:center; margin-bottom:10px;">
-        <span class="status-chip">${unlockedCount}/${ACHIEVEMENTS.length} unlocked</span>
-      </div>
-      <div class="run-history-list">${rows}</div>
-      <div class="small-btn-row" style="justify-content:center;">
-        <button class="primary" id="achv-close-btn">Close</button>
-      </div>
+  return `<div class="statuses" style="justify-content:center; margin-bottom:10px;"><span class="status-chip">${unlockedCount}/${ACHIEVEMENTS.length} unlocked</span></div>
+    <div class="run-history-list">${rows}</div>`;
+}
+function openAchievementsModal(){ openRecordsModal('achievements'); }
+// Records (Oct 13): Run History + Achievements in one tabbed window (shorter settings menu).
+function openRecordsModal(tab){
+  const overlay = el(`<div class="modal-overlay"><div class="modal codex-modal" style="text-align:center; max-width:400px;">
+      <button class="modal-x-btn" id="records-x-btn" title="Close">✕</button>
+      <h2 style="margin-top:0;">Records</h2>
+      <div class="codex-tabs"><button class="codex-tab" data-tab="history">Run History</button><button class="codex-tab" data-tab="achievements">Achievements</button></div>
+      <div class="codex-body" id="records-body"></div>
     </div></div>`);
   openModal(overlay);
+  const body = overlay.querySelector('#records-body');
+  const show = t=>{
+    overlay.querySelectorAll('.codex-tab').forEach(b=>b.classList.toggle('on', b.dataset.tab===t));
+    body.innerHTML = t==='achievements' ? achievementsHTML() : runHistoryHTML();
+    const clr = body.querySelector('#run-history-clear-btn');
+    if(clr) clr.onclick = ()=>{ clearRunHistory(); show('history'); };
+  };
+  overlay.querySelectorAll('.codex-tab').forEach(b=> b.onclick = ()=> show(b.dataset.tab));
+  show(tab || 'history');
   const close = ()=> closeModal(overlay);
-  overlay.querySelector('#achv-x-btn').onclick = close;
-  overlay.querySelector('#achv-close-btn').onclick = close;
+  overlay.querySelector('#records-x-btn').onclick = close;
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
 }
 
@@ -3017,7 +3081,7 @@ function openAchievementsModal(){
 // filled in gradually, so no placeholder-watermark spam for the ones that
 // don't have it yet (unlike the encounter portraits, which are shown one
 // at a time and can afford a loud PLACEHOLDER banner).
-function openDiceCompendiumModal(){
+function diceCompendiumHTML(){
   const tiers = [
     {label:'Alloy', pool:ALLOY},
     {label:'Gilded', pool:GILDED},
@@ -3062,22 +3126,10 @@ function openDiceCompendiumModal(){
         <div class="compendium-list">${rows}</div>
       </div>`;
   }).join('');
-  const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:420px;">
-      <button class="modal-x-btn" id="compendium-x-btn" title="Close">✕</button>
-      <h2 style="margin-top:0;">Dice Compendium</h2>
-      <p class="hint">${discoveredCount}/${totalDice} found</p>
-      ${sections}
-      <div class="small-btn-row" style="justify-content:center;">
-        <button class="primary" id="compendium-close-btn">Close</button>
-      </div>
-    </div></div>`);
-  openModal(overlay);
-  DISCOVERED_DICE.forEach(n=> seen.dice.add(n)); saveSeen(seen); // viewed -- tags clear next visit
-  const close = ()=> closeModal(overlay);
-  overlay.querySelector('#compendium-x-btn').onclick = close;
-  overlay.querySelector('#compendium-close-btn').onclick = close;
-  overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
+  return `<p class="hint">${discoveredCount}/${totalDice} found</p>${sections}`;
 }
+function markDiceSeen(){ const seen = loadSeen(); DISCOVERED_DICE.forEach(n=> seen.dice.add(n)); saveSeen(seen); } // viewed -- tags clear next visit
+function openDiceCompendiumModal(){ openCodexModal('dice'); }
 
 function openInfoModal(title, bodyHTML){
   const overlay = el(`<div class="modal-overlay"><div class="modal">
@@ -3484,17 +3536,90 @@ function openRunRelicsModal(){
   openInfoModal('Your Relics', rows || '<p class="hint">No relics yet. Relic Shrines offer a choice of three.</p>');
 }
 
-function openRelicCodexModal(){
+function relicCodexHTML(){
   const found = new Set(META.relicsFound||[]);
   const owned = (typeof S!=='undefined' && S && S.relics) ? S.relics : [];
   const isFound = r => found.has(r.id) || owned.includes(r.id) || (r.origin && (META.lifetime.victoriesByOrigin[r.origin]||0)>=1);
   const seenR = loadSeen();
   const section = (title, list)=>`<h3 class="camp-section-title" style="margin:10px 0 4px;">${title}</h3>${list.map(r=>relicRowHTML(r, !isFound(r), isFound(r) && !seenR.relics.has(r.id))).join('')}`;
-  openInfoModal('Relic Codex',
-    `<p class="hint" style="text-align:left;">Relics ${infoDot('Permanent perks for a single run. Find them at Relic Shrines. Win a run with an Origin and it will start every later run with its own signature relic.')}</p>`
+  return `<p class="hint" style="text-align:left;">Relics ${infoDot('Permanent perks for a single run. Find them at Relic Shrines. Win a run with an Origin and it will start every later run with its own signature relic.')}</p>`
     + section('Origin Relics', RELICS.filter(r=>r.origin))
-    + section('Shrine Relics', RELICS.filter(r=>!r.origin)));
-  RELICS.forEach(r=>{ if(isFound(r)) seenR.relics.add(r.id); }); saveSeen(seenR);
+    + section('Shrine Relics', RELICS.filter(r=>!r.origin));
+}
+function markRelicsSeen(){
+  const found = new Set(META.relicsFound||[]);
+  const owned = (typeof S!=='undefined' && S && S.relics) ? S.relics : [];
+  const seenR = loadSeen();
+  RELICS.forEach(r=>{ if(found.has(r.id) || owned.includes(r.id) || (r.origin && (META.lifetime.victoriesByOrigin[r.origin]||0)>=1)) seenR.relics.add(r.id); }); saveSeen(seenR);
+}
+function openRelicCodexModal(){ openCodexModal('relics'); }
+
+// ---- Codex (Oct 13): one book with tabs, so the settings menu stays short. Bestiary is new: every
+// monster, trap and boss you've met (META.bestiary, logic.js); unmet ones show as a silhouette.
+const CODEX_TABS = [['bestiary','Bestiary'],['dice','Dice'],['relics','Relics'],['key','Key']];
+function bestiaryEntries(){
+  const out = [];
+  FLOORS.forEach((f,fi)=>{
+    [...f.enemies, ...f.traps].filter(e=>!e.dreadOnly || (META.bestiary||{})[e.name]).forEach(e=>out.push({e, floor:fi+1}));
+    (fi===2 ? BIG_BOSSES : f.bosses).forEach(e=>out.push({e, floor:fi+1}));
+  });
+  return out;
+}
+const TIER_ORDER = {easy:0, standard:1, elite:2, deadly:3};
+function bestiaryHTML(){
+  const B = META.bestiary || {};
+  const all = bestiaryEntries();
+  const metN = all.filter(x=>B[x.e.name]).length;
+  const row = ({e, floor})=>{
+    const b = B[e.name]; const art = ART_WRONG.has(e.name) ? null : MONSTER_ART[e.name];
+    const boss = /Boss/.test(e.type);
+    const tier = boss ? e.type : ({easy:'Easy',standard:'Standard',elite:'Elite',deadly:'Deadly'})[encounterTier(e)] + (e.type==='Trap'?' Trap':'');
+    const img = art ? `<img class="bst-art${b?'':' bst-unknown'}" src="${art}" alt="" loading="lazy"/>` : `<div class="bst-art bst-noart">?</div>`;
+    if(!b) return `<div class="bst-row locked">${img}<div class="bst-main"><div class="run-history-who">???</div><div class="hint bst-sub">${tier}</div></div></div>`;
+    const hp = Math.round((e.health||0) * (BASE_HP_MUL[floor-1]||1));
+    let moves = '';
+    if(boss && BOSS_KITS[e.name]){
+      const k = BOSS_KITS[e.name];
+      moves = `<div class="bst-moves">${k.specials.map(x=>x.name).join(' &middot; ')}${k.phase2?` <span class="hint">| ${k.phase2.name}: ${k.phase2.specials.map(x=>x.name).join(' &middot; ')}</span>`:''}</div>`;
+    } else {
+      const acts = [['dmg','hit'],['minion','minion'],['shield','block'],['heal','heal'],['hot','hot'],['dot','dot']].filter(([k])=>e[k]>0).map(([k,ic])=>`<span>${iconSpan(ic, e[k])}</span>`).join('');
+      moves = `<div class="bst-moves compendium-faces">${acts}</div>`;
+    }
+    return `<div class="bst-row">${img}<div class="bst-main">
+        <div class="run-history-who">${e.name}</div>
+        <div class="hint bst-sub">${tier} &middot; ${hp} HP</div>
+        ${moves}
+        ${e.flavor ? `<div class="bst-flavor">${e.flavor}</div>` : ''}
+        <div class="bst-tally">Beaten ${b.won||0}${b.lost ? ` &middot; <span class="bst-lost">Beat you ${b.lost}</span>` : ''}</div>
+      </div></div>`;
+  };
+  const sections = [1,2,3].map(fl=>{
+    const list = all.filter(x=>x.floor===fl).sort((a,b)=>(/Boss/.test(a.e.type)-/Boss/.test(b.e.type)) || ((TIER_ORDER[encounterTier(a.e)]||0)-(TIER_ORDER[encounterTier(b.e)]||0)));
+    return `<div class="camp-section-title" style="font-weight:800; margin:10px 0 4px;">Floor ${fl}</div>${list.map(row).join('')}`;
+  }).join('');
+  return `<p class="hint">${metN}/${all.length} met</p>${sections}`;
+}
+function openCodexModal(tab){
+  tab = tab || 'bestiary';
+  const overlay = el(`<div class="modal-overlay"><div class="modal codex-modal" style="text-align:center; max-width:420px;">
+      <button class="modal-x-btn" id="codex-x-btn" title="Close">✕</button>
+      <h2 style="margin-top:0;">Codex</h2>
+      <div class="codex-tabs">${CODEX_TABS.map(([id,l])=>`<button class="codex-tab" data-tab="${id}">${l}</button>`).join('')}</div>
+      <div class="codex-body" id="codex-body"></div>
+    </div></div>`);
+  openModal(overlay);
+  const body = overlay.querySelector('#codex-body');
+  const show = t=>{
+    overlay.querySelectorAll('.codex-tab').forEach(b=>b.classList.toggle('on', b.dataset.tab===t));
+    body.innerHTML = t==='dice' ? diceCompendiumHTML() : t==='relics' ? relicCodexHTML() : t==='key' ? keyCardHTML() : bestiaryHTML();
+    body.scrollTop = 0;
+    if(t==='dice') markDiceSeen(); if(t==='relics') markRelicsSeen();
+  };
+  overlay.querySelectorAll('.codex-tab').forEach(b=> b.onclick = ()=> show(b.dataset.tab));
+  show(tab);
+  const close = ()=> closeModal(overlay);
+  overlay.querySelector('#codex-x-btn').onclick = close;
+  overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
 }
 
 // Relic Shrine: pick 1 of 3 (S.relicChoice, see runShrineEffect 'relicChoice').
@@ -4085,6 +4210,91 @@ function runHighlightsHTML(){
   </div>`;
 }
 
+// ---- Run card (Oct 13, Jeremy): a compact, shareable summary of the run on the end screens -- who, how it
+// ended, four headline numbers, the final tray and the relics. "Save Card" draws the same card on a canvas
+// and shares it (phone share sheet) or downloads it as a PNG.
+const RC_DIE_COLORS = { attack:['#b33b3b','#fff3e6'], maneuver:['#e4d7ad','#241c10'], origin:['#4a8a5c','#eafbea'], alloy:['#9aa3ab','#1a1410'], gilded:['#d4af52','#241c10'], magic:['#8a5fb0','#f5eaff'] };
+function runCardData(outcome){
+  const st = S.stats;
+  const name = S.charName && S.charName.trim() ? S.charName.trim() : '';
+  const killer = st.killedBy || (S.encounter && S.encounter.curHealth>0 ? S.encounter.name : '');
+  return {
+    name, who: `${S.origin.name} ${S.klass.name}`, depth: depthLabel(currentDepth()), color: S.klass.color || '#d4af52',
+    outcome: outcome==='victory' ? `Conquered the dungeon in ${st.turnsTaken} turns` : `Fell on Floor ${S.floorIdx+1}${killer?` to ${killer}`:''}`,
+    stats: [['Damage', Math.round(st.damageDealt)], ['Best turn', st.bestTurn||0], ['Blocked', st.damageBlocked||0], ['Foes beaten', st.encountersDefeated]],
+    dice: S.tray.map(c=>{ const f = pickPreviewFace(c.die.faces); return {cat:c.die.cat, type:f.type, value:f.value, name:c.die.name}; }),
+    relics: (S.relics||[]).map(relicById).filter(Boolean),
+    portrait: S.portrait && !S.portrait.placeholder ? S.portrait.img : null,
+    win: outcome==='victory',
+  };
+}
+function runCardHTML(outcome){
+  const d = runCardData(outcome);
+  return `<div class="run-card ${d.win?'rc-win':'rc-loss'}" style="--rc-class:${d.color}">
+    <div class="rc-top">
+      ${d.portrait ? `<img class="rc-portrait" src="${d.portrait}" alt=""/>` : ''}
+      <div class="rc-id">
+        <div class="rc-name">${d.name ? d.name.replace(/</g,'&lt;') : d.who}</div>
+        <div class="rc-sub">${d.name ? d.who+' &middot; ' : ''}Depth ${d.depth}</div>
+        <div class="rc-outcome">${d.outcome}</div>
+      </div>
+    </div>
+    <div class="rc-stats">${d.stats.map(([k,v])=>`<div class="rc-stat"><b>${v}</b><small>${k}</small></div>`).join('')}</div>
+    <div class="rc-dice">${d.dice.map(x=>{ const c = RC_DIE_COLORS[x.cat]||RC_DIE_COLORS.alloy; return `<span class="rc-die" title="${x.name}" style="background:${c[0]};color:${c[1]}">${x.type==='blank'?'':iconSpan(x.type, x.value, true)}</span>`; }).join('')}</div>
+    ${d.relics.length ? `<div class="rc-relics">${d.relics.map(r=>relicBadgeHTML(r,'rc-gem')).join('')}</div>` : ''}
+    <div class="rc-foot">Dungeon Scramble v${GAME_VERSION}</div>
+  </div>
+  <button id="save-run-card-btn" style="margin-top:8px;">Save Card</button>`;
+}
+function rcLoadImg(src){ return new Promise(res=>{ if(!src) return res(null); const im = new Image(); im.onload = ()=>res(im); im.onerror = ()=>res(null); im.src = src; }); }
+function rcSvgImg(svg, color){
+  if(!svg) return Promise.resolve(null);
+  let t = svg.replace(/currentColor/g, color);
+  if(!/xmlns=/.test(t)) t = t.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"');
+  return rcLoadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(t));
+}
+async function saveRunCard(outcome){
+  const d = runCardData(outcome);
+  const W = 540, pad = 28, dieS = 52, gap = 10, cols = 4;
+  const H = 300 + 4*(dieS+gap) + (d.relics.length ? 70 : 0);
+  const cv = document.createElement('canvas'); cv.width = W*2; cv.height = H*2;
+  const g = cv.getContext('2d'); g.scale(2,2);
+  const rr = (x,y,w,h,r)=>{ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); };
+  g.fillStyle = '#1c130c'; g.fillRect(0,0,W,H);
+  rr(8,8,W-16,H-16,22); g.fillStyle = '#3a2716'; g.fill(); g.lineWidth = 6; g.strokeStyle = d.color; g.stroke();
+  const por = await rcLoadImg(d.portrait);
+  let tx = pad+8;
+  if(por){ const ph = 120, pw = ph*por.width/por.height; g.drawImage(por, pad+4, 26, pw, ph); tx = pad + 4 + pw + 16; }
+  g.fillStyle = '#ffd76a'; g.font = 'bold 30px Georgia, serif'; g.fillText(d.name || d.who, tx, 62, W-tx-pad);
+  g.fillStyle = '#fff1d6'; g.font = '18px Georgia, serif'; g.fillText((d.name ? d.who+' · ' : '')+'Depth '+d.depth, tx, 90, W-tx-pad);
+  g.fillStyle = d.win ? '#9affa0' : '#ff9a8a'; g.font = 'italic 18px Georgia, serif'; g.fillText(d.outcome, tx, 118, W-tx-pad);
+  const sw = (W-2*pad-16)/4;
+  d.stats.forEach(([k,v],i)=>{ const x = pad+8+i*sw; rr(x+3,166,sw-6,64,12); g.fillStyle = '#2a1c10'; g.fill();
+    g.textAlign = 'center'; g.fillStyle = '#ffd76a'; g.font = 'bold 26px Georgia, serif'; g.fillText(String(v), x+sw/2, 200);
+    g.fillStyle = '#e9dcc4'; g.font = '13px Georgia, serif'; g.fillText(k, x+sw/2, 220); g.textAlign = 'left'; });
+  const gx = (W - (cols*dieS + (cols-1)*gap))/2, gy = 252;
+  const icons = await Promise.all(d.dice.map(x=>{ const c = RC_DIE_COLORS[x.cat]||RC_DIE_COLORS.alloy; return rcSvgImg(x.type==='blank'?'':(ICON_SVG[x.type]||''), c[1]); }));
+  d.dice.forEach((x,i)=>{ const c = RC_DIE_COLORS[x.cat]||RC_DIE_COLORS.alloy, X = gx+(i%cols)*(dieS+gap), Y = gy+Math.floor(i/cols)*(dieS+gap);
+    rr(X,Y,dieS,dieS,10); g.fillStyle = c[0]; g.fill(); g.lineWidth = 3; g.strokeStyle = '#0c0705'; g.stroke();
+    if(icons[i]) g.drawImage(icons[i], X+10, Y+8, dieS-20, dieS-20);
+    if(x.value && x.type!=='blank'){ g.fillStyle = c[1]; g.font = 'bold 13px Georgia, serif'; g.textAlign = 'right'; g.fillText(String(x.value), X+dieS-5, Y+dieS-5); g.textAlign = 'left'; } });
+  if(d.relics.length){
+    const gems = await Promise.all(d.relics.map(r=>rcSvgImg(relicGemSVG(r), '#fff')));
+    const gs = 40, ry = gy + 4*(dieS+gap) + 12, rx0 = (W - (d.relics.length*(gs+6)-6))/2;
+    gems.forEach((im,i)=>{ if(im) g.drawImage(im, rx0+i*(gs+6), ry, gs, gs); });
+  }
+  g.fillStyle = 'rgba(255,241,214,.6)'; g.font = '13px Georgia, serif'; g.textAlign = 'center'; g.fillText('Dungeon Scramble v'+GAME_VERSION, W/2, H-20); g.textAlign = 'left';
+  const blob = await new Promise(res=>cv.toBlob(res, 'image/png'));
+  const fname = `dungeon-scramble-${outcome}-${Date.now()}.png`;
+  try{
+    const file = new File([blob], fname, {type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:'Dungeon Scramble run'}); return; }
+  }catch(err){ if(err && err.name==='AbortError') return; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fname; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+}
+function wireRunCard(outcome){ const b = document.getElementById('save-run-card-btn'); if(b) b.onclick = ()=>{ b.disabled = true; saveRunCard(outcome).finally(()=>{ b.disabled = false; }); }; }
+
 // Victory-only reveal: the first win with an Origin earns its signature relic.
 function originRelicEarnedHTML(){
   if(!S.newOriginRelic) return '';
@@ -4184,6 +4394,7 @@ function renderVictory(){
     if(S.newOriginRelic) setTimeout(()=>{ if(typeof playTone==='function') playTone('relicProc'); }, 700);
   }
   app.innerHTML = `<div class="panel"><h2>Dungeon Conquered!</h2><p>You defeated the Big Boss and cleared all three floors. Well fought, Adventurer.</p>
+    ${runCardHTML('victory')}
     ${depthSealHTML()}
     ${originRelicEarnedHTML()}
     ${newAchievementsHTML(S.newAchievements)}
@@ -4191,6 +4402,7 @@ function renderVictory(){
     ${summaryStatsHTML()}
     <button class="primary" style="margin-top:12px;" onclick="location.reload()">Play Again</button>
     <button style="margin-top:8px;" onclick="openExportDataModal()">Send Play Data</button></div>`;
+  wireRunCard('victory');
   animateSummary();
 }
 function renderGameOver(){
@@ -4227,12 +4439,14 @@ function renderGameOver(){
   }
   const carryNote = S.carryoverChosenName ? `<p class="hint">${S.carryoverChosenName} will join your tray at the start of your next run.</p>` : '';
   app.innerHTML = `<div class="panel"><h2>Defeated</h2><p>Your Adventurer retreats to town in temporary defeat...</p>
+    ${runCardHTML('defeat')}
     ${carryNote}
     ${newAchievementsHTML(S.newAchievements)}
     ${newBoonsHTML()}
     ${summaryStatsHTML()}
     <button class="primary" style="margin-top:12px;" onclick="location.reload()">Try Again</button>
     <button style="margin-top:8px;" onclick="openExportDataModal()">Send Play Data</button></div>`;
+  wireRunCard('defeat');
 }
 
 // A short "New Achievement" callout block for the post-run screens (shown

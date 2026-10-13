@@ -464,26 +464,28 @@ const FLOOR2_BOSSES = [
   enc('Ceramic Golem','Boss',70,{questHealth:40,dmg:3,shield:3,quests:['8 dot: deal 15+ damage in a single round','30 damage: 5 maneuvers'],flavor:'The bespoke sommelier of the Co-Consul, now cracked and seeping with drink.'}),
 ];
 
+// Oct 13 (Jeremy: Floor 3 should be harder than Floor 2): attack +2 on Easy/Standard/Deadly cards, +1 on Elites
+// (heavy turns double it), +1 on the Big Bosses' base attacks.
 const FLOOR3_ENEMIES = [
-  enc('Morel Dilemma','Enemy',14,{dmg:4,minion:2,hot:1,flavor:'A fungal species that has stumped, and subsequently eaten, philosophers for generations.'}),
-  enc('Chimeric Sludge','Enemy',25,{questHealth:12,dmg:5,hot:2,quests:['12 damage: 4 maneuvers'],flavor:'Biological slag, made up of countless individual chimeras.'}),
-  enc('Gnome Chomper','Enemy',28,{questHealth:6,dmg:7,quests:['6 damage: 3 maneuvers'],flavor:'"The Gnomish Chempire is the leading zealot state!"'}),
+  enc('Morel Dilemma','Enemy',14,{dmg:6,minion:2,hot:1,flavor:'A fungal species that has stumped, and subsequently eaten, philosophers for generations.'}),
+  enc('Chimeric Sludge','Enemy',25,{questHealth:12,dmg:7,hot:2,quests:['12 damage: 4 maneuvers'],flavor:'Biological slag, made up of countless individual chimeras.'}),
+  enc('Gnome Chomper','Enemy',28,{questHealth:6,dmg:8,quests:['6 damage: 3 maneuvers'],flavor:'"The Gnomish Chempire is the leading zealot state!"'}),
   // v1.39.0: replaces Parasite Seer (its art was a cropped copy of another gnome); Jeremy's idea, same slot and stats.
-  enc('Gnomeowners Association','Enemy',20,{dmg:3,shield:3,flavor:'"Only good and gracious hosts are allowed in this neighborhood."'}),
-  enc('Gestalt Network','Enemy',20,{dmg:3,dot:2,flavor:'"You will join us. Our population is mushrooming."'}),
-  enc("Oilephant's Foot",'Enemy',30,{questHealth:15,dmg:2,hot:3,quests:['15 damage: 4 support actions'],flavor:'"An Oilephant never forgets" refers to the long-lasting effects of radiation.'}),
-  enc('Extractnid Matriarch','Enemy',22,{dmg:5,minion:3,quests:['nullify: 10+ damage'],flavor:'Undisturbed for eons, this primordial weaver and its brood now stir and hunger for glass.'}),
-  enc('The Punished','Enemy',36,{dmg:5,minion:1,flavor:'Those foolish enough to try and harness forms they are unable to comprehend.'}),
-  enc('Profane Geometry','Enemy',35,{questHealth:10,dmg:4,hot:2,quests:['10 damage: adventurer H.O.T. = D.O.T.'],flavor:'A simulacrum of the divine, insatiable as the curiosity by which it was conjured.'}),
-  enc('Sacred(?) Geometry','Enemy',38,{questHealth:10,dmg:5,dot:2,quests:['10 damage: encounter D.O.T. = H.O.T.'],flavor:'A mere reflection of the divine geometry. The impossible beauty pains your eyes.'}),
-  enc('Eelagator Escapee','Enemy',44,{questHealth:10,dmg:4,shield:2,quests:['10 damage: 2 nullify'],flavor:'"Such a successful grafting that it escaped of its own measure!"'}),
-  enc('Toadtaur Warrior','Enemy',30,{questHealth:8,dmg:6,quests:['8 damage: 3 maneuvers'],flavor:'"Definitely a \'can we\' vs. a \'should we\' decision, looking back."'}),
+  enc('Gnomeowners Association','Enemy',20,{dmg:5,shield:3,flavor:'"Only good and gracious hosts are allowed in this neighborhood."'}),
+  enc('Gestalt Network','Enemy',20,{dmg:5,dot:2,flavor:'"You will join us. Our population is mushrooming."'}),
+  enc("Oilephant's Foot",'Enemy',30,{questHealth:15,dmg:4,hot:3,quests:['15 damage: 4 support actions'],flavor:'"An Oilephant never forgets" refers to the long-lasting effects of radiation.'}),
+  enc('Extractnid Matriarch','Enemy',22,{dmg:7,minion:3,quests:['nullify: 10+ damage'],flavor:'Undisturbed for eons, this primordial weaver and its brood now stir and hunger for glass.'}),
+  enc('The Punished','Enemy',36,{dmg:6,minion:1,flavor:'Those foolish enough to try and harness forms they are unable to comprehend.'}),
+  enc('Profane Geometry','Enemy',35,{questHealth:10,dmg:6,hot:2,quests:['10 damage: adventurer H.O.T. = D.O.T.'],flavor:'A simulacrum of the divine, insatiable as the curiosity by which it was conjured.'}),
+  enc('Sacred(?) Geometry','Enemy',38,{questHealth:10,dmg:6,dot:2,quests:['10 damage: encounter D.O.T. = H.O.T.'],flavor:'A mere reflection of the divine geometry. The impossible beauty pains your eyes.'}),
+  enc('Eelagator Escapee','Enemy',44,{questHealth:10,dmg:6,shield:2,quests:['10 damage: 2 nullify'],flavor:'"Such a successful grafting that it escaped of its own measure!"'}),
+  enc('Toadtaur Warrior','Enemy',30,{questHealth:8,dmg:7,quests:['8 damage: 3 maneuvers'],flavor:'"Definitely a \'can we\' vs. a \'should we\' decision, looking back."'}),
 ];
 const FLOOR3_TRAPS = [
-  enc('Anti-Euclidian Space','Trap',40,{questHealth:30,dmg:8,shield:2,quests:['10 damage: any 10 actions','15 damage: any 12 actions','20 damage: any 15 actions'],flavor:'Where forbidden postulates are illogically deduced from perfidious axioms.'}),
-  enc('Ergot Eruption','Trap',40,{questHealth:30,dmg:4,hot:3,quests:['15 damage: 4 maneuvers','20 damage: 3 pivot','3 hot: 15+ damage'],flavor:'"Fortune favors the mold" — Plinthi the Eldar before death.'}),
-  enc('Self-Replicating Forge','Trap',40,{questHealth:30,dmg:3,minion:4,quests:['15 damage: 4 maneuvers','20 damage: 3 boosts','1 freeze: 15+ damage'],flavor:'Hydra-aulic systems rebuild themselves stronger when damaged.'}),
-  enc('Bio-Mutant Escape','Trap',40,{questHealth:30,dmg:4,minion:4,quests:['15 damage: 2 nullify','20 damage: 4 support actions','20 damage: survive 4'],flavor:'No weapon known to gnome can stop 30-50 feral mutants.'}),
+  enc('Anti-Euclidian Space','Trap',40,{questHealth:30,dmg:9,shield:2,quests:['10 damage: any 10 actions','15 damage: any 12 actions','20 damage: any 15 actions'],flavor:'Where forbidden postulates are illogically deduced from perfidious axioms.'}),
+  enc('Ergot Eruption','Trap',40,{questHealth:30,dmg:6,hot:3,quests:['15 damage: 4 maneuvers','20 damage: 3 pivot','3 hot: 15+ damage'],flavor:'"Fortune favors the mold" — Plinthi the Eldar before death.'}),
+  enc('Self-Replicating Forge','Trap',40,{questHealth:30,dmg:5,minion:4,quests:['15 damage: 4 maneuvers','20 damage: 3 boosts','1 freeze: 15+ damage'],flavor:'Hydra-aulic systems rebuild themselves stronger when damaged.'}),
+  enc('Bio-Mutant Escape','Trap',40,{questHealth:30,dmg:5,minion:4,quests:['15 damage: 2 nullify','20 damage: 4 support actions','20 damage: survive 4'],flavor:'No weapon known to gnome can stop 30-50 feral mutants.'}),
 ];
 const FLOOR3_SHRINES = [
   enc('Scrying Spheroid','Shrine',0,{boon:'Replace a loot die with a random Magic die.', effect:{type:'randomDieReplace', pool:'Magic'}}),
@@ -589,26 +591,29 @@ const BOSS_KITS = {
     {name:'Glaze', acts:[{type:'shield',value:5}]},
     {name:'Shatterpour', windup:true, acts:[{type:'dmg',value:7},{type:'dropShield'}]},
     {name:'Seep', acts:[{type:'dot',value:2}]} ]},
-  'Extruzeon, Co-consul of Waste':{ each:[{type:'dmg',value:3}], specials:[
+  // Oct 13 (Jeremy: as dangerous as the other bosses, easier or harder by playstyle): Layer by Layer, its base
+  // attack grows by 1 after every hit (by 2 in Meltdown), and the layers carry into phase 2. Fast, bursty builds (and the 20+ damage Freeze quest)
+  // beat it before it builds up; slow Block/heal builds face an ever bigger hit.
+  'Extruzeon, Co-consul of Waste':{ each:[{type:'dmg',value:2,grow:1}], specials:[
     {name:'Compactor', acts:[{type:'shield',value:4}]},
     {name:'Extrue-damage', windup:true, acts:[{type:'dmg',value:8}]},
     {name:'Recycle', acts:[{type:'hot',value:2}]} ],
-    phase2:{ name:'Meltdown', each:[{type:'dmg',value:4}], specials:[
+    phase2:{ name:'Meltdown', each:[{type:'dmg',value:2,grow:2}], specials:[
       {name:'Atomic Pull', windup:true, acts:[{type:'dmg',value:9}]},
       {name:'Excessive Extrusion', acts:[{type:'minion',value:2},{type:'dot',value:2}]} ]}},
-  'Myceleus, Co-consul of Rot':{ each:[{type:'dmg',value:5}], specials:[
+  'Myceleus, Co-consul of Rot':{ each:[{type:'dmg',value:6}], specials:[
     {name:'R.O.T.', acts:[{type:'dot',value:3}]},
     {name:'Spore-Up', acts:[{type:'shield',value:4}]},
     {name:'Be Fruitful and Multiply!', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]} ],
-    phase2:{ name:'Fruiting Body', each:[{type:'dmg',value:4},{type:'minion',value:1}], specials:[
+    phase2:{ name:'Fruiting Body', each:[{type:'dmg',value:5},{type:'minion',value:1}], specials:[
       {name:'R.O.T.', acts:[{type:'dot',value:3}]},
       {name:'Be Fruitful and Multiply!', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]} ]}},
   // v1.39.0: the third Big Boss. Phase 2 (Leap Year): the Toadtaur Warrior joins.
-  'Toadtaur Wizard, Assistant to the Co-consul':{ each:[{type:'dmg',value:4}], specials:[
+  'Toadtaur Wizard, Assistant to the Co-consul':{ each:[{type:'dmg',value:5}], specials:[
     {name:'Toxic Trample', acts:[{type:'dot',value:2}]},
     {name:'Lily Padding', acts:[{type:'shield',value:5}]},
     {name:'Chimeronslaught', windup:true, acts:[{type:'dmg',value:9}]} ],
-    phase2:{ name:'Leap Year', each:[{type:'dmg',value:4},{type:'minion',value:1}], specials:[
+    phase2:{ name:'Leap Year', each:[{type:'dmg',value:5},{type:'minion',value:1}], specials:[
       {name:'Lily Pod', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]},
       {name:'Chimeronslaught', windup:true, acts:[{type:'dmg',value:9}]} ]}},
 };

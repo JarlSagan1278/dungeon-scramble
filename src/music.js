@@ -75,6 +75,9 @@ const MUSIC_FLOORS = [
   { shift:3, bpm:160, bassVoice:'pulse', counter:true, lowBass:true, wood:true, drumsAlways:true },
 ];
 const MUSIC_VOLUME = 0.55;
+// Settings slider (Oct 13): PREFS.musicVol scales the whole mix (0-1).
+function musicVolume(){ const v = (typeof PREFS!=='undefined' && PREFS.musicVol!=null) ? PREFS.musicVol : 1; return Math.max(0.0001, MUSIC_VOLUME*Math.max(0, Math.min(1, v))); }
+function musicSetVolume(){ const ctx = audioCtx; if(!ctx || !Music.gain) return; const t = ctx.currentTime; try{ Music.gain.gain.cancelScheduledValues(t); Music.gain.gain.setTargetAtTime(musicVolume(), t, 0.05); }catch(e){} }
 const LEAD_LEVEL = 0.09; // melody level under the bass (Jeremy: lower the melody)
 const DRUM_LEVEL = 0.6;
 const Music = { on:false, kind:null, floor:0, origin:0, bpm:140, blockBeats:32, barBeats:4, gain:null, timer:null, mode:null, drums:false, drumsFrom:Infinity, groups:{} };
@@ -119,7 +122,7 @@ function musicStart(kind, mode){
   else if(kind==='theme'){ Music.bpm = 140; Music.blockBeats = 32; Music.barBeats = 4; Music.floor = 0; }
   else { Music.floor = musicFloorIdx(); Music.bpm = MUSIC_FLOORS[Music.floor].bpm; Music.blockBeats = 32; Music.barBeats = 4; }
   Music.gain = ctx.createGain(); Music.gain.connect(ctx.destination);
-  Music.gain.gain.setValueAtTime(0.0001, t); Music.gain.gain.exponentialRampToValueAtTime(MUSIC_VOLUME, t + 2.5); // gentle fade-in
+  Music.gain.gain.setValueAtTime(0.0001, t); Music.gain.gain.exponentialRampToValueAtTime(musicVolume(), t + 2.5); // gentle fade-in
   Music.groups = {};
   const keys = kind==='dungeon' ? ['down','act'] : [kind];
   for(const k of keys){ const g = { gain:ctx.createGain(), block:-1, events:null, idx:0, arrBase:0, from:(k===mode)?t:Infinity, until:(k===mode)?Infinity:0 }; g.gain.connect(Music.gain); Music.groups[k] = g; }
@@ -252,7 +255,7 @@ function musicChime(kind){
   const spb = live ? musicSpb() : 60/MUSIC_FLOORS[musicFloorIdx()].bpm, shift = MUSIC_FLOORS[live ? Music.floor : musicFloorIdx()].shift;
   const at = live ? musicNextBar(ctx.currentTime) : ctx.currentTime + 0.05;
   let out = live ? Music.gain : null;
-  if(!out){ out = ctx.createGain(); out.gain.value = MUSIC_VOLUME; out.connect(ctx.destination); setTimeout(()=>{ try{ out.disconnect(); }catch(e){} }, 5000); }
+  if(!out){ out = ctx.createGain(); out.gain.value = MUSIC_VOLUME * ((typeof PREFS!=='undefined' && PREFS.sfxVol!=null) ? PREFS.sfxVol : 1); out.connect(ctx.destination); setTimeout(()=>{ try{ out.disconnect(); }catch(e){} }, 5000); }
   notes.forEach(([t,d,p,v,role])=>{
     const when = at + t*spb, dur = d*spb;
     if(role==='drums') musicDrum(ctx, p, when, v, out);

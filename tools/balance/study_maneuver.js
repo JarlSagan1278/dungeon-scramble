@@ -5,7 +5,8 @@
 //   payoff: hypothetical Maneuver payoffs, test-only (not in the game). 'none', or one or more of these joined by '+':
 //     momentum (each Dodge/Leap/Pivot adds +1 to the next damaging die), footwork (each Dodge/Leap/Pivot gives 1 Block),
 //     dodgeBlock / leapBlock / pivotBlock (that face gives 1 Block), leapMomentum / pivotMomentum (that face adds +1 to
-//     the next damaging die). 'both' = momentum+footwork. e.g. 'dodgeBlock+leapMomentum'
+//     the next damaging die). 'both' = momentum+footwork. e.g. 'dodgeBlock+leapMomentum'. momentum1 = Momentum that
+//     doesn't stack (any run of Maneuvers gives +1 to the next damaging die; Oct 13 half-strength candidate).
 //   Enemy-pressure knobs (per floor, [F1,F2,F3]): hitAdd adds to EVERY enemy hit, bosses included (harness's dmgAdd
 //     only changes e.dmg, which bosses ignore: they use actionCycle); bigBossHitAdd adds to Big Boss hits only;
 //     fxAdd {dot,hot,minion,shield,heal:[..]} raises an effect the enemy already has (bosses: matching actionCycle steps).
@@ -32,7 +33,7 @@ const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmast
 const b=await chromium.launch();const page=await b.newPage();
 page.on('pageerror',e=>console.log('PAGEERR',e.message));
 await page.route(/fonts\.(googleapis|gstatic)\.com/, r=>r.abort());
-await page.goto('file://' + require('path').resolve(__dirname,'../../dist/dungeon_scramble.html') + '');
+await page.goto('file://' + require('path').resolve(__dirname, process.env.DS_HTML || '../../dist/dungeon_scramble.html') + ''); // DS_HTML: a snapshot build, so rebuilding dist mid-study is safe
 let res = await page.evaluate((cfg)=>{
   // ---- stubs ----
   const noop=()=>{};
@@ -43,6 +44,8 @@ let res = await page.evaluate((cfg)=>{
   if(cfg.trayActAfter) TRAYACT_AFTER = cfg.trayActAfter; // Swap/Reroll after-use test: 'blank' | 'step' | 'pivot'
   Object.entries(cfg.relicPatch||{}).forEach(([id,p])=>Object.assign(RELICS.find(r=>r.id===id),p)); // relic number tests, e.g. {"forgeplate":{"amt":2}}
   Object.entries(cfg.classPatch||{}).forEach(([id,p])=>{ const k=CLASSES.find(x=>x.id===id); Object.entries(p).forEach(([f,v])=>{ k[f] = (f==='zone') ? eval(v) : v; }); });
+  // kitPatch (Oct 13): {"<boss name>": <full BOSS_KITS entry>} replaces that boss kit for the study.
+  Object.entries(cfg.kitPatch||{}).forEach(([n,k])=>{ BOSS_KITS[n] = k; });
   META.lifetime.victories=1; META.lifetime.bestFloorReached=3; META.achievements['origin_duo']={date:Date.now()};
   const origFns = {};
   // ---- encounter tuning hooks: scale enemies as they are drawn ----
@@ -59,6 +62,7 @@ let res = await page.evaluate((cfg)=>{
       steps.forEach(st=>{
         if(isMan(st.type)){
           if(P.has('momentum') || P.has(st.type+'Momentum')) carry++;
+          if(P.has('momentum1')) carry=1;
           if(P.has('footwork') || P.has(st.type+'Block')) st.blockGain += 1;
         } else if(st.dmg>0 && carry){ st.dmg += carry; carry=0; }
       });
