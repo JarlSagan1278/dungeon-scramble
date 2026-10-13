@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.39.6 (Oct 13, 2026)
+- Action music (Jeremy): Boss, Elite and Deadly fights switch to the action version on the next bar line -- the driving Palace-pump bass with the frantic melody on toy accordion the whole time; boss phase 2 brings in the toy drums. Winning the fight (or any other screen) drops back to the downtime version on the next bar. Both versions share one clock, so the beat never skips.
+
 ## 1.39.5 (Oct 13, 2026)
 - Music (first try, Jeremy): the game's own synth plays the Floor 1 downtime sketch during a run -- an NES-style triangle bass with a toy-accordion melody, in 8-bar blocks: two rounds of bass alone, then two rounds of bass + melody, repeating (Jeremy). The melody sits lower in the mix, and no two melody notes overlap (the opening grace note now plays just before its note). No audio files (a few KB of notes). New Music switch in Settings, separate from Sound effects; it fades in at the start of a run and out on the end screens, and pauses in the background.
 - Equal and Opposite (Jeremy): whenever your Block absorbs an enemy hit, the enemy takes the amount Blocked (was 2 damage, and only on a fully Blocked hit). Depth 7: about +6 win points (was about 0).
