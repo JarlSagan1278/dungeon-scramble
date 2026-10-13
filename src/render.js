@@ -3197,8 +3197,8 @@ const LOOT_TIER_ACCENT = {
 // all 16-24 streak lines in the same instant.
 function lootStreaksHTML(delayBase){
   let html = '';
-  for(let i=0;i<8;i++){
-    const rot = Math.round((360/8)*i);
+  for(let i=0;i<6;i++){
+    const rot = Math.round((360/6)*i);
     const delay = (delayBase + i*0.02).toFixed(3)+'s';
     html += `<div class="loot-streak-wrap" style="transform:rotate(${rot}deg);"><div class="loot-streak" style="animation-delay:${delay};"></div></div>`;
   }
@@ -3210,8 +3210,8 @@ function lootStreaksHTML(delayBase){
 // pickLootOption below), ported from the same mockup.
 function lootFanfareHTML(){
   let rays = '';
-  for(let i=0;i<8;i++){
-    const rot = Math.round((360/8)*i);
+  for(let i=0;i<6;i++){
+    const rot = Math.round((360/6)*i);
     rays += `<div class="loot-fanfare-ray-wrap" style="transform:rotate(${rot}deg);"><div class="loot-fanfare-ray"></div></div>`;
   }
   return `<div class="loot-fanfare">
@@ -3284,9 +3284,8 @@ function renderLootModal(){
     if(burst){
       overlay.insertAdjacentHTML('afterbegin', `<div class="loot-sunray-burst" style="--sunray-color:${accent.color};">
           <div class="loot-sunray-wheel ${big?'loot-sunray-wheel-big':''}"></div>
-          ${big?'<div class="loot-sunray-wheel loot-sunray-wheel-2"></div>':''}
         </div>`);
-      if(typeof screenShake==='function') screenShake(big ? 'big' : 'small');
+      // (Oct 13, Jeremy: the page shake here made the chest opening lag on phones -- the flip and burst carry it)
     }
     body.innerHTML = `<p class="modal-lead">Choose one ${lootName} Loot Die to add to your tray:</p><div class="loot-options" id="loot-options"></div>`;
     const container = body.querySelector('#loot-options');
@@ -3342,6 +3341,7 @@ function renderLootModal(){
 // modal the instant a card is tapped. Ported from the loot-reveal-animation
 // mockup; the brief delay here is that mockup's 'chosen' phase.
 function pickLootOption(overlay, container, chosenCard, opt){
+  { const m = overlay.querySelector('.modal'); if(m) m.classList.add('loot-picking'); }
   Array.from(container.children).forEach(card=>{
     if(card === chosenCard) card.classList.add('loot-chosen');
     else card.classList.add('loot-faded');

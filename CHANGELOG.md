@@ -1,6 +1,8 @@
 # Changelog
 
 ## 1.39.6 (Oct 13, 2026)
+- Loot chest opening is smoother (Jeremy: it lagged): a smaller single sunray instead of two screen-sized wheels, no page shake, the cards' pulsing glow is a cheap fade, 6 comet streaks per card instead of 8. Phone-speed test: 95% of frames now at 60 fps (was 30).
+- No scrollbar flash when you pick a loot die (Jeremy).
 - Camp: duplicate dice now look like a pile -- copies of the die (in its own color and outline) peek out behind the top one, up to three layers for bigger stacks; stacked dice in the Back Pocket stay the same size as single ones (Jeremy).
 - After a fight, the downtime music restarts its cycle: bass alone for the rest of that block and two more rounds, then the melody rounds (Jeremy).
 - Camp rest: your hero gives a little shake as the healing fills in (Jeremy).

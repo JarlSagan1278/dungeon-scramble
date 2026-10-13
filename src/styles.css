@@ -969,7 +969,7 @@
      regardless of device. screenShake() (render.js) fires alongside it for
      the physical half of the same beat. */
   .loot-sunray-burst{ position:absolute; inset:0; overflow:hidden; pointer-events:none; display:flex; align-items:center; justify-content:center; }
-  .loot-sunray-wheel{ position:absolute; width:220vmax; height:220vmax;
+  .loot-sunray-wheel{ position:absolute; width:130vmin; height:130vmin; will-change:transform, opacity; /* Oct 13: was 220vmax (and two wheels) -- too much to paint on phones */
     background:repeating-conic-gradient(var(--sunray-color, var(--gold)) 0deg 9deg, transparent 9deg 27deg);
     animation: loot-sunray-kf 0.6s ease-out both; }
   /* Overkill (or a Boss's 3-option draw) gets a denser wheel (narrower
@@ -1134,16 +1134,18 @@
      instead of all appearing at once, and its ambient glow pulses in the
      loot's own tier color (--loot-tier-color/--loot-tier-glow, set inline)
      for as long as it's on screen. */
-  .loot-opt-reveal{ animation: loot-opt-settle 0.4s cubic-bezier(.34,1.56,.64,1) both, loot-opt-glow 1.8s ease-in-out infinite; }
+  .loot-opt-reveal{ animation: loot-opt-settle 0.4s cubic-bezier(.34,1.56,.64,1) both; }
+  /* Oct 13: the pulsing glow fades a fixed shadow layer (cheap) instead of repainting box-shadow every frame */
+  .loot-opt-reveal::after{ content:''; position:absolute; inset:-2px; border-radius:inherit; pointer-events:none; box-shadow:0 0 14px 3px var(--loot-tier-glow, rgba(212,175,82,0.4)); opacity:0; animation: loot-opt-glow 1.8s ease-in-out 0.4s infinite; will-change:opacity; }
+  .loot-opt.loot-chosen::after, .loot-opt.loot-faded::after{ animation:none; opacity:0; }
   @keyframes loot-opt-settle{
     0%{ transform:scale(0.5) rotate(-6deg); opacity:0; }
     55%{ transform:scale(1.06) rotate(2deg); opacity:1; }
     100%{ transform:scale(1) rotate(0deg); opacity:1; }
   }
-  @keyframes loot-opt-glow{
-    0%,100%{ box-shadow:0 0 0 0 transparent; }
-    50%{ box-shadow:0 0 14px 3px var(--loot-tier-glow, rgba(212,175,82,0.4)); }
-  }
+  @keyframes loot-opt-glow{ 0%,100%{ opacity:0; } 50%{ opacity:1; } }
+  /* Oct 13 (Jeremy): no scrollbar flash while the picked card grows and its fanfare beam rises */
+  .loot-modal.loot-picking{ overflow:hidden !important; }
   /* Ball x Pit-style comet streaks whooshing outward from each card's
      center as it settles in -- the single most-liked effect from the
      mockup this was prototyped in. See lootStreaksHTML()/render.js. */
