@@ -1934,7 +1934,7 @@ function dealEncounterDamage(e, amount){
   const blocked = Math.min(S.playerBlock, amount);
   S.playerBlock -= blocked;
   const dealt = amount-blocked;
-  const eo = relicById('spite_thorns'); // Equal and Opposite: reflect 'full' = 2 back on a fully Blocked hit (live), 'any' = 2 back when Block absorbs any of a hit, 'blocked' = the amount Blocked back (Oct 12 tests)
+  const eo = relicById('spite_thorns'); // Equal and Opposite: reflect 'blocked' = the amount Blocked back (live since 1.39.5, Jeremy); 'full' = 2 back on a fully Blocked hit (old), 'any' = 2 back on any Blocked hit
   const eoBack = eo.reflect==='blocked' ? blocked : 2;
   if(amount>0 && blocked>0 && (eo.reflect==='full' ? dealt===0 : true) && hasRelic('spite_thorns') && e.curHealth>0){ e.curHealth = capUpper(e.curHealth-absorbWithShield(e, eoBack), e.maxHealth); fireRelic('spite_thorns',eoBack+' back'); }
   S.health = cap(S.health-dealt, S.maxHealth);

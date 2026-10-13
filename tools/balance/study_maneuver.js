@@ -253,7 +253,7 @@ let res = await page.evaluate((cfg)=>{
   // (unmeasured relics get a middling guess).
   const RELIC_PREF = {bloodletter:48,dodger_cloak:35,gambeson:34,banner:28,echo_chime:27,whetstone:20,iron_rations:17,barbed_buckler:17,
     tincture:16,combo_gauntlet:14,frost_charm:13,leaper_spurs:12,grave_tally:10,warding_bell:9,flask:9,lucky_coin:8,venom_vial:6,kettle:5,
-    pivot_compass:3,shrine_bell:2,spite_thorns:2,overflow_chalice:2,hungry_blade:1}; // depth-7 relic study (rs7), Oct 12
+    pivot_compass:3,shrine_bell:2,spite_thorns:6,overflow_chalice:2,hungry_blade:1}; // depth-7 relic study (rs7), Oct 12
   function pickShrineOption(opts){
     const miss = S.maxHealth - S.health, L = o=>o.label||'';
     const heal = opts.find(o=>/^Heal (\d+)/i.test(L(o)));

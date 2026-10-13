@@ -1,6 +1,8 @@
 # Changelog
 
 ## 1.39.5 (in progress)
+- Equal and Opposite (Jeremy): whenever your Block absorbs an enemy hit, the enemy takes the amount Blocked (was 2 damage, and only on a fully Blocked hit). Depth 7: about +6 win points (was about 0).
+- Two new one-point depth levers (Jeremy): Union Dues (receiving a shrine's boon costs 2 HP) and Rounding Error (your Heal faces heal 1 less, never below 1). Each costs about 2-4 win points for a skilled player.
 - Sound effects are in the music's key (Jeremy): every pitched sound sits in D harmonic minor, and the rising ladders (path steps, hits, heals, Block, D.O.T., Freeze...) climb the A freygish scale (A Bb C# D E F G) instead of a major pentatonic one. Happy sounds use A major (the bright chord inside the key); the victory fanfare ends on D major.
 - The small Dodge icon (loot compare rows) has bold arrowheads, so it no longer reads as a plain X (Jeremy).
 - Swap and Reroll (Jeremy): once used, the die becomes a Pivot for the rest of the turn instead of a blank that ends your path.
