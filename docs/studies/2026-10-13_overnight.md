@@ -169,3 +169,24 @@ Whence Wolf (Deadly, ends 9-16% of the runs that meet it), The Strike/Break-er (
 2. **Extruzeon** needs a real threat.
 3. **Classes:** leave the numbers; help newer players use the ability (a first-fight prompt, a pulse on the button until it's used each turn for the first few runs).
 4. Bosses Heating Elemental / The Necrorancher: no change needed for most players.
+
+## 9. Maneuver dice and Dungeoneer, regular player at Depth 0 (4 pairs x 300 / 2 origins x 300)
+| Maneuver variant | Win | HP lost per fight F1 / F2 / F3 |
+|---|---|---|
+| Today | 76% | 3.9 / 6.7 / 7.2 |
+| All Attack dice | 83% | 2.5 / 5.8 / 7.2 |
+| Momentum | 91% | 2.5 / 5.5 / 6.9 |
+| Dodge Block | 95% | 1.6 / 4.4 / 6.6 |
+
+- **Maneuver dice are a net loss for regular players too (-7 vs Attack dice),** so the payoff question matters for everyone, not just experts. Full-strength Momentum (+15) and Dodge Block (+19) overshoot here as well; **a half-strength payoff is the right size** (landing near Attack-die parity, roughly +7).
+
+| Class (regular player, Depth 0) | Win |
+|---|---|
+| Guard | 76% |
+| Armsmaster | 76% |
+| Arcanist | 80% |
+| Dungeoneer as is | 82% |
+| Dungeoneer + all-edge wrap | 87% |
+| Dungeoneer + zone die -> Pivot | 82% |
+
+- For regular players Dungeoneer is already the strongest class, so **no Dungeoneer buff is needed**; the expert-only weakness is better answered by the ability-teaching idea than by a buff.
