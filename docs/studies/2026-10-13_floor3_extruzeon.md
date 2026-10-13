@@ -36,3 +36,22 @@ Playstyle: the cost rises with fight length, so burst builds and the 20+ damage 
 | Momentum, no stacking (any run of Maneuvers: +1 to the next damaging die) | 88% |
 | Momentum, full (each Maneuver +1, stacking) | 91% |
 | Dodge Block (each Dodge: 1 Block) | 95% |
+
+## Maneuver II/III faces (Jeremy: strong Block, Boost allowed; then "smaller block per upgrade level")
+Regular bot, Depth 0, every starting Maneuver die at the tested level, 4 pairs x 200 (D Dodge, L Leap, P Pivot).
+
+| Faces | Maneuver II | Maneuver III |
+|---|---|---|
+| Today (II: D D L L P blank, III: D D L L P P) | 86% | 91% |
+| Attack dice of the same level instead | 89% | 95% |
+| II + Block 1 | 84% | |
+| II + Block 2 (Mix lighter) | 92% | |
+| II + Block 3 (Bulwark / Mix) | 92-93% | |
+| III: D D L L P + Block 2 | | 92% |
+| III: D D L L + Block 1, Block 1 | | 94% |
+| **III: D D L P + Block 1, Block 2** | | **95%** |
+| III: D D L P + Block 3, Boost x2 | | 92% |
+| III: D D L L + Block 3, Block 4 (turtle: 83 turns per run vs 34) | | 87% |
+| Boost-only sets | 75% | 83% (bot plays Boost poorly; not trusted) |
+
+Smallest ladder that matches or beats Attack at each level: Maneuver II = D D L L P **Block 2** (92% vs 89%), Maneuver III = D D L P **Block 1, Block 2** (95% vs 95%). Block 1 alone at II does nothing measurable (84% vs 86%, within noise). Big Block at III makes fights drag and loses.
