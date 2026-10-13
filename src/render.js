@@ -238,6 +238,7 @@ let preGameScreen = 'title';
 
 function render(){
   hideFaceTooltip();
+  if(typeof musicUpdate==='function') musicUpdate(); // start/stop the music for this screen
   if(typeof applyDiceFinish==='function') applyDiceFinish();
   document.body.classList.remove('cog-arch');
   // only screens without the room floor drop its class: removing and re-adding it on the game screen restyled the whole
@@ -2812,6 +2813,7 @@ function openSettingsModal(){
       ${inRun ? `<p class="hint">${S.origin.name} ${S.klass.name} · Floor ${S.floorIdx+1}</p>` : ''}
       <div class="settings-toggles">
         ${settingsToggleRowHTML('pref-sound', 'Sound effects', PREFS.sound)}
+        ${settingsToggleRowHTML('pref-music', 'Music', PREFS.music!==false)}
         ${settingsToggleRowHTML('pref-reduced-motion', 'Reduce motion', PREFS.reducedMotion)}
         ${settingsToggleRowHTML('pref-low-intensity', 'Gentler effects (smaller shakes, fewer sparks)', PREFS.lowIntensity)}
         ${settingsToggleRowHTML('pref-vibration', 'Vibration (phones)', PREFS.vibration!==false)}
@@ -2847,6 +2849,7 @@ function openSettingsModal(){
   overlay.querySelector('#settings-dice-compendium-btn').onclick = ()=>{ close(); openDiceCompendiumModal(); };
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
   overlay.querySelector('#pref-sound').onchange = (ev)=>{ setPref('sound', ev.target.checked); if(ev.target.checked) playTone('hit'); };
+  overlay.querySelector('#pref-music').onchange = (ev)=>{ setPref('music', ev.target.checked); musicUpdate(); };
   overlay.querySelector('#pref-reduced-motion').onchange = (ev)=> setPref('reducedMotion', ev.target.checked);
   overlay.querySelector('#pref-low-intensity').onchange = (ev)=> setPref('lowIntensity', ev.target.checked);
   overlay.querySelector('#pref-vibration').onchange = (ev)=>{ setPref('vibration', ev.target.checked); if(ev.target.checked) vibrate(30); };

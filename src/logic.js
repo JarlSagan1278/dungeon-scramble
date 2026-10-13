@@ -563,7 +563,7 @@ function saveSeen(seen){
 // should survive across runs (including after a run ends and the save is
 // cleared). ----
 const PREFS_KEY = 'dungeonScramblePrefs_v1';
-const DEFAULT_PREFS = { sound: true, reducedMotion: false, lowIntensity: false, vibration: true };
+const DEFAULT_PREFS = { sound: true, music: true, reducedMotion: false, lowIntensity: false, vibration: true };
 let PREFS = loadPrefs();
 function loadPrefs(){
   try{

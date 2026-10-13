@@ -24,9 +24,10 @@ const assets = read('assets.js');
 const logic = read('logic.js');
 const depth = read('depth.js');
 const render = read('render.js');
+const music = read('music.js');
 const main = read('main.js');
 
-const scriptParts = [data, assets, logic, depth, render, main].join('\n');
+const scriptParts = [data, assets, logic, depth, render, music, main].join('\n');
 
 const html = [
   head,
