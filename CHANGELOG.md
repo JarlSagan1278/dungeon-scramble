@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.39.7 (Oct 13, 2026)
+- Victory chime (Jeremy; replaces the old fight-won ding): a quick accordion run up the A-Bb-C#-D motif to a trilled D over the triangle bass, landing on the next bar line of the music (in time and in key). Elite/Deadly wins play it an octave higher with woodblocks; bosses get a longer run with a drum roll. With the music off it plays right away.
+- Loot chest burst: a chord that hints the tier -- Alloy a metal clink and A major, Gilded brighter with a bell on top, Magic a glassy shimmer through the Bb-C# "sob".
+- Camp lullaby: 16 bars in 3/4 at 84 bpm (D harmonic minor) -- soft triangle bass, music-box melody, quiet accordion answers, ending on the Bb-C#-D motif. Crossfades in at camp and back out when you leave.
+- Floors 2 and 3 (Jeremy: same tune, transposed): Floor 2 in E minor at 150 bpm with a plucked countermelody in the bass-only rounds and the action bass doubled an octave down; Floor 3 in F minor at 160 bpm with a buzzier pulse bass, soft woodblocks in downtime and the action drums all the time. Sound effects move into each floor's key too.
+
 ## 1.39.6 (Oct 13, 2026)
 - Loot chest opening is smoother (Jeremy: it lagged): a smaller single sunray instead of two screen-sized wheels, no page shake, the cards' pulsing glow is a cheap fade, 6 comet streaks per card instead of 8. Phone-speed test: 95% of frames now at 60 fps (was 30).
 - No scrollbar flash when you pick a loot die (Jeremy).

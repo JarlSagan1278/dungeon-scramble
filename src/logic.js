@@ -2355,9 +2355,10 @@ function onEncounterDefeated(){
     // all -- every other kill/combat moment has one, so this closes the
     // gap with a light, satisfying chime of its own (quieter/shorter than
     // Boss/Overkill, which stay the bigger moments).
-    if(typeof playTone==='function') playTone('encounterKill');
     if(typeof spawnParticleBurstAtPortrait==='function') spawnParticleBurstAtPortrait(['#ffd76a','#fff5d6']);
   }
+  // Victory chime (Jeremy, Oct 13; replaces the old 'encounterKill' ding): in key and on the next bar line of the music.
+  { const t = encounterTier(e); if(typeof musicChime==='function') musicChime(isBoss ? 'boss' : (t==='elite'||t==='deadly') ? 'elite' : 'regular'); }
   // Let the enemy visibly die (flash, shake, fade) before the chest takes over the
   // screen -- the beat between the killing blow and the reward is the anticipation.
   // State (S.lootChoice etc.) is already set, so this only delays the redraw.

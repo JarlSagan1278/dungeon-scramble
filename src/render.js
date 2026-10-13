@@ -2443,6 +2443,14 @@ const TONE_SEQUENCES = {
   // actually picked on the loot-reveal screen (renderLootModal/
   // pickLootOption) -- a Zelda-ish sparkle, distinct from the later 'equip'
   // ka-ching that plays once the die is actually slotted into the tray.
+  // Loot chest burst, one chord per loot tier (Jeremy, Oct 13): Alloy a metal clink + A major, Gilded brighter and
+  // higher with a bell on top, Magic a glassy shimmer through the Bb-C# "sob".
+  lootBurstAlloy:  [{freq:440, start:0, dur:0.35, type:'triangle', gain:0.12}, {freq:554, start:0.03, dur:0.33, type:'triangle', gain:0.1},
+                    {freq:659, start:0.06, dur:0.4, type:'triangle', gain:0.1}, {freq:1760, start:0, dur:0.08, type:'square', gain:0.04}],
+  lootBurstGilded: [{freq:880, start:0, dur:0.45, type:'triangle', gain:0.11}, {freq:1109, start:0.04, dur:0.45, type:'triangle', gain:0.1},
+                    {freq:1319, start:0.08, dur:0.5, type:'sine', gain:0.1}, {freq:1760, start:0.12, dur:0.7, type:'sine', gain:0.07}, {freq:3520, start:0.12, dur:0.35, type:'sine', gain:0.025}],
+  lootBurstMagic:  [{freq:932, freqTo:1109, start:0, dur:0.35, type:'sine', gain:0.08}, {freq:1175, start:0.3, dur:0.6, type:'sine', gain:0.08},
+                    {freq:1760, start:0.32, dur:0.55, type:'sine', gain:0.05}, {freq:2349, start:0.36, dur:0.5, type:'sine', gain:0.03}],
   lootPick: [{freq:659,  start:0,    dur:0.1,  type:'sine',     gain:0.18},
              {freq:880,  start:0.08, dur:0.12, type:'sine',     gain:0.18},
              {freq:1109, start:0.16, dur:0.24, type:'triangle', gain:0.2}],
@@ -2451,9 +2459,11 @@ const TONE_SEQUENCES = {
 const SFX_KEY_PCS = [2,4,5,7,9,10,1];
 // Tones that keep their own pitch: percussion, metal, deliberate dissonance, and the victory's D-major (Picardy) ending.
 const SFX_FREE_PITCH = new Set(['clank','squeak','heartbeat','enemyDrum','windup','sour','overkill','alloyShine','grandVictory']);
-function sfxInScale(m){ return SFX_KEY_PCS.includes(((m%12)+12)%12); }
+// The music moves up a key on Floors 2 and 3 (MUSIC_FLOORS in music.js); the sound effects follow it.
+function sfxShift(){ return (typeof MUSIC_FLOORS!=='undefined' && typeof S!=='undefined' && S) ? (MUSIC_FLOORS[Math.max(0,Math.min(2,S.floorIdx||0))].shift||0) : 0; }
+function sfxInScale(m){ return SFX_KEY_PCS.includes((((m - sfxShift())%12)+12)%12); }
 function sfxInKey(freq, step){
-  const m0 = 69 + 12*Math.log2(freq/440);
+  const m0 = 69 + 12*Math.log2(freq/440) + sfxShift(); // transposed into the floor's key first, then snapped
   let m = Math.round(m0);
   if(!sfxInScale(m)){ const up = m+1, dn = m-1; m = sfxInScale(up) && (!sfxInScale(dn) || up-m0 <= m0-dn) ? up : (sfxInScale(dn) ? dn : m+2); }
   for(let k=0;k<step;k++){ do{ m++; } while(!sfxInScale(m)); }
@@ -2484,7 +2494,7 @@ function playTone(kind, pitchStep){
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = n.type;
-    let f = keep ? n.freq * Math.pow(2, step*1.7/12) : sfxInKey(n.freq, step);
+    let f = keep ? n.freq * Math.pow(2, (step*1.7 + (kind==='grandVictory' ? sfxShift() : 0))/12) : sfxInKey(n.freq, step);
     if(n.rel && first) f = first * n.rel; // a deliberate detune (chorus shimmer) rides on the note before it
     if(first==null) first = f;
     osc.frequency.setValueAtTime(f, now+n.start);
@@ -3286,6 +3296,7 @@ function renderLootModal(){
           <div class="loot-sunray-wheel ${big?'loot-sunray-wheel-big':''}"></div>
         </div>`);
       // (Oct 13, Jeremy: the page shake here made the chest opening lag on phones -- the flip and burst carry it)
+      if(typeof playTone==='function') playTone({alloy:'lootBurstAlloy', gilded:'lootBurstGilded', magic:'lootBurstMagic'}[tier] || 'lootBurstAlloy');
     }
     body.innerHTML = `<p class="modal-lead">Choose one ${lootName} Loot Die to add to your tray:</p><div class="loot-options" id="loot-options"></div>`;
     const container = body.querySelector('#loot-options');
