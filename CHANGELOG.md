@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.0 (Oct 13, 2026)
+- Maneuver dice scale with upgrades (Jeremy): Maneuver Die II = Dodge, Dodge, Leap, Leap, Pivot, Block 2 (the blank became Block 2); Maneuver Die III = Dodge, Dodge, Leap, Pivot, Block 1, Block 2. Regular bot with all starting Maneuver dice at that level: II 92% (Attack II 89%, old II 86%), III 95% (Attack III 95%, old III 91%).
+
 ## 1.40.4 (Oct 13, 2026)
 - Music tempo per floor is now 140 / 145 / 150 bpm (was 140 / 150 / 160; Jeremy: it ended too fast). The key still rises each floor.
 
