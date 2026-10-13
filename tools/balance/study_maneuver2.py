@@ -7,13 +7,14 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 RUNS = int(sys.argv[1]) if len(sys.argv) > 1 else 300
 JOBS = int(sys.argv[2]) if len(sys.argv) > 2 else 4
 TAG = os.environ.get('RM_TAG', 'rm'); MODS = json.loads(os.environ.get('RM_MODS', '{"foes":1,"fury":1,"rest":1,"swarm":1}'))
+XCFG = json.loads(os.environ.get('RM_CFG', '{}'))
 PAIRS = [('dwarf','guard'), ('gnome','armsmaster'), ('halfling','dungeoneer'), ('pixie','arcanist')]
 VARIANTS = [('today', {}), ('all Attack dice', {'swapManeuver': True}), ('Momentum', {'payoff': 'momentum'}), ('Dodge Block', {'payoff': 'dodgeBlock'})]
 def run(cell):
     (nm, extra), (o, k) = cell
     label = '%s_%s_%s' % (TAG, nm.replace(' ', '_'), o); path = os.path.join(HERE, 'out_' + label + '.json')
     if not os.path.exists(path):
-        cfg = dict(runs=RUNS, origin=o, klass=k, depthMods=MODS, label=label); cfg.update(extra)
+        cfg = dict(runs=RUNS, origin=o, klass=k, depthMods=MODS, label=label); cfg.update(XCFG); cfg.update(extra)
         subprocess.run(['node', os.path.join(HERE, 'study_maneuver.js'), json.dumps(cfg)], cwd=HERE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=14400)
     d = json.load(open(path))['res']; n = len(d)
     fights = [f for r in d for f in r['fights'] if f.get('done')]

@@ -9,6 +9,7 @@ JOBS = int(sys.argv[2]) if len(sys.argv) > 2 else 4
 TAG = os.environ.get('RC_TAG', 'rc')
 MODS = json.loads(os.environ.get('RC_MODS', '{"dread":1,"foes":2,"rest":2,"swarm":1}'))
 ORIGINS = ['halfling', 'pixie']
+XCFG = json.loads(os.environ.get('RC_CFG', '{}'))
 VARIANTS = [
     ('guard as-is', 'guard', {}),
     ('armsmaster as-is', 'armsmaster', {}),
@@ -25,7 +26,7 @@ def run(cell):
     label = '%s_%s_%s' % (TAG, slug(nm), o)
     path = os.path.join(HERE, 'out_' + label + '.json')
     if not os.path.exists(path):
-        cfg = dict(runs=RUNS, origin=o, klass=k, depthMods=MODS, label=label, classPatch={k: patch} if patch else {})
+        cfg = dict(runs=RUNS, origin=o, klass=k, depthMods=MODS, label=label, classPatch={k: patch} if patch else {}); cfg.update(XCFG)
         subprocess.run(['node', os.path.join(HERE, 'study_maneuver.js'), json.dumps(cfg)], cwd=HERE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=14400)
     d = json.load(open(path))['res']
     return nm, o, sum(r['result'] == 'VICTORY' for r in d)/len(d)

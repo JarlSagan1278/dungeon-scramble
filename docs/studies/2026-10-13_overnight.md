@@ -71,3 +71,27 @@ Results are added below as each stage finishes.
 1. Even out Floor 2 vs Floor 3: either soften the Floor 2 Standard/Elite rooms that hit hardest (Blastogenesis Engine and Rogue Technician first, since they're "Standard") or raise Floor 3's Easy/Standard rooms.
 2. Bring the outlier bosses toward their floor-mates: Heating Elemental and The Necrorancher down a little, Extruzeon up (a real threat in its cycle).
 3. Look at The Strike/Break-er again (Deadly, ends 21% of runs that meet it even after the 1.37.1 cut).
+
+## 4. Maneuver dice re-measure (expert bot, depth-7 loadout, 4 pairs x 300 runs)
+| Variant | Win | HP lost per fight F1 / F2 / F3 | Turns per fight F1 / F2 / F3 |
+|---|---|---|---|
+| Today (Maneuver dice as they are) | 42% | 5.4 / 8.1 / 7.4 | 3.06 / 4.06 / 3.91 |
+| Every Maneuver die swapped for an Attack die | 56% | 3.8 / 6.9 / 7.0 | 2.33 / 3.36 / 3.77 |
+| Momentum (each Maneuver +1 to the next damaging die) | 73% | 3.5 / 6.5 / 6.7 | 2.32 / 3.39 / 3.73 |
+| Dodge Block (each Dodge gives 1 Block) | 79% | 3.0 / 5.4 / 6.4 | 3.23 / 4.24 / 3.93 |
+
+- **Maneuver dice are still a clear net loss: swapping them all for Attack dice gains 14 win points** (it was 9 on Oct 11). The Pivot after Swap/Reroll and the wider Arcanist didn't change that.
+- **Both payoffs fix it, and both overshoot** under this pressure: Momentum +31, Dodge Block +37 over today. A half-strength version (e.g. Dodge Block on Dodge only every other time, or Momentum only for the first Maneuver in a path) would land nearer Attack-die parity.
+- Per pair, today vs all-Attack: Dwarf Guard 58 vs 60 (barely matters: Guard's Block covers it), Halfling Dungeoneer 34 vs 52, Pixie Arcanist 34 vs 61.
+
+## 5. Dungeoneer candidates (measurement only; expert bot, depth-7 loadout, Halfling + Pixie, 300 runs each)
+| Class / variant | Win |
+|---|---|
+| Guard | 61% |
+| Armsmaster | 56% |
+| Arcanist | 43% |
+| Dungeoneer as is | 36% |
+| Dungeoneer + top-bottom wrap too (all four edges) | 49% |
+| Dungeoneer + once per turn, a zone die becomes a Pivot | 48% |
+
+- Either candidate lifts Dungeoneer by about 12-13 points, into Arcanist/Armsmaster range. All-edge wrap keeps it a pure movement class (no new button), so it's the cleaner fit. Jeremy said to keep Dungeoneer as is for now; this is here for when he revisits it.
