@@ -1,6 +1,9 @@
 # Changelog
 
 ## 1.39.7 (Oct 13, 2026)
+- Shrine music: A freygish at 96 bpm -- a soft held drone under a glassy, shimmering melody that sighs through the Bb-C# "sob" and comes home to A (follows the floor's key).
+- Title / end theme: a 32-bar version of the whole Floor 1 story (lonely bass, sad melody, the action with drums, the action with the countermelody), looping on the title and setup screens and on the win and loss screens. It starts on your first tap (browsers keep audio locked until then).
+- All the game's music on one page: docs/music/game_music.html (built from the game's own music code by tools/music/build_game_preview.py).
 - Victory chime (Jeremy; replaces the old fight-won ding): a quick accordion run up the A-Bb-C#-D motif to a trilled D over the triangle bass, landing on the next bar line of the music (in time and in key). Elite/Deadly wins play it an octave higher with woodblocks; bosses get a longer run with a drum roll. With the music off it plays right away.
 - Loot chest burst: a chord that hints the tier -- Alloy a metal clink and A major, Gilded brighter with a bell on top, Magic a glassy shimmer through the Bb-C# "sob".
 - Camp lullaby: 16 bars in 3/4 at 84 bpm (D harmonic minor) -- soft triangle bass, music-box melody, quiet accordion answers, ending on the Bb-C#-D motif. Crossfades in at camp and back out when you leave.

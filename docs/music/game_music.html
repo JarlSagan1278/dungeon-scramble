@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dungeon Scramble Music</title>
+<style>
+:root{ --bg:#2a1d14; --panel:#e8d3ac; --ink:#2a1d14; --line:#120b06; --muted:#6b5238; --go:#5c8a3a; --stop:#b8432f; --alt:#7a4fa0; --gold:#e8b23a; --chip:#f6e8c8; }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#1a120c; --panel:#d9c39a; } }
+:root[data-theme="dark"]{ --bg:#1a120c; --panel:#d9c39a; }
+*{ box-sizing:border-box; }
+body{ margin:0; background:var(--bg); color:var(--ink); font:16px/1.45 Georgia,"Times New Roman",serif; }
+main{ max-width:560px; margin:0 auto; padding:16px; }
+h1{ color:var(--panel); font-size:24px; margin:4px 0 2px; }
+.sub{ color:#cdb48a; font-size:14px; margin:0 0 14px; }
+.card{ background:var(--panel); border:3px solid var(--line); border-radius:14px; padding:12px 14px; margin:0 0 14px; box-shadow:0 4px 0 var(--line); }
+.card h2{ font-size:18px; margin:0 0 4px; }
+.note{ font-size:14px; margin:4px 0 10px; color:#3a2a1c; }
+.row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+button{ font:inherit; font-weight:700; font-size:15px; border:3px solid var(--line); border-radius:10px; padding:7px 12px; cursor:pointer; color:#fff8ea; background:var(--go); box-shadow:0 3px 0 var(--line); }
+button.alt{ background:var(--alt); } button.gold{ background:var(--gold); color:var(--ink); } button.on{ background:var(--stop); }
+button:active{ transform:translateY(2px); box-shadow:0 1px 0 var(--line); }
+.seg button{ background:var(--chip); color:var(--ink); } .seg button.sel{ background:var(--gold); }
+.state{ font-weight:700; font-size:14px; }
+#stopall{ position:sticky; top:8px; z-index:5; width:100%; margin-bottom:12px; background:var(--stop); }
+</style></head><body><main>
+<h1>Dungeon Scramble: game music</h1>
+<p class="sub">Played by the game's own music code, so this is exactly what the game plays. Tap anything to start; sound must be on.</p>
+<button id="stopall">Stop all music</button>
+<div class="card">
+  <h2>Floor</h2>
+  <p class="note">The dungeon music, shrine and sound-effect key follow the floor: D minor 140 bpm, E minor 150, F minor 160.</p>
+  <div class="row seg" id="floors"><button data-f="0" class="sel">Floor 1</button><button data-f="1">Floor 2</button><button data-f="2">Floor 3</button></div>
+</div>
+<div class="card">
+  <h2>Dungeon: downtime and action</h2>
+  <p class="note">Downtime: two rounds of lonely bass, then two with the sad melody. Action (Boss, Elite, Deadly fights) switches in on the next bar. Boss phase 2 adds drums. "Win the fight" plays the chime and drops back to bass-only downtime.</p>
+  <div class="row"><button id="dPlay">Play downtime</button><button class="alt" id="dAct">Fight starts</button><button class="alt" id="dDrums">Boss phase 2</button><button class="gold" id="dWin">Win the fight</button></div>
+  <p class="state" id="dState">Stopped</p>
+</div>
+<div class="card">
+  <h2>Victory chimes</h2>
+  <p class="note">They land on the next bar line when the dungeon music is playing, otherwise right away.</p>
+  <div class="row"><button class="gold" data-chime="regular">Regular</button><button class="gold" data-chime="elite">Elite / Deadly</button><button class="gold" data-chime="boss">Boss</button></div>
+</div>
+<div class="card">
+  <h2>Loot chest burst</h2>
+  <p class="note">One chord per loot tier when the chest bursts open.</p>
+  <div class="row"><button class="gold" data-burst="lootBurstAlloy">Alloy</button><button class="gold" data-burst="lootBurstGilded">Gilded</button><button class="gold" data-burst="lootBurstMagic">Magic</button></div>
+</div>
+<div class="card"><h2>Camp lullaby</h2><p class="note">3/4 at 84 bpm: triangle bass, music box, quiet accordion answers.</p><div class="row"><button data-kind="camp">Play camp</button></div></div>
+<div class="card"><h2>Shrine</h2><p class="note">A freygish at 96 bpm: a held drone under a glassy melody.</p><div class="row"><button data-kind="shrine">Play shrine</button></div></div>
+<div class="card"><h2>Title and end theme</h2><p class="note">32 bars: lonely bass, the sad melody, the action with drums, then the action with the countermelody. Loops.</p><div class="row"><button data-kind="theme">Play theme</button></div></div>
+</main>
+<script>
+// --- the few game globals the music engine reads ---
+var S = { floorIdx:0, screen:'game' };
+var PREFS = { music:true, sound:true };
+var audioCtx = null;
+function encounterTier(){ return 'standard'; }
+</script>
+<script>
+/* ============================================================
+   MUSIC (v1.39.5+, Jeremy Oct 13) -- the game's own synth plays the
+   music from note data (no audio files: a few KB, any arrangement free).
+   Sketch notes come from tools/music/make_sketches.py (docs/music/
+   sketches.json, copied in by tools/music/sync_game_music.py); voices match
+   docs/music/preview.html: an NES-style triangle bass, a toy-accordion
+   melody, toy drums, plus a music box and a pluck.
+   Dungeon: two versions of the same piece share tempo, key and 8-bar
+   blocks, so they switch on any bar line:
+   - downtime: lonely bass; melody only in rounds 3-4 of every 4 (Jeremy).
+   - action: Palace-pump bass + frantic melody all the time, for Boss,
+     Elite and Deadly fights; boss phase 2 adds the drums (Jeremy).
+   Floors 2 and 3 play the same tune higher and faster, with extra layers
+   (MUSIC_FLOORS). Camp has its own lullaby, shrines a glassy drone piece, and the title and end screens a
+   32-bar theme. Fights end with a victory chime
+   on the next bar line. Off with the Music switch in Settings.
+   ============================================================ */
+// NOTES (generated by tools/music/sync_game_music.py -- don't edit by hand)
+const MUSIC_NOTES = {
+  down: { bass:[[0,2.91,38,78],[3.0,0.97,33,78],[4,1.94,38,74],[6.0,0.97,41,74],[7.0,0.97,40,74],[8,2.91,34,76],[11.0,0.97,41,76],[12,1.94,33,74],[14.0,0.97,37,74],[15.0,0.97,40,74],[16,2.91,38,78],[19.0,0.97,33,78],[20,1.94,38,74],[22.0,0.97,41,74],[23.0,0.97,40,74],[24,2.91,34,76],[27.0,0.97,41,76],[28,1.94,33,74],[30.0,0.97,37,74],[31.0,0.97,40,74]],
+         lead:[[0,0.108,70,57],[0.12,1.692,69,72],[2.0,0.9,65,72],[3.0,0.9,64,72],[4,2.7,62,68],[7.88,0.108,76,59],[8,1.35,74,74],[9.5,0.45,70,74],[10.0,1.8,69,74],[12,0.9,67,74],[13.0,0.9,65,74],[14.0,0.38,70,74],[14.38,0.108,74,59],[14.5,1.35,73,74],[15.88,0.108,76,61],[16,1.8,74,76],[18.0,0.45,73,76],[18.5,0.45,70,76],[19.0,0.9,69,76],[20,0.9,69,70],[21.0,0.45,70,70],[21.5,0.45,69,70],[22.0,0.9,67,70],[23.0,0.9,65,70],[24,0.9,65,68],[25.0,1.8,62,68],[27.0,0.9,65,68],[28,0.9,64,66],[29.0,0.45,65,66],[29.5,0.45,64,66],[30.0,1.8,61,66]] },
+  act:  { bass:[[0,0.45,38,110],[0.5,0.45,50,84],[1.0,0.45,38,84],[1.5,0.45,50,84],[2.0,0.45,49,110],[2.5,0.45,50,84],[3.0,0.45,45,84],[3.5,0.45,41,84],[4,0.45,38,110],[4.5,0.45,50,84],[5.0,0.45,38,84],[5.5,0.45,50,84],[6.0,0.45,52,110],[6.5,0.45,53,84],[7.0,0.45,52,84],[7.5,0.45,49,84],[8,0.45,34,110],[8.5,0.45,46,84],[9.0,0.45,34,84],[9.5,0.45,46,84],[10.0,0.45,45,110],[10.5,0.45,46,84],[11.0,0.45,41,84],[11.5,0.45,38,84],[12,0.45,33,110],[12.5,0.45,45,84],[13.0,0.45,33,84],[13.5,0.45,45,84],[14.0,0.45,49,110],[14.5,0.45,52,84],[15.0,0.45,49,84],[15.5,0.45,45,84],[16,0.45,38,110],[16.5,0.45,50,84],[17.0,0.45,38,84],[17.5,0.45,50,84],[18.0,0.45,49,110],[18.5,0.45,50,84],[19.0,0.45,45,84],[19.5,0.45,41,84],[20,0.45,38,110],[20.5,0.45,50,84],[21.0,0.45,38,84],[21.5,0.45,50,84],[22.0,0.45,52,110],[22.5,0.45,53,84],[23.0,0.45,52,84],[23.5,0.45,49,84],[24,0.45,34,110],[24.5,0.45,46,84],[25.0,0.45,34,84],[25.5,0.45,46,84],[26.0,0.45,45,110],[26.5,0.45,46,84],[27.0,0.45,41,84],[27.5,0.45,38,84],[28,0.45,33,110],[28.5,0.45,45,84],[29.0,0.45,33,84],[29.5,0.45,45,84],[30.0,0.45,49,110],[30.5,0.45,52,84],[31.0,0.45,49,84],[31.5,0.45,45,84]],
+         lead:[[0,0.45,74,116],[0.5,0.45,69,90],[1.0,0.45,74,90],[1.5,0.45,76,90],[2.0,0.45,77,90],[2.5,0.45,76,90],[3.0,0.45,74,90],[3.5,0.45,73,90],[4,0.225,74,116],[4.25,0.225,76,90],[4.5,0.225,77,90],[4.75,0.225,79,90],[5.0,0.225,81,90],[5.25,0.225,79,90],[5.5,0.225,77,90],[5.75,0.225,76,90],[6.0,0.225,77,90],[6.25,0.225,76,90],[6.5,0.225,74,90],[6.75,0.225,73,90],[7,0.45,74,90],[7.5,0.45,69,90],[8,0.45,70,116],[8.5,0.45,74,90],[9.0,0.45,77,90],[9.5,0.45,74,90],[10.0,0.45,70,90],[10.5,0.45,74,90],[11.0,0.45,77,90],[11.5,0.45,81,90],[12,0.225,79,116],[12.25,0.225,77,90],[12.5,0.225,76,90],[12.75,0.225,77,90],[13.0,0.225,76,90],[13.25,0.225,74,90],[13.5,0.225,73,90],[13.75,0.225,74,90],[14,0.45,73,90],[14.5,0.45,70,90],[15,0.9,69,116],[16,0.45,74,116],[16.5,0.45,74,90],[17.0,0.45,69,90],[17.5,0.45,74,90],[18.0,0.45,77,90],[18.5,0.45,77,90],[19.0,0.45,76,90],[19.5,0.45,74,90],[20,0.45,76,116],[20.5,0.45,77,90],[21.0,0.45,79,90],[21.5,0.45,81,90],[22.0,0.45,82,116],[22.5,0.45,81,90],[23.0,0.45,79,90],[23.5,0.45,77,90],[24,0.45,77,116],[24.5,0.45,74,90],[25.0,0.45,70,90],[25.5,0.45,74,90],[26.0,0.45,79,90],[26.5,0.45,77,90],[27.0,0.45,76,90],[27.5,0.45,74,90],[28,0.45,73,116],[28.5,0.45,76,90],[29.0,0.45,81,90],[29.5,0.45,76,90],[30,0.225,79,90],[30.25,0.225,77,90],[30.5,0.225,76,90],[30.75,0.225,74,90],[31,0.9,73,116]],
+         drums:[[0,0.25,36,100],[2,0.25,36,100],[1,0.25,38,62],[3,0.25,38,62],[0.0,0.2,76,70],[0.5,0.2,77,52],[1.0,0.2,76,70],[1.5,0.2,77,52],[2.0,0.2,76,70],[2.5,0.2,77,52],[3.0,0.2,76,70],[3.5,0.2,77,52],[0.5,0.2,54,48],[1.5,0.2,54,48],[2.5,0.2,54,48],[3.5,0.2,54,48],[4,0.25,36,100],[6,0.25,36,100],[5,0.25,38,62],[7,0.25,38,62],[4.0,0.2,76,70],[4.5,0.2,77,52],[5.0,0.2,76,70],[5.5,0.2,77,52],[6.0,0.2,76,70],[6.5,0.2,77,52],[7.0,0.2,76,70],[7.5,0.2,77,52],[4.5,0.2,54,48],[5.5,0.2,54,48],[6.5,0.2,54,48],[7.5,0.2,54,48],[8,0.25,36,100],[10,0.25,36,100],[9,0.25,38,62],[11,0.25,38,62],[8.0,0.2,76,70],[8.5,0.2,77,52],[9.0,0.2,76,70],[9.5,0.2,77,52],[10.0,0.2,76,70],[10.5,0.2,77,52],[11.0,0.2,76,70],[11.5,0.2,77,52],[8.5,0.2,54,48],[9.5,0.2,54,48],[10.5,0.2,54,48],[11.5,0.2,54,48],[12,0.25,36,100],[14,0.25,36,100],[13,0.25,38,62],[15,0.25,38,62],[12.0,0.2,76,70],[12.5,0.2,77,52],[13.0,0.2,76,70],[13.5,0.2,77,52],[14.0,0.2,76,70],[14.5,0.2,77,52],[15.0,0.2,76,70],[15.5,0.2,77,52],[12.5,0.2,54,48],[13.5,0.2,54,48],[14.5,0.2,54,48],[15.5,0.2,54,48],[16,0.25,36,100],[18,0.25,36,100],[17,0.25,38,62],[19,0.25,38,62],[16.0,0.2,76,70],[16.5,0.2,77,52],[17.0,0.2,76,70],[17.5,0.2,77,52],[18.0,0.2,76,70],[18.5,0.2,77,52],[19.0,0.2,76,70],[19.5,0.2,77,52],[16.5,0.2,54,48],[17.5,0.2,54,48],[18.5,0.2,54,48],[19.5,0.2,54,48],[20,0.25,36,100],[22,0.25,36,100],[21,0.25,38,62],[23,0.25,38,62],[20.0,0.2,76,70],[20.5,0.2,77,52],[21.0,0.2,76,70],[21.5,0.2,77,52],[22.0,0.2,76,70],[22.5,0.2,77,52],[23.0,0.2,76,70],[23.5,0.2,77,52],[20.5,0.2,54,48],[21.5,0.2,54,48],[22.5,0.2,54,48],[23.5,0.2,54,48],[24,0.25,36,100],[26,0.25,36,100],[25,0.25,38,62],[27,0.25,38,62],[24.0,0.2,76,70],[24.5,0.2,77,52],[25.0,0.2,76,70],[25.5,0.2,77,52],[26.0,0.2,76,70],[26.5,0.2,77,52],[27.0,0.2,76,70],[27.5,0.2,77,52],[24.5,0.2,54,48],[25.5,0.2,54,48],[26.5,0.2,54,48],[27.5,0.2,54,48],[28,0.25,36,100],[30,0.25,36,100],[29,0.25,38,62],[31,0.25,38,62],[28.0,0.2,76,70],[28.5,0.2,77,52],[29.0,0.2,76,70],[29.5,0.2,77,52],[30.0,0.2,76,70],[30.5,0.2,77,52],[31.0,0.2,76,70],[31.5,0.2,77,52],[28.5,0.2,54,48],[29.5,0.2,54,48],[30.5,0.2,54,48],[31.5,0.2,54,48]] },
+};
+// /NOTES
+
+// Hand-written parts (beats; [t, dur, midi, velocity]).
+const MUSIC_EXTRA = {
+  // Floor 2+ downtime: a plucked countermelody fills the bass-only rounds (same Dm | Dm | Bb | A harmony).
+  counter: (()=>{ const q = [57,62,65,62, 57,62,64,65, 58,62,65,62, 57,61,64,61, 62,65,69,65, 64,65,62,57, 62,65,70,65, 61,64,69,64];
+    return q.map((p,i)=>[i, 0.5, p, i%4===0 ? 70 : 56]); })(),
+};
+// Camp lullaby (Jeremy, Oct 13): 3/4 at 84 bpm, 16 bars, D harmonic minor; ends on the Bb-C#-D motif.
+const CAMP_SONG = (()=>{
+  const bars = [ // [melody notes as [midi, beats]...], bass root, accordion answer
+    [[[69,2],[65,1]], 38], [[[64,1],[65,1],[62,1]], 38], [[[67,2],[70,1]], 43], [[[69,3]], 43, [74,73,70]],
+    [[[73,2],[76,1]], 45], [[[74,1],[73,1],[69,1]], 45], [[[65,2],[64,1]], 38], [[[62,3]], 38, [65,64,61]],
+    [[[77,2],[74,1]], 46], [[[74,1],[70,1],[65,1]], 46], [[[67,1],[70,1],[74,1]], 43], [[[73,2],[69,1]], 45],
+    [[[69,1],[65,1],[69,1]], 38], [[[70,1],[69,1],[67,1]], 43], [[[70,1],[73,2]], 45], [[[74,3]], 38, [69,65,62]],
+  ];
+  const box = [], bass = [], acc = [];
+  bars.forEach(([mel, root, ans], b)=>{
+    let t = b*3; mel.forEach(([p,d])=>{ box.push([t, d, p, 74]); t += d; });
+    bass.push([b*3, 2.85, root, 70]);
+    if(ans) ans.forEach((p,i)=> acc.push([b*3+i, 0.9, p, 50]));
+  });
+  return { box, bass, acc };
+})();
+// Shrine (Oct 13): A freygish (A Bb C# D E F G) at 96 bpm, 8 bars -- a soft held drone under a glassy, shimmering melody
+// that sighs through the Bb-C# "sob" and comes home to A. No driving bass.
+const SHRINE_SONG = (()=>{
+  const mel = [[[76,2],[77,1],[76,1]], [[73,3],[70,1]], [[69,2],[70,1],[73,1]], [[74,4]],
+               [[77,2],[76,1],[74,1]], [[73,2],[74,1],[70,1]], [[69,1],[70,1],[73,1],[76,1]], [[69,4]]];
+  const droneRoots = [45,45,45,45,50,45,46,45]; // A pedal; D under bar 5, the Bb "sob" under bar 7
+  const glass = [], drone = [];
+  mel.forEach((bar,b)=>{ let t = b*4; bar.forEach(([p,d])=>{ glass.push([t, d, p, 70]); t += d; }); });
+  droneRoots.forEach((r,b)=>{ drone.push([b*4, 3.9, r, 60], [b*4, 3.9, r+7, 46]); });
+  return { glass, drone };
+})();
+// Victory chimes (Jeremy: replaces the old fight-won ding). Beats; roles pick the voice.
+const CHIMES = (()=>{
+  const trill = (t0, len, lo, hi)=>{ const out=[]; for(let t=t0; t < t0+len-0.26; t+=0.25){ out.push([t,0.125,lo,96,'chime'],[t+0.125,0.125,hi,84,'chime']); } out.push([t0+len-0.25, 0.6, lo, 100, 'chime']); return out; };
+  const regular = [[0,0.25,69,92,'chime'],[0.25,0.25,70,96,'chime'],[0.5,0.25,73,100,'chime'], ...trill(0.75,1.5,74,76), [0,2.2,50,80,'bass']];
+  const elite = regular.map(n=> n[4]==='chime' ? [n[0],n[1],n[2]+12,n[3],n[4]] : n).concat([[0,0.2,77,80,'drums'],[0.25,0.2,77,70,'drums'],[0.5,0.2,77,75,'drums'],[0.75,0.2,76,90,'drums']]);
+  const run = [69,70,73,74,76,77,76,73].map((p,i)=>[i*0.25,0.25,p,88+i*2,'chime']);
+  const boss = run.concat(trill(2,1.75,74,76), [[2,2.4,50,90,'bass'],[2,2.4,38,70,'bass']],
+    [...Array(8).keys()].map(i=>[i*0.25,0.2,38,40+i*8,'drums']), [[2,0.25,36,110,'drums'],[2,0.2,54,80,'drums']]);
+  return { regular, elite, boss };
+})();
+// Per floor: key shift (semitones; D -> E -> F harmonic minor), tempo, and the extra layers (Jeremy: same tune, transposed).
+const MUSIC_FLOORS = [
+  { shift:0, bpm:140, bassVoice:'tri' },
+  { shift:2, bpm:150, bassVoice:'tri', counter:true, lowBass:true },
+  { shift:3, bpm:160, bassVoice:'pulse', counter:true, lowBass:true, wood:true, drumsAlways:true },
+];
+const MUSIC_VOLUME = 0.55;
+const LEAD_LEVEL = 0.09; // melody level under the bass (Jeremy: lower the melody)
+const DRUM_LEVEL = 0.6;
+const Music = { on:false, kind:null, floor:0, origin:0, bpm:140, blockBeats:32, barBeats:4, gain:null, timer:null, mode:null, drums:false, drumsFrom:Infinity, groups:{} };
+function musicCtx(){ // music plays even with sound effects off, so it doesn't go through getAudioCtx()'s Sound check
+  if(!audioCtx){ const C = window.AudioContext || window.webkitAudioContext; if(!C) return null; try{ audioCtx = new C(); }catch(e){ return null; } }
+  if(audioCtx.state==='suspended') audioCtx.resume().catch(()=>{});
+  return audioCtx;
+}
+const musicSpb = ()=> 60/Music.bpm;
+const musicFloor = ()=> MUSIC_FLOORS[Math.max(0, Math.min(2, (typeof S!=='undefined' && S && S.floorIdx) || 0))];
+// The next bar line after `now` on the shared clock.
+function musicNextBar(now){ const bar = Music.barBeats*musicSpb(); return Music.origin + Math.ceil((now - Music.origin + 0.05)/bar)*bar; }
+// Arrangement: which parts each version plays in each block (the floor adds layers).
+function musicArrange(k){
+  const F = MUSIC_FLOORS[Music.floor];
+  if(k==='camp') return [['bass','box','acc']];
+  if(k==='shrine') return [['drone','glass']];
+  // Title / end theme (Oct 13): the whole Floor 1 story in 32 bars -- lonely bass, sad melody, the frantic action with drums,
+  // then the action with the countermelody -- looping.
+  if(k==='theme') return [['down.bass'], ['down.bass','down.lead'], ['act.bass','act.lead','act.drums'], ['act.bass','act.lead','counter']];
+  if(k==='act') return [['bass','lead','drums'].concat(F.lowBass?['bassLow']:[])];
+  const quiet = ['bass'].concat(F.counter?['counter']:[], F.wood?['wood']:[]), loud = ['bass','lead'].concat(F.wood?['wood']:[]);
+  return [quiet, quiet, loud, loud];
+}
+function musicPartNotes(k, part){
+  if(k==='camp') return CAMP_SONG[part] || [];
+  if(k==='shrine') return SHRINE_SONG[part] || [];
+  if(part.includes('.')){ const [a,b] = part.split('.'); return (MUSIC_NOTES[a]||{})[b] || []; }
+  const N = MUSIC_NOTES[k] || {};
+  if(part==='counter') return MUSIC_EXTRA.counter;
+  if(part==='bassLow') return (N.bass||[]).map(n=>[n[0],n[1],n[2]-12,n[3]]);
+  if(part==='wood') return (MUSIC_NOTES.act.drums||[]).filter(n=>n[2]===76||n[2]===77).map(n=>[n[0],n[1],n[2],Math.round(n[3]*0.6)]);
+  return N[part] || [];
+}
+function musicStart(kind, mode){
+  const ctx = musicCtx(); if(!ctx) return;
+  musicStop(false); // the old piece fades out while the new one fades in
+  const t = ctx.currentTime + 0.1;
+  Music.on = true; Music.kind = kind; Music.origin = t; Music.mode = mode; Music.drums = false; Music.drumsFrom = Infinity;
+  if(kind==='camp'){ Music.bpm = 84; Music.blockBeats = 48; Music.barBeats = 3; Music.floor = musicFloorIdx(); }
+  else if(kind==='shrine'){ Music.bpm = 96; Music.blockBeats = 32; Music.barBeats = 4; Music.floor = musicFloorIdx(); }
+  else if(kind==='theme'){ Music.bpm = 140; Music.blockBeats = 32; Music.barBeats = 4; Music.floor = 0; }
+  else { Music.floor = musicFloorIdx(); Music.bpm = MUSIC_FLOORS[Music.floor].bpm; Music.blockBeats = 32; Music.barBeats = 4; }
+  Music.gain = ctx.createGain(); Music.gain.connect(ctx.destination);
+  Music.gain.gain.setValueAtTime(0.0001, t); Music.gain.gain.exponentialRampToValueAtTime(MUSIC_VOLUME, t + 2.5); // gentle fade-in
+  Music.groups = {};
+  const keys = kind==='dungeon' ? ['down','act'] : [kind];
+  for(const k of keys){ const g = { gain:ctx.createGain(), block:-1, events:null, idx:0, arrBase:0, from:(k===mode)?t:Infinity, until:(k===mode)?Infinity:0 }; g.gain.connect(Music.gain); Music.groups[k] = g; }
+  musicTick(); Music.timer = setInterval(musicTick, 50);
+}
+function musicFloorIdx(){ return Math.max(0, Math.min(2, (typeof S!=='undefined' && S && S.floorIdx) || 0)); }
+function musicStop(fast){
+  clearInterval(Music.timer); Music.timer = null; Music.on = false; Music.mode = null; Music.kind = null;
+  const g = Music.gain, ctx = audioCtx; Music.gain = null;
+  if(g && ctx){ const t = ctx.currentTime; try{ g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(Math.max(0.0001, g.gain.value), t); g.gain.exponentialRampToValueAtTime(0.0001, t + (fast?0.15:0.8)); setTimeout(()=>{ try{ g.disconnect(); }catch(e){} }, 1200); }catch(e){} }
+}
+// Switch downtime <-> action on the next bar line: the old version's notes stop there (its held notes fade in 0.12 s),
+// the new one's start there, both on the same clock so the beat never skips.
+function musicSwitch(mode){
+  const ctx = audioCtx; if(!ctx || !Music.on || Music.kind!=='dungeon' || Music.mode===mode) return;
+  const bar = musicNextBar(ctx.currentTime), oldG = Music.groups[Music.mode], newG = Music.groups[mode];
+  oldG.until = bar; try{ oldG.gain.gain.setValueAtTime(1, bar); oldG.gain.gain.linearRampToValueAtTime(0.0001, bar + 0.12); }catch(e){}
+  newG.from = bar; newG.until = Infinity; newG.block = -1; newG.events = null;
+  // Jeremy (Oct 13): coming back to downtime after a fight restarts its cycle -- the rest of this block and the next two
+  // full rounds are bass only, then the melody rounds. Blocks before arrBase play round 1's parts.
+  newG.arrBase = Math.floor((bar - Music.origin)/(Music.blockBeats*musicSpb()) + 1e-6) + 1;
+  try{ newG.gain.gain.cancelScheduledValues(0); newG.gain.gain.setValueAtTime(1, bar); }catch(e){}
+  if(mode!=='act'){ Music.drums = false; Music.drumsFrom = Infinity; }
+  Music.mode = mode;
+}
+function musicSetDrums(on){
+  const ctx = audioCtx; if(!ctx || !Music.on || Music.drums===on) return;
+  Music.drums = on; Music.drumsFrom = on ? musicNextBar(ctx.currentTime) : Infinity;
+}
+// Look-ahead scheduler: queues each version's notes due in the next 0.3 s, block by block on the shared clock.
+function musicTick(){
+  const ctx = audioCtx; if(!ctx || !Music.on) return;
+  const spb = musicSpb(), blockLen = Music.blockBeats*spb, now = ctx.currentTime, ahead = now + 0.3;
+  const shift = (Music.kind==='dungeon' || Music.kind==='shrine') ? MUSIC_FLOORS[Music.floor].shift : 0;
+  for(const k in Music.groups){
+    const g = Music.groups[k];
+    if(g.until <= now - 0.5 || g.from > ahead) continue; // silent version: schedule nothing
+    const cur = Math.max(0, Math.floor((Math.max(now, g.from) - Music.origin)/blockLen));
+    if(g.block < cur - 1 || g.block < 0){ g.block = cur; g.events = null; } // (re)joining: start from the current block
+    for(let guard=0; guard<800; guard++){
+      if(!g.events){
+        const A = musicArrange(k), r = g.block - g.arrBase;
+        const parts = r < 0 ? A[0] : A[r % A.length]; // before the cycle restarts: round 1's parts (bass only)
+        g.events = parts.flatMap(p=>musicPartNotes(k,p).map(n=>({t:n[0], d:n[1], p:n[2], v:n[3], role:p}))).sort((a,b)=>a.t-b.t);
+        g.idx = 0;
+      }
+      if(g.idx >= g.events.length){ g.block++; g.events = null; continue; }
+      const e = g.events[g.idx], at = Music.origin + g.block*blockLen + e.t*spb;
+      if(at > ahead) break;
+      g.idx++;
+      if(at < now - 0.02 || at < g.from - 0.001 || at >= g.until) continue;
+      musicVoice(ctx, e.role, /drums|wood/.test(e.role) ? e.p : e.p + shift, at, e.d*spb, e.v, g.gain);
+    }
+  }
+}
+function musicVoice(ctx, role, p, at, d, v, out){
+  if(role==='drums'){ const F = MUSIC_FLOORS[Music.floor]; if(at >= Music.drumsFrom || (F.drumsAlways && Music.mode==='act')) musicDrum(ctx, p, at, v, out); return; }
+  if(role==='wood') return musicDrum(ctx, p, at, v, out);
+  if(role==='bass' || role==='bassLow') return (Music.kind==='dungeon' && MUSIC_FLOORS[Music.floor].bassVoice==='pulse') ? musicPulseBass(ctx, p, at, d, v, out) : musicBass(ctx, p, at, d, v, out, Music.kind==='camp' ? 0.3 : 0.42);
+  if(role==='act.drums') return musicDrum(ctx, p, at, v, out);
+  if(role==='down.bass' || role==='act.bass') return musicBass(ctx, p, at, d, v, out);
+  if(role==='down.lead' || role==='act.lead') return musicLead(ctx, p, at, d, v, out);
+  if(role==='drone') return musicBass(ctx, p, at, d, v, out, 0.22);
+  if(role==='glass') return musicGlass(ctx, p, at, d, v, out);
+  if(role==='box') return musicBox(ctx, p, at, d, v, out);
+  if(role==='counter') return musicPluck(ctx, p, at, d, v, out);
+  if(role==='acc') return musicLead(ctx, p, at, d, v, out, 0.05);
+  if(role==='chime') return musicLead(ctx, p, at, d, v, out, LEAD_LEVEL*1.6);
+  return musicLead(ctx, p, at, d, v, out);
+}
+const mtof = p => 440*Math.pow(2,(p-69)/12);
+function musicBass(ctx, p, t, d, v, out, level){ // NES-style triangle: square-cornered envelope, no filter
+  const o = ctx.createOscillator(), g = ctx.createGain(), k = v/127*(level||0.42);
+  o.type = 'triangle'; o.frequency.value = mtof(p);
+  g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(k,t+0.004); g.gain.setValueAtTime(k,t+Math.max(0.01,d-0.02)); g.gain.linearRampToValueAtTime(0.0001,t+d);
+  o.connect(g).connect(out); o.start(t); o.stop(t+d+0.02);
+}
+function musicPulseBass(ctx, p, t, d, v, out){ // Floor 3: a buzzier pulse bass (filtered square), like "8-Bit Grit"
+  const o = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain(), k = v/127*0.22, f = mtof(p);
+  o.type = 'square'; o.frequency.value = f; lp.type = 'lowpass'; lp.frequency.value = Math.min(2400, f*6);
+  g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(k,t+0.004); g.gain.setValueAtTime(k,t+Math.max(0.01,d-0.02)); g.gain.linearRampToValueAtTime(0.0001,t+d);
+  o.connect(lp).connect(g).connect(out); o.start(t); o.stop(t+d+0.02);
+}
+function musicLead(ctx, p, t, d, v, out, level){ // toy accordion (Jeremy's pick): bright filtered saw, quick vibrato on long notes
+  const f = mtof(p), k = v/127*(level||LEAD_LEVEL);
+  const o = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain(), vib = ctx.createOscillator(), vg = ctx.createGain();
+  o.type = 'sawtooth'; o.frequency.value = f; lp.type = 'lowpass'; lp.frequency.value = f*5; lp.Q.value = 1.2;
+  vib.frequency.value = 6.5; vg.gain.setValueAtTime(0,t); vg.gain.linearRampToValueAtTime(d>0.5 ? f*0.012 : 0, t+Math.min(0.35,d)); vib.connect(vg).connect(o.frequency);
+  g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(k,t+0.02); g.gain.setValueAtTime(k,t+Math.max(0.03,d-0.03)); g.gain.linearRampToValueAtTime(0.0001,t+d+0.04);
+  o.connect(lp).connect(g).connect(out); o.start(t); vib.start(t); o.stop(t+d+0.08); vib.stop(t+d+0.08);
+}
+function musicBox(ctx, p, t, d, v, out){ // music box: a bell-like sine with two quick partials, rings out
+  const f = mtof(p), k = v/127;
+  [[1,0.2,Math.max(0.9,d+0.4)],[3.01,0.05,0.3],[5.4,0.025,0.1]].forEach(([m,a,len])=>{
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.value = f*m;
+    g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(a*k,t+0.005); g.gain.exponentialRampToValueAtTime(0.0001,t+len);
+    o.connect(g).connect(out); o.start(t); o.stop(t+len+0.05); });
+}
+function musicGlass(ctx, p, t, d, v, out){ // shrine: two slightly detuned sines + a soft octave, slow bloom and long ring (glass harmonica)
+  const f = mtof(p), k = v/127;
+  [[1,0.07],[1.006,0.05],[2,0.02]].forEach(([m,a])=>{
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.value = f*m;
+    g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(a*k,t+0.06); g.gain.setValueAtTime(a*k,t+Math.max(0.07,d*0.7)); g.gain.exponentialRampToValueAtTime(0.0001,t+d+0.6);
+    o.connect(g).connect(out); o.start(t); o.stop(t+d+0.65); });
+}
+function musicPluck(ctx, p, t, d, v, out){ // pizzicato: a short filtered saw that closes quickly
+  const f = mtof(p), k = v/127*0.1, o = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain();
+  o.type = 'sawtooth'; o.frequency.value = f; lp.type = 'lowpass'; lp.frequency.setValueAtTime(f*8,t); lp.frequency.exponentialRampToValueAtTime(f*1.5,t+0.15);
+  g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(k,t+0.004); g.gain.exponentialRampToValueAtTime(0.0001,t+0.3);
+  o.connect(lp).connect(g).connect(out); o.start(t); o.stop(t+0.35);
+}
+function musicDrum(ctx, p, t, v, out){ // toy kit: kick 36, snare 38, tambourine 54, woodblocks 76/77
+  const k = v/127*DRUM_LEVEL;
+  if(p===36){ const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.setValueAtTime(140,t); o.frequency.exponentialRampToValueAtTime(45,t+0.12);
+    g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(0.7*k,t+0.003); g.gain.exponentialRampToValueAtTime(0.0001,t+0.16); o.connect(g).connect(out); o.start(t); o.stop(t+0.2); return; }
+  if(p===38 || p===54){ const dur = p===38 ? 0.12 : 0.06, n = Math.floor(ctx.sampleRate*dur), b = ctx.createBuffer(1,n,ctx.sampleRate), x = b.getChannelData(0);
+    for(let i=0;i<n;i++) x[i] = (Math.random()*2-1)*(1-i/n);
+    const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(); s.buffer = b; f.type = p===38 ? 'bandpass' : 'highpass'; f.frequency.value = p===38 ? 1800 : 6000;
+    g.gain.value = (p===38 ? 0.35 : 0.25)*k; s.connect(f).connect(g).connect(out); s.start(t); return; }
+  const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = p===76 ? 1050 : 820;
+  g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(0.3*k,t+0.002); g.gain.exponentialRampToValueAtTime(0.0001,t+0.05); o.connect(g).connect(out); o.start(t); o.stop(t+0.08);
+}
+// Victory chime (fight won): lands on the next bar line in the music's tempo and key -- the bar where the music drops back
+// to the bass-only downtime rounds. With the music off it plays right away. kind: 'regular' | 'elite' | 'boss'.
+function musicChime(kind){
+  if(typeof PREFS!=='undefined' && PREFS.sound===false) return;
+  const ctx = musicCtx(); if(!ctx) return;
+  const notes = CHIMES[kind] || CHIMES.regular;
+  const live = Music.on && Music.kind==='dungeon';
+  const spb = live ? musicSpb() : 60/MUSIC_FLOORS[musicFloorIdx()].bpm, shift = MUSIC_FLOORS[live ? Music.floor : musicFloorIdx()].shift;
+  const at = live ? musicNextBar(ctx.currentTime) : ctx.currentTime + 0.05;
+  let out = live ? Music.gain : null;
+  if(!out){ out = ctx.createGain(); out.gain.value = MUSIC_VOLUME; out.connect(ctx.destination); setTimeout(()=>{ try{ out.disconnect(); }catch(e){} }, 5000); }
+  notes.forEach(([t,d,p,v,role])=>{
+    const when = at + t*spb, dur = d*spb;
+    if(role==='drums') musicDrum(ctx, p, when, v, out);
+    else if(role==='bass') musicBass(ctx, p+shift, when, dur, v, out);
+    else musicLead(ctx, p+shift, when, dur, v, out, LEAD_LEVEL*1.6);
+  });
+}
+// Which music fits right now (called on every render): camp lullaby at camp; in the dungeon, action for a live
+// Boss / Elite / Deadly fight, else downtime.
+function musicWanted(){
+  if(PREFS.music===false || document.hidden) return null;
+  if(typeof S==='undefined' || !S || !S.screen || S.screen==='gameover' || S.screen==='victory') return {kind:'theme', mode:'theme', drums:false}; // title, setup and the end screens
+  if(S.screen==='camp') return {kind:'camp', mode:'camp', drums:false};
+  if(S.screen==='shrine') return {kind:'shrine', mode:'shrine', drums:false};
+  const e = S.encounter;
+  const fight = S.screen==='game' && e && e.type!=='Shrine' && e.curHealth>0 && !S.lootChoice && !S.pendingLootDie;
+  if(!fight) return {kind:'dungeon', mode:'down', drums:false};
+  const boss = e.type==='Boss' || e.type==='Big Boss', tier = encounterTier(e);
+  if(boss || tier==='elite' || tier==='deadly') return {kind:'dungeon', mode:'act', drums: boss && e.phase===2};
+  return {kind:'dungeon', mode:'down', drums:false};
+}
+function musicUpdate(){
+  try{
+    const w = musicWanted();
+    if(!w){ if(Music.on) musicStop(); return; }
+    if(!Music.on || Music.kind!==w.kind || ((w.kind==='dungeon' || w.kind==='shrine') && Music.floor!==musicFloorIdx())){ musicStart(w.kind, w.mode); return; } // new screen type or new floor: fade into it
+    musicSwitch(w.mode);
+    musicSetDrums(w.mode==='act' && w.drums);
+  }catch(e){}
+}
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden) musicStop(true); else musicUpdate(); });
+// Browsers keep audio locked until the player first touches the page; the title theme starts on that first tap.
+['pointerdown','keydown'].forEach(ev=> document.addEventListener(ev, ()=>{
+  try{ if(audioCtx && audioCtx.state==='suspended') audioCtx.resume().catch(()=>{}); if(!Music.on) musicUpdate(); }catch(e){}
+}, {passive:true}));
+
+</script>
+<script>
+const BURSTS = {
+  lootBurstAlloy:  [{freq:440, start:0, dur:0.35, type:'triangle', gain:0.12}, {freq:554, start:0.03, dur:0.33, type:'triangle', gain:0.1},
+                    {freq:659, start:0.06, dur:0.4, type:'triangle', gain:0.1}, {freq:1760, start:0, dur:0.08, type:'square', gain:0.04}],
+
+  lootBurstGilded: [{freq:880, start:0, dur:0.45, type:'triangle', gain:0.11}, {freq:1109, start:0.04, dur:0.45, type:'triangle', gain:0.1},
+                    {freq:1319, start:0.08, dur:0.5, type:'sine', gain:0.1}, {freq:1760, start:0.12, dur:0.7, type:'sine', gain:0.07}, {freq:3520, start:0.12, dur:0.35, type:'sine', gain:0.025}],
+
+  lootBurstMagic:  [{freq:932, freqTo:1109, start:0, dur:0.35, type:'sine', gain:0.08}, {freq:1175, start:0.3, dur:0.6, type:'sine', gain:0.08},
+                    {freq:1760, start:0.32, dur:0.55, type:'sine', gain:0.05}, {freq:2349, start:0.36, dur:0.5, type:'sine', gain:0.03}],
+
+};
+function playBurst(name){ const ctx = musicCtx(), now = ctx.currentTime, shift = MUSIC_FLOORS[S.floorIdx].shift;
+  (BURSTS[name]||[]).forEach(n=>{ const o = ctx.createOscillator(), g = ctx.createGain(), f = n.freq*Math.pow(2,shift/12);
+    o.type = n.type; o.frequency.setValueAtTime(f, now+n.start); if(n.freqTo) o.frequency.exponentialRampToValueAtTime(n.freqTo*Math.pow(2,shift/12), now+n.start+n.dur);
+    g.gain.setValueAtTime(0.0001, now+n.start); g.gain.linearRampToValueAtTime(n.gain, now+n.start+0.01); g.gain.exponentialRampToValueAtTime(0.0001, now+n.start+n.dur);
+    o.connect(g).connect(ctx.destination); o.start(now+n.start); o.stop(now+n.start+n.dur+0.05); }); }
+const $ = id => document.getElementById(id), st = $('dState');
+function label(){ st.textContent = (Music.on && Music.kind==='dungeon') ? (Music.mode==='act' ? (Music.drums ? 'Action + drums (boss phase 2)' : 'Action') : 'Downtime') + ' · Floor ' + (S.floorIdx+1) + ' · ' + Music.bpm + ' bpm' : (Music.on ? 'Playing: ' + Music.kind : 'Stopped'); }
+function dungeon(mode){ musicCtx(); if(!(Music.on && Music.kind==='dungeon')) musicStart('dungeon', mode); else musicSwitch(mode); label(); }
+$('dPlay').onclick = ()=>{ dungeon('down'); };
+$('dAct').onclick = ()=>{ dungeon('act'); };
+$('dDrums').onclick = ()=>{ dungeon('act'); musicSetDrums(true); label(); };
+$('dWin').onclick = ()=>{ if(!(Music.on && Music.kind==='dungeon')) dungeon('act'); musicChime(Music.drums ? 'boss' : 'regular'); musicSwitch('down'); musicSetDrums(false); label(); };
+document.querySelectorAll('[data-chime]').forEach(b=> b.onclick = ()=>{ musicCtx(); musicChime(b.dataset.chime); });
+document.querySelectorAll('[data-burst]').forEach(b=> b.onclick = ()=> playBurst(b.dataset.burst));
+document.querySelectorAll('[data-kind]').forEach(b=> b.onclick = ()=>{ musicCtx(); musicStart(b.dataset.kind, b.dataset.kind); label(); });
+document.querySelectorAll('#floors button').forEach(b=> b.onclick = ()=>{
+  document.querySelectorAll('#floors button').forEach(x=>x.classList.toggle('sel', x===b)); S.floorIdx = +b.dataset.f;
+  if(Music.on && (Music.kind==='dungeon' || Music.kind==='shrine')) musicStart(Music.kind, Music.mode); label(); });
+$('stopall').onclick = ()=>{ musicStop(); label(); };
+// the engine's own screen logic stays out of the way here: the page drives it directly
+musicUpdate = function(){};
+</script></body></html>
