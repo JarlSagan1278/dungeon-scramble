@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.39.7';
+const GAME_VERSION = '1.40.0';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -142,7 +142,7 @@ const TUTORIAL_STEPS = [
   },
   {
     title: "One More Thing",
-    body: "The Action Key in Settings (the gear) is a full glossary of every icon in the game -- check it any time you forget what something does. Good luck!",
+    body: "The Codex in Settings (the gear) holds the Action Key, a full glossary of every icon in the game, plus a Bestiary of every monster you meet. Check it any time you forget what something does. Good luck!",
   },
 ];
 

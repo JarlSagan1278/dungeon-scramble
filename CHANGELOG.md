@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.40.0 (Oct 13, 2026)
+- Floor 3 is harder than Floor 2 (Jeremy): attack +2 on every Floor 3 Easy, Standard and Deadly card, +1 on the Elites (doubled on heavy turns), +1 on all three Big Bosses' base attacks. Regular-player bot at Depth 0: HP lost per Floor 3 fight 7.2 -> 10.1 (Floor 2: 6.6), runs ending on Floor 3 6% -> 17% (Floor 2: 19%), overall win 77% -> 65%.
+- Extruzeon, Co-consul of Waste: new "Layer by Layer" base attack starts at 2 and grows by 1 every turn (by 2 in Meltdown; the layers carry into phase 2), shown in its warning chip with a small arrow. Fast, bursty fights beat it cheaply; long ones get expensive. Now as dangerous as the Toadtaur Wizard (bot: ends 4.0% of runs that meet it vs 4.9%, 18 HP per fight).
+- Swarming is capped at 2 ranks (Jeremy).
+- Codex: one tabbed book in Settings and on the title screen -- Bestiary (new: every monster, trap and boss you've met, with art, tier, HP, moves, flavor and how often you beat it / it beat you; unmet ones show as silhouettes), Dice, Relics and the Action Key. Records: Run History and Achievements together. The settings menu is three buttons shorter.
+- Lethal warning: your HP bar gets a red outline and a "Lethal next turn" tag when the enemy's coming turn plus your D.O.T. would finish you (counts the path you're building: its Block, Heal, Freeze, Nullify, or a kill).
+- Class Skill teaching: the first fight with each class explains its Skill once; for Armsmaster and Guard the Skill button pulses until used each turn for that class's first three runs.
+- Volume sliders for sound effects and music (0 = off).
+- Run card on the win and loss screens: who, how the run ended, four headline numbers, the final tray and relics; "Save Card" shares or downloads it as an image.
+- Performance: every idle loop now runs on the compositor (button pulse as an expanding ring, the quest note's candle flicker as a light layer, the art glint only while it shows, the idle sway as one transform). Idle board at CPU x4: ~1.1 s of browser work per 3 s -> ~0.15 s. During a turn's playback the remaining ambient loops rest (paint -34%, compositing -58%).
+
 ## 1.39.7 (Oct 13, 2026)
 - Splash screen (Jeremy): a "Tap to begin" screen before the title, with "© 2026 Jeremy and Katlynn Friedman. All rights reserved." at the bottom. The tap unlocks the browser's audio, so the title theme plays as soon as the title appears.
 - Shrine music: A freygish at 96 bpm -- a soft held drone under a glassy, shimmering melody that sighs through the Bb-C# "sob" and comes home to A (follows the floor's key).
