@@ -46,6 +46,8 @@ let res = await page.evaluate((cfg)=>{
   Object.entries(cfg.classPatch||{}).forEach(([id,p])=>{ const k=CLASSES.find(x=>x.id===id); Object.entries(p).forEach(([f,v])=>{ k[f] = (f==='zone') ? eval(v) : v; }); });
   // manFaces (Oct 13, Jeremy: strong Block / Boost faces on Maneuver II-III): {"2":["Dodge",...], "3":[...]} replaces
   // the basic Maneuver die's faces at that level (face strings as in data.js, e.g. "Block3", "Boost1" = x2).
+  // lootFaces (Oct 13 loot-dice tweaks): {"<loot die name>": ["Hit2",...]} replaces that loot die's faces for the study.
+  Object.entries(cfg.lootFaces||{}).forEach(([n,arr])=>{ const d = [...ALLOY, ...GILDED, ...MAGIC].find(x=>x.name===n); if(d) d.faces = faces(arr); });
   Object.entries(cfg.manFaces||{}).forEach(([lv,arr])=>{ const d = BASIC_DICE.find(x=>x.cat==='maneuver' && x.level===+lv); if(d) d.faces = faces(arr); });
   // kitPatch (Oct 13): {"<boss name>": <full BOSS_KITS entry>} replaces that boss kit for the study.
   Object.entries(cfg.kitPatch||{}).forEach(([n,k])=>{ BOSS_KITS[n] = k; });
