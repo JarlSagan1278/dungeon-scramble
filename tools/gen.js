@@ -1,5 +1,5 @@
 const fs=require('fs'),vm=require('vm');
-const R='/home/claude/dungeon-scramble/src/';
+const R=require('path').resolve(__dirname,'../src')+'/';
 const ctx={};vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(R+'data.js','utf8')+fs.readFileSync(R+'assets.js','utf8')+
 ';globalThis.O={ICON_SVG,ORIGINS,CLASSES,FLOORS,BIG_BOSSES,RELICS,BASIC_DICE,LOGO_IMG,COVER_ART,MONSTER_ART,LOOT_ART,DWARF_PORTRAITS,GNOME_PORTRAITS,HALFLING_PORTRAITS,PIXIE_PORTRAITS};',ctx);
