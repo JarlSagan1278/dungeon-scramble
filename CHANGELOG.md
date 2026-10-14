@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.41.12 (Oct 14, 2026)
+- Faster taps: Swap / Reroll and class-Skill taps redraw only the tray, path bits and Skill button (`renderTrayFast`), about 3x less work per tap at CPU x4 (73 -> 23 ms). The armed-Skill tap is handled in the tray's own tap handler; tapping a die outside the zone while Skill is armed backs out and taps that die normally. `tools/test_trayfast.js` checks fast vs full redraw.
+- Boss chips: damage-per-Minion specials (e.g. Stampede) show the total for the Minions on your Tray, with a small Minion mark; the tooltip keeps the per-Minion number.
+- Play data: Start New Run from the title over a saved run records that run as abandoned (`run_abandon` with `from:'title'`).
+- Sound: the loot chest burst is now the spec's treasure arpeggio (A D F A, then the Bb-C#-D motif, landing on D major), keeping each tier's timbre and register.
+- Tools: `tools/playdata/analyze.py` summarizes tester exports (per-floor damage, path length, think time, ability use, long fights, big hits, downs, loot take rates, and a Dungeoneer wrap-rule check).
+
 ## 1.41.11 (Oct 14, 2026)
 - Dice finishes (Jeremy): a middle ground between the old and the 1.41.10 slim art -- thicker metal rim, bigger edge diamonds, Gold corner plates and Royal gems, with the corner scrolls kept small so they stay clear of the longest die names (checked on all origin dice, the longest loot names and basic dice, every tier).
 
