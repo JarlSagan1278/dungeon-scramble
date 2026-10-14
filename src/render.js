@@ -834,12 +834,20 @@ function renderTitle(){
       </div></div>`);
     openModal(overlay);
     overlay.querySelector('#title-newrun-cancel').onclick = ()=> closeModal(overlay);
-    overlay.querySelector('#title-newrun-go').onclick = ()=> closeModal(overlay, ()=>{ clearSave(); resetSetupPortraitPreviews(); preGameScreen='setup'; render(); });
+    overlay.querySelector('#title-newrun-go').onclick = ()=> closeModal(overlay, ()=>{ abandonSavedRunTelemetry(); clearSave(); resetSetupPortraitPreviews(); preGameScreen='setup'; render(); });
     overlay.onclick = (ev)=>{ if(ev.target===overlay) closeModal(overlay); };
   };
   document.getElementById('title-codex-btn').onclick = ()=> openCodexModal();
   document.getElementById('title-history-btn').onclick = ()=> openRecordsModal();
   document.getElementById('title-howto-btn').onclick = ()=> openTutorialModal(0);
+}
+
+// Starting a new run from the title over a saved one: record the saved run as abandoned in play data (Oct 14 TODO),
+// same as Restart in the gear menu. Loads the save only long enough to log it, then puts S back.
+function abandonSavedRunTelemetry(){
+  const prev = S;
+  try{ if(loadGame() && S && S.origin){ teleLog('run_abandon', {hp:S.health, maxHp:S.maxHealth, from:'title'}); finalizeTelemetry('abandoned'); } }catch(e){}
+  S = prev;
 }
 
 // A generic "unknown" figure -- a dark hooded silhouette with two softly
@@ -1476,11 +1484,16 @@ function renderEncounterCard(e, mode){
   // v1.35.0: a boss's base attack (every turn) plus its next special, named.
   const bossCycle = (isBoss && e.kit) ? (()=>{
     const iconKey = {dmg:'hit', dmgPerMinion:'hit', minion:'minion', shield:'block', heal:'heal', hot:'hot', dot:'dot'};
-    const actText = a => a.type==='dmgPerMinion' ? `${a.value} per Minion on your Tray` : a.type==='dropShield' ? 'drops its Shield' : enemyActionTooltip(iconKey[a.type], a.value);
+    // Damage-per-Minion moves show the total for the Minions on your Tray now (literature review, Oct 14): the tiny
+    // minion mark says it scales; the tooltip has the per-Minion number. Zeal adds once, as in enemyNextTurnPreview.
+    const minsNow = S.tray ? S.tray.filter(c=>c.minion).length : 0;
+    const perMinTotal = (a, hv) => { const t = a.value*minsNow; return t>0 ? t + zealBonus(hv) : 0; };
+    const perMinNum = (a, hv) => `<b class="enc-n">${perMinTotal(a, hv)}</b><small class="enc-per">${iconSpan('minion')}</small>`;
+    const actText = a => a.type==='dmgPerMinion' ? `${a.value} per Minion on your Tray (${minsNow} now: ${perMinTotal(a, !!a._hv)} damage)` : a.type==='dropShield' ? 'drops its Shield' : enemyActionTooltip(iconKey[a.type], a.value);
     const chip = (a0, extraCls, label) => {
       const a = a0.type==='dmg' ? {...a0, value:a0.value + (a0.grow ? (e.layers||0) : 0) + zealBonus(false)} : a0; // Zeal (and Extruzeon's layers) show in the warning
       const ik = iconKey[a.type]; if(!ik) return '';
-      const num = a.type==='dmgPerMinion' ? `<b class="enc-n">${a.value}</b><small class="enc-per">/${iconSpan('minion')}</small>` : `<b class="enc-n">${a.value}</b>`;
+      const num = a.type==='dmgPerMinion' ? perMinNum(a, false) : `<b class="enc-n">${a.value}</b>`;
       return `<span class="boss-cycle-item next enemy-action-badge ${extraCls}${a.grow?' grows':''}" title="${label?label+': ':''}${actText(a)}${a.grow?` (Layer by Layer: grows by ${a.grow} every turn)`:''}">${iconSpanSolid(ik)}${num}${label?' '+label:''}</span>`;
     };
     const kit = bossKitNow(e), sp = nextTurn.special;
@@ -1488,8 +1501,8 @@ function renderEncounterCard(e, mode){
     const frozen = !!S.freezeNext;
     const spMain0 = sp.acts.find(a=>iconKey[a.type]) || sp.acts[0];
     const spMain = spMain0.type==='dmg' ? {...spMain0, value:spMain0.value + zealBonus(true)} : spMain0;
-    const spTip = `${sp.name}: ${sp.herald?`(brought ${sp.herald.value} Minions with its warning) `:''}${sp.acts.map(actText).join(', ')}${frozen?' (cancelled by Freeze)':''}`;
-    const spNum = !spMain.value ? '' : spMain.type==='dmgPerMinion' ? `<b class="enc-n">${spMain.value}</b><small class="enc-per">/${iconSpan('minion')}</small>` : `<b class="enc-n">${spMain.value}</b>`;
+    const spTip = `${sp.name}: ${sp.herald?`(brought ${sp.herald.value} Minions with its warning) `:''}${sp.acts.map(a=>actText({...a,_hv:true})).join(', ')}${frozen?' (cancelled by Freeze)':''}`;
+    const spNum = !spMain.value ? '' : spMain.type==='dmgPerMinion' ? perMinNum(spMain, true) : `<b class="enc-n">${spMain.value}</b>`;
     const special = `<span class="boss-cycle-item next enemy-action-badge boss-special${sp.windup&&!frozen?' heavy':''}${frozen?' frozen':''}" title="${spTip}">${iconKey[spMain.type]?iconSpanSolid(iconKey[spMain.type]):''}${spNum} ${sp.name}</span>`;
     return `<div class="boss-cycle-row${kit.each.length>1?' crowded':''}"><span class="hint" style="margin:0;">Next turn:</span>${base}${special}</div>`;
   })() : '';
@@ -2354,6 +2367,15 @@ function getAudioCtx(){
   if(audioCtx.state==='suspended') audioCtx.resume().catch(()=>{});
   return audioCtx;
 }
+// Treasure arpeggio (Oct 14): A D F A, then the Bb C# D "sob" motif, landing on a D major chord (D F# A).
+// oct = 1 starts at A3, 2 an octave up. Notes 55 ms apart; the chord rings ~0.6 s.
+function lootArp(oct, type, gain, extra){
+  const m = oct===2 ? 2 : 1, base = [220, 293.66, 349.23, 440, 466.16, 554.37, 587.33];
+  const seq = base.map((f,i)=>({freq:f*m, start:i*0.055, dur:0.14, type, gain:gain*(0.8 + i*0.04)}));
+  const t = base.length*0.055;
+  [587.33, 739.99, 880].forEach((f,i)=> seq.push({freq:f*m, start:t + i*0.01, dur:0.6, type, gain:gain*0.9}));
+  return seq.concat(extra||[]);
+}
 const TONE_SEQUENCES = {
   // A sword-slash instead of a flat blip: a bright, fast downward sweep
   // (the "swish" of the blade) with sharp metallic ping layered right on
@@ -2508,14 +2530,12 @@ const TONE_SEQUENCES = {
   // actually picked on the loot-reveal screen (renderLootModal/
   // pickLootOption) -- a Zelda-ish sparkle, distinct from the later 'equip'
   // ka-ching that plays once the die is actually slotted into the tray.
-  // Loot chest burst, one chord per loot tier (Jeremy, Oct 13): Alloy a metal clink + A major, Gilded brighter and
-  // higher with a bell on top, Magic a glassy shimmer through the Bb-C# "sob".
-  lootBurstAlloy:  [{freq:440, start:0, dur:0.35, type:'triangle', gain:0.12}, {freq:554, start:0.03, dur:0.33, type:'triangle', gain:0.1},
-                    {freq:659, start:0.06, dur:0.4, type:'triangle', gain:0.1}, {freq:1760, start:0, dur:0.08, type:'square', gain:0.04}],
-  lootBurstGilded: [{freq:880, start:0, dur:0.45, type:'triangle', gain:0.11}, {freq:1109, start:0.04, dur:0.45, type:'triangle', gain:0.1},
-                    {freq:1319, start:0.08, dur:0.5, type:'sine', gain:0.1}, {freq:1760, start:0.12, dur:0.7, type:'sine', gain:0.07}, {freq:3520, start:0.12, dur:0.35, type:'sine', gain:0.025}],
-  lootBurstMagic:  [{freq:932, freqTo:1109, start:0, dur:0.35, type:'sine', gain:0.08}, {freq:1175, start:0.3, dur:0.6, type:'sine', gain:0.08},
-                    {freq:1760, start:0.32, dur:0.55, type:'sine', gain:0.05}, {freq:2349, start:0.36, dur:0.5, type:'sine', gain:0.03}],
+  // Loot chest burst (music spec "Treasure": a rising arpeggio that quotes the Bb-C#-D motif, ends on a bright D major chord).
+  // Each tier keeps its Oct 13 character (Jeremy): Alloy low triangle + metal clink, Gilded an octave up with a bell,
+  // Magic glassy sines with a high shimmer. Built by lootArp() below.
+  lootBurstAlloy:  lootArp(1, 'triangle', 0.10, [{freq:1760, start:0, dur:0.08, type:'square', gain:0.04}]),
+  lootBurstGilded: lootArp(2, 'triangle', 0.09, [{freq:3520, start:0.48, dur:0.5, type:'sine', gain:0.03}, {freq:1760, start:0.48, dur:0.8, type:'sine', gain:0.05}]),
+  lootBurstMagic:  lootArp(2, 'sine', 0.08, [{freq:4699, start:0.5, dur:0.6, type:'sine', gain:0.02}, {freq:3520, start:0.56, dur:0.5, type:'sine', gain:0.02}]),
   lootPick: [{freq:659,  start:0,    dur:0.1,  type:'sine',     gain:0.18},
              {freq:880,  start:0.08, dur:0.12, type:'sine',     gain:0.18},
              {freq:1109, start:0.16, dur:0.24, type:'triangle', gain:0.2}],
