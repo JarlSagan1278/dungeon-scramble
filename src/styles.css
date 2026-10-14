@@ -3081,3 +3081,4 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 .campfire-choice.out .cf-label{ color:var(--parchment-dim); }
 .camp-section.cf-point{ animation: cf-point 1.1s ease-out 1; }
 @keyframes cf-point{ 0%{ box-shadow:0 0 0 0 var(--purple); } 30%{ box-shadow:0 0 0 4px var(--purple); } 100%{ box-shadow:0 0 0 0 transparent; } }
+.util-btn .badge.pocket-heart{ background:#c0392b; color:#fff5d6; }

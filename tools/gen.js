@@ -62,7 +62,7 @@ ${tbl(['Floor','Loot','Enemy Health','Trap Health','Boss'],[
  ['2','<span class="tag t-gilded">Gilded</span>','21 – 39','45','The Necrorancher, Bellicose Biomancer or Ceramic Golem'],
  ['3','<span class="tag t-magic">Magic</span>','25 – 67','70','<b>Big Boss:</b> Extruzeon, Myceleus or the Toadtaur Wizard']])}
 <p class="small">Health is shown at Depth 0. Deadly foes have more (up to 48 on Floor 2 and 77 on Floor 3), and some depth modifiers raise it further.</p>
-${call('note','How you win','Defeat the Big Boss. The run ends in defeat only when your Health hits 0 <i>and</i> you have no Back Pocket dice left to roll. See Chapter 10.')}
+${call('note','How you win','Defeat the Big Boss. The run ends in defeat when your Health hits 0 and your Back Pocket cannot save you; a save spends the whole Pocket. See Chapter 10.')}
 `,'c1');
 // 2
 const portr={dwarf:O.DWARF_PORTRAITS,gnome:O.GNOME_PORTRAITS,halfling:O.HALFLING_PORTRAITS,pixie:O.PIXIE_PORTRAITS};
@@ -89,7 +89,7 @@ ${tbl(['Die','What it is','Faces'],[
  ['<span class="tag t-magic">Magic</span> Loot dice','The strongest, Floor 3',O.FLOORS[2].lootPool.length+' dice']])}
 <p>Basic dice show their level (I, II, III). Loot dice show the name of the item. Every Loot die is in the <a href="#dice">Dice Reference</a> at the back.</p>
 <h3>The Back Pocket</h3>
-<p>The Back Pocket holds every die that is not in your Tray. Dice land there when a new Loot die replaces them (or when you keep a new Loot die in the Pocket), and you can swap them back at Camp. They are also your <b>safety net</b>: when your Health hits 0, the game rolls a random Back Pocket die for you. Open it any time with ${btn('Pocket')}.</p>
+<p>The Back Pocket holds every die that is not in your Tray. Dice land there when a new Loot die replaces them (or when you keep a new Loot die in the Pocket), and you can swap them back at Camp. They are also your <b>safety net</b>: when your Health hits 0, your Back Pocket can save you once, but the save spends <b>every</b> die in it (Chapter 10). A red ♥ on ${btn('Pocket')} means the safety net is ready.</p>
 `,'c3');
 // 4
 C+=ch(4,'Taking a Turn',`
@@ -199,10 +199,11 @@ C+=ch(9,'Relics',`
 C+=ch(10,'Defeat',`
 <p>When your Health reaches 0 the game checks your Back Pocket before ending the run.</p>
 <ol class="steps">
-<li>If the Pocket has dice, one is chosen at random and <b>rolled</b>.</li>
-<li>If it lands on any <b>Action</b>, you are restored to <b>5 Health</b> and the fight goes on. The die is spent either way.</li>
-<li>If it lands on a <b>blank</b>, that die is lost and the game rolls another.</li>
-<li>When the Pocket is empty, the run ends.</li></ol>
+<li>If the Pocket has dice, they are <b>rolled</b> one at a time in random order.</li>
+<li>The first one that lands on any <b>Action</b> saves you: you are restored to <b>5 Health</b> and the fight goes on.</li>
+<li>Saved or not, <b>every die in the Back Pocket is spent</b>. Any Pocket is a full safety net, but it can't keep saving you: it arms again when a new die lands in your Pocket (usually your next loot).</li>
+<li>If every die lands blank, or the Pocket is empty, the run ends.</li></ol>
+<p class="small">Combining dice at Camp warns you if it would use your last spare dice.</p>
 ${call('note','Carry a die forward','On the Defeated screen you choose one die from the highest tier of Loot dice in your Tray to carry into your next run, where it takes the place of your extra Attack Die I.')}
 <p>Win or lose, the end screen shows a <b>Run Card</b>: your Adventurer, depth, how the run ended, damage, best turn, Block, foes beaten, final Tray and relics. ${btn('Save Card')} saves or shares it as a picture.</p>
 `,'c10');
@@ -238,7 +239,7 @@ C+=ch(12,'Quick Reference',`
 <div><b>Overkill</b>10+ past lethal (6 with Bloodthirst)</div>
 <div><b>Campfire</b>Rest (heal ½ of non-blank faces) OR Train (combine dice) · Base Camp: combine free</div>
 <div><b>Train</b>3 matching Basics → 1 a level higher</div>
-<div><b>Revive</b>Pocket die rolls Action → 5 Health</div>
+<div><b>Revive</b>Pocket dice rolled · first Action → 5 Health · the whole Pocket is spent</div>
 <div><b>Statuses</b>All reset when a new room opens</div>
 <div><b>D.O.T. / H.O.T.</b>Trigger at round end, then drop by 1</div>
 <div><b>Boost</b>Multiplies the <i>next</i> value face only</div>

@@ -2538,7 +2538,7 @@ function pocketLootDie(){
 // Revive rule switch (Oct 14 test, off until Jeremy decides). spend: 'one' = today (each roll spends one die; a
 // blank rolls again), 'all' = a save spends the whole Pocket, 'half' = a save spends half the Pocket (rounded up).
 // hp: Health after a save, a number or 'half' (half your max).
-let REVIVE_RULE = {spend:'one', hp:5};
+let REVIVE_RULE = {spend:'all', hp:5}; // Jeremy, Oct 14: a save spends the whole Back Pocket ("brings the win rate in line with other roguelikes")
 function onPlayerDefeated(){
   teleLog('player_down', {enemy:S.encounter?S.encounter.name:null, enemyHp:S.encounter?Math.round(S.encounter.curHealth):null, backPocket:S.backPocket.length,
     cause: S._downBeat===2 ? 'dot' : 'hit', lethalStart: S._lw?S._lw.start:null, lethalGo: S._lw?S._lw.go:null, maxHp:S.maxHealth});

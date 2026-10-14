@@ -1740,7 +1740,7 @@ function renderGame(){
         </div>
         <div class="util-rail">
           <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning)?'disabled':''} ${emphasizeResolve?'pulse':''}" id="resolve-btn"><span>Go</span></div>
-          <div class="util-btn rail-pocket" id="open-backpocket-btn">${iconSpan('bag')}<span>Pocket</span></div>
+          <div class="util-btn rail-pocket" id="open-backpocket-btn" title="${S.backPocket.length?'Safety net ready: if you fall to 0 Health, your Back Pocket can save you once (it spends every die in it).':'Back Pocket empty: no safety net until a die lands here.'}">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?'<span class="badge pocket-heart">&#9829;</span>':''}</div>
           <div class="util-btn rail-item ${totalTokens?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Item</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
           <div class="util-btn danger-accent rail-clear ${S.transitioning?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
           ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''} ${abilityArmed?'armed':''} ${(S.coachRun && !S.classAbilityUsed && !S.transitioning && !abilityArmed)?'pulse coach-pulse':''}" id="ability-btn" style="--class-color:${S.klass.color||'#d4af52'}"><span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
@@ -3230,10 +3230,11 @@ function keyShow(cell){
 
 function backPocketViewHTML(){
   if(!S.backPocket.length){
-    return `<p class="hint">Empty ${infoDot('Dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one. Visit Camp to swap them into your Tray.')}</p>`;
+    return `<p class="hint">Empty ${infoDot('Dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one. Visit Camp to swap them into your Tray.')}</p>
+      <p class="hint">No safety net right now: your next die here arms it again.</p>`;
   }
   return `<div class="camp-dice-grid">${S.backPocket.map(d=>`<div class="die dietype-${d.cat} camp-die-tile" style="cursor:default;" title="${d.name}"><span class="camp-die-label">${d.name.replace(/^Maneuver\b/,'Mvr').replace(/^Attack\b/,'Atk')}</span></div>`).join('')}</div>
-    <p class="hint" style="margin-top:8px;">${infoDot('Visit Camp to swap these into your Tray.')}</p>`;
+    <p class="hint" style="margin-top:8px;"><b style="color:#e8746b">&#9829; Safety net ready.</b> If you fall to 0 Health, these dice are rolled until one isn't blank: it saves you at 5 Health, and <b>every</b> die here is spent. ${infoDot('Visit Camp to swap these into your Tray.')}</p>`;
 }
 
 function logViewHTML(){
@@ -4144,6 +4145,24 @@ function campfireChoiceHTML(){
     </div>`;
 }
 
+// Combining can use up the last Back Pocket dice, which disarms the safety net (Oct 14 revive rule): warn first.
+function pocketLeftAfterUpgrade(cat, level){
+  const bpMatches = S.backPocket.filter(d=>d.cat===cat && d.level===level).length;
+  const bpUsed = Math.min(bpMatches, 3), trayUsed = 3 - bpUsed;
+  return S.backPocket.length - bpUsed - Math.max(0, trayUsed - 1) + (trayUsed===0 ? 1 : 0); // a Pocket-only combine puts the new die in the Pocket
+}
+function confirmEmptyPocket(go){
+  const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
+      <h2>Empty your Back Pocket?</h2>
+      <p>This combine uses your last spare dice, so you'll have <b>no safety net</b> if you fall to 0 Health, until a new die lands in your Pocket.</p>
+      <div class="small-btn-row" style="justify-content:center;"><button id="ep-cancel">Keep my safety net</button><button class="danger" id="ep-go">Combine anyway</button></div>
+    </div></div>`);
+  openModal(overlay);
+  overlay.querySelector('#ep-cancel').onclick = ()=> closeModal(overlay);
+  overlay.querySelector('#ep-go').onclick = ()=> closeModal(overlay, go);
+  overlay.onclick = (ev)=>{ if(ev.target===overlay) closeModal(overlay); };
+}
+
 function renderCamp(){
   const baseCamp = S.floorIdx===0 && S.routeStep===0;
   const campFx = healthFX(S.health, S._lastPlayerHealth);
@@ -4233,7 +4252,11 @@ function renderCamp(){
   ['attack','maneuver'].forEach(cat=>{
     [1,2].forEach(level=>{
       const btn = document.getElementById(`upgrade-${cat}-${level}`);
-      if(btn) btn.onclick = ()=> flyDiceToFuse(cat, level, ()=> campUpgrade(cat, level));
+      if(btn) btn.onclick = ()=>{
+        const go = ()=> flyDiceToFuse(cat, level, ()=> campUpgrade(cat, level));
+        if(!pocketLeftAfterUpgrade(cat, level) && S.backPocket.length) return confirmEmptyPocket(go);
+        go();
+      };
       if(btn){
         // Hovering (or focusing / touching) an upgrade lights up the dice stacks it would consume.
         const nm = basic(cat,level).name;

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.41.16 (Oct 14, 2026)
+- Back Pocket revive (Jeremy): any Pocket is a full safety net, but a save spends the whole Pocket. At 0 Health the Pocket dice are rolled one at a time in random order; the first non-blank face saves you at 5 Health; then every Pocket die is gone (if all land blank, the run ends). It arms again when a new die lands in the Pocket. Combining dice no longer quietly costs revives (it was a trap: bots that never combined won 85-89% vs 66-70%). Bot study: regular 82% -> 56%, new players 68% -> 38%, expert depth 7 54% -> 27% (docs/studies/2026-10-14_campfire_backpocket.md); Jeremy wants the win rate nearer other roguelikes.
+- A red heart on the Pocket button shows the safety net is armed; the Pocket window explains the rule; combining at Camp warns before it would use your last spare dice. Telemetry: `pocket_revive`. Rulebook updated.
+
 ## 1.41.15 (Oct 14, 2026)
 - Campfire choice (Jeremy: camp had the least agency; "the upgrading should be the fusing"): every Camp after Base Camp has a "Campfire: choose one" panel, **Rest** (heal; the button shows about how much) **or** **Train** (combine 3 matching dice in the section below, now titled "Train: Upgrade Dice"; still one Attack and one Maneuver per Camp). The chosen one gets a check and a gold ring, the other fades; Organize stays free; Base Camp combining stays free. Leaving without using the fire asks first. Telemetry: `camp_choice`.
 - Time-Intensive Shrine now costs your whole next campfire (no Rest or Train), since a skipped rest alone could be dodged by training.
