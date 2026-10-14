@@ -49,3 +49,15 @@ Significant: Attack II Hit3 Hit2 Combo2 Combo2 Hit1 + 1 blank; Attack III Hit4 H
 | Significant | 68% | 49% | 57% | +11 |
 
 Stronger II/III dice make Train worth taking (the gap between combining and never combining goes from 0 to +7 or +11 points). Moderate raises the overall win rate only ~4 points; Significant raises it ~11, which undoes much of the revive change.
+
+## Campfire policies on 1.41.17 (shipped moderate basics)
+
+| Bot policy at each campfire | Regular D0 | New D0 |
+|---|---|---|
+| Only Rest | 57% | 39% |
+| Only Train (combine whenever possible, never rest) | 38% | 26% |
+| Mix: rest at or below 40% HP, else Train | 55% | |
+| Mix: rest at or below 60% HP, else Train | **61%** | 39% |
+| Mix: rest at or below 80% HP, else Train | 59% | |
+
+Neither choice dominates: always training is far worse than always resting, and choosing by HP beats both for regular players (+4 over Only Rest). For new players the 60% mix ties Only Rest. That is the shape a real choice should have.
