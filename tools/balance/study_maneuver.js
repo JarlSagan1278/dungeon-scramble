@@ -41,7 +41,7 @@ let res = await page.evaluate((cfg)=>{
   try{ PREFS.reducedMotion=true; }catch(e){}
   if(cfg.unlockAllRelics!==false){ try{ DEPTH_BEST.overall=Math.max(DEPTH_BEST.overall||0,2); }catch(e){} } // Oct 12 gating: studies see every relic unless unlockAllRelics:false
   // classPatch (Oct 12 class study): {"guard":{"convertTo":{"type":"block","value":1}}, "arcanist":{"zone":"(r,c)=>r===c||r+c===3"}}; zone given as source text
-  if(cfg.reviveClear) REVIVE_CLEARS_POCKET = true; // Oct 14 test: a Back Pocket save spends the whole Pocket
+  if(cfg.reviveClear) REVIVE_RULE = {spend:'all', hp:5}; if(cfg.reviveRule) REVIVE_RULE = cfg.reviveRule; // Oct 14 test: a Back Pocket save spends the whole Pocket
   window.__rev={saves:0,fails:0,spent:0,downs:0}; { const pd0=onPlayerDefeated; window.onPlayerDefeated=function(){ window.__rev.downs++; return pd0(); }; } { const tl0=teleLog; window.teleLog=function(t,d){ if(t==='pocket_revive'){ if(d.saved) window.__rev.saves++; else window.__rev.fails++; window.__rev.spent+=d.spent; } return tl0(t,d); }; }
   if(cfg.trayActAfter) TRAYACT_AFTER = cfg.trayActAfter; // Swap/Reroll after-use test: 'blank' | 'step' | 'pivot'
   Object.entries(cfg.relicPatch||{}).forEach(([id,p])=>Object.assign(RELICS.find(r=>r.id===id),p)); // relic number tests, e.g. {"forgeplate":{"amt":2}}
