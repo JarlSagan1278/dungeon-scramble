@@ -165,3 +165,4 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - **Tempo (Jeremy, Oct 14, 1.41.5):** music starts at 130 bpm on Floor 1, +5 per floor (130/135/140). Title theme and stings follow Floor 1's tempo (Claude's call, so they match the run's opening).
 - **Enemy chips (Jeremy, Oct 14, 1.41.6):** icon + readable number, no word; named abilities only on boss specials.
 - **Solid icons (Jeremy, Oct 14, 1.41.7):** an icon whose number sits beside it (chips) is drawn solid (`iconSpanSolid` / `solidIcon` in data.js); the hole is only for numbers inside the icon (dice faces).
+- **Netlify zip 1.41.7 (Jeremy asked, Oct 14):** offline check passed (188 cached files incl. all 180 art, plays offline); full bug hunt on 1.41.7 clean (24/24, no findings).
