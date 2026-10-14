@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.9 (Oct 14, 2026)
+- Loot (tester idea, Jeremy approved): the equip pop-up has a blue **Keep in Pocket** button next to Replace. The new die goes straight to the Back Pocket and the Tray stays as it is (it counts as collected, for Starting Boon copies too). Telemetry: `loot_equip` with `pocket:true`, `replaced:null`.
+
 ## 1.41.8 (Oct 14, 2026)
 - Fix (tester): the Dungeoneer's edge wrap let any die in the edge zone step straight up or down, so a Dodge (or Leap) could move like a plain step. Across the left/right seam each face now keeps its own move rule: a plain step crosses to the same row, a Dodge crosses diagonally (one row up or down), a Pivot either, a Leap can't use the seam. `tools/test_wrap.js` checks it (12 ok).
 - Codex (tester): the Dice tab now lists the four Origin starting dice (with faces and a one-line role) above the loot dice; they don't count toward the found total.

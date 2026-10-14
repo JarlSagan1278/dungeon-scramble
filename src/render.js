@@ -3736,13 +3736,13 @@ function dieWorth(d){
 function renderSwapModal(){
   const incoming = S.pendingLootDie;
   const overlay = el(`<div class="modal-overlay modal-bottom"><div class="modal">
-      <h2>Equip ${incoming.name} ${infoDot('Tap the die you want to replace. It goes to your Back Pocket.')}</h2>
+      <h2>Equip ${incoming.name} ${infoDot('Tap the die you want to replace. It goes to your Back Pocket. Or keep the new die in your Back Pocket and leave your Tray as it is.')}</h2>
       <div class="swap-compare" id="swap-compare">
         <div class="swap-compare-row swap-compare-in"><div class="swap-compare-label"><span>New</span> <b>${incoming.name}</b></div>${diceFacesRowHTML(incoming)}</div>
         <div class="swap-compare-row swap-compare-out" id="swap-compare-out"><div class="swap-compare-hint">Select a die below to compare its faces.</div></div>
       </div>
       <div class="swap-list" id="swap-list"></div>
-      <div class="small-btn-row" style="justify-content:center;"><button class="primary" id="swap-go" disabled>Replace</button></div>
+      <div class="small-btn-row" style="justify-content:center;"><button class="pocket-btn" id="swap-pocket" title="Keep the new die in your Back Pocket; your Tray stays as it is">Keep in Pocket</button><button class="primary" id="swap-go" disabled>Replace</button></div>
     </div></div>`);
   overlay.querySelector('.modal').classList.add('swap-modal');
   openUniqueOverlay('swap', overlay);
@@ -3787,6 +3787,7 @@ function renderSwapModal(){
     suggestItem.insertAdjacentHTML('afterbegin', '<span class="swap-suggest-ribbon">Suggested</span>');
     suggestItem.onclick(); // pre-compare it
   }, SWAP_SUGGEST_DELAY_MS);
+  overlay.querySelector('#swap-pocket').onclick = () => closeModal(overlay, ()=> pocketLootDie());
   goBtn.onclick = () => {
     if(!chosen) return;
     const die = S.tray[chosen.indices[0]].die;

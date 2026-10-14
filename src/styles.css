@@ -71,6 +71,8 @@
   }
   button.primary.pulse, .util-btn.pulse{ animation: pulse-glow 1.1s ease-in-out infinite; }
   button.danger{ background:var(--red-dim); }
+  button.pocket-btn{ background:var(--blue); color:var(--parchment); }
+  button.pocket-btn:hover:not(:disabled){ background:#5a8bb0; }
   .panel{ background:var(--panel); border:1px solid var(--line); border-radius:var(--r-md); padding:6px 6px; }
 
   /* Setup screen (character creation) -- a WoW-style icon-row -> contextual

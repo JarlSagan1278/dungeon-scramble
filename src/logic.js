@@ -2509,6 +2509,23 @@ function swapInLootDie(trayIndex){
   render();
 }
 
+// "Keep in Pocket" (tester idea, Jeremy approved Oct 14): take the loot die without replacing a tray die;
+// it goes straight to the Back Pocket. Same as equipping and swapping it back at camp, minus the trip.
+function pocketLootDie(){
+  if(!S.pendingLootDie) return;
+  const d = { name: S.pendingLootDie.name, faces: S.pendingLootDie.faces, cat: S.pendingLootDie.cat || 'loot' };
+  teleLog('loot_equip', {equipped:d.name, replaced:null, pocket:true});
+  S.backPocket.push(d);
+  S.usedLootNames.add(d.name);
+  recordDieAcquired(d);
+  S.pendingLootDie = null;
+  logMsg('sys', `Kept ${d.name} in your Back Pocket.`, 'good');
+  S.stats.lootCollected++;
+  if(typeof playTone==='function') playTone('equip');
+  finishStep();
+  render();
+}
+
 function onPlayerDefeated(){
   teleLog('player_down', {enemy:S.encounter?S.encounter.name:null, enemyHp:S.encounter?Math.round(S.encounter.curHealth):null, backPocket:S.backPocket.length,
     cause: S._downBeat===2 ? 'dot' : 'hit', lethalStart: S._lw?S._lw.start:null, lethalGo: S._lw?S._lw.go:null, maxHp:S.maxHealth});
