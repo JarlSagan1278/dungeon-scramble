@@ -13,10 +13,13 @@
 5. **Remaining performance:** ~1.5 s of script per turn at CPU x4 (renderGame/placeVs) and ~500 ms of style work during playback.
 
 ## Small follow-ups
-- Damage-per-Minion boss specials show "3 / [minion]"; show the total for the Minions on the tray instead (literature review; the lethal warning already counts them).
-- "Start New Run" from the title screen over a saved run discards it without recording it as abandoned in play data.
-- Treasure sound: still a chord per loot tier, not the spec's rising arpeggio quoting Bb-C#-D.
+- Swap / Reroll token shrine boons (Scroll Dispensers AWSP, DOER) still say "before you build your path"; the tokens also work mid-path. Fix the text and the names sheet together.
+- Rulebook Word file (docs/DungeonScramble_Rulebook.docx) is still at build 1.32.26; the PDF is current (1.41.12, from tools/gen.js). Ask Jeremy whether he uses the .docx.
 - Ideas from the literature review (not decided): a reward for reaching a new best depth; an optional assist mode that grows after losses (Hades God Mode style); log whether a death was avoidable in the bot studies.
+
+## Done Oct 14 (background session)
+- Bug hunt on 1.41.11: 24/24 clean. Class re-baseline with the fixed Dungeoneer wrap + Grafter study: docs/studies/2026-10-14_wrapfix_grafter.md.
+- 1.41.12: faster Swap/Reroll/Skill taps (~3x), Minion-damage chips show totals, title New Run logs the abandoned save, treasure arpeggio. tools/playdata/analyze.py reads tester exports. Rulebook PDF refreshed. Reset Progress now also clears depth bests.
 
 ## Settled (Oct 13-14)
 - Balance philosophy recorded (PROJECT_CONTEXT): variance and luck are part of the fun; over-strong player pieces OK, over-strong enemies not.
