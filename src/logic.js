@@ -2366,8 +2366,18 @@ function runShrineEffect(e, effect){
   }
 }
 
+// Test switch (Oct 14 knockout study: a shrine room was worth less than a fight room, because fights give loot).
+// true = after its boon, a shrine also offers a loot pick (2 dice of the floor's tier), like a won fight.
+let SHRINE_LOOT = false;
 function continueFromShrine(){
   S.shrineResult = null;
+  if(SHRINE_LOOT && S.encounter && !S.encounter._shrineLoot){
+    S.encounter._shrineLoot = true;
+    const floor = FLOORS[S.floorIdx];
+    const options = pickLootNUnused(floor.lootPool, Math.min(2 + (hasRelic('lucky_coin') ? 1 : 0), floor.lootPool.length));
+    S.lootChoice = { options, lootName: floor.lootName, overkill:false, nearMiss:0 };
+    render(); return; // taking the die (or keeping it in the Pocket) finishes the room
+  }
   finishStep();
   render();
 }
@@ -2597,12 +2607,14 @@ function upgradeAvailability(cat, level){
 // True only if there are 3 matching dice AND enough OTHER spare Back Pocket
 // dice to backfill every Tray slot the upgrade would empty (every consumed
 // Tray slot beyond the first, which the new upgraded die itself fills).
+// Test switch (Oct 14): how many matching dice a combine takes (3 today; 2 is being studied).
+let UPGRADE_COST = 3;
 function canUpgrade(cat, level){
   const bpMatches = S.backPocket.filter(d=>d.cat===cat && d.level===level).length;
   const trayMatches = S.tray.filter(c=>c.die.cat===cat && c.die.level===level).length;
-  if(bpMatches + trayMatches < 3) return false;
-  const bpUsedInRecipe = Math.min(bpMatches, 3);
-  const trayUsed = 3 - bpUsedInRecipe;
+  if(bpMatches + trayMatches < UPGRADE_COST) return false;
+  const bpUsedInRecipe = Math.min(bpMatches, UPGRADE_COST);
+  const trayUsed = UPGRADE_COST - bpUsedInRecipe;
   const fillersNeeded = Math.max(0, trayUsed - 1);
   const availableFillers = S.backPocket.length - bpUsedInRecipe;
   return availableFillers >= fillersNeeded;
@@ -2627,7 +2639,7 @@ function campUpgrade(cat, level){
   const trayMatches = [];
   S.tray.forEach((c,i)=>{ if(c.die.cat===cat && c.die.level===level) trayMatches.push(i); });
 
-  let need = 3;
+  let need = UPGRADE_COST;
   const consumedBP = [];
   for(const i of bpMatches){ if(need<=0) break; consumedBP.push(i); need--; }
   const consumedTray = [];

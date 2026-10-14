@@ -43,6 +43,8 @@ let res = await page.evaluate((cfg)=>{
   // classPatch (Oct 12 class study): {"guard":{"convertTo":{"type":"block","value":1}}, "arcanist":{"zone":"(r,c)=>r===c||r+c===3"}}; zone given as source text
   // Knockout knobs (Oct 14 system study): each turns one player system off.
   if(cfg.noShrines) window.shrineSlotChance = ()=>0;
+  if(cfg.shrineLoot) SHRINE_LOOT = true;
+  if(cfg.upgradeCost) UPGRADE_COST = cfg.upgradeCost;
   if(cfg.noQuests) window.checkQuests = function(){ return []; };
   if(cfg.noRevive){ const pdx=onPlayerDefeated; window.onPlayerDefeated=function(){ S.backPocket=[]; return pdx(); }; }
   if(cfg.reviveClear) REVIVE_RULE = {spend:'all', hp:5}; if(cfg.reviveRule) REVIVE_RULE = cfg.reviveRule; // Oct 14 test: a Back Pocket save spends the whole Pocket
