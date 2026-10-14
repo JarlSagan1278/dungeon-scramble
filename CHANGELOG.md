@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.41.18 (Oct 14, 2026)
+- Art: silhouette placeholders for the four Magic dice without pictures (Axiom of Choice, Domesticated Displacer, 273.15 Kelvin Box, Exile Elixir), until the real art exists (Jeremy).
+- Text: the Swap and Reroll Scroll Dispensers now say the tokens work "even mid-path" (they used to say "before you build your path").
+
 ## 1.41.17 (Oct 14, 2026)
 - Stronger level II/III basic dice (Jeremy, "ship moderate"), so a Train (combine) at camp pays off and upgraded basics hold their Tray slots against loot: Attack II Hit2 Hit2 Combo2 **Hit1** + 2 blanks; Attack III Hit3 Hit3 Combo3 **Hit2 Hit1** + 1 blank; Maneuver II Dodge Dodge Leap Pivot **Block2 Block2**; Maneuver III Dodge Leap Pivot **Block2 Block2 Boost x2**. Bot study: combining is now worth +7 points (it was worth nothing); overall regular 57% -> 61%, new 35% -> 39%.
 

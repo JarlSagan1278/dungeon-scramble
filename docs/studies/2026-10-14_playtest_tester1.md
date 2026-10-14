@@ -10,7 +10,7 @@ Source: two exports from one tester (player id p-ivd33sozzjy7, phone 360x699). T
 | Depth (as shown in game) | 0 | 2 (Night Shift 1, Union Dues; internal depth 1 and 3) |
 | First run with this class? | yes | yes |
 | Result | Won | Won (one down on Floor 3, saved by the Back Pocket) |
-| Length | 66 min, 53 turns | 68 min, 66 turns |
+| Length (active play) | 41 min, 53 turns (66 min wall clock) | 35 min, 66 turns (68 min wall clock) |
 | Damage taken F1 / F2 / F3 | 17 / 13 / 37 | 39 / 58 / 96 |
 | Relics | Combonatorics, Bisection Method, Bloodthirst | Prime Edge |
 | Best turn | 47 (Myceleus) | 102 (Toadtaur Wizard, overkill by 70) |
@@ -25,7 +25,7 @@ Source: two exports from one tester (player id p-ivd33sozzjy7, phone 360x699). T
 5. **Maneuver I dice are the first thing replaced.** 20 of 30 loot equips replaced a Maneuver Die I (Attack Die I: 3). Expected (it's the weakest die), but it means trays turn into all-Attack/loot by Floor 2. Worth keeping an eye on together with the Maneuver II/III ladder.
 6. **One slog: Grosteque Grafter, 11 turns** (run 2, shown depth 2, Floor 1 boss). With Grafted Plate (Shield 5) and Harvest (heal 4) every three turns, a low-damage early tray dealt about 4 net damage per turn. It went quickly in real time (2.5 min) and the player took little damage, but 11 turns is about twice any other fight. If more exports show this, a smaller heal or plate is the lever. Not changing yet.
 7. **Big player turns happen** (102 damage, overkill by 70). That's the "crazy combo" kind of memory the balance philosophy wants; no action.
-8. **Runs are long for mobile:** about 67 minutes each. Fight time is mostly thinking (Illegal Operation 185 s, Myceleus 302 s). Not a problem by itself, but the pacing study's Floor 2 HP trims would shorten runs if Jeremy wants that.
+8. **Run length:** about 35-41 minutes of active play (66-68 minutes wall clock; the rest is time away from the phone, which play data doesn't count). Fight time is mostly thinking (Illegal Operation 185 s, Myceleus 302 s).
 9. **Swap use:** Cool Whip was swapped 10 times in run 2; rerolls 5 per run. Tray actions are being found and used.
 
 ## Take rates (both runs; tiny counts)

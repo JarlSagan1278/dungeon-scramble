@@ -44,9 +44,10 @@ def main(paths):
     for pid, ver, r in sorted(runs, key=lambda x: x[2].get('startedAt', 0)):
         ev = r['events']; rs = ev[0] if ev and ev[0]['e'] == 'run_start' else {}
         mins = (r.get('endedAt', 0) - r.get('startedAt', 0)) / 60000
-        print('\n== %s %s %s | depth %s %s | %s, floor %s | %.0f min, %s turns | %s' % (
+        active = (ev[-1]['t'] / 60000) if ev else 0  # play data's clock skips idle gaps and background time
+        print('\n== %s %s %s | depth %s %s | %s, floor %s | %.0f min active (%.0f wall clock), %s turns | %s' % (
             ver, r['origin'], r['klass'], (r.get('depth') or 1) - 1, rs.get('depthMods') or '', r['outcome'],
-            r['floorReached'], mins, r['stats'].get('turnsTaken'), 'class run #%s' % rs.get('classRunNo', '?')))
+            r['floorReached'], active, mins, r['stats'].get('turnsTaken'), 'class run #%s' % rs.get('classRunNo', '?')))
         # per floor
         dmg = collections.Counter(); think = collections.defaultdict(list); plen = collections.defaultdict(list)
         seen_turns = set(); ability = set(); turns = []

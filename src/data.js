@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.17';
+const GAME_VERSION = '1.41.18';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -420,7 +420,7 @@ const FLOOR1_SHRINES = [
     {label:'+5 Max Health', effect:{type:'maxHealthUp', amount:5}},
   ]}}),
   enc('Scroll Dispenser: CRELA','Shrine',0,{boon:'Gain a one-use Nullify token (x3).', effect:{type:'grantToken', token:'nullify', charges:3}}),
-  enc('Scroll Dispenser: AWSP','Shrine',0,{boon:'Gain a one-use Swap token (x2): swap any two dice before you build your path.', effect:{type:'grantToken', token:'swap', charges:2}}),
+  enc('Scroll Dispenser: AWSP','Shrine',0,{boon:'Gain a one-use Swap token (x2): swap any two dice, even mid-path.', effect:{type:'grantToken', token:'swap', charges:2}}),
   // v1.36.0 relic shrines
   enc('Surgery Community Theatre','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
   enc('Healthy Hearth','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
@@ -467,7 +467,7 @@ const FLOOR2_SHRINES = [
     {label:'+10 Max Health', effect:{type:'maxHealthUp', amount:10}},
   ]}}),
   enc('Scroll Dispenser: GIB','Shrine',0,{boon:'Gain a one-use x4 Boost token (x2).', effect:{type:'grantToken', token:'boost', value:4, charges:2}}),
-  enc('Scroll Dispenser: DOER','Shrine',0,{boon:'Gain a one-use Reroll token (x2): reroll any one die before you build your path.', effect:{type:'grantToken', token:'reroll', charges:2}}),
+  enc('Scroll Dispenser: DOER','Shrine',0,{boon:'Gain a one-use Reroll token (x2): reroll any one die, even mid-path.', effect:{type:'grantToken', token:'reroll', charges:2}}),
   // v1.36.0
   enc('Blood of Spanneroth','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
   enc('Ferrous Maiden','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
