@@ -56,7 +56,7 @@ C+=ch(1,'Goal &amp; Run at a Glance',`
 <p>Every floor is the same eight stops, shown on the Route bar at the top of the screen. Long-press any stop to see what it is.</p>
 ${route()}
 <div class="route-lab"><span>Camp</span><span>Room ×3</span><span>Camp</span><span>Room ×2</span><span>Boss</span></div>
-<p>A room is an <b>Enemy</b>, a <b>Trap</b> or a <b>Shrine</b>, and you only learn which when you open the door. Rooms get tougher along a floor: <b>Easy, Standard, Elite</b>, then after the second Camp <b>Standard, Elite</b>, then the Boss. On Floors 2 and 3 an Elite room is sometimes a <b>Deadly</b> foe instead. The first room of a run is always an Easy Enemy. Shrines only appear in Easy or Standard rooms (more often deeper in the dungeon), and between two Camps (or a Camp and the Boss) you meet at most one Trap and one Shrine.</p>
+<p>A room is an <b>Enemy</b>, a <b>Trap</b> or a <b>Shrine</b>, and you only learn which when you open the door. Rooms get tougher along a floor: <b>Easy, Standard, Elite</b>, then after the second Camp <b>Standard, Elite</b>, then the Boss. On Floors 2 and 3 an Elite room is sometimes a <b>Deadly</b> foe instead. The first room of a run is always an Easy Enemy. Shrines only appear in rooms that are normally Easy or Standard (Night Shift doesn't change that; they get more common deeper in the dungeon), and between two Camps (or a Camp and the Boss) you meet at most one Trap and one Shrine.</p>
 ${tbl(['Floor','Loot','Enemy Health','Trap Health','Boss'],[
  ['1','<span class="tag t-alloy">Alloy</span>','7 – 15','25','Rogue Golemancer, Heating Elemental or Grosteque Grafter'],
  ['2','<span class="tag t-gilded">Gilded</span>','21 – 39','45','The Necrorancher, Bellicose Biomancer or Ceramic Golem'],

@@ -24,7 +24,7 @@ const DEPTH_MODS = [
   // Oct 12 (Jeremy: "test out these two"): cheap one-point levers, being measured.
   { id:'dues',  name:'Union Dues',     max:1, costs:[1], desc:r=>'Receiving a shrine\'s boon costs 2 HP.' },
   { id:'round', name:'Rounding Error', max:1, costs:[1], desc:r=>'Your Heal faces heal 1 less (never below 1).' },
-  { id:'gauntlet', name:'Night Shift', max:2, costs:[1,2], desc:r=> r===1 ? 'Easy rooms become Standard rooms.' : 'Easy and Standard rooms become Elite rooms.' },
+  { id:'gauntlet', name:'Night Shift', max:2, costs:[1,2], desc:r=> r===1 ? 'Easy rooms become Standard rooms. Shrines appear as usual.' : 'Easy and Standard rooms become Elite rooms. Shrines appear as usual.' },
 ];
 const DEPTH_MOD_BY_ID = Object.fromEntries(DEPTH_MODS.map(m=>[m.id,m]));
 

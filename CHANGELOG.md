@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.41.14 (Oct 14, 2026)
+- Night Shift now does what its text says (Jeremy): rank 1 turns Easy rooms into Standard (it also used to turn Standard rooms into Elite); rank 2 turns Easy and Standard rooms into Elite. Shrine chances now follow each room's normal tier, so Night Shift no longer removes shrines at either rank (rank 2 used to remove them all). Texts say "Shrines appear as usual."
+- Rulebook: the PDF is the rulebook (regenerated); the outdated Word copy was removed (Jeremy).
+
 ## 1.41.13 (Oct 14, 2026)
 - Grosteque Grafter (Jeremy): Health 50 -> 40, same as the Heating Elemental. Its shield and heal are unchanged. In the bot study, fights of 8+ turns dropped from 17% to 14% (Dungeoneer 25% -> 14%) and it ends fewer runs (2.8% -> 1.5%). Rulebook PDF regenerated.
 

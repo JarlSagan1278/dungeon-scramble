@@ -14,7 +14,6 @@
 
 ## Small follow-ups
 - Swap / Reroll token shrine boons (Scroll Dispensers AWSP, DOER) still say "before you build your path"; the tokens also work mid-path. Fix the text and the names sheet together.
-- Rulebook Word file (docs/DungeonScramble_Rulebook.docx) is still at build 1.32.26; the PDF is current (1.41.12, from tools/gen.js). Ask Jeremy whether he uses the .docx.
 - Ideas from the literature review (not decided): a reward for reaching a new best depth; an optional assist mode that grows after losses (Hades God Mode style); log whether a death was avoidable in the bot studies.
 
 ## Done Oct 14 (background session)

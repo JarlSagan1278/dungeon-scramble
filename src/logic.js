@@ -972,10 +972,12 @@ function pickLootNUnused(pool, n){
 // Which tier this room is (v1.35.0): the floor's slot pattern (ROOM_TIER_SLOTS,
 // data.js), shifted up by the Night Shift (gauntlet) depth modifier.
 function roomTierForStep(step){
-  const order = ['easy','standard','elite'];
   let t = ROOM_TIER_SLOTS[step] || 'standard';
   const up = depthRank('gauntlet');
-  if(up>0 && t!=='elite'){ const i = order.indexOf(t); t = order[Math.min(i+up, 2)]; }
+  // Night Shift, as its text says (Oct 14 fix; it used to shift every room up by its rank, so rank 1 also made
+  // Standard rooms Elite): rank 1 = Easy -> Standard; rank 2 = Easy and Standard -> Elite.
+  if(up>=2) t = 'elite';
+  else if(up===1 && t==='easy') t = 'standard';
   return t;
 }
 
@@ -994,7 +996,9 @@ function drawRoomCard(floor){
   const isVeryFirstEncounter = S.floorIdx===0 && S.routeStep===1;
   let tier = roomTierForStep(S.routeStep);
   const unused = c => !S.usedCards.has(c.name);
-  if(!isVeryFirstEncounter && tier!=='elite' && !S.segmentShrineUsed && floor.shrines.length && Math.random() < shrineSlotChance()){
+  // Shrine chances follow the room's normal tier, before Night Shift raises it (Jeremy, Oct 14: keep consistent access to shrines)
+  const baseTier = ROOM_TIER_SLOTS[S.routeStep] || 'standard';
+  if(!isVeryFirstEncounter && baseTier!=='elite' && !S.segmentShrineUsed && floor.shrines.length && Math.random() < shrineSlotChance()){
     const sh = floor.shrines.filter(unused);
     return pick(sh.length ? sh : floor.shrines);
   }
