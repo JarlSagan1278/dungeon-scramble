@@ -41,6 +41,10 @@ let res = await page.evaluate((cfg)=>{
   try{ PREFS.reducedMotion=true; }catch(e){}
   if(cfg.unlockAllRelics!==false){ try{ DEPTH_BEST.overall=Math.max(DEPTH_BEST.overall||0,2); }catch(e){} } // Oct 12 gating: studies see every relic unless unlockAllRelics:false
   // classPatch (Oct 12 class study): {"guard":{"convertTo":{"type":"block","value":1}}, "arcanist":{"zone":"(r,c)=>r===c||r+c===3"}}; zone given as source text
+  // Knockout knobs (Oct 14 system study): each turns one player system off.
+  if(cfg.noShrines) window.shrineSlotChance = ()=>0;
+  if(cfg.noQuests) window.checkQuests = function(){ return []; };
+  if(cfg.noRevive){ const pdx=onPlayerDefeated; window.onPlayerDefeated=function(){ S.backPocket=[]; return pdx(); }; }
   if(cfg.reviveClear) REVIVE_RULE = {spend:'all', hp:5}; if(cfg.reviveRule) REVIVE_RULE = cfg.reviveRule; // Oct 14 test: a Back Pocket save spends the whole Pocket
   window.__rev={saves:0,fails:0,spent:0,downs:0}; { const pd0=onPlayerDefeated; window.onPlayerDefeated=function(){ window.__rev.downs++; return pd0(); }; } { const tl0=teleLog; window.teleLog=function(t,d){ if(t==='pocket_revive'){ if(d.saved) window.__rev.saves++; else window.__rev.fails++; window.__rev.spent+=d.spent; } return tl0(t,d); }; }
   if(cfg.trayActAfter) TRAYACT_AFTER = cfg.trayActAfter; // Swap/Reroll after-use test: 'blank' | 'step' | 'pivot'
@@ -335,6 +339,7 @@ let res = await page.evaluate((cfg)=>{
     if(S.relicChoice && cfg.relicLock){ S.relicChoice=null; S.shrineResult={title:'Relic', text:'(study: declined)'}; return null; }
     if(S.relicChoice){ const o=S.relicChoice.options; chooseRelic(cfg.playerLike ? o.slice().sort((a,b)=>(RELIC_PREF[b]||5)-(RELIC_PREF[a]||5))[0] : o[Math.floor(Math.random()*o.length)]); return null; }
     if(S.shrineResult){ continueFromShrine(); return null; }
+    if(S.pendingLootDie && cfg.lootPocket){ pocketLootDie(); return null; } // knockout: loot never reaches the Tray
     if(S.pendingLootDie){
       // replace the tray die we value least
       let wi=0, ws=1e9; S.tray.forEach((c,i)=>{ const sc=dieScore(c.die); if(sc<ws){ws=sc;wi=i;} });
@@ -345,9 +350,9 @@ let res = await page.evaluate((cfg)=>{
       const fuse = ()=>{ for(const cat of cats){ if(S.campUpgrades[cat]) continue; for(const lv of [2,1]){ if(canUpgrade(cat,lv)){ const before = S.campUpgrades[cat]; campUpgrade(cat,lv); if(S.campUpgrades[cat] && !before) return true; } } } return false; };
       if(typeof campFireUsedBy!=='function'){ // old builds: rest, then combine
         if(!S.campRested && !cfg.noRest){ campRest(); return null; } if(!cfg.noFuse && fuse()) return null; campLeave(); return null; }
-      if(!S.campChoice && !S.campFireOut && S.health <= (cfg.campRestAt!=null?cfg.campRestAt:0.6)*S.maxHealth && !isBaseCamp()){ campRest(); return null; }
-      if(fuse()) return null;
-      if(!S.campChoice && !S.campFireOut && !isBaseCamp()){ campRest(); return null; }
+      if(!cfg.noRest && !S.campChoice && !S.campFireOut && S.health <= (cfg.campRestAt!=null?cfg.campRestAt:0.6)*S.maxHealth && !isBaseCamp()){ campRest(); return null; }
+      if(!cfg.noFuse && fuse()) return null;
+      if(!cfg.noRest && !S.campChoice && !S.campFireOut && !isBaseCamp()){ campRest(); return null; }
       campLeave(); return null; }
     if(S.screen==='shrine'){ applyShrineBoon(S.encounter); return null; }
     if(S.screen==='game'){ log.turns++; doTurn(); return null; }
