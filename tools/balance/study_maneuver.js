@@ -337,8 +337,14 @@ let res = await page.evaluate((cfg)=>{
       let wi=0, ws=1e9; S.tray.forEach((c,i)=>{ const sc=dieScore(c.die); if(sc<ws){ws=sc;wi=i;} });
       swapInLootDie(wi); return null; }
     if(S.screen==='camp'){
-      if(!S.campRested){ campRest(); return null; }
-      for(const cat of (cfg.swapManeuver?['attack']:['attack','maneuver'])){ const lv = S.campUpgrades[cat]?null:1; if(lv && canUpgrade(cat,lv)){ campUpgrade(cat,lv); return null; } }
+      // Campfire choice (1.41.15+: Rest OR combine dice). campRestAt = HP share at or below which the bot rests.
+      const cats = cfg.swapManeuver?['attack']:['attack','maneuver'];
+      const fuse = ()=>{ for(const cat of cats){ if(S.campUpgrades[cat]) continue; for(const lv of [2,1]){ if(canUpgrade(cat,lv)){ const before = S.campUpgrades[cat]; campUpgrade(cat,lv); if(S.campUpgrades[cat] && !before) return true; } } } return false; };
+      if(typeof campFireUsedBy!=='function'){ // old builds: rest, then combine
+        if(!S.campRested){ campRest(); return null; } if(fuse()) return null; campLeave(); return null; }
+      if(!S.campChoice && !S.campFireOut && S.health <= (cfg.campRestAt!=null?cfg.campRestAt:0.6)*S.maxHealth && !isBaseCamp()){ campRest(); return null; }
+      if(fuse()) return null;
+      if(!S.campChoice && !S.campFireOut && !isBaseCamp()){ campRest(); return null; }
       campLeave(); return null; }
     if(S.screen==='shrine'){ applyShrineBoon(S.encounter); return null; }
     if(S.screen==='game'){ log.turns++; doTurn(); return null; }

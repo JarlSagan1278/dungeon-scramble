@@ -3064,3 +3064,20 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 .boss-cycle-item .enc-per{ display:inline-flex; align-items:center; font-size:10px; font-weight:800; }
 .boss-cycle-item .enc-per .icon-svg{ width:10px; height:10px; }
 .fo-chips .boss-cycle-item .icon-svg{ width:14px; height:14px; }
+
+/* ---- Campfire choice (Oct 14): Rest OR Train ---- */
+.campfire-choice{ margin:4px 0 8px; text-align:center; }
+.campfire-choice .cf-label{ font-family:var(--font-display); font-size:14px; color:var(--gold); margin-bottom:5px; }
+.campfire-choice .cf-row{ display:flex; align-items:stretch; justify-content:center; gap:8px; }
+.campfire-choice .cf-or{ align-self:center; font-family:var(--font-display); font-size:13px; color:var(--parchment-dim); }
+.cf-btn{ flex:1 1 0; max-width:150px; display:flex; flex-direction:column; align-items:center; gap:2px; font-weight:bold; font-size:15px; padding:7px 8px; }
+.cf-btn small{ font-weight:normal; font-size:11.5px; opacity:.9; }
+.cf-btn.cf-rest{ background:var(--green); color:var(--parchment); }
+.cf-btn.cf-rest:hover:not(:disabled){ background:#57a06b; }
+.cf-btn.cf-train{ background:var(--purple); color:var(--parchment); }
+.cf-btn.cf-train:hover:not(:disabled){ background:#9a6fc2; }
+.cf-btn.chosen:disabled{ opacity:1; box-shadow:0 0 0 2px var(--gold); }
+.cf-btn.skipped:disabled{ opacity:.35; }
+.campfire-choice.out .cf-label{ color:var(--parchment-dim); }
+.camp-section.cf-point{ animation: cf-point 1.1s ease-out 1; }
+@keyframes cf-point{ 0%{ box-shadow:0 0 0 0 var(--purple); } 30%{ box-shadow:0 0 0 4px var(--purple); } 100%{ box-shadow:0 0 0 0 transparent; } }

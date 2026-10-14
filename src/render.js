@@ -4125,6 +4125,25 @@ function applyPocketCollapse(){
   setOpen(!!S._pocketOpen);
 }
 
+// Campfire choice panel (Oct 14, Jeremy: make the choice clear on the camp screen): Rest OR Train, side by side.
+// Train = combining dice in the Upgrade section below (Jeremy: "the upgrading should be the fusing").
+function campFusionsReady(){ let n = 0; ['attack','maneuver'].forEach(cat=>{ if(!S.campUpgrades[cat]) [1,2].forEach(lv=>{ if(canUpgrade(cat,lv)) n++; }); }); return n; }
+function campfireChoiceHTML(){
+  if(S.campFireOut) return `<div class="campfire-choice out"><div class="cf-label">The campfire is out ${infoDot('The Time-Intensive Shrine took this campfire: no Rest or upgrades at this Camp.')}</div></div>`;
+  const ch = S.campChoice, n = campFusionsReady(), est = restHealEstimate();
+  const restSub = ch==='rest' ? `Healed +${S.campHealed||0}` : (est>0 ? `Heal about +${est}` : (S.health>=S.maxHealth ? 'Already at full health' : 'Heals nothing here'));
+  const trainSub = ch==='train' ? 'Dice combined' : (n ? 'Combine dice below' : 'No sets of 3 yet');
+  const cls = k => ch ? (ch===k ? ' chosen' : ' skipped') : '';
+  return `<div class="campfire-choice${ch?' done':''}">
+      <div class="cf-label">${ch ? 'Campfire used' : 'Campfire: choose one'} ${infoDot('Each Camp\'s fire gives you ONE of these. Rest: scramble your Tray and heal half the faces that aren\'t blank. Train: combine 3 matching dice into 1 of the next level (up to one Attack and one Maneuver). Organizing is always free.')}</div>
+      <div class="cf-row">
+        <button id="rest-btn" class="cf-btn cf-rest${cls('rest')}" ${ch?'disabled':''} title="Scramble your Tray's faces, then heal for half the non-blank faces showing">${ch==='rest'?'&#10003; ':''}Rest<small>${restSub}</small></button>
+        <span class="cf-or">or</span>
+        <button id="train-btn" class="cf-btn cf-train${cls('train')}" ${(ch||!n)?'disabled':''} title="Combine 3 matching dice in the Upgrade section below">${ch==='train'?'&#10003; ':''}Train<small>${trainSub}</small></button>
+      </div>
+    </div>`;
+}
+
 function renderCamp(){
   const baseCamp = S.floorIdx===0 && S.routeStep===0;
   const campFx = healthFX(S.health, S._lastPlayerHealth);
@@ -4137,7 +4156,8 @@ function renderCamp(){
       if(count<3 && S.campUpgrades[cat]) return; // hide impossible/irrelevant rows once used, keep list short
       if(count===0) return; // nothing of this tier exists yet -- would-be-empty row, pure clutter
       const label = cat.charAt(0).toUpperCase()+cat.slice(1);
-      const eligible = canUpgrade(cat, level) && !S.campUpgrades[cat];
+      const fireOk = baseCamp || (!S.campFireOut && S.campChoice!=='rest'); // Train and Rest share the campfire
+      const eligible = canUpgrade(cat, level) && !S.campUpgrades[cat] && fireOk;
       const disabled = !eligible;
       const needsBackfill = count>=3 && !canUpgrade(cat,level);
       const upgradeTitle = needsBackfill ? 'Needs more spare dice to backfill' : `Combine 3 ${label} ${ROMAN[level]} into 1 ${label} ${ROMAN[level+1]}`;
@@ -4150,7 +4170,7 @@ function renderCamp(){
   app.innerHTML = `
     <div class="panel">
       ${renderRoute()}
-      <h2 style="margin-bottom:6px;">${baseCamp?'Base Camp':'Camp'} ${infoDot(baseCamp?'Your adventure begins here. Tinker with your dice if you like, then set out — nothing here is required.':'Rest and prepare before pressing onward.')}</h2>
+      <h2 style="margin-bottom:6px;">${baseCamp?'Base Camp':'Camp'} ${infoDot(baseCamp?'Your adventure begins here. Tinker with your dice if you like, then set out — nothing here is required.':'Prepare before pressing onward. The campfire gives you one choice: Rest or Train.')}</h2>
       ${baseCamp?'<p class="hint" style="margin:0 0 6px;">Nothing here is required — set out whenever you like.</p>':''}
 
       <div class="camp-section camp-status-card">
@@ -4163,14 +4183,15 @@ function renderCamp(){
           <div class="campfire-flame flame-back"></div>
           <div class="campfire-flame flame-front"></div>
         </div>
+        ${baseCamp?'':campfireChoiceHTML()}
         <div class="small-btn-row">
-          ${baseCamp?'':`<button id="rest-btn" ${S.campRested?'disabled':''} title="Scramble your Tray's faces, then heal for half the non-blank faces showing">${S.campRested?'Rested':'Stay a While &amp; Rest'}</button>`}
           <button id="leave-btn" class="primary">${baseCamp?'Start Your Adventure':'Break Camp &amp; Continue'}</button>
         </div>
       </div>
 
       <div class="camp-section">
-        <h3 class="camp-section-title">Upgrade Dice ${infoDot('Combine 3 matching Basic dice into 1 of the next tier. You can upgrade 1 Attack and 1 Maneuver die per Camp.')}</h3>
+        <h3 class="camp-section-title" id="camp-upgrade-title">${baseCamp?'Upgrade Dice':'Train: Upgrade Dice'} ${infoDot(baseCamp?'Combine 3 matching Basic dice into 1 of the next tier. You can upgrade 1 Attack and 1 Maneuver die per Camp.':'Combine 3 matching Basic dice into 1 of the next tier (1 Attack and 1 Maneuver per Camp). Training uses the campfire, so you can\'t also Rest here.')}</h3>
+        ${(!baseCamp && S.campChoice==='rest') ? '<p class="hint" style="margin:0 0 4px;">You rested at this fire, so no training here.</p>' : (!baseCamp && S.campFireOut) ? '<p class="hint" style="margin:0 0 4px;">The campfire is out.</p>' : ''}
         <div class="upgrade-rows-col">${upgradeRows.length? upgradeRows.join('') : '<span class="hint">No matching sets of 3 Basic dice to combine right now.</span>'}</div>
       </div>
 
@@ -4186,13 +4207,19 @@ function renderCamp(){
       </div>
     </div>`;
   const restBtn = document.getElementById('rest-btn');
-  if(restBtn) restBtn.onclick = campRest;
+  if(restBtn) restBtn.onclick = ()=>{ if(!S.campRested) campRest(); };
+  const trainBtn = document.getElementById('train-btn');
+  if(trainBtn) trainBtn.onclick = ()=>{ // point at the Upgrade section, where training happens
+    const t = document.getElementById('camp-upgrade-title'); if(!t) return;
+    t.scrollIntoView({behavior: PREFS.reducedMotion ? 'auto' : 'smooth', block:'center'});
+    const sec = t.closest('.camp-section'); if(sec){ sec.classList.remove('cf-point'); void sec.offsetWidth; sec.classList.add('cf-point'); }
+  };
   syncCampHeal();
   document.getElementById('leave-btn').onclick = ()=>{
     if(baseCamp){ campLeave(); return; }
     const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
         <h2>Break Camp?</h2>
-        <p>You can't come back to rest or upgrade dice until the next Camp.</p>
+        <p>${S.campRested ? "You can't come back to upgrade dice until the next Camp." : "You haven't used the campfire (Rest or Train). Leave without it?"}</p>
         <div class="small-btn-row" style="justify-content:center;">
           <button id="confirm-leave-cancel">Stay a Moment</button>
           <button class="primary" id="confirm-leave-go">Break Camp</button>

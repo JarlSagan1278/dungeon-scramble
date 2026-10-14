@@ -77,8 +77,9 @@ let res = await page.evaluate((cfg)=>{
       let wi=0, ws=1e9; S.tray.forEach((c,i)=>{ const sc=dieScore(c.die); if(sc<ws){ws=sc;wi=i;} });
       swapInLootDie(wi); return null; }
     if(S.screen==='camp'){
-      if(!S.campRested){ campRest(); return null; }
-      for(const cat of ['attack','maneuver']){ const lv = S.campUpgrades[cat]?null:1; if(lv && canUpgrade(cat,lv)){ campUpgrade(cat,lv); return null; } }
+      if(!S.campRested && (typeof campFireUsedBy!=='function' || S.health <= 0.6*S.maxHealth)){ campRest(); if(S.campRested) return null; }
+      for(const cat of ['attack','maneuver']){ if(S.campUpgrades[cat]) continue; for(const lv of [2,1]){ if(canUpgrade(cat,lv)){ campUpgrade(cat,lv); if(S.campUpgrades[cat]) return null; } } }
+      if(!S.campRested){ campRest(); if(S.campRested) return null; }
       campLeave(); return null; }
     if(S.screen==='shrine'){ applyShrineBoon(S.encounter); return null; }
     if(S.screen==='game'){ log.turns++; doTurn(); return null; }

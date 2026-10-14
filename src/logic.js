@@ -1085,7 +1085,10 @@ function advanceRoute(){
     S.encounter = null;
     S.organizeSelection = null;
     S.campUpgrades = {attack:false, maneuver:false};
-    S.campRested = false;
+    S.campRested = false; // true once the campfire is used (Rest or Train)
+    S.campChoice = null;  // Oct 14 (Jeremy): the campfire is a choice, 'rest' or 'train' (= combining dice)
+    S.campFireOut = false;
+    if(S.skipNextRest && !(S.floorIdx===0 && S.routeStep===0)){ S.campFireOut = true; S.skipNextRest = false; S.campRested = true; logMsg('sys', 'The Time-Intensive Shrine took this campfire: no Rest or upgrades here.', 'bad'); }
     teleLog('room_start', {type:'Camp', hp:S.health, maxHp:S.maxHealth});
     // a new segment (the stretch of rooms up to the next Camp or the Boss)
     // starts fresh -- one Shrine and one Trap are allowed per segment
@@ -2339,7 +2342,7 @@ function runShrineEffect(e, effect){
     case 'bargain': {
       const p = effect.price||{};
       if(p.maxHp){ S.maxHealth = Math.max(1, S.maxHealth-p.maxHp); S.health = Math.min(S.health, S.maxHealth); logMsg('sys', `${e.name}: paid ${p.maxHp} maximum health.`); }
-      if(p.skipRest){ S.skipNextRest = true; logMsg('sys', `${e.name}: your next camp rest is forfeit.`); }
+      if(p.skipRest){ S.skipNextRest = true; logMsg('sys', `${e.name}: your next campfire is forfeit.`); }
       teleLog('shrine_bargain', {shrine:e.name, price:p});
       runShrineEffect(e, effect.then); return;
     }
@@ -2588,6 +2591,7 @@ function canUpgrade(cat, level){
 // slots it would empty, rather than padding the gap with fresh dice.
 function campUpgrade(cat, level){
   if(S.campUpgrades[cat]) return;
+  if(!isBaseCamp() && (S.campFireOut || S.campChoice==='rest')) return; // the fire went to Rest (or is out)
   if(!canUpgrade(cat, level)){
     logMsg('sys', `Not enough spare dice to fully back that upgrade — nothing changed.`, 'bad');
     render();
@@ -2620,6 +2624,7 @@ function campUpgrade(cat, level){
     }
   }
   S.campUpgrades[cat] = true;
+  campFireUsedBy('train');
   S.organizeSelection = null; // the Bag/Tray just changed shape; any held selection is now stale
   S._fuseFx = { name:newDie.name, type: consumedTray.length ? 'tray' : 'bp', idx: consumedTray.length ? consumedTray[0] : S.backPocket.length-1 };
   const label = cat.charAt(0).toUpperCase()+cat.slice(1);
@@ -2663,20 +2668,39 @@ function selectOrganize(type, idx){
 }
 
 
+function isBaseCamp(){ return S.floorIdx===0 && S.routeStep===0; }
+// Campfire choice (Oct 14, Jeremy: camp had the least agency; "the upgrading should be the fusing"): each Camp
+// after Base Camp offers ONE of Rest (heal) or Train (combine 3 matching Basic dice into 1 of the next level, up to
+// one Attack and one Maneuver as before). The first combine uses the fire, so no Rest after it, and no combining
+// after a Rest. Organize stays free. Base Camp has no fire: combining there is free.
+function campFireUsedBy(kind){ // marks the fire used; returns false if the other choice already took it
+  if(isBaseCamp()) return true;
+  if(S.campFireOut) return false;
+  if(S.campChoice && S.campChoice!==kind) return false;
+  if(!S.campChoice) teleLog('camp_choice', {choice:kind, hp:S.health, maxHp:S.maxHealth});
+  S.campChoice = kind; S.campRested = true;
+  return true;
+}
+// Expected Rest heal (shown on the Rest button so the choice is informed): half the non-blank faces, on average.
+function restHealEstimate(){
+  let nb = 0; S.tray.forEach(c=>{ const f = c.die.faces; nb += f.filter(x=>x.type!=='blank').length / f.length; });
+  let heal = Math.ceil(nb/2) + (hasRelic('kettle') ? 3 : 0);
+  if(depthRank('rest')) heal = depthRank('rest')>=2 ? 0 : Math.round(heal/2);
+  return Math.min(heal, S.maxHealth - S.health);
+}
 function campRest(){
-  if(S.campRested) return;
+  if(S.campRested || isBaseCamp() || S.campFireOut) return;
   if(typeof UIFX!=='undefined') UIFX.flareAt = performance.now();
   scrambleTray();
   let count=0;
   S.tray.forEach(c=>{ if(currentFace(c).type!=='blank') count++; });
   let heal = Math.ceil(count/2) + (hasRelic('kettle') ? 3 : 0);
   if(depthRank('rest')) heal = depthRank('rest')>=2 ? 0 : Math.round(heal/2); // Rationing Rations: half, then nothing
-  if(S.skipNextRest){ heal = 0; S.skipNextRest = false; logMsg('sys', 'Your rest is forfeit to the Time-Intensive Shrine.', 'bad'); }
   if(hasRelic('kettle')) fireRelic('kettle','+3 HP');
   const hpFrom = S.health;
   S.health = cap(S.health+heal, S.maxHealth);
   if(typeof UIFX!=='undefined' && S.health>hpFrom) UIFX.campHeal = {from:hpFrom, to:S.health, at:performance.now(), dur:900+Math.min(heal,10)*120};
-  S.campRested = true;
+  campFireUsedBy('rest'); S.campHealed = S.health - hpFrom;
   logMsg('heal', `Rested: scrambled ${count} actions, healed ${heal}.`, 'good');
   if(heal>0 && typeof playTone==='function') playTone('restChord');
   render();

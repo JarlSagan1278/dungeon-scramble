@@ -117,7 +117,7 @@ const STATUS_DESC = {
 // "enc" nodes cover monster/trap/shrine encounters -- which one it'll
 // actually be isn't decided until you reach it, so the tooltip says so.
 const ROUTE_STEP_DESC = {
-  camp: "Camp -- rest, organize your tray, and upgrade.",
+  camp: "Camp -- organize your tray, then use the campfire: Rest or Train (upgrade dice).",
   enc: "Encounter -- Reveal a monster, trap, or shrine.",
   boss: "Boss -- the floor's final, toughest fight.",
 };
@@ -138,7 +138,7 @@ const TUTORIAL_STEPS = [
   },
   {
     title: "The Route",
-    body: "The bar at the top shows this floor. There are campsites to rest and upgrade, both Boons and Banes to encounter, and a Boss at the end. Long-press a node to see more.",
+    body: "The bar at the top shows this floor. There are campsites where you either rest or train (upgrade dice), both Boons and Banes to encounter, and a Boss at the end. Long-press a node to see more.",
   },
   {
     title: "One More Thing",
@@ -470,8 +470,8 @@ const FLOOR2_SHRINES = [
   enc('Blood of Spanneroth','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
   enc('Ferrous Maiden','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
   enc("Thom's Guide",'Shrine',0,{boon:'Choose one of three path and movement Relics.', effect:{type:'relicChoice', theme:'path'}}),
-  enc('Time-Intensive Shrine','Shrine',0,{boon:'Give up your next camp rest to choose one of three Relics.', effect:{type:'choice', options:[
-    {label:'Skip next camp rest: choose a Relic', effect:{type:'bargain', price:{skipRest:true}, then:{type:'relicChoice'}}},
+  enc('Time-Intensive Shrine','Shrine',0,{boon:'Give up your next campfire (no Rest or Train) to choose one of three Relics.', effect:{type:'choice', options:[
+    {label:'Skip your next campfire: choose a Relic', effect:{type:'bargain', price:{skipRest:true}, then:{type:'relicChoice'}}},
     {label:'Walk away', effect:{type:'leave'}},
   ]}}),
   enc('Cryotherapist','Shrine',0,{boon:'Heal 8 OR gain a one-use Freeze token.', effect:{type:'choice', options:[

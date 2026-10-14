@@ -178,8 +178,10 @@ C+=ch(8,'Camp',`
 <div class="campbanner">${ic('camp')}<span>Camp is your only chance to reorganize. Every floor has two: one at the start and one after the third room. The very first Camp of a run (Base Camp) has no rest: its button reads Start Your Adventure.</span></div>
 <ol class="steps">
 <li><b>Organize.</b> Swap any Tray die with any Back Pocket die, as often as you like: tap one die in the Tray and one in the Pocket.</li>
-<li><b>Upgrade.</b> Combine <b>3 matching Basic dice</b> (same type and level, Tray or Pocket) into one a level higher, up to III. One Attack and one Maneuver upgrade per Camp. If dice leave the Tray you need enough spare Pocket dice to refill. Loot dice can't be upgrade material.</li>
-<li><b>Stay a While &amp; Rest.</b> Once per Camp the Tray is scrambled and you heal <b>half the non-blank faces</b> it shows, rounded up (Percolation Theory adds 3; the Rationing Rations depth modifier halves or removes it; the Time-Intensive Shrine can cost you a rest). Resting also gives you a fresh scramble for the next room.</li></ol>
+<li><b>The campfire: Rest or Train.</b> Each Camp's fire gives you <b>one</b> of these, so choose:
+<ul class="rules"><li><b>Rest.</b> The Tray is scrambled and you heal <b>half the non-blank faces</b> it shows, rounded up (Percolation Theory adds 3; the Rationing Rations depth modifier halves or removes it). The button shows about how much you'd heal. Resting also gives you a fresh scramble for the next room.</li>
+<li><b>Train.</b> Combine <b>3 matching Basic dice</b> (same type and level, Tray or Pocket) into one a level higher, up to III: one Attack and one Maneuver per Camp. If dice leave the Tray you need enough spare Pocket dice to refill. Loot dice can't be combined.</li></ul>
+Base Camp has no fire: combining there is free. The Time-Intensive Shrine can put out your next campfire.</li></ol>
 <p>Press ${btn('Break Camp &amp; Continue')} when you are done.</p>
 `,'c8');
 // 9 relics
@@ -234,8 +236,8 @@ C+=ch(12,'Quick Reference',`
 <div><b>Floor</b>Camp · 3 rooms · Camp · 2 rooms · Boss</div>
 <div><b>Loot</b>2 dice (3 for Bosses) · +1 Overkill · +1 Need Before Greed · Replace or Keep in Pocket</div>
 <div><b>Overkill</b>10+ past lethal (6 with Bloodthirst)</div>
-<div><b>Rest</b>½ of non-blank faces, rounded up · none at Base Camp</div>
-<div><b>Upgrade</b>3 matching Basics → 1 a level higher</div>
+<div><b>Campfire</b>Rest (heal ½ of non-blank faces) OR Train (combine dice) · Base Camp: combine free</div>
+<div><b>Train</b>3 matching Basics → 1 a level higher</div>
 <div><b>Revive</b>Pocket die rolls Action → 5 Health</div>
 <div><b>Statuses</b>All reset when a new room opens</div>
 <div><b>D.O.T. / H.O.T.</b>Trigger at round end, then drop by 1</div>
