@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.6 (Oct 14, 2026)
+- Enemy action chips (Jeremy): each shows its icon with a readable number beside it instead of a tiny number inside the icon plus a word ("Hit"); names are kept for boss specials only. Damage-per-Minion specials read "3 / [minion]".
+
 ## 1.41.5 (Oct 14, 2026)
 - Music tempo (Jeremy): Floor 1 starts at 130 bpm, +5 per floor (130 / 135 / 140; was 140 / 145 / 150). The title theme and the end-of-run stings follow Floor 1's tempo (130).
 
