@@ -27,3 +27,17 @@ Make Train worth giving up a Rest. Options:
 1. **Revives stop depending on how many dice are in the Pocket** (e.g. a fixed number of revives per run or per floor, shown as a counter). Combining then has no hidden cost, and the Back Pocket is just storage.
 2. **Combining keeps the Pocket size**: the two leftover slots get basic dice back (e.g. two Maneuver I), so you trade quality, not revives.
 3. **Leave it** and accept that combining is a hidden trap (not recommended: it punishes the obvious move).
+
+## Revive rule variants (Oct 14, build 1.41.15 with the campfire choice; switch `REVIVE_RULE` in logic.js, off)
+
+Jeremy's idea: a save spends the whole Back Pocket, so any Pocket is a full safety net but it can't keep saving you. Pocket dice are rolled in random order; the first non-blank face saves you. Bots rest at 60% HP or below, otherwise combine. 800 runs per cell.
+
+| Rule | Regular D0 | New D0 | Expert D7 | Saves per run (regular) |
+|---|---|---|---|---|
+| Today (each roll spends 1 die, save at 5 HP) | 82% | 68% | 54% | many (3-5 downs per run) |
+| Whole Pocket, save at 5 HP | 56% | 38% | 27% | 1.0 |
+| Whole Pocket, save at 10 HP | 70% | 52% | 46% | 1.1 |
+| **Whole Pocket, save at half max HP** | **76%** | **59%** | **49%** | 1.0 |
+| Half the Pocket (rounded up), save at 5 HP | 74% | 55% | 47% | 1.7 |
+
+"Whole Pocket, half max HP" keeps Jeremy's rule and lands close to the difficulty before the campfire change (regular 73% on 1.41.14 bots, which rested and combined every camp).
