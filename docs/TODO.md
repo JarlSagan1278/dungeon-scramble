@@ -5,6 +5,7 @@
    - Oct 14: first tester, 2 runs, both won (Armsmaster depth 1, Dungeoneer depth 3); one warned down; Grosteque Grafter took 11 turns; Maneuver Die I replaced in 20 of 30 equips. See docs/studies/2026-10-14_playtest_tester1.md. Still need newer players' exports.
 2. **Music and art review (Jeremy):** every piece in the spec is in the game; he's reviewing all of it for edits. Art continues in parallel.
 3. **Waiting on Jeremy's call (studies done, nothing applied):**
+   - **Back Pocket revives make combining dice a trap** (bots that never combine win 85-89% vs 66-70%), so the new campfire's Train option isn't worth taking yet. Options in docs/studies/2026-10-14_campfire_backpocket.md.
    - Pacing: Floor 2 Easy rooms about 25-30% less HP (The Warcart, Armored Gear-Pest, Roudy Rinotter, Adhesive Pest Traps, Unventilated Workshop); Myceleus HP 106 -> ~93. (docs/studies/2026-10-13_rebaseline_141.md, "Fight pacing")
    - Shrines: Scroll Dispensers (token shrines) are the weakest shrines; die-upgrade shrines weak; Madpie Nest (Floor 3 loot relics) weak; Floor 3 relic shrines could offer 4. Ties into the shrine overhaul below. (docs/studies/2026-10-13_shrines.md)
    - Extruzeon barely threatens experts at depth (2.2% vs 10-19%): raise its HP if it should.
