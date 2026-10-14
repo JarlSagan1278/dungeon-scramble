@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.19 (Oct 14, 2026)
+- Safety-net badge on the Pocket button is now a drawn heart in a red circle (Jeremy: the tiny text heart read as a triangle).
+
 ## 1.41.18 (Oct 14, 2026)
 - Art: silhouette placeholders for the four Magic dice without pictures (Axiom of Choice, Domesticated Displacer, 273.15 Kelvin Box, Exile Elixir), until the real art exists (Jeremy).
 - Text: the Swap and Reroll Scroll Dispensers now say the tokens work "even mid-path" (they used to say "before you build your path").
