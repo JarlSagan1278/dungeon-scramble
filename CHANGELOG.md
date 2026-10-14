@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.41.8 (Oct 14, 2026)
+- Fix (tester): the Dungeoneer's edge wrap let any die in the edge zone step straight up or down, so a Dodge (or Leap) could move like a plain step. Across the left/right seam each face now keeps its own move rule: a plain step crosses to the same row, a Dodge crosses diagonally (one row up or down), a Pivot either, a Leap can't use the seam. `tools/test_wrap.js` checks it (12 ok).
+- Codex (tester): the Dice tab now lists the four Origin starting dice (with faces and a one-line role) above the loot dice; they don't count toward the found total.
+
 ## 1.41.7 (Oct 14, 2026)
 - Icons (Jeremy): where the number sits beside the icon (enemy action chips, boss chips, your status chips over the doorway), Hit / Combo / Leech / Block / Heal show as solid shapes without the hole for an in-icon number. Dice faces keep the hole with the number inside.
 

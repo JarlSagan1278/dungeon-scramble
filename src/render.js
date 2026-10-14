@@ -3127,7 +3127,25 @@ function diceCompendiumHTML(){
         <div class="compendium-list">${rows}</div>
       </div>`;
   }).join('');
-  return `<p class="hint">${discoveredCount}/${totalDice} found</p>${sections}`;
+  // Origin starting dice: always shown (every origin is visible on character select),
+  // not counted in the found total (tester feedback Oct 14: couldn't find the Gnomish Mushroom Cap).
+  const originRows = ORIGINS.map(o=>{
+    const art = LOOT_ART[o.die];
+    const thumb = art ? `<img class="compendium-thumb" src="${art}" alt="${o.die}"/>` : `<div class="compendium-thumb compendium-thumb-placeholder"></div>`;
+    return `<div class="compendium-row">
+        ${thumb}
+        <div class="compendium-main">
+          <div class="run-history-who">${o.die}</div>
+          <div class="compendium-faces">${o.faces.map(f=>`<span>${iconSpan(f.type, f.value)}</span>`).join('')}</div>
+          <div class="hint" style="font-size:11px; margin-top:2px;">${o.name} starting die. ${o.blurb}</div>
+        </div>
+      </div>`;
+  }).join('');
+  const originSection = `<div class="compendium-tier">
+      <div class="camp-section-title" style="font-weight:800;">Origin Dice</div>
+      <div class="compendium-list">${originRows}</div>
+    </div>`;
+  return `${originSection}<p class="hint">Loot dice: ${discoveredCount}/${totalDice} found</p>${sections}`;
 }
 function markDiceSeen(){ const seen = loadSeen(); DISCOVERED_DICE.forEach(n=> seen.dice.add(n)); saveSeen(seen); } // viewed -- tags clear next visit
 function openDiceCompendiumModal(){ openCodexModal('dice'); }

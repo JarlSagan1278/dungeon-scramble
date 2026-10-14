@@ -1187,6 +1187,7 @@ function adjWrap(a,b){
   // are treated as adjacent (the Path "loops around" the tray).
   return a.r===b.r && Math.abs(a.c-b.c)===3;
 }
+function adjWrapCols(a,b){ return Math.abs(a.c-b.c)===3; } // left edge to right edge, any row
 
 // Leap / Dodge / Pivot may land ON a Minion-covered space: the landing die (and, for a Leap, any Minion
 // on the space jumped over) is uncovered for the rest of this round.
@@ -1244,8 +1245,15 @@ function canSelect(idx){
   if(!allowed && lastFace.type==='pivot' && hasRelic('pivot_compass')) allowed = true; // v1.36.0
 
   // class zone bonuses
-  if(!allowed && S.klass.wrap && inZone(lastIdx) && inZone(idx)){
-    allowed = adjWrap(a,b) || adjNormal(a,b);
+  // Dungeoneer wrap: the far edge counts as the column just past this edge, and the
+  // face's own move rule applies across that seam (a Dodge still moves diagonally).
+  // Before 1.41.8 this also allowed a plain up/down step inside the zone for any face.
+  if(!allowed && S.klass.wrap && inZone(lastIdx) && inZone(idx) && adjWrapCols(a,b)){
+    const vb = {r:b.r, c: b.c > a.c ? a.c - 1 : a.c + 1};
+    if(lastFace.type==='dodge') allowed = adjDiag(a,vb);
+    else if(lastFace.type==='leap') allowed = adjLeap(a,vb);
+    else if(lastFace.type==='pivot') allowed = adjPivot(a,vb);
+    else allowed = adjNormal(a,vb);
   }
   if(!allowed && S.klass.wrapV && inZone(lastIdx) && inZone(idx) && a.c===b.c && Math.abs(a.r-b.r)===3) allowed = true; // test switch (Oct 13 study): top-bottom wrap; no class uses it
   if(!allowed && S.klass.diagonalZone && (S.klass.diagonalZone==='either' ? (inZone(lastIdx) || inZone(idx)) : (inZone(lastIdx) && inZone(idx)))){
