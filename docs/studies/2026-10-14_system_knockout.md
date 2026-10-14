@@ -36,3 +36,16 @@ Question (Jeremy): are other systems carrying the win rate the way the old Back 
 - **Cheaper combining changes nothing.** Combining or not, 57%. Basic dice get replaced by loot as the run goes on (median 12 loot dice owned on Floor 3), so upgrading a basic die only pays until loot replaces it. Train needs to improve something that stays: loot dice, or something other than dice.
 - **A loot pick at every shrine is far too strong** (+26 points; it undoes the revive change). One extra loot pick per shrine is worth more than any boon. A smaller version (one random die, no choice) or loot only from some shrines would be the next thing to test.
 - Loot dice are the dominant power source of a run; every extra loot pick is worth a lot.
+
+## Follow-up: stronger level II/III basic dice (Jeremy's idea)
+
+Moderate: Attack II Hit2 Hit2 Combo2 Hit1 + 2 blanks; Attack III Hit3 Hit3 Combo3 Hit2 Hit1 + 1 blank; Maneuver II Dodge Dodge Leap Pivot Block2 Block2; Maneuver III Dodge Leap Pivot Block2 Block2 Boost x2.
+Significant: Attack II Hit3 Hit2 Combo2 Combo2 Hit1 + 1 blank; Attack III Hit4 Hit3 Combo3 Combo3 Hit2 Hit2; Maneuver II Dodge Leap Pivot Block2 Block2 Boost x2; Maneuver III Pivot Pivot Leap Block3 Block3 Boost x2.
+
+| Basic dice | Regular D0 | New D0 | Regular, bot never combines | What combining is worth |
+|---|---|---|---|---|
+| Today | 57% | 35% | 57% | 0 |
+| Moderate | 61% | 39% | 53% | +7 |
+| Significant | 68% | 49% | 57% | +11 |
+
+Stronger II/III dice make Train worth taking (the gap between combining and never combining goes from 0 to +7 or +11 points). Moderate raises the overall win rate only ~4 points; Significant raises it ~11, which undoes much of the revive change.
