@@ -1750,7 +1750,7 @@ function renderGame(){
     </div>
   `;
   document.getElementById('tray').innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join('');
-  renderGame._minions = S.tray.filter(c=>c.minion).length;
+  renderGame._minions = S.tray.filter(c=>c.minion).length; renderGame._tok = `${S.swapTokens||0}|${S.rerollTokens||0}`;
   { const c = document.querySelector('#enc-panel .fo-arch'); if(c && syncRoomFloor._hz) c.style.setProperty('--hz', syncRoomFloor._hz+'px'); }
   // placeVs() runs after the path strip is written (below): reading layout here and writing the strip after it
   // forced a second full layout on every path tap (Oct 12)
@@ -1813,24 +1813,9 @@ function renderGame(){
   const abilityBtn = document.getElementById('ability-btn');
   if(abilityBtn) abilityBtn.onclick = ()=>{
     if(S.transitioning || S.classAbilityUsed) return;
-    if(abilityArmed){ abilityArmed = false; render(); return; } // tap again to back out before picking a die
-    abilityArmed = true;
-    logMsg('sys', `Click a die in your zone to convert it.`);
-    render();
-    // re-attach one-shot ability click handling
-    const trayEl = document.getElementById('tray');
-    [...trayEl.children].forEach(node=>{
-      const idx = parseInt(node.dataset.idx);
-      if(inZone(idx)){
-        node.style.cursor='crosshair';
-        node.addEventListener('click', function handler(ev){
-          ev.stopPropagation();
-          abilityArmed = false;
-          useClassAbility(idx);
-          node.removeEventListener('click',handler);
-        }, {once:true, capture:true});
-      }
-    });
+    abilityArmed = !abilityArmed; // tap again to back out before picking a die
+    if(abilityArmed) logMsg('sys', `Click a die in your zone to convert it.`);
+    renderTrayFast(); // the zone die tap itself is handled in bindTrayDice (Oct 14: no full redraw per tap)
   };
   const debugWinBtn = document.getElementById('debug-win-btn');
   if(debugWinBtn) debugWinBtn.onclick = ()=>{
@@ -1891,6 +1876,10 @@ function bindTrayDice(){
     node.onclick = ()=> {
       if(S.transitioning) return;
       if(longPressed){ longPressed = false; return; } // long-press consumed this interaction
+      if(abilityArmed){ // Skill armed: a zone die converts (and is not added to the path); any other die backs out and taps normally
+        abilityArmed = false;
+        if(inZone(idx) && !S.classAbilityUsed){ useClassAbility(idx); return; }
+      }
       if(node.classList.contains('used') && !node.classList.contains('undoable')) return;
       toggleSelect(idx);
     };
@@ -1952,6 +1941,34 @@ function syncLethalWarning(){
     pw.insertAdjacentHTML('beforeend', `<span class="lethal-tag" title="${tip}">&#9760; Lethal next turn</span>`);
   }
 }
+// Fast update for Swap/Reroll and class-Skill taps (Oct 14): same idea as renderPathOnly, plus the tray's armed
+// classes, the Skill button and the one-shot flip/convert flourishes. Token use, a changed Minion count or anything
+// unusual falls back to render().
+function renderTrayFast(){
+  const tray = document.getElementById('tray');
+  if(!S || S.screen!=='game' || !S.encounter || S.transitioning || S.newRoomFx || !tray
+     || S.lootChoice || S.shrineChoice || S.relicChoice || S.pendingLootDie
+     || (S.trayAct && S.trayAct.token)
+     || S.tray.filter(c=>c.minion).length !== renderGame._minions
+     || `${S.swapTokens||0}|${S.rerollTokens||0}` !== renderGame._tok) return render();
+  hideFaceTooltip();
+  tray.classList.toggle('ability-armed', abilityArmed);
+  tray.classList.toggle('trayact-armed', !!S.trayAct);
+  tray.innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join('');
+  bindTrayDice();
+  renderPathStrip();
+  const ab = document.getElementById('ability-btn');
+  if(ab){
+    ab.classList.toggle('disabled', !!(S.classAbilityUsed||S.transitioning));
+    ab.classList.toggle('armed', abilityArmed);
+    const coach = !!(S.coachRun && !S.classAbilityUsed && !S.transitioning && !abilityArmed);
+    ab.classList.toggle('pulse', coach); ab.classList.toggle('coach-pulse', coach);
+    const sp = ab.querySelector('span'); if(sp) sp.textContent = S.classAbilityUsed ? 'Used' : (abilityArmed ? 'Pick a Die' : 'Skill');
+  }
+  S.justConvertedIdx = null; S.justRerolledIdx = null; S.justSwappedIdx = null; // one-shot flourishes, as in renderGame
+  refreshPathBits();
+}
+
 function renderPathOnly(){
   const tray = document.getElementById('tray');
   if(!S || S.screen!=='game' || !S.encounter || S.transitioning || S.trayAct || abilityArmed || S.newRoomFx || !tray
@@ -1962,6 +1979,10 @@ function renderPathOnly(){
   tray.innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join('');
   bindTrayDice();
   renderPathStrip();
+  refreshPathBits();
+}
+// What a path change redraws besides the dice and coins: counter, Go, chest lock, enemy hp-bar preview, lethal tag.
+function refreshPathBits(){
   const wrap = document.querySelector('.tray-float-wrap');
   if(wrap){ wrap.querySelectorAll('.path-counter-float').forEach(n=>n.remove()); wrap.insertAdjacentHTML('beforeend', pathCounterHTML()); }
   const go = document.getElementById('resolve-btn');

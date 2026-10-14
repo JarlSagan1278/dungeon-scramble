@@ -1268,8 +1268,8 @@ function anyMoveAvailable(){
 }
 
 function toggleSelect(idx){
-  if(S.trayAct){ if(trayActTap(idx)) render(); return; } // v1.38.0: an armed Swap/Reroll takes the tap
-  if(!S.path.includes(idx)){ const k = trayActFaceAt(idx); if(k){ armTrayAct(k, idx, false); render(); return; } } // Swap/Reroll also work mid-path (Oct 12)
+  if(S.trayAct){ if(trayActTap(idx)) fastTrayRender(); return; } // v1.38.0: an armed Swap/Reroll takes the tap
+  if(!S.path.includes(idx)){ const k = trayActFaceAt(idx); if(k){ armTrayAct(k, idx, false); fastTrayRender(); return; } } // Swap/Reroll also work mid-path (Oct 12)
   if(S.path.length && S.path[S.path.length-1]===idx){
     // clicking the most-recently-chosen die again steps back one move
     S.path.pop();
@@ -1311,6 +1311,7 @@ function armTrayAct(kind, src, token){
   logMsg('sys', kind==='swap' ? (token ? 'Swap token: tap two dice to trade their places.' : 'Swap: tap a die to trade places with it.') : 'Reroll: tap a die to reroll it.');
 }
 function cancelTrayAct(){ S.trayAct = null; }
+function fastTrayRender(){ if(typeof renderTrayFast==='function') renderTrayFast(); else render(); } // Oct 14: Swap/Reroll/Skill taps
 function trayActTargetOk(idx){
   const a = S.trayAct; if(!a) return false;
   const c = S.tray[idx]; if(!c || c.minion || c.spent) return false;
@@ -1392,7 +1393,7 @@ function useClassAbility(idx){
   teleLog('class_ability', {klass:S.klass.id, turn:S.turnNumber, floor:S.floorIdx+1}); // Oct 12: is the ability used every turn in real play?
   S.justConvertedIdx = idx; // one-shot: a conversion flourish on this tile for the very next render only, see renderDie()/renderGame()
   logMsg('sys', `${S.klass.name} ability used: converted a die in the zone to ${LABEL[S.klass.convertTo.type]} ${S.klass.convertTo.value}.`);
-  render();
+  fastTrayRender();
 }
 
 /* =========================================================================
