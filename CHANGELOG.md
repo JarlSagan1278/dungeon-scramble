@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.41.15 (Oct 14, 2026)
+- Campfire choice (Jeremy: camp had the least agency; "the upgrading should be the fusing"): every Camp after Base Camp has a "Campfire: choose one" panel, **Rest** (heal; the button shows about how much) **or** **Train** (combine 3 matching dice in the section below, now titled "Train: Upgrade Dice"; still one Attack and one Maneuver per Camp). The chosen one gets a check and a gold ring, the other fades; Organize stays free; Base Camp combining stays free. Leaving without using the fire asks first. Telemetry: `camp_choice`.
+- Time-Intensive Shrine now costs your whole next campfire (no Rest or Train), since a skipped rest alone could be dodged by training.
+- Tutorial/route text and the rulebook Camp chapter updated.
+
 ## 1.41.14 (Oct 14, 2026)
 - Night Shift now does what its text says (Jeremy): rank 1 turns Easy rooms into Standard (it also used to turn Standard rooms into Elite); rank 2 turns Easy and Standard rooms into Elite. Shrine chances now follow each room's normal tier, so Night Shift no longer removes shrines at either rank (rank 2 used to remove them all). Texts say "Shrines appear as usual."
 - Rulebook: the PDF is the rulebook (regenerated); the outdated Word copy was removed (Jeremy).

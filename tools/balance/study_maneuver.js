@@ -56,6 +56,7 @@ let res = await page.evaluate((cfg)=>{
     if(c && c.type==='Shrine'){ const f = floor.shrines.find(x=>x.name===cfg.forceShrine); if(f) return f; } return c; }; }
   // kitPatch (Oct 13): {"<boss name>": <full BOSS_KITS entry>} replaces that boss kit for the study.
   Object.entries(cfg.kitPatch||{}).forEach(([n,k])=>{ BOSS_KITS[n] = k; });
+  window.__camp={rest:0,fuse:0,heal:0}; { const r0=campRest, u0=campUpgrade; window.campRest=function(){ const h=S.health, was=S.campRested; r0(); if(S.campRested&&!was){ window.__camp.rest++; window.__camp.heal+=S.health-h; } }; window.campUpgrade=function(c,l){ const b=S.campUpgrades[c]; u0(c,l); if(S.campUpgrades[c]&&!b) window.__camp.fuse++; }; }
   META.lifetime.victories=1; META.lifetime.bestFloorReached=3; META.achievements['origin_duo']={date:Date.now()};
   const origFns = {};
   // ---- encounter tuning hooks: scale enemies as they are drawn ----
@@ -341,7 +342,7 @@ let res = await page.evaluate((cfg)=>{
       const cats = cfg.swapManeuver?['attack']:['attack','maneuver'];
       const fuse = ()=>{ for(const cat of cats){ if(S.campUpgrades[cat]) continue; for(const lv of [2,1]){ if(canUpgrade(cat,lv)){ const before = S.campUpgrades[cat]; campUpgrade(cat,lv); if(S.campUpgrades[cat] && !before) return true; } } } return false; };
       if(typeof campFireUsedBy!=='function'){ // old builds: rest, then combine
-        if(!S.campRested){ campRest(); return null; } if(fuse()) return null; campLeave(); return null; }
+        if(!S.campRested && !cfg.noRest){ campRest(); return null; } if(!cfg.noFuse && fuse()) return null; campLeave(); return null; }
       if(!S.campChoice && !S.campFireOut && S.health <= (cfg.campRestAt!=null?cfg.campRestAt:0.6)*S.maxHealth && !isBaseCamp()){ campRest(); return null; }
       if(fuse()) return null;
       if(!S.campChoice && !S.campFireOut && !isBaseCamp()){ campRest(); return null; }
@@ -381,9 +382,9 @@ let res = await page.evaluate((cfg)=>{
     rec.floor=S.floorIdx+1; rec.turns=log.turns; rec.maxHp=S.maxHealth;
     runs.push(rec);
   }
-  return {runs, turns:window.__turns, man:Object.assign(window.__man,window.__end), tok:window.__tok||{}};
+  return {runs, camp:window.__camp, turns:window.__turns, man:Object.assign(window.__man,window.__end), tok:window.__tok||{}};
 }, cfg);
-const turnsData=res.turns, man=res.man, tokUse=res.tok; res=res.runs;
+const turnsData=res.turns, man=res.man, tokUse=res.tok, campLog=res.camp; res=res.runs; if(campLog) console.error('CAMP '+JSON.stringify(campLog));
 require('fs').writeFileSync('' + __dirname + '/out_'+(cfg.label||'x')+'.json', JSON.stringify({cfg,res,tokUse}));
 // summarize
 const n=res.length, wins=res.filter(r=>r.result==='VICTORY').length;
