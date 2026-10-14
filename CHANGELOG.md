@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.17 (Oct 14, 2026)
+- Stronger level II/III basic dice (Jeremy, "ship moderate"), so a Train (combine) at camp pays off and upgraded basics hold their Tray slots against loot: Attack II Hit2 Hit2 Combo2 **Hit1** + 2 blanks; Attack III Hit3 Hit3 Combo3 **Hit2 Hit1** + 1 blank; Maneuver II Dodge Dodge Leap Pivot **Block2 Block2**; Maneuver III Dodge Leap Pivot **Block2 Block2 Boost x2**. Bot study: combining is now worth +7 points (it was worth nothing); overall regular 57% -> 61%, new 35% -> 39%.
+
 ## 1.41.16 (Oct 14, 2026)
 - Back Pocket revive (Jeremy): any Pocket is a full safety net, but a save spends the whole Pocket. At 0 Health the Pocket dice are rolled one at a time in random order; the first non-blank face saves you at 5 Health; then every Pocket die is gone (if all land blank, the run ends). It arms again when a new die lands in the Pocket. Combining dice no longer quietly costs revives (it was a trap: bots that never combined won 85-89% vs 66-70%). Bot study: regular 82% -> 56%, new players 68% -> 38%, expert depth 7 54% -> 27% (docs/studies/2026-10-14_campfire_backpocket.md); Jeremy wants the win rate nearer other roguelikes.
 - A red heart on the Pocket button shows the safety net is armed; the Pocket window explains the rule; combining at Camp warns before it would use your last spare dice. Telemetry: `pocket_revive`. Rulebook updated.

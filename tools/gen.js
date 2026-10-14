@@ -82,7 +82,7 @@ ${call('tip','Using a Class skill','For Armsmaster and Guard, press '+btn('Skill
 C+=ch(3,'The Dice',`
 <p>Your power lives in your dice. Sixteen sit in the Tray and are scrambled every turn; any others wait in the <b>Back Pocket</b>. Each die has six faces, each either blank or an Action with a value. <b>Long-press any die</b> to read what its face does.</p>
 ${tbl(['Die','What it is','Faces'],[
- ...[['attack',1,'Basic damage die'],['attack',2,'Basic damage die'],['attack',3,'Basic damage die'],['maneuver',1,'Basic movement die'],['maneuver',2,'Movement, plus a Pivot and a Block 2'],['maneuver',3,'Movement, plus a Pivot and two Blocks']].map(([cat,lv,what])=>{const d=O.BASIC_DICE.find(x=>x.cat===cat&&x.level===lv);return ['<b>'+d.name+'</b>',what,faces(d.faces,'basic')];}),
+ ...[['attack',1,'Basic damage die'],['attack',2,'Basic damage die'],['attack',3,'Basic damage die'],['maneuver',1,'Basic movement die'],['maneuver',2,'Movement, plus a Pivot and two Block 2'],['maneuver',3,'Movement, two Block 2 and a Boost']].map(([cat,lv,what])=>{const d=O.BASIC_DICE.find(x=>x.cat===cat&&x.level===lv);return ['<b>'+d.name+'</b>',what,faces(d.faces,'basic')];}),
  ['<b>Origin die</b>','One per Adventurer','See Chapter 2'],
  ['<span class="tag t-alloy">Alloy</span> Loot dice','Common loot, Floor 1',O.FLOORS[0].lootPool.length+' dice'],
  ['<span class="tag t-gilded">Gilded</span> Loot dice','Rare loot, Floor 2',O.FLOORS[1].lootPool.length+' dice'],

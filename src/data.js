@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.16';
+const GAME_VERSION = '1.41.17';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -218,14 +218,16 @@ function iconSpan(type, value, small){
 
 // ---- Basic dice ----
 const BASIC_DICE = [
+  // Oct 14 (Jeremy, "ship moderate"): level II/III basics are stronger so a Train (combine) at camp pays off;
+  // upgraded basics now hold their Tray slots against loot (docs/studies/2026-10-14_system_knockout.md).
   {id:'atk1', name:'Attack Die I', cat:'attack', level:1, faces:faces(['Hit1','Hit1','Combo1','blank','blank','blank'])},
-  {id:'atk2', name:'Attack Die II', cat:'attack', level:2, faces:faces(['Hit2','Hit2','Combo2','blank','blank','blank'])},
-  {id:'atk3', name:'Attack Die III', cat:'attack', level:3, faces:faces(['Hit3','Hit3','Combo3','blank','blank','blank'])},
+  {id:'atk2', name:'Attack Die II', cat:'attack', level:2, faces:faces(['Hit2','Hit2','Combo2','Hit1','blank','blank'])},
+  {id:'atk3', name:'Attack Die III', cat:'attack', level:3, faces:faces(['Hit3','Hit3','Combo3','Hit2','Hit1','blank'])},
   {id:'man1', name:'Maneuver Die I', cat:'maneuver', level:1, faces:faces(['Dodge','Dodge','Leap','Leap','blank','blank'])},
   // Oct 13 (Jeremy): high Maneuver dice scale with a small Block ladder, so an upgraded Maneuver is worth as much as an
   // upgraded Attack (regular bot: II 92% vs Attack II 89%, III 95% vs Attack III 95%; docs/studies/2026-10-13_floor3_extruzeon.md).
-  {id:'man2', name:'Maneuver Die II', cat:'maneuver', level:2, faces:faces(['Dodge','Dodge','Leap','Leap','Pivot','Block2'])},
-  {id:'man3', name:'Maneuver Die III', cat:'maneuver', level:3, faces:faces(['Dodge','Dodge','Leap','Pivot','Block1','Block2'])},
+  {id:'man2', name:'Maneuver Die II', cat:'maneuver', level:2, faces:faces(['Dodge','Dodge','Leap','Pivot','Block2','Block2'])},
+  {id:'man3', name:'Maneuver Die III', cat:'maneuver', level:3, faces:faces(['Dodge','Leap','Pivot','Block2','Block2','Boost1'])},
 ];
 function basic(cat, level){ return BASIC_DICE.find(d=>d.cat===cat && d.level===level); }
 
