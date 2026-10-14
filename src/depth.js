@@ -63,7 +63,7 @@ function maxSelectableDepth(){ return Math.max(DEPTH_BEST.overall, 1) + 2; }
 function depthMenuUnlocked(){ return (META.lifetime.victories||0) >= 1 || (typeof debugArmed!=='undefined' && debugArmed); }
 
 /* ---- Finish tiers (dice borders), account-wide ---- */
-const FINISH_AT = [1, 4, 7, 11]; // best depth needed for tier 1..4 (internal; shown as 0, 3, 6, 10)
+const FINISH_AT = [4, 6, 8, 10]; // best depth needed for tier 1..4 (internal; shown as 3, 5, 7, 9 -- Jeremy, Oct 14; was 0/3/6/10)
 const FINISH_NAMES = ['', 'Bronze', 'Silver', 'Gold', 'Royal'];
 function finishTierFor(best){ let t = 0; FINISH_AT.forEach((d,i)=>{ if(best>=d) t = i+1; }); return t; }
 function currentFinishTier(){ return finishTierFor(DEPTH_BEST.overall); }
@@ -123,30 +123,31 @@ function classBadgeHTML(klass, size, withScore){
   return `<div class="depth-badge-wrap">${depthBadgeSVG(klass.color, b.depth, size)}${withScore?`<div class="depth-badge-pill">${b.score.toLocaleString()}</div>`:''}</div>`;
 }
 
-/* ---- Dice finish (filigree border + corner plates), drawn as an overlay ---- */
+/* ---- Dice finish (filigree border + corner plates), drawn as an overlay ----
+   Oct 14 (Jeremy): kept to the die's outer rim so it never covers the name, face icon or label:
+   a thin rim, small corner scrolls (inside ~15% of each corner), no inner frame line. */
 function finishSVG(tier){
   const scroll = `<path d="M13 31C13 19 19 13 31 13C40 13 42 22 36 24C31 26 27 20 33 19"/>`;
-  const corner = `<g transform="scale(.66)">${scroll}<g transform="matrix(0 1 1 0 0 0)">${scroll}</g></g>`;
+  const corner = `<g transform="translate(-1.5,-1.5) scale(.38)">${scroll}<g transform="matrix(0 1 1 0 0 0)">${scroll}</g></g>`;
   const four = (g)=>`<g>${g}</g><g transform="translate(100,0) scale(-1,1)">${g}</g><g transform="translate(0,100) scale(1,-1)">${g}</g><g transform="translate(100,100) scale(-1,-1)">${g}</g>`;
   const dia = (x,y,r)=>`<path d="M${x} ${y-r}L${x+r} ${y}L${x} ${y+r}L${x-r} ${y}Z"/>`;
-  const mids = dia(50,5,3)+dia(50,95,3)+dia(5,50,3)+dia(95,50,3);
-  const plate = `<path d="M5 5H20L5 20Z"/>`;
-  const frame = `<rect x="3.5" y="3.5" width="93" height="93" rx="10" fill="none"/>`;
-  const frame2 = `<rect x="8" y="8" width="84" height="84" rx="6" fill="none"/>`;
+  const mids = dia(50,2.6,2.2)+dia(50,97.4,2.2)+dia(2.6,50,2.2)+dia(97.4,50,2.2);
+  const plate = `<path d="M2.5 2.5H11L2.5 11Z"/>`;
+  const frame = `<rect x="2.2" y="2.2" width="95.6" height="95.6" rx="10" fill="none"/>`;
   let body = '';
   if(tier===1){
     const c = '#e0a566';
-    body = `<g stroke="#1c140c" stroke-width="5" fill="none">${frame}${four(corner)}</g><g stroke="${c}" stroke-width="2.2" fill="none">${frame}</g><g stroke="${c}" stroke-width="1.8" fill="none" stroke-linecap="round">${four(corner)}</g><g stroke="${c}" stroke-width=".9" opacity=".6" fill="none">${frame2}</g>`;
+    body = `<g stroke="#1c140c" stroke-width="3.4" fill="none">${frame}${four(corner)}</g><g stroke="${c}" stroke-width="1.6" fill="none">${frame}</g><g stroke="${c}" stroke-width="1.4" fill="none" stroke-linecap="round">${four(corner)}</g>`;
   } else if(tier===2){
     const c = '#e3e8ec', f = '#c4ccd3';
-    body = `<g stroke="#1c140c" stroke-width="5" fill="none">${frame}${four(corner)}</g><g stroke="${c}" stroke-width="2.2" fill="none">${frame}</g><g stroke="${c}" stroke-width="1.8" fill="none" stroke-linecap="round">${four(corner)}</g><g stroke="${c}" stroke-width=".9" opacity=".7" fill="none">${frame2}</g><g fill="${f}" stroke="#1c140c" stroke-width="1.5">${mids}</g>`;
+    body = `<g stroke="#1c140c" stroke-width="3.4" fill="none">${frame}${four(corner)}</g><g stroke="${c}" stroke-width="1.6" fill="none">${frame}</g><g stroke="${c}" stroke-width="1.4" fill="none" stroke-linecap="round">${four(corner)}</g><g fill="${f}" stroke="#1c140c" stroke-width="1">${mids}</g>`;
   } else {
     const c = tier===4 ? '#fff0a8' : '#f6d56a', f = tier===4 ? '#f0c64a' : '#e8b83a', sc = tier===4 ? '#f0c64a' : c;
-    body = `<g stroke="#1c140c" stroke-width="${tier===4?6:5.5}" fill="none" stroke-linecap="round">${frame}${four(corner)}</g><g fill="#1c140c" stroke="#1c140c" stroke-width="3">${four(plate)}${mids}</g>`
-      + `<g stroke="${c}" stroke-width="${tier===4?2.6:2.4}" fill="none">${frame}</g><g stroke="${sc}" stroke-width="2" fill="none" stroke-linecap="round">${four(corner)}</g><g stroke="${sc}" stroke-width="1" opacity=".78" fill="none">${frame2}</g>`
-      + `<g fill="${f}" stroke="#1c140c" stroke-width="1">${four(plate)}</g><g fill="${c}" stroke="#1c140c" stroke-width="1.2">${mids}</g>`;
+    body = `<g stroke="#1c140c" stroke-width="${tier===4?4:3.6}" fill="none" stroke-linecap="round">${frame}${four(corner)}</g><g fill="#1c140c" stroke="#1c140c" stroke-width="2">${four(plate)}${mids}</g>`
+      + `<g stroke="${c}" stroke-width="${tier===4?1.9:1.7}" fill="none">${frame}</g><g stroke="${sc}" stroke-width="1.5" fill="none" stroke-linecap="round">${four(corner)}</g>`
+      + `<g fill="${f}" stroke="#1c140c" stroke-width=".8">${four(plate)}</g><g fill="${c}" stroke="#1c140c" stroke-width="1">${mids}</g>`;
     if(tier===4){
-      const gem = (col)=>`<circle cx="11" cy="11" r="3.8" fill="${col}" stroke="#1c140c" stroke-width="1.4"/><circle cx="10" cy="10" r="1.1" fill="#fff" opacity=".85"/>`;
+      const gem = (col)=>`<circle cx="6.2" cy="6.2" r="2.6" fill="${col}" stroke="#1c140c" stroke-width="1"/><circle cx="5.6" cy="5.6" r=".8" fill="#fff" opacity=".85"/>`;
       body += gem('#d6264a') + `<g transform="translate(100,0) scale(-1,1)">${gem('#7a4cff')}</g><g transform="translate(0,100) scale(1,-1)">${gem('#7a4cff')}</g><g transform="translate(100,100) scale(-1,-1)">${gem('#d6264a')}</g>`;
     }
   }

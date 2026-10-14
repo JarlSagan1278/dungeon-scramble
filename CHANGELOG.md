@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.10 (Oct 14, 2026)
+- Dice finishes (Jeremy): Bronze / Silver / Gold / Royal now unlock at depth 3 / 5 / 7 / 9 cleared (was 0 / 3 / 6 / 10); the depth titles follow. The finish is slimmer and stays on the die's outer rim (thin rim, small corner scrolls, no inner frame line) so it no longer covers die names or face labels.
+
 ## 1.41.9 (Oct 14, 2026)
 - Loot (tester idea, Jeremy approved): the equip pop-up has a blue **Keep in Pocket** button next to Replace. The new die goes straight to the Back Pocket and the Tray stays as it is (it counts as collected, for Starting Boon copies too). Telemetry: `loot_equip` with `pocket:true`, `replaced:null`.
 
