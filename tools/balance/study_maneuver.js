@@ -41,6 +41,8 @@ let res = await page.evaluate((cfg)=>{
   try{ PREFS.reducedMotion=true; }catch(e){}
   if(cfg.unlockAllRelics!==false){ try{ DEPTH_BEST.overall=Math.max(DEPTH_BEST.overall||0,2); }catch(e){} } // Oct 12 gating: studies see every relic unless unlockAllRelics:false
   // classPatch (Oct 12 class study): {"guard":{"convertTo":{"type":"block","value":1}}, "arcanist":{"zone":"(r,c)=>r===c||r+c===3"}}; zone given as source text
+  if(cfg.reviveClear) REVIVE_CLEARS_POCKET = true; // Oct 14 test: a Back Pocket save spends the whole Pocket
+  window.__rev={saves:0,fails:0,spent:0,downs:0}; { const pd0=onPlayerDefeated; window.onPlayerDefeated=function(){ window.__rev.downs++; return pd0(); }; } { const tl0=teleLog; window.teleLog=function(t,d){ if(t==='pocket_revive'){ if(d.saved) window.__rev.saves++; else window.__rev.fails++; window.__rev.spent+=d.spent; } return tl0(t,d); }; }
   if(cfg.trayActAfter) TRAYACT_AFTER = cfg.trayActAfter; // Swap/Reroll after-use test: 'blank' | 'step' | 'pivot'
   Object.entries(cfg.relicPatch||{}).forEach(([id,p])=>Object.assign(RELICS.find(r=>r.id===id),p)); // relic number tests, e.g. {"forgeplate":{"amt":2}}
   Object.entries(cfg.classPatch||{}).forEach(([id,p])=>{ const k=CLASSES.find(x=>x.id===id); Object.entries(p).forEach(([f,v])=>{ k[f] = (f==='zone') ? eval(v) : v; }); });
@@ -382,9 +384,9 @@ let res = await page.evaluate((cfg)=>{
     rec.floor=S.floorIdx+1; rec.turns=log.turns; rec.maxHp=S.maxHealth;
     runs.push(rec);
   }
-  return {runs, camp:window.__camp, turns:window.__turns, man:Object.assign(window.__man,window.__end), tok:window.__tok||{}};
+  return {runs, rev:window.__rev, camp:window.__camp, turns:window.__turns, man:Object.assign(window.__man,window.__end), tok:window.__tok||{}};
 }, cfg);
-const turnsData=res.turns, man=res.man, tokUse=res.tok, campLog=res.camp; res=res.runs; if(campLog) console.error('CAMP '+JSON.stringify(campLog));
+const turnsData=res.turns, man=res.man, tokUse=res.tok, campLog=res.camp, revLog=res.rev; res=res.runs; if(campLog) console.error('CAMP '+JSON.stringify(campLog)); if(revLog) console.error('REV '+JSON.stringify(revLog));
 require('fs').writeFileSync('' + __dirname + '/out_'+(cfg.label||'x')+'.json', JSON.stringify({cfg,res,tokUse}));
 // summarize
 const n=res.length, wins=res.filter(r=>r.result==='VICTORY').length;

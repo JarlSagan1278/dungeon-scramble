@@ -2535,10 +2535,28 @@ function pocketLootDie(){
   render();
 }
 
+// Revive rule switch (Oct 14 test, off until Jeremy decides): true = a save spends the whole Back Pocket.
+let REVIVE_CLEARS_POCKET = false;
 function onPlayerDefeated(){
   teleLog('player_down', {enemy:S.encounter?S.encounter.name:null, enemyHp:S.encounter?Math.round(S.encounter.curHealth):null, backPocket:S.backPocket.length,
     cause: S._downBeat===2 ? 'dot' : 'hit', lethalStart: S._lw?S._lw.start:null, lethalGo: S._lw?S._lw.go:null, maxHp:S.maxHealth});
-  if(S.backPocket.length>0){
+  if(S.backPocket.length>0 && REVIVE_CLEARS_POCKET){
+    // Test rule (Oct 14, Jeremy's idea): any Pocket is a full safety net, but a save spends the WHOLE Pocket.
+    // Pocket dice are rolled in random order; the first non-blank face saves you at 5 HP; then every Pocket die is gone.
+    const order = S.backPocket.map((d,i)=>i).sort(()=>Math.random()-0.5);
+    const n = S.backPocket.length;
+    const saved = order.some(i=>{ const d = S.backPocket[i]; return d.faces[rand(d.faces.length)].type!=='blank'; });
+    S.backPocket = [];
+    teleLog('pocket_revive', {saved, spent:n});
+    if(saved){
+      S.health = 5;
+      logMsg('heal', `Your Back Pocket saves you! (+5 health) All ${n} spare ${n===1?'die is':'dice are'} spent.`, 'good');
+      render();
+    } else {
+      logMsg('sys', `Every die in your Back Pocket came up blank.`, 'bad');
+      onPlayerDefeated();
+    }
+  } else if(S.backPocket.length>0){
     const idx = rand(S.backPocket.length);
     const d = S.backPocket.splice(idx,1)[0];
     const f = d.faces[rand(6)];
