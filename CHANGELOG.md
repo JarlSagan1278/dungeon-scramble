@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.11 (Oct 14, 2026)
+- Dice finishes (Jeremy): a middle ground between the old and the 1.41.10 slim art -- thicker metal rim, bigger edge diamonds, Gold corner plates and Royal gems, with the corner scrolls kept small so they stay clear of the longest die names (checked on all origin dice, the longest loot names and basic dice, every tier).
+
 ## 1.41.10 (Oct 14, 2026)
 - Dice finishes (Jeremy): Bronze / Silver / Gold / Royal now unlock at depth 3 / 5 / 7 / 9 cleared (was 0 / 3 / 6 / 10); the depth titles follow. The finish is slimmer and stays on the die's outer rim (thin rim, small corner scrolls, no inner frame line) so it no longer covers die names or face labels.
 
