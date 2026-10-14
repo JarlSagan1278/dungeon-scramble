@@ -2,6 +2,7 @@
 
 ## Priority order (updated Oct 14, after 1.41.7 / Netlify zip)
 1. **Playtest 1.41.7 on the phone and collect play data.** New to check: harder Floor 3, Extruzeon's Layer by Layer, Maneuver II/III Block faces, the six retuned loot dice, Codex/Bestiary, Records, lethal warning, Skill coach, volume sliders, run card + Save Card, Suggested die (after 6 s), readable enemy chips, solid chip icons, the action fill, long title theme, win/lose stings, tempos 130/135/140. Ask testers to send exports; read `summary` first (floor funnel, first-10-runs win rate, take rates, warned vs unwarned deaths, abandoned runs).
+   - Oct 14: first tester, 2 runs, both won (Armsmaster depth 1, Dungeoneer depth 3); one warned down; Grosteque Grafter took 11 turns; Maneuver Die I replaced in 20 of 30 equips. See docs/studies/2026-10-14_playtest_tester1.md. Still need newer players' exports.
 2. **Music and art review (Jeremy):** every piece in the spec is in the game; he's reviewing all of it for edits. Art continues in parallel.
 3. **Waiting on Jeremy's call (studies done, nothing applied):**
    - Pacing: Floor 2 Easy rooms about 25-30% less HP (The Warcart, Armored Gear-Pest, Roudy Rinotter, Adhesive Pest Traps, Unventilated Workshop); Myceleus HP 106 -> ~93. (docs/studies/2026-10-13_rebaseline_141.md, "Fight pacing")
