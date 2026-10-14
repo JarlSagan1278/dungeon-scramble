@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.13 (Oct 14, 2026)
+- Grosteque Grafter (Jeremy): Health 50 -> 40, same as the Heating Elemental. Its shield and heal are unchanged. In the bot study, fights of 8+ turns dropped from 17% to 14% (Dungeoneer 25% -> 14%) and it ends fewer runs (2.8% -> 1.5%). Rulebook PDF regenerated.
+
 ## 1.41.12 (Oct 14, 2026)
 - Faster taps: Swap / Reroll and class-Skill taps redraw only the tray, path bits and Skill button (`renderTrayFast`), about 3x less work per tap at CPU x4 (73 -> 23 ms). The armed-Skill tap is handled in the tray's own tap handler; tapping a die outside the zone while Skill is armed backs out and taps that die normally. `tools/test_trayfast.js` checks fast vs full redraw.
 - Boss chips: damage-per-Minion specials (e.g. Stampede) show the total for the Minions on your Tray, with a small Minion mark; the tooltip keeps the per-Minion number.

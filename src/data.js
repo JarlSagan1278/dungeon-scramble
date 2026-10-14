@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.12';
+const GAME_VERSION = '1.41.13';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -432,7 +432,7 @@ const FLOOR1_SHRINES = [
 const FLOOR1_BOSSES = [
   enc('Rogue Golemancer','Boss',24,{dmg:2,minion:1,flavor:'"You cannot handle my golems, adventurer."'}),
   enc('Heating Elemental','Boss',40,{questHealth:25,dmg:3,hot:1,quests:['35 damage: survive to turn 5'],flavor:'"Anyone know the average melting point on the Plane of Immolation?"'}),
-  enc('Grosteque Grafter','Boss',50,{questHealth:30,dmg:2,shield:2,quests:['8 dot: deal 10+ damage in a single round'],flavor:'Oft criticized for reusing parts of other bosses.'}),
+  enc('Grosteque Grafter','Boss',40,{questHealth:30,dmg:2,shield:2,quests:['8 dot: deal 10+ damage in a single round'],flavor:'Oft criticized for reusing parts of other bosses.'}),
 ];
 
 const FLOOR2_ENEMIES = [

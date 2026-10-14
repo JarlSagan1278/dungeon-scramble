@@ -58,5 +58,5 @@ Shrinking its shield and heal cuts the extreme fights (longest 47 -> 27-29 turns
 
 ## Decision points for Jeremy
 1. **Dungeoneer at depth (experts only).** Decided Oct 14: **leave it for now.** (Options were: leave it (it is the easiest class to learn on, and the balance philosophy allows classes to differ), or give it one of the tested boosts. The Oct 12 decision was "Dungeoneer unchanged for now"; that was with the buggy wrap.)
-2. **Grosteque Grafter.** Leave it as the slow, grindy Floor 1 boss (it isn't more dangerous, just longer), or trim it: 40 HP helps most; Heal 2 / Shield 3 mainly removes the 30-47 turn extremes.
+2. **Grosteque Grafter.** Decided Oct 14: **trimmed to 40 HP** (1.41.13). (Options were: leave it as the slow, grindy Floor 1 boss (it isn't more dangerous, just longer), or trim it: 40 HP helps most; Heal 2 / Shield 3 mainly removes the 30-47 turn extremes.)
 3. **Night Shift does more than it says** (found during the rulebook audit). Its rank 1 text says "Easy rooms become Standard rooms", but the code also turns every Standard room into an Elite (and so removes shrine chances from those rooms). The tester's depth-2 win was played with it. Fix the code to match the text, or rewrite the text to match the code.
