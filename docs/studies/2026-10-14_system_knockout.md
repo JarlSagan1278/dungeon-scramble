@@ -22,3 +22,17 @@ Question (Jeremy): are other systems carrying the win rate the way the old Back 
 - **Combining (Train) still adds nothing**, even with the revive fixed: bots that always Rest do slightly better. Train is the weaker campfire choice, so the choice isn't balanced yet.
 - **Swap/Reroll faces and tokens add nothing for the bot.** The bot uses them crudely (30% of the time, no planning), so this is a "check with real players" item, not proof they're dead content.
 - **Class Skill is small for regular bots** (they use it 35% of the time); real players use it almost every turn (tester: 46 of 53 turns), so its human value is higher.
+
+## Follow-up: stronger Train and shrine loot (build 1.41.16 + switches UPGRADE_COST, SHRINE_LOOT; both off)
+
+| Variant | Regular D0 | New D0 | Runs ending F1/F2/F3, regular (%) |
+|---|---|---|---|
+| Today | 57% | 35% | 2 / 18 / 29 |
+| Combine needs 2 dice | 57% | 37% | 2 / 18 / 30 |
+| Combine needs 2 dice, bot never combines | 57% | | 1 / 18 / 30 |
+| Shrines also give a 2-die loot pick | **83%** | **64%** | 2 / 8 / 9 |
+| Both | 83% | 66% | 0 / 8 / 10 |
+
+- **Cheaper combining changes nothing.** Combining or not, 57%. Basic dice get replaced by loot as the run goes on (median 12 loot dice owned on Floor 3), so upgrading a basic die only pays until loot replaces it. Train needs to improve something that stays: loot dice, or something other than dice.
+- **A loot pick at every shrine is far too strong** (+26 points; it undoes the revive change). One extra loot pick per shrine is worth more than any boon. A smaller version (one random die, no choice) or loot only from some shrines would be the next thing to test.
+- Loot dice are the dominant power source of a run; every extra loot pick is worth a lot.
