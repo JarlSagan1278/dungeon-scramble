@@ -1469,7 +1469,7 @@ function renderEncounterCard(e, mode){
     if(e.dot) items.push({type:'dot', stat:'dot', label:'D.O.T.', val:e.dot});
     if(!items.length) return '';
     // Oct 14 (Jeremy): icon + a readable number, no word (the number squeezed inside the icon was illegible); names are for boss specials only.
-    const chips = items.map(it=>{ const v = (it.stat===hs ? it.val*2 : it.val) + (it.stat==='dmg' ? zealBonus(!!hs) : 0); return `<span class="boss-cycle-item next enemy-action-badge${it.stat===hs?' heavy':''}" title="${it.label} ${v}${it.stat===hs?' (heavy turn: doubled)':''}: ${enemyActionTooltip(it.type, v)}">${iconSpan(it.type)}<b class="enc-n">${v}</b></span>`; }).join('');
+    const chips = items.map(it=>{ const v = (it.stat===hs ? it.val*2 : it.val) + (it.stat==='dmg' ? zealBonus(!!hs) : 0); return `<span class="boss-cycle-item next enemy-action-badge${it.stat===hs?' heavy':''}" title="${it.label} ${v}${it.stat===hs?' (heavy turn: doubled)':''}: ${enemyActionTooltip(it.type, v)}">${iconSpanSolid(it.type)}<b class="enc-n">${v}</b></span>`; }).join('');
     return `<div class="boss-cycle-row"><span class="hint" style="margin:0;">Each turn:</span>${chips}</div>`;
   })() : '';
   const art = ART_WRONG.has(e.name) ? null : MONSTER_ART[e.name];
@@ -1481,7 +1481,7 @@ function renderEncounterCard(e, mode){
       const a = a0.type==='dmg' ? {...a0, value:a0.value + (a0.grow ? (e.layers||0) : 0) + zealBonus(false)} : a0; // Zeal (and Extruzeon's layers) show in the warning
       const ik = iconKey[a.type]; if(!ik) return '';
       const num = a.type==='dmgPerMinion' ? `<b class="enc-n">${a.value}</b><small class="enc-per">/${iconSpan('minion')}</small>` : `<b class="enc-n">${a.value}</b>`;
-      return `<span class="boss-cycle-item next enemy-action-badge ${extraCls}${a.grow?' grows':''}" title="${label?label+': ':''}${actText(a)}${a.grow?` (Layer by Layer: grows by ${a.grow} every turn)`:''}">${iconSpan(ik)}${num}${label?' '+label:''}</span>`;
+      return `<span class="boss-cycle-item next enemy-action-badge ${extraCls}${a.grow?' grows':''}" title="${label?label+': ':''}${actText(a)}${a.grow?` (Layer by Layer: grows by ${a.grow} every turn)`:''}">${iconSpanSolid(ik)}${num}${label?' '+label:''}</span>`;
     };
     const kit = bossKitNow(e), sp = nextTurn.special;
     const base = kit.each.map(a=>chip(a,'','')).join('');
@@ -1490,7 +1490,7 @@ function renderEncounterCard(e, mode){
     const spMain = spMain0.type==='dmg' ? {...spMain0, value:spMain0.value + zealBonus(true)} : spMain0;
     const spTip = `${sp.name}: ${sp.herald?`(brought ${sp.herald.value} Minions with its warning) `:''}${sp.acts.map(actText).join(', ')}${frozen?' (cancelled by Freeze)':''}`;
     const spNum = !spMain.value ? '' : spMain.type==='dmgPerMinion' ? `<b class="enc-n">${spMain.value}</b><small class="enc-per">/${iconSpan('minion')}</small>` : `<b class="enc-n">${spMain.value}</b>`;
-    const special = `<span class="boss-cycle-item next enemy-action-badge boss-special${sp.windup&&!frozen?' heavy':''}${frozen?' frozen':''}" title="${spTip}">${iconKey[spMain.type]?iconSpan(iconKey[spMain.type]):''}${spNum} ${sp.name}</span>`;
+    const special = `<span class="boss-cycle-item next enemy-action-badge boss-special${sp.windup&&!frozen?' heavy':''}${frozen?' frozen':''}" title="${spTip}">${iconKey[spMain.type]?iconSpanSolid(iconKey[spMain.type]):''}${spNum} ${sp.name}</span>`;
     return `<div class="boss-cycle-row${kit.each.length>1?' crowded':''}"><span class="hint" style="margin:0;">Next turn:</span>${base}${special}</div>`;
   })() : '';
   if(mode==='faceoff'){
@@ -3482,8 +3482,10 @@ function relicBadgeHTML(r, extraCls){
 // A compact row of the relics held this run (game board + Camp); tap for details.
 // Status chips shown over the doorway are icon + number only (full wording lives in the tooltip).
 function hudChips(h){
-  // icon + the amount as plain text (the in-icon overlay number is too small to read at chip size)
+  // icon + the amount as plain text (the in-icon overlay number is too small to read at chip size); Oct 14: the icon
+  // turns solid (no hole) since the number now sits beside it
   return (h||'')
+    .replace(/<span class="icon-svg">(<svg[\s\S]*?<\/svg>)<span class="icon-value-overlay">[^<]*<\/span><\/span>/g, (m, svg)=>{ const t = Object.keys(ICON_SVG).find(k=>ICON_SVG[k]===svg); return t ? iconSpanSolid(t) : m; })
     .replace(/(<span class="status-chip[^>]*title="[^"]*? (\d+(?:\.\d+)?):[^"]*"[^>]*>)([\s\S]*?) (?:DOT|HOT|Block|Shield)<\/span>/g, '$1$3<b class="chip-n">$2</b></span>')
     .replace(/ Boost x(\d+) armed<\/span>/g, '<b class="chip-n">x$1</b></span>')
     .replace(/Minions (\d+)<\/span>/g, 'Min <b class="chip-n">$1</b></span>');

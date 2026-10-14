@@ -164,3 +164,4 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - **End-of-run stings (Jeremy asked, Oct 13, 1.41.4):** run-win freylekhs landing on D major and a run-lost doina ending on D minor (STINGS / musicSting in music.js); the title theme resumes after. With these, every piece in the music spec is in the game (treasure is still a per-tier chord rather than the spec's rising arpeggio).
 - **Tempo (Jeremy, Oct 14, 1.41.5):** music starts at 130 bpm on Floor 1, +5 per floor (130/135/140). Title theme and stings follow Floor 1's tempo (Claude's call, so they match the run's opening).
 - **Enemy chips (Jeremy, Oct 14, 1.41.6):** icon + readable number, no word; named abilities only on boss specials.
+- **Solid icons (Jeremy, Oct 14, 1.41.7):** an icon whose number sits beside it (chips) is drawn solid (`iconSpanSolid` / `solidIcon` in data.js); the hole is only for numbers inside the icon (dice faces).

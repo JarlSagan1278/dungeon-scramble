@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.7 (Oct 14, 2026)
+- Icons (Jeremy): where the number sits beside the icon (enemy action chips, boss chips, your status chips over the doorway), Hit / Combo / Leech / Block / Heal show as solid shapes without the hole for an in-icon number. Dice faces keep the hole with the number inside.
+
 ## 1.41.6 (Oct 14, 2026)
 - Enemy action chips (Jeremy): each shows its icon with a readable number beside it instead of a tiny number inside the icon plus a word ("Hit"); names are kept for boss specials only. Damage-per-Minion specials read "3 / [minion]".
 

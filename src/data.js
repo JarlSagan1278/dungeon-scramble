@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.6';
+const GAME_VERSION = '1.41.7';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -189,6 +189,25 @@ const ICON_VALUE_SLOT = new Set(['hit','combo','leech','block','heal','dot','hot
 const ICON_SVG_SMALL = {
   dodge: '<svg viewBox="0 0 24 24"><path d="M7.2 7.2 L16.8 16.8 M16.8 7.2 L7.2 16.8" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><path fill="currentColor" d="M1 1 L11 2.6 L2.6 11 Z M23 1 L21.4 11 L13 2.6 Z M1 23 L2.6 13 L11 21.4 Z M23 23 L13 21.4 L21.4 13 Z"/></svg>',
 };
+// Solid versions of the icons that have a hole for the number (Oct 14, Jeremy): used where the number sits beside the
+// icon instead of inside it (enemy chips). Drops every sub-shape whose bounding box lies inside another one's.
+const ICON_SVG_SOLID = {};
+function solidIcon(type){
+  if(ICON_SVG_SOLID[type]) return ICON_SVG_SOLID[type];
+  const svg = ICON_SVG[type] || '';
+  const out = svg.replace(/ d="([^"]+)"/, (m, d)=>{
+    const subs = d.split(/(?=M)/).map(x=>x.trim()).filter(Boolean);
+    if(subs.length < 2) return m;
+    const box = sp=>{ const n = sp.match(/-?\d+(\.\d+)?/g).map(Number); const xs = n.filter((_,i)=>i%2===0), ys = n.filter((_,i)=>i%2===1);
+      return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]; };
+    const bs = subs.map(box);
+    const inside = (a,b)=> a!==b && a[0]>=b[0] && a[1]>=b[1] && a[2]<=b[2] && a[3]<=b[3];
+    const keep = subs.filter((_,i)=> !bs.some((b,j)=> j!==i && inside(bs[i], b)));
+    return ` d="${keep.join(' ')}"`;
+  }).replace(' fill-rule="evenodd"', '');
+  return (ICON_SVG_SOLID[type] = out);
+}
+function iconSpanSolid(type){ return ICON_SVG[type] ? `<span class="icon-svg">${ICON_VALUE_SLOT.has(type) ? solidIcon(type) : ICON_SVG[type]}</span>` : ''; }
 function iconSpan(type, value, small){
   if(!ICON_SVG[type]) return '';
   if(small && ICON_SVG_SMALL[type]) return `<span class="icon-svg">${ICON_SVG_SMALL[type]}</span>`;
