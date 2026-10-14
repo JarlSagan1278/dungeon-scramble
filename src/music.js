@@ -79,7 +79,7 @@ const MUSIC_FILL_UP = (()=>{
   out.push([0, 0.3, 36, 115, 'drums'], [0, 1, 49, 90, 'drums']);
   return out;
 })();
-// End-of-run stings (Oct 13, the spec's Victory / defeat stings). Beats at 140 bpm in D; roles pick the voice.
+// End-of-run stings (Oct 13, the spec's Victory / defeat stings). Beats at Floor 1's tempo in D; roles pick the voice.
 // win: a fast freylekhs -- the Bb-C#-D sob as a pickup, a run up the scale, and a landing on D *major* (Picardy third).
 // lose: a slow doina sigh down the harmonic minor over a falling bass, ending on a soft D minor chord.
 const STINGS = (()=>{
@@ -101,9 +101,9 @@ const STINGS = (()=>{
 })();
 // Per floor: key shift (semitones; D -> E -> F harmonic minor), tempo, and the extra layers (Jeremy: same tune, transposed).
 const MUSIC_FLOORS = [
-  { shift:0, bpm:140, bassVoice:'tri' },
-  { shift:2, bpm:145, bassVoice:'tri', counter:true, lowBass:true },
-  { shift:3, bpm:150, bassVoice:'pulse', counter:true, lowBass:true, wood:true, drumsAlways:true }, // Oct 13 (Jeremy): was 150/160, ended too fast
+  { shift:0, bpm:130, bassVoice:'tri' }, // Oct 14 (Jeremy): start at 130, +5 per floor (was 140/145/150)
+  { shift:2, bpm:135, bassVoice:'tri', counter:true, lowBass:true },
+  { shift:3, bpm:140, bassVoice:'pulse', counter:true, lowBass:true, wood:true, drumsAlways:true },
 ];
 const MUSIC_VOLUME = 0.55;
 // Settings slider (Oct 13): PREFS.musicVol scales the whole mix (0-1).
@@ -111,7 +111,7 @@ function musicVolume(){ const v = (typeof PREFS!=='undefined' && PREFS.musicVol!
 function musicSetVolume(){ const ctx = audioCtx; if(!ctx || !Music.gain) return; const t = ctx.currentTime; try{ Music.gain.gain.cancelScheduledValues(t); Music.gain.gain.setTargetAtTime(musicVolume(), t, 0.05); }catch(e){} }
 const LEAD_LEVEL = 0.09; // melody level under the bass (Jeremy: lower the melody)
 const DRUM_LEVEL = 0.6;
-const Music = { holdUntil:0, on:false, kind:null, floor:0, origin:0, bpm:140, blockBeats:32, barBeats:4, gain:null, timer:null, mode:null, drums:false, drumsFrom:Infinity, groups:{} };
+const Music = { holdUntil:0, on:false, kind:null, floor:0, origin:0, bpm:130, blockBeats:32, barBeats:4, gain:null, timer:null, mode:null, drums:false, drumsFrom:Infinity, groups:{} };
 function musicCtx(){ // music plays even with sound effects off, so it doesn't go through getAudioCtx()'s Sound check
   if(!audioCtx){ const C = window.AudioContext || window.webkitAudioContext; if(!C) return null; try{ audioCtx = new C(); }catch(e){ return null; } }
   if(audioCtx.state==='suspended') audioCtx.resume().catch(()=>{});
@@ -153,7 +153,7 @@ function musicStart(kind, mode){
   Music.on = true; Music.kind = kind; Music.origin = t; Music.mode = mode; Music.drums = false; Music.drumsFrom = Infinity;
   if(kind==='camp'){ Music.bpm = 84; Music.blockBeats = 48; Music.barBeats = 3; Music.floor = musicFloorIdx(); }
   else if(kind==='shrine'){ Music.bpm = 96; Music.blockBeats = 32; Music.barBeats = 4; Music.floor = musicFloorIdx(); }
-  else if(kind==='theme'){ Music.bpm = 140; Music.blockBeats = 32; Music.barBeats = 4; Music.floor = 0; }
+  else if(kind==='theme'){ Music.bpm = MUSIC_FLOORS[0].bpm; Music.blockBeats = 32; Music.barBeats = 4; Music.floor = 0; }
   else { Music.floor = musicFloorIdx(); Music.bpm = MUSIC_FLOORS[Music.floor].bpm; Music.blockBeats = 32; Music.barBeats = 4; }
   Music.gain = ctx.createGain(); Music.gain.connect(ctx.destination);
   Music.gain.gain.setValueAtTime(0.0001, t); Music.gain.gain.exponentialRampToValueAtTime(musicVolume(), t + 2.5); // gentle fade-in
@@ -320,7 +320,7 @@ function musicSting(kind){
   const ctx = musicCtx(); if(!ctx) return;
   const notes = STINGS[kind]; if(!notes) return;
   if(Music.on) musicStop(true);
-  const spb = 60/140, at = ctx.currentTime + 0.08, out = ctx.createGain();
+  const spb = 60/MUSIC_FLOORS[0].bpm, at = ctx.currentTime + 0.08, out = ctx.createGain();
   const P = (typeof PREFS!=='undefined') ? PREFS : {};
   out.gain.value = (P.music!==false) ? musicVolume() : MUSIC_VOLUME*((P.sfxVol!=null)?P.sfxVol:1); // music slider, or the effects slider with music off
   out.connect(ctx.destination);

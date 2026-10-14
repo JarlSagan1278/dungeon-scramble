@@ -24,9 +24,9 @@ Optional later: a boss layer (an extra track added on top of that floor's action
 ## Keys and tempos (a proposal)
 | Floor | Key | Tempo | Orchestration (each floor adds to the last) |
 |---|---|---|---|
-| 1 | D harmonic minor | 140 | Triangle-wave or marimba bass, music box, toy clarinet |
-| 2 | E harmonic minor | 145 | + pizzicato strings, toy accordion, more percussion |
-| 3 | F harmonic minor | 150 | + violin doubling the clarinet, full toy kit, octave bass |
+| 1 | D harmonic minor | 130 | Triangle-wave or marimba bass, music box, toy clarinet |
+| 2 | E harmonic minor | 135 | + pizzicato strings, toy accordion, more percussion |
+| 3 | F harmonic minor | 140 | + violin doubling the clarinet, full toy kit, octave bass |
 | Camp | D harmonic minor | 84 (3/4) | Music box + soft bass drone |
 | Shrine | A freygish | 96 | Celesta or glass, held drone, no driving bass |
 

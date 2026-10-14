@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.5 (Oct 14, 2026)
+- Music tempo (Jeremy): Floor 1 starts at 130 bpm, +5 per floor (130 / 135 / 140; was 140 / 145 / 150). The title theme and the end-of-run stings follow Floor 1's tempo (130).
+
 ## 1.41.4 (Oct 13, 2026)
 - Music: end-of-run stings in the game's own synth, replacing the old fanfare and defeat sound effects. Run won: a fast freylekhs that opens with the Bb-C#-D sob, runs up the scale and lands on D major (Picardy third) with a snare roll and crash (~5.7 s). Run lost: a slow doina sigh down D harmonic minor over a falling bass, ending on a soft D minor chord (~5.9 s). The title theme fades back in after each. Both are on the music preview page.
 
