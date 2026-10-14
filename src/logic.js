@@ -465,6 +465,7 @@ function resetAllProgress(){
   try{ localStorage.removeItem(META_KEY); } catch(e){}
   try{ localStorage.removeItem(DISCOVERED_DICE_KEY); } catch(e){}
   try{ localStorage.removeItem(DIE_COPIES_KEY); } catch(e){}
+  try{ if(typeof DEPTH_BEST_KEY!=='undefined') localStorage.removeItem(DEPTH_BEST_KEY); } catch(e){} // depth bests too: class badges, dice finishes, depth limit (Oct 14 fix)
   try{ localStorage.setItem('dungeonScrambleSymbolsSeen_v1','[]'); } catch(e){} // relearn symbols after a full reset
   DIE_COPIES = {};
 }
