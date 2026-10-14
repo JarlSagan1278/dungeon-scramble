@@ -34,4 +34,4 @@
 - **Rulebook refresh** (rulebook is at build 1.32.28; many rules changed since). Also: the unreproduced "thousands of enemy HP on resume" bug, and the Armsmaster red Skill vs red Clear question.
 - **Relic look polish (later):** a bracelet view in the relic list, sockets that grow with depth.
 - **Replay tool** for the tray/path telemetry, once playtesters send exports.
-- **Two-device multiplayer** (lowest priority).
+- **Co-op multiplayer** (lowest priority). Feasibility study done Oct 14 (Claude Doc: https://claude.ai/code/artifact/1a2e8cb1-5527-400c-b4a2-defff09d6323). Recommended: "Shared Foe, Two Chests" with simultaneous planning, a Bridge edge for Pass-off and Bridge paths, host-authoritative two-phone link over WebRTC. Six questions for Jeremy are in the doc; first step would be a tabletop test, then a same-phone prototype.
