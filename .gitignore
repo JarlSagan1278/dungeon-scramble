@@ -7,3 +7,4 @@ tools/out_*
 # stray test screenshots at the repo root
 /*.png
 tools/balance/snap_*.html
+tools/rulebook.html
