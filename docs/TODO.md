@@ -1,22 +1,22 @@
 # Dungeon Scramble — TODO
 
-## Priority order (updated Oct 14, after 1.41.7 / Netlify zip)
+## Priority order (updated Oct 15)
 1. **Playtest the new rules (1.41.16): campfire Rest OR Train, and the whole-Pocket revive** (bots now win 56% regular / 38% new; watch whether real players feel it's fair). Then also: **Playtest 1.41.7 features and collect play data.** New to check: harder Floor 3, Extruzeon's Layer by Layer, Maneuver II/III Block faces, the six retuned loot dice, Codex/Bestiary, Records, lethal warning, Skill coach, volume sliders, run card + Save Card, Suggested die (after 6 s), readable enemy chips, solid chip icons, the action fill, long title theme, win/lose stings, tempos 130/135/140. Ask testers to send exports; read `summary` first (floor funnel, first-10-runs win rate, take rates, warned vs unwarned deaths, abandoned runs).
    - Oct 14: first tester, 2 runs, both won (Armsmaster depth 1, Dungeoneer depth 3); one warned down; Grosteque Grafter took 11 turns; Maneuver Die I replaced in 20 of 30 equips. See docs/studies/2026-10-14_playtest_tester1.md. Still need newer players' exports.
 2. **Music and art review (Jeremy):** every piece in the spec is in the game; he's reviewing all of it for edits. Art continues in parallel.
-3. **Waiting on Jeremy's call (studies done, nothing applied):**
-   - Shrines: Scroll Dispensers (token shrines) are the weakest shrines; die-upgrade shrines weak; Madpie Nest (Floor 3 loot relics) weak; Floor 3 relic shrines could offer 4. Ties into the shrine overhaul below. (docs/studies/2026-10-13_shrines.md)
-   - Extruzeon barely threatens experts at depth (2.2% vs 10-19%): raise its HP if it should.
-   - Optional caps only if play feels unfair: damage-per-Minion specials count at most 8 Minions; Extruzeon layers max +12.
+3. **Optional caps, only if play feels unfair:** damage-per-Minion specials count at most 8 Minions; Extruzeon layers max +12. (Shrines and Extruzeon were settled Oct 15: 1.41.23.)
 4. **Use real player data before retuning the base game** (literature review: bot win rates are not human win rates; Slay the Spire players win ~9-16% of base runs). Re-check the guidelines in docs/studies/2026-10-13_balance_literature_review.md against the first exports.
 5. **Remaining performance:** ~1.5 s of script per turn at CPU x4 (renderGame/placeVs) and ~500 ms of style work during playback.
 
 ## Oct 15
 - 1.41.24 zipped for Netlify (first build with automatic play data; check the Play Data sheet after the first tester run).
 
+- Oct 15 (1.41.22-1.41.32): monster tuning, Floor 2 trims, shrine boosts, Extruzeon +10% HP, depth repricing, automatic play data, Batch E art, paper texture on all art (WebP) and in-world scenery, Monster Footing rounds 1-2. The Play Data sheet is still empty: needs the 1.41.24+ zip deployed and a finished run with sharing on.
+- Monster Footing page (https://claude.ai/artifact/6sxozXQfah2dSsRxnQEAkj) collection `lifts3` is round 3 (empty so far).
+- Art still out: repaint Batches F, G (Floor 2), H-K, and silhouette batches L-O (stand-in shrines, Magic dice). When the last one is back: the consistency pass (tools/art/consistency.py) over all art.
+
 ## Small follow-ups
-- Swap / Reroll token shrine boons (Scroll Dispensers AWSP, DOER) still say "before you build your path"; the tokens also work mid-path. Fix the text and the names sheet together.
-- Ideas from the literature review (not decided): a reward for reaching a new best depth; an optional assist mode that grows after losses (Hades God Mode style); log whether a death was avoidable in the bot studies.
+- Log whether a death was avoidable in the bot studies (literature review idea). Best-depth rewards: covered by dice finishes and relic gating (Jeremy, Oct 15); assist mode: not for now.
 
 ## Done Oct 14 (background session)
 - Bug hunt on 1.41.11: 24/24 clean. Class re-baseline with the fixed Dungeoneer wrap + Grafter study: docs/studies/2026-10-14_wrapfix_grafter.md.
