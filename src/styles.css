@@ -3099,6 +3099,9 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 .camp-section.camp-status-card{ position:relative; overflow:hidden; background:linear-gradient(rgba(10,6,4,.25), rgba(10,6,4,.05) 55%, rgba(10,6,4,.3)), var(--tex-wall) 0 0/200px 100px repeat, #0c0705 !important; }
 .camp-status-card::before{ content:""; position:absolute; left:0; right:0; bottom:0; height:42%; border-top:3px solid #120b07; background:linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.55)), var(--tex-floor) 50% 0/320px 320px; pointer-events:none; z-index:0; }
 .camp-status-card > *{ position:relative; z-index:1; }
+/* Oct 15 (Jeremy): a campfire in a dark room -- the light falls off toward the edges (above the floor, under the hero, fire and buttons) */
+.camp-status-card::after{ content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
+  background:radial-gradient(ellipse 62% 70% at 50% 52%, rgba(8,4,2,0) 30%, rgba(8,4,2,.55) 70%, rgba(8,4,2,.9) 100%); }
 /* 3. pop-up panels: light card-stock grain */
 .modal{ background-image:var(--paper-tile-light); background-size:110px 110px; background-blend-mode:soft-light; }
 /* 4. stone cards at camp, light grain on hero select boxes, a little wear on the chest's iron (the shine animation does the rest) */

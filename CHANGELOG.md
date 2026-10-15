@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.30 (Oct 15, 2026)
+- Camp (Jeremy): the campfire scene darkens toward its edges, like a fire in a dark room.
+
 ## 1.41.29 (Oct 15, 2026)
 - Textures (Jeremy): camp sections are stone-coloured cards with a light paper grain (the wood pattern is gone); the hero select boxes now show their light grain (the texture only loaded after the first fight before); much less wear on the chest's metal (the shine animation does that job).
 
