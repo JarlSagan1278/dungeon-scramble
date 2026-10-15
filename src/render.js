@@ -3610,12 +3610,12 @@ function relicGemSVG(r){
   const fam = relicFamily(r), F = RELIC_FAM[fam], cx = 50, cy = F.cy||50, gs = F.gs||1.45;
   let outer, table, facets = '';
   if(F.pts){
-    outer = `<polygon points="${F.pts.map(p=>p.join(',')).join(' ')}" fill="url(#rg-${fam})" stroke="#0c0705" stroke-width="5" stroke-linejoin="round"/>`;
+    outer = `<polygon points="${F.pts.map(p=>p.join(',')).join(' ')}" fill="url(#rg-${fam})" stroke="#0c0705" stroke-width="9" stroke-linejoin="round"/>`;
     const tb = F.pts.map(([x,y])=>[cx+(x-cx)*0.52, cy+(y-cy)*0.52]);
     table = `<polygon points="${tb.map(p=>p.map(v=>v.toFixed(1)).join(',')).join(' ')}" fill="${F.c}" stroke="${F.d}" stroke-width="2"/>`;
     facets = F.pts.map((p,i)=>`<line x1="${p[0]}" y1="${p[1]}" x2="${tb[i][0].toFixed(1)}" y2="${tb[i][1].toFixed(1)}" stroke="${F.d}" stroke-width="2"/>`).join('');
   } else {
-    outer = `<circle cx="50" cy="50" r="45" fill="url(#rg-${fam})" stroke="#0c0705" stroke-width="5"/>`;
+    outer = `<circle cx="50" cy="50" r="45" fill="url(#rg-${fam})" stroke="#0c0705" stroke-width="9"/>`;
     const tb = []; for(let i=0;i<8;i++){ const a=i/8*Math.PI*2+Math.PI/8; tb.push([50+24*Math.cos(a),50+24*Math.sin(a)]); facets+=`<line x1="${tb[i][0].toFixed(1)}" y1="${tb[i][1].toFixed(1)}" x2="${(50+42*Math.cos(a)).toFixed(1)}" y2="${(50+42*Math.sin(a)).toFixed(1)}" stroke="${F.d}" stroke-width="2"/>`; }
     table = `<polygon points="${tb.map(p=>p.map(v=>v.toFixed(1)).join(',')).join(' ')}" fill="${F.c}" stroke="${F.d}" stroke-width="2"/>`;
   }

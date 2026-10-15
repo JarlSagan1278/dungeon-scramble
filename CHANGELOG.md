@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.39 (Oct 16, 2026)
+- Relic gems (Jeremy): thicker black outline (stroke 5 -> 9), so they hold up at their small in-fight size.
+
 ## 1.41.38 (Oct 16, 2026)
 - Relics (Jeremy): when a relic acts, its gem on screen pops -- swells, wobbles and brightens, then settles back -- along with the ring and the number.
 - Combonatorics and FTLeporter now report in too: Combonatorics on a Combo die that its diagonal neighbors grew (shows the extra damage), FTLeporter on the step a Pivot teleported to.
