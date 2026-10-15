@@ -4243,17 +4243,36 @@ function campFusionsReady(){ let n = 0; ['attack','maneuver'].forEach(cat=>{ if(
 function campfireChoiceHTML(){
   if(S.campFireOut) return `<div class="campfire-choice out"><div class="cf-label">The campfire is out ${infoDot('The Time-Intensive Shrine took this campfire: no Rest or upgrades at this Camp.')}</div></div>`;
   const ch = S.campChoice, n = campFusionsReady(), est = restHealEstimate();
-  const restSub = ch==='rest' ? `Healed +${S.campHealed||0}` : (est>0 ? `Heal about +${est}` : (S.health>=S.maxHealth ? 'Already at full health' : 'Heals nothing here'));
+  const restSub = ch==='rest' ? `Healed +${S.campHealed||0}` : (S.health>=S.maxHealth ? 'Already at full health' : (est>0 ? '' : 'Heals nothing here'));
   const trainSub = ch==='train' ? 'Dice combined' : (n ? 'Combine dice below' : 'No sets of 3 yet');
   const cls = k => ch ? (ch===k ? ' chosen' : ' skipped') : '';
   return `<div class="campfire-choice${ch?' done':''}">
       <div class="cf-label">${ch ? 'Campfire used' : 'Campfire: choose one'} ${infoDot('Each Camp\'s fire gives you ONE of these. Rest: scramble your Tray and heal half the faces that aren\'t blank. Train: combine 3 matching dice into 1 of the next level (up to one Attack and one Maneuver). Organizing is always free.')}</div>
       <div class="cf-row">
-        <button id="rest-btn" class="cf-btn cf-rest${cls('rest')}" ${ch?'disabled':''} title="Scramble your Tray's faces, then heal for half the non-blank faces showing">${ch==='rest'?'&#10003; ':''}Rest<small>${restSub}</small></button>
+        <button id="rest-btn" class="cf-btn cf-rest${cls('rest')}" ${ch?'disabled':''} title="Scramble your Tray's faces, then heal for half the non-blank faces showing">${ch==='rest'?'&#10003; ':''}Rest${restSub?`<small>${restSub}</small>`:''}</button>
         <span class="cf-or">or</span>
         <button id="train-btn" class="cf-btn cf-train${cls('train')}" ${(ch||!n)?'disabled':''} title="Combine 3 matching dice in the Upgrade section below">${ch==='train'?'&#10003; ':''}Train<small>${trainSub}</small></button>
       </div>
     </div>`;
+}
+
+// Oct 16 (Jeremy): the first Rest or combine at a Camp asks once, briefly, since it uses up the fire's other option.
+// Not asked at the base camp (combining is free there) or once the choice is made.
+function confirmCampfire(kind, go){
+  if(S.campChoice || S.campFireOut || isBaseCamp()) return go();
+  const rest = kind==='rest';
+  const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
+      <h2>${rest ? 'Rest here?' : 'Combine dice?'}</h2>
+      <p>${rest ? "The campfire gives one: if you Rest, you can't combine dice at this Camp." : "The campfire gives one: if you combine dice, you can't Rest at this Camp."}</p>
+      <div class="small-btn-row" style="justify-content:center;">
+        <button id="cf-confirm-cancel">Not yet</button>
+        <button class="primary" id="cf-confirm-go">${rest ? 'Rest' : 'Combine'}</button>
+      </div>
+    </div></div>`);
+  openModal(overlay);
+  overlay.querySelector('#cf-confirm-cancel').onclick = ()=> closeModal(overlay);
+  overlay.querySelector('#cf-confirm-go').onclick = ()=> closeModal(overlay, go);
+  overlay.onclick = (ev)=>{ if(ev.target===overlay) closeModal(overlay); };
 }
 
 // Combining can use up the last Back Pocket dice, which disarms the safety net (Oct 14 revive rule): warn first.
@@ -4338,7 +4357,7 @@ function renderCamp(){
       </div>
     </div>`;
   const restBtn = document.getElementById('rest-btn');
-  if(restBtn) restBtn.onclick = ()=>{ if(!S.campRested) campRest(); };
+  if(restBtn) restBtn.onclick = ()=>{ if(!S.campRested) confirmCampfire('rest', campRest); };
   const trainBtn = document.getElementById('train-btn');
   if(trainBtn) trainBtn.onclick = ()=>{ // point at the Upgrade section, where training happens
     const t = document.getElementById('camp-upgrade-title'); if(!t) return;
@@ -4347,7 +4366,7 @@ function renderCamp(){
   };
   syncCampHeal();
   document.getElementById('leave-btn').onclick = ()=>{
-    if(baseCamp){ campLeave(); return; }
+    if(baseCamp || S.campChoice || S.campFireOut){ campLeave(); return; } // Oct 16 (Jeremy): only ask when the fire is still unused
     const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
         <h2>Break Camp?</h2>
         <p>${S.campRested ? "You can't come back to upgrade dice until the next Camp." : "You haven't used the campfire (Rest or Train). Leave without it?"}</p>
@@ -4366,8 +4385,10 @@ function renderCamp(){
       const btn = document.getElementById(`upgrade-${cat}-${level}`);
       if(btn) btn.onclick = ()=>{
         const go = ()=> flyDiceToFuse(cat, level, ()=> campUpgrade(cat, level));
-        if(!pocketLeftAfterUpgrade(cat, level) && S.backPocket.length) return confirmEmptyPocket(go);
-        go();
+        confirmCampfire('train', ()=>{
+          if(!pocketLeftAfterUpgrade(cat, level) && S.backPocket.length) return confirmEmptyPocket(go);
+          go();
+        });
       };
       if(btn){
         // Hovering (or focusing / touching) an upgrade lights up the dice stacks it would consume.

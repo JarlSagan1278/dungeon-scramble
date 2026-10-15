@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.41.41 (Oct 16, 2026)
+- Camp (Jeremy): the Rest button no longer shows "Heal about +X" (it still says when you're at full health or it would heal nothing).
+- The first Rest or combine at a Camp asks once, briefly, that the fire gives only one of them ("Not yet" / "Rest" or "Combine"). Not asked at the starting Camp, where combining is free.
+- Breaking Camp only asks for confirmation when the fire is still unused.
+
 ## 1.41.40 (Oct 16, 2026)
 - Music (Jeremy: reopened mid-boss and the music never started): music now waits for the first tap instead of starting on a locked audio engine, and every tap revives the audio if it is not running (rebuilding it if the phone shut it off while the app was closed -- iOS reports "interrupted"), then restarts the music.
 
