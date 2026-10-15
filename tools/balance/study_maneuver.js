@@ -46,7 +46,9 @@ let res = await page.evaluate((cfg)=>{
   if(cfg.shrineLoot) SHRINE_LOOT = true;
   // lootShrine (Oct 14 shrine rule study): the forced shrine's own boon is removed and it gives a 2-die loot pick
   // instead, i.e. the "same-floor loot pool" bar every shrine should meet.
-  if(cfg.lootShrine && cfg.forceShrine){ FLOORS.forEach(f=>f.shrines.forEach(x=>{ if(x.name===cfg.forceShrine){ x.effect = null; } })); SHRINE_LOOT = true; }
+  if(cfg.lootShrine && cfg.forceShrine){ FLOORS.forEach(f=>f.shrines.forEach(x=>{ if(x.name===cfg.forceShrine){ x.effect = null; } }));
+    // Oct 15 fix: only the forced shrine gives the loot pick (SHRINE_LOOT is global, so every other shrine used to give one too)
+    const cfs = continueFromShrine; window.continueFromShrine = function(){ SHRINE_LOOT = !!(S.encounter && S.encounter.name===cfg.forceShrine); return cfs(); }; }
   if(cfg.upgradeCost) UPGRADE_COST = cfg.upgradeCost;
   if(cfg.noQuests) window.checkQuests = function(){ return []; };
   if(cfg.noRevive){ const pdx=onPlayerDefeated; window.onPlayerDefeated=function(){ S.backPocket=[]; return pdx(); }; }
