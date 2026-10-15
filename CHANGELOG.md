@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.43 (Oct 16, 2026)
+- Loot (Jeremy): the Suggested die to replace now waits 10 seconds without a tap before it shows (was 6).
+
 ## 1.41.42 (Oct 16, 2026)
 - Class Skill sounds (Jeremy): arming plays a quick rising pair of notes, backing out (tap Skill again, or tap a die outside the zone) the same pair falling, and converting a die a bright upward sweep with a sparkle.
 
