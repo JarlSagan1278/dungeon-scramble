@@ -73,11 +73,12 @@ document.addEventListener('keydown', (ev)=>{
       <feTurbulence type="fractalNoise" baseFrequency="0.9 0.05" numOctaves="2" seed="7" result="s"/>
       <feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="1" seed="2" result="f"/>
       <feBlend in="s" in2="f" mode="multiply" result="sf"/>
-      <feColorMatrix in="sf" type="matrix" values="0.8 0.8 0.8 0 -0.62  0.8 0.8 0.8 0 -0.62  0.8 0.8 0.8 0 -0.62  0 0 0 0 1" result="g"/>
-      <feBlend in="g" in2="SourceGraphic" mode="overlay" result="b"/>
+      <feColorMatrix in="sf" type="matrix" values="0.3 0.3 0.3 0 0.05  0.3 0.3 0.3 0 0.05  0.3 0.3 0.3 0 0.05  0 0 0 0 1" result="g"/>
+      <feBlend in="g" in2="SourceGraphic" mode="soft-light" result="b"/>
       <feComposite in="b" in2="SourceGraphic" operator="in"/>
     </filter></defs></svg>`;
   document.body.appendChild(d);
+  try{ paperTileImg(); }catch(e){} // load the paper tile now, so hero select and the first camp already have their textures
 })();
 render();
 setTimeout(()=>{ try{ flushRunUploads(); }catch(e){} }, 4000); // send any runs left over from an offline session
