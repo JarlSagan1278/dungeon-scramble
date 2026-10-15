@@ -3138,3 +3138,14 @@ body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
 .round-badge .rb-floor{ color:#f1d58a; font-weight:900; margin-right:3px; }
 .tray-head .round-badge{ gap:0; white-space:nowrap; }
 .shrine-orb.so-continue{ background:radial-gradient(circle at 50% 38%, #b9eea0, #5fb544 58%, #3a7f2a) !important; color:#10260a !important; animation:none; }
+
+/* Relic gem pop (Oct 16): a copy of the gem swells and wobbles over the real one when the relic acts. */
+.relic-fx .relic-badge.relic-gem-pop{ position:absolute; margin:0; transform-origin:50% 55%; animation:relic-gem-pop .62s cubic-bezier(.3,1.4,.5,1) forwards; }
+@keyframes relic-gem-pop{
+  0%{ transform:scale(1) rotate(0); filter:drop-shadow(0 1px 1px rgba(0,0,0,.65)) brightness(1); }
+  22%{ transform:scale(1.95) rotate(-10deg); filter:drop-shadow(0 3px 2px rgba(0,0,0,.6)) brightness(1.55); }
+  40%{ transform:scale(1.6) rotate(8deg); filter:drop-shadow(0 3px 2px rgba(0,0,0,.6)) brightness(1.35); }
+  58%{ transform:scale(1.75) rotate(-4deg); filter:drop-shadow(0 2px 2px rgba(0,0,0,.6)) brightness(1.2); }
+  80%{ transform:scale(1.1) rotate(1deg); filter:drop-shadow(0 1px 1px rgba(0,0,0,.65)) brightness(1.05); }
+  100%{ transform:scale(1) rotate(0); filter:drop-shadow(0 1px 1px rgba(0,0,0,.65)) brightness(1); }
+}

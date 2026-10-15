@@ -3681,6 +3681,14 @@ function consumeRelicPulses(){
       fx.className = 'relic-fx';
       fx.style.left = (rc.left+rc.width/2)+'px'; fx.style.top = (rc.top+rc.height/2)+'px';
       fx.innerHTML = `<span class="relic-ring"></span><span class="relic-float">${r.text}</span>`;
+      // The gem itself joins in (Jeremy, Oct 16): a copy pops out over the real one -- swells, wobbles,
+      // brightens -- and settles back onto it, so you can see which relic took part.
+      const gem = b.cloneNode(true);
+      gem.removeAttribute('data-relic'); gem.removeAttribute('title');
+      gem.classList.add('relic-gem-pop');
+      gem.style.width = rc.width+'px'; gem.style.height = rc.height+'px';
+      gem.style.left = (-rc.width/2)+'px'; gem.style.top = (-rc.height/2)+'px';
+      fx.insertBefore(gem, fx.firstChild.nextSibling);
       document.body.appendChild(fx);
       setTimeout(()=>fx.remove(), 950);
     }, i*120);

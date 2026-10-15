@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.41.38 (Oct 16, 2026)
+- Relics (Jeremy): when a relic acts, its gem on screen pops -- swells, wobbles and brightens, then settles back -- along with the ring and the number.
+- Combonatorics and FTLeporter now report in too: Combonatorics on a Combo die that its diagonal neighbors grew (shows the extra damage), FTLeporter on the step a Pivot teleported to.
+
 ## 1.41.37 (Oct 16, 2026)
 - Shrines (Jeremy): the round Hold button sits in the dead centre of the screen; Continue is now green so it reads apart from the gold Hold; tap a shrine to make it wiggle.
 - The round bubble shows the floor too: "F2 · Rd 3" in fights, "F2 · Shrine" at shrines.

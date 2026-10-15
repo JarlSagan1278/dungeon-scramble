@@ -115,6 +115,18 @@ function applyRelicsToSteps(steps, path){
       else if(s.dmg>0 && spur){ s.dmg += spur; tag(s,'leaper_spurs','+'+spur); spur = 0; }
     });
   }
+  // Path-rule relics (Oct 16): they change where the path may go rather than a number, so tag the step they made possible.
+  if(hasRelic('combo_gauntlet')) steps.forEach(s=>{
+    if(s.type!=='combo' || !(s.dmg>0)) return;
+    const {r,c} = trayRC(s.idx);
+    const diag = [[r-1,c-1],[r-1,c+1],[r+1,c-1],[r+1,c+1]].filter(([rr,cc])=>inBounds(rr,cc) && COMBO_NEIGHBOR_TYPES.has(getFaceForIdx(trayIdx(rr,cc)).type)).length;
+    if(diag) tag(s,'combo_gauntlet','+'+Math.round(s.dmg*diag/(1+attackNeighborsCount(s.idx))));
+  });
+  if(hasRelic('pivot_compass')) steps.forEach((s,i)=>{
+    if(!i || steps[i-1].type!=='pivot') return;
+    const a = trayRC(steps[i-1].idx), b = trayRC(s.idx);
+    if(!adjPivot(a,b) && !(S.klass.wrap && adjWrapCols(a,b))) tag(s,'pivot_compass','Teleport');
+  });
   if(hasRelic('echo_chime') && steps.length>=5){ const t = lastDmgStep(); if(t){ t.dmg += 3; tag(t,'echo_chime','+3'); } }
   if(hasRelic('glimmer_dust')){
     const m = Math.min(relicById('glimmer_dust').cap, steps.filter(s=>s.type==='dodge'||s.type==='leap'||s.type==='pivot').length);
