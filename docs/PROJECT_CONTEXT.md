@@ -196,3 +196,4 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - **Assist mode that grows after losses:** not for now.
 - **Armsmaster colour: violet** (#7a45d6), decided Oct 15; its Skill button had the same red as Clear.
 - The "thousands of enemy HP after resuming" bug has not been seen again by Jeremy or Claude; dropped from the list.
+- **Batch E art back and imported (Oct 15, 1.41.25):** Displacer Kitty (now a single cat), Armored Gear-Pest, Rusty Golem, Rogue Technician (new look: blue robe, glasses), The Warcart, Blastogenesis Engine. Kitty and Technician changed too much to auto-match, so `reimport_hires.py` gained `--names` (box order). Batches F and G (Floor 2) are still out.

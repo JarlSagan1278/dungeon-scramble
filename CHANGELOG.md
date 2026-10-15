@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.25 (Oct 15, 2026)
+- Art: Jeremy's Batch E repaints are in (Displacer Kitty, Armored Gear-Pest, Rusty Golem, Rogue Technician, The Warcart, Blastogenesis Engine), at 2x resolution.
+
 ## 1.41.24 (Oct 15, 2026)
 - Depth (per-modifier study): Rounding Error now adds 2 depth (was 1; it was the costliest modifier per point), and Rationing Rations rank 2 adds 1 (was 2; it was the cheapest).
 

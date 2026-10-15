@@ -3,13 +3,16 @@
 # For every dashed box on a *_done.png canvas: crop inside the box, clear the pink guide line, recognize which
 # picture it is (best match against the current, small art), and rebuild that picture at SCALE x its old size,
 # keeping the same padding so it shows at exactly the same size in the game.
-# usage: python3 tools/art/reimport_hires.py <export_dir> <out_dir> <done.png>... [--scale 2]
+# usage: python3 tools/art/reimport_hires.py <export_dir> <out_dir> <done.png>... [--scale 2] [--names 'A|B|C...']
+# --names (Oct 15): the picture names in box order (rows top to bottom, left to right), for repaints changed too much to auto-match.
 import json, os, sys
 import numpy as np
 from PIL import Image
 args = [a for a in sys.argv[1:]]
 SCALE = 2.0
 if '--scale' in args: i = args.index('--scale'); SCALE = float(args[i+1]); del args[i:i+2]
+NAMES = None
+if '--names' in args: i = args.index('--names'); NAMES = args[i+1].split('|'); del args[i:i+2]
 ex, out, canvases = args[0], args[1], args[2:]
 os.makedirs(out, exist_ok=True)
 man = json.load(open(os.path.join(ex, 'manifest.json')))
@@ -60,7 +63,7 @@ def find_boxes(A):
     return sorted(good, key=lambda b: (round(b[1]/300), b[0]))
 for cv in canvases:
     img = Image.open(cv).convert('RGBA'); A = np.asarray(img).copy()
-    for (bx0, by0, bx1, by1) in find_boxes(A):
+    for bi, (bx0, by0, bx1, by1) in enumerate(find_boxes(A)):
         if True:
             crop = A[by0:by1, bx0:bx1].copy()
             # clear pink only in a thin band along the box edge (some art is pink/purple inside)
@@ -75,6 +78,10 @@ for cv in canvases:
                 d = float(np.mean(np.abs(s - s2))) + 0.5*abs(np.log(asp/asp2))
                 if best is None or d < best[0]: best = (d, e, im)
             d, e, old = best
+            if NAMES:  # forced by box order
+                hit = next((v for v in cache.values() if v[0]['key'] == NAMES[bi]), None)
+                if not hit: print('  name not found:', NAMES[bi]); continue
+                e, old = hit[0], hit[1]; d = 0.0
             name = e['key']
             if d > 0.2: print('  no confident match for box', (bx0, by0, bx1, by1), '(best %s %.3f), skipped' % (name, d)); continue
             if e['file'] in picked: print('  duplicate match, skipped:', name); continue
