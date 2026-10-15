@@ -528,11 +528,31 @@ function paperTileImg(){
   if(typeof PAPER_TILE==='undefined') return null;
   if(!PAPER_IMG){
     PAPER_IMG = new Image();
-    PAPER_IMG.onload = ()=>{ ROOM_TEX_READY = false; ensureRoomTextures(); decorateArch._c = null; try{ if(S && (S.screen==='game' || S.screen==='shrine')) decorateArch(); }catch(e){} };
+    PAPER_IMG.onload = ()=>{ ROOM_TEX_READY = false; ensureRoomTextures(); makeTextureTiles(); decorateArch._c = null; try{ if(S && (S.screen==='game' || S.screen==='shrine')) decorateArch(); }catch(e){} };
     PAPER_IMG.src = PAPER_TILE;
     try{ document.documentElement.style.setProperty('--paper-tile', `url("${PAPER_TILE}")`); }catch(e){}
   }
   return (PAPER_IMG.complete && PAPER_IMG.naturalWidth) ? PAPER_IMG : null;
+}
+// Oct 15 (Jeremy: "do all 5"): softer paper tiles for the pop-up panels, and a wood-grain tile for the brown panels.
+function makeTextureTiles(){
+  try{
+    const root = document.documentElement.style, N = 256;
+    const soft = (k)=>{ const c=document.createElement('canvas'); c.width=c.height=N; const g=c.getContext('2d');
+      g.fillStyle='rgb(128,128,128)'; g.fillRect(0,0,N,N); g.globalAlpha=k; g.drawImage(PAPER_IMG,0,0,N,N); return c.toDataURL('image/jpeg',.88); };
+    root.setProperty('--paper-tile-light', `url("${soft(.45)}")`);
+    root.setProperty('--paper-tile-med', `url("${soft(.7)}")`);
+    // wood: grain lines running sideways (planks), gently wavy, seamless in both directions
+    const c=document.createElement('canvas'); c.width=c.height=N; const g=c.getContext('2d'); const id=g.createImageData(N,N); const T=2*Math.PI/N;
+    let seed=91; const rnd=()=>{ seed=(seed*16807)%2147483647; return seed/2147483647; };
+    for(let y=0;y<N;y++) for(let x=0;x<N;x++){
+      const w = 1.7*Math.sin(T*2*x + 0.9*Math.sin(T*3*y)) + 0.6*Math.sin(T*5*x + T*2*y);
+      const ring = Math.sin(T*9*y + w);
+      const v = 128 + 30*ring + 12*Math.sin(T*31*y + 2*w) + (rnd()-.5)*14;
+      const i=(y*N+x)*4; id.data[i]=id.data[i+1]=id.data[i+2]=Math.max(0,Math.min(255,v)); id.data[i+3]=255; }
+    g.putImageData(id,0,0);
+    root.setProperty('--wood-tile', `url("${c.toDataURL('image/jpeg',.88)}")`);
+  }catch(e){}
 }
 function paperOver(g, W, H, scale){
   const t = paperTileImg(); if(!t || !PAPER_ENV) return;
@@ -1412,7 +1432,7 @@ function healthFX(current, last){
 // Encounter art is mirrored to face the hero by default; list any whose original art already faces left here.
 // Encounters whose current art is known to be the wrong picture: show the placeholder until the right art is supplied.
 const ART_WRONG = new Set([]);
-const ENCOUNTER_NO_FLIP = new Set(['Grafted Grifter','Whence Wolf','Roudy Rinotter','Viscous Orb','Unbound Automa','Rogue Golemancer','Heating Elemental','Grosteque Grafter','Displacer Kitty','Armored Gear-Pest','Blastogenesis Engine','Half-life Host','Adhesive Pest Traps','The Necrorancher','Bellicose Biomancer','Ceramic Golem','Chimeric Sludge','Toadtaur Warrior','Rabbid Rabbats']); // Oct 15 (Jeremy): Toadtaur Warrior and Rabbid Rabbats face the other way
+const ENCOUNTER_NO_FLIP = new Set(['Grafted Grifter','Whence Wolf','Roudy Rinotter','Viscous Orb','Unbound Automa','Rogue Golemancer','Heating Elemental','Displacer Kitty','Armored Gear-Pest','Blastogenesis Engine','Half-life Host','Adhesive Pest Traps','The Necrorancher','Bellicose Biomancer','Ceramic Golem','Chimeric Sludge','Toadtaur Warrior','Rabbid Rabbats','Oilephant\'s Foot','Gestalt Network']); // Oct 15 (Jeremy): Toadtaur Warrior and Rabbid Rabbats face the other way
 let foPlayer = null; // the hero's half of the face-off band, set each renderGame()
 function renderEncounterCard(e, mode){
   const curHealthClamped = Math.max(0,e.curHealth);
@@ -4188,6 +4208,7 @@ function confirmEmptyPocket(go){
 }
 
 function renderCamp(){
+  try{ ensureRoomTextures(); }catch(e){} // the camp scene reuses the dungeon's (paper) wall and floor (Oct 15)
   const baseCamp = S.floorIdx===0 && S.routeStep===0;
   const campFx = healthFX(S.health, S._lastPlayerHealth);
   S._lastPlayerHealth = S.health;

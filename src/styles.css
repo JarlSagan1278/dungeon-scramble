@@ -3091,3 +3091,18 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 /* Oct 15 (Jeremy): heavy paper on the dice chest; the dice sit above it */
 .tray-wrap::before{ content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:var(--paper-tile) repeat; background-size:110px 110px; mix-blend-mode:soft-light; z-index:0; }
 .tray-wrap > .tray{ position:relative; z-index:1; }
+
+/* Oct 15 (Jeremy: "do all 5"): textures beyond the art and scenery. Dice, buttons, bars, numbers and chips stay clean. */
+/* 1. the Quests sign is paper (a softer grain: Jeremy, Oct 15 -- it has to stay readable) */
+.fo-quests-float{ filter:url(#fx-paper-soft) drop-shadow(0 3px 2px rgba(0,0,0,.55)) !important; }
+/* 2. the camp scene stands in the dungeon: paper wall behind, paper floor under the fire */
+.camp-section.camp-status-card{ position:relative; overflow:hidden; background:linear-gradient(rgba(10,6,4,.25), rgba(10,6,4,.05) 55%, rgba(10,6,4,.3)), var(--tex-wall) 0 0/200px 100px repeat, #0c0705 !important; }
+.camp-status-card::before{ content:""; position:absolute; left:0; right:0; bottom:0; height:42%; border-top:3px solid #120b07; background:linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.55)), var(--tex-floor) 50% 0/320px 320px; pointer-events:none; z-index:0; }
+.camp-status-card > *{ position:relative; z-index:1; }
+/* 3. pop-up panels: light card-stock grain */
+.modal{ background-image:var(--paper-tile-light); background-size:110px 110px; background-blend-mode:soft-light; }
+/* 4. wood grain on the brown panels, worn metal on the chest's iron */
+.camp-section:not(.camp-status-card), .origin-showcase, .class-showcase{ background-image:var(--wood-tile); background-size:256px 256px; background-blend-mode:soft-light; }
+.tray-wrap .cc svg, .tray-wrap .chest-lock svg{ filter:url(#fx-worn); }
+/* 5. the route bar's doorways are paper too */
+.route .node.rt-door > svg, .route .node.rt-door > .rt-arch{ filter:url(#fx-paper); }

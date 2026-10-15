@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.41.28 (Oct 15, 2026)
+- Textures (Jeremy, "do all 5"): the Quests sign is paper (a soft grain, so it stays readable); the camp scene stands in the dungeon (paper brick wall and stone floor); pop-up panels have a light card-stock grain; the brown panels (camp sections, hero select) have wood grain; the chest's iron corners and lock look worn; the route bar's doorways are paper.
+- Monster Footing round 2 (Jeremy): new sizes for 24 monsters, Oilephant's Foot, Gestalt Network and Grosteque Grafter face the other way, and a few heights nudged.
+
 ## 1.41.27 (Oct 15, 2026)
 - Scenery (Jeremy): heavy paper texture on the stone walls, the floor, the archway and the dice chest (the dice stay clean).
 

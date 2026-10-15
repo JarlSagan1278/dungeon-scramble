@@ -51,6 +51,34 @@ document.addEventListener('keydown', (ev)=>{
   }
 });
 
+// Oct 15 (Jeremy): texture filters for small diegetic pieces -- paper grain (Quests sign, route doorways) and worn,
+// scratched metal (the chest's iron corners and lock). Referenced from styles.css as url(#fx-paper) / url(#fx-worn).
+(function addTextureFilters(){
+  const d = document.createElement('div'); d.setAttribute('aria-hidden','true');
+  d.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+  d.innerHTML = `<svg width="0" height="0" focusable="false"><defs>
+    <filter id="fx-paper" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="4" result="n"/>
+      <feDiffuseLighting in="n" surfaceScale="1.4" lighting-color="#c9c9c9" result="l"><feDistantLight azimuth="225" elevation="50"/></feDiffuseLighting>
+      <feBlend in="l" in2="SourceGraphic" mode="soft-light" result="b"/>
+      <feComposite in="b" in2="SourceGraphic" operator="in"/>
+    </filter>
+    <filter id="fx-paper-soft" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="4" result="n"/>
+      <feDiffuseLighting in="n" surfaceScale="0.55" lighting-color="#d6d6d6" result="l"><feDistantLight azimuth="225" elevation="60"/></feDiffuseLighting>
+      <feBlend in="l" in2="SourceGraphic" mode="soft-light" result="b"/>
+      <feComposite in="b" in2="SourceGraphic" operator="in"/>
+    </filter>
+    <filter id="fx-worn" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9 0.05" numOctaves="2" seed="7" result="s"/>
+      <feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="1" seed="2" result="f"/>
+      <feBlend in="s" in2="f" mode="multiply" result="sf"/>
+      <feColorMatrix in="sf" type="matrix" values="0.8 0.8 0.8 0 -0.62  0.8 0.8 0.8 0 -0.62  0.8 0.8 0.8 0 -0.62  0 0 0 0 1" result="g"/>
+      <feBlend in="g" in2="SourceGraphic" mode="overlay" result="b"/>
+      <feComposite in="b" in2="SourceGraphic" operator="in"/>
+    </filter></defs></svg>`;
+  document.body.appendChild(d);
+})();
 render();
 setTimeout(()=>{ try{ flushRunUploads(); }catch(e){} }, 4000); // send any runs left over from an offline session
 
