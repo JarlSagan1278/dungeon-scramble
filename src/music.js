@@ -352,7 +352,12 @@ function musicWanted(){
   if(boss || tier==='elite' || tier==='deadly') return {kind:'dungeon', mode:'act', drums: boss && e.phase===2};
   return {kind:'dungeon', mode:'down', drums:false};
 }
+// Phones keep audio locked until a tap, and a context made before that (or one the OS shut off while the app was
+// closed -- iOS reports 'interrupted') may never start. So music waits for the first tap (Jeremy, Oct 16: reopened
+// mid-boss and the music never came back).
+let musicGestured = false;
 function musicUpdate(){
+  if(!musicGestured) return;
   try{
     if(Music.holdUntil && performance.now() < Music.holdUntil) return; // an end-of-run sting is still playing
     const w = musicWanted();
@@ -362,8 +367,26 @@ function musicUpdate(){
     musicSetDrums(w.mode==='act' && w.drums);
   }catch(e){}
 }
-document.addEventListener('visibilitychange', ()=>{ if(document.hidden) musicStop(true); else musicUpdate(); });
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden) musicStop(true); else { try{ if(audioCtx && audioCtx.state!=='running') audioCtx.resume().catch(()=>{}); }catch(e){} musicUpdate(); } });
 // Browsers keep audio locked until the player first touches the page; the title theme starts on that first tap.
-['pointerdown','keydown'].forEach(ev=> document.addEventListener(ev, ()=>{
-  try{ if(audioCtx && audioCtx.state==='suspended') audioCtx.resume().catch(()=>{}); if(!Music.on) musicUpdate(); }catch(e){}
-}, {passive:true}));
+// Every tap: if the audio isn't running, revive it inside the tap (rebuild it if the OS shut it off), and restart the music.
+function audioUnlockOnGesture(){
+  try{
+    musicGestured = true;
+    let stale = false;
+    if(audioCtx && (audioCtx.state==='closed' || audioCtx.state==='interrupted')){
+      try{ if(audioCtx.state!=='closed') audioCtx.close().catch(()=>{}); }catch(e){}
+      clearInterval(Music.timer); Music.timer = null; Music.on = false; Music.gain = null; audioCtx = null; stale = true;
+    }
+    const ctx = musicCtx(); if(!ctx) return;
+    if(ctx.state!=='running'){
+      stale = true;
+      ctx.resume().then(()=>{ if(Music.on){ musicStop(true); } musicUpdate(); }).catch(()=>{});
+    }
+    // iOS only truly unlocks once something plays inside the tap: one silent sample.
+    try{ const b = ctx.createBuffer(1, 1, 22050), src = ctx.createBufferSource(); src.buffer = b; src.connect(ctx.destination); src.start(0); }catch(e){}
+    if(!Music.on || stale) musicUpdate();
+  }catch(e){}
+}
+// Capture phase, so it runs before the splash's own tap handler starts the music.
+['pointerdown','keydown'].forEach(ev=> document.addEventListener(ev, audioUnlockOnGesture, {passive:true, capture:true}));

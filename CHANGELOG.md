@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.40 (Oct 16, 2026)
+- Music (Jeremy: reopened mid-boss and the music never started): music now waits for the first tap instead of starting on a locked audio engine, and every tap revives the audio if it is not running (rebuilding it if the phone shut it off while the app was closed -- iOS reports "interrupted"), then restarts the music.
+
 ## 1.41.39 (Oct 16, 2026)
 - Relic gems (Jeremy): thicker black outline (stroke 5 -> 9), so they hold up at their small in-fight size.
 
