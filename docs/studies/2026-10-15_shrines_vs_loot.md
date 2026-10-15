@@ -49,4 +49,28 @@ What it means:
 - Caveat: the regular bot uses tokens only some of the time (tokenRate 0.3), so token shrines are understated somewhat; they were also the weakest shrines in the Oct 13 study with the expert bot.
 - Heal/HP shrines that beat the bar (Healthy Hearth, Surgery Community Theatre, Ark of the Flood) are well above it.
 
-Decision for Jeremy: how to lift the 17 (see chat, Oct 15).
+## Boosts (Oct 15, build 1.41.22 snapshots; Jeremy: boost each shrine's own reward, a loot pick only where it fits)
+
+Same setup; bar re-measured on the new build: Floor 1 63%, Floor 2 67%, Floor 3 65%. Difference vs the bar, before -> shipped version:
+
+| Shrine | Before | Shipped version | After |
+|---|---|---|---|
+| Blood-Drive Treats | -32 | pay 3 max HP, 1 of **4** relics (taking 2 of 4 was +22) | +8 |
+| Scroll Dispenser: CRELA | -31 | Nullify x5 + loot pick (x6 alone: -33) | +4 |
+| Scroll Dispenser: AWSP | -27 | Swap x3 + loot pick (x5 alone: -25) | +6 |
+| Sacred Bellows | -13 | +10 max HP | -1 |
+| Half-Empty Fountain | -7 | heal 20 or +10 max HP (15/+8: -8) | -3 |
+| Scroll Dispenser: GIB | -32 | x4 Boost x3 + loot pick (x4 alone: -28) | +2 |
+| Scroll Dispenser: DOER | -30 | Reroll x3 + loot pick (x5 alone: -26) | 0 |
+| Enchanted Anvil | -25 | forge a Gilded die (1 of 3) OR upgrade 2 dice one level (upgrades alone: -15) | 0 (forge) |
+| Cryotherapist | -19 | heal 15 AND 2 Freeze (heal 14 or 2 Freeze: -8; heal 20 or 3 Freeze: -11) | -2 |
+| Time-Intensive Shrine | -11 | skip a campfire: take 2 of 4 relics | +7 |
+| Madpie Nest | -22 | relic + loot pick (a hoard) | +1 |
+| Faustian Spreadsheet | -22 | pay 3 max HP: take 2 of 4 relics (pay 5: -5) | -4 |
+| Scroll Dispenser: TSOP | -20 | Freeze x2 + loot pick (Freeze x3: -13; x4: -8) | +9 |
+| Charged Fae-Lines | -18 | take 2 of 4 path relics | -3 |
+| Storied Emporium | -7 | relic + loot pick (a shop) | +7 |
+| Indoctrination Inoculation | -6 | relic + 5 max HP | +6 |
+
+The bot gets little from Nullify, Swap, Reroll and Boost tokens even with 5-6 uses (and with tokenRate 1.0); real players may value them more (Jeremy, Oct 14: players get a lot out of using them strategically). The play data will show it. Results within about 5 points of the bar are noise at 400 runs.
+

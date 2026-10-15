@@ -228,7 +228,7 @@ function finalizeTelemetry(outcome){
 // Apps Script web app that files it in Jeremy's "Dungeon Scramble Play Data" Sheet (tools/playdata/apps_script.gs).
 // Off until PLAYDATA_URL is set. Same record as Export Play Data: no names, only the random per-device id.
 // Runs wait in a queue (localStorage) and are retried on the next launch when the phone is offline.
-const PLAYDATA_URL = '';
+const PLAYDATA_URL = 'https://script.google.com/macros/s/AKfycbws5ueTvJMc1mg7L2wANbdWtYDJDHIXiSwl90iqsJZ7KzEEhOwzV-UYOMe6nVjnYKwa/exec';
 const SHARE_KEY = 'dungeonScrambleShareData_v1';      // 'yes' | 'no' | missing (not asked yet)
 const UPLOAD_QUEUE_KEY = 'dungeonScrambleUploadQueue_v1';
 const UPLOADED_KEY = 'dungeonScrambleUploaded_v1';
@@ -2409,6 +2409,12 @@ function runShrineEffect(e, effect){
       if(p.skipRest){ S.skipNextRest = true; logMsg('sys', `${e.name}: your next campfire is forfeit.`); }
       teleLog('shrine_bargain', {shrine:e.name, price:p});
       runShrineEffect(e, effect.then); return;
+    }
+    case 'multi': { // Oct 15: several simple boons at once (heal, max HP, tokens); one combined result message
+      const texts = [];
+      effect.effects.forEach(f=>{ runShrineEffect(e, f); if(S.shrineResult) texts.push(S.shrineResult.text); });
+      S.shrineResult = { title: e.name, text: texts.join(' ') };
+      render(); return;
     }
     case 'leave': {
       S.shrineResult = { title: e.name, text: 'You leave the offering untouched.' };

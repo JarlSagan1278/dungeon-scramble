@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.22';
+const GAME_VERSION = '1.41.23';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -305,7 +305,7 @@ const ORIGINS = [
 // Dungeoneer=orange, Arcanist=magenta) -- carried over so the digital
 // Class picker identifies each Class the same way the physical game does.
 const CLASSES = [
-  {id:'armsmaster', name:'Armsmaster', color:'#c0392f', ability:'Once per turn, turn any Action or Blank in your zone (right column) into a Hit (2).',
+  {id:'armsmaster', name:'Armsmaster', color:'#7a45d6', ability:'Once per turn, turn any Action or Blank in your zone (right column) into a Hit (2).',
     zone:(r,c)=> c===3, convertTo:{type:'hit', value:2}},
   {id:'guard', name:'Guard', color:'#2fb8b8', ability:'Once per turn, turn any Action or Blank in your zone (an L of three squares, middle right) into a Block (1).',
     zone:(r,c)=> (r===1 && (c===2||c===3)) || (r===2 && c===3), convertTo:{type:'block', value:1}}, // 3-square L (Jeremy, Oct 12: 2x2 -> L, 63% -> 58% at depth 7) // Block 2 -> 1 (Jeremy, Oct 12 class study: Guard won 89% vs 40-67%)
@@ -412,22 +412,22 @@ const FLOOR1_TRAPS = [
   enc('Leper Con-Trap','Trap',25,{questHealth:15,dmg:2,minion:1,quests:['10 damage: 3 maneuvers','20 damage: 10 blanks','1 nullify: 8 damage/turn'],flavor:'"Do not listen to anyone who claims to already know where the treasure is"'}),
 ];
 const FLOOR1_SHRINES = [
-  enc('Sacred Bellows','Shrine',0,{boon:'Upgrade Player Maximum Health by 5.', effect:{type:'maxHealthUp', amount:5}}),
+  enc('Sacred Bellows','Shrine',0,{boon:'Upgrade Player Maximum Health by 10.', effect:{type:'maxHealthUp', amount:10}}),
   enc('Expediting Spores','Shrine',0,{boon:'Upgrade a lvl 1 Maneuver Die to a lvl 2 Maneuver Die.', effect:{type:'dieUpgrade', cat:'maneuver'}}),
   enc('Ecclectrical Outlet','Shrine',0,{boon:'Trade in loot for one of three Alloy dice options.', effect:{type:'tradeLoot', pool:'Alloy'}}),
-  enc('Half-Empty Fountain','Shrine',0,{boon:'Heal 10 OR Upgrade Player Max Health by 5.', effect:{type:'choice', options:[
-    {label:'Heal 10', effect:{type:'heal', amount:10}},
-    {label:'+5 Max Health', effect:{type:'maxHealthUp', amount:5}},
+  enc('Half-Empty Fountain','Shrine',0,{boon:'Heal 20 OR Upgrade Player Max Health by 10.', effect:{type:'choice', options:[
+    {label:'Heal 20', effect:{type:'heal', amount:20}},
+    {label:'+10 Max Health', effect:{type:'maxHealthUp', amount:10}},
   ]}}),
-  enc('Scroll Dispenser: CRELA','Shrine',0,{boon:'Gain a one-use Nullify token (x3).', effect:{type:'grantToken', token:'nullify', charges:3}}),
-  enc('Scroll Dispenser: AWSP','Shrine',0,{boon:'Gain a one-use Swap token (x2): swap any two dice, even mid-path.', effect:{type:'grantToken', token:'swap', charges:2}}),
+  enc('Scroll Dispenser: CRELA','Shrine',0,{boon:'Gain a one-use Nullify token (x5). It also dispenses a die: choose one of two loot dice.', loot:true, effect:{type:'grantToken', token:'nullify', charges:5}}),
+  enc('Scroll Dispenser: AWSP','Shrine',0,{boon:'Gain a one-use Swap token (x3): swap any two dice, even mid-path. It also dispenses a die: choose one of two loot dice.', loot:true, effect:{type:'grantToken', token:'swap', charges:3}}),
   // v1.36.0 relic shrines
   enc('Surgery Community Theatre','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
   enc('Healthy Hearth','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
   enc('Ark of the Flood','Shrine',0,{boon:'Choose one of three path and movement Relics.', effect:{type:'relicChoice', theme:'path'}}),
   enc('Loot-Diagonalizer','Shrine',0,{boon:'Choose one of three loot and tempo Relics.', effect:{type:'relicChoice', theme:'loot'}}),
-  enc('Blood-Drive Treats','Shrine',0,{boon:'Pay 3 maximum health to choose one of three Relics.', effect:{type:'choice', options:[
-    {label:'Pay 3 max health: choose a Relic', effect:{type:'bargain', price:{maxHp:3}, then:{type:'relicChoice'}}},
+  enc('Blood-Drive Treats','Shrine',0,{boon:'Pay 3 maximum health to choose one of four Relics.', effect:{type:'choice', options:[
+    {label:'Pay 3 max health: choose from four Relics', effect:{type:'bargain', price:{maxHp:3}, then:{type:'relicChoice', count:4}}},
     {label:'Walk away', effect:{type:'leave'}},
   ]}}),
 ];
@@ -459,27 +459,28 @@ const FLOOR2_TRAPS = [
   enc('The Strike/Break-er','Trap',30,{questHealth:20,dmg:3,quests:['5 damage: survive 2','10 damage: survive 4','15 damage: survive 6'],flavor:'Inevitably causes scabs.'}),
 ];
 const FLOOR2_SHRINES = [
-  enc('Enchanted Anvil','Shrine',0,{boon:'Upgrade a lvl 1 Attack Die to a lvl 2 Attack Die.', effect:{type:'dieUpgrade', cat:'attack'}}),
+  enc('Enchanted Anvil','Shrine',0,{boon:'Forge a new die (choose one of three Gilded dice) OR upgrade two Attack or two Maneuver Dice one level.', effect:{type:'choice', options:[
+    {label:'Forge a new die', effect:{type:'tradeLoot', pool:'Gilded'}},
+    {label:'Upgrade 2 Attack Dice', effect:{type:'dieUpgrade', cat:'attack', count:2}},
+    {label:'Upgrade 2 Maneuver Dice', effect:{type:'dieUpgrade', cat:'maneuver', count:2}},
+  ]}}),
   enc('Alchemists Stone','Shrine',0,{boon:'Upgrade Player Maximum Health by 10.', effect:{type:'maxHealthUp', amount:10}}),
   enc('Department Spore','Shrine',0,{boon:'Choose one of three Relics.', effect:{type:'relicChoice'}}),
   enc('Half-Full Fountain','Shrine',0,{boon:'Heal 15 OR Upgrade Player Maximum Health by 10.', effect:{type:'choice', options:[
     {label:'Heal 15', effect:{type:'heal', amount:15}},
     {label:'+10 Max Health', effect:{type:'maxHealthUp', amount:10}},
   ]}}),
-  enc('Scroll Dispenser: GIB','Shrine',0,{boon:'Gain a one-use x4 Boost token (x2).', effect:{type:'grantToken', token:'boost', value:4, charges:2}}),
-  enc('Scroll Dispenser: DOER','Shrine',0,{boon:'Gain a one-use Reroll token (x2): reroll any one die, even mid-path.', effect:{type:'grantToken', token:'reroll', charges:2}}),
+  enc('Scroll Dispenser: GIB','Shrine',0,{boon:'Gain a one-use x4 Boost token (x3). It also dispenses a die: choose one of two loot dice.', loot:true, effect:{type:'grantToken', token:'boost', value:4, charges:3}}),
+  enc('Scroll Dispenser: DOER','Shrine',0,{boon:'Gain a one-use Reroll token (x3): reroll any one die, even mid-path. It also dispenses a die: choose one of two loot dice.', loot:true, effect:{type:'grantToken', token:'reroll', charges:3}}),
   // v1.36.0
   enc('Blood of Spanneroth','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
   enc('Ferrous Maiden','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
   enc("Thom's Guide",'Shrine',0,{boon:'Choose one of three path and movement Relics.', effect:{type:'relicChoice', theme:'path'}}),
-  enc('Time-Intensive Shrine','Shrine',0,{boon:'Give up your next campfire (no Rest or Train) to choose one of three Relics.', effect:{type:'choice', options:[
-    {label:'Skip your next campfire: choose a Relic', effect:{type:'bargain', price:{skipRest:true}, then:{type:'relicChoice'}}},
+  enc('Time-Intensive Shrine','Shrine',0,{boon:'Give up your next campfire (no Rest or Train) to choose two of four Relics.', effect:{type:'choice', options:[
+    {label:'Skip your next campfire: choose 2 Relics', effect:{type:'bargain', price:{skipRest:true}, then:{type:'relicChoice', count:4, take:2}}},
     {label:'Walk away', effect:{type:'leave'}},
   ]}}),
-  enc('Cryotherapist','Shrine',0,{boon:'Heal 8 OR gain a one-use Freeze token.', effect:{type:'choice', options:[
-    {label:'Heal 8', effect:{type:'heal', amount:8}},
-    {label:'Freeze token', effect:{type:'grantToken', token:'freeze', charges:1}},
-  ]}}),
+  enc('Cryotherapist','Shrine',0,{boon:'Heal 15 AND gain two one-use Freeze tokens.', effect:{type:'multi', effects:[{type:'heal', amount:15},{type:'grantToken', token:'freeze', charges:2}]}}),
 ];
 const FLOOR2_BOSSES = [
   enc('The Necrorancher','Boss',48,{dmg:2,minion:2,quests:['nullify: deal 12 damage in a single turn'],flavor:'Herder of the haunted, granger of the ghoulish, planter of the parasitic.'}),
@@ -513,15 +514,15 @@ const FLOOR3_TRAPS = [
 const FLOOR3_SHRINES = [
   enc('Scrying Spheroid','Shrine',0,{boon:'Replace a loot die with a random Magic die.', effect:{type:'randomDieReplace', pool:'Magic'}}),
   enc("Heron's Fountain",'Shrine',0,{boon:'Upgrade Player Maximum Health by 15.', effect:{type:'maxHealthUp', amount:15}}),
-  enc('Storied Emporium','Shrine',0,{boon:'Choose one of three Relics.', effect:{type:'relicChoice'}}),
-  enc('Scroll Dispenser: TSOP','Shrine',0,{boon:'Gain a one-use Freeze token.', effect:{type:'grantToken', token:'freeze', charges:1}}),
+  enc('Storied Emporium','Shrine',0,{boon:'Choose one of three Relics, then browse the shelves: choose one of two loot dice.', loot:true, effect:{type:'relicChoice'}}),
+  enc('Scroll Dispenser: TSOP','Shrine',0,{boon:'Gain a one-use Freeze token (x2). It also dispenses a die: choose one of two loot dice.', loot:true, effect:{type:'grantToken', token:'freeze', charges:2}}),
   // v1.36.0
   enc('Ruinous Rune Room','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
-  enc('Indoctrination Inoculation','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
-  enc('Charged Fae-Lines','Shrine',0,{boon:'Choose one of three path and movement Relics.', effect:{type:'relicChoice', theme:'path'}}),
-  enc('Madpie Nest','Shrine',0,{boon:'Choose one of three loot and tempo Relics.', effect:{type:'relicChoice', theme:'loot'}}),
-  enc('Faustian Spreadsheet','Shrine',0,{boon:'Pay 5 maximum health to choose one of four Relics.', effect:{type:'choice', options:[
-    {label:'Pay 5 max health: choose from four Relics', effect:{type:'bargain', price:{maxHp:5}, then:{type:'relicChoice', count:4}}},
+  enc('Indoctrination Inoculation','Shrine',0,{boon:'Choose one of three defense Relics, and gain 5 Maximum Health.', effect:{type:'relicChoice', theme:'defense', maxHp:5}}),
+  enc('Charged Fae-Lines','Shrine',0,{boon:'Choose two of four path and movement Relics.', effect:{type:'relicChoice', theme:'path', count:4, take:2}}),
+  enc('Madpie Nest','Shrine',0,{boon:'Choose one of three loot and tempo Relics, then pick through the hoard: choose one of two loot dice.', loot:true, effect:{type:'relicChoice', theme:'loot'}}),
+  enc('Faustian Spreadsheet','Shrine',0,{boon:'Pay 3 maximum health to choose two of four Relics.', effect:{type:'choice', options:[
+    {label:'Pay 3 max health: choose 2 of 4 Relics', effect:{type:'bargain', price:{maxHp:3}, then:{type:'relicChoice', count:4, take:2}}},
     {label:'Walk away', effect:{type:'leave'}},
   ]}}),
   enc('Correctly-Designed Fountain','Shrine',0,{boon:'Heal 20 OR Upgrade Player Maximum Health by 10.', effect:{type:'choice', options:[
@@ -530,7 +531,7 @@ const FLOOR3_SHRINES = [
   ]}}),
 ];
 const BIG_BOSSES = [
-  enc('Extruzeon, Co-consul of Waste','Big Boss',90,{questHealth:60,dmg:6,shield:2,hot:1,quests:['30 damage: 3 boosts','30 damage: 6 maneuvers in a single turn','freeze: 20+ damage'],flavor:'"And to think\u2026I hesitated."'}),
+  enc('Extruzeon, Co-consul of Waste','Big Boss',99,{questHealth:60,dmg:6,shield:2,hot:1,quests:['30 damage: 3 boosts','30 damage: 6 maneuvers in a single turn','freeze: 20+ damage'],flavor:'"And to think\u2026I hesitated."'}),
   enc('Toadtaur Wizard, Assistant to the Co-consul','Big Boss',78,{questHealth:60,dmg:4,quests:['30 damage: 3 leaps','30 damage: 6 maneuvers in a single turn','freeze: 15+ damage'],flavor:'"The wizdom of the toads flows through my three-chambered heart!"'}),
   enc('Myceleus, Co-consul of Rot','Big Boss',93,{questHealth:60,dmg:2,minion:2,dot:1,hot:2,quests:['30 damage: 3 combos','30 damage: 6 maneuvers in a single turn','nullify: 15+ damage'],flavor:'"All must rot away to naught!"'}),
 ];

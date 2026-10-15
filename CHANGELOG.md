@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.41.23 (Oct 15, 2026)
+- Shrines (Jeremy: every shrine at least as good as a same-floor loot pick; tested against one): Sacred Bellows +10 max HP; Half-Empty Fountain heal 20 or +10 max HP; Cryotherapist heals 15 and gives 2 Freeze tokens; Blood-Drive Treats offers 4 relics; Time-Intensive Shrine and Faustian Spreadsheet (now 3 max HP) let you take 2 of 4 relics; Charged Fae-Lines 2 of 4 path relics; Indoctrination Inoculation adds 5 max HP; Enchanted Anvil forges a new Gilded die (1 of 3) or upgrades two dice one level; every Scroll Dispenser gives more scrolls and also dispenses a loot die; Madpie Nest and Storied Emporium add a loot pick to their relic.
+- Extruzeon has 10% more HP (90 to 99): it now threatens skilled players at depth like the other final bosses.
+- Armsmaster's colour is violet (its Skill button was the same red as Clear).
+- Automatic play data is live: the game asks once at the end of a run; finished runs go to the Play Data sheet.
+
 ## 1.41.22 (Oct 15, 2026)
 - Monster tuning (Jeremy): The Strike/Break-er Hit 3; Myceleus 93 HP; Heating Elemental's Melting Point 4; Extractnid Matriarch Hit 6; Rusty Golem and Half-life Host a little less HP; Eelagator Escapee Hit 5; Rogue Golemancer, Fungal Flayer and Morel Dilemma a little more HP; Ditched Heist Hit 3; Ergot Eruption Hit 7.
 - Floor 2 Easy rooms have about 25-30% less HP (The Warcart, Armored Gear-Pest, Roudy Rinotter, Adhesive Pest Traps, Unventilated Workshop).
