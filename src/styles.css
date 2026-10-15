@@ -3134,3 +3134,7 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 /* the round shrine button waits until the "you scramble into a room" banner is tapped away */
 body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
 .shrine-act{ transition:opacity .25s ease-out; }
+
+.round-badge .rb-floor{ color:#f1d58a; font-weight:900; margin-right:3px; }
+.tray-head .round-badge{ gap:0; white-space:nowrap; }
+.shrine-orb.so-continue{ background:radial-gradient(circle at 50% 38%, #b9eea0, #5fb544 58%, #3a7f2a) !important; color:#10260a !important; animation:none; }

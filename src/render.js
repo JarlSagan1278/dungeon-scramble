@@ -1470,6 +1470,8 @@ function healthFX(current, last){
 // Encounter art is mirrored to face the hero by default; list any whose original art already faces left here.
 // Encounters whose current art is known to be the wrong picture: show the placeholder until the right art is supplied.
 const ART_WRONG = new Set([]);
+// Shrines face the way they were drawn unless listed here (Monster Footing page, Oct 16)
+const SHRINE_FLIP = new Set([]);
 const ENCOUNTER_NO_FLIP = new Set(['Grafted Grifter','Whence Wolf','Roudy Rinotter','Viscous Orb','Unbound Automa','Rogue Golemancer','Heating Elemental','Displacer Kitty','Armored Gear-Pest','Blastogenesis Engine','Half-life Host','Adhesive Pest Traps','The Necrorancher','Bellicose Biomancer','Ceramic Golem','Chimeric Sludge','Toadtaur Warrior','Rabbid Rabbats','Oilephant\'s Foot','Gestalt Network']); // Oct 15 (Jeremy): Toadtaur Warrior and Rabbid Rabbats face the other way
 let foPlayer = null; // the hero's half of the face-off band, set each renderGame()
 function renderEncounterCard(e, mode){
@@ -1810,7 +1812,7 @@ function renderGame(){
       <div class="enc-rail-row">
         <div class="enc-card-col">
           <div class="tray-float-wrap">
-            <div class="tray-head"><span class="round-badge">Round ${S.turnNumber+1}</span><div class="path-strip" id="path-strip"></div></div>
+            <div class="tray-head"><span class="round-badge" title="Floor ${S.floorIdx+1}, round ${S.turnNumber+1}"><b class="rb-floor">F${S.floorIdx+1}</b>&middot; Rd ${S.turnNumber+1}</span><div class="path-strip" id="path-strip"></div></div>
             <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
               <div class="tray ${S.newRoomFx?'tray-room-in':''} ${abilityArmed?'ability-armed':''} ${S.trayAct?'trayact-armed':''}" id="tray" style="--class-color:${S.klass.color||'#ffffff'}; --gd:-${Math.round(performance.now()%4600)}ms"></div>
               ${chestTrimHTML()}
@@ -2144,7 +2146,7 @@ document.addEventListener('click', ev=>{
   const hero = ev.target && ev.target.closest ? ev.target.closest('.camp-hero') : null;
   if(hero){ pokeAnim(hero,'shake'); return; }
   const fig = ev.target && ev.target.closest ? ev.target.closest('.fo-arch .fo-fig') : null;
-  if(!fig || !S || S.screen!=='game') return;
+  if(!fig || !S || (S.screen!=='game' && S.screen!=='shrine')) return; // shrines too (Jeremy, Oct 16)
   if(fig.closest('.fo-player')){
     pokeAnim(fig,'shake');
   } else if(fig.closest('.fo-enemy')){
@@ -3617,7 +3619,20 @@ function relicGemSVG(r){
     const tb = []; for(let i=0;i<8;i++){ const a=i/8*Math.PI*2+Math.PI/8; tb.push([50+24*Math.cos(a),50+24*Math.sin(a)]); facets+=`<line x1="${tb[i][0].toFixed(1)}" y1="${tb[i][1].toFixed(1)}" x2="${(50+42*Math.cos(a)).toFixed(1)}" y2="${(50+42*Math.sin(a)).toFixed(1)}" stroke="${F.d}" stroke-width="2"/>`; }
     table = `<polygon points="${tb.map(p=>p.map(v=>v.toFixed(1)).join(',')).join(' ')}" fill="${F.c}" stroke="${F.d}" stroke-width="2"/>`;
   }
-  return `<svg viewBox="-6 -6 112 112" aria-hidden="true"><defs><radialGradient id="rg-${fam}" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="${F.l}"/><stop offset=".55" stop-color="${F.c}"/><stop offset="1" stop-color="${F.d}"/></radialGradient></defs>${outer}${facets}${table}<g transform="translate(${cx-12*gs} ${cy-12*gs}) scale(${gs})" fill="none" stroke="#fff1d6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${RELIC_GLYPH[r.id]||''}</g><path d="M24 26 L36 18" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".5"/></svg>`;
+  return `<svg viewBox="-6 -6 112 112" aria-hidden="true"><defs><radialGradient id="rg-${fam}" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="${F.l}"/><stop offset=".55" stop-color="${F.c}"/><stop offset="1" stop-color="${F.d}"/></radialGradient></defs>${outer}${facets}${table}<g transform="translate(${cx-12*gs} ${cy-12*gs}) scale(${gs})" fill="none" stroke="#fff1d6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${RELIC_GLYPH[r.id]||''}</g>${relicShine(F)}</svg>`;
+}
+// Oct 16 (Jeremy: on the triangle relics the shine floated off to the left): the shine follows each gem's own upper-left edge
+function relicShine(F){
+  let a = [24,26], b = [36,18];
+  if(F.pts){
+    const P = F.pts, n = P.length, cx = P.reduce((t,p)=>t+p[0],0)/n, cy = P.reduce((t,p)=>t+p[1],0)/n;
+    let best = 0, bv = Infinity;
+    for(let i=0;i<n;i++){ const p = P[i], q = P[(i+1)%n], v = (p[0]+q[0])/2 + (p[1]+q[1])/2; if(v < bv){ bv = v; best = i; } }
+    const p = P[best], q = P[(best+1)%n], at = t=>[p[0]+(q[0]-p[0])*t, p[1]+(q[1]-p[1])*t];
+    const inset = pt=>{ const dx = cx-pt[0], dy = cy-pt[1], L = Math.hypot(dx,dy)||1; return [pt[0]+dx/L*11, pt[1]+dy/L*11]; };
+    a = inset(at(.3)); b = inset(at(.55));
+  }
+  return `<path d="M${a[0].toFixed(1)} ${a[1].toFixed(1)} L${b[0].toFixed(1)} ${b[1].toFixed(1)}" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".5"/>`;
 }
 function relicBadgeHTML(r, extraCls){
   return `<span data-relic="${r.id}" class="relic-badge relic-gem gem-${relicFamily(r)} ${extraCls||''}" title="${r.name}: ${r.desc}">${relicGemSVG(r)}</span>`;
@@ -3931,12 +3946,12 @@ const SHRINE_HOLD_MS = 700; // the ring around the round Hold button fills over 
 // The shrine's hold / Continue button floats over the bottom of the shrine scene, just above the tray, like the
 // room callout: it no longer takes a row of its own, so the dice stay where they are (Jeremy, Oct 12).
 function placeShrineFloat(){
-  // Oct 16 (Jeremy): the shrine's action is a round button centred over the (idle) dice tray, the same spot for Hold and Continue
-  const f = document.getElementById('shrine-float'), tw = document.querySelector('.tray-panel .tray-wrap') || document.querySelector('.tray-panel');
-  if(!f || !tw) return;
-  const r = tw.getBoundingClientRect();
-  f.style.left = (r.left + r.width/2) + 'px';
-  f.style.top = Math.max(8, r.top + r.height/2 - f.offsetHeight/2) + 'px';
+  // Oct 16 (Jeremy): the shrine's round Hold / Continue button sits in the dead centre of the screen
+  const f = document.getElementById('shrine-float');
+  if(!f) return;
+  const vw = document.documentElement.clientWidth || window.innerWidth, vh = window.innerHeight;
+  f.style.left = (vw/2) + 'px';
+  f.style.top = Math.max(8, vh/2 - f.offsetHeight/2) + 'px';
 }
 window.addEventListener('resize', ()=>{ if(typeof placeShrineFloat==='function') placeShrineFloat(); });
 function attachShrineHold(){
@@ -4016,7 +4031,8 @@ function renderShrineEncounter(){
   const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
   const heroFig = portrait.placeholder ? mysteryFigureHTML('width:60px; height:60px;') : `<img class="fo-img" src="${portrait.img}" alt="${S.origin.name}">`;
   const hpPct = Math.max(0, Math.min(100, S.health/S.maxHealth*100));
-  const shrineFig = art ? `<img class="fo-img enc-art" src="${art}" alt="${e.name}"/>` : `<div class="fo-img fo-mystery">${mysteryFigureHTML('width:70%; aspect-ratio:1/1;')}</div>`;
+  const ssz = encounterSize(e), sflip = SHRINE_FLIP.has(e.name) ? 'fo-flip' : '';
+  const shrineFig = art ? `<img class="fo-img ${sflip} enc-art" src="${art}" alt="${e.name}" style="--sz:${ssz};--drop:${encounterDrop(e)}%"/>` : `<div class="fo-img fo-mystery">${mysteryFigureHTML('width:70%; aspect-ratio:1/1;')}</div>`;
   const waiting = !S.shrineResult && !S.shrineChoice && !S.relicChoice && !S.lootChoice && !S.pendingLootDie;
   app.innerHTML = `
     <div class="panel route-float" style="margin-bottom:8px;">
@@ -4038,7 +4054,7 @@ function renderShrineEncounter(){
             </div>
             <div class="fo-vs">&nbsp;</div>
             <div class="fo-side fo-enemy">
-              <div class="fo-fig">${shrineFig}</div>
+              <div class="fo-fig ${art?'enc-portrait ':''}${ssz>1.05?'fo-big':''}" style="--sz:${ssz}">${shrineFig}</div>
               <div class="fo-name">${e.name}</div>
               <small class="fo-type">Shrine</small>
               <div class="fo-quests" style="text-align:center;">${e.boon}</div>
@@ -4054,7 +4070,7 @@ function renderShrineEncounter(){
       <div class="enc-rail-row">
         <div class="enc-card-col">
           <div class="tray-float-wrap">
-            <div class="tray-head"><span class="round-badge">Shrine</span><div class="path-strip"></div></div>
+            <div class="tray-head"><span class="round-badge"><b class="rb-floor">F${S.floorIdx+1}</b>&middot; Shrine</span><div class="path-strip"></div></div>
             <div class="tray-wrap tray-wrap-full">
               <div class="tray" id="tray" style="--class-color:${S.klass.color||'#ffffff'}"></div>
               ${chestTrimHTML()}

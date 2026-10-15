@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.41.37 (Oct 16, 2026)
+- Shrines (Jeremy): the round Hold button sits in the dead centre of the screen; Continue is now green so it reads apart from the gold Hold; tap a shrine to make it wiggle.
+- The round bubble shows the floor too: "F2 · Rd 3" in fights, "F2 · Shrine" at shrines.
+- Triangular relics: the shine sits on the gem (was floating to its left).
+- Shrines can take a size, height and facing like monsters (ENCOUNTER_SIZE / ENCOUNTER_DROP / SHRINE_FLIP); all 32 are on the Monster Footing page. tools/monster_scenes.js captures them with SHRINES=1.
+
 ## 1.41.36 (Oct 16, 2026)
 - Textures (Jeremy): the victory chests' wood and metal have the paper grain (the glow behind them stays smooth).
 
