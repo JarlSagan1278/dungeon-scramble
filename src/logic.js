@@ -717,6 +717,7 @@ function loadGame(){
     data.organizeSelection = null;
     delete data._roll; delete data._ghost; delete data._shieldFx; // old saves carried stale animation clocks -> absurd HP numbers
     S = data;
+    refreshSavedPortrait(S.portrait);
     return true;
   }catch(e){ return false; }
 }
@@ -751,7 +752,7 @@ function pickPortrait(originId){
   const arr = originPortraitArray(originId);
   if(!arr) return { img: GNOME_SILHOUETTE, placeholder:true };
   const idx = rand(arr.length);
-  const portrait = { img: arr[idx], placeholder:false, tone:'original' };
+  const portrait = { img: arr[idx], placeholder:false, tone:'original', origin:originId, idx }; // origin + idx (Oct 16): a resumed run redraws it from the current art
   applyRandomSkinTone(portrait, originId, idx);
   return portrait;
 }
@@ -812,6 +813,21 @@ function tintSkinPixels(src, originId, rgb){
     im.onerror = ()=>resolve(null);
     im.src = src;
   });
+}
+// Oct 16 (Jeremy: a run started before the paper texture kept its old portrait): saves used to keep only the finished
+// picture, so a resumed run showed whatever art existed when it began. Saves now also keep which portrait and tint it
+// is, and loading rebuilds the picture from the current art. Older saves without that stay as they are.
+function refreshSavedPortrait(p){
+  try{
+    if(!p || p.placeholder || p.idx==null || !p.origin) return;
+    const arr = originPortraitArray(p.origin); if(!arr || !arr[p.idx]) return;
+    p.img = arr[p.idx];
+    const tone = SKIN_TONES.find(t=>t.id===p.tone);
+    if(!tone || !tone.rgb || !skinTintEligible(p.origin, p.idx)) return;
+    const key = p.origin+':'+p.idx+':'+tone.id;
+    if(_skinTintCache[key]){ p.img = _skinTintCache[key]; return; }
+    tintSkinPixels(p.img, p.origin, tone.rgb).then(url=>{ if(!url) return; _skinTintCache[key] = url; p.img = url; if(typeof render==='function' && typeof S!=='undefined' && S) render(); });
+  }catch(e){}
 }
 function applyRandomSkinTone(portrait, originId, idx){
   if(!skinTintEligible(originId, idx)) return;

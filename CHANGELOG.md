@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.35 (Oct 16, 2026)
+- Fix (Jeremy): a resumed run kept the portrait picture from when it started, so art updates (like the paper texture) never reached it. Saves now remember which portrait and skin tint it is and redraw it from the current art. Runs started before this version keep their old picture.
+
 ## 1.41.34 (Oct 16, 2026)
 - Fix (Jeremy's screen recording): parts of the fight screen blanked out for a moment on his phone. The stone floor was a tilted 3D layer that used about 22 MB of graphics memory on its own; it is now drawn once, flat, with the same look (the fight scene uses about 48 MB instead of 73).
 - Shrines (Jeremy): "Hold to receive the boon" is a round button over the dice tray with a ring that fills as you hold; it no longer fades away after a second (it shared a style with the floating reward numbers). Continue appears in the same circle. A shrine's loot pick comes up directly, titled with the shrine's name (no "Victory!" chest), and shrines that give a relic and a die go straight from one to the other.
