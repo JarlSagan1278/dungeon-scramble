@@ -3104,8 +3104,7 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
   background:radial-gradient(ellipse 62% 70% at 50% 52%, rgba(8,4,2,0) 30%, rgba(8,4,2,.55) 70%, rgba(8,4,2,.9) 100%); }
 /* (pop-up panels stay plain: UI, not in-world -- Jeremy, Oct 15) */
 /* 4. a little wear on the chest's iron (the shine animation does the rest) */
-/* Oct 15 (Jeremy): texture is for in-world things; UI panels stay plain so they read easily. Camp sections keep a plain stone colour. */
-.camp-section:not(.camp-status-card){ background-color:#4a4540 !important; border-color:#1c1712 !important; }
+/* Oct 15 (Jeremy): texture is for in-world things; UI panels stay plain so they read easily (camp sections back to their light brown). */
 .tray-wrap .cc svg, .tray-wrap .chest-lock svg{ filter:url(#fx-worn); }
 /* 5. the route bar's doorways are paper too */
 .route .node.rt-door > svg, .route .node.rt-door > .rt-arch{ filter:url(#fx-paper); }

@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.32 (Oct 15, 2026)
+- Camp (Jeremy): the camp section cards are back to their light brown.
+
 ## 1.41.31 (Oct 15, 2026)
 - Textures (Jeremy: texture is for in-world things, not UI): the camp cards and pop-up panels are plain again (camp cards keep their stone colour, no grain); hero select is unchanged. The campfire logs get the paper grain.
 
