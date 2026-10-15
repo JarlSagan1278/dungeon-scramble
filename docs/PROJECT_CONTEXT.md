@@ -183,3 +183,16 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - **Enemy chips (Jeremy, Oct 14, 1.41.6):** icon + readable number, no word; named abilities only on boss specials.
 - **Solid icons (Jeremy, Oct 14, 1.41.7):** an icon whose number sits beside it (chips) is drawn solid (`iconSpanSolid` / `solidIcon` in data.js); the hole is only for numbers inside the icon (dice faces).
 - **Netlify zip 1.41.7 (Jeremy asked, Oct 14):** offline check passed (188 cached files incl. all 180 art, plays offline); full bug hunt on 1.41.7 clean (24/24, no findings).
+
+## Oct 15, 2026: monster tuning, shrines, depth, play data, co-op
+- **Monster tuning (from the per-monster fight table):** The Strike/Break-er Hit 4->3; Myceleus HP 106->93. Slight nerfs: Heating Elemental's Melting Point 5->4, Extractnid Matriarch Hit 7->6, Rusty Golem HP 23->20 (35->30 shown), Half-life Host 26->22 (39->33 shown). Eelagator Escapee Hit 6->5. Slight buffs: Rogue Golemancer HP 24->30, Ditched Heist Hit 2->3, Fungal Flayer HP 20->24 (30->36 shown), Ergot Eruption Hit 6->7, Morel Dilemma HP 14->18 (25->32 shown).
+- **Floor 2 Easy rooms ~25-30% less HP:** The Warcart 25->18, Armored Gear-Pest 23->17, Roudy Rinotter 20->15, Adhesive Pest Traps 30->22, Unventilated Workshop 30->22.
+- **Extruzeon:** should threaten skilled players at depth too. More HP is the lever (it gives Layer by Layer time to stack); amount set by study.
+- **Shrines:** every shrine at least as good as a same-floor loot pick. Boost each weak shrine's own reward first; give a loot pick on top only where it fits the theme, and sparingly.
+- **Depth modifiers:** reprice only the ones that are really off. Working out the cheapest set of modifiers for yourself is part of the fun, so modest unevenness is fine.
+- **Automatic play data: yes.** With the player's consent (asked once at the end of a run, toggle in Settings), each finished run goes to the "Dungeon Scramble Play Data" Google Sheet via an Apps Script web app (tools/playdata/apps_script.gs). Same record as Export Play Data, no names.
+- **Co-op:** on hold. When it starts, simulate two phones on a computer by doubling the width of the current interface.
+- **Reward for a new best depth:** already covered by the dice finishes and relic gating; nothing new.
+- **Assist mode that grows after losses:** not for now.
+- **Armsmaster colour:** its Skill button and Clear are both red; pick another striking colour (options shown Oct 15).
+- The "thousands of enemy HP after resuming" bug has not been seen again by Jeremy or Claude; dropped from the list.

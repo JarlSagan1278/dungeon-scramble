@@ -5,7 +5,6 @@
    - Oct 14: first tester, 2 runs, both won (Armsmaster depth 1, Dungeoneer depth 3); one warned down; Grosteque Grafter took 11 turns; Maneuver Die I replaced in 20 of 30 equips. See docs/studies/2026-10-14_playtest_tester1.md. Still need newer players' exports.
 2. **Music and art review (Jeremy):** every piece in the spec is in the game; he's reviewing all of it for edits. Art continues in parallel.
 3. **Waiting on Jeremy's call (studies done, nothing applied):**
-   - Pacing: Floor 2 Easy rooms about 25-30% less HP (The Warcart, Armored Gear-Pest, Roudy Rinotter, Adhesive Pest Traps, Unventilated Workshop); Myceleus HP 106 -> ~93. (docs/studies/2026-10-13_rebaseline_141.md, "Fight pacing")
    - Shrines: Scroll Dispensers (token shrines) are the weakest shrines; die-upgrade shrines weak; Madpie Nest (Floor 3 loot relics) weak; Floor 3 relic shrines could offer 4. Ties into the shrine overhaul below. (docs/studies/2026-10-13_shrines.md)
    - Extruzeon barely threatens experts at depth (2.2% vs 10-19%): raise its HP if it should.
    - Optional caps only if play feels unfair: damage-per-Minion specials count at most 8 Minions; Extruzeon layers max +12.
@@ -34,7 +33,7 @@
 - **Redesign the class depth badges** so each one represents its class visually.
 - **When all the art is in (remind Jeremy):** (1) the consistency pass `tools/art/consistency.py` over ALL art, stronger than the Oct 12 test; (2) the hand-drawn texture pass `tools/art/handdrawn.py` on all 48 hero portraits, and try it on the chest and environment art.
 - **Art still needed:** the 4 Magic dice, the stand-in shrines (incl. the Scroll Dispensers), floor and archway bricks, eventually a chest paintover (last priority). Layered cover art parked.
-- **Rulebook refresh** (rulebook is at build 1.32.28; many rules changed since). Also: the unreproduced "thousands of enemy HP on resume" bug, and the Armsmaster red Skill vs red Clear question.
+- **Rulebook refresh** (rulebook is at build 1.32.28; many rules changed since). Armsmaster red Skill vs red Clear: options shown Oct 15, waiting on Jeremy.
 - **Relic look polish (later):** a bracelet view in the relic list, sockets that grow with depth.
 - **Replay tool** for the tray/path telemetry, once playtesters send exports.
 - **Co-op multiplayer** (lowest priority). Feasibility study done Oct 14 (Claude Doc: https://claude.ai/code/artifact/1a2e8cb1-5527-400c-b4a2-defff09d6323). Recommended: "Shared Foe, Two Chests" with simultaneous planning, a Bridge edge for Pass-off and Bridge paths, host-authoritative two-phone link over WebRTC. Six questions for Jeremy are in the doc; first step would be a tabletop test, then a same-phone prototype.

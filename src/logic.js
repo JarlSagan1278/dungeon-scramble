@@ -220,7 +220,51 @@ function finalizeTelemetry(outcome){
     list.push(rec);
     while(list.length > MAX_TELE_RUNS) list.shift();
     localStorage.setItem(TELE_KEY, JSON.stringify(list));
+    queueRunUpload(rec); flushRunUploads();
   } catch(e){ /* storage full/unavailable */ }
+}
+
+// ---- Automatic play data (Oct 15, Jeremy): with the player's consent, each finished run is posted to a Google
+// Apps Script web app that files it in Jeremy's "Dungeon Scramble Play Data" Sheet (tools/playdata/apps_script.gs).
+// Off until PLAYDATA_URL is set. Same record as Export Play Data: no names, only the random per-device id.
+// Runs wait in a queue (localStorage) and are retried on the next launch when the phone is offline.
+const PLAYDATA_URL = '';
+const SHARE_KEY = 'dungeonScrambleShareData_v1';      // 'yes' | 'no' | missing (not asked yet)
+const UPLOAD_QUEUE_KEY = 'dungeonScrambleUploadQueue_v1';
+const UPLOADED_KEY = 'dungeonScrambleUploaded_v1';
+function shareDataPref(){ try{ return localStorage.getItem(SHARE_KEY); }catch(e){ return null; } }
+function setShareData(on){
+  try{ localStorage.setItem(SHARE_KEY, on ? 'yes' : 'no'); }catch(e){}
+  if(on){ getTelemetryRuns().forEach(queueRunUpload); flushRunUploads(); } // opting in also sends the runs already on this device
+}
+function queueRunUpload(rec){
+  try{
+    if(!PLAYDATA_URL || !rec || shareDataPref()!=='yes') return;
+    const done = JSON.parse(localStorage.getItem(UPLOADED_KEY)||'[]'), q = JSON.parse(localStorage.getItem(UPLOAD_QUEUE_KEY)||'[]');
+    if(done.includes(rec.runId) || q.some(r=>r.runId===rec.runId)) return;
+    q.push(rec); while(q.length > MAX_TELE_RUNS) q.shift();
+    localStorage.setItem(UPLOAD_QUEUE_KEY, JSON.stringify(q));
+  }catch(e){}
+}
+let _flushing = false;
+function flushRunUploads(){
+  try{
+    if(_flushing || !PLAYDATA_URL || shareDataPref()!=='yes' || (typeof navigator!=='undefined' && navigator.onLine===false)) return;
+    const q = JSON.parse(localStorage.getItem(UPLOAD_QUEUE_KEY)||'[]'); if(!q.length) return;
+    _flushing = true;
+    const rec = q[0];
+    const body = JSON.stringify({ kind:'run', player:getTelePlayerId(), screen:(typeof window!=='undefined' ? window.innerWidth+'x'+window.innerHeight : ''), rec });
+    // text/plain + no-cors: a "simple" request Apps Script accepts without a CORS preflight (the reply can't be read).
+    fetch(PLAYDATA_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body }).then(()=>{
+      try{
+        const q2 = JSON.parse(localStorage.getItem(UPLOAD_QUEUE_KEY)||'[]').filter(r=>r.runId!==rec.runId);
+        localStorage.setItem(UPLOAD_QUEUE_KEY, JSON.stringify(q2));
+        const done = JSON.parse(localStorage.getItem(UPLOADED_KEY)||'[]'); done.push(rec.runId); while(done.length>200) done.shift();
+        localStorage.setItem(UPLOADED_KEY, JSON.stringify(done));
+      }catch(e){}
+      _flushing = false; flushRunUploads();
+    }, ()=>{ _flushing = false; }); // offline or blocked: try again next launch
+  }catch(e){ _flushing = false; }
 }
 
 // Everything a tester needs to hand over: finished runs, the in-progress
@@ -2247,6 +2291,16 @@ function upgradeOneBasicDie(cat){
   return false;
 }
 
+// Oct 15 (shrine boosts): raise one basic die of a category one level -- a level 1 die to 2 if there is one,
+// otherwise a level 2 die to 3. Tray first, then the Back Pocket.
+function upgradeBasicDieStep(cat){
+  for(const from of [1,2]){
+    for(let i=0;i<S.tray.length;i++){ const c=S.tray[i]; if(c.die.cat===cat && c.die.level===from && basic(cat,from+1)){ c.die=clone(basic(cat,from+1)); c.faceIdx=0; return {idx:i, to:from+1}; } }
+    for(let i=0;i<S.backPocket.length;i++){ const d=S.backPocket[i]; if(d.cat===cat && d.level===from && basic(cat,from+1)){ S.backPocket[i]=clone(basic(cat,from+1)); return {to:from+1}; } }
+  }
+  return false;
+}
+
 function lootPoolByName(name){
   return name==='Alloy' ? ALLOY : (name==='Gilded' ? GILDED : MAGIC);
 }
@@ -2285,6 +2339,15 @@ function runShrineEffect(e, effect){
       render(); return;
     }
     case 'dieUpgrade': {
+      if(effect.count){ // Oct 15: upgrade `count` dice of the category one level each (I->II, else II->III)
+        const label = effect.cat.charAt(0).toUpperCase()+effect.cat.slice(1); let n=0, first=null;
+        for(let k=0;k<effect.count;k++){ const r=upgradeBasicDieStep(effect.cat); if(!r) break; n++; if(first==null && r.idx!=null) first=r.idx; }
+        if(first!=null) S.shrineFx = {kind:'die', idx:first};
+        const t = n ? `Upgraded ${n} ${label} ${n>1?'Dice':'Die'} one level.` : `No ${label} Die left to upgrade.`;
+        logMsg('sys', `${e.name}: ${t}`);
+        S.shrineResult = { title: e.name, text: t };
+        render(); return;
+      }
       const ok = upgradeOneBasicDie(effect.cat);
       const label = effect.cat.charAt(0).toUpperCase()+effect.cat.slice(1);
       const t = ok ? `Upgraded a level 1 ${label} Die to level 2.` : `No level 1 ${label} Die left to upgrade.`;
@@ -2308,7 +2371,8 @@ function runShrineEffect(e, effect){
       const themed = effect.theme ? pool.filter(r=>(r.tags||[]).includes(effect.theme) || (effect.theme==='loot' && (r.tags||[]).includes('tempo'))) : pool;
       let picks = pickN(themed, Math.min(want, themed.length));
       if(picks.length < want) picks = picks.concat(pickN(pool.filter(r=>!picks.includes(r)), Math.min(want-picks.length, pool.length-picks.length)));
-      S.relicChoice = { name:e.name, options: picks.map(r=>r.id) };
+      if(effect.maxHp){ S.maxHealth += effect.maxHp; S.health = cap(S.health+effect.maxHp, S.maxHealth); logMsg('sys', `${e.name}: Max health +${effect.maxHp}.`); }
+      S.relicChoice = { name:e.name, options: picks.map(r=>r.id), left: effect.take||1 }; // Oct 15: some shrines let you take 2
       S.relicChoice.options.forEach(markRelicFound);
       render(); return;
     }
@@ -2371,7 +2435,7 @@ function runShrineEffect(e, effect){
 let SHRINE_LOOT = false;
 function continueFromShrine(){
   S.shrineResult = null;
-  if(SHRINE_LOOT && S.encounter && !S.encounter._shrineLoot){
+  if((SHRINE_LOOT || (S.encounter && S.encounter.loot)) && S.encounter && !S.encounter._shrineLoot){ // loot:true = this shrine also gives a loot pick (Oct 15)
     S.encounter._shrineLoot = true;
     const floor = FLOORS[S.floorIdx];
     const options = pickLootNUnused(floor.lootPool, Math.min(2 + (hasRelic('lucky_coin') ? 1 : 0), floor.lootPool.length));
@@ -2397,9 +2461,10 @@ function applyShrineBoon(e){
 function chooseRelic(id){
   const e = S.encounter, name = (S.relicChoice && S.relicChoice.name) || (e&&e.name) || 'Relic';
   teleLog('relic_pick', {shrine:name, picked:id, offered:(S.relicChoice&&S.relicChoice.options)||null});
-  S.relicChoice = null;
+  const rc = S.relicChoice; S.relicChoice = null;
   grantRelic(id, {silent:true, via:'shrine'});
   const r = relicById(id);
+  if(rc && rc.left>1){ const rest = rc.options.filter(x=>x!==id && !hasRelic(x)); if(rest.length){ S.relicChoice = { name, options: rest, left: rc.left-1 }; render(); return; } }
   S.shrineFx = {kind:'relic', id};
   S.shrineResult = { title: name, text: `Gained relic: ${r.name}. ${r.desc}` };
   render();

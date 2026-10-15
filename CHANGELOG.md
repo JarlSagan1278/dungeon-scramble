@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.41.22 (Oct 15, 2026)
+- Monster tuning (Jeremy): The Strike/Break-er Hit 3; Myceleus 93 HP; Heating Elemental's Melting Point 4; Extractnid Matriarch Hit 6; Rusty Golem and Half-life Host a little less HP; Eelagator Escapee Hit 5; Rogue Golemancer, Fungal Flayer and Morel Dilemma a little more HP; Ditched Heist Hit 3; Ergot Eruption Hit 7.
+- Floor 2 Easy rooms have about 25-30% less HP (The Warcart, Armored Gear-Pest, Roudy Rinotter, Adhesive Pest Traps, Unventilated Workshop).
+- Automatic play data (off until the upload address is set): asks once at the end of a run, toggle in Settings; finished runs are queued and sent when online.
+- Shrine engine: relic shrines can let you take more than one relic and add max HP; die-upgrade shrines can upgrade several dice one level (I to II, or II to III); any shrine can also give a loot pick (used by the coming shrine boosts).
+
 ## 1.41.21 (Oct 15, 2026)
 - Art (Jeremy): Toadtaur Warrior and Rabbid Rabbats now face the other way; Eelagator Escapee shrunk to a normal size (0.95 to 0.65 height; it is a very wide picture, so this gives it about the area of a standard monster).
 - Monster footing (Jeremy, Monster Footing page): 29 monsters sit higher or lower in the fight scene so they stand on the floor (`ENCOUNTER_DROP`, data.js).

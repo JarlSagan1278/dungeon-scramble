@@ -52,6 +52,7 @@ document.addEventListener('keydown', (ev)=>{
 });
 
 render();
+setTimeout(()=>{ try{ flushRunUploads(); }catch(e){} }, 4000); // send any runs left over from an offline session
 
 // Splash (Jeremy, Oct 13): one tap before the title screen. Browsers keep audio locked until the player touches the
 // page, so this tap unlocks it and the title theme starts with the title. Automated test browsers skip it.

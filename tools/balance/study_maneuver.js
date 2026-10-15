@@ -50,6 +50,8 @@ let res = await page.evaluate((cfg)=>{
     // Oct 15 fix: only the forced shrine gives the loot pick (SHRINE_LOOT is global, so every other shrine used to give one too)
     const cfs = continueFromShrine; window.continueFromShrine = function(){ SHRINE_LOOT = !!(S.encounter && S.encounter.name===cfg.forceShrine); return cfs(); }; }
   if(cfg.upgradeCost) UPGRADE_COST = cfg.upgradeCost;
+  // shrinePatch (Oct 15 shrine boosts): {shrineName: {effect, loot}} replaces a shrine's effect and/or gives it a loot pick
+  if(cfg.shrinePatch) FLOORS.forEach(f=>f.shrines.forEach(x=>{ const p=cfg.shrinePatch[x.name]; if(p){ if(p.effect) x.effect=p.effect; if(p.loot!=null) x.loot=p.loot; } }));
   if(cfg.noQuests) window.checkQuests = function(){ return []; };
   if(cfg.noRevive){ const pdx=onPlayerDefeated; window.onPlayerDefeated=function(){ S.backPocket=[]; return pdx(); }; }
   if(cfg.reviveClear) REVIVE_RULE = {spend:'all', hp:5}; if(cfg.reviveRule) REVIVE_RULE = cfg.reviveRule; // Oct 14 test: a Back Pocket save spends the whole Pocket

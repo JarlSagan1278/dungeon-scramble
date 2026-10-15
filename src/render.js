@@ -2942,6 +2942,7 @@ function openSettingsModal(){
         ${settingsToggleRowHTML('pref-reduced-motion', 'Reduce motion', PREFS.reducedMotion)}
         ${settingsToggleRowHTML('pref-low-intensity', 'Gentler effects (smaller shakes, fewer sparks)', PREFS.lowIntensity)}
         ${settingsToggleRowHTML('pref-vibration', 'Vibration (phones)', PREFS.vibration!==false)}
+        ${PLAYDATA_URL ? settingsToggleRowHTML('pref-share-data', 'Share play data automatically', shareDataPref()==='yes') : ''}
       </div>
       <p class="hint" style="text-align:left;">Keyboard shortcuts ${infoDot('Enter = Go · Backspace = Clear · 1234/qwer/asdf/zxcv tap a tray die (matches its grid position)')}</p>
       <div class="small-btn-row" style="justify-content:center; flex-direction:column;">
@@ -2966,6 +2967,7 @@ function openSettingsModal(){
   overlay.querySelector('#settings-codex-btn').onclick = ()=>{ close(); openCodexModal(); };
   overlay.querySelector('#settings-records-btn').onclick = ()=>{ close(); openRecordsModal(); };
   overlay.querySelector('#settings-export-data-btn').onclick = ()=>{ close(); openExportDataModal(); };
+  { const sh = overlay.querySelector('#pref-share-data'); if(sh) sh.onchange = ()=> setShareData(sh.checked); }
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
   // Volume sliders (Oct 13): 0 turns that channel off; the effects slider plays a test tone when you let go.
   const sfxSl = overlay.querySelector('#pref-sound'), musSl = overlay.querySelector('#pref-music');
@@ -3690,7 +3692,7 @@ function renderRelicChoiceModal(){
   const {name, options} = S.relicChoice;
   const overlay = el(`<div class="modal-overlay"><div class="modal" style="max-width:360px;">
       <h2 style="text-align:center;">${name}</h2>
-      <p style="text-align:center;">Choose a Relic. It lasts for the rest of your run.</p>
+      <p style="text-align:center;">${(S.relicChoice.left||1)>1?`Choose ${S.relicChoice.left} Relics, one at a time.`:'Choose a Relic.'} It lasts for the rest of your run.</p>
       <div class="relic-choice-list" id="relic-choice-list"></div>
     </div></div>`);
   openUniqueOverlay('relic-choice', overlay);
@@ -4460,6 +4462,20 @@ function summaryStatsHTML(){
     </div>`;
 }
 
+// Run-end consent card for automatic play data (Oct 15). Shown until the player answers; only when uploads are set up.
+function shareDataAskHTML(){
+  if(!PLAYDATA_URL || shareDataPref()) return '';
+  return `<div class="share-ask" id="share-ask">
+      <p><strong>Help balance the game?</strong> Send how each run went (rooms, dice, what beat you) automatically. No names or personal info. You can turn it off in Settings.</p>
+      <div class="small-btn-row" style="justify-content:center;"><button class="primary" onclick="shareDataAnswer(true)">Yes, share</button><button onclick="shareDataAnswer(false)">No thanks</button></div>
+    </div>`;
+}
+function shareDataAnswer(on){
+  setShareData(on);
+  const box = document.getElementById('share-ask');
+  if(box) box.innerHTML = `<p class="hint" style="margin:0;">${on ? 'Thanks! Your runs will be sent automatically.' : 'No problem. Nothing will be sent.'}</p>`;
+}
+
 // Settings -> Export Play Data: nothing is uploaded; this just packages the
 // on-device telemetry (see buildPlayDataExport(), logic.js) as a file to
 // download, or as text to copy when downloads are blocked (e.g. inside an
@@ -4535,6 +4551,7 @@ function renderVictory(){
     ${newBoonsHTML()}
     ${summaryStatsHTML()}
     <button class="primary" style="margin-top:12px;" onclick="location.reload()">Play Again</button>
+    ${shareDataAskHTML()}
     <button style="margin-top:8px;" onclick="openExportDataModal()">Send Play Data</button></div>`;
   wireRunCard('victory');
   animateSummary();
@@ -4579,6 +4596,7 @@ function renderGameOver(){
     ${newBoonsHTML()}
     ${summaryStatsHTML()}
     <button class="primary" style="margin-top:12px;" onclick="location.reload()">Try Again</button>
+    ${shareDataAskHTML()}
     <button style="margin-top:8px;" onclick="openExportDataModal()">Send Play Data</button></div>`;
   wireRunCard('defeat');
 }
