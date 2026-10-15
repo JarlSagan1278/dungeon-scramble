@@ -520,6 +520,39 @@ function bossArcBarHTML(o){
 // something you look down on. Textures are painted once at runtime (canvas) into CSS variables.
 const ROOM_HORIZON = 0.38, ROOM_MIN_HORIZON = 118; // Oct 15 (Jeremy): floor line 16px higher (was 134); the tallest 3-quest sign still clears it
 let ROOM_TEX_READY = false;
+let ROOM_FLOOR_SRC = null, ROOM_TEX_VER = 0;
+// Oct 16 (Jeremy's screen recording: parts of the fight screen blanked out for a moment on his phone): the floor used to be a
+// tilted 3D plane (perspective + rotateX), which the phone kept as a ~22 MB graphics layer (bigger than everything else
+// on screen) and ran short of graphics memory. Now the same view is drawn once into a flat canvas, row by row, with the
+// same perspective math (880px, 70 degrees, 170px tiles), plus the top fade and bottom vignette. Cached per size.
+function bakedFloorCanvas(W, H){
+  try{
+    if(!ROOM_FLOOR_SRC || W<2 || H<2) return null;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const key = W+'x'+H+'x'+dpr+'x'+ROOM_TEX_VER;
+    if(bakedFloorCanvas._c && bakedFloorCanvas._c.key === key) return bakedFloorCanvas._c.cv;
+    const cv = (bakedFloorCanvas._c && bakedFloorCanvas._c.cv) || document.createElement('canvas');
+    cv.className = 'rf-canvas'; cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
+    const g = cv.getContext('2d');
+    const d = 880, a = 70*Math.PI/180, sn = Math.sin(a), co = Math.cos(a), cx = W/2, PW = 1.8*W, k = 170/ROOM_FLOOR_SRC.width;
+    const pat = g.createPattern(ROOM_FLOOR_SRC, 'repeat');
+    g.fillStyle = '#0a0604'; g.fillRect(0, 0, cv.width, cv.height);
+    for(let py=0; py<cv.height; py++){
+      const Y = (py+0.5)/dpr, y = Y*d/(co*d + Y*sn), sc = d/(d - y*sn);
+      g.setTransform(sc*dpr, 0, 0, 1, (cx - 0.9*W*sc)*dpr, py);
+      pat.setTransform(new DOMMatrix([k, 0, 0, k, 0, -y]));
+      g.fillStyle = pat; g.fillRect(0, 0, PW, 1);
+    }
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    let gr = g.createLinearGradient(0, 0, 0, H);
+    gr.addColorStop(0, 'rgba(10,6,4,.97)'); gr.addColorStop(.07, 'rgba(10,6,4,.6)'); gr.addColorStop(.26, 'rgba(10,6,4,.1)'); gr.addColorStop(.4, 'rgba(10,6,4,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(.5, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,.55)');
+    g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    bakedFloorCanvas._c = { key, cv };
+    return cv;
+  }catch(e){ return null; }
+}
 // Heavy paper on the environment (Jeremy, Oct 15): the paper tile is blended (soft-light) into the generated wall and
 // floor textures, the archway and the dice chest. PAPER_ENV is its strength (1 = heavy, Jeremy's pick).
 const PAPER_ENV = 1;
@@ -578,7 +611,7 @@ function ensureRoomTextures(){
           if(rnd()>.84){ const m=g.createRadialGradient(x0+w*.5,y0+h*.9,0,x0+w*.5,y0+h*.9,w*.45); m.addColorStop(0,'rgba(70,110,50,.3)'); m.addColorStop(1,'rgba(70,110,50,0)'); g.fillStyle=m; rr(g,x0,y0,w,h,5); g.fill(); }
           x+=sw; }
         y+=rh; }
-      noise(g,W,H,14); paperOver(g,W,H,2.4);
+      noise(g,W,H,14); paperOver(g,W,H,2.4); ROOM_FLOOR_SRC = c; ROOM_TEX_VER++;
       document.documentElement.style.setProperty('--tex-floor', `url("${c.toDataURL('image/jpeg',.85)}")`); }
     // wall: dark running-bond brick
     { const W=512,H=256,c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
@@ -610,7 +643,9 @@ function syncRoomFloor(card){
     const fl = document.createElement('div'); fl.id = 'room-floor';
     fl.style.cssText = `left:${-appL}px;width:${vw}px;top:${hy}px;bottom:${floorBelow}px;clip-path:polygon(${xl}px 0,${xr}px 0,${xr}px ${yb}px,100% ${yb}px,100% 100%,0 100%,0 ${yb}px,${xl}px ${yb}px);`;
     fl.style.setProperty('--ld', '-'+Math.round(performance.now()%3100)+'ms');
-    fl.innerHTML = '<div class="rf-plane"></div><div class="rf-fade"></div><div class="rf-light"></div><div class="rf-vig"></div>';
+    const fcv = bakedFloorCanvas(vw, Math.max(1, Math.round(app.offsetHeight - hy - floorBelow)));
+    if(fcv){ fl.innerHTML = '<div class="rf-light"></div>'; fl.insertBefore(fcv, fl.firstChild); }
+    else fl.innerHTML = '<div class="rf-plane"></div><div class="rf-fade"></div><div class="rf-light"></div><div class="rf-vig"></div>';
     // Ground shadows: a feet shadow plus a tall soft pool running down through the health bar, name and chips.
     // All measuring happens before anything is inserted, so this costs one layout, not two (Oct 12).
     const hf = card.querySelector('.hall-fx');

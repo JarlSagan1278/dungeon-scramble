@@ -3110,3 +3110,6 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 .route .node.rt-door > svg, .route .node.rt-door > .rt-arch{ filter:url(#fx-paper); }
 /* Oct 15 (Jeremy): the campfire logs are in-world, so they get the paper grain too */
 .campfire-logs, .campfire-logs::before, .campfire-logs::after{ filter:url(#fx-paper); }
+
+/* Oct 16: the baked floor (see bakedFloorCanvas in render.js) replaces the 3D .rf-plane */
+#room-floor .rf-canvas{ position:absolute; left:0; top:0; width:100%; height:100%; display:block; }
