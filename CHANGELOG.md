@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.20 (Oct 15, 2026)
+- Fight scenes: the wall/floor line sits 16px higher on phones (Jeremy), so monsters stand on the floor instead of at its back edge.
+
 ## 1.41.19 (Oct 14, 2026)
 - Safety-net badge on the Pocket button is now a drawn heart in a red circle (Jeremy: the tiny text heart read as a triangle).
 

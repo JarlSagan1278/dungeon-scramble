@@ -518,7 +518,7 @@ function bossArcBarHTML(o){
 // ---- Stone-floor room: the doorway's back wall (brick, above a horizon ledge) and one flagstone floor that
 // runs from the horizon down behind the chest, so the top of the screen reads as a wall and the chest as
 // something you look down on. Textures are painted once at runtime (canvas) into CSS variables.
-const ROOM_HORIZON = 0.38, ROOM_MIN_HORIZON = 134;
+const ROOM_HORIZON = 0.38, ROOM_MIN_HORIZON = 118; // Oct 15 (Jeremy): floor line 16px higher (was 134); the tallest 3-quest sign still clears it
 let ROOM_TEX_READY = false;
 function ensureRoomTextures(){
   if(ROOM_TEX_READY) return; ROOM_TEX_READY = true;
