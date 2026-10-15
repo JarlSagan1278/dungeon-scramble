@@ -11,6 +11,9 @@
 4. **Use real player data before retuning the base game** (literature review: bot win rates are not human win rates; Slay the Spire players win ~9-16% of base runs). Re-check the guidelines in docs/studies/2026-10-13_balance_literature_review.md against the first exports.
 5. **Remaining performance:** ~1.5 s of script per turn at CPU x4 (renderGame/placeVs) and ~500 ms of style work during playback.
 
+## Oct 15
+- 1.41.24 zipped for Netlify (first build with automatic play data; check the Play Data sheet after the first tester run).
+
 ## Small follow-ups
 - Swap / Reroll token shrine boons (Scroll Dispensers AWSP, DOER) still say "before you build your path"; the tokens also work mid-path. Fix the text and the names sheet together.
 - Ideas from the literature review (not decided): a reward for reaching a new best depth; an optional assist mode that grows after losses (Hades God Mode style); log whether a death was avoidable in the bot studies.
