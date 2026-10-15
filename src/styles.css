@@ -3102,12 +3102,12 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 /* Oct 15 (Jeremy): a campfire in a dark room -- the light falls off toward the edges (above the floor, under the hero, fire and buttons) */
 .camp-status-card::after{ content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
   background:radial-gradient(ellipse 62% 70% at 50% 52%, rgba(8,4,2,0) 30%, rgba(8,4,2,.55) 70%, rgba(8,4,2,.9) 100%); }
-/* 3. pop-up panels: light card-stock grain */
-.modal{ background-image:var(--paper-tile-light); background-size:110px 110px; background-blend-mode:soft-light; }
-/* 4. stone cards at camp, light grain on hero select boxes, a little wear on the chest's iron (the shine animation does the rest) */
-/* camp sections are stone-coloured cards (Jeremy, Oct 15: no wood pattern at camp); hero select boxes keep their colour with the light grain */
-.camp-section:not(.camp-status-card){ background-color:#4a4540 !important; background-image:var(--paper-tile-med) !important; background-size:110px 110px; background-blend-mode:soft-light; border-color:#1c1712 !important; }
-.origin-showcase, .class-showcase{ background-image:var(--paper-tile-med); background-size:110px 110px; background-blend-mode:soft-light; }
+/* (pop-up panels stay plain: UI, not in-world -- Jeremy, Oct 15) */
+/* 4. a little wear on the chest's iron (the shine animation does the rest) */
+/* Oct 15 (Jeremy): texture is for in-world things; UI panels stay plain so they read easily. Camp sections keep a plain stone colour. */
+.camp-section:not(.camp-status-card){ background-color:#4a4540 !important; border-color:#1c1712 !important; }
 .tray-wrap .cc svg, .tray-wrap .chest-lock svg{ filter:url(#fx-worn); }
 /* 5. the route bar's doorways are paper too */
 .route .node.rt-door > svg, .route .node.rt-door > .rt-arch{ filter:url(#fx-paper); }
+/* Oct 15 (Jeremy): the campfire logs are in-world, so they get the paper grain too */
+.campfire-logs, .campfire-logs::before, .campfire-logs::after{ filter:url(#fx-paper); }
