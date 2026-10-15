@@ -85,3 +85,6 @@ you actually changed, rebuild, and run the regression sim.
 
 ## High-resolution re-import (Oct 12)
 `reimport_hires.py <export_dir> <out_dir> BATCH_*_done.png ... [--scale 2]` finds every dashed guide box on returned canvases (joins boxes whose sides were painted over), clears the pink line, recognizes the picture by matching it against the current art, and rebuilds it at 2x the old size with the same padding, so it shows at exactly the same size but sharper. Then `import_art.py <out_dir>`. Use this (not a resize to the old size) for every returned batch from now on.
+
+## Paper texture and WebP (Oct 15, 1.41.26)
+All portraits, monsters and loot pictures carry the medium paper texture (`paper.py`, strength 1.0; Jeremy's pick). `reimport_hires.py` applies it to returned repaints automatically (`--no-paper` to skip). `import_art.py` now stores art as WebP (quality 85, alpha kept; `--png` to keep PNG) because the texture made PNGs about 5x bigger. Exports now come out as `.webp` files; edit them or convert to PNG, either imports fine.

@@ -51,6 +51,8 @@ def find_value_span(src, const_name, key, open_ch):
         m = re.compile(r'data:image/(\w+);base64,([A-Za-z0-9+/=]{200,})').search(src, search_from)
         return m.start(2), m.end(2), m.group(1)
 
+WEBP = '--png' not in sys.argv  # Oct 15: art is stored as WebP by default (pass --png to keep PNG)
+
 def main():
     if len(sys.argv) < 2:
         print(__doc__)
@@ -102,7 +104,12 @@ def main():
         # Re-encode to PNG/JPEG matching the original ext, optimized.
         im = Image.open(io.BytesIO(raw))
         buf = io.BytesIO()
-        if entry['ext'] == 'png':
+        to_webp = WEBP and entry['ext'] in ('png', 'webp')
+        if to_webp:
+            # Oct 15: textured (paper) art compresses ~5x better as WebP (alpha kept); the data URL's type changes too
+            im = im.convert('RGBA')
+            im.save(buf, format='WEBP', quality=85, method=6)
+        elif entry['ext'] == 'png':
             im = im.convert('RGBA')
             im.save(buf, format='PNG', optimize=True)
         elif entry['ext'] in ('jpg', 'jpeg'):
@@ -113,7 +120,11 @@ def main():
         new_b64 = base64.b64encode(buf.getvalue()).decode('ascii')
 
         start, end, _ = find_value_span(src, const_name, key, open_ch)
-        src = src[:start] + new_b64 + src[end:]
+        if to_webp:
+            mstart = src.rfind('data:image/', 0, start)
+            src = src[:mstart] + 'data:image/webp;base64,' + new_b64 + src[end:]
+        else:
+            src = src[:start] + new_b64 + src[end:]
         print(f'updated {const_name}[{key}]  <-  {fname}  ({len(raw)} -> {buf.tell()} bytes)')
         changed += 1
 

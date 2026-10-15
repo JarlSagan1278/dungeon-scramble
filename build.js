@@ -74,14 +74,14 @@ if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
 }
 </script>
 </body>`;
-// Web build only: pull the embedded base64 art out into real files (dist/web/art/<hash>.png|jpg) and point the
+// Web build only: pull the embedded base64 art out into real files (dist/web/art/<hash>.png|jpg|webp) and point the
 // game at them. ~25% smaller than base64-in-HTML, loads faster, and the service worker pre-caches them for offline.
 const crypto = require('crypto');
 const ART_DIR = path.join(WEB, 'art'); fs.mkdirSync(ART_DIR, { recursive: true });
 const ART_FILES = new Set();
-const webAssets = assets.replace(/(["'])data:image\/(png|jpeg);base64,([A-Za-z0-9+\/=]+)\1/g, (m, q, type, b64) => {
+const webAssets = assets.replace(/(["'])data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+\/=]+)\1/g, (m, q, type, b64) => {
   const buf = Buffer.from(b64, 'base64');
-  const name = crypto.createHash('sha1').update(buf).digest('hex').slice(0, 12) + (type === 'png' ? '.png' : '.jpg');
+  const name = crypto.createHash('sha1').update(buf).digest('hex').slice(0, 12) + (type === 'png' ? '.png' : type === 'webp' ? '.webp' : '.jpg');
   if (!ART_FILES.has(name)) { fs.writeFileSync(path.join(ART_DIR, name), buf); ART_FILES.add(name); }
   return '"art/' + name + '"';
 });
@@ -115,7 +115,7 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  if (url.origin === location.origin && /[/]art[/][0-9a-f]{12}[.](png|jpg)$/.test(url.pathname)) {
+  if (url.origin === location.origin && /[/]art[/][0-9a-f]{12}[.](png|jpg|webp)$/.test(url.pathname)) {
     // Art files are content-hashed (never change under the same name): cache first, instant on every launch.
     e.respondWith(caches.match(req).then(m => m || fetch(req).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put(req, copy)); return r; })));
   } else if (url.origin === location.origin) {

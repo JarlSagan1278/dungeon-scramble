@@ -17,7 +17,7 @@ Digital prototype of Jeremy's board game (Boggle-style dice-path dungeon crawler
 - GitHub origin (`main`) is the source of truth. Commit regularly and push after each release commit.
 
 ## Layout
-`src/{data,assets,logic,depth,render,music,main}.js` + `styles.css` concatenated by build.js. `assets.js` is base64 art (3.3 MB). Global state `S`; `render()` rebuilds `#app`. Telemetry: `teleLog(...)`; export via the gear menu (Export Play Data).
+`src/{data,assets,logic,depth,render,music,main}.js` + `styles.css` concatenated by build.js. `assets.js` is base64 art (3.5 MB, WebP with a paper texture since 1.41.26; new art goes through `tools/art/paper.py`). Global state `S`; `render()` rebuilds `#app`. Telemetry: `teleLog(...)`; export via the gear menu (Export Play Data).
 
 ## Gotchas (learned the hard way)
 - Never replace a code slice by index without checking neighbors: a slice replace once deleted `applyBossCycleAction` (boss turns threw intermittently). Run sim several times after big logic edits.

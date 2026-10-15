@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.41.26 (Oct 15, 2026)
+- Art (Jeremy): every portrait, monster and loot picture has a medium paper texture (paper tooth, fibres and a soft shadow; outlines stay clean).
+- Art is now stored as WebP with transparency: the game file is about half the size (art 6.3 MB to 3.5 MB) even with the texture.
+
 ## 1.41.25 (Oct 15, 2026)
 - Art: Jeremy's Batch E repaints are in (Displacer Kitty, Armored Gear-Pest, Rusty Golem, Rogue Technician, The Warcart, Blastogenesis Engine), at 2x resolution.
 

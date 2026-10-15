@@ -3,7 +3,7 @@
 # For every dashed box on a *_done.png canvas: crop inside the box, clear the pink guide line, recognize which
 # picture it is (best match against the current, small art), and rebuild that picture at SCALE x its old size,
 # keeping the same padding so it shows at exactly the same size in the game.
-# usage: python3 tools/art/reimport_hires.py <export_dir> <out_dir> <done.png>... [--scale 2] [--names 'A|B|C...']
+# usage: python3 tools/art/reimport_hires.py <export_dir> <out_dir> <done.png>... [--scale 2] [--names 'A|B|C...'] [--no-paper]
 # --names (Oct 15): the picture names in box order (rows top to bottom, left to right), for repaints changed too much to auto-match.
 import json, os, sys
 import numpy as np
@@ -12,6 +12,10 @@ args = [a for a in sys.argv[1:]]
 SCALE = 2.0
 if '--scale' in args: i = args.index('--scale'); SCALE = float(args[i+1]); del args[i:i+2]
 NAMES = None
+PAPER = '--no-paper' not in args
+if not PAPER: args.remove('--no-paper')
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from paper import paper  # Oct 15: every picture gets the medium paper texture (tools/art/paper.py)
 if '--names' in args: i = args.index('--names'); NAMES = args[i+1].split('|'); del args[i:i+2]
 ex, out, canvases = args[0], args[1], args[2:]
 os.makedirs(out, exist_ok=True)
@@ -93,6 +97,7 @@ for cv in canvases:
             k = min(tw/cc.width, th/cc.height); cc = cc.resize((max(1, round(cc.width*k)), max(1, round(cc.height*k))), Image.LANCZOS)
             new = Image.new('RGBA', (NW, NH), (0, 0, 0, 0))
             new.alpha_composite(cc, (tb[0] + (tw-cc.width)//2, tb[3]-cc.height))  # centered, feet on the old baseline
+            if PAPER: new = paper(new)
             new.save(os.path.join(out, e['file'])); out_man.append(e)
             print('%-34s match %.3f  %dx%d -> %dx%d  (source box %dx%d)' % (name[:34], d, old.width, old.height, NW, NH, crop.shape[1], crop.shape[0]))
 json.dump(out_man, open(os.path.join(out, 'manifest.json'), 'w'), indent=1)
