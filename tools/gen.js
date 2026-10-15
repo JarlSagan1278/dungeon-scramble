@@ -157,7 +157,7 @@ C+=ch(6,'Encounters',`
 <h3>Quests</h3>
 <p>Most Enemies and every Trap list <b>quests</b>. Completing one deals its bonus damage at once (or grants its listed effect). Quests are checked once your Path finishes, so "3 maneuvers" means three Maneuver faces in one Path. Each quest counts once per fight. An Encounter's <b>Quest Health</b> caps the total bonus damage its quests can deal.</p>
 <p>Quests ask for: a number of Maneuvers, Dodges, Leaps, Pivots, Combos, Boosts, Heals, Blocks, D.O.T.s, H.O.T.s or Nullifies in one Path; blank dice left unused; a Path of a certain length (or a short one); a damage total in one turn; Block banked up; or surviving until a certain turn. Most rewards are damage, but some put D.O.T. on the foe, give you H.O.T., or trigger a Nullify or Freeze.</p>
-<h3>Shrines</h3><p>A Shrine is a room without a fight: press and hold it to receive its boon. Some offer a choice, and <b>bargain</b> shrines ask a price (maximum Health, or your next Camp rest) or let you walk away. Themed relic shrines offer relics from one family first.</p>
+<h3>Shrines</h3><p>A Shrine is a room without a fight: press and hold it to receive its boon. Some offer a choice, and <b>bargain</b> shrines ask a price (maximum Health, or your next Camp rest) or let you walk away. Some shrines also hand you a loot pick (a Scroll Dispenser drops a die along with its scrolls; Madpie Nest and Storied Emporium add one to their relic), and a few let you take two Relics. Themed relic shrines offer relics from one family first.</p>
 ${tbl(['Floor','Shrine','Boon'],shr.map(s=>[s[0],`<b>${s[1]}</b>`,s[2]]))}
 <p class="small">If you already own every Relic, a Relic Shrine heals 10 instead.</p>
 <h3>Bosses</h3>
