@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.33 (Oct 16, 2026)
+- Fix (Jeremy, on his phone): the fight screen scrolled about 20px. The stone floor hung a fixed 30px below the game; it now stops at the bottom edge of the screen.
+
 ## 1.41.32 (Oct 15, 2026)
 - Camp (Jeremy): the camp section cards are back to their light brown.
 

@@ -604,8 +604,11 @@ function syncRoomFloor(card){
     // Where the doorway's stone pillars end (archPath stops 12px above the frame's bottom, which sits 5px above the card's top edge + 10px taller)
     const hy = Math.round(c.t + hz), yb = Math.round(ch - 7 - hz), edge = 3;
     const xl = Math.round(appL + c.l + edge), xr = Math.round(appL + c.l + cw - edge);
+    // Oct 16 (Jeremy: the fight screen scrolled a little on his phone): the floor used to hang a fixed 30px below the
+    // app, past the bottom of the screen; now it reaches exactly the screen's bottom edge and no further.
+    const floorBelow = -Math.min(30, Math.max(0, Math.round(window.innerHeight - app.getBoundingClientRect().bottom)));
     const fl = document.createElement('div'); fl.id = 'room-floor';
-    fl.style.cssText = `left:${-appL}px;width:${vw}px;top:${hy}px;bottom:-30px;clip-path:polygon(${xl}px 0,${xr}px 0,${xr}px ${yb}px,100% ${yb}px,100% 100%,0 100%,0 ${yb}px,${xl}px ${yb}px);`;
+    fl.style.cssText = `left:${-appL}px;width:${vw}px;top:${hy}px;bottom:${floorBelow}px;clip-path:polygon(${xl}px 0,${xr}px 0,${xr}px ${yb}px,100% ${yb}px,100% 100%,0 100%,0 ${yb}px,${xl}px ${yb}px);`;
     fl.style.setProperty('--ld', '-'+Math.round(performance.now()%3100)+'ms');
     fl.innerHTML = '<div class="rf-plane"></div><div class="rf-fade"></div><div class="rf-light"></div><div class="rf-vig"></div>';
     // Ground shadows: a feet shadow plus a tall soft pool running down through the health bar, name and chips.
