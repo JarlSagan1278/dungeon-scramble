@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.44 (Oct 16, 2026)
+- Play data: a run counts as sent only when the server answers "ok" (the old upload couldn't see the reply, so a failing server silently dropped runs). Runs the old version marked sent are re-sent once; the server skips duplicates.
+
 ## 1.41.43 (Oct 16, 2026)
 - Loot (Jeremy): the Suggested die to replace now waits 10 seconds without a tap before it shows (was 6).
 

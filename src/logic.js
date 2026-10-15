@@ -249,6 +249,16 @@ function setShareData(on){
   try{ localStorage.setItem(SHARE_KEY, on ? 'yes' : 'no'); }catch(e){}
   if(on){ getTelemetryRuns().forEach(queueRunUpload); flushRunUploads(); } // opting in also sends the runs already on this device
 }
+// Oct 16, 1.41.44: runs marked sent by the old blind upload may never have arrived; forget those marks once and
+// re-queue every run on the device (the server skips any it already has).
+function resendUnconfirmedRuns(){
+  try{
+    if(localStorage.getItem('dungeonScrambleUploadConfirm_v2') || shareDataPref()!=='yes') return;
+    localStorage.setItem('dungeonScrambleUploadConfirm_v2', '1');
+    localStorage.removeItem(UPLOADED_KEY);
+    getTelemetryRuns().forEach(queueRunUpload);
+  }catch(e){}
+}
 function queueRunUpload(rec){
   try{
     if(!PLAYDATA_URL || !rec || shareDataPref()!=='yes') return;
@@ -266,8 +276,11 @@ function flushRunUploads(){
     _flushing = true;
     const rec = q[0];
     const body = JSON.stringify({ kind:'run', player:getTelePlayerId(), screen:(typeof window!=='undefined' ? window.innerWidth+'x'+window.innerHeight : ''), rec });
-    // text/plain + no-cors: a "simple" request Apps Script accepts without a CORS preflight (the reply can't be read).
-    fetch(PLAYDATA_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body }).then(()=>{
+    // text/plain: a "simple" request, so no CORS preflight. Apps Script answers through a redirect that allows any origin,
+    // so the reply can be read: a run only counts as sent when the server says ok/duplicate (or ignored: a bad record, no use retrying) (Oct 16: with no-cors a
+    // failing server looked like success and the run was dropped). Anything else stays queued for the next launch.
+    fetch(PLAYDATA_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body }).then(r=>r.text()).then(txt=>{
+      if(!/^(ok|duplicate|ignored)$/.test(String(txt||'').trim())){ _flushing = false; return; }
       try{
         const q2 = JSON.parse(localStorage.getItem(UPLOAD_QUEUE_KEY)||'[]').filter(r=>r.runId!==rec.runId);
         localStorage.setItem(UPLOAD_QUEUE_KEY, JSON.stringify(q2));

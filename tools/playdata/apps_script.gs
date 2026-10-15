@@ -1,6 +1,8 @@
 // Dungeon Scramble play data receiver (Oct 15, 2026).
 // Lives in the "Dungeon Scramble Play Data" Google Sheet: Extensions > Apps Script, paste this, Deploy > New deployment >
 // Web app (Execute as: Me, Who has access: Anyone). Put the /exec URL in PLAYDATA_URL (src/logic.js).
+// IMPORTANT (Oct 16): run testPost once from the editor first and accept the permissions (Sheets + Drive), or every
+// web-app call fails before writing anything. After editing this code, Deploy > Manage deployments > edit > New version.
 // Each finished run (sent only with the player's consent) becomes one row in "Runs"; the full record is saved as a
 // JSON file in the Drive folder "Dungeon Scramble Play Data (runs)" and linked from the row.
 const FOLDER_NAME = 'Dungeon Scramble Play Data (runs)';
