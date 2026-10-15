@@ -2377,7 +2377,7 @@ function runShrineEffect(e, effect){
       render(); return;
     }
     case 'tradeLoot': {
-      S.lootChoice = { options: pickLootNUnused(lootPoolByName(effect.pool), 3 + (hasRelic('shrine_bell') ? 1 : 0)), lootName: effect.pool, overkill:false, fromShrine:true };
+      S.lootChoice = { options: pickLootNUnused(lootPoolByName(effect.pool), 3 + (hasRelic('shrine_bell') ? 1 : 0)), lootName: effect.pool, overkill:false, fromShrine:true, opened:true, title:e.name };
       if(typeof markDiceDiscovered==='function') S.lootChoice.fresh = peekFreshDice(S.lootChoice.options);
       render(); return;
     }
@@ -2445,7 +2445,7 @@ function continueFromShrine(){
     S.encounter._shrineLoot = true;
     const floor = FLOORS[S.floorIdx];
     const options = pickLootNUnused(floor.lootPool, Math.min(2 + (hasRelic('lucky_coin') ? 1 : 0), floor.lootPool.length));
-    S.lootChoice = { options, lootName: floor.lootName, overkill:false, nearMiss:0 };
+    S.lootChoice = { options, lootName: floor.lootName, overkill:false, nearMiss:0, fromShrine:true, opened:true, title:S.encounter.name }; // Oct 16: no chest to open at a shrine
     render(); return; // taking the die (or keeping it in the Pocket) finishes the room
   }
   finishStep();

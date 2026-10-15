@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.41.34 (Oct 16, 2026)
+- Fix (Jeremy's screen recording): parts of the fight screen blanked out for a moment on his phone. The stone floor was a tilted 3D layer that used about 22 MB of graphics memory on its own; it is now drawn once, flat, with the same look (the fight scene uses about 48 MB instead of 73).
+- Shrines (Jeremy): "Hold to receive the boon" is a round button over the dice tray with a ring that fills as you hold; it no longer fades away after a second (it shared a style with the floating reward numbers). Continue appears in the same circle. A shrine's loot pick comes up directly, titled with the shrine's name (no "Victory!" chest), and shrines that give a relic and a die go straight from one to the other.
+
 ## 1.41.33 (Oct 16, 2026)
 - Fix (Jeremy, on his phone): the fight screen scrolled about 20px. The stone floor hung a fixed 30px below the game; it now stops at the bottom edge of the screen.
 

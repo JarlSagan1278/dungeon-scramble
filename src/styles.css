@@ -2936,10 +2936,10 @@ html,body{ overflow-x:clip; }
 .fo-player > .relic-strip .relic-badge{ width:18px; height:18px; filter:drop-shadow(0 0 1.5px #0c0705) drop-shadow(0 2px 1px rgba(0,0,0,.7)); }
 
 /* Shrine hold / Continue button floats above the tray (Oct 12): out of the page flow so the dice don't move. */
-.shrine-float{ position:fixed; z-index:40; transform:translateX(-50%); pointer-events:none; }
-.shrine-float button{ padding-top:8px; padding-bottom:8px; font-size:15px; }
-.shrine-float > *{ pointer-events:auto; }
-.shrine-float button{ box-shadow:0 6px 18px rgba(0,0,0,.55); }
+.shrine-act{ position:fixed; z-index:40; transform:translateX(-50%); pointer-events:none; }
+
+.shrine-act > *{ pointer-events:auto; }
+
 .shrine-float-hint{ text-align:center; margin:0; padding:8px 12px; border-radius:12px; background:rgba(10,7,5,.85); border:2px solid var(--line); }
 
 /* ===== Splash (Oct 13): one tap before the title unlocks audio so the theme can play ===== */
@@ -3113,3 +3113,24 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 
 /* Oct 16: the baked floor (see bakedFloorCanvas in render.js) replaces the 3D .rf-plane */
 #room-floor .rf-canvas{ position:absolute; left:0; top:0; width:100%; height:100%; display:block; }
+
+/* Oct 16 (Jeremy): the shrine's Hold / Continue is a round button over the dice tray; it never fades, it pulses to invite a press,
+   and a gold ring fills while you hold (SHRINE_HOLD_MS) */
+.shrine-orb{ position:relative; width:128px; height:128px; border-radius:50% !important; padding:0 !important; display:flex; align-items:center; justify-content:center;
+  background:radial-gradient(circle at 50% 38%, #ffe7a3, #f2b833 58%, #c98a14) !important; color:#2a1a08 !important; border:4px solid var(--line) !important;
+  touch-action:none; user-select:none; -webkit-user-select:none; animation:so-pulse 1.8s ease-in-out infinite; }
+.shrine-orb .so-label{ position:relative; display:flex; flex-direction:column; align-items:center; line-height:1.05; pointer-events:none; }
+.shrine-orb .so-label b{ font-family:var(--font-display); font-size:22px; }
+.shrine-orb .so-label small{ font-size:10.5px; font-weight:700; max-width:84px; text-align:center; margin-top:3px; opacity:.85; }
+.shrine-orb.so-continue .so-label small{ font-size:18px; margin-top:0; }
+.shrine-orb .so-ring{ position:absolute; inset:-11px; width:calc(100% + 22px); height:calc(100% + 22px); transform:rotate(-90deg); pointer-events:none; overflow:visible; }
+.shrine-orb .so-track{ fill:none; stroke:rgba(12,7,5,.55); stroke-width:6; }
+.shrine-orb .so-fill{ fill:none; stroke:#fff3c4; stroke-width:6; stroke-linecap:round; stroke-dasharray:100; stroke-dashoffset:100; transition:stroke-dashoffset .15s ease-out; filter:drop-shadow(0 0 4px rgba(255,220,120,.9)); }
+.shrine-orb.charging{ animation:none; transform:scale(.96); }
+.shrine-orb.charging .so-fill{ stroke-dashoffset:0; transition:stroke-dashoffset .7s linear; }
+@keyframes so-pulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.06); } }
+.reduced-motion .shrine-orb{ animation:none; }
+.shrine-act .shrine-float-hint{ margin-top:46px; }
+/* the round shrine button waits until the "you scramble into a room" banner is tapped away */
+body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
+.shrine-act{ transition:opacity .25s ease-out; }

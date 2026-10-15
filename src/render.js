@@ -3471,7 +3471,7 @@ function renderLootModal(){
   const overlay = el(`<div class="modal-overlay loot-overlay">
       <div class="modal loot-modal ${S.lootChoice.opened?'':'loot-modal-chest'} ${options.length<=2?'loot-modal-n2':''}">
       <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:4px;">
-        <h2 style="margin:0; width:100%; text-align:center; padding-right:0;">${fromShrine ? 'Shrine Boon' : 'Victory!'}</h2>
+        <h2 style="margin:0; width:100%; text-align:center; padding-right:0;">${fromShrine ? (S.lootChoice.title || 'Shrine Boon') : 'Victory!'}</h2>
         ${overkill?'<span class="status-chip" style="background:var(--gold);color:#241c10;">Overkill! +1 option</span>':''}
         ${(!overkill && S.lootChoice.nearMiss)?`<span class="status-chip near-miss-chip">So close! ${S.lootChoice.nearMiss} short of Overkill</span>`:''}
       </div>
@@ -3925,20 +3925,16 @@ function renderSwapModal(){
 // Press and hold the shrine (its figure or the button) for SHRINE_HOLD_MS: the
 // art lifts and glows, the pathTick ladder climbs, and on completion the
 // shrine bursts and grants its boon. Letting go early cancels.
-const SHRINE_HOLD_MS = 650;
+const SHRINE_HOLD_MS = 700; // the ring around the round Hold button fills over this long (styles.css .shrine-orb)
 // The shrine's hold / Continue button floats over the bottom of the shrine scene, just above the tray, like the
 // room callout: it no longer takes a row of its own, so the dice stay where they are (Jeremy, Oct 12).
 function placeShrineFloat(){
-  const f = document.getElementById('shrine-float'), tray = document.querySelector('.tray-panel');
-  if(!f || !tray) return;
-  // sits in the tray's header row, right of the "Shrine" badge (empty on a shrine), so it covers no dice and no boon text
-  const strip = tray.querySelector('.tray-head') || tray.querySelector('.tray-wrap'), badge = tray.querySelector('.round-badge');
-  const r = (strip || tray).getBoundingClientRect(), bR = badge ? badge.getBoundingClientRect() : null;
-  const left = bR ? bR.right + 8 : r.left, right = r.right;
-  f.style.width = Math.max(170, right - left) + 'px';
-  f.style.left = ((left + right) / 2) + 'px';
-  const row = bR || r;
-  f.style.top = Math.max(8, row.top + row.height/2 - f.offsetHeight/2) + 'px';
+  // Oct 16 (Jeremy): the shrine's action is a round button centred over the (idle) dice tray, the same spot for Hold and Continue
+  const f = document.getElementById('shrine-float'), tw = document.querySelector('.tray-panel .tray-wrap') || document.querySelector('.tray-panel');
+  if(!f || !tw) return;
+  const r = tw.getBoundingClientRect();
+  f.style.left = (r.left + r.width/2) + 'px';
+  f.style.top = Math.max(8, r.top + r.height/2 - f.offsetHeight/2) + 'px';
 }
 window.addEventListener('resize', ()=>{ if(typeof placeShrineFloat==='function') placeShrineFloat(); });
 function attachShrineHold(){
@@ -4050,8 +4046,8 @@ function renderShrineEncounter(){
         </div>
       </div></div>
     </div>
-    ${waiting ? `<div class="shrine-float" id="shrine-float">${S.newRoomFx ? '<p class="hint shrine-float-hint">The shrine stirs…</p>' : '<button class="primary shrine-hold-btn" id="shrine-hold-btn" style="width:100%;"><span class="shrine-hold-fill"></span><span class="shrine-hold-label">Hold to receive the boon</span></button>'}</div>` : ''}
-    ${S.shrineResult ? '<div class="shrine-float" id="shrine-float"><button class="primary" id="shrine-result-continue" style="width:100%;">Continue</button></div>' : ''}
+    ${waiting ? `<div class="shrine-act" id="shrine-float">${S.newRoomFx ? '<p class="hint shrine-float-hint">The shrine stirs…</p>' : '<button class="shrine-orb" id="shrine-hold-btn" aria-label="Hold to receive the boon"><svg class="so-ring" viewBox="0 0 100 100" aria-hidden="true"><circle class="so-track" cx="50" cy="50" r="44"/><circle class="so-fill" cx="50" cy="50" r="44" pathLength="100"/></svg><span class="so-label"><b>Hold</b><small>to receive the boon</small></span></button>'}</div>` : ''}
+    ${S.shrineResult ? '<div class="shrine-act" id="shrine-float"><button class="shrine-orb so-continue" id="shrine-result-continue"><span class="so-label"><b>Continue</b><small>&#10140;</small></span></button></div>' : ''}
     <div class="panel tray-panel tray-idle">
       <div class="enc-rail-row">
         <div class="enc-card-col">
@@ -4082,6 +4078,13 @@ function renderShrineEncounter(){
     if(!S.shrineResult._logged){ S.shrineResult._logged = true; teleLog('shrine_result', {shrine:S.shrineResult.title, text:String(S.shrineResult.text).replace(/<[^>]+>/g,'').slice(0,160), hp:S.health, maxHp:S.maxHealth}); }
     const cb = document.getElementById('shrine-result-continue');
     if(cb) cb.onclick = ()=>{ S.shrineFx = null; continueFromShrine(); };
+    // Oct 16 (Jeremy: the shrine chain felt disjointed): a shrine that also gives a loot pick moves straight on to it
+    // once its boon has landed, instead of asking for an extra Continue first.
+    if(S.encounter && S.encounter.loot && !S.encounter._shrineLoot && !S.pendingLootDie){
+      const enc = S.encounter;
+      clearTimeout(renderShrineEncounter._auto);
+      renderShrineEncounter._auto = setTimeout(()=>{ if(S && S.encounter===enc && S.shrineResult && !enc._shrineLoot){ S.shrineFx = null; continueFromShrine(); } }, PREFS.reducedMotion ? 400 : 1500);
+    }
   }
   if(S.pendingLootDie) renderSwapModal();
   // The ritual (v1.36.0): hold the shrine (or the button) to receive its boon.
