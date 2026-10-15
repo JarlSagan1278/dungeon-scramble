@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.20';
+const GAME_VERSION = '1.41.21';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -667,8 +667,12 @@ const ENCOUNTER_SIZE = {
   'The Necrorancher':1.15,'Bellicose Biomancer':1.2,'Ceramic Golem':1.3,
   'Morel Dilemma':0.7,'Chimeric Sludge':1.3,'Gnome Chomper':1.15,'Gnomeowners Association':1.2,'Gestalt Network':1.3,
   "Oilephant's Foot":1.3,
-  'Untamed Unicrows':0.65,'Prickly Porcupanther':0.75,'Rabbid Rabbats':0.7,'Roudy Rinotter':0.75,'Whence Wolf':0.9,'Eelagator Escapee':0.95,'Toadtaur Warrior':1.25,'Toadtaur Wizard, Assistant to the Co-consul':1.25,'Extractnid Matriarch':1.2,'The Punished':1.25,'Profane Geometry':1.15,'Sacred(?) Geometry':1,
+  'Untamed Unicrows':0.65,'Prickly Porcupanther':0.75,'Rabbid Rabbats':0.7,'Roudy Rinotter':0.75,'Whence Wolf':0.9,'Eelagator Escapee':0.65,'Toadtaur Warrior':1.25,'Toadtaur Wizard, Assistant to the Co-consul':1.25,'Extractnid Matriarch':1.2,'The Punished':1.25,'Profane Geometry':1.15,'Sacred(?) Geometry':1,
   // line-thickness pass (Oct 12): bosses that used the 1.35 default
   "Extruzeon, Co-consul of Waste":1.15,"Myceleus, Co-consul of Rot":1.15
 };
+// Oct 15 (Jeremy, Monster Footing page): how far each monster sits lower (+) or higher (-) in the face-off, in % of its
+// picture's height, so it scales with the screen. Set by dragging each one on the page; missing = 0.
+const ENCOUNTER_DROP = {"Amanitabomination":-5.3,"Beaker Breakers":-6.4,"Bellicose Biomancer":2.2,"Ceramic Golem":2.1,"Chimeric Sludge":-1.4,"Displacer Kitty":-2.9,"Eelagator Escapee":5.5,"Extractnid Matriarch":6.7,"Feral Pet Rock":5.5,"Filement Bunny":-1.2,"Fungal Flayer":3.9,"Gestalt Network":3.4,"Gnome Chomper":10.8,"Grafted Grifter":2.7,"Half-life Host":8.1,"Leper Colonizers":5.7,"Lichen-Thrope":-3.4,"Morel Dilemma":-6.4,"Myceleus, Co-consul of Rot":0.8,"Profane Geometry":3.9,"Rogue Golemancer":3.2,"Roudy Rinotter":1.2,"Sacred(?) Geometry":-1.8,"The Necrorancher":6.2,"The Warcart":-10.4,"Toadtaur Warrior":-0.7,"Toadtaur Wizard, Assistant to the Co-consul":7.8,"Whence Wolf":4.0,"Wooden Golem":4.9};
+function encounterDrop(e){ return (e && ENCOUNTER_DROP[e.name]) || 0; }
 function encounterSize(e){ if(!e) return 1; const v = ENCOUNTER_SIZE[e.name]; return v || (/Boss/.test(e.type) ? 1.35 : 1); }

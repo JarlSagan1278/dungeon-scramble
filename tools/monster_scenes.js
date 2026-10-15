@@ -41,11 +41,11 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     const slug=m.name.replace(/[^a-z0-9]+/gi,'_');
     await page.addStyleTag({content:'.fo-enemy .fo-fig{visibility:hidden!important}'}).then(h=>h.evaluate(n=>n.id='hidefig'));
     // hide also z2 enemy UI for bg layer
-    await page.addStyleTag({content:'.fo-enemy .fo-hpwrap,.fo-enemy .fo-name,.fo-enemy .fo-chips,.fo-enemy .kill-hint,.fo-enemy .fo-turnlabel,.fo-enemy .fo-quests,.fo-quests-float{visibility:hidden!important}'}).then(h=>h.evaluate(n=>n.id='hideui'));
+    await page.addStyleTag({content:'.fo-enemy .fo-hpwrap,.fo-enemy .fo-name,.fo-enemy .fo-chips,.fo-enemy .kill-hint,.fo-enemy .fo-turnlabel,.fo-enemy .fo-quests{visibility:hidden!important}'}).then(h=>h.evaluate(n=>n.id='hideui'));
     await page.screenshot({path:`bg_${slug}.jpg`,clip,type:'jpeg',quality:72});
     // overlay: only enemy UI, transparent
     await page.evaluate(()=>{ document.getElementById('hideui').remove();
-      const s=document.createElement('style'); s.id='ovl'; s.textContent='html,body,#app,#app *{background:transparent!important;background-image:none!important;box-shadow:none}#app *{visibility:hidden!important} #room-floor,.rf-shadow{display:none!important} #app .fo-enemy .fo-hpwrap,#app .fo-enemy .fo-hpwrap *,#app .fo-enemy .fo-name,#app .fo-enemy .fo-name *,#app .fo-enemy .fo-chips,#app .fo-enemy .fo-chips *,#app .fo-enemy .fo-turnlabel,#app .fo-enemy .fo-turnlabel *,#app .fo-quests-float,#app .fo-quests-float *{visibility:visible!important}'; document.head.appendChild(s); });
+      const s=document.createElement('style'); s.id='ovl'; s.textContent='html,body,#app,#app *{background:transparent!important;background-image:none!important;box-shadow:none}#app *{visibility:hidden!important} #room-floor,.rf-shadow{display:none!important} #app .fo-enemy .fo-hpwrap,#app .fo-enemy .fo-hpwrap *,#app .fo-enemy .fo-name,#app .fo-enemy .fo-name *,#app .fo-enemy .fo-chips,#app .fo-enemy .fo-chips *,#app .fo-enemy .fo-turnlabel,#app .fo-enemy .fo-turnlabel *{visibility:visible!important}'; document.head.appendChild(s); });
     // restore element backgrounds for UI pieces: re-allow their own backgrounds
     await page.evaluate(()=>{ const s=document.getElementById('ovl'); s.textContent=s.textContent.replace('#app *{background:transparent!important;background-image:none!important;box-shadow:none}',''); s.textContent='html,body,#app,.enc-card,.enc-card-col,#enc-panel,.fo-band,.fo-side{background:transparent!important;background-image:none!important}'+s.textContent; });
     await page.screenshot({path:`ov_${slug}.png`,clip,omitBackground:true});

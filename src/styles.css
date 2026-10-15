@@ -1611,8 +1611,8 @@
   .fo-band{ display:flex; align-items:flex-end; gap:6px; padding:6px 8px 4px; position:relative; z-index:1; }
   .fo-side{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; gap:4px; }
   .fo-fig{ display:flex; align-items:flex-end; justify-content:center; position:relative; max-width:100%; padding:0 !important; background:none !important; border:none !important; width:auto !important; flex:none !important; overflow:visible !important; }
-  .fo-img{ height:89px; width:auto; max-width:100%; object-fit:contain; display:block; filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); transform:none; }
-  .fo-img.fo-flip{ transform:scaleX(-1); }
+  .fo-img{ height:89px; width:auto; max-width:100%; object-fit:contain; display:block; filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); transform:translateY(var(--drop,0%)); }
+  .fo-img.fo-flip{ transform:translateY(var(--drop,0%)) scaleX(-1); }
   .fo-mystery{ width:80px; align-items:center; justify-content:center; display:flex; }
   .fo-fig.dmg-flash{ animation:portrait-shake 0.4s ease; }
   .fo-fig.dmg-flash::after, .fo-fig.heal-flash::after{ content:''; position:absolute; inset:0; pointer-events:none; mix-blend-mode:screen; animation:portrait-flash .45s ease-out forwards; }

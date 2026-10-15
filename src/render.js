@@ -1390,7 +1390,7 @@ function healthFX(current, last){
 // Encounter art is mirrored to face the hero by default; list any whose original art already faces left here.
 // Encounters whose current art is known to be the wrong picture: show the placeholder until the right art is supplied.
 const ART_WRONG = new Set([]);
-const ENCOUNTER_NO_FLIP = new Set(['Grafted Grifter','Whence Wolf','Roudy Rinotter','Viscous Orb','Unbound Automa','Rogue Golemancer','Heating Elemental','Grosteque Grafter','Displacer Kitty','Armored Gear-Pest','Blastogenesis Engine','Half-life Host','Adhesive Pest Traps','The Necrorancher','Bellicose Biomancer','Ceramic Golem','Chimeric Sludge']);
+const ENCOUNTER_NO_FLIP = new Set(['Grafted Grifter','Whence Wolf','Roudy Rinotter','Viscous Orb','Unbound Automa','Rogue Golemancer','Heating Elemental','Grosteque Grafter','Displacer Kitty','Armored Gear-Pest','Blastogenesis Engine','Half-life Host','Adhesive Pest Traps','The Necrorancher','Bellicose Biomancer','Ceramic Golem','Chimeric Sludge','Toadtaur Warrior','Rabbid Rabbats']); // Oct 15 (Jeremy): Toadtaur Warrior and Rabbid Rabbats face the other way
 let foPlayer = null; // the hero's half of the face-off band, set each renderGame()
 function renderEncounterCard(e, mode){
   const curHealthClamped = Math.max(0,e.curHealth);
@@ -1517,7 +1517,7 @@ function renderEncounterCard(e, mode){
       ? `<div class="fo-quests-float" title="Complete these during the fight for bonus rewards"><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label">Quests</div><div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, e.questsDone[i])}</span>`; }).join('')}</div></div>` : '';
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
     const sz = encounterSize(e);
-    const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz}"/>`
+    const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz};--drop:${encounterDrop(e)}%"/>`
       : `<div class="fo-img ${flipCls} fo-mystery">${mysteryFigureHTML('width:70%; aspect-ratio:1/1;')}</div>`;
     const p = foPlayer || {};
     return `

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.41.21 (Oct 15, 2026)
+- Art (Jeremy): Toadtaur Warrior and Rabbid Rabbats now face the other way; Eelagator Escapee shrunk to a normal size (0.95 to 0.65 height; it is a very wide picture, so this gives it about the area of a standard monster).
+- Monster footing (Jeremy, Monster Footing page): 29 monsters sit higher or lower in the fight scene so they stand on the floor (`ENCOUNTER_DROP`, data.js).
+
 ## 1.41.20 (Oct 15, 2026)
 - Fight scenes: the wall/floor line sits 16px higher on phones (Jeremy), so monsters stand on the floor instead of at its back edge.
 

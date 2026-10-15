@@ -26,6 +26,7 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - Tray buttons sit in a side rail beside the dice tray (not a row); the portrait slightly overlaps the tray. Dice tray is the "Oak & Iron" chest. Combo-power outline is shaped like the star icon.
 - Rejected: darker/ornate look; room dressing such as banners and skulls (for now); a "first Block die +1" bonus.
 - Fight scene floor line (Oct 15): the wall/floor seam sits 118px down the face-off card on his phone (`ROOM_MIN_HORIZON`, was 134), as high as it can go while the tallest 3-quest sign stays on the wall. Monster heights are then set one by one on the Monster Footing page (https://claude.ai/artifact/6sxozXQfah2dSsRxnQEAkj), because some monsters float.
+- Monster facing and size (Oct 15): Toadtaur Warrior and Rabbid Rabbats are flipped; Eelagator Escapee shrunk to a normal size. Monsters always stand in front of the Quests sign. Per-monster heights set on the Monster Footing page live in `ENCOUNTER_DROP` (data.js, % of picture height).
 - Dice upgrades look like filigreed borders and emblazoned corners, not glows or auras. He likes the wax-seal style victory badge and wants the best badge per class shown on the title screen (earned badges only; no placeholders or names). Badge redesign so each class is represented visually is a to-do.
 
 ## Rules decisions
