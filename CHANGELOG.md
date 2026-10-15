@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.42 (Oct 16, 2026)
+- Class Skill sounds (Jeremy): arming plays a quick rising pair of notes, backing out (tap Skill again, or tap a die outside the zone) the same pair falling, and converting a die a bright upward sweep with a sparkle.
+
 ## 1.41.41 (Oct 16, 2026)
 - Camp (Jeremy): the Rest button no longer shows "Heal about +X" (it still says when you're at full health or it would heal nothing).
 - The first Rest or combine at a Camp asks once, briefly, that the fire gives only one of them ("Not yet" / "Rest" or "Combine"). Not asked at the starting Camp, where combining is free.

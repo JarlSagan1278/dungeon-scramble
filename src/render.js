@@ -1896,6 +1896,7 @@ function renderGame(){
   if(abilityBtn) abilityBtn.onclick = ()=>{
     if(S.transitioning || S.classAbilityUsed) return;
     abilityArmed = !abilityArmed; // tap again to back out before picking a die
+    playTone(abilityArmed ? 'skillArm' : 'skillDisarm');
     if(abilityArmed) logMsg('sys', `Click a die in your zone to convert it.`);
     renderTrayFast(); // the zone die tap itself is handled in bindTrayDice (Oct 14: no full redraw per tap)
   };
@@ -1960,7 +1961,8 @@ function bindTrayDice(){
       if(longPressed){ longPressed = false; return; } // long-press consumed this interaction
       if(abilityArmed){ // Skill armed: a zone die converts (and is not added to the path); any other die backs out and taps normally
         abilityArmed = false;
-        if(inZone(idx) && !S.classAbilityUsed){ useClassAbility(idx); return; }
+        if(inZone(idx) && !S.classAbilityUsed){ playTone('skillUse'); useClassAbility(idx); return; }
+        playTone('skillDisarm');
       }
       if(node.classList.contains('used') && !node.classList.contains('undoable')) return;
       toggleSelect(idx);
@@ -2496,6 +2498,14 @@ const TONE_SEQUENCES = {
               {freq:880, start:0.18, dur:0.1,  type:'triangle', gain:0.16},
               {freq:1175,start:0.27, dur:0.3,  type:'sine',     gain:0.18}],
   uiTick:    [{freq:1500,start:0,    dur:0.03, type:'sine',     gain:0.05}],
+  // Class Skill (Jeremy, Oct 16): arm = a quick rising pair, disarm = the same pair falling, use = a bright upward sweep with a sparkle.
+  skillArm:    [{freq:660, start:0,    dur:0.06, type:'triangle', gain:0.12},
+                {freq:990, start:0.05, dur:0.09, type:'triangle', gain:0.12}],
+  skillDisarm: [{freq:990, start:0,    dur:0.06, type:'triangle', gain:0.1},
+                {freq:660, start:0.05, dur:0.09, type:'triangle', gain:0.1}],
+  skillUse:    [{freq:520, freqTo:1560, start:0, dur:0.13, type:'sine', gain:0.14},
+                {freq:2093,start:0.09, dur:0.14, type:'sine',     gain:0.07},
+                {freq:1568,start:0.09, dur:0.12, type:'triangle', gain:0.05}],
   glint:     [{freq:1760,start:0,    dur:0.07, type:'sine',     gain:0.07},
               {freq:2637,start:0.05, dur:0.1,  type:'sine',     gain:0.06}],
   closeCall: [{freq:330, start:0,    dur:0.09, type:'sine',     gain:0.1},
