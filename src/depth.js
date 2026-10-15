@@ -13,9 +13,11 @@ const BASE_HP_MUL = [1, 1.5, 1.75];
 // (~6 win points for a skilled player). costs[] = depth added by each rank, in order.
 // Oct 13 (Jeremy): Swarming capped at 2 ranks (rank 3 was the cheap stack: +6 depth for little difficulty); rank 2 costs
 // 2 depth, not 3 (1.41.0 depth study: it was -4.3 win points per depth point vs about -6.5 elsewhere).
+// Oct 15 (per-modifier study, docs/studies/2026-10-15_depth_modifiers.md): Rounding Error 1 -> 2 depth (it cost ~17 win points),
+// Rationing rank 2 2 -> 1 depth (~9 points for 2 depth). The rest stay: modest unevenness is part of the fun (Jeremy).
 const DEPTH_MODS = [
   { id:'foes',  name:'Tougher Scuffs', max:4, costs:[1,1,1,1], desc:r=>`Enemies and bosses have +${r*15}% HP.` },
-  { id:'rest',  name:'Rationing Rations', max:2, costs:[1,2], desc:r=> r===2 ? 'Camp rest heals nothing.' : 'Camp rest heals half as much.' },
+  { id:'rest',  name:'Rationing Rations', max:2, costs:[1,1], desc:r=> r===2 ? 'Camp rest heals nothing.' : 'Camp rest heals half as much.' },
   { id:'frail', name:'Clumsy',         max:3, costs:[1,1,2], desc:r=>`Start with ${r*4} less max HP.` },
   { id:'swarm', name:'Swarming',       max:2, costs:[1,2], desc:r=>`Minion spawns place ${r} extra die${r>1?'s':''}.` },
   { id:'slim',  name:'Burden of Choice', max:1, costs:[1], desc:r=> 'Overkills add no loot option, and every loot reward offers one fewer die.' },
@@ -23,7 +25,7 @@ const DEPTH_MODS = [
   { id:'dread', name:'Dread',          max:3, costs:[1,1,1], desc:r=>`Deadly encounters are ${r*12}% more likely to take an Elite room, Elite and Deadly foes have +${Math.round(r*DREAD_HP*100)}% HP, and Floor 1 gains its own Deadly card.` },
   // Oct 12 (Jeremy: "test out these two"): cheap one-point levers, being measured.
   { id:'dues',  name:'Union Dues',     max:1, costs:[1], desc:r=>'Receiving a shrine\'s boon costs 2 HP.' },
-  { id:'round', name:'Rounding Error', max:1, costs:[1], desc:r=>'Your Heal faces heal 1 less (never below 1).' },
+  { id:'round', name:'Rounding Error', max:1, costs:[2], desc:r=>'Your Heal faces heal 1 less (never below 1).' },
   { id:'gauntlet', name:'Night Shift', max:2, costs:[1,2], desc:r=> r===1 ? 'Easy rooms become Standard rooms. Shrines appear as usual.' : 'Easy and Standard rooms become Elite rooms. Shrines appear as usual.' },
 ];
 const DEPTH_MOD_BY_ID = Object.fromEntries(DEPTH_MODS.map(m=>[m.id,m]));
