@@ -3043,7 +3043,7 @@ function openSettingsModal(){
         <button id="settings-codex-btn">Codex <small class="hint">(Bestiary, Dice, Relics, Key)</small></button>
         <button id="settings-records-btn">Records <small class="hint">(Run History, Achievements)</small></button>
         <button id="settings-export-data-btn">Export Play Data</button>
-        ${inRun ? '<button id="settings-restart-btn" class="danger">Restart Run</button>' : ''}
+        ${inRun ? '<button id="settings-restart-btn" class="danger">Abandon Run</button>' : ''}
         <button id="settings-reset-progress-btn" class="danger">Reset Progress</button>
         <button id="settings-close-btn">Close</button>
       </div>
@@ -3073,11 +3073,11 @@ function openSettingsModal(){
   if(restartBtn) restartBtn.onclick = ()=>{
     close();
     const confirmOverlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
-        <h2>Restart Run?</h2>
+        <h2>Abandon Run?</h2>
         <p>Your current run (Floor ${S.floorIdx+1}, ${S.health}/${S.maxHealth} HP) will be lost.</p>
         <div class="small-btn-row" style="justify-content:center;">
           <button id="confirm-restart-cancel">Keep Playing</button>
-          <button class="danger" id="confirm-restart-go">Restart Run</button>
+          <button class="danger" id="confirm-restart-go">Abandon Run</button>
         </div>
       </div></div>`);
     openModal(confirmOverlay);

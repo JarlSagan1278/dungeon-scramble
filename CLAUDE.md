@@ -8,6 +8,7 @@ Digital prototype of Jeremy's board game (Boggle-style dice-path dungeon crawler
 - `node build.js` → `dist/dungeon_scramble.html` (single file) + `dist/web/` (installable PWA; art extracted to `dist/web/art/`). Also syncs package.json version.
 - `node sim.js` → 5-combination crash smoke test (random-legal bot, one run per origin/class combo listed in sim.js; not full coverage). Fails only on JS errors (TIMEOUT/GAMEOVER are fine). Run after ANY logic/data change.
 - `node bugsearch.js` → the broader bug hunt; can hang, run with `timeout`/nohup. Needs no stray `http.server` on 8765/8766.
+- `node tools/gen.js && node tools/print_rulebook.js` → rulebook HTML + `docs/DungeonScramble_Rulebook.pdf`.
 - `tools/balance/` → headless balance harness (`harness.js '{"runs":40,"skill":1500}'`, `study_*.js`). Outputs `out_*.json` are git-ignored.
 
 ## Release routine

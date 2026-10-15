@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.41.45 (Oct 16, 2026)
+- Gear menu (Jeremy): "Restart Run" is now "Abandon Run" (button, confirm title and confirm button).
+- Rulebook: says Abandon Run, and describes the opt-in automatic play data. tools/print_rulebook.js reprints the PDF.
+- Play data confirmed working end to end on the live site (Apps Script authorized; first real run row arrived).
+
 ## 1.41.44 (Oct 16, 2026)
 - Play data: a run counts as sent only when the server answers "ok" (the old upload couldn't see the reply, so a failing server silently dropped runs). Runs the old version marked sent are re-sent once; the server skips duplicates.
 

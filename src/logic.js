@@ -313,7 +313,7 @@ function buildPlayDataExport(){
 }
 // Headline numbers for a tester's export (Oct 13, from the balance literature review): where runs end by floor, the
 // win rate over the first 10 runs, how often each offered item is taken, and how deaths split between warned and
-// unwarned turns. Computed from the stored runs; abandoned runs (Restart Run) are counted separately.
+// unwarned turns. Computed from the stored runs; abandoned runs (Abandon Run) are counted separately.
 function summarizePlayData(runs){
   try{
     const done = runs.filter(r=>r.outcome==='victory' || r.outcome==='defeat');

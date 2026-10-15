@@ -228,7 +228,7 @@ ${tbl(['Modifier','Ranks','Depth per rank','Effect'],O.DEPTH_MODS.map(m=>['<b>'+
 <li><b>Records</b> (Settings or title screen) holds your Run History (last 20 runs) and Achievements.</li>
 <li>The <b>Codex</b> has four tabs: <b>Bestiary</b> (every foe you've met, with its moves, flavor and your wins and losses), <b>Dice</b> (Origin dice and every Loot die you've collected), <b>Relics</b> and <b>Key</b> (every action icon, tap for its rule).</li></ul>
 <h3>Settings &amp; Play Data</h3>
-<p>The gear menu holds <b>Sound effects</b> and <b>Music</b> volume sliders, Reduce motion, Gentler effects and Vibration, plus How to Play, Codex, Records, Restart Run and <b>Reset Progress</b>, which erases all unlocks, records and depth bests. <b>Export Play Data</b> packages your recent runs as a file for playtest feedback; nothing is uploaded automatically.</p>
+<p>The gear menu holds <b>Sound effects</b> and <b>Music</b> volume sliders, Reduce motion, Gentler effects and Vibration, plus How to Play, Codex, Records, Abandon Run and <b>Reset Progress</b>, which erases all unlocks, records and depth bests. <b>Export Play Data</b> packages your recent runs as a file for playtest feedback. The game asks once whether to share play data; if you say yes, each finished run is sent anonymously (no names, only a random device id).</p>
 `,'c11');
 // 12 quick ref
 C+=ch(12,'Quick Reference',`
