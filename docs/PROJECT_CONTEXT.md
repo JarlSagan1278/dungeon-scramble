@@ -207,3 +207,4 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - **Camp cards back to light brown (Jeremy, Oct 15, 1.41.32);** the stone colour is gone too.
 - **Shrine flow (Jeremy, Oct 16, 1.41.34):** the Hold button is a round button over the dice tray that invites a press (pulse, filling ring); Continue uses the same circle; shrine loot opens directly under the shrine's name (no chest, no "Victory!"); relic-plus-loot shrines move on to the loot automatically.
 - **Graphics memory (Oct 16):** the room floor is baked into a canvas (bakedFloorCanvas) instead of a 3D CSS plane; blank-out flashes on Jeremy's phone came from running out of graphics memory.
+- **Victory chests are in-world (Jeremy, Oct 16, 1.41.36):** their wood and metal get the paper grain (fx-paper on the chest SVG's body, not its glow).

@@ -3440,6 +3440,7 @@ function lootChestSVG(tier){
 <defs><radialGradient id="lootChestGlow" cx="50%" cy="60%" r="55%"><stop offset="0" stop-color="${m}" stop-opacity=".55"/><stop offset="1" stop-color="${m}" stop-opacity="0"/></radialGradient></defs>
 <ellipse cx="70" cy="68" rx="68" ry="58" fill="url(#lootChestGlow)"/>
 <ellipse cx="70" cy="118" rx="52" ry="6" fill="#000" opacity=".35"/>
+<g filter="url(#fx-paper)"><!-- Oct 16 (Jeremy): paper grain on the chest's wood and metal (not the glow) -->
 <g stroke="#0c0705" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
  <path d="M20 64 H120 V108 a5 5 0 0 1-5 5 H25 a5 5 0 0 1-5-5 Z" fill="${wood}"/>
  <path d="M18 64 V50 C18 28 40 18 70 18 C100 18 122 28 122 50 V64 Z" fill="${woodLt}"/>
@@ -3458,6 +3459,7 @@ function lootChestSVG(tier){
 </g>
 <g fill="#fff" opacity=".45"><rect x="42" y="26" width="3" height="30" rx="1.5"/><rect x="90" y="26" width="3" height="30" rx="1.5" opacity=".5"/><rect x="62" y="57" width="3" height="10" rx="1.5"/></g>
 <g fill="${d}" stroke="#0c0705" stroke-width="1.5"><circle cx="46" cy="72" r="2.4"/><circle cx="46" cy="104" r="2.4"/><circle cx="94" cy="72" r="2.4"/><circle cx="94" cy="104" r="2.4"/></g>
+</g>
 </svg>`;
 }
 

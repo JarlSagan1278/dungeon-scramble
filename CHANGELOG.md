@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.36 (Oct 16, 2026)
+- Textures (Jeremy): the victory chests' wood and metal have the paper grain (the glow behind them stays smooth).
+
 ## 1.41.35 (Oct 16, 2026)
 - Fix (Jeremy): a resumed run kept the portrait picture from when it started, so art updates (like the paper texture) never reached it. Saves now remember which portrait and skin tint it is and redraw it from the current art. Runs started before this version keep their old picture.
 
