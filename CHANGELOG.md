@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.27 (Oct 15, 2026)
+- Scenery (Jeremy): heavy paper texture on the stone walls, the floor, the archway and the dice chest (the dice stay clean).
+
 ## 1.41.26 (Oct 15, 2026)
 - Art (Jeremy): every portrait, monster and loot picture has a medium paper texture (paper tooth, fibres and a soft shadow; outlines stay clean).
 - Art is now stored as WebP with transparency: the game file is about half the size (art 6.3 MB to 3.5 MB) even with the texture.

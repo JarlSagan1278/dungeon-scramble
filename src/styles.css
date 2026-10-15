@@ -3087,3 +3087,7 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 /* Oct 15: run-end ask for automatic play data */
 .share-ask{ margin:12px 0 4px; padding:10px 12px; border:3px solid var(--line); border-radius:12px; background:rgba(143,208,255,.12); text-align:left; }
 .share-ask p{ margin:0 0 8px; font-size:13px; line-height:1.35; }
+
+/* Oct 15 (Jeremy): heavy paper on the dice chest; the dice sit above it */
+.tray-wrap::before{ content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:var(--paper-tile) repeat; background-size:110px 110px; mix-blend-mode:soft-light; z-index:0; }
+.tray-wrap > .tray{ position:relative; z-index:1; }

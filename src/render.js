@@ -520,6 +520,25 @@ function bossArcBarHTML(o){
 // something you look down on. Textures are painted once at runtime (canvas) into CSS variables.
 const ROOM_HORIZON = 0.38, ROOM_MIN_HORIZON = 118; // Oct 15 (Jeremy): floor line 16px higher (was 134); the tallest 3-quest sign still clears it
 let ROOM_TEX_READY = false;
+// Heavy paper on the environment (Jeremy, Oct 15): the paper tile is blended (soft-light) into the generated wall and
+// floor textures, the archway and the dice chest. PAPER_ENV is its strength (1 = heavy, Jeremy's pick).
+const PAPER_ENV = 1;
+let PAPER_IMG = null;
+function paperTileImg(){
+  if(typeof PAPER_TILE==='undefined') return null;
+  if(!PAPER_IMG){
+    PAPER_IMG = new Image();
+    PAPER_IMG.onload = ()=>{ ROOM_TEX_READY = false; ensureRoomTextures(); decorateArch._c = null; try{ if(S && (S.screen==='game' || S.screen==='shrine')) decorateArch(); }catch(e){} };
+    PAPER_IMG.src = PAPER_TILE;
+    try{ document.documentElement.style.setProperty('--paper-tile', `url("${PAPER_TILE}")`); }catch(e){}
+  }
+  return (PAPER_IMG.complete && PAPER_IMG.naturalWidth) ? PAPER_IMG : null;
+}
+function paperOver(g, W, H, scale){
+  const t = paperTileImg(); if(!t || !PAPER_ENV) return;
+  g.save(); g.globalCompositeOperation = 'soft-light'; g.globalAlpha = Math.min(1, PAPER_ENV);
+  g.setTransform(scale,0,0,scale,0,0); g.fillStyle = g.createPattern(t,'repeat'); g.fillRect(0,0,W/scale,H/scale); g.restore();
+}
 function ensureRoomTextures(){
   if(ROOM_TEX_READY) return; ROOM_TEX_READY = true;
   try{
@@ -539,13 +558,13 @@ function ensureRoomTextures(){
           if(rnd()>.84){ const m=g.createRadialGradient(x0+w*.5,y0+h*.9,0,x0+w*.5,y0+h*.9,w*.45); m.addColorStop(0,'rgba(70,110,50,.3)'); m.addColorStop(1,'rgba(70,110,50,0)'); g.fillStyle=m; rr(g,x0,y0,w,h,5); g.fill(); }
           x+=sw; }
         y+=rh; }
-      noise(g,W,H,14);
+      noise(g,W,H,14); paperOver(g,W,H,2.4);
       document.documentElement.style.setProperty('--tex-floor', `url("${c.toDataURL('image/jpeg',.85)}")`); }
     // wall: dark running-bond brick
     { const W=512,H=256,c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
       g.fillStyle='#0a0705'; g.fillRect(0,0,W,H);
       let y=0,row=0; while(y<H){ const rh=40; let x=-(row%2)*50; while(x<W){ const sw=100, k=.7+rnd()*.5; g.fillStyle=`rgb(${62*k|0},${44*k|0},${32*k|0})`; rr(g,x+2,y+2,sw-4,rh-4,3); g.fill(); g.fillStyle='rgba(255,230,190,.08)'; g.fillRect(x+5,y+3,sw-10,2); x+=sw; } y+=rh; row++; }
-      noise(g,W,H,12);
+      noise(g,W,H,12); paperOver(g,W,H,1.6);
       document.documentElement.style.setProperty('--tex-wall', `url("${c.toDataURL('image/jpeg',.85)}")`); }
   }catch(err){}
 }
@@ -624,7 +643,10 @@ function decorateArch(){
     const PX = Math.max(0, Math.min(8, Math.floor(r.left) - 5, Math.floor(vw - r.right) - 5)), PY = 8;
     const key = w+'x'+h+'x'+lvl+'x'+PX;
     if(!decorateArch._c || decorateArch._c.key !== key){
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w+2*PX}" height="${h+2*PY}" viewBox="${-PX} ${-PY} ${w+2*PX} ${h+2*PY}">${archFrameSVG(w,h,lvl)}</svg>`;
+      // paper on the stones (Oct 15): the tile, tiled and soft-light blended, clipped to the arch's own pixels
+      const pt = PAPER_ENV && paperTileImg() ? PAPER_TILE : null;
+      const pf = pt ? `<defs><filter id="pp" filterUnits="userSpaceOnUse" x="${-PX}" y="${-PY}" width="${w+2*PX}" height="${h+2*PY}" color-interpolation-filters="sRGB"><feImage href="${pt}" xlink:href="${pt}" x="${-PX}" y="${-PY}" width="110" height="110" preserveAspectRatio="none" result="t1"/><feTile in="t1" result="tile"/><feBlend in="tile" in2="SourceGraphic" mode="soft-light" result="b"/><feComposite in="b" in2="SourceGraphic" operator="in"/></filter></defs>` : '';
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w+2*PX}" height="${h+2*PY}" viewBox="${-PX} ${-PY} ${w+2*PX} ${h+2*PY}">${pf}${pt?'<g filter="url(#pp)">':''}${archFrameSVG(w,h,lvl)}${pt?'</g>':''}</svg>`;
       // one <img> element, built once and moved into each new card: no re-parsing and it stays decoded
       // (a blob: URL was tried first and is refused on file:// pages)
       const img = document.createElement('img');
