@@ -3175,8 +3175,8 @@ body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
 .fo-quests-float{ background:none !important; box-shadow:none !important; border:3px solid transparent !important; border-radius:0 !important;
   --nr:58%;  /* right-edge nick, from the top */
   --nb:27%;  /* bottom-edge nick, from the left */
-  --qcut-outer:polygon(0 0,100% 0,100% calc(var(--nr) - 5px),calc(100% - 8px) var(--nr),100% calc(var(--nr) + 5px),100% 100%,calc(var(--nb) + 5px) 100%,var(--nb) calc(100% - 8px),calc(var(--nb) - 5px) 100%,0 100%);
-  --qcut-inner:polygon(3px 3px,calc(100% - 3px) 3px,calc(100% - 3px) calc(var(--nr) - 8.5px),calc(100% - 12.5px) var(--nr),calc(100% - 3px) calc(var(--nr) + 8.5px),calc(100% - 3px) calc(100% - 3px),calc(var(--nb) + 8.5px) calc(100% - 3px),var(--nb) calc(100% - 12.5px),calc(var(--nb) - 8.5px) calc(100% - 3px),3px calc(100% - 3px)); }
+  --qcut-outer:polygon(0 0,100% 0,100% calc(var(--nr) - 3.5px),calc(100% - 5.5px) var(--nr),100% calc(var(--nr) + 3.5px),100% 100%,calc(var(--nb) + 3.5px) 100%,var(--nb) calc(100% - 5.5px),calc(var(--nb) - 3.5px) 100%,0 100%);
+  --qcut-inner:polygon(3px 3px,calc(100% - 3px) 3px,calc(100% - 3px) calc(var(--nr) - 7px),calc(100% - 10px) var(--nr),calc(100% - 3px) calc(var(--nr) + 7px),calc(100% - 3px) calc(100% - 3px),calc(var(--nb) + 7px) calc(100% - 3px),var(--nb) calc(100% - 10px),calc(var(--nb) - 7px) calc(100% - 3px),3px calc(100% - 3px)); }
 .fo-quests-float > .fq-body{ position:absolute !important; inset:-3px; z-index:0 !important; pointer-events:none; background:var(--line); clip-path:var(--qcut-outer); }
 .fo-quests-float > .fq-body::after{ content:''; position:absolute; inset:0; clip-path:var(--qcut-inner);
   background:

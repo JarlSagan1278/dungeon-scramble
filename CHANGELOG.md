@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.52 (Oct 16, 2026)
+- Quest paper (Jeremy): smaller nicks (5.5 px deep, 7 px wide; were 8 by 10).
+
 ## 1.41.51 (Oct 16, 2026)
 - Quest paper (Jeremy): the two nicks are now real cut-outs in the paper (the wall shows through, and the black outline and shadow follow the cut), not little triangles drawn on top.
 
