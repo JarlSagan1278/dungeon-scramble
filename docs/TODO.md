@@ -1,12 +1,18 @@
 # Dungeon Scramble — TODO
 
 ## Priority order (updated Oct 15)
-1. **Playtest the new rules (1.41.16): campfire Rest OR Train, and the whole-Pocket revive** (bots now win 56% regular / 38% new; watch whether real players feel it's fair). Then also: **Playtest 1.41.7 features and collect play data.** New to check: harder Floor 3, Extruzeon's Layer by Layer, Maneuver II/III Block faces, the six retuned loot dice, Codex/Bestiary, Records, lethal warning, Skill coach, volume sliders, run card + Save Card, Suggested die (after 6 s), readable enemy chips, solid chip icons, the action fill, long title theme, win/lose stings, tempos 130/135/140. Ask testers to send exports; read `summary` first (floor funnel, first-10-runs win rate, take rates, warned vs unwarned deaths, abandoned runs).
+1. **Playtest the new rules (1.41.16): campfire Rest OR Train, and the whole-Pocket revive** (bots now win 56% regular / 38% new; watch whether real players feel it's fair). Then also: **Playtest 1.41.7 features and collect play data.** New to check: harder Floor 3, Extruzeon's Layer by Layer, Maneuver II/III Block faces, the six retuned loot dice, Codex/Bestiary, Records, lethal warning, Skill coach, volume sliders, run card + Save Card, Suggested die (after 10 s), readable enemy chips, solid chip icons, the action fill, long title theme, win/lose stings, tempos 130/135/140. Ask testers to send exports; read `summary` first (floor funnel, first-10-runs win rate, take rates, warned vs unwarned deaths, abandoned runs).
    - Oct 14: first tester, 2 runs, both won (Armsmaster depth 1, Dungeoneer depth 3); one warned down; Grosteque Grafter took 11 turns; Maneuver Die I replaced in 20 of 30 equips. See docs/studies/2026-10-14_playtest_tester1.md. Still need newer players' exports.
 2. **Music and art review (Jeremy):** every piece in the spec is in the game; he's reviewing all of it for edits. Art continues in parallel.
 3. **Optional caps, only if play feels unfair:** damage-per-Minion specials count at most 8 Minions; Extruzeon layers max +12. (Shrines and Extruzeon were settled Oct 15: 1.41.23.)
 4. **Use real player data before retuning the base game** (literature review: bot win rates are not human win rates; Slay the Spire players win ~9-16% of base runs). Re-check the guidelines in docs/studies/2026-10-13_balance_literature_review.md against the first exports.
 5. **Remaining performance:** ~1.5 s of script per turn at CPU x4 (renderGame/placeVs) and ~500 ms of style work during playback.
+
+## Oct 16
+- Shipped 1.41.35-1.41.54 (preview only; live Netlify is still 1.41.34): shrine Hold centred + green Continue, tap-to-wiggle at shrines, floor in the round bubble (F2 · Rd 3), relic gems pop when they act (all relics report), thicker gem outlines, music recovers after reopening, camp: one-fire confirms + combines locked until Train, no heal estimate, Abandon Run, Skill sounds, Suggested die after 10 s, portrait re-roll button, quest paper outline + cut nicks, play-data uploads confirm the reply.
+- Class changes: Arcanist diagonals only along the X + Boosts 1 stronger (1.41.53); Dungeoneer wraps add +1 to the next attacking die (1.41.54). Studies: 2026-10-16_arcanist_boost.md, 2026-10-16_dungeoneer_passive.md. Watch: Dungeoneer is now the easiest class for regular players (85% bot).
+- Play data is live (Apps Script authorized Oct 16); first real row arrived. The earlier lost run re-sends once a 1.41.44+ zip is live.
+- Shrines are on the Monster Footing page (collection `lifts3`, still empty); shrines can take size/height/facing in the game.
 
 ## Oct 15
 - 1.41.24 zipped for Netlify (first build with automatic play data). Oct 16: 1.41.34 zipped (paper art and scenery, footing rounds 1-2, round shrine button, floor memory fix). Check the Play Data sheet after the first tester run.
