@@ -1014,7 +1014,7 @@ function originShowcaseHTML(o, unlocked){
   const dieArt = LOOT_ART[o.die];
   return `
     <div class="origin-showcase-top">
-      <div class="origin-showcase-portrait ${unlocked?'':'dim'}">${portraitHTML}</div>
+      <div class="osp-wrap"><div class="origin-showcase-portrait ${unlocked?'':'dim'}">${portraitHTML}</div>${unlocked && !portrait.placeholder ? `<button class="portrait-reroll" id="portrait-reroll" title="Randomize your look" aria-label="Randomize your look"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M20.5 4.5v6.5H14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` : ''}</div>
       <div class="origin-showcase-name-col">
         <div class="origin-showcase-name">${o.name}</div>
         ${unlocked?'':`<div class="origin-lock-hint">${lockSVG(11)} ${ORIGIN_UNLOCK_HINT[o.id]||'Locked.'}</div>`}
@@ -1173,6 +1173,15 @@ function renderSetup(){
   }
   renderOriginTabs();
   renderOriginShowcaseNow();
+  // Oct 16 (Jeremy): the little refresh button on the portrait re-rolls the character's look (portrait + skin tone).
+  originShowcase.addEventListener('click', ev=>{
+    const b = ev.target.closest && ev.target.closest('#portrait-reroll'); if(!b) return;
+    const oid = previewedOriginId, np = rerollSetupPortrait(oid);
+    np._onTint = url=>{ const im = document.querySelector('#origin-showcase .portrait-img'); if(im && previewedOriginId===oid && setupPortraitCache[oid]===np) im.src = url; };
+    if(typeof playTone==='function') playTone('uiTick');
+    renderOriginShowcaseNow();
+    const nb = document.getElementById('portrait-reroll'); if(nb){ nb.classList.remove('spin'); void nb.offsetWidth; nb.classList.add('spin'); }
+  });
 
   const classTabRow = document.getElementById('class-tab-row');
   const classShowcase = document.getElementById('class-showcase');

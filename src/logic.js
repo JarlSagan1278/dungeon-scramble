@@ -866,6 +866,7 @@ function applyRandomSkinTone(portrait, originId, idx){
     if(!url) return;
     _skinTintCache[key] = url;
     portrait.img = url;
+    if(portrait._onTint){ try{ portrait._onTint(url); }catch(e){} } // the setup screen's re-roll swaps the picture in place
     if(typeof render==='function' && typeof S!=='undefined' && S) render();
   });
 }
@@ -884,6 +885,13 @@ function applyRandomSkinTone(portrait, originId, idx){
 // staying fixed for the whole session.
 let setupPortraitCache = {};
 function resetSetupPortraitPreviews(){ setupPortraitCache = {}; }
+function rerollSetupPortrait(originId){ // a different look than the one showing (a few tries: same picture + same tone counts as the same)
+  const cur = setupPortraitCache[originId];
+  let p = pickPortrait(originId);
+  for(let i=0; i<6 && cur && p.idx===cur.idx && p.tone===cur.tone; i++) p = pickPortrait(originId);
+  setupPortraitCache[originId] = p;
+  return p;
+}
 function getSetupPreviewPortrait(originId){
   if(!setupPortraitCache[originId]) setupPortraitCache[originId] = pickPortrait(originId);
   return setupPortraitCache[originId];

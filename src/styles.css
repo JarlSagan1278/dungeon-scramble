@@ -3149,3 +3149,11 @@ body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
   80%{ transform:scale(1.1) rotate(1deg); filter:drop-shadow(0 1px 1px rgba(0,0,0,.65)) brightness(1.05); }
   100%{ transform:scale(1) rotate(0); filter:drop-shadow(0 1px 1px rgba(0,0,0,.65)) brightness(1); }
 }
+
+/* Portrait re-roll (Oct 16): a small round button over the setup portrait's corner; the wrapper is the portrait's own size, so nothing moves. */
+.osp-wrap{ position:relative; flex-shrink:0; }
+.portrait-reroll{ position:absolute; right:-7px; bottom:-7px; width:30px; height:30px; padding:0 !important; border-radius:50% !important; display:flex; align-items:center; justify-content:center;
+  background:#e0a63a !important; color:#2a1a08 !important; border:3px solid var(--line) !important; min-height:0 !important; z-index:2; }
+.portrait-reroll svg{ display:block; }
+.portrait-reroll.spin svg{ animation:portrait-reroll-spin .45s ease-out; }
+@keyframes portrait-reroll-spin{ from{ transform:rotate(-360deg); } to{ transform:rotate(0); } }

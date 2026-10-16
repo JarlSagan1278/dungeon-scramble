@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.46 (Oct 16, 2026)
+- Character creation (Jeremy): a small round refresh button on the portrait's corner re-rolls your look (picture and skin tone; always a different one). Nothing else on the screen moves; the run starts with the look you rolled.
+
 ## 1.41.45 (Oct 16, 2026)
 - Gear menu (Jeremy): "Restart Run" is now "Abandon Run" (button, confirm title and confirm button).
 - Rulebook: says Abandon Run, and describes the opt-in automatic play data. tools/print_rulebook.js reprints the PDF.
