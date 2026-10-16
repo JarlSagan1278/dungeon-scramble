@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.41.56 (Oct 17, 2026)
+- Quests (Jeremy, from the Oct 17 audit): one consistent wording on the quest paper -- counts of dice in your path ("3 Maneuvers", "2 Heal dice", "2 Dodges"), thresholds noun-first ("Damage 10+", "Path 6+", "Path 1-3", "Block 5+", "Blanks 10+"), rounds as the tray bubble shows them ("Reach Rd 5") -- plus an "in one turn" line when the card has per-turn quests. Freeze and Nullify rewards show just the icon.
+- Survive quests: "Survive to turn N" now completes on Rd N, as written (was one round late: Rusty Golem Rd 4, Heating Elemental Rd 5). "Survive N" (N turns survived) keeps its timing and reads "Reach Rd N+1".
+- Bellicose Biomancer: its quests now count amounts -- gain 3+ H.O.T. / deal 5+ D.O.T. in one turn (were 3 H.O.T. dice / 5 D.O.T. dice, which the bot never managed).
+- Geometry quests show their real reward: Profane pays D.O.T. on it, Sacred pays H.O.T. to you (the badge showed damage).
+
+## 1.41.55 (Oct 17, 2026, preview only)
+- Fix (bug hunt): Boost tokens now actually multiply the path. Since Sep 30 the token was cleared before the path was worked out, so it showed in the preview, was used up, and did nothing.
+- Fix: a Dungeoneer's FTLeporter teleport between the two edges no longer counts as a wrap (it shows "Teleport"); wraps follow the same rule as path building.
+- Arcanist tooltips (long-press and path coins) show the boosted value; the "+1 Wrap" pop sits below the die's corner number.
+
 ## 1.41.54 (Oct 16, 2026)
 - Dungeoneer (Jeremy, from the Oct 16 study, option B): each wrap across the edge adds +1 damage to your next attacking die (wraps stack until spent); a "+1 Wrap" pops off the boosted die during the turn, and the damage preview includes it. Study: experts at depth 7 go from 36% to 55%. Skill text, tooltip and rulebook updated.
 

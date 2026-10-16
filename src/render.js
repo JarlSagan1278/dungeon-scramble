@@ -1605,7 +1605,7 @@ function renderEncounterCard(e, mode){
     const typeWord = isBoss ? (e.type + '') : [tierWord, e.type!=='Enemy'?e.type:''].filter(Boolean).join(' ');
     const typeTag = typeWord ? `<small class="fo-type${isBoss?' fo-type-inline':''}${e.tier==='deadly'?' fo-type-deadly':''}">${typeWord}</small>` : '';
     const questLine = (e.quests && e.quests.length)
-      ? `<div class="fo-quests-float" title="Complete these during the fight for bonus rewards"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label">Quests</div><div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, e.questsDone[i])}</span>`; }).join('')}</div></div>` : '';
+      ? `<div class="fo-quests-float" title="Complete these during the fight for bonus rewards"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label">Quests</div>${e.quests.some(q=>!QUEST_ALL_FIGHT.test(parseQuestSpec(q).cond)) ? '<div class="fo-quests-sub">in one turn</div>' : ''}<div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, e.questsDone[i])}</span>`; }).join('')}</div></div>` : '';
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
     const sz = encounterSize(e);
     const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz};--drop:${encounterDrop(e)}%"/>`
@@ -1960,7 +1960,7 @@ function bindTrayDice(){
           showFaceTooltip(rect, `<strong>Minion die</strong> — clogs this space; each damage you deal clears one, or Leap clean over it.`);
           return;
         }
-        const f = cell.forcedFace || currentFace(cell);
+        const f = classFace(cell.forcedFace || currentFace(cell));
         showFaceTooltip(rect, `<strong>${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</strong> — ${FACE_DESC[f.type]||''}`);
       }, 420);
     });
@@ -1985,7 +1985,7 @@ function renderPathStrip(){
     const ta = S.trayAct;
     if(ta){ document.getElementById('path-strip').innerHTML = `<span class="trayact-hint">${iconSpan(ta.kind)} ${ta.kind==='swap' ? (ta.token ? (ta.first==null ? 'Tap the first die to swap' : 'Tap the second die') : 'Tap a die to trade places') : 'Tap a die to reroll'}</span>`; }
     else document.getElementById('path-strip').innerHTML = S.path.map((idx,k)=>{
-      const f = getFaceForIdx(idx);
+      const f = classFace(getFaceForIdx(idx));
       const tip = `${k+1}. ${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?(' '+f.value):''}`;
       return `<span class="path-coin" style="${k?`margin-left:${(step-30).toFixed(1)}px;`:''}z-index:${k+1}" title="${tip}">${iconSpan(f.type, f.value)}</span>`;
     }).join('');
@@ -3693,7 +3693,7 @@ function consumeRelicPulses(){
       setTimeout(()=>{
         const d = document.querySelector(`#tray [data-idx="${r.die}"], [data-idx="${r.die}"]`); if(!d) return;
         const rc = d.getBoundingClientRect(), fx = document.createElement('div');
-        fx.className = 'relic-fx class-fx'; fx.style.left = (rc.left+rc.width/2)+'px'; fx.style.top = (rc.top+rc.height*0.3)+'px';
+        fx.className = 'relic-fx class-fx'; fx.style.left = (rc.left+rc.width/2)+'px'; fx.style.top = (rc.top+rc.height*0.55)+'px'; /* below the die's corner badge */
         fx.innerHTML = `<span class="relic-float">${r.text}</span>`;
         document.body.appendChild(fx); setTimeout(()=>fx.remove(), 950);
       }, i*120);
@@ -4182,35 +4182,45 @@ function syncCampHeal(){
 
 // ---- Quest paper rows: "do this  ->  get that". The data string is "REWARD: CONDITION"
 // (e.g. "5 damage: 3 maneuvers"); the paper shows the condition first, an arrow, then the reward as a badge. ----
+// Quest paper wording (Oct 17 audit, approved by Jeremy): counts of dice in one path ("3 Maneuvers", "2 Heal dice"),
+// thresholds noun-first ("Damage 10+", "Path 6+", "Block 5+", "Blanks 10+"), rounds as the tray bubble shows them ("Reach Rd 5").
 function questCondShort(cond){
   const c = cond.toLowerCase().trim(); let m;
   const cap = t=> t.charAt(0).toUpperCase()+t.slice(1);
-  if((m=c.match(/(\d+)\s*maneuvers?(?: in a single (?:turn|round))?/))) return `${m[1]} Maneuvers`;
-  if((m=c.match(/any (\d+) or fewer actions/))) return `≤${m[1]} Actions`;
-  if((m=c.match(/any (\d+) actions/))) return `${m[1]} Actions`;
+  const pl = (n, one, many)=> n==='1' ? one : many;
+  if((m=c.match(/(\d+)\s*maneuvers?(?: in a single (?:turn|round))?/))) return `${m[1]} ${pl(m[1],'Maneuver','Maneuvers')}`;
+  if((m=c.match(/any (\d+) or fewer actions/))) return `Path 1-${m[1]}`;
+  if((m=c.match(/any (\d+) actions/))) return `Path ${m[1]}+`;
   if((m=c.match(/(\d+)\s*support actions/))) return `${m[1]} Support`;
-  if((m=c.match(/accumulate (\d+) block/))) return `Bank ${m[1]} Block`;
-  if((m=c.match(/survive (?:to )?(?:turn )?(\d+)/))) return /turn|to/.test(c)?`Survive to turn ${m[1]}`:`Survive ${m[1]} turns`;
-  if((m=c.match(/(?:deal )?(\d+)\+?\s*damage(?: in a single (turn|round))?/))) return `${m[1]}+ dmg${m[2]?'/turn':''}`;
-  if(/adventurer h\.?o\.?t\.? = d\.?o\.?t/.test(c)) return 'HOT = DOT';
-  if(/encounter d\.?o\.?t\.? = h\.?o\.?t/.test(c)) return 'Foe DOT = HOT';
-  if((m=c.match(/(\d+)\s*(blanks?|block|dodge|leap|pivot|heals?|boosts?|nullify|combos?|hot|dot)/))){
-    const nm = {hot:'H.O.T.', dot:'D.O.T.'}[m[2]] || cap(m[2]);
-    return `${m[1]} ${nm}`;
-  }
+  if((m=c.match(/accumulate (\d+) block/))) return `Block ${m[1]}+`;
+  if((m=c.match(/survive (?:to )?turn (\d+)/))) return `Reach Rd ${m[1]}`;
+  if((m=c.match(/survive (\d+)/))) return `Reach Rd ${parseInt(m[1])+1}`;
+  if((m=c.match(/gain (\d+)\s*hot\b/))) return `Gain ${m[1]}+ H.O.T.`;
+  if((m=c.match(/deal (\d+)\s*dot\b/))) return `Deal ${m[1]}+ D.O.T.`;
+  if((m=c.match(/(?:deal )?(\d+)\+?\s*damage/))) return `Damage ${m[1]}+`;
+  if(/adventurer h\.?o\.?t\.? = d\.?o\.?t/.test(c)) return 'Your H.O.T.';
+  if(/encounter d\.?o\.?t\.? = h\.?o\.?t/.test(c)) return 'Its D.O.T.';
+  if((m=c.match(/(\d+)\s*blanks?/))) return `Blanks ${m[1]}+`;
+  if((m=c.match(/(\d+)\s*heals?\b/))) return `${m[1]} Heal ${pl(m[1],'die','dice')}`;
+  if((m=c.match(/(\d+)\s*block\b/))) return `${m[1]} Block ${pl(m[1],'die','dice')}`;
+  if((m=c.match(/(\d+)\s*(dodge|leap|pivot|boost|combo)s?\b/))) return `${m[1]} ${cap(m[2])}${m[1]==='1'?'':'s'}`;
+  if((m=c.match(/(\d+)\s*nullify/))) return `${m[1]} Nullify`;
   return cap(c);
 }
+const QUEST_ALL_FIGHT = /survive|accumulate|h\.?o\.?t\.? = d\.?o\.?t|d\.?o\.?t\.? = h\.?o\.?t/; // not checked within one turn
 function questRewardHTML(rewardText){
   if(!rewardText) return '';
   const t = rewardText.toLowerCase(); const m = t.match(/(\d+(?:\.\d+)?)/); const n = m? m[1] : '';
   let type = 'hit';
   if(t.includes('dot')) type='dot'; else if(t.includes('hot')) type='hot'; else if(t.includes('nullify')) type='nullify'; else if(t.includes('freeze')) type='freeze';
-  const num = (type==='nullify') ? '' : n;
+  const num = (type==='nullify' || type==='freeze') ? '' : n; // a Freeze is always one skipped turn
   return `<span class="q-reward q-reward-${type}" title="Reward: ${rewardText}">${iconSpan(type)}${num?`<b>${num}</b>`:''}</span>`;
 }
 function questRowHTML(q, done){
   const {rewardText, cond} = parseQuestSpec(q);
-  return `<span class="q-cond">${questCondShort(cond)}</span><span class="q-arrow">→</span>${questRewardHTML(rewardText)}`;
+  // Geometry mirrors pay D.O.T. on it (Profane) or H.O.T. for you (Sacred), not damage (Oct 17 audit).
+  const rt = /adventurer h\.?o\.?t\.? = d\.?o\.?t/.test(cond) ? (rewardText||'').replace(/damage/i,'dot') : /encounter d\.?o\.?t\.? = h\.?o\.?t/.test(cond) ? (rewardText||'').replace(/damage/i,'hot') : rewardText;
+  return `<span class="q-cond">${questCondShort(cond)}</span><span class="q-arrow">→</span>${questRewardHTML(rt)}`;
 }
 function infoDot(text){ return `<span class="info-dot" title="${String(text).replace(/"/g,'&quot;')}" tabindex="0">i</span>`; }
 // If the Camp screen would scroll, fold the Back Pocket down to its first two rows;

@@ -86,6 +86,19 @@ function grantRelic(id, opts){
 // Relics that change a Path's numbers. Mutates the per-die `steps` that
 // computePathSteps() builds, so the live preview (computePathEffects), the
 // step-by-step playback, and the final totals all agree.
+// A step that crosses the Dungeoneer's seam (edge to edge), by the same rule canSelect() uses: both squares in the zone,
+// opposite edge columns, and the previous face's own move valid across the seam. (Oct 17: a FTLeporter teleport between
+// the edges used to count as a wrap.)
+function isWrapStep(prevIdx, idx, prevType){
+  if(!S.klass || !S.klass.wrap || !inZone(prevIdx) || !inZone(idx)) return false;
+  const a = trayRC(prevIdx), b = trayRC(idx);
+  if(!adjWrapCols(a,b)) return false;
+  const vb = {r:b.r, c: b.c > a.c ? a.c - 1 : a.c + 1};
+  if(prevType==='dodge') return adjDiag(a,vb);
+  if(prevType==='leap') return adjLeap(a,vb);
+  if(prevType==='pivot') return adjPivot(a,vb);
+  return adjNormal(a,vb);
+}
 // Class passives on path steps (Oct 16, Jeremy, from the Dungeoneer study): each wrap crossing (a step from one edge
 // column straight to the other) adds seamDamage to the next damaging die, the one landed on included; crossings stack.
 function applyClassToSteps(steps){
@@ -93,7 +106,7 @@ function applyClassToSteps(steps){
   if(!amt) return steps;
   let carry = 0;
   steps.forEach((s,i)=>{
-    if(i>0 && Math.abs(trayRC(steps[i-1].idx).c - trayRC(s.idx).c)===3) carry += amt;
+    if(i>0 && isWrapStep(steps[i-1].idx, s.idx, steps[i-1].type)) carry += amt;
     if(s.dmg>0 && carry){ s.dmg += carry; s.seamBonus = carry; carry = 0; }
   });
   return steps;
@@ -137,7 +150,7 @@ function applyRelicsToSteps(steps, path){
   if(hasRelic('pivot_compass')) steps.forEach((s,i)=>{
     if(!i || steps[i-1].type!=='pivot') return;
     const a = trayRC(steps[i-1].idx), b = trayRC(s.idx);
-    if(!adjPivot(a,b) && !(S.klass.wrap && adjWrapCols(a,b))) tag(s,'pivot_compass','Teleport');
+    if(!adjPivot(a,b) && !isWrapStep(steps[i-1].idx, s.idx, 'pivot')) tag(s,'pivot_compass','Teleport');
   });
   if(hasRelic('echo_chime') && steps.length>=5){ const t = lastDmgStep(); if(t){ t.dmg += 3; tag(t,'echo_chime','+3'); } }
   if(hasRelic('glimmer_dust')){
@@ -1781,7 +1794,12 @@ function checkQuests(e, ctx){
     // v1.39.0 quest audit: every phrasing the quest card shows now has a check
     // ("20+ damage", "8 damage/turn", "survive turn 4", combos, hot, dot,
     // "accumulate N block", "2 nullify"). See docs/studies/2026-10-12_quest_audit.md.
-    if((m=cond.match(/survive (?:to )?(?:turn )?(\d+)/))) done = ctx.turnNumber >= parseInt(m[1]);
+    // Survive (Oct 17, Jeremy): "survive (to) turn N" is done on the round the bubble shows as Rd N; "survive N" means
+    // N enemy turns survived, so it's done on Rd N+1. The paper prints both as "Reach Rd X".
+    if((m=cond.match(/survive (?:to )?turn (\d+)/))) done = ctx.turnNumber >= parseInt(m[1]) - 1;
+    else if((m=cond.match(/survive (\d+)/))) done = ctx.turnNumber >= parseInt(m[1]);
+    else if((m=cond.match(/gain (\d+)\s*hot\b/))) done = (ctx.hotGained||0) >= parseInt(m[1]);   // amounts (Oct 17), not dice
+    else if((m=cond.match(/deal (\d+)\s*dot\b/))) done = (ctx.dotDealt||0) >= parseInt(m[1]);
     else if((m=cond.match(/(\d+)\+?\s*damage/))) done = ctx.totalDamageThisRound >= parseInt(m[1]);
     else if((m=cond.match(/any (\d+)(?:\s*or fewer)? actions/))) done = cond.includes('or fewer') ? (ctx.totalActions>0 && ctx.totalActions<=parseInt(m[1])) : ctx.totalActions>=parseInt(m[1]);
     else if((m=cond.match(/(\d+)\s*blanks/))) done = ctx.blankCount >= parseInt(m[1]);
@@ -1902,12 +1920,14 @@ function startTurnTransition(){
     trayTele = S.tray.map(c=>{ if(c.minion) return 'M'; const f = c.forcedFace || currentFace(c); return (dc[c.die.cat]||'?') + ':' + (fc[f.type]||f.type) + (f.value||''); }).join(' ');
   }catch(e){}
   teleLog('turn', {n:S.turnNumber, len:S.path.length, hp:S.health, enemy:S.encounter?S.encounter.name:null, enemyHp:S.encounter?Math.round(S.encounter.curHealth):null, tray:trayTele, path:S.path.slice(), block:S.playerBlock||0, lethalStart:S._lw?S._lw.start:null, lethalGo:S._lw?S._lw.go:null});
-  S.pendingFreeBoost = 0; // a free Boost token is spent by end of turn whether or not it landed on anything
   const path = S.path.slice();
   S._resolvingPath = true;
   const steps = computePathSteps(path);
   const effects = computePathEffects(path); // aggregate counts, for the quest check once the path finishes
   S._resolvingPath = false;
+  // A free Boost token is spent by end of turn whether or not it landed on anything. Cleared only AFTER the path is
+  // computed (Oct 17 bug hunt: it was cleared first, so tokens previewed but never applied).
+  S.pendingFreeBoost = 0;
   runPlayerPathSteps(steps, 0, path, effects);
 }
 
@@ -1964,7 +1984,7 @@ function finishPlayerPath(path, effects){
     comboCount:effects.comboCount, healCount:effects.healCount, blockCount:effects.blockCount,
     boostCount:effects.boostCount, dodgeCount:effects.dodgeCount, leapCount:effects.leapCount,
     pivotCount:effects.pivotCount, nullifyCount:effects.nullifyCount, supportCount:effects.supportCount,
-    hotCount:effects.hotCount, dotCount:effects.dotCount
+    hotCount:effects.hotCount, dotCount:effects.dotCount, hotGained:effects.hotToPlayer, dotDealt:effects.dotToEncounter
   });
   { const tt = Math.round(S.resolveTotal||0);
     if(tt > (S.stats.bestTurn||0)){ S.stats.bestTurn = tt; S.stats.bestTurnFoe = e.name; } }

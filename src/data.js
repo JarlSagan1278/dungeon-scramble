@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.54';
+const GAME_VERSION = '1.41.56';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -484,7 +484,7 @@ const FLOOR2_SHRINES = [
 ];
 const FLOOR2_BOSSES = [
   enc('The Necrorancher','Boss',48,{dmg:2,minion:2,quests:['nullify: deal 12 damage in a single turn'],flavor:'Herder of the haunted, granger of the ghoulish, planter of the parasitic.'}),
-  enc('Bellicose Biomancer','Boss',50,{questHealth:25,dmg:4,hot:2,quests:['20 damage: 3 hot','20 damage: 5 dot'],flavor:'Not content with creating life, this relentless innovator seeks new ways to destroy it.'}),
+  enc('Bellicose Biomancer','Boss',50,{questHealth:25,dmg:4,hot:2,quests:['20 damage: gain 3 hot','20 damage: deal 5 dot'],flavor:'Not content with creating life, this relentless innovator seeks new ways to destroy it.'}),
   enc('Ceramic Golem','Boss',70,{questHealth:40,dmg:3,shield:3,quests:['8 dot: deal 15+ damage in a single round','30 damage: 5 maneuvers'],flavor:'The bespoke sommelier of the Co-Consul, now cracked and seeping with drink.'}),
 ];
 

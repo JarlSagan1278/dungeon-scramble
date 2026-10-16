@@ -3192,3 +3192,4 @@ body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
 .fo-quests-float::before, .fo-quests-float::after{ z-index:2; } /* pins above the cut-paper layer */
 
 .relic-fx.class-fx .relic-float{ color:#ffb15c; font-size:14px; } /* Dungeoneer wrap bonus pop (Oct 16) */
+.fo-quests-float .fo-quests-sub{ font-size:8px; font-style:italic; color:#5a3a1c; line-height:1; margin:-1px 0 2px; text-align:center; } /* Oct 17 quest audit */
