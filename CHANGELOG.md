@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.47 (Oct 16, 2026)
+- Arcanist (Jeremy): diagonal steps only along the X -- from one X square to another. Steps onto or off the X follow the normal rules (was: any step into or out of the zone could go diagonally, since Oct 12). Skill text, tooltip and rulebook updated. Expect Arcanist to be notably harder (Oct 12 study: 29% vs 53% at depth 7).
+
 ## 1.41.46 (Oct 16, 2026)
 - Character creation (Jeremy): a small round refresh button on the portrait's corner re-rolls your look (picture and skin tone; always a different one). Nothing else on the screen moves; the run starts with the look you rolled.
 
