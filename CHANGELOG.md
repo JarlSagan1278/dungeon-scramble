@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.53 (Oct 16, 2026)
+- Arcanist (Jeremy, from the Oct 16 study): every Boost you play is 1 stronger (x2 becomes x3); the tray shows the boosted value. Study: experts at depth 7 go from 34% to 49% (Guard 66%, Armsmaster 57%, Dungeoneer 36%). Skill text, tooltip and rulebook updated.
+
 ## 1.41.52 (Oct 16, 2026)
 - Quest paper (Jeremy): smaller nicks (5.5 px deep, 7 px wide; were 8 by 10).
 

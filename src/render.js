@@ -1369,7 +1369,7 @@ function minionEyeStyle(idx){
 }
 
 function renderDie(cell, idx){
-  const f = cell.forcedFace || currentFace(cell);
+  const f = classFace(cell.forcedFace || currentFace(cell));
   const isBlank = f.type==='blank';
   const inPath = S.path.includes(idx);
   const isLastMove = S.path.length && S.path[S.path.length-1]===idx;
@@ -2000,7 +2000,7 @@ const ABILITY_COACH = {
   armsmaster:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the right column) to turn it into a Hit (2). Use it every turn: it is free damage.',
   guard:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the L of three squares, middle right) to turn it into a Block (1). Use it every turn: Block stops damage before it lands.',
   dungeoneer:'Always on: your dashed zone is the left and right edges, and your path can wrap from one edge straight to the other on any row. Look for long paths that cross the sides.',
-  arcanist:'Always on: your dashed zone is both diagonals. Once your path is on the X, it may step diagonally to another square of the X. Look for paths that run along the X.',
+  arcanist:'Always on: your dashed zone is both diagonals. Once your path is on the X, it may step diagonally to another square of the X. And every Boost you play is 1 stronger (x2 becomes x3). Look for paths that run along the X.',
 };
 function maybeAbilityCoach(){
   if(!S || S.screen!=='game' || !S.encounter || S.encounter.type==='Shrine' || S.transitioning) return;

@@ -1549,8 +1549,14 @@ function buildComboRipple(path){
 // its real face. Previews never use this, so a path can't scout covered dice.
 function pathFaceForIdx(idx){
   const cell = S.tray[idx];
-  if(S._resolvingPath && cell.minion && !cell.forcedFace) return cell.die.faces[cell.faceIdx];
-  return getFaceForIdx(idx);
+  if(S._resolvingPath && cell.minion && !cell.forcedFace) return classFace(cell.die.faces[cell.faceIdx]);
+  return classFace(getFaceForIdx(idx));
+}
+// Class passives on face values (Oct 16, Jeremy): the Arcanist's Boosts are 1 stronger (x2 counts as x3). Applied where the
+// path is computed (pathFaceForIdx) and where the tray draws a die, so what you see is what you get.
+function classFace(f){
+  if(f && f.type==='boost' && S && S.klass && S.klass.boostPlus) return Object.assign({}, f, {value:(f.value||1) + S.klass.boostPlus});
+  return f;
 }
 function getFaceForIdx(idx){
   const cell = S.tray[idx];
