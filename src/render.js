@@ -1605,7 +1605,7 @@ function renderEncounterCard(e, mode){
     const typeWord = isBoss ? (e.type + '') : [tierWord, e.type!=='Enemy'?e.type:''].filter(Boolean).join(' ');
     const typeTag = typeWord ? `<small class="fo-type${isBoss?' fo-type-inline':''}${e.tier==='deadly'?' fo-type-deadly':''}">${typeWord}</small>` : '';
     const questLine = (e.quests && e.quests.length)
-      ? `<div class="fo-quests-float" title="Complete these during the fight for bonus rewards"><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label">Quests</div><div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, e.questsDone[i])}</span>`; }).join('')}</div></div>` : '';
+      ? `<div class="fo-quests-float" title="Complete these during the fight for bonus rewards"><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i>${QUEST_NICKS}<div class="fo-quests-label">Quests</div><div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, e.questsDone[i])}</span>`; }).join('')}</div></div>` : '';
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
     const sz = encounterSize(e);
     const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz};--drop:${encounterDrop(e)}%"/>`
@@ -3641,6 +3641,9 @@ function relicGemSVG(r){
   return `<svg viewBox="-6 -6 112 112" aria-hidden="true"><defs><radialGradient id="rg-${fam}" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="${F.l}"/><stop offset=".55" stop-color="${F.c}"/><stop offset="1" stop-color="${F.d}"/></radialGradient></defs>${outer}${facets}${table}<g transform="translate(${cx-12*gs} ${cy-12*gs}) scale(${gs})" fill="none" stroke="#fff1d6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${RELIC_GLYPH[r.id]||''}</g>${relicShine(F)}</svg>`;
 }
 // Oct 16 (Jeremy: on the triangle relics the shine floated off to the left): the shine follows each gem's own upper-left edge
+// Quest paper nicks (Jeremy, Oct 16): two little V-shaped notches on the paper's edges, cut through the black outline.
+const QUEST_NICK_SVG = '<svg viewBox="0 0 10 9" aria-hidden="true"><path d="M10.2 0 L1.6 4.2 L10.2 9 Z" fill="#5a3a22"/><path d="M10.2 0.4 L1.6 4.2 L10.2 8.6" fill="none" stroke="#0c0705" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+const QUEST_NICKS = `<i class="fq-nick fq-n1">${QUEST_NICK_SVG}</i><i class="fq-nick fq-n2">${QUEST_NICK_SVG}</i>`;
 function relicShine(F){
   let a = [24,26], b = [36,18];
   if(F.pts){
@@ -4330,11 +4333,11 @@ function renderCamp(){
       const fireOk = baseCamp || (!S.campFireOut && S.campChoice!=='rest'); // Train and Rest share the campfire
       const eligible = canUpgrade(cat, level) && !S.campUpgrades[cat] && fireOk;
       const locked = eligible && trainLocked; // Oct 16 (Jeremy): pick Train at the top first
-      const disabled = !eligible || locked;
+      const disabled = !eligible; // a locked one keeps its glow and normal look; its tap is refused in the handler (Oct 16, Jeremy)
       const needsBackfill = count>=3 && !canUpgrade(cat,level);
       const upgradeTitle = needsBackfill ? 'Needs more spare dice to backfill' : `Combine 3 ${label} ${ROMAN[level]} into 1 ${label} ${ROMAN[level+1]}`;
       upgradeRows.push(`<div class="upgrade-row">
-          <button class="upgrade-btn${(eligible && !baseCamp && !locked)?' upgrade-ready':''}${locked?' upgrade-locked':''}" id="upgrade-${cat}-${level}" ${disabled?'disabled':''} title="${locked?'Choose Train at the campfire first':upgradeTitle}">${label} ${ROMAN[level]} ${mergeGlyphSVG(16)} ${ROMAN[level+1]} <span class="token-count">${count}</span></button>
+          <button class="upgrade-btn${(eligible && !baseCamp)?' upgrade-ready':''}${locked?' upgrade-locked':''}" id="upgrade-${cat}-${level}" ${disabled?'disabled':''}${locked?' aria-disabled="true"':''} title="${locked?'Choose Train at the campfire first':upgradeTitle}">${label} ${ROMAN[level]} ${mergeGlyphSVG(16)} ${ROMAN[level+1]} <span class="token-count">${count}</span></button>
           <button id="preview-${cat}-${level}" class="upgrade-preview-btn" title="Preview the resulting die's faces">?</button>
         </div>`);
     });
@@ -4409,6 +4412,10 @@ function renderCamp(){
     [1,2].forEach(level=>{
       const btn = document.getElementById(`upgrade-${cat}-${level}`);
       if(btn) btn.onclick = ()=>{
+        if(btn.classList.contains('upgrade-locked')){ // not until Train is chosen: nudge the Train button instead
+          const tb = document.getElementById('train-btn'); if(tb){ tb.classList.remove('cf-nudge'); void tb.offsetWidth; tb.classList.add('cf-nudge'); }
+          return;
+        }
         const go = ()=> flyDiceToFuse(cat, level, ()=> campUpgrade(cat, level));
         confirmCampfire('train', ()=>{
           if(!pocketLeftAfterUpgrade(cat, level) && S.backPocket.length) return confirmEmptyPocket(go);
