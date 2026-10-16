@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.51 (Oct 16, 2026)
+- Quest paper (Jeremy): the two nicks are now real cut-outs in the paper (the wall shows through, and the black outline and shadow follow the cut), not little triangles drawn on top.
+
 ## 1.41.50 (Oct 16, 2026)
 - Camp (Jeremy): combine buttons that are possible keep their glow while locked (lighter stripes + lock on top) so you can see they're an option; tapping one before choosing Train gives the Train button a little shake instead.
 - Quest paper: two small V-shaped nicks cut into its edges (right side and bottom).
