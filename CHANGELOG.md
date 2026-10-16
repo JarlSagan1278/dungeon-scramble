@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.49 (Oct 16, 2026)
+- Quest paper (Jeremy): chunky black outline like everything else (was a thin brown border).
+
 ## 1.41.48 (Oct 16, 2026)
 - Camp (Jeremy): Train is now chosen at the campfire (same one-time "Train here?" confirm). Until then the combine buttons are covered with stripes and a lock and can't be tapped, with a line saying to choose Train above; the "?" previews still work. The starting Camp stays free.
 
