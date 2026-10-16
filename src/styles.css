@@ -3190,3 +3190,5 @@ body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
   box-shadow:inset 0 0 0 4px rgba(255,225,160,.25), inset 0 0 13px 4px rgba(110,70,25,.5); }
 .fo-quests-float > .fq-light{ inset:-3px !important; border-radius:0 !important; clip-path:var(--qcut-inner); }
 .fo-quests-float::before, .fo-quests-float::after{ z-index:2; } /* pins above the cut-paper layer */
+
+.relic-fx.class-fx .relic-float{ color:#ffb15c; font-size:14px; } /* Dungeoneer wrap bonus pop (Oct 16) */

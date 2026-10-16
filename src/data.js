@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.53';
+const GAME_VERSION = '1.41.54';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -309,8 +309,8 @@ const CLASSES = [
     zone:(r,c)=> c===3, convertTo:{type:'hit', value:2}},
   {id:'guard', name:'Guard', color:'#2fb8b8', ability:'Once per turn, turn any Action or Blank in your zone (an L of three squares, middle right) into a Block (1).',
     zone:(r,c)=> (r===1 && (c===2||c===3)) || (r===2 && c===3), convertTo:{type:'block', value:1}}, // 3-square L (Jeremy, Oct 12: 2x2 -> L, 63% -> 58% at depth 7) // Block 2 -> 1 (Jeremy, Oct 12 class study: Guard won 89% vs 40-67%)
-  {id:'dungeoneer', name:'Dungeoneer', color:'#d4812e', ability:'Your zone (the left and right edges) wraps left-to-right when building a Path, on every row.',
-    zone:(r,c)=> c===0 || c===3, wrap:true}, // every row wraps (Jeremy, Oct 12; was the two middle rows)
+  {id:'dungeoneer', name:'Dungeoneer', color:'#d4812e', ability:'Your zone (the left and right edges) wraps left-to-right when building a Path, on every row. Each wrap adds +1 damage to your next attacking die.',
+    zone:(r,c)=> c===0 || c===3, wrap:true, seamDamage:1}, // seamDamage: Oct 16 study (experts at depth 7: 36% -> 55%) // every row wraps (Jeremy, Oct 12; was the two middle rows)
   {id:'arcanist', name:'Arcanist', color:'#b4419a', ability:'Your zone is both diagonals. Once on the X, you may step diagonally along it, as if using Dodge. Your Boosts are 1 stronger (x2 becomes x3).',
     zone:(r,c)=> r===c || r+c===3, diagonalZone:'both', boostPlus:1}, // both diagonals; diagonal steps only from an X square to an X square (Jeremy, Oct 16; was 'either' from Oct 12, 53% vs 29% at depth 7)
   {id:'debug', name:'Debug', color:'#9aa3ab', ability:'No class ability. Starting tray is a random assortment of every die type in the game, for testing.',

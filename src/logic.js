@@ -86,6 +86,18 @@ function grantRelic(id, opts){
 // Relics that change a Path's numbers. Mutates the per-die `steps` that
 // computePathSteps() builds, so the live preview (computePathEffects), the
 // step-by-step playback, and the final totals all agree.
+// Class passives on path steps (Oct 16, Jeremy, from the Dungeoneer study): each wrap crossing (a step from one edge
+// column straight to the other) adds seamDamage to the next damaging die, the one landed on included; crossings stack.
+function applyClassToSteps(steps){
+  const amt = S.klass && S.klass.seamDamage;
+  if(!amt) return steps;
+  let carry = 0;
+  steps.forEach((s,i)=>{
+    if(i>0 && Math.abs(trayRC(steps[i-1].idx).c - trayRC(s.idx).c)===3) carry += amt;
+    if(s.dmg>0 && carry){ s.dmg += carry; s.seamBonus = carry; carry = 0; }
+  });
+  return steps;
+}
 function applyRelicsToSteps(steps, path){
   if(!S.relics || !S.relics.length) return steps;
   const lastDmgStep = ()=>{ for(let i=steps.length-1;i>=0;i--) if(steps[i].dmg>0) return steps[i]; return null; };
@@ -1602,7 +1614,7 @@ function computePathEffects(path){
 
   // Relics adjust the per-die steps (see applyRelicsToSteps); take the totals
   // from them so the live preview includes every relic bonus.
-  if(S.relics && S.relics.length){
+  if((S.relics && S.relics.length) || (S.klass && S.klass.seamDamage)){
     const st = computePathSteps(path);
     totalDamage = st.reduce((a,x)=>a+x.dmg,0);
     dotToEncounter = st.reduce((a,x)=>a+x.dotToEncounter,0);
@@ -1658,7 +1670,7 @@ function computePathSteps(path){
     if(f.type!=='boost') boostMult = 1;
     return step;
   });
-  return applyRelicsToSteps(steps, path);
+  return applyClassToSteps(applyRelicsToSteps(steps, path));
 }
 
 // Un-minions the first minion-covered tray cell found (tray order), same
@@ -1705,6 +1717,7 @@ function applyPathStep(step){
   const e = S.encounter;
   if(step.revealIdx!=null) revealMinionAt(step.revealIdx);
   if(step.relicFx) step.relicFx.forEach(r=>fireRelic(r.id, r.text));
+  if(step.seamBonus){ if(!S._relicQ) S._relicQ = []; S._relicQ.push({die:step.idx, text:'+'+step.seamBonus+' Wrap'}); } // Dungeoneer passive: pops on the die it boosted
   if(step.dmg>0){
     e.curHealth = capUpper(e.curHealth-absorbWithShield(e, step.dmg), e.maxHealth);
     S.stats.damageDealt += step.dmg;

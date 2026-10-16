@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.54 (Oct 16, 2026)
+- Dungeoneer (Jeremy, from the Oct 16 study, option B): each wrap across the edge adds +1 damage to your next attacking die (wraps stack until spent); a "+1 Wrap" pops off the boosted die during the turn, and the damage preview includes it. Study: experts at depth 7 go from 36% to 55%. Skill text, tooltip and rulebook updated.
+
 ## 1.41.53 (Oct 16, 2026)
 - Arcanist (Jeremy, from the Oct 16 study): every Boost you play is 1 stronger (x2 becomes x3); the tray shows the boosted value. Study: experts at depth 7 go from 34% to 49% (Guard 66%, Armsmaster 57%, Dungeoneer 36%). Skill text, tooltip and rulebook updated.
 

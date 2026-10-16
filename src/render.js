@@ -1999,7 +1999,7 @@ function renderPathStrip(){
 const ABILITY_COACH = {
   armsmaster:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the right column) to turn it into a Hit (2). Use it every turn: it is free damage.',
   guard:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the L of three squares, middle right) to turn it into a Block (1). Use it every turn: Block stops damage before it lands.',
-  dungeoneer:'Always on: your dashed zone is the left and right edges, and your path can wrap from one edge straight to the other on any row. Look for long paths that cross the sides.',
+  dungeoneer:'Always on: your dashed zone is the left and right edges, and your path can wrap from one edge straight to the other on any row. Each wrap adds +1 damage to your next attacking die. Look for long paths that cross the sides.',
   arcanist:'Always on: your dashed zone is both diagonals. Once your path is on the X, it may step diagonally to another square of the X. And every Boost you play is 1 stronger (x2 becomes x3). Look for paths that run along the X.',
 };
 function maybeAbilityCoach(){
@@ -3689,6 +3689,16 @@ function consumeRelicPulses(){
   if(PREFS.reducedMotion) return;
   let played = false;
   q.forEach((r,i)=>{
+    if(r.die!=null){ // a class passive (Dungeoneer's wrap bonus): the label floats up off the die it boosted
+      setTimeout(()=>{
+        const d = document.querySelector(`#tray [data-idx="${r.die}"], [data-idx="${r.die}"]`); if(!d) return;
+        const rc = d.getBoundingClientRect(), fx = document.createElement('div');
+        fx.className = 'relic-fx class-fx'; fx.style.left = (rc.left+rc.width/2)+'px'; fx.style.top = (rc.top+rc.height*0.3)+'px';
+        fx.innerHTML = `<span class="relic-float">${r.text}</span>`;
+        document.body.appendChild(fx); setTimeout(()=>fx.remove(), 950);
+      }, i*120);
+      return;
+    }
     if(!document.querySelector(`.relic-strip [data-relic="${r.id}"]`)) return;
     setTimeout(()=>{
       // Effects live in a body-level fixed layer, not inside the badge: the board
