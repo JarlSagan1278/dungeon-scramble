@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.48 (Oct 16, 2026)
+- Camp (Jeremy): Train is now chosen at the campfire (same one-time "Train here?" confirm). Until then the combine buttons are covered with stripes and a lock and can't be tapped, with a line saying to choose Train above; the "?" previews still work. The starting Camp stays free.
+
 ## 1.41.47 (Oct 16, 2026)
 - Arcanist (Jeremy): diagonal steps only along the X -- from one X square to another. Steps onto or off the X follow the normal rules (was: any step into or out of the zone could go diagonally, since Oct 12). Skill text, tooltip and rulebook updated. Expect Arcanist to be notably harder (Oct 12 study: 29% vs 53% at depth 7).
 

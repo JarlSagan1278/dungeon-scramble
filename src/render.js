@@ -4263,7 +4263,7 @@ function campfireChoiceHTML(){
   if(S.campFireOut) return `<div class="campfire-choice out"><div class="cf-label">The campfire is out ${infoDot('The Time-Intensive Shrine took this campfire: no Rest or upgrades at this Camp.')}</div></div>`;
   const ch = S.campChoice, n = campFusionsReady(), est = restHealEstimate();
   const restSub = ch==='rest' ? `Healed +${S.campHealed||0}` : (S.health>=S.maxHealth ? 'Already at full health' : (est>0 ? '' : 'Heals nothing here'));
-  const trainSub = ch==='train' ? 'Dice combined' : (n ? 'Combine dice below' : 'No sets of 3 yet');
+  const trainSub = ch==='train' ? ((S.campUpgrades.attack||S.campUpgrades.maneuver) ? 'Dice combined' : 'Combine dice below') : (n ? 'Unlocks combining below' : 'No sets of 3 yet');
   const cls = k => ch ? (ch===k ? ' chosen' : ' skipped') : '';
   return `<div class="campfire-choice${ch?' done':''}">
       <div class="cf-label">${ch ? 'Campfire used' : 'Campfire: choose one'} ${infoDot('Each Camp\'s fire gives you ONE of these. Rest: scramble your Tray and heal half the faces that aren\'t blank. Train: combine 3 matching dice into 1 of the next level (up to one Attack and one Maneuver). Organizing is always free.')}</div>
@@ -4281,11 +4281,11 @@ function confirmCampfire(kind, go){
   if(S.campChoice || S.campFireOut || isBaseCamp()) return go();
   const rest = kind==='rest';
   const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
-      <h2>${rest ? 'Rest here?' : 'Combine dice?'}</h2>
-      <p>${rest ? "The campfire gives one: if you Rest, you can't combine dice at this Camp." : "The campfire gives one: if you combine dice, you can't Rest at this Camp."}</p>
+      <h2>${rest ? 'Rest here?' : 'Train here?'}</h2>
+      <p>${rest ? "The campfire gives one: if you Rest, you can't combine dice at this Camp." : "The campfire gives one: if you Train (combine dice), you can't Rest at this Camp."}</p>
       <div class="small-btn-row" style="justify-content:center;">
         <button id="cf-confirm-cancel">Not yet</button>
-        <button class="primary" id="cf-confirm-go">${rest ? 'Rest' : 'Combine'}</button>
+        <button class="primary" id="cf-confirm-go">${rest ? 'Rest' : 'Train'}</button>
       </div>
     </div></div>`);
   openModal(overlay);
@@ -4319,6 +4319,8 @@ function renderCamp(){
   S._lastPlayerHealth = S.health;
   const organizeSel = S.organizeSelection;
   const upgradeRows = [];
+  // Oct 16 (Jeremy): combining is locked (striped cover + lock) until Train is picked at the campfire; Base Camp is free.
+  const trainLocked = !baseCamp && !S.campChoice && !S.campFireOut;
   ['attack','maneuver'].forEach(cat=>{
     [1,2].forEach(level=>{
       const count = upgradeAvailability(cat, level);
@@ -4327,11 +4329,12 @@ function renderCamp(){
       const label = cat.charAt(0).toUpperCase()+cat.slice(1);
       const fireOk = baseCamp || (!S.campFireOut && S.campChoice!=='rest'); // Train and Rest share the campfire
       const eligible = canUpgrade(cat, level) && !S.campUpgrades[cat] && fireOk;
-      const disabled = !eligible;
+      const locked = eligible && trainLocked; // Oct 16 (Jeremy): pick Train at the top first
+      const disabled = !eligible || locked;
       const needsBackfill = count>=3 && !canUpgrade(cat,level);
       const upgradeTitle = needsBackfill ? 'Needs more spare dice to backfill' : `Combine 3 ${label} ${ROMAN[level]} into 1 ${label} ${ROMAN[level+1]}`;
       upgradeRows.push(`<div class="upgrade-row">
-          <button class="upgrade-btn${(eligible && !baseCamp)?' upgrade-ready':''}" id="upgrade-${cat}-${level}" ${disabled?'disabled':''} title="${upgradeTitle}">${label} ${ROMAN[level]} ${mergeGlyphSVG(16)} ${ROMAN[level+1]} <span class="token-count">${count}</span></button>
+          <button class="upgrade-btn${(eligible && !baseCamp && !locked)?' upgrade-ready':''}${locked?' upgrade-locked':''}" id="upgrade-${cat}-${level}" ${disabled?'disabled':''} title="${locked?'Choose Train at the campfire first':upgradeTitle}">${label} ${ROMAN[level]} ${mergeGlyphSVG(16)} ${ROMAN[level+1]} <span class="token-count">${count}</span></button>
           <button id="preview-${cat}-${level}" class="upgrade-preview-btn" title="Preview the resulting die's faces">?</button>
         </div>`);
     });
@@ -4360,6 +4363,7 @@ function renderCamp(){
 
       <div class="camp-section">
         <h3 class="camp-section-title" id="camp-upgrade-title">${baseCamp?'Upgrade Dice':'Train: Upgrade Dice'} ${infoDot(baseCamp?'Combine 3 matching Basic dice into 1 of the next tier. You can upgrade 1 Attack and 1 Maneuver die per Camp.':'Combine 3 matching Basic dice into 1 of the next tier (1 Attack and 1 Maneuver per Camp). Training uses the campfire, so you can\'t also Rest here.')}</h3>
+        ${(trainLocked && upgradeRows.length) ? '<p class="hint upgrade-locked-hint" style="margin:0 0 4px;">Choose <b>Train</b> at the campfire above to combine dice.</p>' : ''}
         ${(!baseCamp && S.campChoice==='rest') ? '<p class="hint" style="margin:0 0 4px;">You rested at this fire, so no training here.</p>' : (!baseCamp && S.campFireOut) ? '<p class="hint" style="margin:0 0 4px;">The campfire is out.</p>' : ''}
         <div class="upgrade-rows-col">${upgradeRows.length? upgradeRows.join('') : '<span class="hint">No matching sets of 3 Basic dice to combine right now.</span>'}</div>
       </div>
@@ -4378,11 +4382,13 @@ function renderCamp(){
   const restBtn = document.getElementById('rest-btn');
   if(restBtn) restBtn.onclick = ()=>{ if(!S.campRested) confirmCampfire('rest', campRest); };
   const trainBtn = document.getElementById('train-btn');
-  if(trainBtn) trainBtn.onclick = ()=>{ // point at the Upgrade section, where training happens
+  if(trainBtn) trainBtn.onclick = ()=> confirmCampfire('train', ()=>{ // Oct 16: Train is the choice itself; it unlocks combining below
+    if(!campFireUsedBy('train')) return;
+    render();
     const t = document.getElementById('camp-upgrade-title'); if(!t) return;
     t.scrollIntoView({behavior: PREFS.reducedMotion ? 'auto' : 'smooth', block:'center'});
     const sec = t.closest('.camp-section'); if(sec){ sec.classList.remove('cf-point'); void sec.offsetWidth; sec.classList.add('cf-point'); }
-  };
+  });
   syncCampHeal();
   document.getElementById('leave-btn').onclick = ()=>{
     if(baseCamp || S.campChoice || S.campFireOut){ campLeave(); return; } // Oct 16 (Jeremy): only ask when the fire is still unused
