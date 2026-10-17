@@ -1902,7 +1902,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
   background:radial-gradient(circle at 35% 30%, #d8d8d8, #7d7d7d 60%, #3b3b3b); }
 .fo-quests-float::after{ content:''; position:absolute; top:3px; right:6px; width:5px; height:5px; border-radius:50%;
   background:radial-gradient(circle at 35% 30%, #d8d8d8, #7d7d7d 60%, #3b3b3b); box-shadow:0 1px 1px rgba(0,0,0,.6); }
-.fo-quests-float{ transform:translateX(-63%) rotate(-2.2deg) !important; width:108px; }
+.fo-quests-float{ transform:translateX(calc(-63% + var(--qdx, 0px))) translateY(var(--qdy, 0px)) rotate(-2.2deg) !important; width:108px; } /* --qdx/--qdy: QUEST_PAPER_NUDGE (render.js), keeps rewards clear of big monsters */
 
 /* Bosses: large-enemy size, standing in the pocket of their health-bar arc (feet resting on the curve) */
 .enc-card.fo-arch .fo-boss-side .fo-fig .fo-img.enc-art{ margin-bottom:-12px !important; max-width:125%; }
@@ -2720,7 +2720,7 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 .campfire-choice .cf-row{ display:flex; align-items:stretch; justify-content:center; gap:8px; }
 .campfire-choice .cf-or{ align-self:center; font-family:var(--font-display); font-size:13px; color:var(--parchment-dim); }
 .cf-btn{ flex:1 1 0; max-width:150px; display:flex; flex-direction:column; align-items:center; gap:2px; font-weight:bold; font-size:15px; padding:7px 8px; }
-.cf-btn small{ font-weight:normal; font-size:11.5px; opacity:.9; }
+.cf-btn small{ font-weight:normal; font-size:11.5px; opacity:.9; text-wrap:balance; }
 .cf-btn.cf-rest{ background:var(--green); color:var(--parchment); }
 .cf-btn.cf-rest:hover:not(:disabled){ background:#57a06b; }
 .cf-btn.cf-train{ background:var(--purple); color:var(--parchment); }
@@ -2842,3 +2842,48 @@ body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
 
 .relic-fx.class-fx .relic-float{ color:#ffb15c; font-size:14px; } /* Dungeoneer wrap bonus pop (Oct 16) */
 .fo-quests-float .fo-quests-sub{ font-size:8px; font-style:italic; color:#5a3a1c; line-height:1; margin:-1px 0 2px; text-align:center; } /* Oct 17 quest audit */
+
+/* ---- Oct 17 design fixes (audit Part 2, items 1, 3, 4, 5) ---- */
+/* Each menu button its own colour; the same colour means the same place everywhere (title, Settings, Codex tabs) */
+button.btn-codex{ background:#5f8a3c; color:#fff3dc; }
+button.btn-records{ background:#4f6aa6; color:#fff3dc; }
+button.btn-howto{ background:#8a5aa0; color:#fff3dc; }
+button.btn-log{ background:#b5653a; color:#fff3dc; }
+button.btn-export{ background:#2f7f7a; color:#fff3dc; }
+button.btn-codex:hover:not(:disabled){ background:#6e9c48; }
+button.btn-records:hover:not(:disabled){ background:#5d79b8; }
+button.btn-howto:hover:not(:disabled){ background:#9a6ab0; }
+button.btn-log:hover:not(:disabled){ background:#c47346; }
+button.btn-export:hover:not(:disabled){ background:#3a918b; }
+/* Settings: a two-column grid of smaller buttons so Abandon / Reset / Close show without scrolling */
+.settings-btn-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px; }
+.settings-btn-grid button{ font-size:13px; padding:7px 6px; line-height:1.2; }
+/* Reset Progress: darker, outline-only danger, so it never sits beside Abandon Run in the same red */
+button.danger-outline{ background:#1c130c; color:#ff9a8a; box-shadow:inset 0 0 0 2px #b33b3b; }
+button.danger-outline:hover:not(:disabled){ background:#2c1a12; box-shadow:inset 0 0 0 2px #d24a3e; }
+/* Camp upgrade rows take their die's colour (Attack red, Maneuver cream, like the tray); the "?" matches its row */
+.upg-attack .upgrade-btn, .upg-attack .upgrade-preview-btn{ background:#e8574f; color:#fff; }
+.upg-maneuver .upgrade-btn, .upg-maneuver .upgrade-preview-btn{ background:#ffe9a8; color:#3a2410; }
+.upg-attack .upgrade-btn:hover:not(:disabled), .upg-attack .upgrade-preview-btn:hover:not(:disabled){ background:#f06a62; }
+.upg-maneuver .upgrade-btn:hover:not(:disabled), .upg-maneuver .upgrade-preview-btn:hover:not(:disabled){ background:#fff2c8; }
+.upg-attack .upgrade-btn:disabled{ background:#6a2f2a !important; color:#f4c9c2 !important; }
+.upg-maneuver .upgrade-btn:disabled{ background:#6a5a34 !important; color:#f3e3b8 !important; }
+/* The one-time campfire confirm uses the colour of the button that opened it */
+button.cf-go-rest{ background:var(--green); color:var(--parchment); }
+button.cf-go-rest:hover:not(:disabled){ background:#57a06b; }
+button.cf-go-train{ background:var(--purple); color:var(--parchment); }
+button.cf-go-train:hover:not(:disabled){ background:#9a6fc2; }
+.upg-maneuver .token-count{ background:rgba(58,36,16,.16); }
+/* End screens (items 6-7): run card + [Save Card][Try Again] on one 769px screen; the rest behind Details */
+.end-screen h2{ margin-bottom:4px; }
+.end-screen .end-lede{ margin:0 0 4px; }
+.end-details[hidden], .end-main[hidden]{ display:none !important; }
+.end-details{ overflow-y:auto; overscroll-behavior:contain; padding:0 2px; }
+.end-details > :first-child{ margin-top:6px; }
+.end-send-btn{ display:block; margin:8px auto 2px; }
+.end-actions{ display:flex; justify-content:center; gap:10px; margin-top:12px; }
+.end-actions button{ flex:0 1 150px; }
+button.end-details-btn{ display:flex; flex-direction:column; align-items:center; gap:1px; width:min(100%, 340px); margin:12px auto 0; padding:6px 10px; background:#4a3220; color:#ffd76a; }
+button.end-details-btn:hover:not(:disabled){ background:#5a3e28; }
+.end-details-btn small{ font-weight:normal; font-size:11px; color:var(--parchment); opacity:.85; white-space:normal; }
+.end-screen .share-ask{ margin-top:10px; }

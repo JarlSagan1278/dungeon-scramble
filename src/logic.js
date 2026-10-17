@@ -2880,7 +2880,7 @@ function campRest(){
   S.health = cap(S.health+heal, S.maxHealth);
   if(typeof UIFX!=='undefined' && S.health>hpFrom) UIFX.campHeal = {from:hpFrom, to:S.health, at:performance.now(), dur:900+Math.min(heal,10)*120};
   campFireUsedBy('rest'); S.campHealed = S.health - hpFrom;
-  logMsg('heal', `Rested: scrambled ${count} actions, healed ${heal}.`, 'good');
+  logMsg('heal', `Rested: +${S.campHealed} HP`, 'good');
   if(heal>0 && typeof playTone==='function') playTone('restChord');
   render();
 }

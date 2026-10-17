@@ -868,9 +868,9 @@ function renderTitle(){
           <div class="title-btn-col">
             ${continueBtn}
             <button class="${saved?'':'primary'}" id="title-newrun-btn">${saved?'Start New Run':'New Run'}</button>
-            <button id="title-codex-btn">Codex</button>
-            <button id="title-history-btn">Records</button>
-            <button id="title-howto-btn">How to Play</button>
+            <button id="title-codex-btn" class="btn-codex">Codex</button>
+            <button id="title-history-btn" class="btn-records">Records</button>
+            <button id="title-howto-btn" class="btn-howto">How to Play</button>
           </div>
           ${(()=>{ const earned = CLASSES.filter(k=>!k.debug && DEPTH_BEST.byClass[k.id] && DEPTH_BEST.byClass[k.id].depth); return earned.length ? `<div class="title-badges">${earned.map(k=>`<div class="title-badge">${depthBadgeSVG(k.color, DEPTH_BEST.byClass[k.id].depth, 52)}</div>`).join('')}</div>` : ''; })()}
           <p class="hint" style="text-align:center; margin:10px 0 0; font-size:12px;">Playtesting? After a few runs, tap the gear &rarr; Export Play Data and send the file.</p>
@@ -1460,6 +1460,12 @@ const ART_WRONG = new Set([]);
 // Shrines face the way they were drawn unless listed here (Monster Footing page, Oct 16)
 const SHRINE_FLIP = new Set([]);
 const ENCOUNTER_NO_FLIP = new Set(['Grafted Grifter','Whence Wolf','Roudy Rinotter','Viscous Orb','Unbound Automa','Rogue Golemancer','Heating Elemental','Displacer Kitty','Armored Gear-Pest','Blastogenesis Engine','Half-life Host','Adhesive Pest Traps','The Necrorancher','Bellicose Biomancer','Ceramic Golem','Chimeric Sludge','Toadtaur Warrior','Rabbid Rabbats','Oilephant\'s Foot','Gestalt Network']); // Oct 15 (Jeremy): Toadtaur Warrior and Rabbid Rabbats face the other way
+// Quest paper nudges (Oct 17 design fixes): [px left, px up] for the monsters whose art would otherwise hide the
+// reward badges. Monsters always stand in front of the paper, so the paper moves instead (measured at 395x769).
+const QUEST_PAPER_NUDGE = {'The Strike/Break-er':[-36,-14],'Self-Replicating Forge':[-25,-18],'Bio-Mutant Escape':[-25,-17],'Extractnid Matriarch':[-23,-6],
+  'Anti-Euclidian Space':[-16,-12],'Extruzeon, Co-consul of Waste':[-12,-6],'Myceleus, Co-consul of Rot':[-10,-4],'Ergot Eruption':[-7,0],
+  'Unventilated Workshop':[-6,0],'Leper Con-Trap':[-5,0],'Ditched Heist':[-5,0]};
+function questPaperStyle(e){ const n = QUEST_PAPER_NUDGE[e && e.name]; return n ? ` style="--qdx:${n[0]}px;--qdy:${n[1]}px"` : ''; }
 let foPlayer = null; // the hero's half of the face-off band, set each renderGame()
 function renderEncounterCard(e, mode){
   const curHealthClamped = Math.max(0,e.curHealth);
@@ -1571,7 +1577,7 @@ function renderEncounterCard(e, mode){
     const typeWord = isBoss ? (e.type + '') : [tierWord, e.type!=='Enemy'?e.type:''].filter(Boolean).join(' ');
     const typeTag = typeWord ? `<small class="fo-type${isBoss?' fo-type-inline':''}${e.tier==='deadly'?' fo-type-deadly':''}">${typeWord}</small>` : '';
     const questLine = (e.quests && e.quests.length)
-      ? `<div class="fo-quests-float" title="Complete these during the fight for bonus rewards"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label">Quests</div>${e.quests.some(q=>!QUEST_ALL_FIGHT.test(parseQuestSpec(q).cond)) ? '<div class="fo-quests-sub">in one turn</div>' : ''}<div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, e.questsDone[i])}</span>`; }).join('')}</div></div>` : '';
+      ? `<div class="fo-quests-float"${questPaperStyle(e)} title="Complete these during the fight for bonus rewards"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label">Quests</div>${e.quests.some(q=>!QUEST_ALL_FIGHT.test(parseQuestSpec(q).cond)) ? '<div class="fo-quests-sub">in one turn</div>' : ''}<div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, e.questsDone[i])}</span>`; }).join('')}</div></div>` : '';
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
     const sz = encounterSize(e);
     const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz};--drop:${encounterDrop(e)}%"/>`
@@ -2224,14 +2230,15 @@ function showToast(text, kind){
   const notice = RB_NOTICE_RE.test(text) || (!kind && !/hit|damage|dealt|heal|block|nullify|leap|minion|quest|dot|hot|shield|freeze/i.test(text));
   const toPlayer = !notice && (kind==='bad' || /hits you|you for|your D\.O\.T|desperate/i.test(text)) && !/dealt/i.test(text);
   const arch = document.querySelector('#enc-panel .fo-arch');
-  const base = arch || document.getElementById('app') || document.body;
+  const campCard = !arch && document.querySelector('.camp-status-card'); // Oct 17: camp ribbons sit under the Camp title, not on it
+  const base = arch || campCard || document.getElementById('app') || document.body;
   const r = base.getBoundingClientRect();
   const layerId = notice ? 'rb-layer-notice' : 'rb-layer-combat';
   let layer = document.getElementById(layerId);
   if(layer) layer.remove();
   layer = document.createElement('div');
   layer.id = layerId; layer.className = 'rb-layer';
-  const h = arch ? r.height : Math.min(r.height, 280);
+  const h = (arch || campCard) ? r.height : Math.min(r.height, 280);
   layer.style.cssText = `left:${r.left}px;top:${Math.max(0,r.top)}px;width:${r.width}px;height:${h}px;`;
   const tone = notice ? 'gold' : (kind==='bad'||toPlayer ? 'bad' : kind==='good' ? 'good' : 'neutral');
   const dir = notice ? 'n' : (toPlayer ? 'l' : 'r');
@@ -3010,15 +3017,15 @@ function openSettingsModal(){
         ${PLAYDATA_URL ? settingsToggleRowHTML('pref-share-data', 'Share play data automatically', shareDataPref()==='yes') : ''}
       </div>
       <p class="hint" style="text-align:left;">Keyboard shortcuts ${infoDot('Enter = Go · Backspace = Clear · 1234/qwer/asdf/zxcv tap a tray die (matches its grid position)')}</p>
-      <div class="small-btn-row" style="justify-content:center; flex-direction:column;">
-        ${inRun ? '<button id="settings-log-btn">Log</button>' : ''}
-        <button id="settings-how-to-play-btn">How to Play</button>
-        <button id="settings-codex-btn">Codex <small class="hint">(Bestiary, Dice, Relics, Key)</small></button>
-        <button id="settings-records-btn">Records <small class="hint">(Run History, Achievements)</small></button>
-        <button id="settings-export-data-btn">Export Play Data</button>
-        ${inRun ? '<button id="settings-restart-btn" class="danger">Abandon Run</button>' : ''}
-        <button id="settings-reset-progress-btn" class="danger">Reset Progress</button>
+      <div class="settings-btn-grid">
+        ${inRun ? '<button id="settings-log-btn" class="btn-log">Log</button>' : ''}
+        <button id="settings-how-to-play-btn" class="btn-howto">How to Play</button>
+        <button id="settings-codex-btn" class="btn-codex" title="Bestiary, Dice, Relics, Key">Codex</button>
+        <button id="settings-records-btn" class="btn-records" title="Run History, Achievements">Records</button>
+        <button id="settings-export-data-btn" class="btn-export">Export Play Data</button>
         <button id="settings-close-btn">Close</button>
+        ${inRun ? '<button id="settings-restart-btn" class="danger">Abandon Run</button>' : ''}
+        <button id="settings-reset-progress-btn" class="danger-outline">Reset Progress</button>
       </div>
       <p class="hint" style="margin:10px 0 0;">v${GAME_VERSION}</p>
     </div></div>`);
@@ -4225,11 +4232,23 @@ function applyPocketCollapse(){
 // Campfire choice panel (Oct 14, Jeremy: make the choice clear on the camp screen): Rest OR Train, side by side.
 // Train = combining dice in the Upgrade section below (Jeremy: "the upgrading should be the fusing").
 function campFusionsReady(){ let n = 0; ['attack','maneuver'].forEach(cat=>{ if(!S.campUpgrades[cat]) [1,2].forEach(lv=>{ if(canUpgrade(cat,lv)) n++; }); }); return n; }
+// Oct 17: when nothing can be combined, say the real reason. A combine needs 3 matching dice AND a spare Back Pocket die
+// for every Tray slot it empties beyond the first (canUpgrade, logic.js), so 3 matching Tray dice need 2 spare Pocket dice.
+function trainBlockedText(){
+  let need = 0;
+  ['attack','maneuver'].forEach(cat=>{ if(S.campUpgrades[cat]) return; [1,2].forEach(lv=>{
+    const bp = S.backPocket.filter(d=>d.cat===cat && d.level===lv).length, tr = S.tray.filter(c=>c.die.cat===cat && c.die.level===lv).length;
+    if(bp + tr < UPGRADE_COST) return;
+    const fillers = Math.max(0, UPGRADE_COST - Math.min(bp, UPGRADE_COST) - 1);
+    if(fillers && (!need || fillers < need)) need = fillers;
+  }); });
+  return need ? `Needs ${need} spare ${need===1?'die':'dice'} in your Pocket` : 'No sets of 3 yet';
+}
 function campfireChoiceHTML(){
   if(S.campFireOut) return `<div class="campfire-choice out"><div class="cf-label">The campfire is out ${infoDot('Goldberg&#39;s Rube Machine took all night: no Rest or upgrades at this Camp.')}</div></div>`;
   const ch = S.campChoice, n = campFusionsReady(), est = restHealEstimate();
   const restSub = ch==='rest' ? `Healed +${S.campHealed||0}` : (S.health>=S.maxHealth ? 'Already at full health' : (est>0 ? '' : 'Heals nothing here'));
-  const trainSub = ch==='train' ? ((S.campUpgrades.attack||S.campUpgrades.maneuver) ? 'Dice combined' : 'Combine dice below') : (n ? 'Unlocks combining below' : 'No sets of 3 yet');
+  const trainSub = ch==='train' ? ((S.campUpgrades.attack||S.campUpgrades.maneuver) ? 'Dice combined' : 'Combine dice below') : (n ? 'Unlocks combining below' : trainBlockedText());
   const cls = k => ch ? (ch===k ? ' chosen' : ' skipped') : '';
   return `<div class="campfire-choice${ch?' done':''}">
       <div class="cf-label">${ch ? 'Campfire used' : 'Campfire: choose one'} ${infoDot('Each Camp\'s fire gives you ONE of these. Rest: scramble your Tray and heal half the faces that aren\'t blank. Train: combine 3 matching dice into 1 of the next level (up to one Attack and one Maneuver). Organizing is always free.')}</div>
@@ -4251,7 +4270,7 @@ function confirmCampfire(kind, go){
       <p>${rest ? "The campfire gives one: if you Rest, you can't combine dice at this Camp." : "The campfire gives one: if you Train (combine dice), you can't Rest at this Camp."}</p>
       <div class="small-btn-row" style="justify-content:center;">
         <button id="cf-confirm-cancel">Not yet</button>
-        <button class="primary" id="cf-confirm-go">${rest ? 'Rest' : 'Train'}</button>
+        <button class="${rest ? 'cf-go-rest' : 'cf-go-train'}" id="cf-confirm-go">${rest ? 'Rest' : 'Train'}</button>
       </div>
     </div></div>`);
   openModal(overlay);
@@ -4299,7 +4318,7 @@ function renderCamp(){
       const disabled = !eligible; // a locked one keeps its glow and normal look; its tap is refused in the handler (Oct 16, Jeremy)
       const needsBackfill = count>=3 && !canUpgrade(cat,level);
       const upgradeTitle = needsBackfill ? 'Needs more spare dice to backfill' : `Combine 3 ${label} ${ROMAN[level]} into 1 ${label} ${ROMAN[level+1]}`;
-      upgradeRows.push(`<div class="upgrade-row">
+      upgradeRows.push(`<div class="upgrade-row upg-${cat}">
           <button class="upgrade-btn${(eligible && !baseCamp)?' upgrade-ready':''}${locked?' upgrade-locked':''}" id="upgrade-${cat}-${level}" ${disabled?'disabled':''}${locked?' aria-disabled="true"':''} title="${locked?'Choose Train at the campfire first':upgradeTitle}">${label} ${ROMAN[level]} ${mergeGlyphSVG(16)} ${ROMAN[level+1]} <span class="token-count">${count}</span></button>
           <button id="preview-${cat}-${level}" class="upgrade-preview-btn" title="Preview the resulting die's faces">?</button>
         </div>`);
@@ -4505,8 +4524,7 @@ function runCardHTML(outcome){
     <div class="rc-dice">${d.dice.map(x=>{ const c = RC_DIE_COLORS[x.cat]||RC_DIE_COLORS.alloy; return `<span class="rc-die" title="${x.name}" style="background:${c[0]};color:${c[1]}">${x.type==='blank'?'':iconSpan(x.type, x.value, true)}</span>`; }).join('')}</div>
     ${d.relics.length ? `<div class="rc-relics">${d.relics.map(r=>relicBadgeHTML(r,'rc-gem')).join('')}</div>` : ''}
     <div class="rc-foot">Dungeon Scramble v${GAME_VERSION}</div>
-  </div>
-  <button id="save-run-card-btn" style="margin-top:8px;">Save Card</button>`;
+  </div>`;
 }
 function rcLoadImg(src){ return new Promise(res=>{ if(!src) return res(null); const im = new Image(); im.onload = ()=>res(im); im.onerror = ()=>res(null); im.src = src; }); }
 function rcSvgImg(svg, color){
@@ -4555,7 +4573,43 @@ async function saveRunCard(outcome){
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fname; document.body.appendChild(a); a.click();
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1500);
 }
-function wireRunCard(outcome){ const b = document.getElementById('save-run-card-btn'); if(b) b.onclick = ()=>{ b.disabled = true; saveRunCard(outcome).finally(()=>{ b.disabled = false; }); }; }
+function wireRunCard(outcome){ const b = document.getElementById('save-run-card-btn'); if(b) b.onclick = ()=>{ b.disabled = true; saveRunCard(outcome).finally(()=>{ b.disabled = false; }); }; wireEndDetails(outcome==='victory'); }
+
+// End screens (Oct 17 design fixes, items 6-7): the run card and [Save Card][Try Again] fit one 769px screen; the
+// depth seal, relic, achievements, boons and Run Summary sit behind a Details toggle that swaps places with the card.
+function endScreenHTML(o){
+  const news = [];
+  if(o.seal) news.push(S.depthResult && S.depthResult.newClassBest ? 'New best depth' : 'Depth seal');
+  if(o.relic) news.push('Origin relic');
+  const na = (S.newAchievements||[]).length; if(na) news.push(`${na} achievement${na>1?'s':''}`);
+  const nb = (S.newBoonDice||[]).filter((n,i,a)=>a.indexOf(n)===i).length; if(nb) news.push(`${nb} Starting Boon${nb>1?'s':''}`);
+  news.push('Run Summary');
+  return `<div class="panel end-screen"><h2>${o.title}</h2><p class="end-lede">${o.lede}</p>
+    <div class="end-swap">
+      <div class="end-main">${runCardHTML(o.outcome)}${o.note||''}</div>
+      <div class="end-details" hidden>${o.seal}${o.relic}${newAchievementsHTML(S.newAchievements)}${newBoonsHTML()}${summaryStatsHTML()}
+        <button class="btn-export end-send-btn" onclick="openExportDataModal()">Send Play Data</button></div>
+    </div>
+    <div class="end-actions"><button id="save-run-card-btn">Save Card</button><button class="primary" onclick="location.reload()">${o.again}</button></div>
+    <button id="end-details-btn" class="end-details-btn"><span class="end-details-word">Details</span><small>${news.join(' &middot; ')}</small></button>
+    ${shareDataAskHTML()}
+  </div>`;
+}
+function wireEndDetails(countUp){ // countUp: the Run Summary numbers count up (victory only, as before)
+  const b = document.getElementById('end-details-btn'); if(!b) return;
+  const main = document.querySelector('.end-main'), det = document.querySelector('.end-details');
+  let animated = false;
+  b.onclick = ()=>{
+    const open = det.hidden;
+    // the details take the card's place and may use whatever room is left on screen, never growing the page
+    if(open){ const kids = [...b.parentNode.children], bottom = Math.max(...kids.map(k=>k.getBoundingClientRect().bottom));
+      det.style.maxHeight = Math.max(main.offsetHeight, Math.floor(window.innerHeight - bottom - 22 + main.offsetHeight)) + 'px'; }
+    det.hidden = !open; main.hidden = open;
+    b.classList.toggle('open', open);
+    b.querySelector('.end-details-word').textContent = open ? 'Back to run card' : 'Details';
+    if(open){ det.scrollTop = 0; if(countUp && !animated){ animated = true; animateSummary(); } }
+  };
+}
 
 // Victory-only reveal: the first win with an Origin earns its signature relic.
 function originRelicEarnedHTML(){
@@ -4669,18 +4723,9 @@ function renderVictory(){
     if(typeof spawnConfettiRain==='function') spawnConfettiRain();
     if(S.newOriginRelic) setTimeout(()=>{ if(typeof playTone==='function') playTone('relicProc'); }, 700);
   }
-  app.innerHTML = `<div class="panel"><h2>Dungeon Conquered!</h2><p>You defeated the Big Boss and cleared all three floors. Well fought, Adventurer.</p>
-    ${runCardHTML('victory')}
-    ${depthSealHTML()}
-    ${originRelicEarnedHTML()}
-    ${newAchievementsHTML(S.newAchievements)}
-    ${newBoonsHTML()}
-    ${summaryStatsHTML()}
-    <button class="primary" style="margin-top:12px;" onclick="location.reload()">Play Again</button>
-    ${shareDataAskHTML()}
-    <button style="margin-top:8px;" onclick="openExportDataModal()">Send Play Data</button></div>`;
+  app.innerHTML = endScreenHTML({ outcome:'victory', title:'Dungeon Conquered!', lede:'You defeated the Big Boss and cleared all three floors. Well fought, Adventurer.',
+    seal:depthSealHTML(), relic:originRelicEarnedHTML(), again:'Play Again' });
   wireRunCard('victory');
-  animateSummary();
 }
 function renderGameOver(){
   if(!S.gameOverRecorded){
@@ -4715,15 +4760,8 @@ function renderGameOver(){
     return;
   }
   const carryNote = S.carryoverChosenName ? `<p class="hint">${S.carryoverChosenName} will join your tray at the start of your next run.</p>` : '';
-  app.innerHTML = `<div class="panel"><h2>Defeated</h2><p>Your Adventurer retreats to town in temporary defeat...</p>
-    ${runCardHTML('defeat')}
-    ${carryNote}
-    ${newAchievementsHTML(S.newAchievements)}
-    ${newBoonsHTML()}
-    ${summaryStatsHTML()}
-    <button class="primary" style="margin-top:12px;" onclick="location.reload()">Try Again</button>
-    ${shareDataAskHTML()}
-    <button style="margin-top:8px;" onclick="openExportDataModal()">Send Play Data</button></div>`;
+  app.innerHTML = endScreenHTML({ outcome:'defeat', title:'Defeated', lede:'Your Adventurer retreats to town in temporary defeat...',
+    note:carryNote, seal:'', relic:'', again:'Try Again' });
   wireRunCard('defeat');
 }
 

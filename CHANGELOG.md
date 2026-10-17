@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.41.60 (Oct 17, 2026)
+- Design fixes approved by Jeremy (Oct 17 audit): title and Settings buttons each their own colour (Codex green, Records blue, How to Play violet, Log orange, Export teal; Reset Progress now a dark red-ringed button next to the red Abandon Run); camp Attack/Maneuver combine rows red and cream with matching "?" buttons.
+- Game over and Victory fit the screen (were up to 1,242px tall): run card, then Save Card + Try Again centred in one row, then a Details toggle for achievements and the run summary. Settings shows every button without scrolling.
+- Quest papers move clear of big monsters on 11 cards: no reward badge is covered on any of the 42 quest cards.
+- Camp: the Rest/Train confirm button takes the colour of the button that opened it (green/purple); Train says "Needs N spare dice in your Pocket" when that is what blocks combining; the rest message reads "Rested: +H HP" and sits below the Camp title.
+
 ## 1.41.59 (Oct 17, 2026)
 - Quests (Jeremy, from the Oct 17 Quest Health study): Quest Health is gone -- every quest pays exactly what its paper says, and the gold "quest health" slice on enemy health bars is removed. Displacer Lair's quests now pay 5 / 5 / 5 (were 10 / 10 / 10, capped at 15), the one card that became trivial without the cap.
 - Shrine renamed (Jeremy): Time-Intensive Shrine is now **Goldberg's Rube Machine** ("It takes all night to run: give up your next campfire..."). Same effect; still borrows the Scrying Spheroid's art until its own is painted.
