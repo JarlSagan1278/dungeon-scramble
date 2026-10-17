@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.41.61 (Oct 17, 2026)
+- Batch G art: Bellicose Biomancer, Ceramic Golem, The Strike/Break-er.
+- Design pass 2 (rest of the Oct 17 audit): Metamorphous only on titles/headings (buttons plain serif, path counter Georgia); all pop-up titles centred with the same close button; gear hidden under pop-ups; Codex Key tiles drawn like dice; near-black outlines on camp/pocket/stat panels; brown round bubble with gold floor; shrine tray rail hidden; disabled buttons solid; each Origin/Class pill and shrine option its own colour; HP number inside the bar at camp and shrines; vines behind the quest paper; Bestiary lists each monster's quests; Codex/Records scroll once.
+- Camp: Attack/Maneuver labels readable over the lock stripes; wall horizon lowered so the campfire sits on the floor; Rest/Train labels vertically centred.
+- Loot chest outlines drawn on top of the fill.
+- Setup screen no longer grows past 769px for returning players.
+
 ## 1.41.60 (Oct 17, 2026)
 - Design fixes approved by Jeremy (Oct 17 audit): title and Settings buttons each their own colour (Codex green, Records blue, How to Play violet, Log orange, Export teal; Reset Progress now a dark red-ringed button next to the red Abandon Run); camp Attack/Maneuver combine rows red and cream with matching "?" buttons.
 - Game over and Victory fit the screen (were up to 1,242px tall): run card, then Save Card + Try Again centred in one row, then a Details toggle for achievements and the run summary. Settings shows every button without scrolling.

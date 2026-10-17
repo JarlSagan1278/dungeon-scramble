@@ -20,7 +20,7 @@
 - Oct 15 (1.41.22-1.41.32): monster tuning, Floor 2 trims, shrine boosts, Extruzeon +10% HP, depth repricing, automatic play data, Batch E art, paper texture on all art (WebP) and in-world scenery, Monster Footing rounds 1-2. The Play Data sheet is still empty: needs the 1.41.24+ zip deployed and a finished run with sharing on.
 - Bug hunt on 1.41.32: 24/24 runs clean (bugsearch.js), every shrine option clean (new tools/test_shrines.js, 40/40). Rulebook PDF refreshed for today's changes.
 - Monster Footing page (https://claude.ai/artifact/6sxozXQfah2dSsRxnQEAkj) collection `lifts3` is round 3 (empty so far).
-- Art still out: repaint Batch G (Floor 2; F imported Oct 17), H-K, and silhouette batches L-O (stand-in shrines, Magic dice). When the last one is back: the consistency pass (tools/art/consistency.py) over all art.
+- Art still out: Batch G remainder (Unventilated Workshop, The Necrorancher; F and the rest of G imported Oct 17), H-K, and silhouette batches L-O (stand-in shrines, Magic dice). When the last one is back: the consistency pass (tools/art/consistency.py) over all art.
 
 ## Small follow-ups
 - Log whether a death was avoidable in the bot studies (literature review idea). Best-depth rewards: covered by dice finishes and relic gating (Jeremy, Oct 15); assist mode: not for now.
@@ -39,7 +39,7 @@
 - **Tap responsiveness (ongoing):** path taps ~2.5x faster (1.39.2); idle animations compositor-only (1.40.0, idle board ~7x cheaper). Next candidates: Swap/Reroll and class-ability taps (still full render), camp screen, turn playback script. Measure at CPU x4 with studies paused.
 - **Shrine overhaul:** more presence in animation and timing; many more shrines as a way to add relics; conversion-relic idea (e.g. 1 damage per Shield gained). Use the shrine study's findings.
 - **Sound effect pass:** waiting on Jeremy's ear test.
-- **Design-consistency audit**, plus a rewrite of the quest descriptions (quest audit done Oct 12).
+- ~~Design-consistency audit~~ done Oct 17 (1.41.60-1.41.61). Left: six `--` strings in data.js; Rube Machine needs its own art.
 - **Redesign the class depth badges** so each one represents its class visually.
 - **When all the art is in (remind Jeremy):** (1) the consistency pass `tools/art/consistency.py` over ALL art, stronger than the Oct 12 test; (2) the hand-drawn texture pass `tools/art/handdrawn.py` on all 48 hero portraits, and try it on the chest and environment art.
 - **Art still needed:** the 4 Magic dice, the stand-in shrines (incl. the Scroll Dispensers), floor and archway bricks, eventually a chest paintover (last priority). Layered cover art parked.

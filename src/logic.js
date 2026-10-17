@@ -79,7 +79,7 @@ function grantRelic(id, opts){
   if(id==='flask'){ S.maxHealth += 8; S.health = cap(S.health+8, S.maxHealth); }
   markRelicFound(id);
   teleLog('relic_gain', {relic:id, via:(opts&&opts.via)||'shrine'});
-  if(!(opts&&opts.silent)) logMsg('sys', `Relic gained: ${r.name} -- ${r.desc}`, 'good');
+  if(!(opts&&opts.silent)) logMsg('sys', `Relic gained: ${r.name} — ${r.desc}`, 'good');
   return true;
 }
 
@@ -1743,7 +1743,7 @@ function applyPathStep(step){
     const cl = m0 - S.tray.filter(c=>c.minion).length; if(cl>0) teleLog('minions_cleared', {n:cl, left:m0-cl}); }
   if(step.leapClearIdx!=null){
     clearMinionAt(step.leapClearIdx);
-    logMsg('sys', 'Leaped clean over a Minion -- cleared it!', 'good');
+    logMsg('sys', 'Leaped clean over a Minion: cleared it!', 'good');
   }
 }
 
@@ -2434,7 +2434,7 @@ function runShrineEffect(e, effect){
       if(hasRelic('shrine_bell') && pool.length) fireRelic('shrine_bell','+1 choice');
       if(!pool.length){
         S.health = cap(S.health+10, S.maxHealth);
-        const t = 'You already hold every relic -- the altar heals 10 instead.';
+        const t = 'You already hold every relic, so the altar heals 10 instead.';
         logMsg('heal', `${e.name}: ${t}`);
         S.shrineResult = { title: e.name, text: t };
         render(); return;
@@ -2527,7 +2527,7 @@ function continueFromShrine(){
 function applyShrineBoon(e){
   if(depthRank('dues') && e.effect){ const was = S.health; S.health = Math.max(1, S.health-2); if(S.health<was) logMsg('dmg', `Union Dues: the shrine takes ${was-S.health} HP.`, 'bad'); }
   if(!e.effect){
-    const t = `${e.name} has no coded effect yet (boon: "${e.boon}") -- log-only for now.`;
+    const t = `${e.name} has no coded effect yet (boon: "${e.boon}"); log-only for now.`;
     logMsg('sys', t);
     S.shrineResult = { title: e.name, text: t };
     render();
@@ -2837,7 +2837,7 @@ function selectOrganize(type, idx){
   const bpDie = S.backPocket[bpIdx];
   if(!trayCell || !trayCell.die || !bpDie){ S.organizeSelection = null; render(); return; }
   // Swapping two identical dice changes nothing -- say so and keep the selection instead of looking like it cancelled.
-  if(trayCell.die.name===bpDie.name){ if(typeof showToast==='function') showToast('Those two dice are identical -- pick a different one.', null); render(); return; }
+  if(trayCell.die.name===bpDie.name){ if(typeof showToast==='function') showToast('Those two dice are identical. Pick a different one.', null); render(); return; }
   S.backPocket[bpIdx] = trayCell.die;
   trayCell.die = bpDie;
   trayCell.faceIdx = 0;

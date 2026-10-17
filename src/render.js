@@ -277,6 +277,7 @@ function archPoints(w,h,i,step){ const pts=[], rx=120, ry=90;
   for(let y=ry;y<=h-12;y+=step) pts.push([w-i,y]);
   return pts; }
 function archFrameSVG(w,h,lvl){
+  archFrameSVG.vines = '';
   const AP = archPath(w,h,5);
   // Outlined bricks: one stone band over a black underlay, cut into bricks by thin black joints; a faint second pass on a
   // different period lightens a few bricks at irregular intervals so it reads as stonework, not stripes.
@@ -314,7 +315,7 @@ function archFrameSVG(w,h,lvl){
     if(lvl>=2){ const lx=(x+sway/2+3).toFixed(1), ly=(yTop+len*.6).toFixed(1), mx=(x+sway/2-3).toFixed(1), my=(yTop+len*.9).toFixed(1);
       v+=`<ellipse cx="${lx}" cy="${ly}" rx="3.6" ry="2" fill="${G[2]}" transform="rotate(-30 ${lx} ${ly})"/><ellipse cx="${mx}" cy="${my}" rx="3.6" ry="2" fill="${G[3]}" transform="rotate(30 ${mx} ${my})"/>`; }
   }
-  out+=`<g>${v}</g>`;
+  archFrameSVG.vines = v; // hanging vines go on their own layer behind the quest paper (decorateArch, Oct 17)
   const n=[0,2,4,7][lvl]; let sv='';
   for(let k=0;k<n;k++){ const side=k%2?1:-1, x=side>0?w-9:9, y0=h-14-Math.floor(k/2)*10, len=22+rnd()*(14+lvl*8);
     sv+=`<path d="M${x},${y0} q${side*-4},${-len/2} ${side*-1},${-len}" stroke="${G[1]}" stroke-width="${(1.6+lvl*.4).toFixed(1)}" fill="none" stroke-linecap="round"/>`; }
@@ -690,9 +691,17 @@ function decorateArch(){
       img.width = w+2*PX; img.height = h+2*PY;
       img.style.cssText = `left:${-5-PX}px;top:${-10-PY}px;max-width:none`;
       img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-      decorateArch._c = { key, img };
+      let vimg = null;
+      if(archFrameSVG.vines){
+        const vsvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w+2*PX}" height="${h+2*PY}" viewBox="${-PX} ${-PY} ${w+2*PX} ${h+2*PY}">${pf}${pt?'<g filter="url(#pp)">':''}<g>${archFrameSVG.vines}</g>${pt?'</g>':''}</svg>`;
+        vimg = img.cloneNode(false); vimg.className = 'fo-frame fo-vines';
+        vimg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(vsvg);
+      }
+      decorateArch._c = { key, img, vimg };
     }
     card.appendChild(decorateArch._c.img);
+    // the vines layer goes first in the card, so the quest paper and the monster (same layer, later) paint over it
+    if(decorateArch._c.vimg) card.insertBefore(decorateArch._c.vimg, card.firstChild);
     try{ document.body.classList.toggle('is-resolving', !!S.transitioning); }catch(e){}
     syncIdleBreath(); syncMascotHop(); rollHpNumbers();
     // Headroom above the monster (offset sizes again), so big monsters grow upward only until the arch would hide them.
@@ -813,7 +822,7 @@ let chestLockFxAt = -1e9; // when Go was last pressed (render() rebuilds the loc
 const CHEST_TRIM_STATIC = (()=>{
   const g='<defs><linearGradient id="chMg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8d98a2"/><stop offset="1" stop-color="#4a5560"/></linearGradient><linearGradient id="chLg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e0b14a"/><stop offset="1" stop-color="#9a6d1d"/></linearGradient></defs>';
   const corner='<svg viewBox="0 0 36 36" width="36" height="36">'+g+'<path d="M2 2H34V13H13V34H2Z" fill="url(#chMg)" stroke="#0c0705" stroke-width="2.2" stroke-linejoin="round"/><circle cx="7.5" cy="7.5" r="2.2" fill="#0c0705" opacity=".55"/><circle cx="24" cy="7.5" r="2.2" fill="#0c0705" opacity=".55"/><circle cx="7.5" cy="24" r="2.2" fill="#0c0705" opacity=".55"/><circle cx="7.1" cy="7.1" r="1.1" fill="#fff" opacity=".5"/></svg>';
-  const lock='<svg viewBox="0 0 64 58" width="58" height="52">'+g+'<path class="ch-shackle" d="M14 6 Q32 -2 50 6 L50 18 L14 18Z" fill="url(#chMg)" stroke="#0c0705" stroke-width="2.4" stroke-linejoin="round"/><path d="M6 16 H58 Q60 16 60 19 V40 Q60 54 32 55 Q4 54 4 40 V19 Q4 16 6 16Z" fill="url(#chLg)" stroke="#0c0705" stroke-width="2.6" stroke-linejoin="round"/><path d="M9 21 H55 V30" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="2" stroke-linecap="round"/><circle cx="32" cy="28" r="5" fill="#0c0705"/><path d="M32 31 L29 43 H35Z" fill="#0c0705"/><clipPath id="chLockClip"><path d="M6 16 H58 Q60 16 60 19 V40 Q60 54 32 55 Q4 54 4 40 V19 Q4 16 6 16Z"/></clipPath><g clip-path="url(#chLockClip)"><g class="ch-shine"><rect x="-26" y="0" width="12" height="60" fill="#fff" opacity=".7" transform="skewX(-20)"/></g></g></svg>';
+  const lock='<svg viewBox="0 0 64 58" width="58" height="52">'+g+'<path class="ch-shackle" d="M14 6 Q32 -2 50 6 L50 18 L14 18Z" fill="url(#chMg)" stroke="#0c0705" stroke-width="2.4" stroke-linejoin="round"/><path d="M6 16 H58 Q60 16 60 19 V40 Q60 54 32 55 Q4 54 4 40 V19 Q4 16 6 16Z" fill="url(#chLg)" stroke="#0c0705" stroke-width="2.6" stroke-linejoin="round"/><path d="M9 21 H55 V30" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="2" stroke-linecap="round"/><circle cx="32" cy="28" r="5" fill="#0c0705"/><path d="M32 31 L29 43 H35Z" fill="#0c0705"/><clipPath id="chLockClip"><path d="M6 16 H58 Q60 16 60 19 V40 Q60 54 32 55 Q4 54 4 40 V19 Q4 16 6 16Z"/></clipPath><g clip-path="url(#chLockClip)"><g class="ch-shine"><rect x="-26" y="0" width="12" height="60" fill="#fff" opacity=".7" transform="skewX(-20)"/></g></g><path d="M6 16 H58 Q60 16 60 19 V40 Q60 54 32 55 Q4 54 4 40 V19 Q4 16 6 16Z" fill="none" stroke="#0c0705" stroke-width="2.6" stroke-linejoin="round"/></svg>';
   return {corners:'<div class="cc tl">'+corner+'</div><div class="cc tr">'+corner+'</div><div class="cc bl">'+corner+'</div><div class="cc br">'+corner+'</div>', lock};
 })();
 function chestTrimHTML(){
@@ -860,7 +869,7 @@ function renderTitle(){
     <div class="title-screen-fill">
       <div class="panel title-panel">
         <div class="title-art-wrap">
-          <img class="title-cover-art" src="${COVER_ART}" alt="Dungeon Scramble -- a dice-drafting, deck-builder">
+          <img class="title-cover-art" src="${COVER_ART}" alt="Dungeon Scramble: a dice-drafting deck-builder">
           <div class="title-art-fade"></div>
         </div>
         <div class="title-content">
@@ -1049,7 +1058,7 @@ function classShowcaseHTML(k){
 // as the Origin die above, shown under the runic carousel once something
 // other than "None" is picked.
 function boonShowcaseHTML(d){
-  if(!d) return `<div class="boon-showcase-empty">No Starting Boon selected -- you'll begin with just the standard tray.</div>`;
+  if(!d) return `<div class="boon-showcase-empty">No Starting Boon selected: you'll begin with just the standard tray.</div>`;
   const dieArt = LOOT_ART[d.name];
   const tone = `${d.tier}-tone`;
   return `
@@ -1093,7 +1102,7 @@ function renderSetup(){
         ${boonDice.length ? `
           <div class="boon-scroll" id="boon-scroll"></div>
           <div class="boon-showcase" id="boon-showcase"></div>
-        ` : `<p class="hint">You've unlocked Starting Boon tier${boonTiers.length>1?'s':''} (${boonTiers.map(t=>BOON_TIER_LABELS[t]).join(', ')}), but no die is ready yet -- take the same loot die in ${BOON_COPIES_NEEDED} runs (see the Dice Compendium) to make it pickable here.</p>`}
+        ` : `<p class="hint boon-none-hint">No die ready yet. Take the same loot die in ${BOON_COPIES_NEEDED} runs to start with it.</p>`}
       </div>` : ''}
 
       ${depthMenuUnlocked() ? depthMenuHTML() : ''}
@@ -1133,7 +1142,7 @@ function renderSetup(){
     ORIGINS.forEach(o=>{
       const unlocked = isOriginUnlocked(o.id);
       const previewing = (o.id===previewedOriginId && o.id!==chosenOrigin);
-      const c = el(`<button type="button" class="class-tab-btn ${o.id===chosenOrigin?'selected':''} ${previewing?'previewing':''} ${unlocked?'':'locked'}">${unlocked?'':lockSVG(10)+' '}${o.name}</button>`);
+      const c = el(`<button type="button" class="class-tab-btn origin-tab-${o.id} ${o.id===chosenOrigin?'selected':''} ${previewing?'previewing':''} ${unlocked?'':'locked'}">${unlocked?'':lockSVG(10)+' '}${o.name}</button>`);
       c.onclick = ()=>{
         previewedOriginId = o.id;
         if(unlocked){ chosenOrigin = o.id; } else if(typeof showToast==='function') showToast(ORIGIN_UNLOCK_HINT[o.id]||'Locked', null);
@@ -1224,6 +1233,7 @@ function renderSetup(){
     }
     function renderBoonShowcaseNow(){
       boonShowcase.innerHTML = boonShowcaseHTML(chosenBoonName ? boonDice.find(d=>d.name===chosenBoonName) : null);
+      fitSetup();
       attachLongPressTooltips('#boon-showcase .die-face-chip');
     }
     renderBoonScroll();
@@ -1272,6 +1282,17 @@ function renderSetup(){
       if(typeof showToast==='function') showToast('Debug class armed', 'good');
     }
   };
+  fitSetup();
+  try{ if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>fitSetup()); }catch(e){}
+  setTimeout(fitSetup, 400); // again once the title font and the art have settled
+}
+// The setup card must never grow past the screen (Oct 17): veterans get a Starting Boon row and the Depth bar, so
+// tighten step by step (fit1..fit3, styles.css) only while the page is still taller than the window.
+function fitSetup(){
+  const p = document.querySelector('.setup-panel'); if(!p) return;
+  const se = document.scrollingElement || document.documentElement;
+  p.classList.remove('fit1','fit2','fit3');
+  for(const c of ['fit1','fit2','fit3']){ if(se.scrollHeight <= window.innerHeight + 1) break; p.classList.add(c); }
 }
 
 function renderRoute(){
@@ -3074,7 +3095,7 @@ function openSettingsModal(){
     close();
     const confirmOverlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
         <h2>Reset Progress?</h2>
-        <p>This permanently erases your lifetime stats, Achievements, Dice Compendium discoveries, and Run History -- locked Origins and Starting Boon tiers go back to locked. Sound and motion settings are kept.${inRun ? ' Your current run will also be lost.' : ''}</p>
+        <p>This permanently erases your lifetime stats, Achievements, Dice Compendium discoveries, and Run History. Locked Origins and Starting Boon tiers go back to locked. Sound and motion settings are kept.${inRun ? ' Your current run will also be lost.' : ''}</p>
         <div class="small-btn-row" style="justify-content:center;">
           <button id="confirm-reset-cancel">Cancel</button>
           <button class="danger" id="confirm-reset-go">Reset Progress</button>
@@ -3140,7 +3161,7 @@ function runHistoryHTML(){
         </div>
         <span class="run-history-date">${dateStr}</span>
       </div>`;
-  }).join('') : `<p class="hint">No runs recorded yet -- finish a run to see it here.</p>`;
+  }).join('') : `<p class="hint">No runs recorded yet. Finish a run to see it here.</p>`;
   return `${summary}<div class="run-history-list">${rows}</div>
     ${history.length ? '<div class="small-btn-row" style="justify-content:center;"><button id="run-history-clear-btn" class="danger">Clear History</button></div>' : ''}`;
 }
@@ -3345,6 +3366,15 @@ function lootPreviewTileHTML(opt, uniqueId, artSrc){
 // globally) never leaves the overlay stuck in the DOM.
 function openModal(overlay){
   document.body.appendChild(overlay);
+  // Oct 17 design fixes (item 16): every pop-up a backdrop tap dismisses gets the same ✕ in the same corner. Added a
+  // microtask later, once the caller has set overlay.onclick; the ✕ acts exactly like that backdrop tap.
+  Promise.resolve().then(()=>{
+    const m = overlay.querySelector('.modal');
+    if(!m || m.querySelector('.modal-x-btn') || typeof overlay.onclick!=='function') return;
+    const x = el('<button class="modal-x-btn" title="Close" aria-label="Close">✕</button>');
+    x.onclick = ev=>{ ev.stopPropagation(); overlay.onclick({target:overlay}); };
+    m.insertBefore(x, m.firstChild);
+  });
   return overlay;
 }
 function closeModal(overlay, after){
@@ -3426,29 +3456,36 @@ function lootChestSVG(tier){
   const c = LOOT_CHEST_METAL[tier] || LOOT_CHEST_METAL.alloy;
   const m=c.metal, d=c.dark, wood='#9a5b26', woodDk='#74421b', woodLt='#b97636';
   return `<svg class="loot-chest-svg" viewBox="0 0 140 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-<defs><radialGradient id="lootChestGlow" cx="50%" cy="60%" r="55%"><stop offset="0" stop-color="${m}" stop-opacity=".55"/><stop offset="1" stop-color="${m}" stop-opacity="0"/></radialGradient></defs>
+<defs><radialGradient id="lootChestGlow" cx="50%" cy="60%" r="55%"><stop offset="0" stop-color="${m}" stop-opacity=".55"/><stop offset="1" stop-color="${m}" stop-opacity="0"/></radialGradient><clipPath id="lootChestShape"><path d="M20 64 H120 V108 a5 5 0 0 1-5 5 H25 a5 5 0 0 1-5-5 Z"/><path d="M18 64 V50 C18 28 40 18 70 18 C100 18 122 28 122 50 V64 Z"/></clipPath></defs>
 <ellipse cx="70" cy="68" rx="68" ry="58" fill="url(#lootChestGlow)"/>
 <ellipse cx="70" cy="118" rx="52" ry="6" fill="#000" opacity=".35"/>
 <g filter="url(#fx-paper)"><!-- Oct 16 (Jeremy): paper grain on the chest's wood and metal (not the glow) -->
-<g stroke="#0c0705" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+<g stroke="none" clip-path="url(#lootChestShape)">
  <path d="M20 64 H120 V108 a5 5 0 0 1-5 5 H25 a5 5 0 0 1-5-5 Z" fill="${wood}"/>
  <path d="M18 64 V50 C18 28 40 18 70 18 C100 18 122 28 122 50 V64 Z" fill="${woodLt}"/>
- <path d="M18 64 H122" fill="none"/>
  <path d="M38 21 V64 H54 V18 C48 18 42 19 38 21Z" fill="${m}"/>
  <path d="M102 21 V64 H86 V18 C92 18 98 19 102 21Z" fill="${m}"/>
  <path d="M38 64 V113 H54 V64Z" fill="${m}"/>
  <path d="M102 64 V113 H86 V64Z" fill="${m}"/>
  <rect x="58" y="54" width="24" height="26" rx="5" fill="${m}"/>
- <circle cx="70" cy="64" r="4" fill="#0c0705" stroke="none"/>
- <path d="M70 66 V74" stroke="#0c0705" stroke-width="3.5" fill="none"/>
 </g>
 <g fill="none" stroke="${woodDk}" stroke-width="2.4" stroke-linecap="round" opacity=".8">
  <path d="M24 82 H34 M106 82 H116 M24 98 H34 M106 98 H116"/>
  <path d="M26 36 Q32 28 38 25 M114 36 Q108 28 102 25"/>
 </g>
 <g fill="#fff" opacity=".45"><rect x="42" y="26" width="3" height="30" rx="1.5"/><rect x="90" y="26" width="3" height="30" rx="1.5" opacity=".5"/><rect x="62" y="57" width="3" height="10" rx="1.5"/></g>
-<g fill="${d}" stroke="#0c0705" stroke-width="1.5"><circle cx="46" cy="72" r="2.4"/><circle cx="46" cy="104" r="2.4"/><circle cx="94" cy="72" r="2.4"/><circle cx="94" cy="104" r="2.4"/></g>
 </g>
+<!-- Oct 17 (Jeremy: "the fill is over the outline"): every outline is drawn last, outside the paper filter, at full width -->
+<g fill="none" stroke="#0c0705" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M20 64 H120 V108 a5 5 0 0 1-5 5 H25 a5 5 0 0 1-5-5 Z"/>
+ <path d="M18 64 V50 C18 28 40 18 70 18 C100 18 122 28 122 50 V64 Z"/>
+ <path d="M18 64 H58 M82 64 H122"/>
+ <path d="M38 25 V113 M54 21 V113 M86 21 V113 M102 25 V113"/>
+ <rect x="58" y="54" width="24" height="26" rx="5"/>
+ <path d="M70 66 V74" stroke-width="3.5"/>
+</g>
+<circle cx="70" cy="64" r="4" fill="#0c0705"/>
+<g fill="${d}" stroke="#0c0705" stroke-width="1.5"><circle cx="46" cy="72" r="2.4"/><circle cx="46" cy="104" r="2.4"/><circle cx="94" cy="72" r="2.4"/><circle cx="94" cy="104" r="2.4"/></g>
 </svg>`;
 }
 
@@ -3694,7 +3731,7 @@ function consumeRelicPulses(){
 }
 
 function relicRowHTML(r, locked, isNew){
-  if(locked) return `<div class="relic-row relic-row-locked"><span class="relic-badge relic-locked">?</span><div><div class="relic-name">???</div><div class="hint" style="margin:0;">${r.origin?`Win a run as a ${ORIGINS.find(o=>o.id===r.origin).name} to earn this.`:'Not found yet -- look for Relic Shrines.'}</div></div></div>`;
+  if(locked) return `<div class="relic-row relic-row-locked"><span class="relic-badge relic-locked">?</span><div><div class="relic-name">???</div><div class="hint" style="margin:0;">${r.origin?`Win a run as a ${ORIGINS.find(o=>o.id===r.origin).name} to earn this.`:'Not found yet. Look for Relic Shrines.'}</div></div></div>`;
   return `<div class="relic-row">${relicBadgeHTML(r)}<div><div class="relic-name">${r.name}${isNew?' <span class="new-tag">NEW!</span>':''}${r.origin?` <span class="relic-origin-tag">${ORIGINS.find(o=>o.id===r.origin).name} relic</span>`:''}</div><div class="relic-desc">${r.desc}</div></div></div>`;
 }
 
@@ -3732,6 +3769,12 @@ function bestiaryEntries(){
   return out;
 }
 const TIER_ORDER = {easy:0, standard:1, elite:2, deadly:3};
+// A monster's quests in the Bestiary (Oct 17), in the same words and reward icons as its quest paper in the fight.
+function bestiaryQuestsHTML(e){
+  if(!e.quests || !e.quests.length) return '';
+  const oneTurn = e.quests.some(q=>!QUEST_ALL_FIGHT.test(parseQuestSpec(q).cond));
+  return `<div class="bst-quests"><div class="bst-quests-head">Quests${oneTurn ? ' <span>in one turn</span>' : ''}</div>${e.quests.map(q=>`<div class="bst-quest q-row" title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, false)}</div>`).join('')}</div>`;
+}
 function bestiaryHTML(){
   const B = META.bestiary || {};
   const all = bestiaryEntries();
@@ -3755,6 +3798,7 @@ function bestiaryHTML(){
         <div class="run-history-who">${e.name}</div>
         <div class="hint bst-sub">${tier} &middot; ${hp} HP</div>
         ${moves}
+        ${bestiaryQuestsHTML(e)}
         ${e.flavor ? `<div class="bst-flavor">${e.flavor}</div>` : ''}
         <div class="bst-tally">Beaten ${b.won||0}${b.lost ? ` &middot; <span class="bst-lost">Beat you ${b.lost}</span>` : ''}</div>
       </div></div>`;
@@ -3811,6 +3855,18 @@ function renderRelicChoiceModal(){
   });
 }
 
+// Each shrine option its own colour, matching what it gives (Oct 17 design fixes, item 10).
+function shrineOptClass(label){
+  const l = String(label||'');
+  if(/^Heal/i.test(l)) return 'so-heal';
+  if(/Max Health/i.test(l) && !/^Pay/i.test(l)) return 'so-maxhp';
+  if(/Relic/i.test(l)) return 'so-relic';
+  if(/Attack/i.test(l)) return 'so-attack';
+  if(/Maneuver/i.test(l)) return 'so-maneuver';
+  if(/Forge|die/i.test(l)) return 'so-forge';
+  if(/Walk away/i.test(l)) return 'so-leave';
+  return '';
+}
 function renderShrineChoiceModal(){
   const {name, options} = S.shrineChoice;
   const overlay = el(`<div class="modal-overlay"><div class="modal">
@@ -3821,7 +3877,7 @@ function renderShrineChoiceModal(){
   openUniqueOverlay('shrine-choice', overlay);
   const container = overlay.querySelector('#shrine-options');
   options.forEach(opt=>{
-    const card = el(`<div class="loot-opt"><h4>${opt.label}</h4></div>`);
+    const card = el(`<div class="loot-opt shrine-opt ${shrineOptClass(opt.label)}"><h4>${opt.label}</h4></div>`);
     card.onclick = ()=> closeModal(overlay, ()=> chooseShrineOption(opt));
     container.appendChild(card);
   });
@@ -4038,7 +4094,7 @@ function renderShrineEncounter(){
           <div class="fo-band">
             <div class="fo-side fo-player">
               <div class="fo-fig" title="${S.origin.name} ${S.klass.name}">${heroFig}</div>
-              <div class="fo-hpwrap" style="position:relative;"><div class="bar"><div class="bar-fill hp player" style="width:${hpPct}%"></div></div><span>${S.health}/${S.maxHealth}</span></div>
+              <div class="fo-hpwrap" style="position:relative;"><div class="bar"><div class="bar-fill hp player" style="width:${hpPct}%"></div></div><span class="bar-num">${S.health}/${S.maxHealth}</span></div>
               <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim().replace(/</g,'&lt;')+', '+S.origin.name+' '+S.klass.name:S.origin.name+' '+S.klass.name}</div>
               <div class="fo-chips fo-buffs">${relicStripHTML()}</div>
             </div>
@@ -4067,7 +4123,7 @@ function renderShrineEncounter(){
             </div>
           </div>
         </div>
-        <div class="util-rail">
+        <div class="util-rail rail-shrine" aria-hidden="true">
           <div class="util-btn primary-accent rail-go disabled"><span>Go</span></div>
           <div class="util-btn rail-pocket">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?`<span class="badge">${S.backPocket.length}</span>`:''}</div>
           <div class="util-btn rail-item disabled">${iconSpan('use')}<span>Item</span></div>
@@ -4319,7 +4375,7 @@ function renderCamp(){
       const needsBackfill = count>=3 && !canUpgrade(cat,level);
       const upgradeTitle = needsBackfill ? 'Needs more spare dice to backfill' : `Combine 3 ${label} ${ROMAN[level]} into 1 ${label} ${ROMAN[level+1]}`;
       upgradeRows.push(`<div class="upgrade-row upg-${cat}">
-          <button class="upgrade-btn${(eligible && !baseCamp)?' upgrade-ready':''}${locked?' upgrade-locked':''}" id="upgrade-${cat}-${level}" ${disabled?'disabled':''}${locked?' aria-disabled="true"':''} title="${locked?'Choose Train at the campfire first':upgradeTitle}">${label} ${ROMAN[level]} ${mergeGlyphSVG(16)} ${ROMAN[level+1]} <span class="token-count">${count}</span></button>
+          <button class="upgrade-btn${(eligible && !baseCamp)?' upgrade-ready':''}${locked?' upgrade-locked':''}" id="upgrade-${cat}-${level}" ${disabled?'disabled':''}${locked?' aria-disabled="true"':''} title="${locked?'Choose Train at the campfire first':upgradeTitle}"><span class="upg-lbl">${label} ${ROMAN[level]} ${mergeGlyphSVG(16)} ${ROMAN[level+1]} <span class="token-count">${count}</span></span></button>
           <button id="preview-${cat}-${level}" class="upgrade-preview-btn" title="Preview the resulting die's faces">?</button>
         </div>`);
     });
@@ -4331,7 +4387,7 @@ function renderCamp(){
       ${baseCamp?'<p class="hint" style="margin:0 0 6px;">Nothing here is required — set out whenever you like.</p>':''}
 
       <div class="camp-section camp-status-card">
-        <div class="bar-row" style="position:relative;"><span style="flex:0 0 auto;">Health</span><div class="bar ${campFx.cls}"><div class="bar-fill hp player camp-hp-fill" style="width:${S.health/S.maxHealth*100}%"></div></div><span class="camp-hp-num">${S.health}/${S.maxHealth}</span>${campFx.deltaHTML}</div>
+        <div class="bar-row camp-hp-row" style="position:relative;"><span style="flex:0 0 auto;">Health</span><div class="fo-hpwrap camp-hpwrap" style="position:relative;"><div class="bar ${campFx.cls}"><div class="bar-fill hp player camp-hp-fill" style="width:${S.health/S.maxHealth*100}%"></div></div><span class="bar-num camp-hp-num">${S.health}/${S.maxHealth}</span></div>${campFx.deltaHTML}</div>
         ${relicStripHTML()}
         <div class="camp-fire-wrap ${(performance.now()-UIFX.flareAt)<900?'flare':''}" style="--fl:-${Math.max(0,Math.round(performance.now()-UIFX.flareAt))}ms">
           <div class="camp-hero" title="${S.origin.name} ${S.klass.name}">${(S.portrait&&!S.portrait.placeholder)?`<img src="${S.portrait.img}" alt="${S.origin.name}">`:mysteryFigureHTML('width:56px; height:56px;')}</div>
@@ -4669,14 +4725,14 @@ function openExportDataModal(){
       <h2 style="margin-top:0;">Export Play Data</h2>
       <p class="hint" style="text-align:left;">Helps balance the game. This makes a small file of how your runs went (rooms, loot picks, what beat you). It has no personal info, and <strong>nothing is sent anywhere</strong> unless you choose to share the file.</p>
       <p class="hint">${runCount} run${runCount===1?'':'s'} recorded &middot; ${(json.length/1024).toFixed(0)} KB</p>
-      <textarea id="export-note" maxlength="1500" placeholder="Anything to tell the developer? (too hard, confusing, bug, favorite moment...)" style="width:100%; height:64px; font-size:13px; box-sizing:border-box; margin-bottom:8px;"></textarea>
+      <textarea id="export-note" class="paper-input" maxlength="1500" placeholder="Anything to tell the developer? (too hard, confusing, bug, favorite moment...)" style="width:100%; height:64px; font-size:13px; box-sizing:border-box; margin-bottom:8px;"></textarea>
       <div class="small-btn-row" style="justify-content:center; flex-direction:column;">
         <button class="primary" id="export-download-btn">Download File</button>
-        <button id="export-copy-btn">Copy to Clipboard</button>
+        <button id="export-copy-btn" class="btn-export">Copy to Clipboard</button>
         <button id="export-close-btn">Close</button>
       </div>
       <p class="hint" id="export-status" style="min-height:1.2em;"></p>
-      <textarea id="export-text" readonly style="display:none; width:100%; height:110px; font-size:10px;"></textarea>
+      <textarea id="export-text" class="paper-input" readonly style="display:none; width:100%; height:110px; font-size:10px;"></textarea>
     </div></div>`);
   openModal(overlay);
   const close = ()=> closeModal(overlay);
