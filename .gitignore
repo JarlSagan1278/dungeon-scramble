@@ -11,3 +11,4 @@ tools/rulebook.html
 
 # study scratch (snapshots, per-run temp scripts)
 tools/balance/_*
+__pycache__/
