@@ -15,7 +15,7 @@
 - Shrines are on the Monster Footing page (collection `lifts3`, still empty); shrines can take size/height/facing in the game.
 
 ## Oct 15
-- 1.41.24 zipped for Netlify (first build with automatic play data). Oct 16: 1.41.34 zipped (paper art and scenery, footing rounds 1-2, round shrine button, floor memory fix). Check the Play Data sheet after the first tester run.
+- Oct 17: 1.41.59 zipped for Netlify (music on the web app, class passives, quest wording, Quest Health removed, trim, no-halo art). 1.41.24 zipped for Netlify (first build with automatic play data). Oct 16: 1.41.34 zipped (paper art and scenery, footing rounds 1-2, round shrine button, floor memory fix). Check the Play Data sheet after the first tester run.
 
 - Oct 15 (1.41.22-1.41.32): monster tuning, Floor 2 trims, shrine boosts, Extruzeon +10% HP, depth repricing, automatic play data, Batch E art, paper texture on all art (WebP) and in-world scenery, Monster Footing rounds 1-2. The Play Data sheet is still empty: needs the 1.41.24+ zip deployed and a finished run with sharing on.
 - Bug hunt on 1.41.32: 24/24 runs clean (bugsearch.js), every shrine option clean (new tools/test_shrines.js, 40/40). Rulebook PDF refreshed for today's changes.
