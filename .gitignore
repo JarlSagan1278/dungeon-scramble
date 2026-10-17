@@ -8,3 +8,6 @@ tools/out_*
 /*.png
 tools/balance/snap_*.html
 tools/rulebook.html
+
+# study scratch (snapshots, per-run temp scripts)
+tools/balance/_*
