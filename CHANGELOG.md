@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.64 (Oct 17, 2026)
+- Batch I art (Floor 3): The Punished (now round instead of tall), Profane Geometry, Sacred(?) Geometry, Ergot Eruption, Self-Replicating Forge, Bio-Mutant Escape.
+
 ## 1.41.63 (Oct 17, 2026)
 - Batch H art (Floor 3): Morel Dilemma, Chimeric Sludge, Gnome Chomper, Gestalt Network, Oilephant's Foot, Extractnid Matriarch.
 - The tap that dismisses the splash screen no longer also presses the title button under it (even when held past the fade).
