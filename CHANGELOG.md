@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.58 (Oct 17, 2026)
+- Art: Batch F repaints imported (Half-life Host, Lichen-Thrope, Fungal Flayer, Illegal Operation, Adhesive Pest Traps, Ditched Heist), at 2x with the paper texture, same size in the game.
+
 ## 1.41.57 (Oct 17, 2026)
 - Music on the web app (Netlify): the music code was never included in the web build (only in the single-file preview) since 1.39.5, so the live site had no music. Fixed.
 - Trim (Jeremy: "cut out unnecessary stuff"), no visible change (72 screens pixel-identical before/after): shipped CSS 261 -> 176 KB (88 dead selectors, 431 always-overridden declarations, 25 duplicate/unused keyframes), unused JS removed (incl. makeTextureTiles, which ran a 65k-pixel loop on every load for nothing), unused art, CSS comments stripped from builds, rulebook-only logo left out of the game. Single-file game 4,377 -> 4,235 KB; web index 827 -> 740 KB.
