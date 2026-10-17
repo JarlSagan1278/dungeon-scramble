@@ -561,31 +561,11 @@ function paperTileImg(){
   if(typeof PAPER_TILE==='undefined') return null;
   if(!PAPER_IMG){
     PAPER_IMG = new Image();
-    PAPER_IMG.onload = ()=>{ ROOM_TEX_READY = false; ensureRoomTextures(); makeTextureTiles(); decorateArch._c = null; try{ if(S && (S.screen==='game' || S.screen==='shrine')) decorateArch(); }catch(e){} };
+    PAPER_IMG.onload = ()=>{ ROOM_TEX_READY = false; ensureRoomTextures(); decorateArch._c = null; try{ if(S && (S.screen==='game' || S.screen==='shrine')) decorateArch(); }catch(e){} };
     PAPER_IMG.src = PAPER_TILE;
     try{ document.documentElement.style.setProperty('--paper-tile', `url("${PAPER_TILE}")`); }catch(e){}
   }
   return (PAPER_IMG.complete && PAPER_IMG.naturalWidth) ? PAPER_IMG : null;
-}
-// Oct 15 (Jeremy: "do all 5"): softer paper tiles for the pop-up panels, and a wood-grain tile for the brown panels.
-function makeTextureTiles(){
-  try{
-    const root = document.documentElement.style, N = 256;
-    const soft = (k)=>{ const c=document.createElement('canvas'); c.width=c.height=N; const g=c.getContext('2d');
-      g.fillStyle='rgb(128,128,128)'; g.fillRect(0,0,N,N); g.globalAlpha=k; g.drawImage(PAPER_IMG,0,0,N,N); return c.toDataURL('image/jpeg',.88); };
-    root.setProperty('--paper-tile-light', `url("${soft(.45)}")`);
-    root.setProperty('--paper-tile-med', `url("${soft(.7)}")`);
-    // wood: grain lines running sideways (planks), gently wavy, seamless in both directions
-    const c=document.createElement('canvas'); c.width=c.height=N; const g=c.getContext('2d'); const id=g.createImageData(N,N); const T=2*Math.PI/N;
-    let seed=91; const rnd=()=>{ seed=(seed*16807)%2147483647; return seed/2147483647; };
-    for(let y=0;y<N;y++) for(let x=0;x<N;x++){
-      const w = 1.7*Math.sin(T*2*x + 0.9*Math.sin(T*3*y)) + 0.6*Math.sin(T*5*x + T*2*y);
-      const ring = Math.sin(T*9*y + w);
-      const v = 128 + 30*ring + 12*Math.sin(T*31*y + 2*w) + (rnd()-.5)*14;
-      const i=(y*N+x)*4; id.data[i]=id.data[i+1]=id.data[i+2]=Math.max(0,Math.min(255,v)); id.data[i+3]=255; }
-    g.putImageData(id,0,0);
-    root.setProperty('--wood-tile', `url("${c.toDataURL('image/jpeg',.88)}")`);
-  }catch(e){}
 }
 function paperOver(g, W, H, scale){
   const t = paperTileImg(); if(!t || !PAPER_ENV) return;
@@ -3173,7 +3153,6 @@ function runHistoryHTML(){
   return `${summary}<div class="run-history-list">${rows}</div>
     ${history.length ? '<div class="small-btn-row" style="justify-content:center;"><button id="run-history-clear-btn" class="danger">Clear History</button></div>' : ''}`;
 }
-function openRunHistoryModal(){ openRecordsModal('history'); }
 
 // Lifetime Achievements (ACHIEVEMENTS, logic.js) -- locked entries show
 // greyed-out with just name+desc; unlocked entries show the date earned.
@@ -3196,7 +3175,6 @@ function achievementsHTML(){
   return `<div class="statuses" style="justify-content:center; margin-bottom:10px;"><span class="status-chip">${unlockedCount}/${ACHIEVEMENTS.length} unlocked</span></div>
     <div class="run-history-list">${rows}</div>`;
 }
-function openAchievementsModal(){ openRecordsModal('achievements'); }
 // Records (Oct 13): Run History + Achievements in one tabbed window (shorter settings menu).
 function openRecordsModal(tab){
   const overlay = el(`<div class="modal-overlay"><div class="modal codex-modal" style="text-align:center; max-width:400px;">
@@ -3292,7 +3270,6 @@ function diceCompendiumHTML(){
   return `${originSection}<p class="hint">Loot dice: ${discoveredCount}/${totalDice} found</p>${sections}`;
 }
 function markDiceSeen(){ const seen = loadSeen(); DISCOVERED_DICE.forEach(n=> seen.dice.add(n)); saveSeen(seen); } // viewed -- tags clear next visit
-function openDiceCompendiumModal(){ openCodexModal('dice'); }
 
 function openInfoModal(title, bodyHTML){
   const overlay = el(`<div class="modal-overlay"><div class="modal">
@@ -3751,7 +3728,6 @@ function markRelicsSeen(){
   const seenR = loadSeen();
   RELICS.forEach(r=>{ if(found.has(r.id) || owned.includes(r.id) || (r.origin && (META.lifetime.victoriesByOrigin[r.origin]||0)>=1)) seenR.relics.add(r.id); }); saveSeen(seenR);
 }
-function openRelicCodexModal(){ openCodexModal('relics'); }
 
 // ---- Codex (Oct 13): one book with tabs, so the settings menu stays short. Bestiary is new: every
 // monster, trap and boss you've met (META.bestiary, logic.js); unmet ones show as a silhouette.
@@ -3858,20 +3834,6 @@ function renderShrineChoiceModal(){
     card.onclick = ()=> closeModal(overlay, ()=> chooseShrineOption(opt));
     container.appendChild(card);
   });
-}
-
-// Always shown once a Shrine's outcome is known -- a real confirmation box,
-// even when there was no choice to make, so a boon is never applied silently.
-function renderShrineResultModal(){
-  const {title, text} = S.shrineResult;
-  if(!S.shrineResult._logged){ S.shrineResult._logged = true; teleLog('shrine_result', {shrine:title, text:String(text).replace(/<[^>]+>/g,'').slice(0,160), hp:S.health, maxHp:S.maxHealth}); }
-  const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
-      <h2>${title}</h2>
-      <p>${text}</p>
-      <button class="primary" id="shrine-result-continue">Continue</button>
-    </div></div>`);
-  openUniqueOverlay('shrine-result', overlay);
-  overlay.querySelector('#shrine-result-continue').onclick = ()=> closeModal(overlay, continueFromShrine);
 }
 
 // A pop-up over whatever screen is already showing (the game board, or the

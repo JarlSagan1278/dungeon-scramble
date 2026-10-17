@@ -118,7 +118,6 @@ function musicCtx(){ // music plays even with sound effects off, so it doesn't g
   return audioCtx;
 }
 const musicSpb = ()=> 60/Music.bpm;
-const musicFloor = ()=> MUSIC_FLOORS[Math.max(0, Math.min(2, (typeof S!=='undefined' && S && S.floorIdx) || 0))];
 // The next bar line after `now` on the shared clock.
 function musicNextBar(now){ const bar = Music.barBeats*musicSpb(); return Music.origin + Math.ceil((now - Music.origin + 0.05)/bar)*bar; }
 // Arrangement: which parts each version plays in each block (the floor adds layers).

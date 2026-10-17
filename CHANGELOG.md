@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.41.57 (Oct 17, 2026)
+- Music on the web app (Netlify): the music code was never included in the web build (only in the single-file preview) since 1.39.5, so the live site had no music. Fixed.
+- Trim (Jeremy: "cut out unnecessary stuff"), no visible change (72 screens pixel-identical before/after): shipped CSS 261 -> 176 KB (88 dead selectors, 431 always-overridden declarations, 25 duplicate/unused keyframes), unused JS removed (incl. makeTextureTiles, which ran a 65k-pixel loop on every load for nothing), unused art, CSS comments stripped from builds, rulebook-only logo left out of the game. Single-file game 4,377 -> 4,235 KB; web index 827 -> 740 KB.
+- Testing: `node tools/check.js` runs every check in one browser (~1 min).
+
 ## 1.41.56 (Oct 17, 2026)
 - Quests (Jeremy, from the Oct 17 audit): one consistent wording on the quest paper -- counts of dice in your path ("3 Maneuvers", "2 Heal dice", "2 Dodges"), thresholds noun-first ("Damage 10+", "Path 6+", "Path 1-3", "Block 5+", "Blanks 10+"), rounds as the tray bubble shows them ("Reach Rd 5") -- plus an "in one turn" line when the card has per-turn quests. Freeze and Nullify rewards show just the icon.
 - Survive quests: "Survive to turn N" now completes on Rd N, as written (was one round late: Rusty Golem Rd 4, Heating Elemental Rd 5). "Survive N" (N turns survived) keeps its timing and reads "Reach Rd N+1".

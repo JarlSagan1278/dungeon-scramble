@@ -17,10 +17,12 @@ function read(name) {
 }
 
 const head = read('_head.html');
-const styles = read('styles.css');
+// Comments are for us, not the player: strip them from the shipped CSS (no string in styles.css contains "/*").
+const styles = read('styles.css').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\n[ \t]*(?=\n)/g, '').replace(/\n{2,}/g, '\n');
 const body = read('_body.html');
 const data = read('data.js');
-const assets = read('assets.js');
+// LOGO_IMG is only used by the rulebook (tools/gen.js reads src/assets.js itself), so the game builds leave it out.
+const assets = read('assets.js').replace(/^const LOGO_IMG = "[^"]*";\n/m, '');
 const logic = read('logic.js');
 const depth = read('depth.js');
 const render = read('render.js');
@@ -85,7 +87,7 @@ const webAssets = assets.replace(/(["'])data:image\/(png|jpeg|webp);base64,([A-Z
   if (!ART_FILES.has(name)) { fs.writeFileSync(path.join(ART_DIR, name), buf); ART_FILES.add(name); }
   return '"art/' + name + '"';
 });
-const webScriptParts = [data, webAssets, logic, depth, render, main].join('\n');
+const webScriptParts = [data, webAssets, logic, depth, render, music, main].join('\n'); // music added Oct 17 (was missing from the web build since 1.39.5)
 const webBase = html.replace(scriptParts, () => webScriptParts);
 const webHtml = webBase.replace('</head>', PWA_HEAD).replace('</body>', PWA_REG);
 fs.writeFileSync(path.join(WEB, 'index.html'), webHtml, 'utf8');

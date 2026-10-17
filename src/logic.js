@@ -1308,11 +1308,6 @@ function adjNormal(a,b){ return Math.abs(a.r-b.r)+Math.abs(a.c-b.c)===1; }
 function adjDiag(a,b){ return Math.abs(a.r-b.r)===1 && Math.abs(a.c-b.c)===1; }
 function adjLeap(a,b){ return (a.r===b.r && Math.abs(a.c-b.c)===2) || (a.c===b.c && Math.abs(a.r-b.r)===2); }
 function adjPivot(a,b){ return adjNormal(a,b)||adjDiag(a,b); }
-function adjWrap(a,b){
-  // Dungeoneer: the left-edge and right-edge zone squares on the same row
-  // are treated as adjacent (the Path "loops around" the tray).
-  return a.r===b.r && Math.abs(a.c-b.c)===3;
-}
 function adjWrapCols(a,b){ return Math.abs(a.c-b.c)===3; } // left edge to right edge, any row
 
 // Leap / Dodge / Pivot may land ON a Minion-covered space: the landing die (and, for a Leap, any Minion

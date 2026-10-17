@@ -35,17 +35,15 @@
   body.reduced-motion, body.reduced-motion *{ animation: none !important; transition-duration: 0.01ms !important; }
   body{
     margin:0; min-height:100vh;
-    background:var(--b0);
     color: var(--parchment);
-    font-family: Georgia, 'Iowan Old Style', serif;
     padding:8px;
   }
-  h1,h2,h3{ font-family: var(--font-ui); letter-spacing: 0.5px; color: var(--gold); margin: 0 0 8px 0; font-weight: 800; }
+  h1,h2,h3{ letter-spacing: 0.5px; color: var(--gold); margin: 0 0 8px 0; }
   /* Matches the tray row's actual max content width (encounter/tray column
      maxing out at 300px + gap + the 68px button rail + the panel's own
      padding) -- 420px left a dead strip of empty panel background to the
      right of the button rail on any viewport wide enough to hit that cap. */
-  .wrap{ max-width: 390px; margin: 0 auto; }
+  .wrap{ margin: 0 auto; }
   /* The top bar (logo + "Origin Class - Floor N" text + Settings gear) was
      removed from every screen -- it was chrome that didn't earn its space.
      Settings is now reached via a single floating gear button (below),
@@ -55,25 +53,22 @@
   .settings-toggles{ display:flex; flex-direction:column; gap:6px; margin:12px 0; text-align:left; }
   .settings-toggle-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--panel2); border:1px solid var(--line); border-radius:var(--r-md); padding:8px 10px; font-size:13px; cursor:pointer; }
   .settings-toggle-row input{ width:18px; height:18px; accent-color:var(--gold); cursor:pointer; }
-  button{
-    font-family: inherit; cursor:pointer; border:none; border-radius:var(--r-sm);
-    background:var(--stone); color: var(--parchment); padding:8px 16px; font-size:14px;
+  button{ cursor:pointer; border-radius:var(--r-sm); padding:8px 16px; font-size:14px;
     transition: background .15s, transform .05s;
   }
-  button:hover:not(:disabled){ background:#4a3f32; transform: translateY(-1px); box-shadow:0 2px 4px rgba(0,0,0,0.3); }
-  button:active:not(:disabled){ transform: translateY(1px) scale(0.95); box-shadow:none; }
+  button:hover:not(:disabled){ box-shadow:0 2px 4px rgba(0,0,0,0.3); }
+  button:active:not(:disabled){ box-shadow:none; }
   button:disabled{ opacity:0.4; cursor:default; }
-  button.primary{ background:var(--gold); color:#241c10; font-weight:bold; }
+  button.primary{ font-weight:bold; }
   button.primary:hover:not(:disabled){ background:#e6c265; }
   @keyframes pulse-glow{
     0%,100%{ box-shadow:0 0 0 0 rgba(212,175,82,0.7); }
     50%{ box-shadow:0 0 0 8px rgba(212,175,82,0); }
   }
-  button.primary.pulse, .util-btn.pulse{ animation: pulse-glow 1.1s ease-in-out infinite; }
   button.danger{ background:var(--red-dim); }
   button.pocket-btn{ background:var(--blue); color:var(--parchment); }
   button.pocket-btn:hover:not(:disabled){ background:#5a8bb0; }
-  .panel{ background:var(--panel); border:1px solid var(--line); border-radius:var(--r-md); padding:6px 6px; }
+  .panel{ border:1px solid var(--line); border-radius:var(--r-md); padding:6px 6px; }
 
   /* Setup screen (character creation) -- a WoW-style icon-row -> contextual
      detail-panel pattern: tapping an Origin/Class icon fills one shared
@@ -81,11 +76,10 @@
      (the old 2-up grid of cards this replaced). Sized to fit the whole
      screen within one phone-height viewport without scrolling. */
   .setup-name-row{ display:flex; align-items:center; gap:6px; margin:0 0 10px; }
-  .char-name-input{ font-family: var(--font-display); font-size:18px; font-weight:800;
-    color:var(--gold); letter-spacing:0.3px; background:transparent; border:none; border-bottom:1.5px solid transparent;
+  .char-name-input{ font-size:18px; letter-spacing:0.3px; background:transparent; border:none;
     outline:none; padding:0 0 2px 0; max-width:220px; }
   .char-name-input:hover, .char-name-input:focus{ border-bottom-color:var(--gold); }
-  .char-name-pencil{ color: var(--parchment-dim); flex-shrink:0; }
+  .char-name-pencil{ flex-shrink:0; }
   .setup-section{ display:flex; flex-direction:column; gap:6px; margin:0 0 10px; }
   .setup-label{ font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; color:var(--parchment-dim); user-select:none; }
   .setup-label-sub{ text-transform:none; font-weight:normal; font-size:10.5px; }
@@ -98,10 +92,10 @@
   .origin-showcase, .class-showcase, .boon-showcase{ background:var(--panel); border:1px solid var(--line); border-radius:var(--r-lg); }
   .origin-showcase{ display:flex; flex-direction:column; gap:6px; padding:9px; }
   .origin-showcase-top{ display:flex; gap:12px; align-items:center; }
-  .origin-showcase-portrait{ width:126px; height:126px; border-radius:18px; overflow:hidden; flex-shrink:0; }
-  .origin-showcase-portrait img, .origin-showcase-portrait .mystery-figure{ width:100%; height:100%; object-fit:cover; object-position:top center; }
+  .origin-showcase-portrait{ overflow:hidden; flex-shrink:0; }
+  .origin-showcase-portrait img, .origin-showcase-portrait .mystery-figure{ width:100%; height:100%; }
   .origin-showcase-name-col{ display:flex; flex-direction:column; gap:3px; min-width:0; }
-  .origin-showcase-name{ font-size:18px; font-weight:800; color:var(--cream); }
+  .origin-showcase-name{ font-size:18px; color:var(--cream); }
   .origin-lock-hint{ font-size:11px; color:var(--red); line-height:1.3; display:flex; align-items:flex-start; gap:4px; }
   .origin-lock-hint svg{ flex:0 0 auto; margin-top:1px; }
   .origin-die-block{ display:flex; flex-direction:column; gap:5px; }
@@ -137,9 +131,7 @@
      cue itself carries the identity instead of just overwriting it with gold. */
   .class-tab-btn{ flex:1 1 0; min-width:0; height:38px; border-radius:var(--r-lg); padding:0 2px;
     border:2.5px solid var(--line); border-bottom:4px solid var(--class-color, var(--stone));
-    background:var(--panel2); color:var(--parchment);
-    font-family:inherit; font-size:10px; font-weight:800; letter-spacing:-0.1px; cursor:pointer; text-align:center; }
-  .class-tab-btn.selected{ border-color:var(--class-color, var(--gold)); box-shadow:0 0 0 2px var(--class-color, rgba(212,175,82,0.25)); }
+    background:var(--panel2); color:var(--parchment); font-size:10px; font-weight:800; letter-spacing:-0.1px; cursor:pointer; text-align:center; }
   /* Locked Origin tab (Class tabs never lock) -- dimmed text plus the inline
      lock glyph render.js already prefixes the label with, cursor stays
      default since tapping it still previews rather than selects. */
@@ -151,12 +143,12 @@
      visible feedback instead of leaving an unrelated tab looking "chosen"
      while this one's info is what's showing. */
   .class-tab-btn.previewing{ border-color:var(--parchment-dim); box-shadow:0 0 0 2px rgba(224,214,188,0.2); }
-  .class-showcase{ display:flex; gap:10px; align-items:center; padding:9px; height:64px; box-sizing:border-box; }
+  .class-showcase{ display:flex; box-sizing:border-box; }
   .class-action-icon{ width:36px; height:36px; border-radius:var(--r-md); background:var(--panel2); border:1.5px solid var(--class-color, var(--gold));
     color:var(--class-color, var(--gold)); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:20px; }
-  .class-showcase-text{ display:flex; flex-direction:column; gap:2px; min-width:0; overflow:hidden; }
-  .class-showcase-name{ font-size:13.5px; font-weight:800; color:var(--class-color, var(--cream)); }
-  .class-showcase-ability{ font-size:10.5px; color:var(--parchment-dim); line-height:1.3; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .class-showcase-text{ display:flex; flex-direction:column; gap:2px; }
+  .class-showcase-name{ color:var(--class-color, var(--cream)); }
+  .class-showcase-ability{ line-height:1.3; -webkit-box-orient:vertical; }
 
   /* Starting Boon -- a horizontally-scrolling "runic" strip of medallions
      (one per discovered die the player's unlocked tiers allow) instead of
@@ -177,18 +169,15 @@
   .boon-showcase-empty{ padding:10px 2px; font-size:11px; color:var(--parchment-dim); text-align:center; }
 
   /* Route tracker */
-  .route-wrap{ position:relative; margin-bottom:12px; }
-  .route{ display:flex; margin-bottom:0; border:3px solid var(--line); border-radius:var(--r-md); overflow:hidden; box-shadow:2px 2px 0 rgba(0,0,0,0.35); }
-  .mascot-wrap{ position:absolute; bottom:-3px; transform: translateX(-78%); transition: left 0.6s ease; pointer-events:none; z-index:2; display:flex; flex-direction:column; align-items:center; }
-  .mascot-marker{ display:block; height:34px; width:auto; filter: drop-shadow(1px 2px 0 rgba(0,0,0,0.4)); }
+  .route-wrap{ position:relative; }
+  .route{ display:flex; margin-bottom:0; }
+  .mascot-wrap{ position:absolute; transform: translateX(-78%); transition: left 0.6s ease; pointer-events:none; z-index:2; display:flex; flex-direction:column; align-items:center; }
+  .mascot-marker{ display:block; width:auto; filter: drop-shadow(1px 2px 0 rgba(0,0,0,0.4)); }
 
   /* Character icon (second copy): sits below Go/Clear/Skill in the tray's
      util-rail, nudged left so it slightly overlaps the tray-wrap panel's
      own edge/border -- but the tray-wrap's border+padding (12px) keeps it
      clear of the actual die tiles inside. */
-  .char-icon-wrap{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; position:relative; min-height:0; padding-top:4px;
-    margin-left:-10px; z-index:2; }
-  .char-icon-img{ display:block; max-height:100%; max-width:100%; width:auto; height:auto; object-fit:contain; filter: drop-shadow(1px 2px 0 rgba(0,0,0,0.4)); transform: scaleX(-1.5) scaleY(1.5); }
   .route .node{ flex:1; display:flex; align-items:center; justify-content:center; position:relative;
     padding:6px 2px; font-size:32px; background:var(--floor1); border-right:2px solid rgba(0,0,0,0.25); color: var(--ink); }
   .route .node:last-child{ border-right:none; }
@@ -216,18 +205,16 @@
      badge is free to grow past the card's edge instead of being cut off
      at it. */
   .tray-float-wrap{ position:relative; }
-  .tray-wrap{ background:linear-gradient(160deg,var(--b2),var(--b1)); border:3px solid var(--line); border-radius:var(--r-lg); padding:4px; max-width:310px; min-width:216px; margin:0 auto; position:relative;
-    overflow-x:auto; container-type: inline-size; container-name: tray; }
-  .tray-wrap.tray-wrap-full{ max-width:310px; margin:0 auto; }
+  .tray-wrap{ max-width:310px; min-width:216px; margin:0 auto; position:relative; container-type: inline-size; container-name: tray; }
+  .tray-wrap.tray-wrap-full{ margin:0 auto; }
   .tray{ display:grid; grid-template-columns: repeat(4, minmax(44px,1fr)); gap:3px; perspective:500px; }
   .die{
-    aspect-ratio:1/1; border-radius:var(--r-md); display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
-    background:#cbbf9e; color:#241c10; font-weight:bold; font-size:11px; cursor:pointer;
-    border:2px solid rgba(0,0,0,0.25); position:relative; user-select:none; text-align:center; padding:27px 2px 2px;
+    aspect-ratio:1/1; border-radius:var(--r-md); display:flex; flex-direction:column; align-items:center;
+    background:#cbbf9e; color:#241c10; font-weight:bold; font-size:11px; cursor:pointer; position:relative; user-select:none; text-align:center; padding:27px 2px 2px;
     transition: transform .08s; min-width:44px; min-height:44px; overflow:hidden;
   }
-  .die.dietype-attack{ background:#b33b3b; color:#fff3e6; }
-  .die.dietype-maneuver{ background:#e4d7ad; color:#241c10; }
+  .die.dietype-attack{ color:#fff3e6; }
+  .die.dietype-maneuver{ color:#241c10; }
   .die.dietype-origin{ background:#4a8a5c; color:#eafbea; }
   .die.dietype-alloy{ background:#9aa3ab; color:#1a1410; }
   .die.dietype-gilded{ background:#d4af52; color:#241c10; }
@@ -255,7 +242,6 @@
      (e.g. sharing a row with the Go/Clear rail) the icon shrinks to actually
      fit its die instead of overflowing the tile and spilling out of the
      tray's bounding box. clamp() keeps it sane at both extremes. */
-  .die .face-val{ font-size: clamp(18px, 11.5cqw, 36px); }
   /* Absolutely-positioned overlay instead of a CSS Grid area -- a grid
      item's percentage width/height needs a "definite" track size to
      resolve against, and a single-cell auto-track grid doesn't reliably
@@ -273,11 +259,10 @@
   .die .face-word{ font-size:9px; }
   .die .name-tag{ position:absolute; top:0; left:0; right:0; height:20px; z-index:1; pointer-events:none; }
   .die .name-tag-svg{ width:100%; height:100%; display:block; overflow:visible; }
-  .die .name-tag-svg text{ fill:currentColor; opacity:0.55; font-weight:700; font-family:inherit; }
-  .zone-cell{ outline:2px dashed rgba(255,255,255,0.55); outline-offset:-2px; }
+  .die .name-tag-svg text{ fill:currentColor; font-family:inherit; }
 
   /* Encounter card */
-  .enc-card{ position:relative; background:var(--panel2); border:2px solid var(--line); border-radius:var(--r-md); padding:0 0 12px; margin-bottom:8px; overflow:hidden;
+  .enc-card{ position:relative; border-radius:var(--r-md); padding:0 0 12px; margin-bottom:8px; overflow:hidden;
     box-shadow:3px 3px 0 rgba(0,0,0,0.35); }
   /* New-room entrance: the card itself drops/settles in with a brief
      golden glow around it, so a new encounter reads as something that just
@@ -302,7 +287,7 @@
   .reduced-motion .enc-card.room-enter, .reduced-motion .enc-card.room-enter-boss{ animation:none; opacity:1; transform:none; }
   .enc-header{ background:var(--stone); border-bottom:2px solid var(--line);
     padding:6px 8px; display:flex; align-items:center; gap:6px; }
-  .enc-name-txt{ margin:0; font-size:14px; color: var(--parchment); font-weight:800; line-height:1.15; flex:1; }
+  .enc-name-txt{ margin:0; font-size:14px; color: var(--parchment); line-height:1.15; flex:1; }
   .enc-type{ font-size:8px; text-transform:uppercase; letter-spacing:1px; color: var(--parchment-dim); font-weight:bold; white-space:nowrap; }
   /* Portrait sits beside the vitals (HP bar / turn stats / quests) instead
      of on top of them -- keeps the whole card noticeably shorter than
@@ -310,8 +295,8 @@
      given a fixed width and stretched to the row's own height (rather than
      forced 1:1) so it can grow into whatever space the narrower bar/quest
      column frees up without the row itself getting any taller. */
-  .enc-top-row{ display:flex; gap:8px; align-items:stretch; }
-  .enc-portrait{ flex:0 0 auto; width:68px; position:relative; background:var(--panel2); border:1px solid var(--line); border-radius:var(--r-md); padding:4px; overflow:hidden; }
+  .enc-top-row{ display:flex; gap:8px; }
+  .enc-portrait{ position:relative; border-radius:var(--r-md); overflow:hidden; }
   .enc-art{ display:block; width:100%; height:100%; object-fit:contain; }
 
   /* Portrait hit/heal reaction: the health bar already flashes and floats a
@@ -323,10 +308,10 @@
      class is only present for one render (the one right after the health
      value changed), so the animation plays once per hit/heal and then the
      class is simply gone on the next render. */
-  .enc-portrait.dmg-flash, .char-icon-wrap.dmg-flash{ animation: portrait-shake 0.4s ease; }
-  .enc-portrait.dmg-flash::after, .char-icon-wrap.dmg-flash::after{ content:''; position:absolute; inset:0;
+  .enc-portrait.dmg-flash{ animation: portrait-shake 0.4s ease; }
+  .enc-portrait.dmg-flash::after{ content:''; position:absolute; inset:0;
     background:rgba(192,57,43,0.5); border-radius:var(--r-md); animation: portrait-flash 0.4s ease forwards; pointer-events:none; }
-  .enc-portrait.heal-flash::after, .char-icon-wrap.heal-flash::after{ content:''; position:absolute; inset:0;
+  .enc-portrait.heal-flash::after{ content:''; position:absolute; inset:0;
     background:rgba(63,174,84,0.4); border-radius:var(--r-md); animation: portrait-flash 0.5s ease forwards; pointer-events:none; }
   @keyframes portrait-shake{
     0%,100%{ transform:translateX(0) rotate(0); }
@@ -337,9 +322,8 @@
     80%{ transform:translateX(-1px) rotate(0); }
   }
   @keyframes portrait-flash{ 0%{ opacity:0; } 20%{ opacity:1; } 100%{ opacity:0; } }
-  .reduced-motion .enc-portrait.dmg-flash, .reduced-motion .char-icon-wrap.dmg-flash{ animation:none; }
-  .reduced-motion .enc-portrait.dmg-flash::after, .reduced-motion .char-icon-wrap.dmg-flash::after,
-  .reduced-motion .enc-portrait.heal-flash::after, .reduced-motion .char-icon-wrap.heal-flash::after{
+  .reduced-motion .enc-portrait.dmg-flash{ animation:none; }
+  .reduced-motion .enc-portrait.dmg-flash::after, .reduced-motion .enc-portrait.heal-flash::after{
     animation:none; opacity:0.35; transition:opacity 0.6s ease; }
   .enc-art-wrap{ position:relative; width:100%; height:100%; display:flex; justify-content:center; align-items:center; }
   .enc-vitals{ flex:1; min-width:0; }
@@ -348,9 +332,8 @@
     white-space:normal; overflow:hidden; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; }
   .bar-row{ display:flex; align-items:center; gap:6px; margin:2px 0; font-size:12px; color: var(--parchment); }
   .bar-row.status-tooltip-target[title]{ cursor:help; }
-  .bar{ flex:1; height:11px; background:#2a2420; border-radius:var(--r-md); border:1px solid var(--line); position:relative; overflow:hidden; }
+  .bar{ flex:1; background:#2a2420; border-radius:var(--r-md); position:relative; overflow:hidden; }
   .bar-fill{ height:100%; border-radius:var(--r-md); }
-  .bar-fill.hp{ background:linear-gradient(90deg,#7a1f1f,#c0392b); }
   .bar-fill.hp.player{ background:linear-gradient(90deg,#1f5a2a,#3fae54); }
   /* Quest Health used to be a separate "X/Y remaining" text line; it's now
      this gold slice layered on the HP bar, flush against the current
@@ -397,14 +380,13 @@
   .quest.complete .quest-mark{ color: var(--green); }
 
   .log{ background:#000; border-radius:var(--r-md); padding:6px 8px; height:64px; overflow-y:auto; font-size:11px; font-family: ui-monospace, monospace; color:#b8caa8; }
-  .enc-rail-row{ display:flex; gap:6px; align-items:stretch; flex-wrap:wrap; }
-  .enc-card-col{ flex:1; min-width:216px; max-width:310px; }
-  .util-rail{ display:flex; flex-direction:column; gap:5px; width:60px; flex:0 0 auto; }
+  .enc-rail-row{ display:flex; }
+  .util-rail{ display:flex; }
   .util-btn{ background:var(--stone); border:2px solid var(--line); border-radius:var(--r-md); padding:4px 2px; display:flex; flex-direction:column;
     align-items:center; justify-content:center; gap:2px; cursor:pointer; color:var(--parchment); font-size:8px; font-weight:bold;
     position:relative; flex:1; font-size:19px; transition: transform .05s, box-shadow .1s, background .15s; }
   .util-btn span{ font-size:9.5px; }
-  .util-btn .badge{ position:absolute; top:-5px; right:-5px; background:var(--gold); color:#241c10; font-size:8px; font-weight:800;
+  .util-btn .badge{ background:var(--gold); color:#241c10; font-size:8px; font-weight:800;
     border-radius:var(--r-md); padding:2px 4px; min-width:13px; text-align:center; line-height:1.3; }
   /* Same tactile hover/press feedback as real <button>s elsewhere (these
      are divs, so they don't pick that up automatically) -- keeps the util
@@ -414,22 +396,15 @@
   .util-btn.disabled{ opacity:0.35; cursor:default; }
   .util-btn.danger-accent{ background:var(--red-dim); }
   .util-btn.primary-accent{ background:var(--gold); color:#241c10; }
-  .util-btn.rail-go{ flex:0 0 auto; height:46px; font-size:18px; }
-  .util-btn.rail-clear{ flex:0 0 auto; height:32px; font-size:12px; }
-  .util-btn.rail-ability{ flex:0 0 auto; height:32px; font-size:12px; }
-  .util-btn.rail-ability.armed{ background:var(--gold); color:#241c10; box-shadow:0 0 0 2px rgba(212,175,82,0.4); }
   .log div{ margin-bottom:2px; }
   .log .dmg{ color:#e6a9a9; }
   .log .heal{ color:#a9e6b8; }
   .log .sys{ color:#8fa8c9; }
-
-  .path-strip-col{ max-width:300px; margin:0 auto; }
   /* No min-height/fixed margin here -- when the path is empty the strip
      renders no children and its wrapper's inline margin-top is set to 0
      (see render.js), so the panel hugs the tray instead of reserving a
      tall empty gutter below it. Margin only appears once there's a chip
      to separate from the tray above it. */
-  .path-strip{ display:flex; gap:4px; flex-wrap:wrap; }
   .round-badge{ display:inline-block; margin:0 0 4px 4px; background:var(--stone); border:2px solid var(--line); border-radius:var(--r-md); padding:1px 8px; font-size:10px; font-weight:800; color:var(--parchment-dim); }
   /* Lives in .tray-float-wrap now (render.js), a plain unclipped wrapper
      around .tray-wrap, so growing past the tray's own corner -- overlapping
@@ -446,7 +421,7 @@
   /* Display-only readout: pointer-events:none so a big total growing over the
      top-right die can never swallow taps meant for that die. */
   .path-counter-float{ pointer-events:none; position:absolute; top:-10px; right:0px; background:radial-gradient(circle at 32% 28%, #f3dd98, var(--gold) 60%); color:#241c10; border:3px solid var(--line);
-    border-radius:999px; padding:2px 10px; z-index:13; display:flex; align-items:baseline; gap:4px;
+    border-radius:999px; z-index:13; display:flex; gap:4px;
     box-shadow:0 3px 8px rgba(0,0,0,0.55); animation: pop-in 0.2s ease-out;
     transition: font-size .15s var(--ease-pop); }
   /* A bigger total gets a louder badge, not just a bigger one -- a warm
@@ -459,7 +434,7 @@
     50%{ box-shadow:0 3px 10px rgba(0,0,0,0.6), 0 0 14px 4px rgba(212,175,82,0.65); }
   }
   .reduced-motion .path-counter-float.pcf-big{ animation: pop-in 0.2s ease-out; }
-  .pcf-num{ font-weight:800; line-height:1; font-variant-numeric:tabular-nums; }
+  .pcf-num{ font-weight:800; }
   .pcf-extra{ font-size:10px; font-weight:bold; display:flex; align-items:center; gap:2px; }
   @keyframes pop-in{ from{ transform:scale(0.4); opacity:0;} to{ transform:scale(1); opacity:1;} }
   /* Dice reroll: a per-tile flip (rotateX through 90deg, where the tile
@@ -470,12 +445,6 @@
      Each tile's animation-delay is staggered by idx (see shakeDelay in
      render.js), so the flip sweeps across the tray in a wave rather than
      all 16 dice flipping in a flat, robotic unison. */
-  @keyframes flip-tile{
-    0%{ transform:rotateX(0deg); }
-    45%{ transform:rotateX(94deg); }
-    55%{ transform:rotateX(94deg); }
-    100%{ transform:rotateX(0deg); }
-  }
   .die.shaking{ animation: flip-tile 0.5s cubic-bezier(.3,.1,.3,1); transform-style:preserve-3d; backface-visibility:hidden; }
   /* Landing settle: each die overshoots a touch when it comes back face-up. */
   @keyframes flip-tile{
@@ -540,7 +509,6 @@
      just centers the icon inside it), so a ring on .face-val would follow
      that wide box and come out an oval; .icon-svg is the actual icon glyph,
      always a tight 1em-square box, so a ring on it comes out a true circle. */
-  .die.combo-active .face-val .icon-svg{ border-radius:50%; }
   .die.combo-active-1 .face-val .icon-svg{ animation: combo-active-ring-1 1.8s ease-in-out infinite; }
   .die.combo-active-2 .face-val .icon-svg{ animation: combo-active-ring-2 1.5s ease-in-out infinite; }
   .die.combo-active-3 .face-val .icon-svg{ animation: combo-active-ring-3 1.1s ease-in-out infinite; }
@@ -567,11 +535,6 @@
      than the Combo ripple (it's rarer -- once per turn) plus the existing
      forced-face "✦" corner badge popping in with a little spin, instead of
      silently appearing fully-formed. */
-  @keyframes ability-convert-pulse{
-    0%{ box-shadow:0 0 0 0 rgba(212,175,82,0); transform:scale(1); filter:brightness(1); }
-    30%{ box-shadow:0 0 0 9px rgba(212,175,82,0.65); transform:scale(1.14); filter:brightness(1.3); }
-    100%{ box-shadow:0 0 0 0 rgba(212,175,82,0); transform:scale(1); filter:brightness(1); }
-  }
   .die.ability-convert{ animation: ability-convert-pulse 0.55s cubic-bezier(.2,1.4,.4,1); z-index:2; }
   @keyframes badge-pop-in{
     0%{ transform:scale(0) rotate(-45deg); opacity:0; }
@@ -632,19 +595,8 @@
      default list/tag component. The step number is a little pressed-metal
      coin instead of plain text, echoing the gold .pathnum badges already
      used on the tray tiles themselves. */
-  .path-chip{ display:inline-flex; align-items:center; gap:5px;
-    background:linear-gradient(160deg, var(--b2), var(--b1));
-    border:1px solid rgba(0,0,0,0.65); border-radius:var(--r-md); padding:3px 8px 3px 3px;
-    font-size:12px; color: var(--parchment);
-    box-shadow:0 2px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08); }
-  .path-chip .chip-num{ display:flex; align-items:center; justify-content:center; flex:0 0 auto;
-    width:15px; height:15px; border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #f3dd98, var(--gold));
-    color:#241c10; font-weight:800; font-size:9px;
-    box-shadow:0 1px 2px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.55); }
 
   .key-card{ background:var(--panel2); border:3px solid var(--line); border-radius:var(--r-lg); padding:12px 12px 8px; margin-top:16px; }
-  .key-title{ font-weight:800; font-size:15px; color: var(--gold); text-align:center; font-family: var(--font-display); white-space:nowrap; }
   .key-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap:8px 6px; }
   .key-item{ display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 2px; border-radius:var(--r-md); text-align:center; }
   .key-item .key-icon{ font-size:20px; color: var(--parchment); }
@@ -668,7 +620,7 @@
      bordered panel2 card instead of floating directly on the page
      background, so Camp reads as a real game screen with distinct areas
      rather than a flat stack of controls. */
-  .camp-section{ background:var(--panel2); border:1px solid var(--line); border-radius:var(--r-md); padding:8px 10px 9px; margin:7px 0; }
+  .camp-section{ background:var(--panel2); border-radius:var(--r-md); padding:8px 10px 9px; margin:7px 0; }
   .camp-status-card .bar-row{ margin-bottom:0; }
   .camp-status-card .small-btn-row{ margin-top:6px; }
   .camp-status-card .small-btn-row button{ flex:1 1 0; }
@@ -691,7 +643,7 @@
        sit outside the tile like it's drawn to. */
     overflow:visible;
     display:flex; align-items:center; justify-content:center; text-align:center; }
-  .camp-die-tile img{ width:100%; height:100%; object-fit:cover; display:block; border-radius:var(--r-md); }
+  .camp-die-tile img{ display:block; border-radius:var(--r-md); }
   .camp-die-basic-label{ font-size:11px; line-height:1.3; font-weight:800; }
   .camp-die-tile.organize-selected{ box-shadow:0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
   /* Card-stack look for more than one copy: three faux layers fan out
@@ -728,7 +680,6 @@
   /* every tile in a grid that has a stack shares the same top/right room, so singles and stacks stay one size */
   .camp-pocket .camp-dice-grid{ padding-top:2px; }
   .camp-pocket .camp-die-tile.stacked{ margin:0; }
-  .camp-pocket .camp-dice-grid{ row-gap:10px; column-gap:12px; }
   .camp-die-tile.stacked{ box-shadow: var(--stk); }
   .camp-die-tile.stacked.organize-selected{ z-index:2; box-shadow: var(--stk), 0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
   /* Pushed further past the tile's own edge (was -3px) so the badge visibly
@@ -746,7 +697,7 @@
      kept" on its own. Deliberately smaller than the Tray above it (tighter
      padding, smaller tiles via its own grid rule below) -- it's a side
      pocket for spares, not a second equal-weight tray. */
-  .camp-pocket{ position:relative; background:var(--b0); border:1px solid var(--line);
+  .camp-pocket{ position:relative;
     border-radius:8px 8px 16px 16px; padding:11px 7px 7px; margin-top:4px;
     box-shadow:inset 0 3px 10px rgba(0,0,0,0.6); }
   .camp-pocket .camp-dice-grid{ grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap:6px; }
@@ -780,19 +731,18 @@
   .reduced-motion .organize-swap-arrow.up{ transform:rotate(180deg); }
   .camp-section-title{ font-size:13px; margin:7px 0 3px; }
   .camp-section .camp-section-title:first-child{ margin-top:0; }
-  .camp-subhint{ margin:5px 0 2px; }
   .camp-empty-hint{ margin:0 0 2px; }
   /* A small CSS-only campfire (logs + two flickering flame blobs + a pulsing
      warm glow) as Camp's focal point -- no art asset needed, and it doubles
      as a bit of ambient motion/juice consistent with the rest of the game's
      feedback (screen shake, particle bursts, etc.). Respects the global
      reduced-motion rule at the top of this file like every other animation. */
-  .camp-fire-wrap{ position:relative; width:106px; height:70px; margin:10px auto 18px; display:flex; align-items:flex-end; justify-content:center; }
+  .camp-fire-wrap{ position:relative; width:106px; margin:10px auto 18px; display:flex; align-items:flex-end; justify-content:center; }
   .campfire-glow{ position:absolute; bottom:4px; left:50%; transform:translateX(-50%); width:81px; height:81px; border-radius:50%;
     background:radial-gradient(circle, rgba(255,170,60,0.55) 0%, rgba(255,170,60,0) 70%);
     animation: campfire-glow-pulse 2.4s ease-in-out infinite; }
-  .campfire-logs{ position:relative; width:48px; height:10px; background:var(--b3); border-radius:var(--r-sm); z-index:1; }
-  .campfire-logs::before, .campfire-logs::after{ content:''; position:absolute; width:48px; height:8px; background:var(--b4); border-radius:var(--r-sm); top:0; left:0; }
+  .campfire-logs{ position:relative; width:48px; border-radius:var(--r-sm); z-index:1; }
+  .campfire-logs::before, .campfire-logs::after{ content:''; position:absolute; width:48px; border-radius:var(--r-sm); }
   .campfire-logs::before{ transform: rotate(22deg); }
   .campfire-logs::after{ transform: rotate(-22deg); }
   .campfire-flame{ position:absolute; bottom:13px; left:50%; border-radius:50% 50% 50% 50% / 62% 62% 38% 38%; z-index:2; }
@@ -829,8 +779,7 @@
      like the low-health vignette above; pointer-events:none so it never
      intercepts a tap meant for the dice underneath it. */
   #path-trail-svg{ position:fixed; inset:0; width:100%; height:100%; z-index:12; pointer-events:none; overflow:visible; }
-  .path-trail-line{ stroke:var(--gold); stroke-width:4; stroke-linecap:round; fill:none; opacity:0.85;
-    filter:drop-shadow(0 0 3px rgba(212,175,82,0.65)); }
+  .path-trail-line{ stroke:var(--gold); stroke-width:4; stroke-linecap:round; fill:none; }
 
   .face-tooltip{ position:fixed; z-index:90; background:rgba(20,16,12,0.97); border:2px solid var(--line); color:var(--cream); font-size:12px; line-height:1.35; padding:8px 10px; border-radius:var(--r-md); max-width:220px; box-shadow:0 2px 10px rgba(0,0,0,0.5); opacity:0; transform:translateY(4px); transition:opacity .15s ease, transform .15s ease; pointer-events:none; }
   .face-tooltip.show{ opacity:1; transform:translateY(0); }
@@ -865,26 +814,11 @@
      hard-edged plaque (2px ink border, beveled gradient, drop shadow) to
      match the dice tiles and token chips rather than a default notification
      bubble. */
-  .toast{ background:linear-gradient(160deg, var(--b2), var(--b1)); border:2px solid var(--line);
-    box-shadow:0 1px 0 rgba(255,255,255,0.08) inset, 0 4px 10px rgba(0,0,0,0.55);
-    color: var(--cream); font-size:12.5px; font-weight:bold; padding:7px 16px; border-radius:var(--r-md);
-    white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis;
-    animation: toast-sweep 1.15s cubic-bezier(.22,1,.36,1) forwards; }
-  @keyframes toast-sweep{
-    0%{ transform:translateX(-85%) rotate(-2deg); opacity:0; }
-    16%{ transform:translateX(3%) rotate(1deg); opacity:1; }
-    24%{ transform:translateX(0) rotate(0deg); opacity:1; }
-    80%{ transform:translateX(0) rotate(0deg); opacity:1; }
-    100%{ transform:translateX(85%) rotate(2deg); opacity:0; }
-  }
   /* The global reduced-motion rule (top of file) already forces
      animation:none on this, so it just appears/disappears with the JS
      timeout below instead of sweeping -- this only needs to make sure it's
      actually visible (not stuck at the keyframe's own 0% opacity:0) once
      the animation is switched off. */
-  .reduced-motion .toast{ opacity:1; transform:none; }
-  .toast-good{ border-color:#2f5a33; box-shadow:0 0 0 1px #7fd17f inset, 0 4px 10px rgba(0,0,0,0.55); }
-  .toast-bad{ border-color:#5a2f2f; box-shadow:0 0 0 1px #d17f7f inset, 0 4px 10px rgba(0,0,0,0.55); }
 
   /* Kill callout: a brief banner for the two moments worth making feel
      different from an ordinary kill -- a Boss/Big Boss going down, and an
@@ -894,10 +828,10 @@
      inherited from #fx-stack, so it never blocks a tap. Auto-removed by JS
      after its animation finishes. */
   #kill-callout{ display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; }
-  .kill-callout-line{ font-family: var(--font-display); font-weight:800;
-    letter-spacing:1.5px; text-transform:uppercase; text-shadow:0 2px 10px rgba(0,0,0,0.8), 0 0 24px rgba(0,0,0,0.6);
+  .kill-callout-line{
+    letter-spacing:1.5px; text-transform:uppercase;
     opacity:0; transform:scale(0.6); animation: kill-callout-pop 1.3s cubic-bezier(.22,1.4,.36,1) forwards; }
-  .kill-callout-line.boss{ font-size:30px; color:var(--gold); -webkit-text-stroke:1px #241c10; }
+  .kill-callout-line.boss{ font-size:30px; color:var(--gold); }
   .kill-callout-line.overkill{ font-size:22px; color:#ff8a3d; -webkit-text-stroke:1px #241c10; }
   .kill-callout-line.sub{ animation-delay:0.18s; }
   @keyframes kill-callout-pop{
@@ -926,7 +860,7 @@
   .room-callout-box{ background:rgba(10,7,5,0.93); border:3px solid var(--line);
     box-shadow:0 8px 28px rgba(0,0,0,0.6); border-radius:14px; padding:20px 30px; display:flex; flex-direction:column; gap:6px; max-width:92%; min-width:260px;
     transform:translateY(-10px); animation: room-callout-slide 0.4s cubic-bezier(.22,1,.36,1) forwards; }
-  .room-callout-line{ font-family: var(--font-display); font-weight:800;
+  .room-callout-line{
     letter-spacing:1.5px; }
   .room-callout-line.intro{ font-size:18px; color:var(--gold); }
   .room-callout-line.intro.boss{ color:#ff8a3d; }
@@ -978,7 +912,6 @@
      wedges) plus this second, slightly delayed layer underneath -- reads as
      a bigger burst for a bigger haul, not just a recolored one. */
   .loot-sunray-wheel.loot-sunray-wheel-big{ background:repeating-conic-gradient(var(--sunray-color, var(--gold)) 0deg 7deg, transparent 7deg 21deg); }
-  .loot-sunray-wheel.loot-sunray-wheel-2{ opacity:0.6; animation: loot-sunray-kf 0.7s ease-out 0.12s both; }
   @keyframes loot-sunray-kf{
     0%{ opacity:0; transform: scale(0.2) rotate(0deg); }
     18%{ opacity:0.8; }
@@ -1075,8 +1008,8 @@
      under the big art rather than something trying to fill the leftover
      space itself; title-content centers that compact block in whatever
      room is left below the art. */
-  .title-screen-fill{ display:flex; flex-direction:column; min-height: calc(100vh - 16px); }
-  .title-panel{ max-width:360px; margin:0 auto; padding:0; overflow:hidden; flex:1; display:flex; flex-direction:column; width:100%; }
+  .title-screen-fill{ display:flex; flex-direction:column; }
+  .title-panel{ margin:0 auto; padding:0; overflow:hidden; flex:1; display:flex; flex-direction:column; width:100%; }
   .title-art-wrap{ position:relative; width:100%; flex:0 0 auto; }
   .title-cover-art{ display:block; width:100%; height:auto; }
   /* Taller, darker fade at the bottom edge of the art -- the button column
@@ -1105,29 +1038,17 @@
   .compendium-faces .icon-svg{ width:13px; height:13px; }
   /* Closed chest shown first on the loot screen (renderLootModal(), render.js):
      bobs and pulses in the loot's tier color, flips edge-on when tapped. */
-  .loot-chest-btn{ display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; padding:18px 0 8px; background:transparent; border:none; box-shadow:none; border-radius:0; cursor:pointer; color:var(--loot-tier-color, var(--gold)); }
+  .loot-chest-btn{ display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; padding:18px 0 8px; border-radius:0; cursor:pointer; color:var(--loot-tier-color, var(--gold)); }
   .loot-chest-btn:hover:not(:disabled), .loot-chest-btn:active:not(:disabled){ background:transparent; box-shadow:none; transform:none; }
   .loot-chest{ width:120px; height:104px; border-radius:var(--r-lg); background:var(--panel2); border:2.5px solid var(--loot-tier-color, var(--gold));
     display:flex; align-items:center; justify-content:center;
     animation: loot-chest-glow 1.6s ease-in-out infinite, loot-chest-bob 1.6s ease-in-out infinite; }
   .loot-chest-btn.opening .loot-chest{ animation: loot-chest-flip 0.48s ease-in-out both; }
-  .loot-chest-label{ font-size:14px; font-weight:700; color:var(--cream); letter-spacing:0.3px; }
   @keyframes loot-chest-glow{ 0%,100%{ box-shadow:0 0 0 0 var(--loot-tier-glow, rgba(212,175,82,0.5)); } 50%{ box-shadow:0 0 0 14px transparent; } }
   @keyframes loot-chest-bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
   @keyframes loot-chest-flip{ 0%{ transform:rotateY(0) scale(1); } 45%,55%{ transform:rotateY(90deg) scale(1.08); } 100%{ transform:rotateY(180deg) scale(1); } }
   .loot-options{ display:flex; gap:10px; margin:12px 0; flex-wrap:wrap; justify-content:center; }
-  .loot-opt{ position:relative; flex:1 1 calc(50% - 10px); min-width:140px; max-width:220px; background:var(--panel2); border:2px solid var(--line); border-radius:var(--r-md); padding:8px; cursor:pointer; transition: transform .08s; }
-  .loot-opt:hover{ border-color:var(--loot-tier-color, var(--gold)); transform: translateY(-2px); }
-  .loot-chest{ width:120px; height:104px; border-radius:var(--r-lg); background:var(--panel2); border:2.5px solid var(--loot-tier-color, var(--gold));
-    display:flex; align-items:center; justify-content:center;
-    animation: loot-chest-glow 1.6s ease-in-out infinite, loot-chest-bob 1.6s ease-in-out infinite; }
-  .loot-chest-btn.opening .loot-chest{ animation: loot-chest-flip 0.48s ease-in-out both; }
-  .loot-chest-label{ font-size:14px; font-weight:700; color:var(--cream); letter-spacing:0.3px; }
-  @keyframes loot-chest-glow{ 0%,100%{ box-shadow:0 0 0 0 var(--loot-tier-glow, rgba(212,175,82,0.5)); } 50%{ box-shadow:0 0 0 14px transparent; } }
-  @keyframes loot-chest-bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
-  @keyframes loot-chest-flip{ 0%{ transform:rotateY(0) scale(1); } 45%,55%{ transform:rotateY(90deg) scale(1.08); } 100%{ transform:rotateY(180deg) scale(1); } }
-  .loot-options{ display:flex; gap:10px; margin:12px 0; flex-wrap:wrap; justify-content:center; }
-  .loot-opt{ position:relative; flex:1 1 calc(50% - 10px); min-width:140px; max-width:220px; background:var(--panel2); border:2px solid var(--line); border-radius:var(--r-md); padding:8px; cursor:pointer; transition: transform .08s; }
+  .loot-opt{ flex:1 1 calc(50% - 10px); min-width:140px; max-width:220px; background:var(--panel2); border:2px solid var(--line); border-radius:var(--r-md); padding:8px; cursor:pointer; transition: transform .08s; }
   .loot-opt:hover{ border-color:var(--loot-tier-color, var(--gold)); transform: translateY(-2px); }
   .loot-opt h4{ margin:4px 0 0; font-size:13px; color:var(--parchment); text-align:center; }
   /* Reveal pop-in + ambient glow (mirrors dieSettle/glowPulse from the
@@ -1194,7 +1115,6 @@
      there. */
   .loot-preview-tile{ width:72px; height:72px; margin:0 auto 8px; cursor:default; }
   .loot-preview-tile .face-val{ font-size:32px; }
-  .loot-art-thumb{ display:block; width:64px; height:64px; object-fit:contain; margin:0 auto 4px; }
   .faces{ display:flex; gap:3px; flex-wrap:wrap; font-size:9px; }
   /* The loot screen's own face chips used to be forced onto one line
      (nowrap + horizontal scroll) inside a narrow ~140-220px card, with no
@@ -1262,8 +1182,6 @@
      the choice (unlike the carryover list above, which is a one-time pick
      with no way back) is clearly a toggle you can change your mind on. */
   .swap-item.selected{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold), 0 0 8px 1px rgba(212,175,82,0.5); }
-  .boon-none-item{ display:flex; align-items:center; justify-content:center; min-height:56px; }
-  .boon-none-item .swap-item-label{ margin-top:0; font-weight:bold; color:var(--parchment); }
   .small-btn-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
   .hint{ font-size:12px; color:var(--parchment-dim); margin:6px 0; }
   a{ color: var(--gold); }
@@ -1273,17 +1191,13 @@
    Backdrop is also lighter so the rays show through. */
 .loot-overlay{ background:rgba(0,0,0,0.55); }
 .loot-modal{ max-width:340px; padding:10px 12px 12px; }
-.loot-modal h2{ font-size:16px; padding-bottom:5px; margin-bottom:6px; }
-.loot-modal p{ font-size:12px; margin:4px 0; text-align:center; }
+.loot-modal h2{ font-size:16px; }
+.loot-modal p{ margin:4px 0; text-align:center; }
 .loot-modal .loot-chest-btn{ padding:6px 0 2px; gap:8px; }
 .loot-modal .loot-chest{ width:76px; height:66px; border-radius:12px; }
 .loot-modal .loot-chest svg{ width:36px; height:36px; }
-.loot-modal .loot-chest-label{ font-size:12px; }
-.loot-modal .loot-options{ gap:6px; margin:6px 0 0; }
-.loot-modal .loot-opt{ flex:1 1 calc(33.3% - 6px); min-width:92px; max-width:104px; padding:4px; }
 .loot-modal .loot-preview-tile{ width:52px; height:52px; margin-bottom:4px; }
 .loot-modal .loot-preview-tile .face-val{ font-size:22px; }
-.loot-modal .loot-art-thumb{ width:36px; height:36px; margin-bottom:2px; }
 .loot-modal .loot-opt .faces{ gap:3px; }
 .loot-modal .loot-opt .faces span{ font-size:8px; padding:2px 3px; }
 .loot-modal .loot-opt .faces .icon-svg{ width:9px; height:9px; }
@@ -1293,8 +1207,6 @@
 .loot-modal.loot-modal-chest .loot-chest-btn{ padding:10px 0 6px; }
 /* Closed chest fills the narrow card and twitches (quick shake, then a
    pause) until tapped; the .opening flip animation replaces it. */
-.loot-modal.loot-modal-chest .loot-chest{ width:100%; height:150px; border-radius:var(--r-lg);
-  animation: loot-chest-glow 1.6s ease-in-out infinite, loot-chest-twitch 2.2s ease-in-out infinite; }
 .loot-modal.loot-modal-chest .loot-chest svg{ width:84px; height:84px; }
 .loot-modal.loot-modal-chest .loot-chest-btn.opening .loot-chest{ animation: loot-chest-flip 0.48s ease-in-out both; }
 @keyframes loot-chest-twitch{
@@ -1315,7 +1227,6 @@
 .relic-badge{ display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%;
   background:radial-gradient(circle at 32% 28%, #f3dd98, var(--gold) 65%); color:#241c10; border:2px solid var(--line);
   font-size:10px; font-weight:800; letter-spacing:0; flex:0 0 auto; box-shadow:0 2px 4px rgba(0,0,0,0.5); }
-.relic-badge.relic-origin{ background:radial-gradient(circle at 32% 28%, #e3c9ff, #9b6bd6 65%); color:#1b0f2a; }
 .relic-badge.relic-locked{ background:var(--stone); color:var(--parchment-dim); box-shadow:none; }
 .relic-badge-lg{ width:40px; height:40px; font-size:14px; }
 .relic-strip{ display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; cursor:pointer; }
@@ -1342,19 +1253,9 @@
   100%{ transform:none; filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); }
 }
 .enc-impact{ animation: enc-impact-kf var(--impact-dur,0.2s) ease-out; }
-.run-total{ position:absolute; top:-12px; left:0; right:0; margin:0 auto; width:max-content; z-index:13; pointer-events:none;
-  background:rgba(20,15,10,0.88); color:#ffd76a; border:2px solid var(--gold); border-radius:999px; padding:1px 12px;
-  font-weight:800; font-size:17px; box-shadow:0 3px 8px rgba(0,0,0,0.6); animation: pop-in 0.14s ease-out; font-variant-numeric:tabular-nums; }
-.run-total small{ font-size:10px; font-weight:700; color:var(--parchment); }
 
 /* ---- Juice pass 2: enemy death, relic procs, fuse flash, run-end tally ---- */
-@keyframes enc-death-kf{
-  0%{ filter:brightness(2.2); transform:scale(1.04); opacity:1; }
-  25%{ filter:brightness(1.4) saturate(0.6); transform:translateX(-4px) scale(1.02) rotate(-1deg); }
-  45%{ transform:translateX(4px) scale(1.0) rotate(1deg); }
-  100%{ filter:grayscale(1) blur(2px); transform:scale(0.82) translateY(10px); opacity:0; }
-}
-.enc-card-col.enc-death{ animation: enc-death-kf 0.46s ease-in forwards; pointer-events:none; }
+.enc-card-col.enc-death{ pointer-events:none; }
 .relic-badge{ position:relative; }
 .relic-fx{ position:fixed; width:0; height:0; z-index:60; pointer-events:none; }
 .relic-ring{ position:absolute; left:-16px; top:-16px; width:32px; height:32px; border-radius:50%; border:3px solid #ffd76a; box-shadow:0 0 14px 3px rgba(255,215,106,0.75); animation: relic-ring-kf 0.55s ease-out forwards; }
@@ -1382,24 +1283,21 @@
   .new-tag-card{ position:absolute; top:6px; right:6px; z-index:5; font-size:11px; padding:2px 7px; box-shadow:0 0 10px rgba(255,215,106,.8); }
   @keyframes new-tag-pop{ from{ transform:scale(0) rotate(-20deg);} to{ transform:scale(1) rotate(0);} }
   .loot-opt{ position:relative; }
-  #floor-card{ position:fixed; inset:0; z-index:9000; display:flex; align-items:center; justify-content:center; pointer-events:none;
-    background:radial-gradient(ellipse at center, rgba(0,0,0,.55), rgba(0,0,0,0) 70%); animation: floor-card-bg 1.7s ease-out both; }
+  #floor-card{ position:fixed; inset:0; z-index:9000; display:flex; align-items:center; justify-content:center; pointer-events:none; animation: floor-card-bg 1.7s ease-out both; }
   .floor-card-box{ text-align:center; animation: floor-card-in 1.7s cubic-bezier(.2,.9,.3,1) both; }
-  .floor-card-num{ font-size:34px; font-weight:900; color:var(--gold); letter-spacing:4px; text-transform:uppercase; -webkit-text-stroke:1px #241c10; }
+  .floor-card-num{ font-size:34px; color:var(--gold); letter-spacing:4px; text-transform:uppercase; -webkit-text-stroke:1px #241c10; }
   .floor-card-name{ font-size:15px; color:var(--parchment); letter-spacing:2px; margin-top:4px; }
   @keyframes floor-card-in{ 0%{ opacity:0; transform:scale(.8);} 18%{ opacity:1; transform:scale(1.04);} 28%{ transform:scale(1);} 80%{ opacity:1;} 100%{ opacity:0; transform:scale(1.06);} }
   @keyframes floor-card-bg{ 0%{ opacity:0;} 15%{ opacity:1;} 80%{ opacity:1;} 100%{ opacity:0;} }
   .reduced-motion #floor-card, .reduced-motion .floor-card-box{ animation:none !important; }
 
   /* ---- Style tighten pass: UI chrome and numerals share one display face ---- */
-  button, .pcf-num, .kill-callout-line, .room-callout-line, .floor-card-num, .floor-card-name, .new-tag, .status-chip, .kill-hint, .face-val, .face-word, .chip-num{ font-family: var(--font-ui); }
   .pcf-num, .face-val, .sum-count, .bar + span{ font-variant-numeric: tabular-nums; }
   button{ box-shadow:var(--shadow-1); letter-spacing:.2px; }
 
   /* ================= Toy theme (v1.23) =================
      Chunky outlines, a lip under every pressable thing (drop shadow, so faces
      keep their full size), bright dice on a dark brown ground. */
-  body{ background:var(--b0) !important; font-family: var(--font-ui) !important; }
   h1,h2,h3{ text-shadow:0 2px 0 rgba(0,0,0,.4); }
   button{ border:2px solid var(--line) !important; filter:drop-shadow(0 4px 0 var(--line)); font-weight:800; background:var(--b6); color:#fff; transform:translateY(-2px); margin-bottom:2px; }
   button:hover:not(:disabled){ background:#c8915a; transform:translateY(-3px); }
@@ -1410,13 +1308,12 @@
   .die.dietype-maneuver{ background:#ffe9a8 !important; }
   .die .name-tag-svg text{ opacity:.95 !important; font-weight:900 !important; paint-order:stroke; stroke:rgba(0,0,0,.35); stroke-width:.6px; }
   .die .face-word{ font-weight:900; }
-  .tray-wrap{ background:var(--b2) !important; }
   .enc-card{ border:3px solid var(--line) !important; filter:drop-shadow(0 4px 0 var(--line)); }
   .bar{ height:16px !important; border:3px solid var(--line) !important; }
   .bar-fill.hp{ background:linear-gradient(#ff8a8a,#ff3b3b) !important; }
 
   /* Path coins: one circle per move, each overlapping the last by about half. */
-  .tray-head{ display:flex; align-items:center; gap:8px; min-height:32px; margin-bottom:2px; }
+  .tray-head{ display:flex; align-items:center; gap:8px; margin-bottom:2px; }
   .tray-head .round-badge{ margin:0; flex:0 0 auto; }
   .path-strip{ display:flex; flex-wrap:nowrap; align-items:center; gap:0; min-width:0; padding:1px 0 3px; }
   .path-coin{ position:relative; flex:0 0 30px; width:30px; height:30px; border-radius:50%; background:var(--cream); color:#241c10;
@@ -1437,39 +1334,30 @@
   .die .face-word{ line-height:1.1; margin-top:1px; }
 
   /* Loot cards: faces as plain icon dots (no text labels, blanks hidden). */
-  .loot-modal .loot-opt .faces-dots{ display:grid; grid-template-columns:repeat(3,auto); justify-content:center; gap:4px; }
-  .loot-modal .loot-opt .faces-dots .face-dot{ display:inline-flex; align-items:center; justify-content:center; gap:1px; min-width:28px; height:28px; padding:0 3px;
-    border-radius:var(--r-pill); background:var(--cream); border:2px solid var(--line); font-size:10px; font-weight:800; color:#241c10; }
-  .loot-modal .loot-opt .faces-dots .icon-svg{ width:20px; height:20px; margin:0; }
   .loot-modal h2{ border-bottom:none; padding-bottom:0; margin-bottom:6px; text-align:center; }
 
   /* Loot cards: each face as a mini die tile (die color, small icon, name underneath). */
-  .loot-modal .loot-opt .faces-tiles{ display:grid; grid-template-columns:repeat(2,auto); justify-content:center; gap:3px; }
+  .loot-modal .loot-opt .faces-tiles{ display:grid; }
   .mini-face{ display:flex; flex-direction:column; align-items:center; justify-content:center; width:40px; height:40px; border-radius:var(--r-sm);
     border:2px solid var(--line); box-shadow:0 2px 0 var(--line); line-height:1; color:#241c10; }
-  .mini-face .icon-svg, .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ width:21px; height:21px; margin:0; }
   .mini-face small{ font-size:8px; font-weight:900; margin-top:2px; white-space:nowrap; }
   .mf-attack{ background:#ff5b5b; color:#fff3e6; } .mf-maneuver{ background:#ffe9a8; } .mf-origin{ background:#4a8a5c; color:#eafbea; }
   .mf-alloy{ background:#9aa3ab; } .mf-gilded{ background:#d9a93a; } .mf-magic{ background:#9a6ad0; color:#fff; }
   .mini-face.mf-blank{ background:var(--b4); opacity:.45; box-shadow:none; border-style:dashed; }
   /* Light backdrop so dark icons read on every die color. */
-  .mini-face .icon-svg, .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ background:#fff4d2; border-radius:50%; box-shadow:0 0 0 2px #fff4d2; width:19px; height:19px; margin:2px 0 1px; }
+  .mini-face .icon-svg, .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ background:#fff4d2; }
   .mini-face .icon-svg, .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ color:#241c10; }
   .mini-face .icon-svg, .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ box-shadow:none; width:22px; height:22px; margin:1px 0 1px; border-radius:50%; }
   .mini-face .icon-svg svg{ inset:1px; width:calc(100% - 2px); height:calc(100% - 2px); }
 
   /* Final mini-face icon: plain glyph, no chip styling (the old .faces chip rules added a dark disc). */
-  .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ background:transparent; box-shadow:none; border-radius:0; width:24px; height:24px; color:#241c10; }
+  .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ background:transparent; box-shadow:none; border-radius:0; color:#241c10; }
   .mf-attack .icon-svg, .mf-magic .icon-svg{ color:#fff !important; }
   .mini-face .icon-value-overlay{ font-size:9px; font-weight:900; }
   /* Only two loot options: shrink the modal to hug them. */
-  .loot-modal.loot-modal-n2:not(.loot-modal-chest){ max-width:268px; }
 
 
   /* ===== QA pass: character select ===== */
-  .setup-panel{ background:var(--b4) !important; }
-  .setup-panel .origin-showcase, .setup-panel .class-showcase, .setup-panel .boon-showcase{ background:var(--b5); }
-  .setup-panel .setup-label{ color:#f1dcb4; }
   .char-name-input{ color:#ffeab8 !important; text-shadow:0 1px 0 rgba(0,0,0,.35); border-bottom:2px dashed rgba(255,234,184,.45); }
   .char-name-input::placeholder{ color:rgba(255,234,184,.8); }
   .char-name-pencil{ color:#ffeab8; }
@@ -1481,7 +1369,7 @@
   .origin-showcase-portrait{ width:96px !important; height:96px !important; border-radius:var(--r-lg) !important; border:3px solid var(--line); background:linear-gradient(#c4a073,var(--b5)); box-shadow:inset 0 0 0 2px rgba(255,255,255,.18); }
   .origin-showcase-portrait img, .origin-showcase-portrait .mystery-figure{ object-fit:contain !important; object-position:center bottom !important; padding:3px; }
   /* Class: taller panel with a mini tray showing the zone */
-  .class-showcase{ height:auto !important; min-height:118px; align-items:center; gap:12px; padding:10px; }
+  .class-showcase{ height:auto !important; min-height:118px; align-items:center; padding:10px; }
   .class-mini-tray{ display:grid; grid-template-columns:repeat(4,1fr); gap:3px; width:96px; flex:0 0 96px; padding:5px; background:var(--b2); border:3px solid var(--line); border-radius:var(--r-md); }
   .class-mini-tray i{ aspect-ratio:1/1; border-radius:4px; background:var(--b3); border:1.5px solid rgba(0,0,0,.35); display:block; }
   .class-mini-tray i.zone{ background:var(--class-color); border-color:var(--line); box-shadow:inset 0 2px 0 rgba(255,255,255,.35), 0 0 6px var(--class-color); }
@@ -1492,30 +1380,27 @@
 
   /* ===== QA pass: camp dice art shouldn't squash (the tray-die padding was leaking in) ===== */
   .die.camp-die-tile{ padding:0 !important; justify-content:center !important; }
-  .camp-die-tile img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 
   /* ===== Side rail: Skill / tall Go / Clear stacked beside the tray (saves ~160px of height) ===== */
   .enc-rail-row{ flex-direction:row !important; flex-wrap:nowrap !important; gap:6px !important; align-items:stretch; }
   .enc-card-col{ flex:1 1 auto !important; width:auto !important; max-width:none !important; min-width:0 !important; }
   .tray-wrap.tray-wrap-full{ max-width:none !important; }
   .util-rail{ flex-direction:column !important; width:62px !important; flex:0 0 62px !important; align-items:stretch; gap:6px !important; }
-  .util-btn.rail-ability{ order:1; flex:0 0 auto !important; height:38px !important; font-size:12px !important; }
-  .util-btn.rail-go{ order:2; flex:1 1 auto !important; height:auto !important; min-height:60px; font-size:22px !important; }
-  .util-btn.rail-clear{ order:3; flex:0 0 auto !important; height:38px !important; font-size:12px !important; }
+  .util-btn.rail-ability{ flex:0 0 auto !important; height:38px !important; font-size:12px !important; }
+  .util-btn.rail-go{ flex:1 1 auto !important; height:auto !important; min-height:60px; font-size:22px !important; }
+  .util-btn.rail-clear{ flex:0 0 auto !important; height:38px !important; font-size:12px !important; }
   .util-btn.rail-go span, .util-btn.rail-clear span, .util-btn.rail-ability span{ font-size:10px; }
-  .char-icon-wrap{ order:4; display:flex !important; flex:0 0 92px !important; margin-left:-10px !important; align-self:stretch; min-height:0; padding-top:0 !important; justify-content:flex-end !important; overflow:visible; }
   .setup-panel .class-showcase-name{ color:#fff1d6; text-shadow:0 0 0 var(--class-color); border-bottom:3px solid var(--class-color); padding-bottom:1px; }
 
   /* ===== Fonts: Metamorphous for titles/names/banners, MedievalSharp for buttons, numbers, chips and dice labels ===== */
-  h1,h2,h3,.enc-name-txt,.origin-showcase-name,.class-showcase-name,.kill-callout-line,.room-callout-line,.floor-card-num,.floor-card-name,.char-name-input,.camp-section-title,.key-title{ font-family:var(--font-display) !important; font-weight:400; }
+  h1,h2,h3,.enc-name-txt,.origin-showcase-name,.class-showcase-name,.kill-callout-line,.room-callout-line,.floor-card-num,.floor-card-name,.char-name-input,.camp-section-title{ font-family:var(--font-display) !important; font-weight:400; }
   body{ font-family: Georgia,'Iowan Old Style',serif !important; }
-  button,.util-btn,.pcf-num,.status-chip,.face-val,.face-word,.chip-num,.name-tag-svg text,.mini-face small,.kill-hint,.new-tag,.round-badge,.boss-cycle-item,.run-total,.class-tab-btn{ font-family:var(--font-ui) !important; }
+  button,.util-btn,.pcf-num,.status-chip,.face-val,.face-word,.name-tag-svg text,.mini-face small,.kill-hint,.new-tag,.round-badge,.boss-cycle-item,.class-tab-btn{ font-family:var(--font-ui) !important; }
   
 
 
   /* ===== Round 5 tweaks ===== */
   .title-panel{ background:var(--b1) !important; }
-  .setup-panel .setup-label{ font-size:10px; letter-spacing:1.2px; padding:6px 4px 5px; margin-bottom:2px; }
   .enc-portrait{ border:none !important; }
   /* class-ability convert: glow only, no scale (the scale pulse read as the tray resizing) */
   @keyframes ability-convert-pulse{
@@ -1533,7 +1418,6 @@
   #path-trail-svg{ filter:drop-shadow(0 0 3px rgba(212,175,82,0.65)); }
 
   /* ===== One fixed screen height: every screen is at least as tall as the game screen ===== */
-  :root{ --screen-h:640px; }
   .wrap{ min-height:var(--screen-h); }
   #app{ display:flex; flex-direction:column; min-height:var(--screen-h); }
   #app > *:last-child{ flex:1 1 auto; }
@@ -1549,14 +1433,11 @@
   .setup-panel .origin-showcase, .setup-panel .class-showcase, .setup-panel .boon-showcase{ background:var(--brown-light) !important; }
   /* unique rail button colors */
   .util-btn.rail-ability{ background:#6a45a8 !important; color:#fff1d6; }
-  .util-btn.rail-ability.armed{ background:var(--gold) !important; color:#241c10; }
   .util-btn.rail-go{ background:var(--gold) !important; color:#241c10; }
-  .util-btn.rail-pocket{ background:#2f7a6b !important; color:#f2fff9; position:relative; }
+  .util-btn.rail-pocket{ position:relative; }
   .util-btn.rail-item{ background:#2f66a8 !important; color:#eef6ff; position:relative; }
   .util-btn.rail-clear{ background:#a63232 !important; color:#fff1d6; }
-  .util-btn.rail-pocket, .util-btn.rail-item{ order:3; flex:0 0 auto !important; height:36px !important; flex-direction:row; gap:4px; font-size:11px !important; }
-  .util-btn.rail-clear{ order:4 !important; }
-  .char-icon-wrap{ order:5 !important; }
+  .util-btn.rail-pocket, .util-btn.rail-item{ flex:0 0 auto !important; height:36px !important; flex-direction:row; gap:4px; font-size:11px !important; }
   .util-btn.rail-pocket span:not(.badge), .util-btn.rail-item span:not(.badge){ font-size:10px; }
   .util-btn.rail-pocket .icon-svg, .util-btn.rail-item .icon-svg{ width:13px; height:13px; }
   .util-btn .badge{ position:absolute; top:-6px; right:-4px; }
@@ -1574,8 +1455,7 @@
   .loot-modal .loot-options{ flex-direction:column !important; flex-wrap:nowrap !important; gap:8px !important; margin:8px 0 0 !important; }
   .loot-modal .loot-opt{ flex:0 0 auto !important; width:100% !important; max-width:none !important; min-width:0 !important; padding:8px 10px !important;
     display:grid !important; grid-template-columns:92px 1fr; column-gap:12px; align-items:center; background:var(--brown-light) !important; }
-  .loot-modal .loot-opt .loot-art-thumb{ grid-column:1; grid-row:1; justify-self:center; width:30px; height:30px; margin:0 0 2px; }
-  .loot-modal .loot-opt .loot-preview-tile{ grid-column:1; grid-row:2; justify-self:center; width:84px; height:84px; margin:0; }
+  .loot-modal .loot-opt .loot-preview-tile{ grid-column:1; justify-self:center; margin:0; }
   .loot-modal .loot-opt .loot-preview-tile .face-val{ font-size:30px; }
   .loot-modal .loot-opt .faces-tiles{ grid-column:2; grid-row:1 / span 2; grid-template-columns:repeat(3,1fr) !important; gap:5px !important; justify-content:stretch; }
   .loot-modal .loot-opt .mini-face{ width:100%; height:58px; }
@@ -1599,16 +1479,13 @@
   .enc-panel-arch .enc-rail-row{ gap:0 !important; }
   .enc-panel-arch .enc-card-col{ width:100% !important; }
   body.cog-arch .settings-btn-floating{ position:absolute; top:var(--cog-top,10px); right:max(4px, calc(50% - 195px + 4px)); transform:scale(.82); }
-  .enc-card.fo-arch{ position:relative; overflow:visible !important; border:5px solid transparent !important; border-radius:120px 120px 12px 12px / 90px 90px 12px 12px !important; filter:none !important; margin:0 !important; padding:15px 8px 2px;
-    background:radial-gradient(ellipse at 50% 35%, var(--b4) 0%, var(--b2) 55%, var(--b0) 100%) !important; box-shadow:inset 0 8px 24px rgba(0,0,0,.6); }
-  .enc-card.fo-arch.fo-lvl2{ background:radial-gradient(ellipse at 50% 35%, #5e4a26 0%, #33260f 55%, var(--b1) 100%) !important; }
-  .enc-card.fo-arch.fo-lvl3{ background:radial-gradient(ellipse at 50% 35%, #4f4a22 0%, #2a2610 55%, #0e1006 100%) !important; }
+  .enc-card.fo-arch{ position:relative; overflow:visible !important; border:5px solid transparent !important; border-radius:120px 120px 12px 12px / 90px 90px 12px 12px !important; filter:none !important; margin:0 !important; padding:15px 8px 2px; }
   .fo-frame{ position:absolute; left:-5px; top:-10px; pointer-events:none; overflow:visible; filter:drop-shadow(0 4px 0 #0c0705); z-index:2; }
-  .fo-torch{ position:absolute; top:46px; width:10px; height:14px; border-radius:50% 50% 40% 40%; background:radial-gradient(circle at 50% 70%,#fff2a0,#ff9a2a 60%,#d4401a); box-shadow:0 0 14px 6px rgba(255,150,40,.45); animation:fo-flick .7s infinite; z-index:1; }
+  .fo-torch{ position:absolute; top:46px; width:10px; height:14px; border-radius:50% 50% 40% 40%; animation:fo-flick .7s infinite; z-index:1; }
   .fo-torch-l{ left:14px; } .fo-torch-r{ right:14px; animation-delay:.25s; }
   @keyframes fo-flick{ 0%,100%{ transform:scale(1); opacity:1; } 50%{ transform:scale(1.15,.9); opacity:.85; } }
   .reduced-motion .fo-torch{ animation:none; }
-  .fo-band{ display:flex; align-items:flex-end; gap:6px; padding:6px 8px 4px; position:relative; z-index:1; }
+  .fo-band{ display:flex; align-items:flex-end; gap:6px; position:relative; z-index:1; }
   .fo-side{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; gap:4px; }
   .fo-fig{ display:flex; align-items:flex-end; justify-content:center; position:relative; max-width:100%; padding:0 !important; background:none !important; border:none !important; width:auto !important; flex:none !important; overflow:visible !important; }
   .fo-img{ height:89px; width:auto; max-width:100%; object-fit:contain; display:block; filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); transform:translateY(var(--drop,0%)); }
@@ -1619,33 +1496,26 @@
   .fo-fig.dmg-flash::after{ background:rgba(255,60,60,.55); } .fo-fig.heal-flash::after{ background:rgba(90,255,140,.5); }
   .reduced-motion .fo-fig.dmg-flash{ animation:none; }
   .fo-hpwrap{ width:100%; display:flex; align-items:center; gap:5px; font-size:11px; color:#fff1d6; }
-  .fo-hpwrap .bar{ flex:1; }
   .fo-name{ font-family:var(--font-display); font-size:12px; color:#fff1d6; text-align:center; line-height:1.1; }
   .fo-type{ display:block; font-family:var(--font-ui); font-size:8px; letter-spacing:1px; text-transform:uppercase; color:var(--parchment-dim); }
-  .fo-chips{ display:flex; gap:4px; flex-wrap:nowrap; justify-content:center; font-size:10px; }
-  .fo-chips .boss-cycle-item{ padding:1px 6px; }
-  .fo-quests{ display:flex; flex-direction:column; align-items:center; gap:1px; font-size:9px; color:var(--parchment-dim); line-height:1.15; }
+  .fo-chips{ display:flex; flex-wrap:nowrap; justify-content:center; }
+  .fo-quests{ align-items:center; }
   .fo-quest.complete{ color:var(--gold); }
-  .fo-vs{ flex:0 0 22px; align-self:center; font-family:var(--font-display); color:#d9b36a; font-size:13px; opacity:.9; margin-bottom:30px; text-align:center; }
+  .fo-vs{ flex:0 0 22px; align-self:center; font-family:var(--font-display); color:#d9b36a; font-size:13px; opacity:.9; text-align:center; }
   .fo-floor{ height:6px; border-radius:3px; background:rgba(0,0,0,.28); width:92%; margin-top:-6px; }
   .fo-flavor{ margin:0 10px 6px; padding-top:4px; border-top:2px solid var(--b0); font-style:italic; font-size:9.5px; color:#e8d9bd; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; position:relative; z-index:1; }
   body{ background:var(--b0) !important; }
 
-  .fo-fig .fo-img, .enc-portrait.fo-fig .enc-art{ height:89px !important; width:auto !important; max-width:100%; }
-  .fo-has-quests .fo-fig .fo-img, .fo-has-quests .enc-portrait.fo-fig .enc-art{ height:74px !important; }
+  .fo-fig .fo-img, .enc-portrait.fo-fig .enc-art{ width:auto !important; max-width:100%; }
   .fo-quests{ display:flex; flex-direction:row; flex-wrap:wrap; justify-content:center; gap:1px 10px; margin:0 10px 3px; font-size:8.5px; color:var(--parchment-dim); line-height:1.2; position:relative; z-index:1; }
-  .fo-has-quests .fo-flavor{ margin-bottom:5px; }
   .fo-chips{ gap:3px; font-size:9.5px; }
   .fo-chips .boss-cycle-item{ padding:1px 5px; white-space:nowrap; }
   .fo-band{ padding:4px 8px 2px; }
   .enc-card.fo-arch{ padding-top:12px; }
-  .fo-fig .fo-img, .enc-portrait.fo-fig .enc-art{ height:84px !important; }
-  .fo-has-quests .fo-fig .fo-img, .fo-has-quests .enc-portrait.fo-fig .enc-art{ height:70px !important; }
   .fo-flavor{ margin-bottom:4px; }
 
   .fo-chips .boss-cycle-row{ flex-wrap:nowrap; gap:3px; margin:0; justify-content:center; }
-  .fo-tight .fo-flavor{ display:none; }
-  .enc-card.fo-arch{ box-sizing:border-box; min-height:202px; display:flex; flex-direction:column; justify-content:center; }
+  .enc-card.fo-arch{ box-sizing:border-box; display:flex; flex-direction:column; justify-content:center; }
 
   /* face-off hit feedback: flash the figure's own silhouette (no boxy overlay) and float the number above the head */
   .fo-fig.dmg-flash::after, .fo-fig.heal-flash::after{ display:none !important; }
@@ -1654,7 +1524,7 @@
   @keyframes fo-flash-red{ 0%{ filter:brightness(2.4) sepia(1) saturate(7) hue-rotate(-35deg) drop-shadow(0 0 8px #ff3030); } 100%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); } }
   @keyframes fo-flash-green{ 0%{ filter:brightness(2) sepia(1) saturate(6) hue-rotate(60deg) drop-shadow(0 0 8px #3cff7a); } 100%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); } }
   .reduced-motion .fo-fig.dmg-flash .fo-img, .reduced-motion .fo-fig.heal-flash .fo-img{ animation:none; }
-  .fo-hpwrap .delta-float{ left:0; right:0; top:-74px; text-align:center; text-shadow:0 2px 0 #0c0705, 0 0 6px rgba(0,0,0,.7); z-index:5; pointer-events:none; }
+  .fo-hpwrap .delta-float{ pointer-events:none; }
 
 /* Touch: no OS long-press callout / text selection / tap flash on the game; form fields stay normal */
 html, body{ -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; -webkit-tap-highlight-color:transparent; }
@@ -1663,14 +1533,6 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 
 /* Face-off kill: the doorway and hero stay put; only the monster dissolves */
 .enc-card-col.enc-death:has(.fo-arch){ animation:none; }
-.enc-card-col.enc-death .fo-fig.enc-portrait{ animation: fo-mon-death .46s ease-in forwards; }
-@keyframes fo-mon-death{
-  0%{ filter:brightness(2.4); transform:scale(1.06); opacity:1; }
-  30%{ filter:brightness(1.5) saturate(.6); transform:translateX(-3px) rotate(-2deg); }
-  55%{ transform:translateX(3px) rotate(2deg); }
-  100%{ filter:grayscale(1) blur(2px); transform:scale(.8) translateY(10px); opacity:0; }
-}
-.reduced-motion .enc-card-col.enc-death .fo-fig.enc-portrait{ animation:none; }
 
 /* Text-only rail buttons (no glyph icons) */
 .util-btn.rail-go span{ font-size:20px !important; font-weight:800; letter-spacing:.5px; text-transform:uppercase; }
@@ -1683,16 +1545,10 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .fo-arch .fo-hud{ position:absolute; inset:0; z-index:6; pointer-events:none; }
 .fo-hud .relic-strip{ position:absolute; top:5px; left:50%; transform:translateX(-50%); margin:0; gap:3px; flex-wrap:nowrap; pointer-events:auto; background:rgba(20,12,6,.55); padding:2px 5px; border-radius:14px; }
 .fo-hud .relic-badge{ width:20px; height:20px; font-size:9px; }
-.fo-hud-col{ position:absolute; top:44px; display:flex; flex-direction:column; gap:2px; pointer-events:none; }
-.fo-hud-l{ left:14px; align-items:flex-start; } .fo-hud-r{ right:14px; align-items:flex-end; }
-.fo-hud-col .status-chip{ pointer-events:auto; font-size:10px; padding:1px 5px; white-space:nowrap; }
-.fo-hud-col:empty{ display:none; }
 
 /* Player buffs sit under the name; enemy quests sit under the enemy */
-.fo-buffs{ min-height:0; }
-.fo-buffs:empty{ display:none; }
 .fo-buffs .status-chip{ font-size:10px; padding:1px 5px; white-space:nowrap; }
-.fo-enemy .fo-quests{ margin:2px 0 0; align-items:flex-start; justify-content:flex-start; flex-direction:column; flex-wrap:nowrap; gap:1px; width:100%; text-align:left; font-size:8.5px; }
+.fo-enemy .fo-quests{ margin:2px 0 0; flex-direction:column; flex-wrap:nowrap; gap:1px; width:100%; font-size:8.5px; }
 .fo-enemy .fo-quest{ display:block; }
 
 /* Basic dice: icon dead-centre in the tile, word pinned along the bottom */
@@ -1701,7 +1557,6 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 #tray .die.dietype-attack:not(.blank) .face-word, #tray .die.dietype-maneuver:not(.blank) .face-word{ position:absolute; left:0; right:0; bottom:3px; margin:0; text-align:center; }
 
 .modal-lead{ text-align:center; }
-.fo-has-quests .fo-flavor{ display:none; }
 .util-btn, .util-btn span{ text-align:center; }
 .util-btn.rail-ability span{ line-height:1.1; width:100%; display:block; }
 
@@ -1713,7 +1568,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 /* Camp: your hero sits beside the fire, facing it */
 .camp-fire-wrap{ height:78px !important; }
 .camp-hero{ position:absolute; right:calc(50% + 24px); bottom:0; z-index:3; }
-.camp-hero img{ display:block; height:74px; width:auto; filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)) drop-shadow(6px 0 8px rgba(255,150,40,.45)); }
+.camp-hero img{ display:block; height:74px; filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)) drop-shadow(6px 0 8px rgba(255,150,40,.45)); }
 .camp-hero{ width:max-content; }
 .camp-hero img{ max-width:none !important; width:auto !important; object-fit:contain; }
 
@@ -1724,20 +1579,14 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 
 /* Kill hint ("So close", "Lethal"...) always owns its slot so nothing shifts when it appears */
 .fo-enemy .fo-hint{ margin:0 !important; height:12px; line-height:12px; text-align:center; width:100%; overflow:visible; }
-:root{ --screen-h:660px; }
-.enc-card.fo-arch{ min-height:222px !important; }
 /* Buff row always reserves its line so the hero and name don't hop when a buff lands */
 .fo-buffs, .fo-buffs:empty{ display:flex !important; min-height:18px; }
 
 /* Extra height: roughly one die (~60px) more screen, spent on a bigger doorway and larger fighters */
 :root{ --screen-h:720px; }
-.enc-card.fo-arch{ min-height:272px !important; }
-.fo-fig .fo-img, .enc-portrait.fo-fig .enc-art{ height:104px !important; }
-.fo-has-quests .fo-fig .fo-img, .fo-has-quests .enc-portrait.fo-fig .enc-art{ height:88px !important; }
-.fo-hud-col{ top:56px; }
 
 /* Class-coloured zone: the cells your class ability applies to, and the armed ability button */
-.zone-cell{ outline:3px dashed var(--class-color,#fff) !important; outline-offset:-3px; box-shadow:inset 0 0 12px color-mix(in srgb, var(--class-color,#fff) 55%, transparent), inset 0 3px 0 rgba(255,255,255,.3); }
+.zone-cell{ outline-offset:-3px; box-shadow:inset 0 0 12px color-mix(in srgb, var(--class-color,#fff) 55%, transparent), inset 0 3px 0 rgba(255,255,255,.3); }
 .util-btn.rail-ability.armed{ background:var(--class-color,var(--gold)) !important; color:#fff !important; box-shadow:0 0 0 2px #fff6, 0 0 12px var(--class-color,gold); }
 .zone-cell{ outline-color:color-mix(in srgb, var(--class-color,#fff) 65%, #fff) !important; box-shadow:inset 0 0 0 5px rgba(20,10,4,.55), inset 0 0 14px 3px color-mix(in srgb, var(--class-color,#fff) 80%, transparent), inset 0 3px 0 rgba(255,255,255,.3); }
 /* Loot chest: the art is the button -- no frame lines around it */
@@ -1750,34 +1599,23 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 
 /* ---- Diagonal ribbons (replace toasts) ---- */
 .rb-layer{ position:fixed; z-index:95; overflow:hidden; pointer-events:none; }
-.rb{ position:absolute; left:0; right:0; display:flex; align-items:center; pointer-events:none; color:#fff1d6; text-align:center;
-  font-family:var(--font-display) !important; font-size:17px; line-height:1.1; letter-spacing:.5px; text-shadow:0 2px 0 rgba(0,0,0,.75); }
-.rb-in{ position:relative; max-width:96%; padding:8px 40px; clip-path:polygon(14px 0,100% 0,calc(100% - 14px) 100%,0 100%); box-shadow:inset 0 2px 0 rgba(255,255,255,.14); }
-.rb-in small{ display:block; font-family:var(--font-ui) !important; font-size:9px; letter-spacing:1.2px; text-transform:uppercase; opacity:.8; margin-bottom:3px; }
+.rb{ position:absolute; left:0; right:0; display:flex; align-items:center; pointer-events:none; color:#fff1d6; text-align:center; font-size:17px; line-height:1.1; }
+.rb-in{ max-width:96%; }
+.rb-in small{ display:block; font-family:var(--font-ui) !important; font-size:9px; letter-spacing:1.2px; text-transform:uppercase; margin-bottom:3px; }
 .rb-ic{ display:inline-flex; width:15px; height:15px; vertical-align:-2px; margin-right:6px; }
 .rb-bad .rb-in{ background:linear-gradient(180deg,#8a241a,#3a0c08); }
 .rb-good .rb-in{ background:linear-gradient(180deg,#25783a,#0c2c14); }
 .rb-neutral .rb-in{ background:linear-gradient(180deg,var(--b2),var(--b1)); }
-.rb-gold .rb-in{ background:linear-gradient(180deg,#9a7a22,#3a2a08); padding:5px 30px; font-size:12px; }
+.rb-gold .rb-in{ background:linear-gradient(180deg,#9a7a22,#3a2a08); font-size:12px; }
 .rb-long{ font-size:13px; }
-.rb-streak{ position:absolute; height:2px; width:70px; background:linear-gradient(90deg,transparent,rgba(255,241,214,.85),transparent); opacity:.9; }
-.rb-streak.s1{ top:34%; } .rb-streak.s2{ top:66%; width:46px; }
 /* placement: combat slashes the middle of the scene tilted toward the target; notices ride higher */
-.rb-combat-pos{}
 #rb-layer-combat .rb{ top:40%; }
 #rb-layer-notice .rb{ top:14%; }
-.rb-l{ justify-content:flex-start; transform:rotate(-9deg); animation: rb-in-l 1.25s cubic-bezier(.22,1,.36,1) forwards; }
-.rb-l .rb-in{ margin-left:-14px; } .rb-l .rb-streak{ left:-6px; }
-.rb-r{ justify-content:flex-end; transform:rotate(9deg); animation: rb-in-r 1.25s cubic-bezier(.22,1,.36,1) forwards; }
-.rb-r .rb-in{ margin-right:-14px; } .rb-r .rb-streak{ right:-6px; }
-.rb-n{ justify-content:center; transform:rotate(-4deg); animation: rb-in-n 1.4s cubic-bezier(.22,1,.36,1) forwards; }
-@keyframes rb-in-l{ 0%{ transform:translateX(120%) rotate(-9deg); opacity:0; } 14%{ transform:translateX(0) rotate(-9deg); opacity:1; } 78%{ transform:translateX(0) rotate(-9deg); opacity:1; } 100%{ transform:translateX(-60%) rotate(-9deg); opacity:0; } }
-@keyframes rb-in-r{ 0%{ transform:translateX(-120%) rotate(9deg); opacity:0; } 14%{ transform:translateX(0) rotate(9deg); opacity:1; } 78%{ transform:translateX(0) rotate(9deg); opacity:1; } 100%{ transform:translateX(60%) rotate(9deg); opacity:0; } }
-@keyframes rb-in-n{ 0%{ transform:translateX(100%) rotate(-4deg); opacity:0; } 14%{ transform:translateX(0) rotate(-4deg); opacity:1; } 80%{ transform:translateX(0) rotate(-4deg); opacity:1; } 100%{ transform:translateX(-40%) rotate(-4deg); opacity:0; } }
-.reduced-motion .rb{ animation:none !important; opacity:1; }
-.reduced-motion .rb-streak{ display:none; }
-
-.rb-streak{ display:none !important; }
+.rb-l{ justify-content:flex-start; transform:rotate(-9deg); }
+.rb-l .rb-in{ margin-left:-14px; }
+.rb-r{ justify-content:flex-end; transform:rotate(9deg); }
+.rb-r .rb-in{ margin-right:-14px; }
+.rb-n{ justify-content:center; transform:rotate(-4deg); }
 
 /* Rail order: Go on top, Skill beneath it */
 .util-btn.rail-go{ order:1 !important; }
@@ -1821,7 +1659,6 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 /* Spend the extra device height on the doorway scene (scales with --screen-h; unchanged at 720) */
 .enc-card.fo-arch{ min-height:calc(253px + (var(--screen-h) - 720px) * 0.65) !important; }
 .fo-fig .fo-img, .enc-portrait.fo-fig .enc-art{ height:calc(104px + (var(--screen-h) - 720px) * 0.25) !important; }
-.fo-has-quests .fo-fig .fo-img, .fo-has-quests .enc-portrait.fo-fig .enc-art{ height:calc(88px + (var(--screen-h) - 720px) * 0.2) !important; }
 .title-panel{ max-width:395px !important; }
 
 /* ===== Damage / heal numbers by the portraits: big, outlined, held a beat longer ===== */
@@ -1862,11 +1699,11 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
   .class-showcase-ability{ font-size:12.5px !important; }
   #start-btn{ padding:22px 12px; font-size:22px; margin-top:8px; }
   .camp-fire-wrap{ zoom:1.7; margin:14px auto 22px !important; }
-  .title-panel .title-btn, .title-panel button{ padding-top:14px; padding-bottom:14px; }
+  .title-panel button{ padding-top:14px; padding-bottom:14px; }
 }
 
 /* ===== Ribbons restyled to match the game's toy-like art: flat colour, chunky dark outline, button-style drop edge; slanted parallelogram kept ===== */
-.rb{ text-shadow:none; letter-spacing:.3px; }
+.rb{ text-shadow:none; }
 .rb-in{ --rbc:#b8844a; --rbt:#fff1d6; position:relative; isolation:isolate; z-index:0; clip-path:none !important; box-shadow:none !important; background:none !important; border:0;
   padding:9px 40px; color:var(--rbt); text-shadow:0 2px 0 rgba(27,15,6,.85); }
 .rb-in::before, .rb-in::after{ content:''; position:absolute; z-index:-1; clip-path:polygon(16px 0,100% 0,calc(100% - 16px) 100%,0 100%); }
@@ -1895,9 +1732,6 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .rb, .rb-in{ font-family:var(--font-ui) !important; font-weight:800; letter-spacing:.2px; }
 
 /* ---- v1.32: anticipation pips, near-miss chip, run highlights, origin relic ---- */
-.loot-pips{ display:flex; gap:7px; justify-content:center; min-height:10px; }
-.loot-pips i{ width:9px; height:9px; border-radius:50%; background:rgba(255,255,255,.14); border:1px solid var(--loot-tier-color, var(--gold)); transition:background .12s, box-shadow .12s, transform .12s; }
-.loot-pips i.lit{ background:var(--loot-tier-color, var(--gold)); box-shadow:0 0 10px var(--loot-tier-glow, var(--gold)); transform:scale(1.35); }
 .loot-tap-hint{ font-size:12px; letter-spacing:.06em; opacity:.75; }
 .loot-chest-btn.opening .loot-tap-hint{ visibility:hidden; }
 .near-miss-chip{ background:rgba(255,138,61,.16) !important; color:#ffb877 !important; border:1px solid rgba(255,138,61,.5) !important; }
@@ -1922,20 +1756,13 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 /* v1.32.8 contrast pass: flat colors, lighter edges so brown layers separate */
 .wrap > .panel{ background:var(--b2) !important; border:2px solid var(--b4) !important; box-shadow:0 0 0 2px var(--b0); }
 .camp-section{ border:2px solid var(--b4) !important; box-shadow:inset 0 0 0 1px rgba(255,220,160,.12); }
-.camp-section.camp-status-card{ background:var(--b0) !important; }
 .camp-pocket{ background:var(--b0) !important; border:1px solid var(--b4) !important; }
-.tray-wrap{ background:var(--b2) !important; border-color:var(--b5) !important; box-shadow:0 0 0 2px var(--b0); }
+.tray-wrap{ border-color:var(--b5) !important; }
 .upgrade-btn:disabled, .upgrade-preview-btn:disabled{ opacity:1 !important; background:var(--b3) !important; color:#e3caa3 !important; border-color:var(--b0) !important; }
 .upgrade-btn:disabled .icon-svg, .upgrade-btn:disabled svg{ opacity:.85; }
 
 /* v1.32.10 shield on health bars */
 .bar-fill.shield-seg{ position:absolute; top:0; bottom:0; height:auto; background:#5fa8d8 !important; border-left:2px solid #1c3a52; z-index:1; }
-.bar-shield{ position:absolute; right:2px; top:50%; transform:translateY(-50%); z-index:5; display:flex; align-items:center; pointer-events:none; filter:drop-shadow(0 1px 0 #000); }
-.bar-shield .icon-svg{ font-size:12px; }
-.bar-shield{ gap:2px; padding:0 4px; height:calc(100% - 4px); border-radius:8px; background:#1c3a52; border:1px solid #8cc8f0; color:#e6f4ff; font:700 11px var(--font-ui); }
-.bar-shield b{ font-weight:700; line-height:1; }
-.bar-shield .icon-svg{ width:12px; height:12px; display:inline-flex; color:#8cc8f0; }
-.bar-shield .icon-svg svg{ width:12px; height:12px; }
 
 /* v1.32.13 animation polish */
 @keyframes idle-breath-kf{
@@ -1950,51 +1777,6 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 }
 .idle-breath{ animation: idle-breath-kf 4.4s steps(1,end) infinite; transform-origin:50% 100%; }
 /* Player: composed -- a quick head-up shrug and a slow weight shift. Enemy: jerky, erratic double/triple spasms. */
-@keyframes idle-twitch-p{
-  0%,40%,100%{ translate:0 0; rotate:0deg; scale:1 1; }
-  12%{ translate:.5px 0; rotate:.3deg; }
-  13.5%{ translate:0 0; rotate:0deg; }
-  24%{ translate:0 -.5px; rotate:0deg; }
-  25.5%{ translate:0 0; rotate:0deg; }
-  42%{ translate:0 -2px; rotate:0deg; scale:1 1.02; }
-  46%{ translate:0 0; rotate:0deg; scale:1 1; }
-  58%{ translate:-.5px 0; rotate:-.4deg; }
-  59.5%{ translate:0 0; rotate:0deg; }
-  68%{ translate:.5px -.5px; rotate:.3deg; }
-  69.5%{ translate:0 0; rotate:0deg; }
-  78%{ translate:-1px 0; rotate:-.7deg; scale:1 1; }
-  90%{ translate:0 0; rotate:0deg; }
-  95%{ translate:.5px 0; rotate:.3deg; }
-  96.5%{ translate:0 0; rotate:0deg; }
-}
-@keyframes idle-twitch-e{
-  0%,30%,100%{ translate:0 0; rotate:0deg; scale:1 1; }
-  8%{ translate:.6px -.4px; rotate:.5deg; }
-  9%{ translate:0 0; rotate:0deg; }
-  15%{ translate:-.6px 0; rotate:-.5deg; }
-  16%{ translate:0 0; rotate:0deg; }
-  22%{ translate:.5px .5px; rotate:.4deg; }
-  23%{ translate:0 0; rotate:0deg; }
-  31%{ translate:-2px 1px; rotate:2.4deg; scale:.98 1.02; }
-  33%{ translate:2px -1px; rotate:-2deg; scale:1.02 .98; }
-  35%{ translate:-1px 0; rotate:1.2deg; scale:1 1; }
-  37%{ translate:0 0; rotate:0deg; scale:1 1; }
-  48%{ translate:-.6px 0; rotate:-.6deg; }
-  49%{ translate:0 0; rotate:0deg; }
-  55%{ translate:.6px -.5px; rotate:.5deg; }
-  56%{ translate:0 0; rotate:0deg; }
-  62%{ translate:-.5px 0; rotate:-.4deg; }
-  63%{ translate:0 0; rotate:0deg; }
-  71%{ translate:2px -2px; rotate:-3deg; scale:1.03 .97; }
-  73%{ translate:0 0; rotate:0deg; scale:1 1; }
-  83%{ translate:-1px 0; rotate:1.5deg; }
-  85%{ translate:0 0; rotate:0deg; }
-  92%{ translate:.6px 0; rotate:.5deg; }
-  93%{ translate:0 0; rotate:0deg; }
-}
-.idle-breath.idle-p{ animation-name: idle-twitch-p; animation-timing-function: steps(1,end); }
-.idle-breath.idle-p{ animation-timing-function: ease-in-out; }
-.idle-breath.idle-e{ animation-name: idle-twitch-e; }
 .fo-fig.fo-dead .idle-breath, .enc-death .idle-breath{ animation:none; }
 @keyframes hp-ghost-kf{ 0%,35%{ transform:scaleX(1); opacity:.95; } 100%{ transform:scaleX(0); opacity:.4; } }
 .bar-fill.hp-ghost{ position:absolute; top:0; bottom:0; height:auto; background:#ffe6c4 !important; transform-origin:left center; animation:hp-ghost-kf .9s ease-in forwards; z-index:1; }
@@ -2006,8 +1788,8 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 
 @keyframes sh-up-kf{ 0%{ filter:brightness(2.2); scale:1.35; } 100%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); scale:1; } }
 @keyframes sh-down-kf{ 0%{ filter:brightness(2); scale:1; translate:0 0; } 30%{ translate:-3px 0; } 60%{ translate:3px 0; } 100%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); translate:0 0; } }
-.bar-shield.sh-up, .bar-fill.shield-seg.sh-up{ animation:sh-up-kf .5s cubic-bezier(.2,1.4,.4,1) both; }
-.bar-shield.sh-down, .bar-fill.shield-seg.sh-down{ animation:sh-down-kf .4s ease-out both; }
+.bar-fill.shield-seg.sh-up{ animation:sh-up-kf .5s cubic-bezier(.2,1.4,.4,1) both; }
+.bar-fill.shield-seg.sh-down{ animation:sh-down-kf .4s ease-out both; }
 .reduced-motion .sh-up, .reduced-motion .sh-down{ animation:none !important; }
 
 .bar-num .bn-sh{ color:#8cd0ff; text-shadow:0 1px 0 #0a2236, 0 0 3px #0a2236; }
@@ -2049,7 +1831,6 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 
 /* v1.32.19 monster presence: per-encounter size (--sz). Big ones grow up AND down, looming behind their health bar. */
 .enc-card.fo-arch{ --fh:calc(104px + (var(--screen-h) - 720px) * 0.25); }
-.enc-card.fo-arch.fo-has-quests{ --fh:calc(88px + (var(--screen-h) - 720px) * 0.2); }
 .enc-card.fo-arch .fo-enemy .fo-fig.enc-portrait{ height:var(--fh) !important; }
 .enc-card.fo-arch .fo-enemy .fo-fig.enc-portrait .fo-img.enc-art{ height:calc(var(--fh) * var(--sz,1)) !important; max-width:none; width:auto !important; flex:none; }
 .enc-card.fo-arch .fo-enemy .fo-fig.fo-big{ z-index:0;
@@ -2070,10 +1851,9 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .fo-enemy .bar.bar-arc{ height:auto !important; border:none !important; background:none !important; overflow:visible !important; box-shadow:none !important; border-radius:0; flex:none; width:100%; animation:none !important; }
 .bar-arc svg{ display:block; overflow:visible; }
 .bar-arc .ba-out, .bar-arc .ba-track, .bar-arc .ba-seg{ fill:none; }
-.bar-arc .ba-out{ stroke:var(--line); stroke-width:16; stroke-linecap:round; }
-.bar-arc .ba-track{ stroke:#2a2420; stroke-width:10; stroke-linecap:round; }
-.bar-arc .ba-seg{ stroke-width:10; stroke-linecap:butt; }
-.bar-arc .ba-hp{ stroke:#ff4d43; }
+.bar-arc .ba-out{ stroke:var(--line); stroke-linecap:round; }
+.bar-arc .ba-track{ stroke:#2a2420; stroke-linecap:round; }
+.bar-arc .ba-seg{ stroke-linecap:butt; }
 .bar-arc .ba-quest{ stroke:var(--gold); }
 .bar-arc .ba-shield{ stroke:#5fa8d8; }
 .bar-arc .ba-prev{ stroke:rgba(255,255,255,.5); }
@@ -2107,32 +1887,21 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .fo-enemy:not(.fo-boss-side){ position:relative; }
 .fo-enemy:not(.fo-boss-side) > .kill-hint{ position:absolute; top:0; left:0; right:0; margin:0 !important; z-index:4; text-align:center; pointer-events:none; text-shadow:0 1px 0 #0c0705, 0 0 5px rgba(0,0,0,.9); }
 /* Bosses keep their bars where they are; the portrait stands a little higher */
-.enc-card.fo-arch .fo-boss-side .fo-fig .fo-img.enc-art{ margin-bottom:calc(-1 * var(--down, 0px) + 10px) !important; }
 
 /* Quests float above the "vs" in their own labeled plate, so they never push the fighters around */
-.fo-quests-float{ position:absolute; left:50%; top:20px; transform:translateX(calc(-100% + 10px)); z-index:5; width:118px; padding:3px 7px 4px; text-align:center;
-  background:rgba(28,14,6,.82); border:1px solid var(--b4); border-radius:8px; box-shadow:0 2px 0 rgba(0,0,0,.5); pointer-events:auto; }
-.fo-quests-label{ font-family:var(--font-ui); font-size:8px; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin-bottom:1px; }
-.fo-quests-float .fo-quests{ margin:0 !important; width:auto !important; align-items:center !important; gap:1px !important; font-size:9px !important; line-height:1.2; color:#e8d9bd; }
-.fo-quests-float .fo-quest.complete{ color:var(--gold); }
+.fo-quests-float{ position:absolute; text-align:center; pointer-events:auto; }
+.fo-quests-label{ text-transform:uppercase; }
+.fo-quests-float .fo-quests{ margin:0 !important; width:auto !important; gap:1px !important; font-size:9px !important; line-height:1.2; }
 .fo-quests-float .fo-quest{ display:block; white-space:normal; }
 
 /* Quests as a paper notice pinned to the dungeon wall, behind the fighters */
-.fo-quests-float{ z-index:0 !important; left:50%; top:18px; transform:translateX(-68%) rotate(-2.2deg) !important; transform-origin:50% 0; width:124px; padding:9px 8px 8px;
-  background:radial-gradient(ellipse at 20% 15%, rgba(255,255,255,.28), transparent 55%),
-    repeating-linear-gradient(0deg, rgba(120,80,30,.05) 0 2px, transparent 2px 5px),
-    linear-gradient(170deg,#efdfb4,#d8c08a);
-  border:none; border-radius:2px; box-shadow:none;
-  filter:drop-shadow(0 3px 2px rgba(0,0,0,.55));
-  clip-path:polygon(0 0,100% 0,100% 94%,94% 98%,86% 94%,78% 99%,68% 95%,58% 99%,48% 95%,38% 99%,28% 95%,18% 99%,8% 95%,0 98%); }
-.fo-quests-float::before{ content:''; position:absolute; top:2px; left:50%; width:7px; height:7px; margin-left:-3.5px; border-radius:50%;
-  background:radial-gradient(circle at 35% 30%, #ff9a8a, #b3261e 60%, #6b130e); box-shadow:0 1px 1px rgba(0,0,0,.6); }
-.fo-quests-label{ color:#7a1f14 !important; font-family:var(--font-display); font-size:9.5px !important; letter-spacing:2px; border-bottom:1px solid rgba(90,55,20,.45); padding-bottom:2px; margin-bottom:3px !important; }
+.fo-quests-float{ z-index:0 !important; left:50%; top:18px; transform-origin:50% 0; padding:9px 8px 8px; }
+.fo-quests-float::before{ content:''; position:absolute; border-radius:50%; box-shadow:0 1px 1px rgba(0,0,0,.6); }
+.fo-quests-label{ color:#7a1f14 !important; font-family:var(--font-display); font-size:9.5px !important; letter-spacing:2px; }
 .fo-quests-float .fo-quests{ color:#3a2410 !important; }
 .fo-quests-float .fo-quest.complete{ color:#2d6a2f !important; text-decoration:line-through; }
 
 /* two nails instead of a pin; more centered, a bit narrower, balanced wrapping (no one-word last lines) */
-.fo-quests-float{ transform:translateX(-56%) rotate(-2.2deg) !important; width:112px; }
 .fo-quests-float .fo-quest{ text-wrap:balance; }
 .fo-quests-float::before{ top:3px; left:6px; margin-left:0; width:5px; height:5px;
   background:radial-gradient(circle at 35% 30%, #d8d8d8, #7d7d7d 60%, #3b3b3b); }
@@ -2145,7 +1914,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 
 /* One ink colour everywhere. Camp props get a slimmer outline than the characters: logs 2px, flames 2.5px */
 .campfire-logs, .campfire-logs::before, .campfire-logs::after{ border:2px solid var(--line); box-sizing:border-box; }
-.campfire-flame{ border:2.5px solid var(--line); box-sizing:border-box; }
+.campfire-flame{ box-sizing:border-box; }
 
 /* v1.32.19 dark hallway: two torch-lit foci, a faint warm centre, near-black edges */
 .enc-card.fo-arch{ background:radial-gradient(circle at 19px 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
@@ -2215,8 +1984,6 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .chest-lock .ch-shine{ opacity:0; animation:lk-shine 7s ease-in-out infinite; animation-delay:2s; }
 .chest-lock.unlock{ animation:lk-jolt .7s cubic-bezier(.3,.7,.4,1) both; animation-delay:var(--lk-delay,0ms); }
 .chest-lock.unlock .ch-shackle{ animation:lk-pop .7s cubic-bezier(.3,.7,.4,1) both; animation-delay:var(--lk-delay,0ms); }
-.chest-lock.ready{ animation:lk-ready 1.3s ease-in-out infinite; }
-.chest-lock.ready .ch-shine{ animation:lk-shine 1.6s ease-in-out infinite; animation-delay:0s; }
 @keyframes lk-shine{ 0%,70%{ transform:translateX(0); opacity:0; } 76%{ opacity:1; } 94%{ transform:translateX(100px); opacity:1; } 100%{ transform:translateX(100px); opacity:0; } }
 @keyframes lk-jolt{ 0%{ transform:translateX(-50%) scale(.84) rotate(0) translateY(0); } 12%{ transform:translateX(-50%) scale(.84) rotate(-7deg) translateY(2px); } 26%{ transform:translateX(-50%) scale(.84) rotate(5deg) translateY(-1px); } 40%{ transform:translateX(-50%) scale(.84) rotate(-2deg); } 60%,100%{ transform:translateX(-50%) scale(.84) rotate(0); } }
 @keyframes lk-pop{ 0%{ transform:translateY(0) rotate(0); } 28%{ transform:translateY(-7px) rotate(-22deg); } 66%{ transform:translateY(-7px) rotate(-22deg); } 100%{ transform:translateY(0) rotate(0); } }
@@ -2233,7 +2000,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .reduced-motion .combo-ring{ animation:none; opacity:1; }
 
 /* ---- Health bar segments meet in clean flat edges (the .bar clips the outer rounded ends) ---- */
-.bar .bar-fill, .bar .bar-shield, .bar .bar-fill.hp, .bar .bar-fill.quest-hp, .bar .bar-fill.shield-seg, .bar .bar-fill.hp-ghost, .bar .bar-fill.dmg-preview{ border-radius:0 !important; }
+.bar .bar-fill, .bar .bar-fill.hp, .bar .bar-fill.quest-hp, .bar .bar-fill.shield-seg, .bar .bar-fill.hp-ghost, .bar .bar-fill.dmg-preview{ border-radius:0 !important; }
 
 
 /* ---- Juice pass 3: quest stamp, status ticks, door kick, hit-stop, camp fuse fly, fire flare ---- */
@@ -2285,10 +2052,6 @@ body.hit-stop .fo-enemy .fo-fig{ filter:brightness(2.4) saturate(.35); }
 .reduced-motion .tray-wrap .tray::before{ animation:none; opacity:.5; }
 
 /* ---- Idle v2: bodies hold still; a brief eye-glint/light pulse instead of body motion ---- */
-@keyframes idle-glint-p{ 0%,86%,100%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); } 90%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)) brightness(1.18) drop-shadow(0 0 4px rgba(255,214,120,.55)); } 95%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); } }
-@keyframes idle-glint-e{ 0%,78%,100%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); } 80%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)) brightness(1.35) saturate(1.2) drop-shadow(0 0 5px rgba(255,70,40,.7)); } 83%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); } 86%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)) brightness(1.2) drop-shadow(0 0 3px rgba(255,70,40,.5)); } 90%{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); } }
-.idle-breath.idle-p{ animation-name:idle-glint-p !important; animation-timing-function:ease-in-out !important; }
-.idle-breath.idle-e{ animation-name:idle-glint-e !important; animation-timing-function:ease-in-out !important; }
 
 /* While a path is resolving, pause purely decorative loops so phones spend the frame budget on the hit sequence */
 body.is-resolving .hall-fx i, body.is-resolving .tray-wrap .tray::before,
@@ -2310,32 +2073,9 @@ body.is-resolving .lethal-tag, body.is-resolving .die .face-val .icon-svg, body.
 .tray-head .round-badge{ background:#2f3b42 !important; color:#c9d6dc !important; border-color:var(--line) !important; }
 
 /* Quest note: aged parchment (stains + darkened edges), no ruled lines */
-.fo-quests-float{
-  background:
-    radial-gradient(ellipse at 20% 15%, rgba(255,255,255,.26), transparent 50%),
-    radial-gradient(ellipse 22px 16px at 78% 70%, rgba(130,85,35,.22), transparent 70%),
-    radial-gradient(ellipse 16px 12px at 18% 82%, rgba(120,75,30,.18), transparent 70%),
-    radial-gradient(ellipse 30px 10px at 62% 12%, rgba(140,95,40,.14), transparent 70%),
-    linear-gradient(170deg,#ecd9a8,#cfb27a) !important;
-  box-shadow:inset 0 0 10px 1px rgba(110,70,25,.5) !important; }
 .fo-quests-label{ border-bottom:none !important; padding-bottom:0 !important; margin-bottom:2px !important; }
 
 /* ---- Quest note lit by the room: torchlight warms the edges, the note dims toward the centre/bottom and flickers with the torches ---- */
-.fo-quests-float{
-  background:
-    radial-gradient(ellipse 70% 120% at -5% 35%, rgba(255,150,60,.5), transparent 72%),
-    radial-gradient(ellipse 70% 120% at 105% 35%, rgba(255,140,50,.32), transparent 72%),
-    linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(30,14,4,.3) 100%),
-    radial-gradient(ellipse at 20% 15%, rgba(255,255,255,.18), transparent 50%),
-    radial-gradient(ellipse 22px 16px at 78% 70%, rgba(130,85,35,.22), transparent 70%),
-    radial-gradient(ellipse 16px 12px at 18% 82%, rgba(120,75,30,.18), transparent 70%),
-    linear-gradient(170deg,#e4cd96,#bf9f68) !important;
-  animation:quest-flicker 3.1s ease-in-out infinite; }
-@keyframes quest-flicker{
-  0%,100%{ filter:brightness(.94) drop-shadow(0 3px 2px rgba(0,0,0,.55)); }
-  22%{ filter:brightness(1.06) drop-shadow(0 3px 2px rgba(0,0,0,.55)); }
-  48%{ filter:brightness(.98) drop-shadow(0 3px 2px rgba(0,0,0,.55)); }
-  71%{ filter:brightness(1.1) drop-shadow(0 3px 2px rgba(0,0,0,.55)); } }
 .reduced-motion .fo-quests-float, body.is-resolving .fo-quests-float{ animation:none !important; }
 
 /* ---- Infrequent idle moves (a glint plus one small move per long cycle) ---- */
@@ -2345,16 +2085,6 @@ body.is-resolving .lethal-tag, body.is-resolving .die .face-val .icon-svg, body.
   34%{ translate:0 0; rotate:0deg; scale:1 1; }
   36%{ translate:-1px 0; rotate:-.6deg; }
   39%{ translate:0 0; rotate:0deg; } }
-@keyframes idle-move-e{
-  0%,40%,100%{ translate:0 0; rotate:0deg; scale:1 1; }
-  41%{ translate:-2px 1px; rotate:2deg; scale:.98 1.02; }
-  42.5%{ translate:2px -1px; rotate:-1.8deg; scale:1.02 .98; }
-  44%{ translate:-1px 0; rotate:1deg; scale:1 1; }
-  46%{ translate:0 0; rotate:0deg; }
-  72%{ translate:1px -1px; rotate:-1.2deg; }
-  73.5%{ translate:0 0; rotate:0deg; } }
-.idle-breath.idle-p{ animation-name:idle-glint-p, idle-move-p !important; animation-timing-function:ease-in-out !important; }
-.idle-breath.idle-e{ animation-name:idle-glint-e, idle-move-e !important; animation-timing-function:ease-in-out, steps(1,end) !important; }
 
 /* Room tracker floats in the dark: no panel card behind it */
 .panel.route-float{ background:transparent !important; border-color:transparent !important; box-shadow:none !important; padding-top:2px; padding-bottom:0; }
@@ -2363,7 +2093,7 @@ body.is-resolving .lethal-tag, body.is-resolving .die .face-val .icon-svg, body.
 /* ======== Stone-floor room (v1.32.48): brick back wall above a horizon ledge, one flagstone floor under everything below ======== */
 #app.has-room-floor{ position:relative; }
 #room-floor ~ .panel, #app.has-room-floor > .panel{ position:relative; } /* keyed to the app class too, so re-inserting the floor doesn't flip every panel's position (a full re-layout per tap; Oct 12) */
-#room-floor{ position:absolute; z-index:0; pointer-events:none; overflow:hidden; }
+#room-floor{ position:absolute; pointer-events:none; overflow:hidden; }
 #room-floor .rf-plane{ position:absolute; left:-40%; right:-40%; top:0; height:260%; background:var(--tex-floor) 0 0/170px auto; transform-origin:50% 0; transform:perspective(880px) rotateX(70deg); }
 #room-floor .rf-fade{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(10,6,4,.97) 0%, rgba(10,6,4,.6) 7%, rgba(10,6,4,.1) 26%, transparent 40%); }
 #room-floor .rf-light{ position:absolute; inset:0; background:radial-gradient(ellipse 55% 26% at 0% 0%, rgba(255,150,60,.55), transparent 75%), radial-gradient(ellipse 55% 26% at 100% 0%, rgba(255,150,60,.45), transparent 75%), radial-gradient(ellipse 70% 40% at 50% 12%, rgba(255,170,90,.10), transparent 70%); }
@@ -2392,11 +2122,7 @@ body.is-resolving .lethal-tag, body.is-resolving .die .face-val .icon-svg, body.
 
 /* Enemy action badges (Every Turn / Cycles through): stone slab, not gold -- gold means Quest health.
    The icon carries the meaning; the lit "next" action of a boss gets a bone rim and a soft glow. */
-.enemy-action-badge{ background:linear-gradient(#6a5f52,#4a4036) !important; color:#f4ead6 !important; font-weight:bold;
-  box-shadow:inset 0 0 0 1.5px #0c0705, inset 0 2px 0 rgba(255,240,210,.25), 0 2px 0 rgba(0,0,0,.6) !important; }
-.boss-cycle-item.enemy-action-badge:not(.next){ opacity:.5; }
 .boss-cycle-item.enemy-action-badge.next{ opacity:1; }
-.boss-cycle-row .boss-cycle-item.enemy-action-badge.next:not(:only-child){ box-shadow:inset 0 0 0 1.5px #0c0705, inset 0 0 0 3px rgba(235,220,185,.75), 0 0 8px 1px rgba(235,220,185,.35), 0 2px 0 rgba(0,0,0,.6) !important; }
 
 /* Lock when a path is ready: no pulsing -- a steady warm glow only (the slow passive shine stays) */
 .chest-lock.ready{ animation:none !important; filter:drop-shadow(0 3px 0 rgba(0,0,0,.4)) drop-shadow(0 0 4px rgba(255,200,90,.45)); }
@@ -2426,18 +2152,13 @@ body.is-resolving .lethal-tag, body.is-resolving .die .face-val .icon-svg, body.
 
 /* ======== 1.32.57: Pocket is moss green (no longer teal like Guard's Skill); armed Skill lights the class zone ======== */
 .util-btn.rail-pocket{ background:#5f6f2e !important; color:#f4f1d2 !important; }
-@keyframes zone-armed{ 0%,100%{ box-shadow:inset 0 0 0 5px rgba(20,10,4,.55), inset 0 0 16px 4px color-mix(in srgb, var(--class-color,#fff) 85%, transparent), 0 0 8px 1px color-mix(in srgb, var(--class-color,#fff) 70%, transparent); }
-  50%{ box-shadow:inset 0 0 0 5px rgba(20,10,4,.35), inset 0 0 26px 9px color-mix(in srgb, var(--class-color,#fff) 100%, transparent), 0 0 18px 5px color-mix(in srgb, var(--class-color,#fff) 90%, transparent); } }
 @keyframes zone-armed-bob{ 0%,100%{ transform:scale(1.03); } 50%{ transform:scale(1.07); } }
 .tray.ability-armed > *{ transition:filter .25s, opacity .25s; }
-.tray.ability-armed > *:not(.zone-cell){ filter:brightness(.45) saturate(.5); }
-.tray.ability-armed > .zone-cell{ outline:4px solid #fff3d6 !important; outline-offset:-4px; position:relative; z-index:2; cursor:crosshair;
-  animation:zone-armed 1.1s ease-in-out infinite, zone-armed-bob 1.1s ease-in-out infinite !important; }
-.reduced-motion .tray.ability-armed > .zone-cell{ animation:none !important; box-shadow:0 0 14px 4px var(--class-color,#fff), inset 0 0 18px 6px var(--class-color,#fff); }
+.tray.ability-armed > .zone-cell{ outline:4px solid #fff3d6 !important; position:relative; z-index:2; cursor:crosshair; }
+.reduced-motion .tray.ability-armed > .zone-cell{ box-shadow:0 0 14px 4px var(--class-color,#fff), inset 0 0 18px 6px var(--class-color,#fff); }
 
 /* 1.32.60: quest paper gets an even ink-brown outline all the way round (straight bottom edge so the outline is continuous) */
-.fo-quests-float{ clip-path:none !important; border:2px solid #4a2c12 !important; border-radius:3px !important;
-  box-shadow:inset 0 0 0 1px rgba(255,225,160,.25), inset 0 0 10px 1px rgba(110,70,25,.5) !important; }
+.fo-quests-float{ clip-path:none !important; }
 
 /* 1.32.61: the hit punch used to tilt/scale the WHOLE card (arch + wall ledge) while the stone floor stayed put, so the wall/floor seam
    visibly slid on every hit. Now only the fighters take the punch; the room itself stays rock steady. */
@@ -2463,7 +2184,7 @@ body.is-resolving .lethal-tag, body.is-resolving .die .face-val .icon-svg, body.
 .bar-arc .ba-track{ stroke-width:14; }
 .bar-arc .ba-seg{ stroke-width:14; }
 .bar-arc .ba-hp{ stroke:#ff3b3b; }
-.bar-arc .ba-hl{ stroke-width:5; transform:translate(0,-3px); }
+.bar-arc .ba-hl{ transform:translate(0,-3px); }
 .bar-arc .ba-hl-hp{ stroke:#ff8a8a; } .bar-arc .ba-hl-quest{ stroke:#f2dc8f; } .bar-arc .ba-hl-shield{ stroke:#a6d3ef; }
 .bar-arc .ba-hl{ opacity:.7; stroke-width:6; }
 
@@ -2476,10 +2197,7 @@ html, body{ overscroll-behavior:none; overscroll-behavior-y:none; }
 body{ -webkit-tap-highlight-color:transparent; }
 
 /* ---- Depth: setup menu, badges, victory seal ---- */
-.depth-card{ background:var(--b5); border:1px solid var(--line); border-radius:var(--r-lg); padding:10px; display:flex; flex-direction:column; gap:8px; }
-.depth-head{ display:flex; align-items:center; gap:12px; }
 .depth-num{ width:48px; height:48px; border-radius:50%; background:var(--b2); border:2px solid var(--gold); color:var(--gold); font:800 24px var(--font-ui); display:flex; align-items:center; justify-content:center; flex:none; }
-.depth-head-text{ font-size:13px; font-weight:800; color:var(--parchment); line-height:1.3; }
 .depth-limit{ font-size:11px; font-weight:600; color:var(--parchment-dim); }
 .depth-row{ display:flex; align-items:center; gap:10px; padding:7px 9px; background:var(--b3); border:1px solid var(--line); border-radius:var(--r-md); }
 .depth-row.on{ border-color:var(--gold); }
@@ -2498,7 +2216,6 @@ body{ -webkit-tap-highlight-color:transparent; }
 .depth-badge-pill{ margin-top:-4px; font:800 9.5px var(--font-ui); letter-spacing:.6px; color:var(--parchment); background:var(--b1); border:1.5px solid var(--line); border-radius:999px; padding:2px 8px; white-space:nowrap; }
 .title-badges{ display:flex; justify-content:center; gap:12px; margin:14px 0 0; }
 .title-badge{ display:flex; flex-direction:column; align-items:center; }
-.title-badge-name{ margin-top:-2px; font:800 9px var(--font-ui); letter-spacing:1px; text-transform:uppercase; color:var(--parchment-dim); }
 .depth-seal{ display:flex; align-items:center; gap:14px; margin:12px 0; padding:14px; border-radius:var(--r-lg); border:2px solid var(--gold); background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(0,0,0,.25)); box-shadow:0 0 18px rgba(255,200,58,.25); }
 .depth-seal-text{ min-width:0; }
 .depth-seal-kicker{ font-size:11px; letter-spacing:1.5px; font-weight:800; text-transform:uppercase; color:var(--parchment-dim); }
@@ -2519,8 +2236,7 @@ body{ -webkit-tap-highlight-color:transparent; }
 .depth-toggle-title{ font-family:var(--font-display); font-size:13px; letter-spacing:2.5px; text-transform:uppercase; color:var(--gold); text-shadow:0 2px 0 #0c0705; }
 .depth-toggle-sub{ font-size:11.5px; font-weight:700; color:var(--parchment-dim); }
 .depth-chevron{ flex:none; color:var(--gold); display:flex; transition:transform .2s; }
-.depth-toggle.open .depth-chevron{ transform:rotate(180deg); }
-.depth-body{ margin-top:6px; background:var(--b5); border:2px solid var(--line); border-radius:var(--r-lg); padding:8px; display:flex; flex-direction:column; gap:6px; }
+.depth-body{ background:var(--b5); border:2px solid var(--line); border-radius:var(--r-lg); padding:8px; display:flex; flex-direction:column; gap:6px; }
 .depth-body[hidden]{ display:none; }
 .depth-body .depth-limit{ text-align:center; }
 .depth-seal{ border-width:3px !important; }
@@ -2540,10 +2256,6 @@ body{ -webkit-tap-highlight-color:transparent; }
 
 /* Available basic-die upgrades gently pulse so players notice them */
 .upgrade-btn.upgrade-ready:not(:disabled){ animation: upgradeReady 1.8s ease-in-out infinite; }
-@keyframes upgradeReady{
-  0%,100%{ box-shadow:0 0 0 0 rgba(255,215,106,0); filter:none; }
-  50%{ box-shadow:0 0 12px 3px rgba(255,215,106,.55); filter:brightness(1.18); }
-}
 @media (prefers-reduced-motion: reduce){ .upgrade-btn.upgrade-ready:not(:disabled){ animation:none; box-shadow:0 0 8px 2px rgba(255,215,106,.45); } }
 
 /* Quest paper: one-time glow when a room with bonus quests begins */
@@ -2569,16 +2281,13 @@ body{ -webkit-tap-highlight-color:transparent; }
 
 /* Swap picker: face comparison */
 .swap-item.selected{ outline:3px solid var(--gold); outline-offset:2px; border-radius:10px; }
-.swap-compare{ display:flex; flex-direction:column; gap:6px; margin:10px 0 8px; padding:8px; background:var(--b1); border:2px solid var(--line); border-radius:10px; }
-.swap-compare-row{ display:flex; align-items:center; gap:8px; min-height:44px; }
-.swap-compare-label{ flex:0 0 68px; font-size:10px; line-height:1.25; text-transform:uppercase; letter-spacing:1px; color:var(--parchment-dim); }
-.swap-compare-label b{ display:block; color:var(--gold); font-size:11px; text-transform:none; letter-spacing:0; }
+.swap-compare{ display:flex; flex-direction:column; gap:6px; padding:8px; background:var(--b1); border:2px solid var(--line); border-radius:10px; }
+.swap-compare-row{ display:flex; }
+.swap-compare-label{ line-height:1.25; text-transform:uppercase; letter-spacing:1px; color:var(--parchment-dim); }
+.swap-compare-label b{ color:var(--gold); text-transform:none; letter-spacing:0; }
 .swap-compare-hint{ font-size:11px; color:var(--parchment-dim); font-style:italic; width:100%; text-align:center; }
 .swap-compare .faces-tiles{ flex:1 1 auto; min-width:0; }
-.swap-compare .faces-tiles{ display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:3px; }
-.swap-compare .mini-face{ width:100%; height:auto; aspect-ratio:1/1; }
-.swap-compare .mini-face small{ font-size:6.5px; }
-.swap-compare .mini-face .icon-svg{ width:18px; height:18px; }
+.swap-compare .faces-tiles{ display:grid; }
 
 /* ⓘ info dot: explanatory text lives in a hover / tap bubble instead of inline copy */
 .info-dot{ display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; margin-left:4px; vertical-align:middle;
@@ -2601,26 +2310,17 @@ html,body{ overflow-x:clip; }
 
 .face-tooltip.flavor-bubble{ max-width:190px; text-align:center; font-size:12px; z-index:95; border-color:var(--gold); background:rgba(20,12,6,.94); box-shadow:0 3px 14px rgba(0,0,0,.65); }
 
-@keyframes poke-jerk-kf{
-  0%,100%{ transform:translate(0,0) rotate(0) scale(1); }
-  12%{ transform:translate(5px,-2px) rotate(4deg) scale(1.04,.96); }
-  26%{ transform:translate(-6px,1px) rotate(-5deg) scale(.97,1.03); }
-  42%{ transform:translate(4px,-1px) rotate(3deg); }
-  58%{ transform:translate(-3px,0) rotate(-2deg); }
-  75%{ transform:translate(2px,0) rotate(1deg); }
-}
-
 /* Kill-hint (Lethal / Almost...) sits just above the enemy health bar, free to overlap the portrait */
 .fo-enemy .fo-hpwrap > .kill-hint{ position:absolute !important; left:0; right:0; bottom:100%; top:auto; margin:0 0 1px !important; height:auto !important; line-height:12px; text-align:center; z-index:6; pointer-events:none; text-shadow:0 1px 0 #0c0705, 0 0 5px rgba(0,0,0,.9); }
 
 /* Swap picker comparison v2: on top, stacked label-over-faces, bigger dark-tile faces */
 .swap-compare{ margin:4px 0 10px; }
-.swap-compare-row{ flex-direction:column; align-items:stretch; gap:3px; min-height:84px; }
+.swap-compare-row{ flex-direction:column; align-items:stretch; gap:3px; }
 .swap-compare-label{ flex:none; display:flex; align-items:baseline; gap:6px; font-size:10px; }
 .swap-compare-label b{ display:inline; font-size:12px; }
 .swap-compare .faces-tiles{ gap:4px; }
 .swap-compare .mini-face{ border-radius:8px; }
-.swap-compare .mini-face .icon-svg{ background:transparent !important; box-shadow:none !important; width:28px !important; height:28px !important; margin:0 !important; color:#241c10; }
+.swap-compare .mini-face .icon-svg{ background:transparent !important; box-shadow:none !important; margin:0 !important; color:#241c10; }
 .swap-compare .mini-face small{ font-size:8.5px; margin-top:1px; }
 .swap-compare-hint{ align-self:center; margin:auto; }
 
@@ -2628,8 +2328,7 @@ html,body{ overflow-x:clip; }
 .face-delta{ position:absolute; top:1px; right:2px; font-size:11px; line-height:1; font-weight:900; text-shadow:0 0 2px #0c0705, 0 1px 0 #0c0705; pointer-events:auto; }
 .face-delta.up{ color:#5dff7a; } .face-delta.down{ color:#ff5a4a; }
 /* comparison faces: tiles sized to their contents instead of stretching across the panel */
-.swap-compare .faces-tiles{ grid-template-columns:repeat(6,46px); justify-content:start; }
-.swap-compare .mini-face{ width:46px; height:46px; aspect-ratio:auto; }
+.swap-compare .faces-tiles{ justify-content:start; }
 .swap-compare .mini-face .icon-svg{ width:24px !important; height:24px !important; }
 .swap-compare-row{ min-height:68px; }
 
@@ -2639,10 +2338,9 @@ html,body{ overflow-x:clip; }
 .swap-compare .mini-face{ width:100%; height:auto; aspect-ratio:1/1; }
 .swap-modal .swap-list{ justify-content:center; }
 /* Equip window: dice sit directly on the panel (no card behind each) */
-.swap-modal .swap-item{ background:none; border:2px solid transparent; box-shadow:none; padding:4px; border-radius:12px; }
+.swap-modal .swap-item{ background:none; box-shadow:none; border-radius:12px; }
 .swap-modal .swap-item:hover{ border-color:transparent; }
 .swap-modal .swap-item.selected{ outline:none; border-color:var(--gold); box-shadow:0 0 10px 2px rgba(255,200,58,.55); background:rgba(255,200,58,.08); }
-.swap-modal .swap-list{ gap:6px; }
 /* Equip window: four dice per row at the existing die size */
 .swap-modal .swap-list{ gap:4px 2px; padding-left:0; padding-right:0; }
 .swap-modal .swap-item{ width:76px; padding:2px; border:0; box-sizing:border-box; }
@@ -2668,20 +2366,18 @@ html,body{ overflow-x:clip; }
 .swap-modal .swap-item-label{ display:none; }
 
 /* Quest paper rows: condition -> reward badge */
-.fo-quests-float .fo-quest.q-row{ display:flex; align-items:center; gap:3px; text-align:left; padding:1px 0; }
-.fo-quests-float .q-mark{ flex:0 0 auto; font-size:8px; opacity:.8; }
-.fo-quests-float .q-cond{ flex:1 1 auto; min-width:0; font-size:9px; line-height:1.15; font-weight:700; text-wrap:balance; }
-.fo-quests-float .q-arrow{ flex:0 0 auto; font-size:10px; font-weight:900; color:#7a1f14; }
-.fo-quests-float .q-reward{ flex:0 0 auto; display:inline-flex; align-items:center; gap:1px; padding:1px 4px 1px 2px; border-radius:9px; background:#3a2410; color:#ffd76a; font-size:10px; font-weight:900; line-height:1; box-shadow:0 1px 0 rgba(0,0,0,.35); }
-.fo-quests-float .q-reward .icon-svg{ width:13px; height:13px; color:#ffd76a; }
+.fo-quests-float .fo-quest.q-row{ display:flex; align-items:center; text-align:left; padding:1px 0; }
+.fo-quests-float .q-cond{ flex:1 1 auto; min-width:0; line-height:1.15; font-weight:700; text-wrap:balance; }
+.fo-quests-float .q-arrow{ flex:0 0 auto; font-weight:900; color:#7a1f14; }
+.fo-quests-float .q-reward{ flex:0 0 auto; display:inline-flex; align-items:center; gap:1px; border-radius:9px; background:#3a2410; color:#ffd76a; font-weight:900; line-height:1; box-shadow:0 1px 0 rgba(0,0,0,.35); }
+.fo-quests-float .q-reward .icon-svg{ color:#ffd76a; }
 .fo-quests-float .q-reward b{ font-family:var(--font-ui); }
 .fo-quests-float .fo-quest.complete .q-cond{ text-decoration:line-through; }
 .fo-quests-float .fo-quest.complete .q-reward{ background:#2d6a2f; color:#e8ffe0; }
 .fo-quests-float .fo-quest.complete .q-arrow{ color:#2d6a2f; }
 
 .fo-quests-float .fo-quest.q-row{ gap:2px; }
-.fo-quests-float .q-mark{ font-size:7px; width:6px; }
-.fo-quests-float .q-cond{ font-size:8.5px; letter-spacing:-.1px; }
+.fo-quests-float .q-cond{ letter-spacing:-.1px; }
 .fo-quests-float .q-arrow{ font-size:9px; margin:0 -1px; }
 .fo-quests-float .q-reward{ padding:1px 3px 1px 1px; font-size:9px; }
 .fo-quests-float .q-reward .icon-svg{ width:11px; height:11px; }
@@ -2689,7 +2385,7 @@ html,body{ overflow-x:clip; }
 .fo-quests-float .fo-quests{ align-items:stretch !important; }
 .fo-quests-float .fo-quest.q-row{ width:100%; }
 .fo-quests-float .q-cond{ text-align:left; }
-.fo-quests-float .q-reward{ margin-left:auto; min-width:30px; justify-content:center; }
+.fo-quests-float .q-reward{ margin-left:auto; justify-content:center; }
 .fo-quests-float .q-arrow{ margin-left:auto; margin-right:0; }
 .fo-quests-float .q-arrow + .q-reward{ margin-left:2px; }
 
@@ -2719,8 +2415,7 @@ html,body{ overflow-x:clip; }
 .die-sheen.sheen-magic::before{ content:''; position:absolute; inset:0; mix-blend-mode:screen;
   background:radial-gradient(circle at 50% 55%, rgba(236,206,255,.75), rgba(190,140,255,.25) 45%, transparent 70%);
   animation:sheenMagic 2.8s ease-in-out infinite; animation-delay:var(--sd,0s); }
-.die-sheen.sheen-magic::after{ content:''; position:absolute; left:50%; top:50%; width:30%; aspect-ratio:1; border-radius:50%; transform:translate(-50%,-50%) scale(.4);
-  background:radial-gradient(circle, rgba(245,230,255,0) 38%, rgba(245,230,255,.55) 62%, rgba(245,230,255,0) 80%); filter:blur(2.5px); opacity:0; animation:sheenMagicRing 2.8s ease-out infinite; animation-delay:var(--sd,0s); }
+.die-sheen.sheen-magic::after{ content:''; position:absolute; left:50%; top:50%; width:30%; aspect-ratio:1; border-radius:50%; transform:translate(-50%,-50%) scale(.4); filter:blur(2.5px); opacity:0; animation:sheenMagicRing 2.8s ease-out infinite; animation-delay:var(--sd,0s); }
 @keyframes sheenMagic{ 0%,100%{ opacity:.15; transform:scale(.85); } 45%{ opacity:.75; transform:scale(1.05); } }
 @keyframes sheenMagicRing{ 0%,35%{ opacity:0; transform:translate(-50%,-50%) scale(.4); } 45%{ opacity:.9; } 100%{ opacity:0; transform:translate(-50%,-50%) scale(3.2); } }
 .reduced-motion .die-sheen::before, .reduced-motion .die-sheen::after{ animation:none !important; opacity:0 !important; }
@@ -2738,56 +2433,23 @@ html,body{ overflow-x:clip; }
 /* Class-ability zones: quiet colored halo (mat) idle; softer armed pulse */
 .zone-cell, #tray .zone-cell{ outline:none !important; animation:none;
   box-shadow:0 0 0 4px color-mix(in srgb, var(--class-color,#fff) 55%, transparent), inset 0 3px 0 rgba(255,255,255,.3) !important; }
-@keyframes zoneSoft{
-  0%,100%{ box-shadow:inset 0 0 0 5px rgba(20,10,4,.45), inset 0 0 8px 1px color-mix(in srgb,var(--class-color,#fff) 55%,transparent); }
-  50%{ box-shadow:inset 0 0 0 5px rgba(20,10,4,.45), inset 0 0 12px 3px color-mix(in srgb,var(--class-color,#fff) 70%,transparent); } }
-.tray.ability-armed > .zone-cell{ animation:zoneSoft 2.8s ease-in-out infinite !important;
-  outline:3px solid color-mix(in srgb,var(--class-color,#fff) 55%,#fff3d6) !important; outline-offset:-3px; }
-.tray.ability-armed > *:not(.zone-cell){ filter:brightness(.62) saturate(.7); }
-.reduced-motion .tray.ability-armed > .zone-cell{ animation:none !important; }
+.tray.ability-armed > .zone-cell{
+  outline:3px solid color-mix(in srgb,var(--class-color,#fff) 55%,#fff3d6) !important; }
 
 /* armed zone: a bit stronger than the softest pass */
-@keyframes zoneSoft{
-  0%,100%{ box-shadow:inset 0 0 0 5px rgba(20,10,4,.5), inset 0 0 12px 3px color-mix(in srgb,var(--class-color,#fff) 75%,transparent), 0 0 8px 1px color-mix(in srgb,var(--class-color,#fff) 55%,transparent); }
-  50%{ box-shadow:inset 0 0 0 5px rgba(20,10,4,.5), inset 0 0 18px 6px color-mix(in srgb,var(--class-color,#fff) 95%,transparent), 0 0 16px 4px color-mix(in srgb,var(--class-color,#fff) 80%,transparent); } }
-.tray.ability-armed > .zone-cell{ animation-duration:2s !important;
-  outline:4px solid color-mix(in srgb,var(--class-color,#fff) 40%,#fff3d6) !important; outline-offset:-4px; }
+.tray.ability-armed > .zone-cell{
+  outline:4px solid color-mix(in srgb,var(--class-color,#fff) 40%,#fff3d6) !important; }
 .tray.ability-armed > *:not(.zone-cell){ filter:brightness(.5) saturate(.6); }
 
 /* armed zone: thinner line, slight pulse (box-shadow is !important at idle, so pulse via transform+filter) */
-@keyframes zonePulse{
-  0%,100%{ transform:scale(1); filter:drop-shadow(0 0 3px color-mix(in srgb,var(--class-color,#fff) 60%,transparent)); }
-  50%{ transform:scale(1.025); filter:drop-shadow(0 0 7px color-mix(in srgb,var(--class-color,#fff) 90%,transparent)); } }
-.tray.ability-armed > .zone-cell{ animation:zonePulse 1.8s ease-in-out infinite !important;
+.tray.ability-armed > .zone-cell{
   outline:2px solid color-mix(in srgb,var(--class-color,#fff) 40%,#fff3d6) !important; outline-offset:-2px;
   box-shadow:inset 0 0 0 4px rgba(20,10,4,.45), inset 0 0 12px 3px color-mix(in srgb,var(--class-color,#fff) 75%,transparent), 0 0 0 3px color-mix(in srgb,var(--class-color,#fff) 55%,transparent) !important; }
 
 /* armed zone: crisp twitch instead of scale/filter pulse (those blurred the face) */
-@keyframes zoneTwitch{
-  0%,62%,100%{ transform:none; }
-  66%{ transform:translate(-1px,0) rotate(-1.5deg); }
-  70%{ transform:translate(1px,0) rotate(1.5deg); }
-  74%{ transform:translate(-1px,0) rotate(-1deg); }
-  78%{ transform:translate(1px,0) rotate(1deg); }
-  82%{ transform:none; } }
-.tray.ability-armed > .zone-cell{ animation:zoneTwitch 1.6s steps(1,end) infinite !important; filter:none; }
-.tray.ability-armed > .zone-cell:nth-child(2n){ animation-delay:-.5s !important; }
-.tray.ability-armed > .zone-cell:nth-child(3n){ animation-delay:-1.1s !important; }
-.reduced-motion .tray.ability-armed > .zone-cell{ animation:none !important; }
+.tray.ability-armed > .zone-cell{ filter:none; }
 
 /* armed zone: all twitch together, 3 quick twitches then ~8s rest */
-@keyframes zoneTwitch{
-  0%,12%,100%{ transform:none; }
-  1%{ transform:translate(-1px,0) rotate(-1.5deg); }
-  2%{ transform:translate(1px,0) rotate(1.5deg); }
-  3%{ transform:translate(-1px,0) rotate(-1deg); }
-  4%{ transform:none; }
-  5%{ transform:translate(1px,0) rotate(1.5deg); }
-  6%{ transform:translate(-1px,0) rotate(-1.5deg); }
-  7%{ transform:none; }
-  8%{ transform:translate(-1px,0) rotate(-1.5deg); }
-  9%{ transform:translate(1px,0) rotate(1.5deg); }
-  10%{ transform:none; } }
 .tray.ability-armed > .zone-cell,
 .tray.ability-armed > .zone-cell:nth-child(2n),
 .tray.ability-armed > .zone-cell:nth-child(3n){ animation:zoneTwitch 9s steps(1,end) infinite !important; animation-delay:0s !important; }
@@ -2811,9 +2473,8 @@ html,body{ overflow-x:clip; }
 .tray.ability-armed > .zone-cell:nth-child(3n){ animation-duration:5s !important; }
 
 /* Minion dice: yellow slit-pupil eyes (the Pest/spider look), a blink, a glance, and a nervous twitch */
-.minion-eyes{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:12%; pointer-events:none; z-index:2; }
-.minion-eye{ position:relative; display:block; width:24%; height:34%; border-radius:50%; background:#f4cf3a; border:2px solid #1a1208;
-  box-shadow:inset 0 -3px 0 rgba(180,110,0,.45); overflow:hidden; transform-origin:50% 50%;
+.minion-eyes{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; z-index:2; }
+.minion-eye{ position:relative; display:block; border-radius:50%; background:#f4cf3a; border:2px solid #1a1208; overflow:hidden; transform-origin:50% 50%;
   animation:minionBlink 5.2s infinite; animation-delay:calc(var(--md,0) * -1s); }
 .minion-eye::after{ content:''; position:absolute; left:50%; top:8%; width:26%; height:84%; margin-left:-13%; border-radius:50%; background:#1a1208;
   animation:minionGlance 6.5s ease-in-out infinite; animation-delay:calc(var(--md,0) * -1s); }
@@ -2826,9 +2487,7 @@ html,body{ overflow-x:clip; }
   91%{ translate:0 0; rotate:0deg; } 93%{ translate:1px -1px; rotate:1.5deg; } 95%{ translate:0 0; rotate:0deg; } }
 .reduced-motion .die.minion, .reduced-motion .minion-eye, .reduced-motion .minion-eye::after{ animation:none !important; }
 .die.minion.used{ opacity:.9; }
-.minion-eye{ box-shadow:inset 0 -3px 0 rgba(180,110,0,.45), 0 0 6px 1px rgba(255,210,60,.55); }
-.minion-eyes{ gap:10%; }
-.minion-eye{ width:17%; height:25%; border-width:1.5px; animation-duration:11s; }
+.minion-eye{ animation-duration:11s; }
 
 /* magic die: rarer pulse with a purple glow */
 .die-sheen.sheen-magic::before{ animation-duration:6.5s; }
@@ -2838,16 +2497,14 @@ html,body{ overflow-x:clip; }
 /* while a path is being built, unreachable minions dim like any other unreachable die */
 #tray:has(.in-path) .die.minion.used{ opacity:.32; }
 .die.minion.used{ transition:opacity .2s; }
-.minion-eye{ width:12%; height:18%; }
 .minion-eyes{ gap:8%; }
 .minion-eye{ width:14%; height:21%; border-width:2.5px; }
 .minion-eye{ box-shadow:inset 0 -3px 0 rgba(180,110,0,.45); background-clip:padding-box; }
 
 /* Back Pocket fold (Camp) */
-.pocket-more{ display:flex; align-items:center; justify-content:center; gap:5px; width:100%; margin-top:5px; padding:3px 0; background:transparent; border:0; border-top:1px dashed var(--line); color:var(--gold); font:inherit; font-size:12px; font-weight:700; cursor:pointer; }
+.pocket-more{ display:flex; align-items:center; justify-content:center; gap:5px; width:100%; margin-top:5px; padding:3px 0; color:var(--gold); font:inherit; font-size:12px; font-weight:700; cursor:pointer; }
 .pocket-more svg{ transform:rotate(0deg); }
 .pocket-more.up svg{ transform:rotate(180deg); }
-.camp-pocket.pocket-open{ box-shadow:0 -8px 22px rgba(0,0,0,.55); }
 
 /* upgrade-ready pulse keeps the button's drop-shadow thickness (the global button rule sets it via filter) */
 @keyframes upgradeReady{
@@ -2884,9 +2541,6 @@ html,body{ overflow-x:clip; }
 .fo-shrine .fo-enemy .fo-fig.shrine-burst::after{ opacity:0; transition:opacity .45s; }
 @keyframes shrineBurst{ 0%{ transform:translateY(-8px) scale(1.06); } 40%{ transform:translateY(-10px) scale(1.14); } 100%{ transform:translateY(0) scale(1); } }
 .shrine-hold-btn{ position:relative; overflow:hidden; touch-action:none; user-select:none; -webkit-user-select:none; }
-.shrine-hold-btn .shrine-hold-fill{ position:absolute; left:0; top:0; bottom:0; width:0; background:rgba(255,255,255,.45); transition:width .12s ease-out; pointer-events:none; }
-.shrine-hold-btn.charging .shrine-hold-fill{ width:100%; transition:width .65s linear; }
-.shrine-hold-btn .shrine-hold-label{ position:relative; }
 .shrine-result-banner{ position:absolute; left:14px; right:14px; top:12px; z-index:4; text-align:center; padding:7px 10px;
   background:rgba(28,17,9,.92); border:2px solid var(--line); border-radius:var(--r-md); box-shadow:0 3px 0 rgba(0,0,0,.5);
   animation:shrineBanner .35s ease-out both; }
@@ -2927,7 +2581,7 @@ html,body{ overflow-x:clip; }
 .reduced-motion .die.trayact-ready .face-val, .reduced-motion .die.just-rerolled, .reduced-motion .die.just-swapped, .reduced-motion .tray.trayact-armed > .trayact-src{ animation:none !important; }
 
 /* ---- Relic gems (Oct 12): the badge circle becomes a drawn gem ---- */
-.relic-badge.relic-gem, .relic-badge.relic-gem.relic-origin{ background:none; border:none; border-radius:0; box-shadow:none; color:transparent; filter:drop-shadow(0 1px 1px rgba(0,0,0,.65)); }
+.relic-badge.relic-gem{ background:none; border:none; border-radius:0; box-shadow:none; color:transparent; filter:drop-shadow(0 1px 1px rgba(0,0,0,.65)); }
 .relic-badge.relic-gem svg{ width:100%; height:100%; overflow:visible; display:block; }
 /* In a fight the gems stand in a column beside the hero, so the buffs row stays free and the hero keeps its room. */
 .fo-player{ position:relative; }
@@ -2964,7 +2618,7 @@ html,body{ overflow-x:clip; }
 /* Oct 13: Codex / Records tabbed windows and the Bestiary */
 .codex-tabs{ display:flex; gap:4px; justify-content:center; margin:0 0 8px; flex-wrap:wrap; }
 .codex-tabs .codex-tab{ padding:5px 10px; font-size:13px; min-height:0; opacity:.75; }
-.codex-tabs .codex-tab.on{ opacity:1; background:var(--gold); color:#241c10; }
+.codex-tabs .codex-tab.on{ background:var(--gold); color:#241c10; }
 .codex-body{ max-height:min(62vh,520px); overflow-y:auto; text-align:left; }
 .bst-row{ display:flex; gap:8px; align-items:flex-start; padding:6px 4px; border-bottom:1px solid rgba(255,255,255,.08); }
 .bst-art{ width:54px; height:54px; object-fit:contain; flex:0 0 54px; }
@@ -3029,8 +2683,8 @@ button.primary.pulse::after, .util-btn.pulse::after{ content:''; position:absolu
 body.is-resolving .util-btn.pulse::after{ animation:none; }
 .reduced-motion button.primary.pulse::after, .reduced-motion .util-btn.pulse::after{ animation:none; opacity:.6; transform:none; }
 /* 2. Quest note candle flicker: a light layer fading in and out over a static note */
-.fo-quests-float{ animation:none !important; filter:drop-shadow(0 3px 2px rgba(0,0,0,.55)); }
-.fo-quests-float > .fq-light{ position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:0;
+.fo-quests-float{ animation:none !important; }
+.fo-quests-float > .fq-light{ position:absolute; pointer-events:none; z-index:0;
   background:rgba(255,236,190,.22); opacity:.3; animation:fq-flicker 3.1s ease-in-out infinite; }
 .fo-quests-float > :not(.fq-light){ position:relative; z-index:1; }
 @keyframes fq-flicker{ 0%,100%{ opacity:0; } 22%{ opacity:.6; } 48%{ opacity:.2; } 71%{ opacity:1; } }
@@ -3038,8 +2692,8 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 /* 3. Art glint: the steady shadow is static; the brief flash plays on the figure's frame only while it shows
    (glintTick in render.js adds the class for that moment). */
 .idle-breath{ filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); }
-.idle-breath.idle-p{ animation-name:idle-move-p !important; animation-timing-function:ease-in-out !important; }
-.idle-breath.idle-e{ animation-name:idle-move-e !important; animation-timing-function:steps(1,end) !important; }
+.idle-breath.idle-p{ animation-timing-function:ease-in-out !important; }
+.idle-breath.idle-e{ animation-timing-function:steps(1,end) !important; }
 .fo-fig.glint-p{ animation:glint-p var(--gd,1200ms) ease-in-out 1; }
 .fo-fig.glint-e{ animation:glint-e var(--gd,1600ms) ease-in-out 1; }
 @keyframes glint-p{ 0%,100%{ filter:none; } 44%{ filter:brightness(1.18) drop-shadow(0 0 4px rgba(255,214,120,.55)); } }
