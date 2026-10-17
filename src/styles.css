@@ -2887,3 +2887,110 @@ button.end-details-btn{ display:flex; flex-direction:column; align-items:center;
 button.end-details-btn:hover:not(:disabled){ background:#5a3e28; }
 .end-details-btn small{ font-weight:normal; font-size:11px; color:var(--parchment); opacity:.85; white-space:normal; }
 .end-screen .share-ask{ margin-top:10px; }
+/* ---- Oct 17 design fixes, part 2 (audit Part 2, items 8-22, 25-26, plus Jeremy's 1.41.60 review) ---- */
+/* 8: the Health number sits inside the bar everywhere (camp and shrine like the fight) */
+.camp-hp-row .camp-hpwrap{ flex:1 1 auto; width:auto; }
+.camp-hp-row .camp-hpwrap .bar{ height:20px !important; }
+/* 9: every Origin and Class pill carries its own colour as a rim, so no two neighbours look alike */
+#class-tab-row .class-tab-btn{ --tab-rim:var(--class-color); }
+.origin-tab-dwarf{ --tab-rim:#c8873a; } .origin-tab-gnome{ --tab-rim:#d9534f; } .origin-tab-halfling{ --tab-rim:#e8c25a; } .origin-tab-pixie{ --tab-rim:#c77ddb; }
+.class-tab-btn:not(.selected){ opacity:1; box-shadow:inset 0 -5px 0 var(--tab-rim, transparent) !important; }
+.class-tab-btn.locked:not(.selected){ color:rgba(227,202,163,.7); }
+.class-tab-btn.previewing:not(.selected){ box-shadow:inset 0 -5px 0 var(--tab-rim, transparent), 0 0 0 2px rgba(224,214,188,.45) !important; }
+/* 10: each shrine option its own colour, matching what it gives */
+#shrine-options .loot-opt.shrine-opt{ border:3px solid var(--line); filter:drop-shadow(0 3px 0 var(--line)); }
+#shrine-options .loot-opt.shrine-opt h4{ margin:2px 0; font-size:14px; }
+.shrine-opt.so-heal{ background:#c9506a; } .shrine-opt.so-heal h4{ color:#fff1e8; }
+.shrine-opt.so-maxhp{ background:var(--green); } .shrine-opt.so-maxhp h4{ color:#eafbea; }
+.shrine-opt.so-relic{ background:var(--purple); } .shrine-opt.so-relic h4{ color:#f5eaff; }
+.shrine-opt.so-attack{ background:#e8574f; } .shrine-opt.so-attack h4{ color:#fff3e6; }
+.shrine-opt.so-maneuver{ background:#ffe9a8; } .shrine-opt.so-maneuver h4{ color:#3a2410; }
+.shrine-opt.so-forge{ background:#d4af52; } .shrine-opt.so-forge h4{ color:#241c10; }
+.shrine-opt.so-leave{ background:var(--b1); } .shrine-opt.so-leave h4{ color:var(--parchment-dim); }
+/* 11: text boxes are parchment with the chunky outline and the serif; the Log uses the serif too */
+textarea.paper-input{ background:var(--paper); color:var(--ink); border:3px solid var(--line); border-radius:var(--r-sm); font-family:var(--font-ui); padding:6px 8px; outline:none; }
+textarea.paper-input::placeholder{ color:#7d6a52; font-family:var(--font-ui); font-style:italic; }
+textarea.paper-input:focus{ box-shadow:0 0 0 2px var(--gold); }
+.log{ font-family:var(--font-ui) !important; font-size:11.5px; background:var(--b0); color:#d9c9a6; }
+/* 12: the big path counter is Georgia bold, like every other number */
+.pcf-num{ font-family:Georgia,'Iowan Old Style',serif !important; font-weight:900; }
+/* 13: buttons never use the title face (Enter the Dungeon, the shrine's Hold / Continue) */
+#start-btn{ font-family:var(--font-ui) !important; font-weight:800; letter-spacing:.3px; }
+.shrine-orb .so-label b{ font-family:var(--font-ui); font-weight:900; letter-spacing:.3px; }
+/* 14: headings in Metamorphous (small caps labels stay serif) */
+.achv-unlock-title, .origin-relic-earned .ore-kicker{ font-family:var(--font-display); font-weight:400; text-transform:none; letter-spacing:.5px; font-size:16px; }
+/* 15-16: every pop-up title centred; the same ✕ in the same corner, red-brown so it never matches the gear (hidden under pop-ups) */
+.modal h2{ text-align:center !important; padding-left:4px; padding-right:4px; }
+.modal:has(> .modal-x-btn) h2{ padding-left:32px; padding-right:32px; }
+.modal-x-btn{ width:30px; height:30px; top:9px; right:9px; background:#7a2e22 !important; color:#ffe3d6 !important; font-size:14px; font-weight:900; z-index:3; }
+.modal-x-btn:hover:not(:disabled){ background:#923a2c !important; color:#fff !important; }
+body:has(.modal-overlay) .settings-btn-floating{ visibility:hidden; }
+/* 17: Key tiles drawn like tray dice: same colours, 3px outline (support faces in the Gilded gold) */
+.key-item{ border:3px solid var(--line); box-shadow:inset 0 3px 0 rgba(255,255,255,.3); filter:drop-shadow(0 3px 0 var(--line)); margin-bottom:3px; }
+.key-item.blk-attack{ background:#ff5b5b; } .key-item.blk-maneuver{ background:#ffe9a8; } .key-item.blk-support{ background:#d4af52; }
+.key-item.blk-attack .key-icon, .key-item.blk-attack .key-label{ color:#fff3e6; }
+.key-item.blk-maneuver .key-icon, .key-item.blk-maneuver .key-label, .key-item.blk-support .key-icon, .key-item.blk-support .key-label{ color:#241c10; }
+.key-item .key-label{ font-weight:900; }
+.key-item.on{ outline:3px solid #fff1d6; outline-offset:1px; }
+/* 18: camp cards and the Back Pocket get the near-black outline */
+.camp-section{ border:3px solid var(--line) !important; }
+.camp-pocket{ border:3px solid var(--line) !important; }
+/* 19: achievement box and run-card stat tiles outlined in the line colour (gold stays for the heading) */
+.achv-unlock-box{ border:3px solid var(--line); }
+.rc-stat{ border:2px solid var(--line); }
+.share-ask{ background:rgba(255,220,160,.07); }
+/* 20: origin die-face chips outlined; the Signature Relic box dashed in the line colour */
+.die-face-chip{ border:2px solid var(--line); }
+.origin-relic-line{ border:2px solid var(--line); }
+.origin-relic-line.locked{ border-style:dashed; }
+/* 21: no dead tray rail on shrines; a disabled rail button is darkened, never see-through */
+.util-rail.rail-shrine > *{ visibility:hidden; }
+.util-btn.disabled:not(.rail-go){ opacity:1 !important; position:relative; }
+.util-btn.disabled:not(.rail-go)::before{ content:''; position:absolute; inset:0; border-radius:inherit; background:rgba(28,17,9,.6); pointer-events:none; z-index:3; }
+.cf-btn:disabled:not(.chosen){ opacity:1 !important; }
+.cf-btn.cf-rest:disabled:not(.chosen){ background:#2f4a37 !important; color:#c9d6c4 !important; }
+.cf-btn.cf-train:disabled:not(.chosen){ background:#463656 !important; color:#d6c9e3 !important; }
+/* 22: round bubble in dark brown with light-brown text; the floor number stays gold */
+.tray-head .round-badge{ background:var(--b2) !important; color:var(--parchment-dim) !important; }
+/* 25: one scroll area per Codex / Records tab (no scrolling list inside the scrolling window) */
+.codex-body .compendium-list, .codex-body .run-history-list{ max-height:none; overflow:visible; }
+/* Locked combine rows (Jeremy, 1.41.60 review): lighter stripes, the label on its own backing, the lock beside it */
+.upgrade-btn .upg-lbl{ position:relative; z-index:2; display:inline-flex; align-items:center; gap:5px; min-width:0; }
+.upgrade-btn.upgrade-locked::after{ z-index:0; background:repeating-linear-gradient(135deg, rgba(12,7,5,.17) 0 6px, rgba(12,7,5,0) 6px 12px); }
+.upgrade-btn.upgrade-locked .upg-lbl{ padding:1px 9px 1px 26px; border-radius:var(--r-pill); box-shadow:0 0 0 2px var(--line); }
+.upg-attack .upgrade-btn.upgrade-locked .upg-lbl{ background:#e8574f; }
+.upg-maneuver .upgrade-btn.upgrade-locked .upg-lbl{ background:#ffe9a8; }
+.upgrade-btn.upgrade-locked::before{ display:none; }
+.upgrade-btn.upgrade-locked .upg-lbl::before{ content:''; position:absolute; left:6px; top:50%; width:15px; height:17px; transform:translateY(-50%); pointer-events:none;
+  background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 18'%3E%3Crect x='1.5' y='7.5' width='13' height='9.5' rx='2' fill='%23f2e4c8' stroke='%230c0705' stroke-width='1.6'/%3E%3Cpath d='M4.5 7.5V5a3.5 3.5 0 0 1 7 0v2.5' fill='none' stroke='%230c0705' stroke-width='3.2'/%3E%3Cpath d='M4.5 7.5V5a3.5 3.5 0 0 1 7 0v2.5' fill='none' stroke='%23f2e4c8' stroke-width='1.4'/%3E%3C/svg%3E"); }
+/* Hanging vines (Floors 2-3) sit behind the quest paper and the monsters: their own layer under the arch */
+.fo-frame.fo-vines{ z-index:0; }
+/* Bestiary: each monster's quests in the fight's own wording and reward icons */
+.bst-quests{ display:inline-flex; flex-direction:column; gap:2px; margin:5px 0 3px; padding:3px 7px 4px; min-width:160px; max-width:100%;
+  background:var(--paper); color:var(--ink); border:2px solid var(--line); border-radius:6px; }
+.bst-quests-head{ font-family:var(--font-display); color:#7a1f14; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; line-height:1.2; }
+.bst-quests-head span{ font-family:var(--font-ui); text-transform:none; letter-spacing:0; font-size:9.5px; color:#5a4630; font-style:italic; }
+.bst-quest{ display:flex; align-items:center; gap:4px; font-size:11px; line-height:1.2; }
+.bst-quest .q-cond{ flex:1 1 auto; font-weight:700; }
+.bst-quest .q-arrow{ color:#7a1f14; font-weight:900; }
+.bst-quest .q-reward{ display:inline-flex; align-items:center; gap:1px; border-radius:9px; background:#3a2410; color:#ffd76a; font-weight:900; padding:1px 4px 1px 2px; font-size:10px; line-height:1; }
+.bst-quest .q-reward .icon-svg{ width:12px; height:12px; color:#ffd76a; }
+.bst-quest .q-reward b{ font-family:var(--font-ui); }
+/* Setup fits one screen for veterans too (fitSetup, render.js adds fit1..fit3 only while the page would scroll) */
+.setup-panel.fit1 .setup-back-btn{ float:left; margin:0 10px 0 0; }
+.setup-panel.fit1 .setup-name-row{ margin-bottom:8px; min-height:29px; }
+.setup-panel.fit1 .setup-section{ margin-top:0; margin-bottom:6px; }
+.setup-panel.fit1 .boon-showcase{ flex-direction:row; align-items:center; gap:8px; padding:5px 8px; }
+.setup-panel.fit1 .boon-showcase .die-plate{ display:none; }
+.setup-panel.fit1 .boon-showcase .die-art-wrap{ width:30px; height:30px; }
+.setup-panel.fit1 .boon-showcase:has(.boon-showcase-empty){ display:none; }
+.setup-panel.fit1 .boon-scroll{ padding:2px; }
+.setup-panel.fit2 #start-btn{ padding:10px 12px; font-size:19px; margin-top:2px; }
+.setup-panel.fit2 .class-showcase{ min-height:0 !important; padding:7px 10px !important; }
+.setup-panel.fit2 .class-mini-tray{ width:80px; flex-basis:80px; padding:4px; gap:2px; }
+.setup-panel.fit2 .origin-relic-line{ padding:4px 8px; margin-top:5px; }
+.setup-panel.fit2 .depth-toggle{ padding:4px 10px; }
+.setup-panel.fit2 .depth-toggle .depth-num{ width:32px; height:32px; font-size:17px; }
+.setup-panel.fit3 .origin-showcase-portrait{ width:80px !important; height:80px !important; }
+.setup-panel.fit3 .boon-tile-circle{ width:38px; height:38px; }
+.setup-panel.fit3 .setup-section{ gap:4px; }
