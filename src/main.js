@@ -102,7 +102,15 @@ setTimeout(()=>{ try{ resendUnconfirmedRuns(); flushRunUploads(); }catch(e){} },
     try{ if(typeof musicCtx==='function') musicCtx(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); }catch(e){}
     try{ if(typeof musicUpdate==='function') musicUpdate(); }catch(e){}
     sp.classList.add('splash-out'); setTimeout(()=> sp.remove(), 450);
+    // The tap that dismisses the splash must not also press whatever sits under it (Jeremy, Oct 17): swallow
+    // clicks until that finger lifts (plus a beat), even if it is held past the fade.
+    let until = Infinity;
+    const swallow = ev=>{ if(performance.now() < until){ ev.stopPropagation(); ev.preventDefault(); } else window.removeEventListener('click', swallow, true); };
+    window.addEventListener('click', swallow, true);
+    const lift = ()=>{ until = performance.now() + 350; window.removeEventListener('pointerup', lift, true); window.removeEventListener('pointercancel', lift, true); };
+    window.addEventListener('pointerup', lift, true); window.addEventListener('pointercancel', lift, true);
+    setTimeout(()=>{ if(until===Infinity) until = 0; }, 4000); // never leave the game deaf if a pointerup goes missing
   };
-  sp.addEventListener('pointerdown', go); sp.addEventListener('keydown', go); sp.tabIndex = 0;
+  sp.addEventListener('pointerdown', go); sp.addEventListener('keydown', ev=>{ ev.preventDefault(); go(); }); sp.tabIndex = 0;
 })();
 

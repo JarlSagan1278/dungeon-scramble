@@ -41,7 +41,7 @@ def find_value_span(src, const_name, key, open_ch):
         raise ValueError(f'index {idx} not found in {const_name}')
     elif open_ch == '{':
         # find `'key':` or "key": then the following data:image match
-        key_pat = re.compile(r'[\'"]' + re.escape(key) + r'[\'"]\s*:\s*[\'"]')
+        key_pat = re.compile(r'[\'"]' + re.escape(key).replace("'", r"\\?'") + r'[\'"]\s*:\s*[\'"]')  # 'Oilephant\'s Foot' is stored escaped
         km = key_pat.search(src, search_from)
         if not km:
             raise ValueError(f'key {key!r} not found in {const_name}')

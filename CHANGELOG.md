@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.41.63 (Oct 17, 2026)
+- Batch H art (Floor 3): Morel Dilemma, Chimeric Sludge, Gnome Chomper, Gestalt Network, Oilephant's Foot, Extractnid Matriarch.
+- The tap that dismisses the splash screen no longer also presses the title button under it (even when held past the fade).
+- Art tools: names with an apostrophe (Oilephant's Foot) now export and import under their real name.
+
 ## 1.41.62 (Oct 17, 2026)
 - Shrine Hold button rattles harder the longer it is held, with a light buzz on each rising note.
 - Setup screen: nothing moves when an Origin, Class or Starting Boon is picked. Each showcase keeps the height of its tallest option, the boon panel always holds its place, and the layout is fitted once per visit (new fit4 step keeps veterans at 769px).

@@ -81,8 +81,9 @@ def main():
             # the window ends right at the opening quote of the "data:image..."
             # string value itself, so allow (and strip) one trailing quote.
             window = src[max(0, pos-200):pos]
-            km = re.search(r'[\'"]([^\'"]+)[\'"]\s*:\s*[\'"]?$', window.rstrip())
-            key = km.group(1) if km else f'pos{pos}'
+            # the key may hold an escaped quote ('Oilephant\'s Foot', Oct 17)
+            km = re.search(r'([\'"])((?:\\.|(?!\1).)+)\1\s*:\s*[\'"]?$', window.rstrip())
+            key = re.sub(r'\\(.)', r'\1', km.group(2)) if km else f'pos{pos}'
 
         raw = base64.b64decode(b64)
         fname_base = f'{const_name or "UNKNOWN"}__{safe_key(key)}'

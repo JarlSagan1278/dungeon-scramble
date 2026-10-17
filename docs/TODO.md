@@ -20,7 +20,7 @@
 - Oct 15 (1.41.22-1.41.32): monster tuning, Floor 2 trims, shrine boosts, Extruzeon +10% HP, depth repricing, automatic play data, Batch E art, paper texture on all art (WebP) and in-world scenery, Monster Footing rounds 1-2. The Play Data sheet is still empty: needs the 1.41.24+ zip deployed and a finished run with sharing on.
 - Bug hunt on 1.41.32: 24/24 runs clean (bugsearch.js), every shrine option clean (new tools/test_shrines.js, 40/40). Rulebook PDF refreshed for today's changes.
 - Monster Footing page (https://claude.ai/artifact/6sxozXQfah2dSsRxnQEAkj) collection `lifts3` is round 3 (empty so far).
-- Art still out: Batch G remainder (Unventilated Workshop, The Necrorancher; F and the rest of G imported Oct 17), H-K, and silhouette batches L-O (stand-in shrines, Magic dice). When the last one is back: the consistency pass (tools/art/consistency.py) over all art.
+- Art still out: Batch G remainder (Unventilated Workshop, The Necrorancher; F, the rest of G and H imported Oct 17), I-K, and silhouette batches L-O (stand-in shrines, Magic dice). When the last one is back: the consistency pass (tools/art/consistency.py) over all art.
 
 ## Small follow-ups
 - Log whether a death was avoidable in the bot studies (literature review idea). Best-depth rewards: covered by dice finishes and relic gating (Jeremy, Oct 15); assist mode: not for now.
