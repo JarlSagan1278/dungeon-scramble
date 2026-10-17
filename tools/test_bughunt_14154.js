@@ -134,8 +134,11 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
   // ---------------- Save / load per class ----------------
   for (const [o, k] of [['pixie', 'arcanist'], ['gnome', 'dungeoneer'], ['dwarf', 'armsmaster'], ['halfling', 'guard']]) {
     await setup(o, k);
-    await page.evaluate(() => { saveGame(); });
+    // Carry the save string across the reload by hand: headless Chromium sometimes drops ALL of a file:// page's
+    // localStorage on reload (every key, not just the save), which made this check fail ~1 run in 6 (Oct 17).
+    const saved = await page.evaluate(() => { saveGame(); return localStorage.getItem(SAVE_KEY); });
     await page.reload(); await page.mouse.click(200, 400);
+    await page.evaluate(raw => localStorage.setItem(SAVE_KEY, raw), saved);
     const s = await page.evaluate(() => {
       const okLoad = loadGame(); if (!okLoad) return { okLoad };
       try { render(); } catch (e) { return { okLoad, err: e.message }; }

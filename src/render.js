@@ -1233,7 +1233,6 @@ function renderSetup(){
     }
     function renderBoonShowcaseNow(){
       boonShowcase.innerHTML = boonShowcaseHTML(chosenBoonName ? boonDice.find(d=>d.name===chosenBoonName) : null);
-      fitSetup();
       attachLongPressTooltips('#boon-showcase .die-face-chip');
     }
     renderBoonScroll();
@@ -1282,17 +1281,38 @@ function renderSetup(){
       if(typeof showToast==='function') showToast('Debug class armed', 'good');
     }
   };
-  fitSetup();
-  try{ if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>fitSetup()); }catch(e){}
-  setTimeout(fitSetup, 400); // again once the title font and the art have settled
+  const fitOpts = {
+    origin: ORIGINS.map(o=> originShowcaseHTML(o, isOriginUnlocked(o.id))),
+    klass: realClasses.map(k=> classShowcaseHTML(k)),
+    boon: boonScroll ? [boonShowcaseHTML(null), ...boonDice.map(d=> boonShowcaseHTML(d))] : null,
+  };
+  const refit = ()=>{ if(document.contains(originShowcase)) fitSetup(fitOpts); };
+  refit();
+  try{ if(document.fonts && document.fonts.ready) document.fonts.ready.then(refit); }catch(e){}
+  setTimeout(refit, 400); // again once the title font and the art have settled
 }
 // The setup card must never grow past the screen (Oct 17): veterans get a Starting Boon row and the Depth bar, so
 // tighten step by step (fit1..fit3, styles.css) only while the page is still taller than the window.
-function fitSetup(){
+// Setup layout is decided once per visit, against the TALLEST content each showcase can hold: picking an Origin,
+// Class or Boon must never move anything else on the screen (Jeremy, Oct 17). Each showcase gets a min-height
+// equal to its tallest option, then fit1..fit4 tighten spacing only while that worst case would scroll.
+// opts: {origin:[html...], klass:[html...], boon:[html...]} -- every option each showcase can show.
+function fitSetup(opts){
   const p = document.querySelector('.setup-panel'); if(!p) return;
   const se = document.scrollingElement || document.documentElement;
-  p.classList.remove('fit1','fit2','fit3');
-  for(const c of ['fit1','fit2','fit3']){ if(se.scrollHeight <= window.innerHeight + 1) break; p.classList.add(c); }
+  const boxes = [['#origin-showcase', opts && opts.origin], ['#class-showcase', opts && opts.klass], ['#boon-showcase', opts && opts.boon]];
+  const lockHeights = ()=>{
+    boxes.forEach(([sel, list])=>{
+      const box = document.querySelector(sel); if(!box || !list || !list.length) return;
+      const keep = box.innerHTML; box.style.removeProperty('min-height');
+      let max = 0;
+      list.forEach(h=>{ box.innerHTML = h; max = Math.max(max, box.offsetHeight); });
+      box.innerHTML = keep; box.style.setProperty('min-height', max + 'px', 'important');
+    });
+  };
+  p.classList.remove('fit1','fit2','fit3','fit4');
+  lockHeights();
+  for(const c of ['fit1','fit2','fit3','fit4']){ if(se.scrollHeight <= window.innerHeight + 1) break; p.classList.add(c); lockHeights(); }
 }
 
 function renderRoute(){
@@ -4010,7 +4030,7 @@ function attachShrineHold(){
     if(done || timers.length) return;
     if(ev && ev.cancelable) ev.preventDefault();
     btn.classList.add('charging'); if(fig) fig.classList.add('shrine-charging');
-    [0,1,2].forEach(k=> timers.push(setTimeout(()=>{ if(typeof playTone==='function') playTone('pathTick', k*2); }, k*SHRINE_HOLD_MS/3)));
+    [0,1,2].forEach(k=> timers.push(setTimeout(()=>{ if(typeof playTone==='function') playTone('pathTick', k*2); if(typeof vibrate==='function') vibrate(8+k*8); }, k*SHRINE_HOLD_MS/3)));
     timers.push(setTimeout(()=>{
       done = true;
       if(fig){ fig.classList.remove('shrine-charging'); fig.classList.add('shrine-burst'); }

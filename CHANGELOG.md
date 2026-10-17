@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.41.62 (Oct 17, 2026)
+- Shrine Hold button rattles harder the longer it is held, with a light buzz on each rising note.
+- Setup screen: nothing moves when an Origin, Class or Starting Boon is picked. Each showcase keeps the height of its tallest option, the boon panel always holds its place, and the layout is fitted once per visit (new fit4 step keeps veterans at 769px).
+- Test fix: the class save/load check no longer fails 1 run in 6 (headless Chromium dropping a file:// page's storage on reload).
+
 ## 1.41.61 (Oct 17, 2026)
 - Batch G art: Bellicose Biomancer, Ceramic Golem, The Strike/Break-er.
 - Design pass 2 (rest of the Oct 17 audit): Metamorphous only on titles/headings (buttons plain serif, path counter Georgia); all pop-up titles centred with the same close button; gear hidden under pop-ups; Codex Key tiles drawn like dice; near-black outlines on camp/pocket/stat panels; brown round bubble with gold floor; shrine tray rail hidden; disabled buttons solid; each Origin/Class pill and shrine option its own colour; HP number inside the bar at camp and shrines; vines behind the quest paper; Bestiary lists each monster's quests; Codex/Records scroll once.
