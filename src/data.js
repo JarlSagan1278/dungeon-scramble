@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.58';
+const GAME_VERSION = '1.41.59';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -387,29 +387,29 @@ const MAGIC = lootSet([
 ], 'magic');
 
 // ---- Encounters (Cards 0.4 sheet -- the most complete/current tab) ----
-// fields: name,type,health,questHealth,dmg,minion,shield,heal,dot,hot,quests[],flavor
+// fields: name,type,health,dmg,minion,shield,heal,dot,hot,quests[],flavor  (Quest Health removed Oct 17: every quest pays what it says)
 function enc(name,type,health,extra){ return Object.assign({name,type,health,maxHealth:health,dmg:0,minion:0,shield:0,heal:0,dot:0,hot:0,quests:[],flavor:''}, extra); }
 
 const FLOOR1_ENEMIES = [
   enc('Filement Bunny','Enemy',7,{dmg:2,flavor:'"Cute, until it gunks up your gears and gnaws off your toes!"'}),
-  enc('Wooden Golem','Enemy',10,{questHealth:5,dmg:3,quests:['5 damage: 3 maneuvers'],flavor:'Shoddy construction is evident from the visible weak points.'}),
+  enc('Wooden Golem','Enemy',10,{dmg:3,quests:['5 damage: 3 maneuvers'],flavor:'Shoddy construction is evident from the visible weak points.'}),
   enc('Feral Pet Rock','Enemy',12,{dmg:2,flavor:'Somedwarf took this companion for granite…'}),
-  enc('Unbound Automa','Enemy',15,{questHealth:6,dmg:3,quests:['5 damage: 3 maneuvers'],flavor:'This replaced the Automaton, mostly to remove the weight.'}),
-  enc('Beaker Breakers','Enemy',15,{questHealth:6,dmg:1,heal:1,quests:['5 damage: 2 dodge'],flavor:'"No longer into flasks"'}),
+  enc('Unbound Automa','Enemy',15,{dmg:3,quests:['5 damage: 3 maneuvers'],flavor:'This replaced the Automaton, mostly to remove the weight.'}),
+  enc('Beaker Breakers','Enemy',15,{dmg:1,heal:1,quests:['5 damage: 2 dodge'],flavor:'"No longer into flasks"'}),
   enc('Viscous Orb','Enemy',10,{dmg:2,minion:1,flavor:'"Thankfully it isn\u2019t a gelatinous cube!"'}),
   enc('United Separatists','Enemy',12,{dmg:1,heal:1,flavor:'"Nothing like a shared schism to bring people apart".'}),
-  enc('Amanitabomination','Enemy',14,{questHealth:6,dmg:2,shield:2,quests:['5 damage: 2 heals'],flavor:'"I was benevolent and good, misery made me a foe"'}),
-  enc('Grafted Grifter','Enemy',15,{questHealth:6,dmg:2,shield:2,quests:['5 damage: 2 leap'],flavor:'Known to charge an arm and a leg.'}),
+  enc('Amanitabomination','Enemy',14,{dmg:2,shield:2,quests:['5 damage: 2 heals'],flavor:'"I was benevolent and good, misery made me a foe"'}),
+  enc('Grafted Grifter','Enemy',15,{dmg:2,shield:2,quests:['5 damage: 2 leap'],flavor:'Known to charge an arm and a leg.'}),
   enc('Leper Colonizers','Enemy',12,{dmg:2,shield:2,flavor:'"May our crustulant new Chempire outlast its crumbling citizens!"'}),
   // v1.39.0: Jeremy's spare monsters from the Mechanics Document; stats from the evened tiers (docs/studies/2026-10-11_new_content_plan.md).
-  enc('Untamed Unicrows','Enemy',14,{questHealth:6,dmg:2,dot:1,quests:['5 damage: 2 dodge'],flavor:'"A murderous parliament, or a parliamentary murder?"'}),
-  enc('Prickly Porcupanther','Enemy',18,{questHealth:6,dmg:2,shield:1,dreadOnly:true,quests:['5 damage: 2 block'],flavor:'"Prickly of both texture and temperament."'}),
+  enc('Untamed Unicrows','Enemy',14,{dmg:2,dot:1,quests:['5 damage: 2 dodge'],flavor:'"A murderous parliament, or a parliamentary murder?"'}),
+  enc('Prickly Porcupanther','Enemy',18,{dmg:2,shield:1,dreadOnly:true,quests:['5 damage: 2 block'],flavor:'"Prickly of both texture and temperament."'}),
 ];
 const FLOOR1_TRAPS = [
-  enc('Displacer Lair','Trap',25,{questHealth:15,dmg:3,quests:['10 damage: any 6 actions','10 damage: any 8 actions','10 damage: any 10 actions'],flavor:'"Move either very fast or very slow. Don\u2019t touch the bellies"'}),
-  enc('Rigged Sporks','Trap',25,{questHealth:15,dmg:1,shield:2,quests:['10 damage: 4 maneuvers','10 damage: 2 leap','10 damage: 2 dodge'],flavor:'Elegantly spiked-spores, set to blow upon detecting the slightest movement.'}),
-  enc('Unauthorized Transfusion','Trap',25,{questHealth:15,dmg:1,hot:1,quests:['10 damage: 3 maneuvers','10 damage: 2 block','1 nullify: 8 damage/turn'],flavor:'"Everyone is a universal donor if you aren\u2019t picky"'}),
-  enc('Leper Con-Trap','Trap',25,{questHealth:15,dmg:2,minion:1,quests:['10 damage: 3 maneuvers','20 damage: 10 blanks','1 nullify: 8 damage/turn'],flavor:'"Do not listen to anyone who claims to already know where the treasure is"'}),
+  enc('Displacer Lair','Trap',25,{dmg:3,quests:['5 damage: any 6 actions','5 damage: any 8 actions','5 damage: any 10 actions'],flavor:'"Move either very fast or very slow. Don\u2019t touch the bellies"'}),
+  enc('Rigged Sporks','Trap',25,{dmg:1,shield:2,quests:['10 damage: 4 maneuvers','10 damage: 2 leap','10 damage: 2 dodge'],flavor:'Elegantly spiked-spores, set to blow upon detecting the slightest movement.'}),
+  enc('Unauthorized Transfusion','Trap',25,{dmg:1,hot:1,quests:['10 damage: 3 maneuvers','10 damage: 2 block','1 nullify: 8 damage/turn'],flavor:'"Everyone is a universal donor if you aren\u2019t picky"'}),
+  enc('Leper Con-Trap','Trap',25,{dmg:2,minion:1,quests:['10 damage: 3 maneuvers','20 damage: 10 blanks','1 nullify: 8 damage/turn'],flavor:'"Do not listen to anyone who claims to already know where the treasure is"'}),
 ];
 const FLOOR1_SHRINES = [
   enc('Sacred Bellows','Shrine',0,{boon:'Upgrade Player Maximum Health by 10.', effect:{type:'maxHealthUp', amount:10}}),
@@ -433,30 +433,30 @@ const FLOOR1_SHRINES = [
 ];
 const FLOOR1_BOSSES = [
   enc('Rogue Golemancer','Boss',30,{dmg:2,minion:1,flavor:'"You cannot handle my golems, adventurer."'}),
-  enc('Heating Elemental','Boss',40,{questHealth:25,dmg:3,hot:1,quests:['35 damage: survive to turn 5'],flavor:'"Anyone know the average melting point on the Plane of Immolation?"'}),
-  enc('Grosteque Grafter','Boss',40,{questHealth:30,dmg:2,shield:2,quests:['8 dot: deal 10+ damage in a single round'],flavor:'Oft criticized for reusing parts of other bosses.'}),
+  enc('Heating Elemental','Boss',40,{dmg:3,hot:1,quests:['35 damage: survive to turn 5'],flavor:'"Anyone know the average melting point on the Plane of Immolation?"'}),
+  enc('Grosteque Grafter','Boss',40,{dmg:2,shield:2,quests:['8 dot: deal 10+ damage in a single round'],flavor:'Oft criticized for reusing parts of other bosses.'}),
 ];
 
 const FLOOR2_ENEMIES = [
   enc('Displacer Kitty','Enemy',18,{dmg:3,flavor:'"I think that one had a collar. Where\u2019d it go?"'}),
   enc('Armored Gear-Pest','Enemy',17,{dmg:2,flavor:'A well-documented example of dungeon adaptation.'}),
-  enc('Rusty Golem','Enemy',20,{questHealth:8,dmg:4,quests:['16 damage: survive turn 4'],flavor:'"Looks like it was falling apart on its own"'}),
+  enc('Rusty Golem','Enemy',20,{dmg:4,quests:['16 damage: survive turn 4'],flavor:'"Looks like it was falling apart on its own"'}),
   enc('Rogue Technician','Enemy',16,{dmg:4,flavor:'"I\u2019m not here to fix your lockpick, I have an ideology!"'}),
-  enc('The Warcart','Enemy',18,{questHealth:9,dmg:2,shield:2,quests:['8 damage: 4 maneuvers'],flavor:'The top contributing reason as to why mining is the most dangerous profession.'}),
+  enc('The Warcart','Enemy',18,{dmg:2,shield:2,quests:['8 damage: 4 maneuvers'],flavor:'The top contributing reason as to why mining is the most dangerous profession.'}),
   enc('Blastogenesis Engine','Enemy',14,{dmg:3,minion:2,flavor:'A true perpetual devotion machine.'}),
-  enc('Half-life Host','Enemy',22,{questHealth:8,dmg:3,shield:2,quests:['8 damage: 2 heal'],flavor:'"\u2018Release spores. Multiply.\u2019? - Now I\u2019m always saying that!"'}),
+  enc('Half-life Host','Enemy',22,{dmg:3,shield:2,quests:['8 damage: 2 heal'],flavor:'"\u2018Release spores. Multiply.\u2019? - Now I\u2019m always saying that!"'}),
   enc('Lichen-Thrope','Enemy',24,{dmg:3,heal:1,flavor:'Under the luminance of the full bloom, this creature becomes a true hater.'}),
-  enc('Fungal Flayer','Enemy',24,{questHealth:10,dmg:3,hot:2,quests:['16 damage: accumulate 5 block'],flavor:'It is, in fact, acceptable to hate the flayer.'}),
+  enc('Fungal Flayer','Enemy',24,{dmg:3,hot:2,quests:['16 damage: accumulate 5 block'],flavor:'It is, in fact, acceptable to hate the flayer.'}),
   enc('Illegal Operation','Enemy',19,{dmg:4,hot:1,flavor:'"Oh no, maybe we try multiplying by zero this time??"'}),
-  enc('Rabbid Rabbats','Enemy',18,{questHealth:6,dmg:2,minion:1,quests:['5 damage: 2 leap'],flavor:'"They multiply like rabbits and, as a group, have inverse operations."'}),
-  enc('Roudy Rinotter','Enemy',15,{questHealth:6,dmg:2,heal:1,quests:['5 damage: 2 heal'],flavor:'"Is that some cornbread on its tummy?"'}),
-  enc('Whence Wolf','Enemy',32,{questHealth:10,dmg:3,dot:1,quests:['10 damage: 3 maneuvers'],flavor:'"Why, Grandma, what uncertain provenance you have."'}),
+  enc('Rabbid Rabbats','Enemy',18,{dmg:2,minion:1,quests:['5 damage: 2 leap'],flavor:'"They multiply like rabbits and, as a group, have inverse operations."'}),
+  enc('Roudy Rinotter','Enemy',15,{dmg:2,heal:1,quests:['5 damage: 2 heal'],flavor:'"Is that some cornbread on its tummy?"'}),
+  enc('Whence Wolf','Enemy',32,{dmg:3,dot:1,quests:['10 damage: 3 maneuvers'],flavor:'"Why, Grandma, what uncertain provenance you have."'}),
 ];
 const FLOOR2_TRAPS = [
-  enc('Adhesive Pest Traps','Trap',22,{questHealth:20,dmg:2,minion:2,quests:['15 damage: 3 maneuvers','15 damage: 4 maneuvers','15 damage: 5 maneuvers'],flavor:'"Environmentally friendly snares for unfriendly environments"'}),
-  enc('Ditched Heist','Trap',30,{questHealth:20,dmg:3,shield:3,quests:['15 damage: any 8 actions','15 damage: any 3 or fewer actions','20 damage: 8 blanks'],flavor:'Looks like the previous party spent too long describing their plans to finish them.'}),
-  enc('Unventilated Workshop','Trap',22,{questHealth:20,dmg:2,hot:1,quests:['15 damage: 2 block','15 damage: 4 maneuvers','nullify: 12+ damage'],flavor:'"Carol never wore her ventilator. Now she doesn\u2019t need it."'}),
-  enc('The Strike/Break-er','Trap',30,{questHealth:20,dmg:3,quests:['5 damage: survive 2','10 damage: survive 4','15 damage: survive 6'],flavor:'Inevitably causes scabs.'}),
+  enc('Adhesive Pest Traps','Trap',22,{dmg:2,minion:2,quests:['15 damage: 3 maneuvers','15 damage: 4 maneuvers','15 damage: 5 maneuvers'],flavor:'"Environmentally friendly snares for unfriendly environments"'}),
+  enc('Ditched Heist','Trap',30,{dmg:3,shield:3,quests:['15 damage: any 8 actions','15 damage: any 3 or fewer actions','20 damage: 8 blanks'],flavor:'Looks like the previous party spent too long describing their plans to finish them.'}),
+  enc('Unventilated Workshop','Trap',22,{dmg:2,hot:1,quests:['15 damage: 2 block','15 damage: 4 maneuvers','nullify: 12+ damage'],flavor:'"Carol never wore her ventilator. Now she doesn\u2019t need it."'}),
+  enc('The Strike/Break-er','Trap',30,{dmg:3,quests:['5 damage: survive 2','10 damage: survive 4','15 damage: survive 6'],flavor:'Inevitably causes scabs.'}),
 ];
 const FLOOR2_SHRINES = [
   enc('Enchanted Anvil','Shrine',0,{boon:'Forge a new die (choose one of three Gilded dice) OR upgrade two Attack or two Maneuver Dice one level.', effect:{type:'choice', options:[
@@ -476,7 +476,7 @@ const FLOOR2_SHRINES = [
   enc('Blood of Spanneroth','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
   enc('Ferrous Maiden','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
   enc("Thom's Guide",'Shrine',0,{boon:'Choose one of three path and movement Relics.', effect:{type:'relicChoice', theme:'path'}}),
-  enc('Time-Intensive Shrine','Shrine',0,{boon:'Give up your next campfire (no Rest or Train) to choose two of four Relics.', effect:{type:'choice', options:[
+  enc("Goldberg's Rube Machine",'Shrine',0,{boon:'It takes all night to run: give up your next campfire (no Rest or Train) to choose two of four Relics.', effect:{type:'choice', options:[
     {label:'Skip your next campfire: choose 2 Relics', effect:{type:'bargain', price:{skipRest:true}, then:{type:'relicChoice', count:4, take:2}}},
     {label:'Walk away', effect:{type:'leave'}},
   ]}}),
@@ -484,32 +484,32 @@ const FLOOR2_SHRINES = [
 ];
 const FLOOR2_BOSSES = [
   enc('The Necrorancher','Boss',48,{dmg:2,minion:2,quests:['nullify: deal 12 damage in a single turn'],flavor:'Herder of the haunted, granger of the ghoulish, planter of the parasitic.'}),
-  enc('Bellicose Biomancer','Boss',50,{questHealth:25,dmg:4,hot:2,quests:['20 damage: gain 3 hot','20 damage: deal 5 dot'],flavor:'Not content with creating life, this relentless innovator seeks new ways to destroy it.'}),
-  enc('Ceramic Golem','Boss',70,{questHealth:40,dmg:3,shield:3,quests:['8 dot: deal 15+ damage in a single round','30 damage: 5 maneuvers'],flavor:'The bespoke sommelier of the Co-Consul, now cracked and seeping with drink.'}),
+  enc('Bellicose Biomancer','Boss',50,{dmg:4,hot:2,quests:['20 damage: gain 3 hot','20 damage: deal 5 dot'],flavor:'Not content with creating life, this relentless innovator seeks new ways to destroy it.'}),
+  enc('Ceramic Golem','Boss',70,{dmg:3,shield:3,quests:['8 dot: deal 15+ damage in a single round','30 damage: 5 maneuvers'],flavor:'The bespoke sommelier of the Co-Consul, now cracked and seeping with drink.'}),
 ];
 
 // Oct 13 (Jeremy: Floor 3 should be harder than Floor 2): attack +2 on Easy/Standard/Deadly cards, +1 on Elites
 // (heavy turns double it), +1 on the Big Bosses' base attacks.
 const FLOOR3_ENEMIES = [
   enc('Morel Dilemma','Enemy',18,{dmg:6,minion:2,hot:1,flavor:'A fungal species that has stumped, and subsequently eaten, philosophers for generations.'}),
-  enc('Chimeric Sludge','Enemy',25,{questHealth:12,dmg:7,hot:2,quests:['12 damage: 4 maneuvers'],flavor:'Biological slag, made up of countless individual chimeras.'}),
-  enc('Gnome Chomper','Enemy',28,{questHealth:6,dmg:8,quests:['6 damage: 3 maneuvers'],flavor:'"The Gnomish Chempire is the leading zealot state!"'}),
+  enc('Chimeric Sludge','Enemy',25,{dmg:7,hot:2,quests:['12 damage: 4 maneuvers'],flavor:'Biological slag, made up of countless individual chimeras.'}),
+  enc('Gnome Chomper','Enemy',28,{dmg:8,quests:['6 damage: 3 maneuvers'],flavor:'"The Gnomish Chempire is the leading zealot state!"'}),
   // v1.39.0: replaces Parasite Seer (its art was a cropped copy of another gnome); Jeremy's idea, same slot and stats.
   enc('Gnomeowners Association','Enemy',20,{dmg:5,shield:3,flavor:'"Only good and gracious hosts are allowed in this neighborhood."'}),
   enc('Gestalt Network','Enemy',20,{dmg:5,dot:2,flavor:'"You will join us. Our population is mushrooming."'}),
-  enc("Oilephant's Foot",'Enemy',30,{questHealth:15,dmg:4,hot:3,quests:['15 damage: 4 support actions'],flavor:'"An Oilephant never forgets" refers to the long-lasting effects of radiation.'}),
+  enc("Oilephant's Foot",'Enemy',30,{dmg:4,hot:3,quests:['15 damage: 4 support actions'],flavor:'"An Oilephant never forgets" refers to the long-lasting effects of radiation.'}),
   enc('Extractnid Matriarch','Enemy',22,{dmg:6,minion:3,quests:['nullify: 10+ damage'],flavor:'Undisturbed for eons, this primordial weaver and its brood now stir and hunger for glass.'}),
   enc('The Punished','Enemy',36,{dmg:6,minion:1,flavor:'Those foolish enough to try and harness forms they are unable to comprehend.'}),
-  enc('Profane Geometry','Enemy',35,{questHealth:10,dmg:6,hot:2,quests:['10 damage: adventurer H.O.T. = D.O.T.'],flavor:'A simulacrum of the divine, insatiable as the curiosity by which it was conjured.'}),
-  enc('Sacred(?) Geometry','Enemy',38,{questHealth:10,dmg:6,dot:2,quests:['10 damage: encounter D.O.T. = H.O.T.'],flavor:'A mere reflection of the divine geometry. The impossible beauty pains your eyes.'}),
-  enc('Eelagator Escapee','Enemy',44,{questHealth:10,dmg:5,shield:2,quests:['10 damage: 2 nullify'],flavor:'"Such a successful grafting that it escaped of its own measure!"'}),
-  enc('Toadtaur Warrior','Enemy',30,{questHealth:8,dmg:7,quests:['8 damage: 3 maneuvers'],flavor:'"Definitely a \'can we\' vs. a \'should we\' decision, looking back."'}),
+  enc('Profane Geometry','Enemy',35,{dmg:6,hot:2,quests:['10 damage: adventurer H.O.T. = D.O.T.'],flavor:'A simulacrum of the divine, insatiable as the curiosity by which it was conjured.'}),
+  enc('Sacred(?) Geometry','Enemy',38,{dmg:6,dot:2,quests:['10 damage: encounter D.O.T. = H.O.T.'],flavor:'A mere reflection of the divine geometry. The impossible beauty pains your eyes.'}),
+  enc('Eelagator Escapee','Enemy',44,{dmg:5,shield:2,quests:['10 damage: 2 nullify'],flavor:'"Such a successful grafting that it escaped of its own measure!"'}),
+  enc('Toadtaur Warrior','Enemy',30,{dmg:7,quests:['8 damage: 3 maneuvers'],flavor:'"Definitely a \'can we\' vs. a \'should we\' decision, looking back."'}),
 ];
 const FLOOR3_TRAPS = [
-  enc('Anti-Euclidian Space','Trap',40,{questHealth:30,dmg:9,shield:2,quests:['10 damage: any 10 actions','15 damage: any 12 actions','20 damage: any 15 actions'],flavor:'Where forbidden postulates are illogically deduced from perfidious axioms.'}),
-  enc('Ergot Eruption','Trap',40,{questHealth:30,dmg:7,hot:3,quests:['15 damage: 4 maneuvers','20 damage: 3 pivot','3 hot: 15+ damage'],flavor:'"Fortune favors the mold" — Plinthi the Eldar before death.'}),
-  enc('Self-Replicating Forge','Trap',40,{questHealth:30,dmg:5,minion:4,quests:['15 damage: 4 maneuvers','20 damage: 3 boosts','1 freeze: 15+ damage'],flavor:'Hydra-aulic systems rebuild themselves stronger when damaged.'}),
-  enc('Bio-Mutant Escape','Trap',40,{questHealth:30,dmg:5,minion:4,quests:['15 damage: 2 nullify','20 damage: 4 support actions','20 damage: survive 4'],flavor:'No weapon known to gnome can stop 30-50 feral mutants.'}),
+  enc('Anti-Euclidian Space','Trap',40,{dmg:9,shield:2,quests:['10 damage: any 10 actions','15 damage: any 12 actions','20 damage: any 15 actions'],flavor:'Where forbidden postulates are illogically deduced from perfidious axioms.'}),
+  enc('Ergot Eruption','Trap',40,{dmg:7,hot:3,quests:['15 damage: 4 maneuvers','20 damage: 3 pivot','3 hot: 15+ damage'],flavor:'"Fortune favors the mold" — Plinthi the Eldar before death.'}),
+  enc('Self-Replicating Forge','Trap',40,{dmg:5,minion:4,quests:['15 damage: 4 maneuvers','20 damage: 3 boosts','1 freeze: 15+ damage'],flavor:'Hydra-aulic systems rebuild themselves stronger when damaged.'}),
+  enc('Bio-Mutant Escape','Trap',40,{dmg:5,minion:4,quests:['15 damage: 2 nullify','20 damage: 4 support actions','20 damage: survive 4'],flavor:'No weapon known to gnome can stop 30-50 feral mutants.'}),
 ];
 const FLOOR3_SHRINES = [
   enc('Scrying Spheroid','Shrine',0,{boon:'Replace a loot die with a random Magic die.', effect:{type:'randomDieReplace', pool:'Magic'}}),
@@ -531,9 +531,9 @@ const FLOOR3_SHRINES = [
   ]}}),
 ];
 const BIG_BOSSES = [
-  enc('Extruzeon, Co-consul of Waste','Big Boss',99,{questHealth:60,dmg:6,shield:2,hot:1,quests:['30 damage: 3 boosts','30 damage: 6 maneuvers in a single turn','freeze: 20+ damage'],flavor:'"And to think\u2026I hesitated."'}),
-  enc('Toadtaur Wizard, Assistant to the Co-consul','Big Boss',78,{questHealth:60,dmg:4,quests:['30 damage: 3 leaps','30 damage: 6 maneuvers in a single turn','freeze: 15+ damage'],flavor:'"The wizdom of the toads flows through my three-chambered heart!"'}),
-  enc('Myceleus, Co-consul of Rot','Big Boss',93,{questHealth:60,dmg:2,minion:2,dot:1,hot:2,quests:['30 damage: 3 combos','30 damage: 6 maneuvers in a single turn','nullify: 15+ damage'],flavor:'"All must rot away to naught!"'}),
+  enc('Extruzeon, Co-consul of Waste','Big Boss',99,{dmg:6,shield:2,hot:1,quests:['30 damage: 3 boosts','30 damage: 6 maneuvers in a single turn','freeze: 20+ damage'],flavor:'"And to think\u2026I hesitated."'}),
+  enc('Toadtaur Wizard, Assistant to the Co-consul','Big Boss',78,{dmg:4,quests:['30 damage: 3 leaps','30 damage: 6 maneuvers in a single turn','freeze: 15+ damage'],flavor:'"The wizdom of the toads flows through my three-chambered heart!"'}),
+  enc('Myceleus, Co-consul of Rot','Big Boss',93,{dmg:2,minion:2,dot:1,hot:2,quests:['30 damage: 3 combos','30 damage: 6 maneuvers in a single turn','nullify: 15+ damage'],flavor:'"All must rot away to naught!"'}),
 ];
 
 const FLOORS = [
@@ -650,7 +650,7 @@ const SHRINE_ART_STANDIN = {
   'Healthy Hearth':'Sacred Bellows','Ferrous Maiden':'Sacred Bellows','Indoctrination Inoculation':'Alchemists Stone',
   'Ark of the Flood':'Expediting Spores',"Thom's Guide":'Expediting Spores','Charged Fae-Lines':'Department Spore',
   'Loot-Diagonalizer':'Ecclectrical Outlet','Madpie Nest':'Storied Emporium',
-  'Blood-Drive Treats':'Scrying Spheroid','Time-Intensive Shrine':'Scrying Spheroid','Faustian Spreadsheet':'Scrying Spheroid',
+  'Blood-Drive Treats':'Scrying Spheroid',"Goldberg's Rube Machine":'Scrying Spheroid','Faustian Spreadsheet':'Scrying Spheroid',
   'Scroll Dispenser: AWSP':'Scroll Dispenser: CRELA','Scroll Dispenser: DOER':'Scroll Dispenser: GIB',
   'Cryotherapist':'Half-Full Fountain','Correctly-Designed Fountain':"Heron's Fountain",
 };

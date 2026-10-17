@@ -181,14 +181,14 @@ C+=ch(8,'Camp',`
 <li><b>The campfire: Rest or Train.</b> Each Camp's fire gives you <b>one</b> of these, so choose:
 <ul class="rules"><li><b>Rest.</b> The Tray is scrambled and you heal <b>half the non-blank faces</b> it shows, rounded up (Percolation Theory adds 3; the Rationing Rations depth modifier halves or removes it). The button shows about how much you'd heal. Resting also gives you a fresh scramble for the next room.</li>
 <li><b>Train.</b> Combine <b>3 matching Basic dice</b> (same type and level, Tray or Pocket) into one a level higher, up to III: one Attack and one Maneuver per Camp. If dice leave the Tray you need enough spare Pocket dice to refill. Loot dice can't be combined.</li></ul>
-Base Camp has no fire: combining there is free. The Time-Intensive Shrine can put out your next campfire.</li></ol>
+Base Camp has no fire: combining there is free. Goldberg's Rube Machine (a shrine) can cost you your next campfire.</li></ol>
 <p>Press ${btn('Break Camp &amp; Continue')} when you are done.</p>
 `,'c8');
 // 9 relics
 const relCard=r=>`<div class="relic ${r.origin?'orel':''}"><div class="mono">${r.mono}</div><div><b>${r.name}</b>${r.origin?` <small>${r.origin[0].toUpperCase()+r.origin.slice(1)}</small>`:''}<span>${r.desc.replace(/^\+8 maximum health, right now\./,'+8 maximum Health, immediately.')}</span></div></div>`;
 C+=ch(9,'Relics',`
 <p>Relics are <b>permanent passive perks</b> for the rest of a run. They take no Tray space and can't be lost or swapped. You can hold any number, never the same one twice. They show as badges above the doorway; tap to read, and watch them pulse when they fire.</p>
-<h3>Shrine Relics</h3><p>Found at Relic Shrines. General ones (Department Spore, Storied Emporium) draw from every relic; themed ones draw from one family (offense, defense, path and movement, or loot and tempo); bargain ones (Blood-Drive Treats, Time-Intensive Shrine, Faustian Spreadsheet) charge a price. You are shown 3 you don't hold (4 at the Faustian Spreadsheet, +1 with Inductive Step) and keep 1. Each family has its own gem: offense a red triangle, defense a blue emerald, path a green hexagon, loot and tempo a gold round, Origin a purple kite.</p>
+<h3>Shrine Relics</h3><p>Found at Relic Shrines. General ones (Department Spore, Storied Emporium) draw from every relic; themed ones draw from one family (offense, defense, path and movement, or loot and tempo); bargain ones (Blood-Drive Treats, Goldberg's Rube Machine, Faustian Spreadsheet) charge a price. You are shown 3 you don't hold (4 at the Faustian Spreadsheet, +1 with Inductive Step) and keep 1. Each family has its own gem: offense a red triangle, defense a blue emerald, path a green hexagon, loot and tempo a gold round, Origin a purple kite.</p>
 <p class="small">Some relics join the shrines later: Hard Hat Act, Perfect Fifth and Prime Edge after your first win; Scavenger's Acumen, Evasion Tank and Minus-One Mantra after you clear Depth 1. Until then the Codex shows them as locked.</p>
 <div class="relics">${O.RELICS.filter(r=>!r.origin).map(relCard).join('')}</div>
 <h3>Origin Relics</h3><p>Never offered at Shrines. <b>Winning a full run with an Origin earns that Origin's relic</b>, and every later run as that Origin begins with it.</p>

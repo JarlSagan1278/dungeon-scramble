@@ -335,10 +335,6 @@
   .bar{ flex:1; background:#2a2420; border-radius:var(--r-md); position:relative; overflow:hidden; }
   .bar-fill{ height:100%; border-radius:var(--r-md); }
   .bar-fill.hp.player{ background:linear-gradient(90deg,#1f5a2a,#3fae54); }
-  /* Quest Health used to be a separate "X/Y remaining" text line; it's now
-     this gold slice layered on the HP bar, flush against the current
-     health level -- the amount a completed quest could still shave off. */
-  .bar-fill.quest-hp{ position:absolute; top:0; background:linear-gradient(90deg,#a3812f,var(--gold)); }
   .bar-fill.dmg-preview{ position:absolute; top:0; z-index:2; background:repeating-linear-gradient(45deg, rgba(255,255,255,0.5) 0 3px, rgba(255,255,255,0.15) 3px 6px); border-right:2px solid #fff; }
   @keyframes flash-bar{
     0%{ box-shadow:0 0 0 0 rgba(255,255,255,0); }
@@ -1854,7 +1850,6 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .bar-arc .ba-out{ stroke:var(--line); stroke-linecap:round; }
 .bar-arc .ba-track{ stroke:#2a2420; stroke-linecap:round; }
 .bar-arc .ba-seg{ stroke-linecap:butt; }
-.bar-arc .ba-quest{ stroke:var(--gold); }
 .bar-arc .ba-shield{ stroke:#5fa8d8; }
 .bar-arc .ba-prev{ stroke:rgba(255,255,255,.5); }
 .bar-arc .ba-prev-end{ stroke:#fff; }
@@ -2000,7 +1995,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .reduced-motion .combo-ring{ animation:none; opacity:1; }
 
 /* ---- Health bar segments meet in clean flat edges (the .bar clips the outer rounded ends) ---- */
-.bar .bar-fill, .bar .bar-fill.hp, .bar .bar-fill.quest-hp, .bar .bar-fill.shield-seg, .bar .bar-fill.hp-ghost, .bar .bar-fill.dmg-preview{ border-radius:0 !important; }
+.bar .bar-fill, .bar .bar-fill.hp, .bar .bar-fill.shield-seg, .bar .bar-fill.hp-ghost, .bar .bar-fill.dmg-preview{ border-radius:0 !important; }
 
 
 /* ---- Juice pass 3: quest stamp, status ticks, door kick, hit-stop, camp fuse fly, fire flare ---- */
@@ -2120,7 +2115,7 @@ body.is-resolving .lethal-tag, body.is-resolving .die .face-val .icon-svg, body.
 #ability-btn.rail-ability{ background:var(--class-color,#6a45a8) !important; color:#fff !important; text-shadow:0 1px 0 rgba(0,0,0,.55), 0 0 3px rgba(0,0,0,.45); }
 #ability-btn.rail-ability.armed{ background:var(--class-color,var(--gold)) !important; color:#fff !important; filter:brightness(1.12); }
 
-/* Enemy action badges (Every Turn / Cycles through): stone slab, not gold -- gold means Quest health.
+/* Enemy action badges (Every Turn / Cycles through): stone slab, not gold -- gold was Quest Health (removed Oct 17).
    The icon carries the meaning; the lit "next" action of a boss gets a bone rim and a soft glow. */
 .boss-cycle-item.enemy-action-badge.next{ opacity:1; }
 
@@ -2515,7 +2510,7 @@ html,body{ overflow-x:clip; }
 .camp-die-tile img{ position:absolute !important; inset:9% !important; width:82% !important; height:82% !important; object-fit:contain !important; }
 .pocket-more{ filter:none !important; transform:none !important; border:0 !important; border-top:1px dashed var(--line) !important; box-shadow:none !important; background:transparent !important; margin-bottom:0 !important; }
 
-/* v1.35.0: boss specials, heavy turns, encounter tiers (gold stays reserved for Quest health) */
+/* v1.35.0: boss specials, heavy turns, encounter tiers (gold was reserved for Quest Health, removed Oct 17) */
 .boss-cycle-row .boss-cycle-item.enemy-action-badge.heavy{ background:linear-gradient(#c8402f,#8e221a) !important; color:#fff3dc !important; box-shadow:inset 0 0 0 1.5px #0c0705, 0 2px 0 rgba(0,0,0,.6) !important; animation:heavyTwitch 1.6s ease-in-out infinite; }
 .boss-cycle-row .boss-cycle-item.enemy-action-badge.frozen{ background:linear-gradient(#8cc3e0,#5f97b8) !important; color:#10202a !important; text-decoration:line-through; box-shadow:inset 0 0 0 1.5px #0c0705, 0 2px 0 rgba(0,0,0,.6) !important; }
 @keyframes heavyTwitch{ 0%,82%,100%{ transform:none; } 86%{ transform:translateX(-1px) rotate(-2deg); } 90%{ transform:translateX(1px) rotate(2deg); } 94%{ transform:translateX(-1px) rotate(-1deg); } }

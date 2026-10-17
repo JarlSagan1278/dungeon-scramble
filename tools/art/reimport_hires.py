@@ -16,6 +16,7 @@ PAPER = '--no-paper' not in args
 if not PAPER: args.remove('--no-paper')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paper import paper  # Oct 15: every picture gets the medium paper texture (tools/art/paper.py)
+from black_edge import blacken  # Oct 17: then its outermost 2 px are repainted the line black (no halo)
 if '--names' in args: i = args.index('--names'); NAMES = args[i+1].split('|'); del args[i:i+2]
 ex, out, canvases = args[0], args[1], args[2:]
 os.makedirs(out, exist_ok=True)
@@ -98,6 +99,7 @@ for cv in canvases:
             new = Image.new('RGBA', (NW, NH), (0, 0, 0, 0))
             new.alpha_composite(cc, (tb[0] + (tw-cc.width)//2, tb[3]-cc.height))  # centered, feet on the old baseline
             if PAPER: new = paper(new)
+            new = blacken(new)[0]
             new.save(os.path.join(out, e['file'])); out_man.append(e)
             print('%-34s match %.3f  %dx%d -> %dx%d  (source box %dx%d)' % (name[:34], d, old.width, old.height, NW, NH, crop.shape[1], crop.shape[0]))
 json.dump(out_man, open(os.path.join(out, 'manifest.json'), 'w'), indent=1)

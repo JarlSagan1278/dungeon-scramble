@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.41.59 (Oct 17, 2026)
+- Quests (Jeremy, from the Oct 17 Quest Health study): Quest Health is gone -- every quest pays exactly what its paper says, and the gold "quest health" slice on enemy health bars is removed. Displacer Lair's quests now pay 5 / 5 / 5 (were 10 / 10 / 10, capped at 15), the one card that became trivial without the cap.
+- Shrine renamed (Jeremy): Time-Intensive Shrine is now **Goldberg's Rube Machine** ("It takes all night to run: give up your next campfire..."). Same effect; still borrows the Scrying Spheroid's art until its own is painted.
+- Art (Jeremy: "a lot of outline haloing", most on Fungal Flayer): every picture's outermost 2 px are now the black line colour (alpha kept), removing the light speckle halo the paper texture left around outlines. New repaints get this automatically (tools/art/black_edge.py, run by reimport_hires.py). Art data 3.52 -> 3.18 MB.
+
 ## 1.41.58 (Oct 17, 2026)
 - Art: Batch F repaints imported (Half-life Host, Lichen-Thrope, Fungal Flayer, Illegal Operation, Adhesive Pest Traps, Ditched Heist), at 2x with the paper texture, same size in the game.
 

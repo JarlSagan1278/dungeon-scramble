@@ -147,7 +147,7 @@ const SHOTS = process.env.SHOTS || ''; // set SHOTS=<dir> to save screenshots
   await page.evaluate(() => { const g = document.getElementById('ep-go'); if (g) g.click(); }); await page.waitForTimeout(1800);
   const bc3 = await page.evaluate(() => ({ up: S.campUpgrades.attack, choice: S.campChoice }));
   ok(!/locked/.test(bc.cls) && !bc.dis && !bc.cf && bc2.modal !== 'Train here?' && bc3.up, `base camp combining is free (${JSON.stringify(bc)} ${JSON.stringify(bc2)} ${JSON.stringify(bc3)})`);
-  // Time-Intensive Shrine: campfire out
+  // Goldberg's Rube Machine (was Time-Intensive Shrine): campfire out
   const ti = await page.evaluate(() => { S.screen = 'camp'; S.floorIdx = 1; S.routeStep = 2; S.campChoice = null; S.campRested = true; S.campFireOut = true; S.campUpgrades = {}; S.backPocket = [clone(basic('attack', 1)), clone(basic('attack', 1)), clone(basic('attack', 1))]; render(); const b = document.getElementById('upgrade-attack-1'); return { out: !!document.querySelector('.campfire-choice.out'), cls: b && b.className, dis: b && b.disabled, lockedHint: !!document.querySelector('.upgrade-locked-hint') }; });
   await clean(); await shot('camp_fireout');
   await page.click('#leave-btn'); await page.waitForTimeout(150);

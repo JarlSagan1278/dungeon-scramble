@@ -1156,7 +1156,6 @@ function drawEncounter(kind){
   // Block (like every other status) is a clean slate in a new room too.
   S.playerDOT = 0; S.playerHOT = 0; S.playerBlock = 0;
   e.questsDone = (e.quests||[]).map(()=>false);
-  e.questDamageDealt = 0;
   e.minionsSpawned = 0;
   clearAllMinions();
   e._lastHealth = e.curHealth; // baseline for the heal/damage flash effect
@@ -1206,7 +1205,7 @@ function advanceRoute(){
     S.campRested = false; // true once the campfire is used (Rest or Train)
     S.campChoice = null;  // Oct 14 (Jeremy): the campfire is a choice, 'rest' or 'train' (= combining dice)
     S.campFireOut = false;
-    if(S.skipNextRest && !(S.floorIdx===0 && S.routeStep===0)){ S.campFireOut = true; S.skipNextRest = false; S.campRested = true; logMsg('sys', 'The Time-Intensive Shrine took this campfire: no Rest or upgrades here.', 'bad'); }
+    if(S.skipNextRest && !(S.floorIdx===0 && S.routeStep===0)){ S.campFireOut = true; S.skipNextRest = false; S.campRested = true; logMsg('sys', "Goldberg's Rube Machine took all night: this campfire is out (no Rest or upgrades here).", 'bad'); }
     teleLog('room_start', {type:'Camp', hp:S.health, maxHp:S.maxHealth});
     // a new segment (the stretch of rooms up to the next Camp or the Boss)
     // starts fresh -- one Shrine and one Trap are allowed per segment
@@ -1855,19 +1854,9 @@ function applyQuestReward(e, rewardText){
   else if(low.includes('nullify')) { applyNullify(); }
   else if(low.includes('freeze')) { S.freezeNext = true; logMsg('sys', `Quest reward: ${e.name} will skip its next action.`); }
   else if(amt>0){
-    // questHealth is the total health this encounter can lose from quest
-    // bonuses specifically, across the whole fight -- it caps the sum of
-    // every quest's flat-damage reward, not any single quest's damage alone.
-    const questCap = e.questHealth!=null ? e.questHealth : Infinity;
-    const already = e.questDamageDealt||0;
-    const applied = Math.max(0, Math.min(amt, questCap-already));
-    if(applied>0){
-      e.curHealth = capUpper(e.curHealth-absorbWithShield(e, applied), e.maxHealth);
-      e.questDamageDealt = already+applied;
-      logMsg('dmg', `Bonus ${applied} damage from quest!`);
-    } else {
-      logMsg('sys', `Quest completed, but ${e.name} has already lost its full Quest Health -- no further quest damage.`);
-    }
+    // Every quest pays what its paper says (Oct 17, Jeremy: Quest Health removed after the quest study).
+    e.curHealth = capUpper(e.curHealth-absorbWithShield(e, amt), e.maxHealth);
+    logMsg('dmg', `Bonus ${amt} damage from quest!`);
   }
 }
 

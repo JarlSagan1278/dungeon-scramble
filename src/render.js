@@ -496,14 +496,12 @@ function bossArcBarHTML(o){
   const healCls = fx.heal ? ' ba-heal' : '';
   const healStyle = fx.heal ? ` style="--from:${fx.heal.from}; --to:${hp}; animation-delay:-${fx.heal.delay}ms"` : '';
   s += `<path class="ba-seg ba-hp${healCls}" pathLength="100" d="${P}" stroke-dasharray="${hp.toFixed(2)} 300"${healStyle}/>`;
-  if(o.questW>0) s += `<path class="ba-seg ba-quest" pathLength="100" d="${P}" ${seg(o.questLeft,o.questW)}/>`;
   if(o.shieldVal>0){ const sh = shieldBarHTML(o.shieldVal,o.shieldMax,hp,'enemy'); const m = /shield-seg( sh-\w+)?" style="left:([\d.]+)%; width:([\d.]+)%; ([^"]*)"/.exec(sh);
     if(m) s += `<path class="ba-seg ba-shield${m[1]||''}" pathLength="100" d="${P}" ${seg(+m[2],+m[3])} style="${m[4]}"/>`; }
   if(o.prevW>0){ s += `<path class="ba-seg ba-prev" pathLength="100" d="${P}" ${seg(o.prevLeft,o.prevW)}/><path class="ba-seg ba-prev-end" pathLength="100" d="${P}" ${seg(o.prevLeft+o.prevW-1.2,1.2)}/>`; }
   // round the fill's outer ends to the track's rounded caps
   { // butt-capped segments leave the bar's two ends square: add round end caps in the colour of whichever segment touches that end
     const ends = [{c:'#ff3b3b', a:0, b:hp}];
-    if(o.questW>0) ends.push({c:'#ffc83d', a:o.questLeft, b:o.questLeft+o.questW});
     const mS = o.shieldVal>0 ? /left:([\d.]+)%; width:([\d.]+)%/.exec(shieldBarHTML(o.shieldVal,o.shieldMax,hp,'enemy')||'') : null;
     if(mS) ends.push({c:'#5fa8d8', a:+mS[1], b:+mS[1]+ +mS[2]});
     const startC = ends.find(e=>e.a<0.5 && e.b>0.5), endC = ends.slice().reverse().find(e=>e.b>99.5);
@@ -512,7 +510,7 @@ function bossArcBarHTML(o){
   }
   s = `<mask id="ba-mask" maskUnits="userSpaceOnUse" x="-20" y="-20" width="${W+40}" height="${H+40}"><path d="${P}" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round"/></mask>` + head + `<g mask="url(#ba-mask)">` + s + '</g>';
   // top-light highlight twins (the straight bars are light on top, darker below)
-  s = s.replace(/<path class="ba-seg (ba-hp|ba-quest|ba-shield)([^"]*)"([^>]*)\/>/g, (m,k,rest,attrs)=> m + `<path class="ba-seg ba-hl ba-hl-${k.slice(3)}${rest}"${attrs}/>`);
+  s = s.replace(/<path class="ba-seg (ba-hp|ba-shield)([^"]*)"([^>]*)\/>/g, (m,k,rest,attrs)=> m + `<path class="ba-seg ba-hl ba-hl-${k.slice(3)}${rest}"${attrs}/>`);
   return `<div class="bar bar-arc ${o.cls||''}"><svg viewBox="0 0 ${W} ${H}" width="100%" aria-hidden="true">${s}</svg>${o.numHTML}</div>`;
 }
 // ---- Stone-floor room: the doorway's back wall (brick, above a horizon ledge) and one flagstone floor that
@@ -1466,18 +1464,6 @@ let foPlayer = null; // the hero's half of the face-off band, set each renderGam
 function renderEncounterCard(e, mode){
   const curHealthClamped = Math.max(0,e.curHealth);
   const hpPct = e.maxHealth? curHealthClamped/e.maxHealth*100 : 0;
-  // Quest Health used to be spelled out as its own "X/Y remaining" line.
-  // Now it's just a differently-colored slice of the health bar itself: the
-  // outstanding amount a quest could still shave off, shown flush against
-  // the current health level (since that's where the next point of damage,
-  // quest or otherwise, would land).
-  let questSegLeftPct = 0, questSegWidthPct = 0;
-  if(e.maxHealth && e.questHealth!=null){
-    const qhRemaining = Math.max(0, e.questHealth-(e.questDamageDealt||0));
-    const questAmt = Math.min(qhRemaining, curHealthClamped);
-    questSegWidthPct = questAmt/e.maxHealth*100;
-    questSegLeftPct = hpPct - questSegWidthPct;
-  }
   // Live preview of the currently-built (not-yet-committed) path's damage:
   // a hatched ghost slice at the leading edge of the health bar, so the
   // player can see the projected outcome before tapping Go.
@@ -1607,9 +1593,8 @@ function renderEncounterCard(e, mode){
         <div class="fo-vs"><span class="fo-vs-txt${(performance.now()-UIFX.vsAt)<3400?' vs-intro':''}" style="animation-delay:-${Math.max(0,Math.round(performance.now()-UIFX.vsAt))}ms">vs</span></div>
         <div class="fo-side fo-enemy${isBoss?' fo-boss-side':''}">
           ${doorDustHTML}<div class="fo-fig enc-portrait ${sz>1.05?'fo-big ':''}${(sz>1.05&&/Boss/.test(e.type))?'fo-bossbig ':''}${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}" style="--sz:${sz}">${monsterFig}</div><div class="fo-floor"></div>
-          <div class="fo-hpwrap status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;">${isBoss ? bossArcBarHTML({hpPct, questLeft:questSegLeftPct, questW:questSegWidthPct, prevLeft:dmgPreviewLeftPct, prevW:dmgPreviewWidthPct, shieldVal:e.curShield, shieldMax:e.maxHealth, cls:`${fx.cls} ${killHint?'bar-'+killHint.state:''}`, numHTML:`<span class="bar-num">${curHealthClamped.toFixed(0)}${shieldNumHTML(e.curShield)}/${e.maxHealth}</span>`}) : `<div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
+          <div class="fo-hpwrap status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;">${isBoss ? bossArcBarHTML({hpPct, prevLeft:dmgPreviewLeftPct, prevW:dmgPreviewWidthPct, shieldVal:e.curShield, shieldMax:e.maxHealth, cls:`${fx.cls} ${killHint?'bar-'+killHint.state:''}`, numHTML:`<span class="bar-num">${curHealthClamped.toFixed(0)}${shieldNumHTML(e.curShield)}/${e.maxHealth}</span>`}) : `<div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
               ${hpFillHTML('enemy','hp',hpPct)}
-              ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
               ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
               ${shieldBarHTML(e.curShield, e.maxHealth, hpPct, 'enemy')}<span class="bar-num">${curHealthClamped.toFixed(0)}${shieldNumHTML(e.curShield)}/${e.maxHealth}</span>
             </div>`}${fx.deltaHTML}${tickFloatersHTML('enemy')}<div class="kill-hint fo-hint ${killHint?'kill-hint-'+killHint.state:''}" ${killHint?`data-hint="${killHint.state}"`:''}>${killHint?killHint.text:'&nbsp;'}</div></div>
@@ -1637,7 +1622,6 @@ function renderEncounterCard(e, mode){
           <div class="enc-vitals">
             <div class="bar-row status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;"><span>${iconSpan('heal')}</span><div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
                 <div class="bar-fill hp" style="width:${hpPct}%"></div>
-                ${questSegWidthPct>0?`<div class="bar-fill quest-hp" style="left:${questSegLeftPct}%; width:${questSegWidthPct}%;" title="Quest Health remaining"></div>`:''}
                 ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
               </div><span>${curHealthClamped.toFixed(0)}/${e.maxHealth}</span>${fx.deltaHTML}</div>
             ${killHint?`<div class="kill-hint kill-hint-${killHint.state}" data-hint="${killHint.state}">${killHint.text}</div>`:''}
@@ -4242,7 +4226,7 @@ function applyPocketCollapse(){
 // Train = combining dice in the Upgrade section below (Jeremy: "the upgrading should be the fusing").
 function campFusionsReady(){ let n = 0; ['attack','maneuver'].forEach(cat=>{ if(!S.campUpgrades[cat]) [1,2].forEach(lv=>{ if(canUpgrade(cat,lv)) n++; }); }); return n; }
 function campfireChoiceHTML(){
-  if(S.campFireOut) return `<div class="campfire-choice out"><div class="cf-label">The campfire is out ${infoDot('The Time-Intensive Shrine took this campfire: no Rest or upgrades at this Camp.')}</div></div>`;
+  if(S.campFireOut) return `<div class="campfire-choice out"><div class="cf-label">The campfire is out ${infoDot('Goldberg&#39;s Rube Machine took all night: no Rest or upgrades at this Camp.')}</div></div>`;
   const ch = S.campChoice, n = campFusionsReady(), est = restHealEstimate();
   const restSub = ch==='rest' ? `Healed +${S.campHealed||0}` : (S.health>=S.maxHealth ? 'Already at full health' : (est>0 ? '' : 'Heals nothing here'));
   const trainSub = ch==='train' ? ((S.campUpgrades.attack||S.campUpgrades.maneuver) ? 'Dice combined' : 'Combine dice below') : (n ? 'Unlocks combining below' : 'No sets of 3 yet');
