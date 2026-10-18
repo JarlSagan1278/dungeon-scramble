@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.64';
+const GAME_VERSION = '1.41.65';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -662,9 +662,9 @@ const ENCOUNTER_SIZE = {
   'Viscous Orb':0.55,'Filement Bunny':.75,'Feral Pet Rock':0.55,'Beaker Breakers':0.6,'Leper Colonizers':0.95,
   'Wooden Golem':1.1,'Amanitabomination':1.3,
   'Displacer Lair':1.1,'Rigged Sporks':0.75,'Leper Con-Trap':1.05,
-  'Rogue Golemancer':1.25,'Heating Elemental':1.2,'Grosteque Grafter':1.45,
+  'Rogue Golemancer':1.6,'Heating Elemental':1.2,'Grosteque Grafter':1.45,
   'Displacer Kitty':0.65,'Armored Gear-Pest':0.75,'Rusty Golem':1,'Rogue Technician':0.95,'The Warcart':1.45,
-  'Blastogenesis Engine':1.05,'Half-life Host':1.1,'Lichen-Thrope':1.3,'Fungal Flayer':1.15,
+  'Blastogenesis Engine':1.05,'Half-life Host':1,'Lichen-Thrope':1.3,'Fungal Flayer':1.15,
   'The Necrorancher':1.05,'Bellicose Biomancer':1.05,'Ceramic Golem':1.25,
   'Morel Dilemma':1,'Chimeric Sludge':1.15,'Gnome Chomper':1.05,'Gnomeowners Association':1.1,'Gestalt Network':1.15,
   "Oilephant's Foot":1.3,
@@ -677,6 +677,6 @@ const ENCOUNTER_SIZE = {
 };
 // Oct 15 (Jeremy, Monster Footing page): how far each monster sits lower (+) or higher (-) in the face-off, in % of its
 // picture's height, so it scales with the screen. Set by dragging each one on the page; missing = 0.
-const ENCOUNTER_DROP = {"Amanitabomination":-5.3,"Beaker Breakers":1.0,"Bellicose Biomancer":2.2,"Ceramic Golem":2.1,"Chimeric Sludge":-5.3,"Displacer Kitty":-2.9,"Eelagator Escapee":5.5,"Extractnid Matriarch":-13.5,"Feral Pet Rock":7.1,"Filement Bunny":-1.2,"Fungal Flayer":3.9,"Gestalt Network":4.2,"Gnome Chomper":10.8,"Grafted Grifter":4.1,"Half-life Host":8.1,"Leper Colonizers":5.7,"Lichen-Thrope":-3.4,"Morel Dilemma":-6.4,"Myceleus, Co-consul of Rot":0.8,"Profane Geometry":3.9,"Rogue Golemancer":6.1,"Roudy Rinotter":1.2,"Sacred(?) Geometry":-1.8,"The Necrorancher":6.2,"The Punished":-7.0,"The Warcart":-10.4,"Toadtaur Warrior":-3.0,"Toadtaur Wizard, Assistant to the Co-consul":7.8,"United Separatists":-2.0,"Whence Wolf":4.0,"Wooden Golem":4.9};
+const ENCOUNTER_DROP = {"Grosteque Grafter":3.1,"Amanitabomination":-5.3,"Beaker Breakers":1.0,"Bellicose Biomancer":2.2,"Ceramic Golem":2.1,"Chimeric Sludge":-5.3,"Displacer Kitty":-2.9,"Eelagator Escapee":5.5,"Extractnid Matriarch":-13.5,"Feral Pet Rock":7.1,"Filement Bunny":-1.2,"Fungal Flayer":3.9,"Gestalt Network":4.2,"Gnome Chomper":10.8,"Grafted Grifter":4.1,"Half-life Host":3.6,"Leper Colonizers":5.7,"Lichen-Thrope":-3.4,"Morel Dilemma":-6.4,"Myceleus, Co-consul of Rot":0.8,"Profane Geometry":3.9,"Rogue Golemancer":21.7,"Roudy Rinotter":1.2,"Sacred(?) Geometry":-1.8,"The Necrorancher":6.2,"The Punished":-7.0,"The Warcart":-10.4,"Toadtaur Warrior":-3.0,"Toadtaur Wizard, Assistant to the Co-consul":7.8,"United Separatists":-2.0,"Whence Wolf":4.0,"Wooden Golem":4.9};
 function encounterDrop(e){ return (e && ENCOUNTER_DROP[e.name]) || 0; }
 function encounterSize(e){ if(!e) return 1; const v = ENCOUNTER_SIZE[e.name]; return v || (/Boss/.test(e.type) ? 1.35 : 1); }

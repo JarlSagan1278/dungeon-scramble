@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.65 (Oct 18, 2026)
+- Monster Footing moves from Jeremy: Rogue Golemancer bigger (1.6x) and 28 px lower, Grosteque Grafter 5 px lower, Half-life Host size 1.0 (feet kept in place), Ecclectrical Outlet faces the other way. The Footing page was refreshed with the current art (batches F-I).
+
 ## 1.41.64 (Oct 17, 2026)
 - Batch I art (Floor 3): The Punished (now round instead of tall), Profane Geometry, Sacred(?) Geometry, Ergot Eruption, Self-Replicating Forge, Bio-Mutant Escape.
 
