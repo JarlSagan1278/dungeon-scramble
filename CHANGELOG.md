@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.41.66 (Oct 19, 2026)
+- Batch J art: Extruzeon, Myceleus, Toadtaur Wizard, Toadtaur Warrior, Eelagator Escapee, Whence Wolf. Batch K art: Untamed Unicrows, Prickly Porcupanther, Rabbid Rabbats, Roudy Rinotter.
+- Monster Footing round 4 (Jeremy): Bellicose Biomancer 1.35x, Gnome Chomper 1.1x, Gnomeowners Association 1.0x, The Punished 0.95x and turned; Chimeric Sludge, Extractnid Matriarch, Morel Dilemma, Toadtaur Warrior lower, Sacred(?) Geometry higher; Gestalt Network and Department Spore face the other way. Feet measured to within 0.1 px of the page.
+
 ## 1.41.65 (Oct 18, 2026)
 - Monster Footing moves from Jeremy: Rogue Golemancer bigger (1.6x) and 28 px lower, Grosteque Grafter 5 px lower, Half-life Host size 1.0 (feet kept in place), Ecclectrical Outlet faces the other way. The Footing page was refreshed with the current art (batches F-I).
 

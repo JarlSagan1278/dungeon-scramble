@@ -1499,8 +1499,8 @@ function healthFX(current, last){
 // Encounters whose current art is known to be the wrong picture: show the placeholder until the right art is supplied.
 const ART_WRONG = new Set([]);
 // Shrines face the way they were drawn unless listed here (Monster Footing page, Oct 16)
-const SHRINE_FLIP = new Set(['Ecclectrical Outlet']); // Monster Footing page, Oct 18
-const ENCOUNTER_NO_FLIP = new Set(['Grafted Grifter','Whence Wolf','Roudy Rinotter','Viscous Orb','Unbound Automa','Rogue Golemancer','Heating Elemental','Displacer Kitty','Armored Gear-Pest','Blastogenesis Engine','Half-life Host','Adhesive Pest Traps','The Necrorancher','Bellicose Biomancer','Ceramic Golem','Chimeric Sludge','Toadtaur Warrior','Rabbid Rabbats','Oilephant\'s Foot','Gestalt Network']); // Oct 15 (Jeremy): Toadtaur Warrior and Rabbid Rabbats face the other way
+const SHRINE_FLIP = new Set(['Ecclectrical Outlet','Department Spore']); // Monster Footing page, Oct 18
+const ENCOUNTER_NO_FLIP = new Set(['Grafted Grifter','Whence Wolf','Roudy Rinotter','Viscous Orb','Unbound Automa','Rogue Golemancer','Heating Elemental','Displacer Kitty','Armored Gear-Pest','Blastogenesis Engine','Half-life Host','Adhesive Pest Traps','The Necrorancher','Bellicose Biomancer','Ceramic Golem','Chimeric Sludge','Toadtaur Warrior','Rabbid Rabbats','Oilephant\'s Foot','The Punished']); // Oct 19 footing page: Gestalt Network faces the default way, The Punished turned // Oct 15 (Jeremy): Toadtaur Warrior and Rabbid Rabbats face the other way
 // Quest paper nudges (Oct 17 design fixes): [px left, px up] for the monsters whose art would otherwise hide the
 // reward badges. Monsters always stand in front of the paper, so the paper moves instead (measured at 395x769).
 const QUEST_PAPER_NUDGE = {'The Strike/Break-er':[-36,-14],'Self-Replicating Forge':[-25,-18],'Bio-Mutant Escape':[-25,-17],'Extractnid Matriarch':[-23,-6],
