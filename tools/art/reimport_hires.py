@@ -4,7 +4,7 @@
 # picture it is (best match against the current, small art), and rebuild that picture at SCALE x its old size,
 # keeping the same padding so it shows at exactly the same size in the game.
 # usage: python3 tools/art/reimport_hires.py <export_dir> <out_dir> <done.png>... [--scale 2] [--names 'A|B|C...'] [--no-paper]
-# --names (Oct 15): the picture names in box order (rows top to bottom, left to right), for repaints changed too much to auto-match.
+# --names (Oct 15): the picture names in box order (rows by box centre, top to bottom, then left to right), for repaints changed too much to auto-match.
 # Portraits are named CONST:index, e.g. 'DWARF_PORTRAITS:3' (Oct 19).
 import json, os, sys
 import numpy as np
@@ -54,7 +54,7 @@ def find_boxes(A):
                     if 0 <= yy < h and 0 <= xx < w and small[yy, xx] and not seen[yy, xx]:
                         seen[yy, xx] = True; stack.append((yy, xx))
             bx0, by0, bx1, by1 = min(xs)*P, min(ys)*P, (max(xs)+1)*P, (max(ys)+1)*P
-            if bx1-bx0 > 150 and by1-by0 > 150: boxes.append((bx0, by0, bx1, by1))
+            if bx1-bx0 > 100 and by1-by0 > 100: boxes.append((bx0, by0, bx1, by1))
     # tighten each to its outermost rows/cols with many pink pixels
     out = []
     for bx0, by0, bx1, by1 in boxes:
@@ -66,7 +66,14 @@ def find_boxes(A):
     while flat:
         t = flat.pop(0); mate = next((f for f in flat if abs(f[0]-t[0]) < 20 and abs(f[2]-t[2]) < 20 and f[1]-t[1] > 150), None)
         if mate: flat.remove(mate); good.append((t[0], min(t[1], t[3])+2, t[2], max(mate[1], mate[3])-2))
-    return sorted(good, key=lambda b: (round(b[1]/300), b[0]))
+    # pink inside a picture (wings, robes) can look like a small box: drop any box that sits inside another one
+    good = [b for b in good if not any(o is not b and o[0] <= b[0] and o[1] <= b[1] and o[2] >= b[2] and o[3] >= b[3] for o in good)]
+    # reading order: group boxes into rows by their centres (a gap of 120px+ starts a new row), then left to right
+    good.sort(key=lambda b: (b[1]+b[3])/2); rows = []
+    for b in good:
+        if rows and (b[1]+b[3])/2 - (rows[-1][-1][1]+rows[-1][-1][3])/2 < 120: rows[-1].append(b)
+        else: rows.append([b])
+    return [b for r in rows for b in sorted(r, key=lambda b: b[0])]
 for cv in canvases:
     img = Image.open(cv).convert('RGBA'); A = np.asarray(img).copy()
     for bi, (bx0, by0, bx1, by1) in enumerate(find_boxes(A)):
