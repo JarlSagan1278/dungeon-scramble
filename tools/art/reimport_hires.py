@@ -5,6 +5,7 @@
 # keeping the same padding so it shows at exactly the same size in the game.
 # usage: python3 tools/art/reimport_hires.py <export_dir> <out_dir> <done.png>... [--scale 2] [--names 'A|B|C...'] [--no-paper]
 # --names (Oct 15): the picture names in box order (rows top to bottom, left to right), for repaints changed too much to auto-match.
+# Portraits are named CONST:index, e.g. 'DWARF_PORTRAITS:3' (Oct 19).
 import json, os, sys
 import numpy as np
 from PIL import Image
@@ -84,7 +85,7 @@ for cv in canvases:
                 if best is None or d < best[0]: best = (d, e, im)
             d, e, old = best
             if NAMES:  # forced by box order
-                hit = next((v for v in cache.values() if v[0]['key'] == NAMES[bi]), None)
+                hit = next((v for v in cache.values() if v[0]['key'] == NAMES[bi] or (v[0]['const'] or '')+':'+v[0]['key'] == NAMES[bi]), None)  # portraits: 'GNOME_PORTRAITS:4'
                 if not hit: print('  name not found:', NAMES[bi]); continue
                 e, old = hit[0], hit[1]; d = 0.0
             name = e['key']

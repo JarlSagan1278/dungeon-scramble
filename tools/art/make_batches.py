@@ -5,6 +5,9 @@ import json, sys
 from PIL import Image, ImageDraw, ImageFont
 man = json.load(open(sys.argv[1]+'/manifest.json'))
 fileof = {e['key']: e['file'] for e in man if e.get('const') == 'MONSTER_ART'}
+# portraits (Oct 19): name them 'DWARF_PORTRAITS:3' etc.; the label reads 'Dwarf portrait 3'
+fileof.update({e['const']+':'+e['key']: e['file'] for e in man if 'PORTRAITS' in (e.get('const') or '')})
+def label(n): return n.split('_')[0].title()+' portrait '+n.split(':')[1] if '_PORTRAITS:' in n else n
 W, H, CW, CH, BOX = 2160, 1580, 720, 790, 617
 MAG = (255, 0, 255, 255)
 font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf', 26)
@@ -28,7 +31,7 @@ for title, names in batches:
         can.alpha_composite(big, (bx, by))
         dashed(d, bx-1, by-1, bx+big.width, by+big.height)
         lines, cur = [], ''
-        for w in n.split(' '):  # wrap long names (e.g. the Toadtaur Wizard's title) so they stay in their cell
+        for w in label(n).split(' '):  # wrap long names (e.g. the Toadtaur Wizard's title) so they stay in their cell
             if cur and len(cur)+1+len(w) > 38: lines.append(cur); cur = w
             else: cur = (cur+' '+w).strip()
         lines.append(cur)
