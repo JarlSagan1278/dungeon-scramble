@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.67 (Oct 20, 2026)
+- Jeremy's repaints: the four Magic dice (Axiom of Choice, Domesticated Displacer, 273.15 Kelvin Box, Exile Elixir; were silhouettes), the 14 shrines with their own art (batches P-R), all 47 remaining character portraits (S-Z) and 51 loot pictures (LOOT_1-4). Portraits capped at 400 px and loot at 220 px (sharp on a 3x phone, art file 5.7 MB).
+
 ## 1.41.66 (Oct 19, 2026)
 - Batch J art: Extruzeon, Myceleus, Toadtaur Wizard, Toadtaur Warrior, Eelagator Escapee, Whence Wolf. Batch K art: Untamed Unicrows, Prickly Porcupanther, Rabbid Rabbats, Roudy Rinotter.
 - Monster Footing round 4 (Jeremy): Bellicose Biomancer 1.35x, Gnome Chomper 1.1x, Gnomeowners Association 1.0x, The Punished 0.95x and turned; Chimeric Sludge, Extractnid Matriarch, Morel Dilemma, Toadtaur Warrior lower, Sacred(?) Geometry higher; Gestalt Network and Department Spore face the other way. Feet measured to within 0.1 px of the page.
