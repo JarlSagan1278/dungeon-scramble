@@ -1,5 +1,8 @@
 # Dungeon Scramble — TODO
 
+## Release checklist (Oct 21)
+The live checklist is the Checklist tab of the release plan doc (https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH): 40 items with owner and status. Next for Claude: #11 strip Floors 2-3 from the demo file, #16 rulebook text refresh, #18 GIFs/screenshots, #19 press kit page.
+
 ## Priority order (updated Oct 15)
 1. **Playtest the new rules (1.41.16): campfire Rest OR Train, and the whole-Pocket revive** (bots now win 56% regular / 38% new; watch whether real players feel it's fair). Then also: **Playtest 1.41.7 features and collect play data.** New to check: harder Floor 3, Extruzeon's Layer by Layer, Maneuver II/III Block faces, the six retuned loot dice, Codex/Bestiary, Records, lethal warning, Skill coach, volume sliders, run card + Save Card, Suggested die (after 10 s), readable enemy chips, solid chip icons, the action fill, long title theme, win/lose stings, tempos 130/135/140. Ask testers to send exports; read `summary` first (floor funnel, first-10-runs win rate, take rates, warned vs unwarned deaths, abandoned runs).
    - Oct 14: first tester, 2 runs, both won (Armsmaster depth 1, Dungeoneer depth 3); one warned down; Grosteque Grafter took 11 turns; Maneuver Die I replaced in 20 of 30 equips. See docs/studies/2026-10-14_playtest_tester1.md. Still need newer players' exports.
