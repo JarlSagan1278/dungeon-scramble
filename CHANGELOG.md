@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased (Oct 21, 2026)
+- Rulebook text refreshed to the current game (1.41.77): Quest Health removed, current quest wording, health ranges now computed from the data, relic shrine offers, camp Train lock, minion and carried-die details, Records Backup, play-data wording. PDF regenerated (31 pages).
+- Demo build (`--demo`) strips Floors 2-3: their encounters, Big Bosses, boss kits and 60 pictures (5.1 MB vs 7.6 MB).
 ## 1.41.77 (Oct 21, 2026)
 - Release prep, Phase 1 (from the release plan):
   - Play data: saying yes now covers runs finished from then on only (no back-catalogue of older runs); the consent card says exactly what is sent (random device id, screen size, error messages).

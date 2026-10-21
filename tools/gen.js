@@ -4,7 +4,7 @@ const ctx={};vm.createContext(ctx);
 const depthSrc=fs.readFileSync(R+'depth.js','utf8'); const dpart=(a,b)=>depthSrc.slice(depthSrc.indexOf(a), depthSrc.indexOf(b));
 vm.runInContext(fs.readFileSync(R+'data.js','utf8')+fs.readFileSync(R+'assets.js','utf8')+
 dpart('const BASE_HP_MUL','const DEPTH_MOD_BY_ID')+'const DREAD_HP=0.2;'+
-';globalThis.O={GAME_VERSION,BOSS_KITS,HEAVY_EVERY,BASE_HP_MUL,DEPTH_MODS,ICON_SVG,ORIGINS,CLASSES,FLOORS,BIG_BOSSES,RELICS,BASIC_DICE,LOGO_IMG,COVER_ART,MONSTER_ART,LOOT_ART,DWARF_PORTRAITS,GNOME_PORTRAITS,HALFLING_PORTRAITS,PIXIE_PORTRAITS};',ctx);
+';globalThis.O={GAME_VERSION,BOSS_KITS,HEAVY_EVERY,ENCOUNTER_TIER,BASE_HP_MUL,DEPTH_MODS,ICON_SVG,ORIGINS,CLASSES,FLOORS,BIG_BOSSES,RELICS,BASIC_DICE,LOGO_IMG,COVER_ART,MONSTER_ART,LOOT_ART,DWARF_PORTRAITS,GNOME_PORTRAITS,HALFLING_PORTRAITS,PIXIE_PORTRAITS};',ctx);
 const O=ctx.O;
 // ---------- icons
 const SLOT=new Set(['hit','combo','leech','block','heal','dot','hot']);
@@ -26,6 +26,11 @@ const tierOf=['alloy','gilded','magic'];
 const img=(s,c='',alt='')=>`<img class="${c}" src="${s}" alt="${alt}">`;
 const MA=O.MONSTER_ART, LA=O.LOOT_ART;
 const bossArt=n=>MA[n]||'';
+// Health at Depth 0, straight from the data (Oct 21 refresh: the hand-typed ranges had drifted)
+const hpAt=(e,i)=>Math.round(e.health*O.BASE_HP_MUL[i]);
+const rng=a=>{const lo=Math.min(...a),hi=Math.max(...a);return lo===hi?''+lo:lo+' – '+hi;};
+const tierOfEnc=e=>O.ENCOUNTER_TIER[e.name]||'standard';
+const HP=O.FLOORS.map((f,i)=>({enemy:rng(f.enemies.filter(e=>tierOfEnc(e)!=='deadly').map(e=>hpAt(e,i))),trap:rng(f.traps.map(e=>hpAt(e,i))),deadly:Math.max(0,...f.enemies.concat(f.traps).filter(e=>tierOfEnc(e)==='deadly').map(e=>hpAt(e,i)))}));
 // ---------- helpers
 const ch=(n,title,body,id)=>`<section class="page" id="${id}"><div class="rib-wrap"><div class="rib"><small>Chapter ${n}</small>${title}</div></div>${body}</section>`;
 const call=(k,t,b)=>`<aside class="call c-${k}"><div class="call-h">${k==='tip'?ic('boost'):k==='warn'?ic('boss'):ic('key')}<span>${t}</span></div><p>${b}</p></aside>`;
@@ -56,12 +61,12 @@ C+=ch(1,'Goal &amp; Run at a Glance',`
 <p>Every floor is the same eight stops, shown on the Route bar at the top of the screen. Long-press any stop to see what it is.</p>
 ${route()}
 <div class="route-lab"><span>Camp</span><span>Room ×3</span><span>Camp</span><span>Room ×2</span><span>Boss</span></div>
-<p>A room is an <b>Enemy</b>, a <b>Trap</b> or a <b>Shrine</b>, and you only learn which when you open the door. Rooms get tougher along a floor: <b>Easy, Standard, Elite</b>, then after the second Camp <b>Standard, Elite</b>, then the Boss. On Floors 2 and 3 an Elite room is sometimes a <b>Deadly</b> foe instead. The first room of a run is always an Easy Enemy. Shrines only appear in rooms that are normally Easy or Standard (Night Shift doesn't change that; they get more common deeper in the dungeon), and between two Camps (or a Camp and the Boss) you meet at most one Trap and one Shrine.</p>
+<p>A room is an <b>Enemy</b>, a <b>Trap</b> or a <b>Shrine</b>, and you only learn which when you open the door. Rooms get tougher along a floor: <b>Easy, Standard, Elite</b>, then after the second Camp <b>Standard, Elite</b>, then the Boss. On Floors 2 and 3 an Elite room is sometimes a <b>Deadly</b> foe instead (on Floor 1 only with the Dread depth modifier). The first room of a run is always an Easy Enemy. Shrines only appear in rooms that are normally Easy or Standard (Night Shift doesn't change that; they get more common deeper in the dungeon), and between two Camps (or a Camp and the Boss) you meet at most one Trap and one Shrine.</p>
 ${tbl(['Floor','Loot','Enemy Health','Trap Health','Boss'],[
- ['1','<span class="tag t-alloy">Alloy</span>','7 – 15','25','Rogue Golemancer, Heating Elemental or Grosteque Grafter'],
- ['2','<span class="tag t-gilded">Gilded</span>','21 – 39','45','The Necrorancher, Bellicose Biomancer or Ceramic Golem'],
- ['3','<span class="tag t-magic">Magic</span>','25 – 67','70','<b>Big Boss:</b> Extruzeon, Myceleus or the Toadtaur Wizard']])}
-<p class="small">Health is shown at Depth 0. Deadly foes have more (up to 48 on Floor 2 and 77 on Floor 3), and some depth modifiers raise it further.</p>
+ ['1','<span class="tag t-alloy">Alloy</span>',HP[0].enemy,HP[0].trap,'Rogue Golemancer, Heating Elemental or Grosteque Grafter'],
+ ['2','<span class="tag t-gilded">Gilded</span>',HP[1].enemy,HP[1].trap,'The Necrorancher, Bellicose Biomancer or Ceramic Golem'],
+ ['3','<span class="tag t-magic">Magic</span>',HP[2].enemy,HP[2].trap,'<b>Big Boss:</b> Extruzeon, Myceleus or the Toadtaur Wizard']])}
+<p class="small">Health is shown at Depth 0. Deadly foes have more (up to ${HP[1].deadly} on Floor 2 and ${HP[2].deadly} on Floor 3), and some depth modifiers raise it further.</p>
 ${call('note','How you win','Defeat the Big Boss. The run ends in defeat when your Health hits 0 and your Back Pocket cannot save you; a save spends the whole Pocket. See Chapter 10.')}
 `,'c1');
 // 2
@@ -93,7 +98,7 @@ ${tbl(['Die','What it is','Faces'],[
 `,'c3');
 // 4
 C+=ch(4,'Taking a Turn',`
-<p>A fight is a series of <b>rounds</b> (the Round counter sits above the Tray). Combat ends the instant either side reaches 0 Health, even mid-round.</p>
+<p>A fight is a series of <b>rounds</b>. The round bubble above the Tray shows the floor and round, e.g. <i>F2 · Rd 3</i>. Combat ends the instant either side reaches 0 Health, even mid-round.</p>
 <ol class="steps">
 <li><b>Scramble.</b> Every die takes a random face. This happens when a room opens and at the end of every round.</li>
 <li><b>Build a Path.</b> Tap a die to start, then tap neighbors to extend. Tap the last die again to step back one. ${btn('Clear')} removes the whole Path (tap it twice once you've built one). A running damage total and any <i>Lethal</i>, <i>Overkill</i> or <i>So close</i> hint update as you build. The chips over the enemy show what it will do <b>next turn</b>, and if that would knock you out, your Health bar turns red with a <b>☠ Lethal next turn</b> tag (it counts the Block, healing, Freeze or kill in the Path you're building).</li>
@@ -137,7 +142,7 @@ ${tbl(['Status','How it works'],[
 ['<b>D.O.T.</b>','At round end the holder takes damage equal to its D.O.T., then it drops by 1 (3 deals 3, then 2, then 1). Your own D.O.T. ignores Block.'],
 ['<b>H.O.T.</b>','At round end the holder heals equal to its H.O.T., then it drops by 1. Never above maximum Health. Your own H.O.T. is capped at 6.'],
 ['<b>Shield</b> (enemy)','Some enemies gain Shield, which soaks up the damage you deal (Hits, Combos and quest bonuses) before their Health is touched. D.O.T. ignores Shield.'],
-['<b>Minion</b>','Covers a random die in your Tray so it counts as a blank (new Minions land after the roll, so you never see what\'s under them). <b>Each point of damage you deal clears one</b>, and so do a Leap over it, a Maneuver landing on it, your Skill, or Nullify (all of them). Minions never carry over to the next fight.']])}
+['<b>Minion</b>','Covers a random die in your Tray so it counts as a blank (new Minions land after the roll, so you never see what\'s under them). <b>Each point of damage your Path deals clears one</b> (quest bonuses and D.O.T. do not), and so do a Leap over it, a Maneuver landing on it, your Skill, or Nullify (all of them). A cleared Minion leaves a blank until the next Scramble. Minions never carry over to the next fight.']])}
 ${call('note','Resets','<b>Every status resets when a new room opens</b>: your Block, D.O.T. and H.O.T., and all of the enemy\'s statuses. Only relics that grant Block at the start of a fight (Hard Hat Act, Stronger Infill) give you any. An armed Boost shows as a gold chip on your status row; long-press any status chip to read it.')}
 `,'c5');
 // 6 encounters
@@ -152,11 +157,12 @@ const bossCards=bossList.map(b=>`<div class="card boss ${b.big?'big':''}"><div c
 C+=ch(6,'Encounters',`
 <p>Every door opens onto one Encounter. The doorway shows its name, Health bar, what it will do next turn, and any quests. The <b>Codex</b> Bestiary keeps a page for every foe you have met.</p>
 <h3>Enemies &amp; Traps</h3>
-<p><b>Enemies</b> are the dungeon's ordinary defenders. <b>Traps</b> have more Health (25, 45 and 70 by floor) and are meant to be beaten with quests rather than raw damage. Each turn an Enemy or Trap performs <i>every</i> action on its card in one go: it hits you, gains Shield, heals, channels H.O.T., adds to your D.O.T., or summons Minions. The chips over the doorway show each one as an icon and a number.</p>
+<p><b>Enemies</b> are the dungeon's ordinary defenders. <b>Traps</b> have more Health (${HP[0].trap} on Floor 1, ${HP[1].trap} on Floor 2, ${HP[2].trap} on Floor 3) and are meant to be beaten with quests rather than raw damage. Each turn an Enemy or Trap performs <i>every</i> action on its card in one go: it hits you, gains Shield, heals, channels H.O.T., adds to your D.O.T., or summons Minions. The chips over the doorway show each one as an icon and a number.</p>
 <p><b>Elite</b> and <b>Deadly</b> foes (tagged in the doorway) have <b>heavy turns</b>: an Elite every 3rd turn, a Deadly every 2nd. A heavy turn doubles its attack (or, with no attack, its biggest Minion, D.O.T. or Shield action; healing is never doubled). The chips count down ("Heavy in 2") and turn red the turn before.</p>
 <h3>Quests</h3>
-<p>Most Enemies and every Trap list <b>quests</b>. Completing one deals its bonus damage at once (or grants its listed effect). Quests are checked once your Path finishes, so "3 maneuvers" means three Maneuver faces in one Path. Each quest counts once per fight. An Encounter's <b>Quest Health</b> caps the total bonus damage its quests can deal.</p>
-<p>Quests ask for: a number of Maneuvers, Dodges, Leaps, Pivots, Combos, Boosts, Heals, Blocks, D.O.T.s, H.O.T.s or Nullifies in one Path; blank dice left unused; a Path of a certain length (or a short one); a damage total in one turn; Block banked up; or surviving until a certain turn. Most rewards are damage, but some put D.O.T. on the foe, give you H.O.T., or trigger a Nullify or Freeze.</p>
+<p>Every Trap, most Bosses and many Enemies list <b>quests</b> on a paper sign. Completing one pays its reward at once, in full: there is no cap on quest damage. Quest damage hits Shield first, like your Hits. Quests are checked once your Path finishes, so "3 Maneuvers" means three Maneuver faces in one Path. Each quest counts once per fight.</p>
+<p>Quests ask for: a number of Maneuvers, Dodges, Leaps, Pivots, Combos, Boosts, Heals, Blocks, support dice (Heal, H.O.T., Block) or Nullifies in one Path; blank dice left unused ("Blanks 10+"); a long Path ("Path 6+") or a short one ("Path 1-3"); a damage total in one turn ("Damage 10+"); an amount of H.O.T. gained or D.O.T. dealt in one turn; Block banked up ("Block 5+"); or reaching a certain round ("Reach Rd 5"). Most rewards are damage, but some put D.O.T. on the foe, give you H.O.T., or trigger a Nullify or Freeze.</p>
+<p>The two <b>Geometry</b> quests are standing rules instead: on Profane Geometry every H.O.T. you gain also lands on it as D.O.T.; on Sacred(?) Geometry every D.O.T. it takes also gives you H.O.T. The reward number caps the total.</p>
 <h3>Shrines</h3><p>A Shrine is a room without a fight: press and hold it to receive its boon. Some offer a choice, and <b>bargain</b> shrines ask a price (maximum Health, or your next Camp rest) or let you walk away. Some shrines also hand you a loot pick (a Scroll Dispenser drops a die along with its scrolls; Madpie Nest and Storied Emporium add one to their relic), and a few let you take two Relics. Themed relic shrines offer relics from one family first.</p>
 ${tbl(['Floor','Shrine','Boon'],shr.map(s=>[s[0],`<b>${s[1]}</b>`,s[2]]))}
 <p class="small">If you already own every Relic, a Relic Shrine heals 10 instead.</p>
@@ -179,16 +185,16 @@ C+=ch(8,'Camp',`
 <ol class="steps">
 <li><b>Organize.</b> Swap any Tray die with any Back Pocket die, as often as you like: tap one die in the Tray and one in the Pocket.</li>
 <li><b>The campfire: Rest or Train.</b> Each Camp's fire gives you <b>one</b> of these, so choose:
-<ul class="rules"><li><b>Rest.</b> The Tray is scrambled and you heal <b>half the non-blank faces</b> it shows, rounded up (Percolation Theory adds 3; the Rationing Rations depth modifier halves or removes it). The button shows about how much you'd heal. Resting also gives you a fresh scramble for the next room.</li>
-<li><b>Train.</b> Combine <b>3 matching Basic dice</b> (same type and level, Tray or Pocket) into one a level higher, up to III: one Attack and one Maneuver per Camp. If dice leave the Tray you need enough spare Pocket dice to refill. Loot dice can't be combined.</li></ul>
-Base Camp has no fire: combining there is free. Goldman's Rube Machine (a shrine) can cost you your next campfire.</li></ol>
-<p>Press ${btn('Break Camp &amp; Continue')} when you are done.</p>
+<ul class="rules"><li><b>Rest.</b> The Tray is scrambled and you heal <b>half the non-blank faces</b> it shows, rounded up (Percolation Theory adds 3; the Rationing Rations depth modifier halves or removes it). Resting also gives you a fresh scramble for the next room.</li>
+<li><b>Train.</b> Tap ${btn('Train')} to unlock the combine buttons (until then they sit under a striped lock). Combine <b>3 matching Basic dice</b> (same type and level, Tray or Pocket) into one a level higher, up to III: one Attack and one Maneuver per Camp. If dice leave the Tray you need enough spare Pocket dice to refill. Loot dice can't be combined.</li></ul>
+The first Rest or Train at a Camp asks you to confirm, since the fire gives only one. Base Camp has no fire: combining there is free. Goldman's Rube Machine (a shrine) can cost you your next campfire.</li></ol>
+<p>Press ${btn('Break Camp &amp; Continue')} when you are done. It only asks first if the fire is still unused.</p>
 `,'c8');
 // 9 relics
 const relCard=r=>`<div class="relic ${r.origin?'orel':''}"><div class="mono">${r.mono}</div><div><b>${r.name}</b>${r.origin?` <small>${r.origin[0].toUpperCase()+r.origin.slice(1)}</small>`:''}<span>${r.desc.replace(/^\+8 maximum health, right now\./,'+8 maximum Health, immediately.')}</span></div></div>`;
 C+=ch(9,'Relics',`
 <p>Relics are <b>permanent passive perks</b> for the rest of a run. They take no Tray space and can't be lost or swapped. You can hold any number, never the same one twice. They show as badges above the doorway; tap to read, and watch them pulse when they fire.</p>
-<h3>Shrine Relics</h3><p>Found at Relic Shrines. General ones (Department Spore, Storied Emporium) draw from every relic; themed ones draw from one family (offense, defense, path and movement, or loot and tempo); bargain ones (Blood-Drive Treats, Goldman's Rube Machine, Faustian Spreadsheet) charge a price. You are shown 3 you don't hold (4 at the Faustian Spreadsheet, +1 with Inductive Step) and keep 1. Each family has its own gem: offense a red triangle, defense a blue emerald, path a green hexagon, loot and tempo a gold round, Origin a purple kite.</p>
+<h3>Shrine Relics</h3><p>Found at Relic Shrines. General ones (Department Spore, Storied Emporium) draw from every relic; themed ones draw from one family (offense, defense, path and movement, or loot and tempo); bargain ones (Blood-Drive Treats, Goldman's Rube Machine, Faustian Spreadsheet) charge a price. You are shown 3 you don't hold and keep 1. Blood-Drive Treats shows 4; Goldman's Rube Machine, Charged Fae-Lines and the Faustian Spreadsheet show 4 and let you keep 2. Inductive Step adds one more to every offer. Each family has its own gem: offense a red triangle, defense a blue emerald, path a green hexagon, loot and tempo a gold round, Origin a purple kite.</p>
 <p class="small">Some relics join the shrines later: Hard Hat Act, Perfect Fifth and Prime Edge after your first win; Scavenger's Acumen, Evasion Tank and Minus-One Mantra after you clear Depth 1. Until then the Codex shows them as locked.</p>
 <div class="relics">${O.RELICS.filter(r=>!r.origin).map(relCard).join('')}</div>
 <h3>Origin Relics</h3><p>Never offered at Shrines. <b>Winning a full run with an Origin earns that Origin's relic</b>, and every later run as that Origin begins with it.</p>
@@ -204,8 +210,8 @@ C+=ch(10,'Defeat',`
 <li>Saved or not, <b>every die in the Back Pocket is spent</b>. Any Pocket is a full safety net, but it can't keep saving you: it arms again when a new die lands in your Pocket (usually your next loot).</li>
 <li>If every die lands blank, or the Pocket is empty, the run ends.</li></ol>
 <p class="small">Combining dice at Camp warns you if it would use your last spare dice.</p>
-${call('note','Carry a die forward','On the Defeated screen you choose one die from the highest tier of Loot dice in your Tray to carry into your next run, where it takes the place of your extra Attack Die I.')}
-<p>Win or lose, the end screen shows a <b>Run Card</b>: your Adventurer, depth, how the run ended, damage, best turn, Block, foes beaten, final Tray and relics. ${btn('Save Card')} saves or shares it as a picture.</p>
+${call('note','Carry a die forward','On the Defeated screen you choose one of the highest-tier dice in your Tray (your best Loot dice, if you have any) to carry into your next run, where it takes the place of your extra Attack Die I.')}
+<p>Win or lose, the end screen shows a <b>Run Card</b>: your Adventurer, depth, how the run ended, damage, best turn, Block, foes beaten, final Tray and relics. ${btn('Save Card')} saves or shares it as a picture; ${btn('Details')} opens achievements and the run summary.</p>
 `,'c10');
 // 11
 C+=ch(11,'Progression &amp; Records',`
@@ -219,16 +225,16 @@ C+=ch(11,'Progression &amp; Records',`
 <h3>Depth</h3>
 <p>After your first win, the character screen lets you go <b>deeper</b>. The base dungeon is <b>Depth 0</b>; each rank of a modifier adds depth, and you may choose up to 2 deeper than your best clear. Deeper runs score more (×1 + ¼ per depth).</p>
 ${tbl(['Modifier','Ranks','Depth per rank','Effect'],O.DEPTH_MODS.map(m=>['<b>'+m.name+'</b>',m.max,m.costs.join(', '),Array.from({length:m.max},(_,i)=>(m.max>1?'<i>'+(i+1)+':</i> ':'')+m.desc(i+1)).join('<br>')]))}
-<p>Each Class shows a rosette <b>badge</b> with the deepest depth you've cleared with it. Clearing deeper also earns account-wide <b>dice finishes</b>, a metal border on your Tray dice, and a title: <b>Bronze</b> at Depth 3 (Delver of the Deep), <b>Silver</b> at 5 (Dread Delver), <b>Gold</b> at 7 (Dungeon Breaker) and <b>Royal</b> at 9 (Scourge of the Dungeon).</p>
+<p>Each Class shows a <b>badge</b> in its own shape (Guard a shield, Armsmaster crossed swords, Arcanist a star with an X, Dungeoneer an archway) with the deepest depth you've cleared with it. Clearing deeper also earns account-wide <b>dice finishes</b>, a metal border on your Tray dice, and a title: <b>Bronze</b> at Depth 3 (Delver of the Deep), <b>Silver</b> at 5 (Dread Delver), <b>Gold</b> at 7 (Dungeon Breaker) and <b>Royal</b> at 9 (Scourge of the Dungeon).</p>
 <h3>Records</h3>
 <ul class="rules">
 <li><b>Achievements</b> are lifetime milestones: First Blood, Dungeon Conqueror, Two Roads, Jack of All Trades (every Origin), Master Tactician (every Class), Into the Deep, Overkill Enthusiast, Shrine Seeker, Monster Hunter, Veteran Adventurer and Heavy Hitter. They never change gameplay.</li>
-<li><b>Run Highlights.</b> The end-of-run screen shows your biggest single turn, biggest Overkill, longest Path and Close Calls. A gold <span class="tag new">NEW BEST</span> appears when one of the first three beats an earlier run.</li>
+<li><b>Run Highlights.</b> The end-of-run screen (under Details) shows your biggest single turn, biggest Overkill, longest Path and Close Calls. A gold <span class="tag new">NEW BEST</span> appears when one of the first three beats an earlier run.</li>
 <li><b>Close Calls.</b> A turn that leaves a foe with 3 Health or less, or a kill 1 to 3 damage short of an Overkill, is called out on screen ("Just 2 HP left!"). Information only.</li>
-<li><b>Records</b> (Settings or title screen) holds your Run History (last 20 runs) and Achievements.</li>
-<li>The <b>Codex</b> has four tabs: <b>Bestiary</b> (every foe you've met, with its moves, flavor and your wins and losses), <b>Dice</b> (Origin dice and every Loot die you've collected), <b>Relics</b> and <b>Key</b> (every action icon, tap for its rule).</li></ul>
+<li><b>Records</b> (Settings or title screen) holds your Run History (last 20 runs), Achievements and <b>Backup</b>: a code holding this device's progress (unlocks, dice, Codex, records, a saved run). Paste it on a new phone to restore it.</li>
+<li>The <b>Codex</b> has four tabs: <b>Bestiary</b> (every foe you've met, with its moves, quests, flavor and your wins and losses), <b>Dice</b> (Origin dice and every Loot die you've collected), <b>Relics</b> and <b>Key</b> (every action icon, tap for its rule).</li></ul>
 <h3>Settings &amp; Play Data</h3>
-<p>The gear menu holds <b>Sound effects</b> and <b>Music</b> volume sliders, Reduce motion, Gentler effects and Vibration, plus How to Play, Codex, Records, Abandon Run and <b>Reset Progress</b>, which erases all unlocks, records and depth bests. <b>Export Play Data</b> packages your recent runs as a file for playtest feedback. The game asks once whether to share play data; if you say yes, each finished run is sent anonymously (no names, only a random device id).</p>
+<p>The gear menu holds <b>Sound effects</b> and <b>Music</b> volume sliders, Reduce motion, Gentler effects, Vibration and the play-data switch, plus the Log, How to Play, Codex, Records, Abandon Run and <b>Reset Progress</b>, which erases all unlocks, records and depth bests. With a keyboard, Enter is Go, Backspace is Clear, and the keys 1234 / qwer / asdf / zxcv tap the matching Tray die. <b>Export Play Data</b> packages your recent runs as a file for playtest feedback. At the end of a run the game asks once whether to share play data; if you say yes, runs you finish from then on are sent with a random device id, screen size and any error messages (no names). The Backup tab shows that id.</p>
 `,'c11');
 // 12 quick ref
 C+=ch(12,'Quick Reference',`
@@ -248,7 +254,7 @@ C+=ch(12,'Quick Reference',`
 <div><b>Bosses</b>Every-turn attack + a telegraphed special · Phase 2 at half Health</div>
 <div><b>Swap / Reroll</b>The used die becomes a Pivot for the turn</div></div>
 <h3>From the Tabletop</h3>
-<p>Dungeon Scramble began as a physical dice game. The video game keeps the rules but takes over the chores: it scrambles the dice, tracks every counter and cube, and shuffles the encounters. The tabletop's multi-Adventurer co-op (extra Health and summed Encounter Health per player) is not part of the video game yet; for now this is a <b>solo</b> experience.</p>
+<p>Dungeon Scramble began as a physical dice game. The video game grew from those rules and now goes its own way: bigger numbers, boss kits, Minions and relics that would be a chore by hand. It scrambles the dice, tracks every counter and shuffles the encounters for you. The tabletop's multi-Adventurer co-op is not part of the video game yet; for now this is a <b>solo</b> experience.</p>
 `,'c12');
 // dice reference
 const diceRef=O.FLOORS.map((f,i)=>{const t=tierOf[i];return `<h3${i===2?' style="break-before:page"':''}><span class="tag t-${t}">${f.lootName}</span> Floor ${i+1} Loot Dice <small>(${f.lootPool.length})</small></h3><div class="dgrid">${f.lootPool.map(d=>`<div class="dcard t-${t}-b"><div class="dart">${LA[d.name]?img(LA[d.name],'',d.name):''}</div><b>${d.name}</b>${faces(d.faces,t)}</div>`).join('')}</div>`;}).join('');

@@ -6,7 +6,7 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - Digital prototype of the owner's (Jeremy's) board game: Boggle-style dice-path building plus dungeon crawling. He builds it with Claude; he is the only designer and the main tester.
 - Core fantasy: kick in doors as an adventurer, clear rooms of monsters, get epic loot. The screen should read as a player-versus-monster face-off.
 - Design goal: every interaction should feel as good as possible and release as much dopamine as possible. He wants more roguelite elements (relics, including origin-specific relics earned by winning).
-- The digital game is no longer bound by the board game ("this is a video game now"). The old tabletop manual is retired; the video-game rulebook (Word + PDF, old-school manual look) is the documentation. Rulebook refresh is pending (it describes build 1.32.28).
+- The digital game is no longer bound by the board game ("this is a video game now"). The old tabletop manual is retired; the video-game rulebook (Word + PDF, old-school manual look) is the documentation. Rulebook text refreshed to build 1.41.77 (Oct 21); gen.js now computes encounter health ranges from data.
 
 ## Distribution and testing
 - Playtest builds ship as an installable web app (home-screen icon, dwarf portrait "icon A") on Netlify: https://dungeon-scramble-mobile.netlify.app/. He plays it on his phone.
