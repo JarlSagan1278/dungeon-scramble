@@ -24,10 +24,46 @@ const head = read('_head.html').replace('<title>Dungeon Scramble</title>', DEMO 
 // Comments are for us, not the player: strip them from the shipped CSS (no string in styles.css contains "/*").
 const styles = read('styles.css').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\n[ \t]*(?=\n)/g, '').replace(/\n{2,}/g, '\n');
 const body = read('_body.html');
-const data = read('data.js').replace('var BUILD = { demo:false, release:false };', `var BUILD = { demo:${DEMO}, release:${RELEASE} };`);
+let data = read('data.js').replace('var BUILD = { demo:false, release:false };', `var BUILD = { demo:${DEMO}, release:${RELEASE} };`);
 if (RELEASE && !/var BUILD = \{ demo:(true|false), release:true \}/.test(data)) throw new Error('build flags line not found in data.js');
 // LOGO_IMG is only used by the rulebook (tools/gen.js reads src/assets.js itself), so the game builds leave it out.
-const assets = read('assets.js').replace(/^const LOGO_IMG = "[^"]*";\n/m, '');
+let assets = read('assets.js').replace(/^const LOGO_IMG = "[^"]*";\n/m, '');
+// Demo build (Oct 21): the free file must not be the whole game. Floors 2-3 (their enemies, traps, shrines, bosses,
+// the Big Bosses and their boss kits) are emptied out of the data, and their pictures are dropped from the art.
+let DEMO_STRIPPED = [];
+if (DEMO) {
+  const vm = require('vm');
+  const LISTS = ['FLOOR2_ENEMIES', 'FLOOR2_TRAPS', 'FLOOR2_SHRINES', 'FLOOR2_BOSSES', 'FLOOR3_ENEMIES', 'FLOOR3_TRAPS', 'FLOOR3_SHRINES', 'BIG_BOSSES'];
+  const names = vm.runInNewContext(data + `\n;[${LISTS.map(l => '...' + l).join(',')}].map(e => e.name)`, { console });
+  const keep = new Set(vm.runInNewContext(data + '\n;[...FLOOR1_ENEMIES,...FLOOR1_TRAPS,...FLOOR1_SHRINES,...FLOOR1_BOSSES].map(e => e.name)', { console }));
+  DEMO_STRIPPED = names.filter(n => !keep.has(n));
+  for (const l of LISTS) {
+    const re = new RegExp('^const ' + l + ' = \\[\\n[\\s\\S]*?\\n\\];', 'm');
+    if (!re.test(data)) throw new Error('demo: could not find ' + l);
+    data = data.replace(re, 'const ' + l + ' = [];');
+  }
+  // boss kits of the removed bosses: drop each "'Name': {" ... matching "}," entry
+  for (const n of DEMO_STRIPPED) {
+    const keys = [`'${n.replace(/'/g, "\\'")}':`, `"${n}":`];
+    for (const k of keys) {
+      let i = data.indexOf(k, data.indexOf('const BOSS_KITS'));
+      if (i < 0 || i > data.indexOf('\n};', data.indexOf('const BOSS_KITS'))) continue;
+      let j = data.indexOf('{', i), depth = 0;
+      for (; j < data.length; j++) { if (data[j] === '{') depth++; else if (data[j] === '}' && --depth === 0) break; }
+      let end = j + 1; if (data[end] === ',') end++;
+      data = data.slice(0, i) + data.slice(end);
+    }
+  }
+  let dropped = 0;
+  for (const n of DEMO_STRIPPED) {
+    for (const k of [`'${n.replace(/'/g, "\\'")}': "data:`, `"${n}": "data:`]) {
+      const i = assets.indexOf(k); if (i < 0) continue;
+      const v = i + k.length - 'data:'.length, e = assets.indexOf('"', v);
+      assets = assets.slice(0, v) + assets.slice(e); dropped++;
+    }
+  }
+  console.log(`Demo: removed ${DEMO_STRIPPED.length} Floor 2-3 encounters (${dropped} pictures).`);
+}
 const logic = read('logic.js');
 const depth = read('depth.js');
 const render = read('render.js');
