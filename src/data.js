@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.74';
+const GAME_VERSION = '1.41.75';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -381,7 +381,7 @@ const MAGIC = lootSet([
   ['Measurably Lucky Test Tube', ['Combo2','Pivot','Freeze','HOT2','HOT2','Nullify']],
   // v1.39.0: fill the action holes (Freeze, Swap, Reroll); faction-themed names.
   ['Axiom of Choice', ['Reroll','Reroll','Hit3','Boost3','Block3','blank']],
-  ['Domesticated Displacer', ['Swap','Swap','Combo3','Combo2','Pivot','Combo2']],
+  ['Trained Transposer', ['Swap','Swap','Combo3','Combo2','Pivot','Combo2']],
   ['273.15 Kelvin Box', ['Freeze','Freeze','Hit3','Hit3','Combo2','blank']],
   ['Exile Elixir', ['Swap','Block4','Block4','Freeze','Heal3','blank']],
 ], 'magic');
@@ -406,7 +406,7 @@ const FLOOR1_ENEMIES = [
   enc('Prickly Porcupanther','Enemy',18,{dmg:2,shield:1,dreadOnly:true,quests:['5 damage: 2 block'],flavor:'"Prickly of both texture and temperament."'}),
 ];
 const FLOOR1_TRAPS = [
-  enc('Displacer Lair','Trap',25,{dmg:3,quests:['5 damage: any 6 actions','5 damage: any 8 actions','5 damage: any 10 actions'],flavor:'"Move either very fast or very slow. Don\u2019t touch the bellies"'}),
+  enc('Transposer Lair','Trap',25,{dmg:3,quests:['5 damage: any 6 actions','5 damage: any 8 actions','5 damage: any 10 actions'],flavor:'"Move either very fast or very slow. Don\u2019t touch the bellies"'}),
   enc('Rigged Sporks','Trap',25,{dmg:1,shield:2,quests:['10 damage: 4 maneuvers','10 damage: 2 leap','10 damage: 2 dodge'],flavor:'Elegantly spiked-spores, set to blow upon detecting the slightest movement.'}),
   enc('Unauthorized Transfusion','Trap',25,{dmg:1,hot:1,quests:['10 damage: 3 maneuvers','10 damage: 2 block','1 nullify: 8 damage/turn'],flavor:'"Everyone is a universal donor if you aren\u2019t picky"'}),
   enc('Leper Con-Trap','Trap',25,{dmg:2,minion:1,quests:['10 damage: 3 maneuvers','20 damage: 10 blanks','1 nullify: 8 damage/turn'],flavor:'"Do not listen to anyone who claims to already know where the treasure is"'}),
@@ -438,7 +438,7 @@ const FLOOR1_BOSSES = [
 ];
 
 const FLOOR2_ENEMIES = [
-  enc('Displacer Kitty','Enemy',18,{dmg:3,flavor:'"I think that one had a collar. Where\u2019d it go?"'}),
+  enc('Transposer Kitty','Enemy',18,{dmg:3,flavor:'"I think that one had a collar. Where\u2019d it go?"'}),
   enc('Armored Gear-Pest','Enemy',17,{dmg:2,flavor:'A well-documented example of dungeon adaptation.'}),
   enc('Rusty Golem','Enemy',20,{dmg:4,quests:['16 damage: survive turn 4'],flavor:'"Looks like it was falling apart on its own"'}),
   enc('Rogue Technician','Enemy',16,{dmg:4,flavor:'"I\u2019m not here to fix your lockpick, I have an ideology!"'}),
@@ -555,12 +555,12 @@ const ENCOUNTER_TIER = {
   'Filement Bunny':'easy','Wooden Golem':'easy','Beaker Breakers':'easy','United Separatists':'easy',
   'Rigged Sporks':'easy','Unauthorized Transfusion':'easy',
   'Untamed Unicrows':'standard','Prickly Porcupanther':'deadly',
-  'Feral Pet Rock':'standard','Viscous Orb':'standard','Grafted Grifter':'standard','Displacer Lair':'standard',
+  'Feral Pet Rock':'standard','Viscous Orb':'standard','Grafted Grifter':'standard','Transposer Lair':'standard',
   'Amanitabomination':'elite','Leper Colonizers':'elite','Unbound Automa':'elite','Leper Con-Trap':'elite',
   // Floor 2
   'Unventilated Workshop':'easy','Adhesive Pest Traps':'easy','The Warcart':'easy','Armored Gear-Pest':'easy',
   'Rabbid Rabbats':'easy','Roudy Rinotter':'easy','Whence Wolf':'deadly',
-  'Rogue Technician':'standard','Displacer Kitty':'standard','Blastogenesis Engine':'standard','Ditched Heist':'standard',
+  'Rogue Technician':'standard','Transposer Kitty':'standard','Blastogenesis Engine':'standard','Ditched Heist':'standard',
   'Half-life Host':'elite','Rusty Golem':'elite','Illegal Operation':'elite','Lichen-Thrope':'elite','Fungal Flayer':'elite',
   'The Strike/Break-er':'deadly',
   // Floor 3
@@ -679,9 +679,9 @@ const ENCOUNTER_SIZE = {
   'Alchemists Stone':0.85,
   'Viscous Orb':0.55,'Filement Bunny':0.9,'Feral Pet Rock':0.6,'Beaker Breakers':0.6,'Leper Colonizers':0.95,
   'Wooden Golem':1.1,'Amanitabomination':1.3,
-  'Displacer Lair':1.1,'Rigged Sporks':0.75,'Leper Con-Trap':1.05,
+  'Transposer Lair':1.1,'Rigged Sporks':0.75,'Leper Con-Trap':1.05,
   'Rogue Golemancer':1.6,'Heating Elemental':1.2,'Grosteque Grafter':1.45,
-  'Displacer Kitty':0.65,'Armored Gear-Pest':0.75,'Rusty Golem':1,'Rogue Technician':0.95,'The Warcart':1.45,
+  'Transposer Kitty':0.65,'Armored Gear-Pest':0.75,'Rusty Golem':1,'Rogue Technician':0.95,'The Warcart':1.45,
   'Blastogenesis Engine':1.05,'Half-life Host':1,'Lichen-Thrope':1.3,'Fungal Flayer':1.15,
   'The Necrorancher':1.05,'Bellicose Biomancer':1.35,'Ceramic Golem':1.25,
   'Morel Dilemma':1,'Chimeric Sludge':1.15,'Gnome Chomper':1.1,'Gnomeowners Association':1,'Gestalt Network':1.15,
@@ -695,6 +695,6 @@ const ENCOUNTER_SIZE = {
 };
 // Oct 15 (Jeremy, Monster Footing page): how far each monster sits lower (+) or higher (-) in the face-off, in % of its
 // picture's height, so it scales with the screen. Set by dragging each one on the page; missing = 0.
-const ENCOUNTER_DROP = {"Thom's Guide":-21.4,"Surgery Community Theatre":-16.0,"Ruinous Rune Room":-2.5,"Madpie Nest":11.4,"Loot-Diagonalizer":-3.6,"Healthy Hearth":-5.5,"Goldberg's Rube Machine":3.8,"Ferrous Maiden":-17.3,"Faustian Spreadsheet":4.4,"Cryotherapist":4.2,"Charged Fae-Lines":20.6,"Blood-Drive Treats":4.0,"Ark of the Flood":-1.5,"Untamed Unicrows":-16.8,"Scrying Spheroid":-28.5,"Sacred Bellows":-2.4,"Rabbid Rabbats":-10.9,"Prickly Porcupanther":2.0,"Heron's Fountain":4.4,"Half-Full Fountain":4.4,"Half-Empty Fountain":4.4,"Extruzeon, Co-consul of Waste":3.2,"Expediting Spores":0.0,"Enchanted Anvil":0.0,"Ecclectrical Outlet":-0.1,"Department Spore":-5.1,"Alchemists Stone":-15.7,"Gnomeowners Association":4.7,"Grosteque Grafter":3.1,"Amanitabomination":-5.3,"Beaker Breakers":1.0,"Bellicose Biomancer":8.3,"Ceramic Golem":2.1,"Chimeric Sludge":5.5,"Displacer Kitty":-2.9,"Eelagator Escapee":5.5,"Extractnid Matriarch":-7.8,"Feral Pet Rock":6.4,"Filement Bunny":-1.2,"Fungal Flayer":3.9,"Gestalt Network":4.2,"Gnome Chomper":15.3,"Grafted Grifter":-3.3,"Half-life Host":3.6,"Leper Colonizers":1.9,"Lichen-Thrope":-3.4,"Morel Dilemma":1.6,"Myceleus, Co-consul of Rot":2.4,"Profane Geometry":3.9,"Rogue Golemancer":21.7,"Roudy Rinotter":5.2,"Sacred(?) Geometry":-5.3,"The Necrorancher":6.2,"The Punished":-12.4,"The Warcart":-10.4,"Toadtaur Warrior":2.6,"Toadtaur Wizard, Assistant to the Co-consul":7.8,"United Separatists":-2.0,"Whence Wolf":8.1,"Wooden Golem":4.9};
+const ENCOUNTER_DROP = {"Thom's Guide":-21.4,"Surgery Community Theatre":-16.0,"Ruinous Rune Room":-2.5,"Madpie Nest":11.4,"Loot-Diagonalizer":-3.6,"Healthy Hearth":-5.5,"Goldberg's Rube Machine":3.8,"Ferrous Maiden":-17.3,"Faustian Spreadsheet":4.4,"Cryotherapist":4.2,"Charged Fae-Lines":20.6,"Blood-Drive Treats":4.0,"Ark of the Flood":-1.5,"Untamed Unicrows":-16.8,"Scrying Spheroid":-28.5,"Sacred Bellows":-2.4,"Rabbid Rabbats":-10.9,"Prickly Porcupanther":2.0,"Heron's Fountain":4.4,"Half-Full Fountain":4.4,"Half-Empty Fountain":4.4,"Extruzeon, Co-consul of Waste":3.2,"Expediting Spores":0.0,"Enchanted Anvil":0.0,"Ecclectrical Outlet":-0.1,"Department Spore":-5.1,"Alchemists Stone":-15.7,"Gnomeowners Association":4.7,"Grosteque Grafter":3.1,"Amanitabomination":-5.3,"Beaker Breakers":1.0,"Bellicose Biomancer":8.3,"Ceramic Golem":2.1,"Chimeric Sludge":5.5,"Transposer Kitty":-2.9,"Eelagator Escapee":5.5,"Extractnid Matriarch":-7.8,"Feral Pet Rock":6.4,"Filement Bunny":-1.2,"Fungal Flayer":3.9,"Gestalt Network":4.2,"Gnome Chomper":15.3,"Grafted Grifter":-3.3,"Half-life Host":3.6,"Leper Colonizers":1.9,"Lichen-Thrope":-3.4,"Morel Dilemma":1.6,"Myceleus, Co-consul of Rot":2.4,"Profane Geometry":3.9,"Rogue Golemancer":21.7,"Roudy Rinotter":5.2,"Sacred(?) Geometry":-5.3,"The Necrorancher":6.2,"The Punished":-12.4,"The Warcart":-10.4,"Toadtaur Warrior":2.6,"Toadtaur Wizard, Assistant to the Co-consul":7.8,"United Separatists":-2.0,"Whence Wolf":8.1,"Wooden Golem":4.9};
 function encounterDrop(e){ return (e && ENCOUNTER_DROP[e.name]) || 0; }
 function encounterSize(e){ if(!e) return 1; const v = ENCOUNTER_SIZE[e.name]; return v || (/Boss/.test(e.type) ? 1.35 : 1); }

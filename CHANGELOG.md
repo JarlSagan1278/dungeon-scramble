@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.41.75 (Oct 21, 2026)
+- Renames (Jeremy, release prep: names that borrowed another game's trademark): Displacer Kitty -> Transposer Kitty, Displacer Lair -> Transposer Lair, Domesticated Displacer -> Trained Transposer. Saved runs, dice copies, the Codex and run history carry over (one-time rename on load). Rulebook PDF regenerated.
 ## 1.41.74 (Oct 21, 2026)
 - Jeremy's BATCH_AA restyle: Grafted Grifter, Anti-Euclidian Space (now pink accents), Oilephant's Foot and Ergot Eruption get crisp black outlines so they match the rest of the art. Same size and footing in game; Anti-Euclidian Space and Ergot Eruption also at higher resolution.
 ## 1.41.73 (Oct 21, 2026)

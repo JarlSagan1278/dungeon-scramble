@@ -4,6 +4,23 @@
    ========================================================================= */
 let S = null;
 
+// Renamed content (Oct 21, 1.41.75: names that borrowed other games' trademarks). Saves, dice copies, the Codex,
+// run history and play data store names as JSON strings, so swap the quoted old name for the new one in every
+// dungeonScramble* key, once per load, before anything reads storage.
+const RENAMED = { 'Domesticated Displacer':'Trained Transposer', 'Displacer Kitty':'Transposer Kitty', 'Displacer Lair':'Transposer Lair' };
+(function migrateRenamed(){
+  try{
+    for(let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if(!k || k.indexOf('dungeonScramble') !== 0) continue;
+      const v = localStorage.getItem(k); if(!v || v.indexOf('Displacer') < 0) continue;
+      let out = v;
+      for(const [a, b] of Object.entries(RENAMED)) out = out.split(JSON.stringify(a)).join(JSON.stringify(b));
+      if(out !== v) localStorage.setItem(k, out);
+    }
+  } catch(e){ /* storage unavailable: nothing to migrate */ }
+})();
+
 const SAVE_KEY = 'dungeonScrambleSave_v1';
 
 // Builds a plain, JSON-safe snapshot of S. klass/origin are stored as ids

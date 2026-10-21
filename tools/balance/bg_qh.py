@@ -13,7 +13,7 @@ O = ['dwarf','gnome','halfling','pixie']; K = ['armsmaster','guard','arcanist','
 SEEK = dict(qSeek=4)
 VAR = {'cap': dict(qhMode='cap'), 'none': dict(qhMode='none'),
        'scap': dict(SEEK, qhMode='cap'), 'snone': dict(SEEK, qhMode='none'),
-       'smul': dict(SEEK, qhMode='mul', qhMul=1.5), 'sexc': dict(SEEK, qhMode='except', qhKeep=['Displacer Lair']),
+       'smul': dict(SEEK, qhMode='mul', qhMul=1.5), 'sexc': dict(SEEK, qhMode='except', qhKeep=['Transposer Lair']),
        'inc': dict(qhMode='cap', questAware=False), 'incnone': dict(qhMode='none', questAware=False)}
 jobs = sys.argv[2:] or ['x7:cap','x7:none','r0:cap','r0:none','x7:scap','x7:snone','r0:scap','r0:snone','x7:inc','r0:inc']
 cells = []
