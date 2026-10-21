@@ -12,3 +12,6 @@ tools/rulebook.html
 # study scratch (snapshots, per-run temp scripts)
 tools/balance/_*
 __pycache__/
+
+# Marketing screenshots/GIFs (large, regenerable; delivered to Jeremy directly, Oct 21)
+docs/release/media/
