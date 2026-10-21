@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.69 (Oct 21, 2026)
+- Jeremy's repainted Floor 3 shrines (new Batch R upload): Scrying Spheroid, Heron's Fountain, Storied Emporium, Scroll Dispenser: TSOP.
+
 ## 1.41.68 (Oct 21, 2026)
 - Jeremy's art for the 18 shrines that were borrowing another shrine's picture (batches L-N), including Goldberg's Rube Machine. Every monster and shrine now has its own art; SHRINE_ART_STANDIN is empty.
 - Monster Footing round 5 (Jeremy, Oct 20): 23 size/height moves (Alchemists Stone, Department Spore, Ecclectrical Outlet, Eelagator Escapee, Enchanted Anvil, Expediting Spores, Extruzeon, Feral Pet Rock, Filement Bunny, Grafted Grifter, the three fountains, Leper Colonizers, Myceleus, Prickly Porcupanther, Rabbid Rabbats, Roudy Rinotter, Sacred Bellows, Scrying Spheroid, Toadtaur Warrior, Untamed Unicrows, Whence Wolf). Feet within 0.4 px of the page.
