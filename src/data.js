@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.70';
+const GAME_VERSION = '1.41.71';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -652,16 +652,29 @@ const SHRINE_ART_STANDIN = {};
 // Under 1 = small/scuttling things; over 1 = hulking things that loom behind their own health bar.
 // Anything unlisted is 1 (Bosses default to 1.3).
 const ENCOUNTER_SIZE = {
+  'Thom\'s Guide':0.75,
+  'Surgery Community Theatre':1.55,
+  'Ruinous Rune Room':1.4,
+  'Madpie Nest':1.25,
+  'Loot-Diagonalizer':1.25,
+  'Healthy Hearth':1.35,
+  'Goldberg\'s Rube Machine':1.4,
+  'Ferrous Maiden':1.65,
+  'Faustian Spreadsheet':1.2,
+  'Cryotherapist':1.25,
+  'Charged Fae-Lines':1.25,
+  'Blood-Drive Treats':1.3,
+  'Ark of the Flood':1.2,
   'Scrying Spheroid':1,
   'Sacred Bellows':1.15,
   'Myceleus, Co-consul of Rot':1.1,
   'Heron\'s Fountain':1.2,
   'Half-Full Fountain':1.2,
   'Half-Empty Fountain':1.2,
-  'Extruzeon, Co-consul of Waste':1.2,
+  'Extruzeon, Co-consul of Waste':1.25,
   'Expediting Spores':0.65,
   'Enchanted Anvil':1.05,
-  'Ecclectrical Outlet':1.45,
+  'Ecclectrical Outlet':1.3,
   'Department Spore':1.05,
   'Alchemists Stone':0.85,
   'Viscous Orb':0.55,'Filement Bunny':0.9,'Feral Pet Rock':0.6,'Beaker Breakers':0.6,'Leper Colonizers':0.95,
@@ -673,7 +686,7 @@ const ENCOUNTER_SIZE = {
   'The Necrorancher':1.05,'Bellicose Biomancer':1.35,'Ceramic Golem':1.25,
   'Morel Dilemma':1,'Chimeric Sludge':1.15,'Gnome Chomper':1.1,'Gnomeowners Association':1,'Gestalt Network':1.15,
   "Oilephant's Foot":1.3,
-  'Untamed Unicrows':0.9,'Prickly Porcupanther':0.9,'Rabbid Rabbats':1.15,'Roudy Rinotter':0.9,'Whence Wolf':1.1,'Eelagator Escapee':0.6,'Toadtaur Warrior':1.1,'Toadtaur Wizard, Assistant to the Co-consul':1.15,'Extractnid Matriarch':1.1,'The Punished':0.95,'Profane Geometry':1.15,'Sacred(?) Geometry':1,
+  'Untamed Unicrows':0.9,'Prickly Porcupanther':0.9,'Rabbid Rabbats':1.15,'Roudy Rinotter':0.9,'Whence Wolf':1.1,'Eelagator Escapee':0.6,'Toadtaur Warrior':1.05,'Toadtaur Wizard, Assistant to the Co-consul':1.15,'Extractnid Matriarch':1.1,'The Punished':0.95,'Profane Geometry':1.15,'Sacred(?) Geometry':1.3,
   // line-thickness pass (Oct 12): bosses that used the 1.35 default
   "Extruzeon, Co-consul of Waste":1.1,"Myceleus, Co-consul of Rot":1.1,
   'United Separatists':0.9,
@@ -682,6 +695,6 @@ const ENCOUNTER_SIZE = {
 };
 // Oct 15 (Jeremy, Monster Footing page): how far each monster sits lower (+) or higher (-) in the face-off, in % of its
 // picture's height, so it scales with the screen. Set by dragging each one on the page; missing = 0.
-const ENCOUNTER_DROP = {"Untamed Unicrows":-16.8,"Scrying Spheroid":-28.5,"Sacred Bellows":-2.4,"Rabbid Rabbats":-10.9,"Prickly Porcupanther":2.0,"Heron's Fountain":4.4,"Half-Full Fountain":4.4,"Half-Empty Fountain":4.4,"Extruzeon, Co-consul of Waste":-2.2,"Expediting Spores":0.0,"Enchanted Anvil":0.0,"Ecclectrical Outlet":-5.9,"Department Spore":-5.1,"Alchemists Stone":-36.7,"Gnomeowners Association":4.7,"Grosteque Grafter":3.1,"Amanitabomination":-5.3,"Beaker Breakers":1.0,"Bellicose Biomancer":8.3,"Ceramic Golem":2.1,"Chimeric Sludge":5.5,"Displacer Kitty":-2.9,"Eelagator Escapee":5.5,"Extractnid Matriarch":-7.8,"Feral Pet Rock":6.4,"Filement Bunny":-1.2,"Fungal Flayer":3.9,"Gestalt Network":4.2,"Gnome Chomper":15.3,"Grafted Grifter":-3.3,"Half-life Host":3.6,"Leper Colonizers":1.9,"Lichen-Thrope":-3.4,"Morel Dilemma":1.6,"Myceleus, Co-consul of Rot":2.4,"Profane Geometry":3.9,"Rogue Golemancer":21.7,"Roudy Rinotter":5.2,"Sacred(?) Geometry":-8.9,"The Necrorancher":6.2,"The Punished":-12.4,"The Warcart":-10.4,"Toadtaur Warrior":7.3,"Toadtaur Wizard, Assistant to the Co-consul":7.8,"United Separatists":-2.0,"Whence Wolf":8.1,"Wooden Golem":4.9};
+const ENCOUNTER_DROP = {"Thom's Guide":-21.4,"Surgery Community Theatre":-16.0,"Ruinous Rune Room":-2.5,"Madpie Nest":11.4,"Loot-Diagonalizer":-3.6,"Healthy Hearth":-5.5,"Goldberg's Rube Machine":3.8,"Ferrous Maiden":-17.3,"Faustian Spreadsheet":4.4,"Cryotherapist":4.2,"Charged Fae-Lines":20.6,"Blood-Drive Treats":4.0,"Ark of the Flood":-1.5,"Untamed Unicrows":-16.8,"Scrying Spheroid":-28.5,"Sacred Bellows":-2.4,"Rabbid Rabbats":-10.9,"Prickly Porcupanther":2.0,"Heron's Fountain":4.4,"Half-Full Fountain":4.4,"Half-Empty Fountain":4.4,"Extruzeon, Co-consul of Waste":3.2,"Expediting Spores":0.0,"Enchanted Anvil":0.0,"Ecclectrical Outlet":-0.1,"Department Spore":-5.1,"Alchemists Stone":-15.7,"Gnomeowners Association":4.7,"Grosteque Grafter":3.1,"Amanitabomination":-5.3,"Beaker Breakers":1.0,"Bellicose Biomancer":8.3,"Ceramic Golem":2.1,"Chimeric Sludge":5.5,"Displacer Kitty":-2.9,"Eelagator Escapee":5.5,"Extractnid Matriarch":-7.8,"Feral Pet Rock":6.4,"Filement Bunny":-1.2,"Fungal Flayer":3.9,"Gestalt Network":4.2,"Gnome Chomper":15.3,"Grafted Grifter":-3.3,"Half-life Host":3.6,"Leper Colonizers":1.9,"Lichen-Thrope":-3.4,"Morel Dilemma":1.6,"Myceleus, Co-consul of Rot":2.4,"Profane Geometry":3.9,"Rogue Golemancer":21.7,"Roudy Rinotter":5.2,"Sacred(?) Geometry":-5.3,"The Necrorancher":6.2,"The Punished":-12.4,"The Warcart":-10.4,"Toadtaur Warrior":2.6,"Toadtaur Wizard, Assistant to the Co-consul":7.8,"United Separatists":-2.0,"Whence Wolf":8.1,"Wooden Golem":4.9};
 function encounterDrop(e){ return (e && ENCOUNTER_DROP[e.name]) || 0; }
 function encounterSize(e){ if(!e) return 1; const v = ENCOUNTER_SIZE[e.name]; return v || (/Boss/.test(e.type) ? 1.35 : 1); }

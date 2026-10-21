@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.71 (Oct 21, 2026)
+- Monster Footing round 6 (Jeremy): sizes and heights for 18 monsters and shrines, mostly the new L-N shrines (Ferrous Maiden 1.65x, Surgery Community Theatre 1.55x, Goldberg's Rube Machine 1.4x, Thom's Guide 0.75x, and others); Cryotherapist, Healthy Hearth and Madpie Nest face the other way. Feet within 0.4 px of the page.
+
 ## 1.41.70 (Oct 21, 2026)
 - Jeremy's repainted loot, batches LOOT_3 and LOOT_4 (re-uploaded): 25 pictures. Sporific Staff came back unchanged; Dodecahedron of Future Pasts and Bonus Breakfast only lightly touched.
 
