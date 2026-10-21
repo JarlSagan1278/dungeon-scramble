@@ -5,7 +5,7 @@
 - Monster Footing round 5 (Jeremy, Oct 20): 23 size/height moves (Alchemists Stone, Department Spore, Ecclectrical Outlet, Eelagator Escapee, Enchanted Anvil, Expediting Spores, Extruzeon, Feral Pet Rock, Filement Bunny, Grafted Grifter, the three fountains, Leper Colonizers, Myceleus, Prickly Porcupanther, Rabbid Rabbats, Roudy Rinotter, Sacred Bellows, Scrying Spheroid, Toadtaur Warrior, Untamed Unicrows, Whence Wolf). Feet within 0.4 px of the page.
 
 ## 1.41.67 (Oct 20, 2026)
-- Jeremy's repaints: the four Magic dice (Axiom of Choice, Domesticated Displacer, 273.15 Kelvin Box, Exile Elixir; were silhouettes), the 14 shrines with their own art (batches P-R), all 47 remaining character portraits (S-Z) and 51 loot pictures (LOOT_1-4). Portraits capped at 400 px and loot at 220 px (sharp on a 3x phone, art file 5.7 MB).
+- Jeremy's repaints: the four Magic dice (Axiom of Choice, Domesticated Displacer, 273.15 Kelvin Box, Exile Elixir; were silhouettes), shrines (batches P-Q), portraits and loot. Correction (Oct 21): 70 of the 116 returned pictures were unpainted (all of R, Y, Z, LOOT_3, LOOT_4 and parts of S, T, U, V, LOOT_1, LOOT_2), so those still show the original art. Portraits capped at 400 px and loot at 220 px (sharp on a 3x phone, art file 5.7 MB).
 
 ## 1.41.66 (Oct 19, 2026)
 - Batch J art: Extruzeon, Myceleus, Toadtaur Wizard, Toadtaur Warrior, Eelagator Escapee, Whence Wolf. Batch K art: Untamed Unicrows, Prickly Porcupanther, Rabbid Rabbats, Roudy Rinotter.
