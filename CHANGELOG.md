@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.41.74 (Oct 21, 2026)
+- Jeremy's BATCH_AA restyle: Grafted Grifter, Anti-Euclidian Space (now pink accents), Oilephant's Foot and Ergot Eruption get crisp black outlines so they match the rest of the art. Same size and footing in game; Anti-Euclidian Space and Ergot Eruption also at higher resolution.
 ## 1.41.73 (Oct 21, 2026)
 - Class depth badges have their own shapes (Jeremy, "try it"): Guard a shield, Armsmaster crossed swords behind the medal, Arcanist an eight-point star with its X, Dungeoneer a stone archway with a keystone. Bronze/silver/gold rims and ribbons as before.
 - Hand-drawn texture pass (Jeremy) on the 15 dwarf and gnome portraits that kept their original art (Dwarf 0-3, 5-8; Gnome 0, 2, 3, 5, 6, 8, 11): slightly wobbly outlines and brush grain so they sit with the repainted ones. Pixies unchanged.

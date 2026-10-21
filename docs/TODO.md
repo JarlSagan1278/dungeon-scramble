@@ -20,7 +20,7 @@
 - Oct 15 (1.41.22-1.41.32): monster tuning, Floor 2 trims, shrine boosts, Extruzeon +10% HP, depth repricing, automatic play data, Batch E art, paper texture on all art (WebP) and in-world scenery, Monster Footing rounds 1-2. The Play Data sheet is still empty: needs the 1.41.24+ zip deployed and a finished run with sharing on.
 - Bug hunt on 1.41.32: 24/24 runs clean (bugsearch.js), every shrine option clean (new tools/test_shrines.js, 40/40). Rulebook PDF refreshed for today's changes.
 - Monster Footing page (https://claude.ai/artifact/6sxozXQfah2dSsRxnQEAkj) collection `lifts3` is round 3 (empty so far).
-- Art: pixie portraits stay original (Jeremy, Oct 21); some dwarf/gnome portraits and LOOT_1/2 loot remain original. Consistency study done Oct 21 (1.41.72: targeted fixes + hi-res re-import; global pass declined). BATCH_AA_restyle_4 (Grifter, Anti-Euclidian Space, Oilephant's Foot, Ergot Eruption) sent Oct 21 for a restyle repaint; import with reimport_hires.py when it comes back. If a global pass is ever wanted, tools/art/consistency.py has a speck-removal bug to fix first (see the study).
+- Art: pixie portraits stay original (Jeremy, Oct 21); some dwarf/gnome portraits and LOOT_1/2 loot remain original. Consistency study done Oct 21 (1.41.72: targeted fixes + hi-res re-import; global pass declined). BATCH_AA restyle (Grifter, Anti-Euclidian Space, Oilephant's Foot, Ergot Eruption) imported in 1.41.74. If a global pass is ever wanted, tools/art/consistency.py has a speck-removal bug to fix first (see the study).
 
 ## Small follow-ups
 - Log whether a death was avoidable in the bot studies (literature review idea). Best-depth rewards: covered by dice finishes and relic gating (Jeremy, Oct 15); assist mode: not for now.
@@ -42,7 +42,7 @@
 - ~~Design-consistency audit~~ done Oct 17 (1.41.60-1.41.61). Left: six `--` strings in data.js.
 - ~~Class depth badges~~ redesigned per class (1.41.73).
 - ~~Consistency + hand-drawn passes~~ done Oct 21 (study; targeted fixes + hi-res 1.41.72; hand-drawn on the 15 original dwarf/gnome portraits 1.41.73; global pass declined).
-- **Art still needed:** only BATCH_AA (the 4 restyles). Scenery paintover not needed for now (paper texture covers it). Layered cover art parked.
+- **Art still needed:** none queued (all batches in as of 1.41.74). Scenery paintover not needed for now (paper texture covers it). Layered cover art parked.
 - **Rulebook refresh** (rulebook is at build 1.32.28; many rules changed since). Armsmaster red Skill vs red Clear: options shown Oct 15, waiting on Jeremy.
 - **Relic look polish (later):** a bracelet view in the relic list, sockets that grow with depth.
 - **Replay tool** for the tray/path telemetry, once playtesters send exports.
