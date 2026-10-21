@@ -26,10 +26,23 @@ const SAVE_KEY = 'dungeonScrambleSave_v1';
 // Builds a plain, JSON-safe snapshot of S. klass/origin are stored as ids
 // (they carry a live zone() function that can't survive JSON) and rebuilt
 // on load; usedCards/usedLootNames (both Sets) are stored as arrays.
+// Save format version (Oct 21, release prep). Bump when the saved run's shape changes and add a step to migrateSave(),
+// so a saved run survives an app update instead of failing to load.
+const SAVE_VERSION = 1;
+function migrateSave(data){
+  if(!data.saveVersion) data.saveVersion = 1; // saves written before versioning have the v1 shape
+  // future: if(data.saveVersion < 2){ ...; data.saveVersion = 2; }
+  return data;
+}
+
 function serializeState(){
   // _roll/_ghost/_shieldFx hold performance.now() timestamps for animations; they mean nothing after a reload (the clock restarts), so never save them.
   const { klass, origin, _advance, _pendingTimeout, _roll, _ghost, _shieldFx, ...rest } = S;
-  return { ...rest, classId: klass.id, originId: origin.id, usedCards: [...S.usedCards], usedLootNames: [...S.usedLootNames] };
+  // The portrait picture itself (~265 KB of base64 in the single-file build) is rebuilt on load from origin + idx + tone
+  // by refreshSavedPortrait(), so the save keeps only those (Oct 21: saves and backup codes ~40x smaller).
+  const p = rest.portrait;
+  if(p && !p.placeholder && p.idx!=null && p.origin && originPortraitArray(p.origin) && originPortraitArray(p.origin)[p.idx]) rest.portrait = { ...p, img: null };
+  return { ...rest, saveVersion: SAVE_VERSION, classId: klass.id, originId: origin.id, usedCards: [...S.usedCards], usedLootNames: [...S.usedLootNames] };
 }
 
 function saveGame(){
@@ -202,10 +215,10 @@ function markRelicFound(id){
 
 // ---- Play telemetry -- an anonymous, on-device log of how each run
 // actually went (rooms, turns, loot offered vs. picked, what ended the run),
-// so playtest sessions can be turned into balance data. NOTHING is sent
-// anywhere: finished runs pile up in localStorage and the player can export
-// them as a file from Settings -> Export Play Data (see render.js) and send
-// that file along. Deliberately excludes the player's typed character name;
+// so playtest sessions can be turned into balance data. Finished runs pile up
+// in localStorage; they leave the device only through Settings -> Export Play
+// Data (a file the player sends by hand, render.js) or, if the player opts in,
+// the automatic upload below. Deliberately excludes the player's typed character name;
 // the only identifier is a random per-device id so several files from one
 // tester can be grouped. Best-effort throughout -- never allowed to throw
 // into gameplay. ----
@@ -289,7 +302,17 @@ const UPLOADED_KEY = 'dungeonScrambleUploaded_v1';
 function shareDataPref(){ try{ return localStorage.getItem(SHARE_KEY); }catch(e){ return null; } }
 function setShareData(on){
   try{ localStorage.setItem(SHARE_KEY, on ? 'yes' : 'no'); }catch(e){}
-  if(on){ getTelemetryRuns().forEach(queueRunUpload); flushRunUploads(); } // opting in also sends the runs already on this device
+  // Release prep (Oct 21): opting in covers runs finished from now on only. Runs already on the device are marked
+  // as not-to-send, so saying yes never uploads a back-catalogue the player didn't know about.
+  if(on){
+    try{
+      const done = JSON.parse(localStorage.getItem(UPLOADED_KEY)||'[]');
+      getTelemetryRuns().forEach(r=>{ if(r && r.runId && !done.includes(r.runId)) done.push(r.runId); });
+      while(done.length>200) done.shift();
+      localStorage.setItem(UPLOADED_KEY, JSON.stringify(done));
+      localStorage.setItem('dungeonScrambleUploadConfirm_v2', '1'); // and resendUnconfirmedRuns() must not re-queue them
+    }catch(e){}
+  }
 }
 // Oct 16, 1.41.44: runs marked sent by the old blind upload may never have arrived; forget those marks once and
 // re-queue every run on the device (the server skips any it already has).
@@ -770,7 +793,7 @@ function loadGame(){
   try{
     const raw = localStorage.getItem(SAVE_KEY);
     if(!raw) return false;
-    const data = JSON.parse(raw);
+    const data = migrateSave(JSON.parse(raw));
     data.klass = CLASSES.find(c=>c.id===data.classId);
     data.origin = ORIGINS.find(o=>o.id===data.originId);
     data.usedCards = new Set(data.usedCards||[]);
@@ -1200,6 +1223,7 @@ function advanceRoute(){
   S.swapLog = []; S.trayAct = null;
   if(S.routeStep >= S.route.length){
     // move to next floor
+    if(BUILD.demo && S.floorIdx===0){ S.screen='demoEnd'; return; } // free demo build: Floor 1 only
     if(S.floorIdx < FLOORS.length-1){
       S.floorIdx++;
       S.routeStep = 0;
@@ -2904,5 +2928,36 @@ function campRest(){
 function campLeave(){
   finishStep();
   render();
+}
+
+// ---- Progress backup (Oct 21, release prep): saves live only on this device, so Settings -> Back Up Progress gives the
+// player a code holding every dungeonScramble* key (unlocks, dice copies, Codex, records, depth bests, settings and any
+// saved run) to paste back on a new phone or after reinstalling. Play-data logs, the upload queue, the device id and the
+// sharing choice stay per device and are not included.
+const BACKUP_SKIP = ['dungeonScrambleTelemetry_v1', 'dungeonScrambleUploadQueue_v1', 'dungeonScrambleUploaded_v1',
+  'dungeonScrambleTelePlayer_v1', 'dungeonScrambleShareData_v1', 'dungeonScrambleUploadConfirm_v2'];
+function exportProgressCode(){
+  const keys = {};
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(k && k.indexOf('dungeonScramble') === 0 && !BACKUP_SKIP.includes(k)) keys[k] = localStorage.getItem(k);
+  }
+  const json = JSON.stringify({ app:'dungeon-scramble', v:1, game:GAME_VERSION, at:Date.now(), keys });
+  return 'DS1-' + btoa(unescape(encodeURIComponent(json)));
+}
+// Returns the number of entries restored; throws a player-readable message when the code isn't a backup.
+function importProgressCode(code){
+  let o;
+  try{ o = JSON.parse(decodeURIComponent(escape(atob(String(code||'').trim().replace(/^DS1-/, '').replace(/\s+/g, ''))))); }
+  catch(e){ throw new Error("That isn't a Dungeon Scramble backup code."); }
+  if(!o || o.app!=='dungeon-scramble' || !o.keys || typeof o.keys!=='object') throw new Error("That isn't a Dungeon Scramble backup code.");
+  const ks = Object.keys(o.keys).filter(k=>k.indexOf('dungeonScramble')===0 && !BACKUP_SKIP.includes(k) && typeof o.keys[k]==='string');
+  if(!ks.length) throw new Error('That backup is empty.');
+  for(let i = localStorage.length - 1; i >= 0; i--){
+    const k = localStorage.key(i);
+    if(k && k.indexOf('dungeonScramble') === 0 && !BACKUP_SKIP.includes(k)) localStorage.removeItem(k);
+  }
+  ks.forEach(k=>localStorage.setItem(k, o.keys[k]));
+  return ks.length;
 }
 

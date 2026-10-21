@@ -5,7 +5,7 @@ Digital prototype of Jeremy's board game (Boggle-style dice-path dungeon crawler
 **Every session: read `docs/PROJECT_CONTEXT.md` and `docs/TODO.md` first.** Whenever Jeremy makes a design decision, update `docs/PROJECT_CONTEXT.md` to record it (and commit).
 
 ## Commands
-- `node build.js` → `dist/dungeon_scramble.html` (single file) + `dist/web/` (installable PWA; art extracted to `dist/web/art/`). Also syncs package.json version.
+- `node build.js` → `dist/dungeon_scramble.html` (single file) + `dist/web/` (installable PWA; art extracted to `dist/web/art/`). Also syncs package.json version. `--demo` → `dist/demo/` (Floor 1 only, `BUILD.demo`); `--release` → `dist/release/` (no Debug unlock, `BUILD.release`). Tester builds stay the default.
 - `node tools/check.js` → **every automated check in one browser, ~2 min** (Oct 17): sim.js (random-legal bot, 5 origin/class combos; fails only on JS errors), class passives/wraps/relics/Boost tokens, UI flows (camp, shrine, quests, music, uploads), fast-redraw equivalence (path, tray), Swap/Reroll, every shrine option. One line per check; exit 1 on any failure. `node tools/check.js quick` (~1 min: sim + UI + redraws) for small visual changes. Run after ANY change.
 - `node bugsearch.js` → the broader bug hunt; can hang, run with `timeout`/nohup. Needs no stray `http.server` on 8765/8766.
 - `node tools/gen.js && node tools/print_rulebook.js` → rulebook HTML + `docs/DungeonScramble_Rulebook.pdf`.

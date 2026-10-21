@@ -9,18 +9,23 @@ const fs = require('fs');
 const path = require('path');
 
 const SRC = path.join(__dirname, 'src');
-const DIST_DIR = path.join(__dirname, 'dist');
-const OUT = path.join(DIST_DIR, 'dungeon_scramble.html');
+// Build flavours (Oct 21, release prep): default = tester build in dist/ (as before);
+// --release = public/store build in dist/release/ (no Debug unlock); --demo = free Floor-1-only build in dist/demo/.
+const DEMO = process.argv.includes('--demo');
+const RELEASE = DEMO || process.argv.includes('--release');
+const DIST_DIR = path.join(__dirname, 'dist', DEMO ? 'demo' : RELEASE ? 'release' : '');
+const OUT = path.join(DIST_DIR, DEMO ? 'dungeon_scramble_demo.html' : 'dungeon_scramble.html');
 
 function read(name) {
   return fs.readFileSync(path.join(SRC, name), 'utf8');
 }
 
-const head = read('_head.html');
+const head = read('_head.html').replace('<title>Dungeon Scramble</title>', DEMO ? '<title>Dungeon Scramble (Free Demo)</title>' : '<title>Dungeon Scramble</title>');
 // Comments are for us, not the player: strip them from the shipped CSS (no string in styles.css contains "/*").
 const styles = read('styles.css').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\n[ \t]*(?=\n)/g, '').replace(/\n{2,}/g, '\n');
 const body = read('_body.html');
-const data = read('data.js');
+const data = read('data.js').replace('var BUILD = { demo:false, release:false };', `var BUILD = { demo:${DEMO}, release:${RELEASE} };`);
+if (RELEASE && !/var BUILD = \{ demo:(true|false), release:true \}/.test(data)) throw new Error('build flags line not found in data.js');
 // LOGO_IMG is only used by the rulebook (tools/gen.js reads src/assets.js itself), so the game builds leave it out.
 const assets = read('assets.js').replace(/^const LOGO_IMG = "[^"]*";\n/m, '');
 const logic = read('logic.js');
@@ -55,7 +60,7 @@ console.log(`Built ${OUT} (${(html.length / 1024).toFixed(1)} KB)`);
 // above is untouched (no manifest/service worker there).
 const VERSION = (data.match(/GAME_VERSION\s*=\s*'([^']+)'/) || [])[1] || 'dev';
 // Keep package.json's version in step with GAME_VERSION (single source of truth: src/data.js).
-try { const pj = path.join(__dirname, 'package.json'); const j = JSON.parse(fs.readFileSync(pj, 'utf8')); if (j.version !== VERSION && VERSION !== 'dev') { j.version = VERSION; fs.writeFileSync(pj, JSON.stringify(j, null, 2) + '\n'); } } catch (e) {}
+if (!RELEASE) try { const pj = path.join(__dirname, 'package.json'); const j = JSON.parse(fs.readFileSync(pj, 'utf8')); if (j.version !== VERSION && VERSION !== 'dev') { j.version = VERSION; fs.writeFileSync(pj, JSON.stringify(j, null, 2) + '\n'); } } catch (e) {}
 const WEB = path.join(DIST_DIR, 'web');
 fs.rmSync(WEB, { recursive: true, force: true });
 fs.mkdirSync(WEB, { recursive: true });
@@ -105,7 +110,7 @@ fs.writeFileSync(path.join(WEB, 'manifest.webmanifest'), JSON.stringify({
   ]
 }, null, 2), 'utf8');
 const SW = `// Dungeon Scramble service worker -- cache name is stamped with the game version.
-const CACHE = 'ds-${VERSION}';
+const CACHE = 'ds-${DEMO ? 'demo-' : ''}${VERSION}';
 const FILES = ['./', 'index.html', 'manifest.webmanifest'].concat(${JSON.stringify(ICONS)}).concat(${JSON.stringify([...ART_FILES].map(f => 'art/' + f))});
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
@@ -124,9 +129,6 @@ self.addEventListener('fetch', e => {
     // Game files: network first (so testers get new builds), cache when offline.
     e.respondWith(fetch(req).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put(req, copy)); return r; })
       .catch(() => caches.match(req).then(m => m || caches.match('index.html'))));
-  } else if (/fonts\.(googleapis|gstatic)\.com$/.test(url.hostname)) {
-    // Title font: cache after first load.
-    e.respondWith(caches.match(req).then(m => m || fetch(req).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put(req, copy)); return r; })));
   }
 });
 `;

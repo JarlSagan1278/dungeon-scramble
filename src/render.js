@@ -253,6 +253,7 @@ function render(){
     return;
   }
   if(S.screen==='victory'){ clearPathTrail(); renderVictory(); maybeScreenTransition('victory'); return; }
+  if(S.screen==='demoEnd'){ clearPathTrail(); renderDemoEnd(); maybeScreenTransition('victory'); return; }
   if(S.screen==='gameover'){ clearPathTrail(); renderGameOver(); maybeScreenTransition('gameover'); return; }
   if(S.screen==='camp'){ clearPathTrail(); renderCamp(); tuckCampCog(); maybeAutosave(); maybeScreenTransition('camp'); return; }
   if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); decorateArch(); maybeAutosave(); maybeScreenTransition('shrine'); return; }
@@ -1262,7 +1263,7 @@ function renderSetup(){
   //      kept as a quick in-place selection so it doesn't cost a 3rd
   //      re-render.
   let classHeaderClicks = [];
-  document.getElementById('class-header').onclick = ()=>{
+  if(!BUILD.release) document.getElementById('class-header').onclick = ()=>{ // tester builds only: never in a release or demo build
     const now = Date.now();
     classHeaderClicks = classHeaderClicks.filter(t=>now-t<1200);
     classHeaderClicks.push(now);
@@ -3212,14 +3213,15 @@ function openRecordsModal(tab){
   const overlay = el(`<div class="modal-overlay"><div class="modal codex-modal" style="text-align:center; max-width:400px;">
       <button class="modal-x-btn" id="records-x-btn" title="Close">✕</button>
       <h2 style="margin-top:0;">Records</h2>
-      <div class="codex-tabs"><button class="codex-tab" data-tab="history">Run History</button><button class="codex-tab" data-tab="achievements">Achievements</button></div>
+      <div class="codex-tabs"><button class="codex-tab" data-tab="history">Run History</button><button class="codex-tab" data-tab="achievements">Achievements</button><button class="codex-tab" data-tab="backup">Backup</button></div>
       <div class="codex-body" id="records-body"></div>
     </div></div>`);
   openModal(overlay);
   const body = overlay.querySelector('#records-body');
   const show = t=>{
     overlay.querySelectorAll('.codex-tab').forEach(b=>b.classList.toggle('on', b.dataset.tab===t));
-    body.innerHTML = t==='achievements' ? achievementsHTML() : runHistoryHTML();
+    body.innerHTML = t==='achievements' ? achievementsHTML() : t==='backup' ? backupPanelHTML() : runHistoryHTML();
+    if(t==='backup') wireBackupPanel(body);
     const clr = body.querySelector('#run-history-clear-btn');
     if(clr) clr.onclick = ()=>{ clearRunHistory(); show('history'); };
   };
@@ -4577,12 +4579,12 @@ function runCardData(outcome){
   const killer = st.killedBy || (S.encounter && S.encounter.curHealth>0 ? S.encounter.name : '');
   return {
     name, who: `${S.origin.name} ${S.klass.name}`, depth: depthLabel(currentDepth()), color: S.klass.color || '#d4af52',
-    outcome: outcome==='victory' ? `Conquered the dungeon in ${st.turnsTaken} turns` : `Fell on Floor ${S.floorIdx+1}${killer?` to ${killer}`:''}`,
+    outcome: outcome==='victory' ? `Conquered the dungeon in ${st.turnsTaken} turns` : outcome==='demo' ? `Cleared Floor 1 in ${st.turnsTaken} turns` : `Fell on Floor ${S.floorIdx+1}${killer?` to ${killer}`:''}`,
     stats: [['Damage', Math.round(st.damageDealt)], ['Best turn', st.bestTurn||0], ['Blocked', st.damageBlocked||0], ['Foes beaten', st.encountersDefeated]],
     dice: S.tray.map(c=>{ const f = pickPreviewFace(c.die.faces); return {cat:c.die.cat, type:f.type, value:f.value, name:c.die.name}; }),
     relics: (S.relics||[]).map(relicById).filter(Boolean),
     portrait: S.portrait && !S.portrait.placeholder ? S.portrait.img : null,
-    win: outcome==='victory',
+    win: outcome==='victory' || outcome==='demo',
   };
 }
 function runCardHTML(outcome){
@@ -4722,7 +4724,7 @@ function summaryStatsHTML(){
 function shareDataAskHTML(){
   if(!PLAYDATA_URL || shareDataPref()) return '';
   return `<div class="share-ask" id="share-ask">
-      <p><strong>Help balance the game?</strong> Send how each run went (rooms, dice, what beat you) automatically. No names or personal info. You can turn it off in Settings.</p>
+      <p><strong>Help balance the game?</strong> Send how each run goes from now on (rooms, dice, what beat you), with a random id for this device, its screen size and any error messages. No names or personal info. You can turn it off in Settings.</p>
       <div class="small-btn-row" style="justify-content:center;"><button class="primary" onclick="shareDataAnswer(true)">Yes, share</button><button onclick="shareDataAnswer(false)">No thanks</button></div>
     </div>`;
 }
@@ -4736,6 +4738,38 @@ function shareDataAnswer(on){
 // on-device telemetry (see buildPlayDataExport(), logic.js) as a file to
 // download, or as text to copy when downloads are blocked (e.g. inside an
 // embedded page).
+// Records -> Backup (Oct 21, release prep): copy a code holding this device's progress, or paste one to restore it.
+function backupPanelHTML(){
+  return `<div class="backup-panel" style="text-align:center;">
+      <p class="hint" style="text-align:left;">Your unlocks, dice, Codex, records and any saved run live only on this device. Copy this code somewhere safe (a note or an email to yourself), then paste it here on a new phone or after reinstalling.</p>
+      <textarea id="backup-code" class="paper-input" readonly style="width:100%; height:64px; font-size:10px; box-sizing:border-box;"></textarea>
+      <div class="small-btn-row" style="justify-content:center;"><button class="btn-backup" id="backup-copy-btn">Copy Code</button></div>
+      <p class="hint" style="text-align:left; margin-bottom:4px;">Restore: paste a code. This replaces the progress on this device.</p>
+      <textarea id="restore-code" class="paper-input" style="width:100%; height:48px; font-size:10px; box-sizing:border-box;" placeholder="Paste a backup code"></textarea>
+      <div class="small-btn-row" style="justify-content:center;"><button id="restore-btn" class="danger-outline">Restore</button></div>
+      <p class="hint" id="backup-status" style="min-height:1.2em;"></p>
+      <p class="hint" style="text-align:left; margin-top:4px;">Play data id for this device: <strong>${getTelePlayerId()}</strong> (quote it to ask for your shared play data to be deleted).</p>
+    </div>`;
+}
+function wireBackupPanel(root){
+  let code = '';
+  try{ code = exportProgressCode(); }catch(e){}
+  const status = root.querySelector('#backup-status');
+  const ta = root.querySelector('#backup-code'); ta.value = code;
+  root.querySelector('#backup-copy-btn').onclick = ()=>{
+    ta.focus(); ta.select();
+    const done = ()=>{ status.textContent = 'Copied.'; };
+    try{ navigator.clipboard.writeText(code).then(done, ()=>{ document.execCommand('copy'); done(); }); }
+    catch(e){ try{ document.execCommand('copy'); done(); }catch(e2){ status.textContent = 'Select the code and copy it.'; } }
+  };
+  root.querySelector('#restore-btn').onclick = ()=>{
+    try{
+      const n = importProgressCode(root.querySelector('#restore-code').value);
+      status.textContent = `Restored (${n} items). Reloading...`;
+      setTimeout(()=>location.reload(), 700);
+    }catch(e){ status.textContent = e.message || 'That code did not work.'; }
+  };
+}
 function openExportDataModal(){
   const data = buildPlayDataExport();
   let json = JSON.stringify(data, null, 1);
@@ -4802,6 +4836,21 @@ function renderVictory(){
   app.innerHTML = endScreenHTML({ outcome:'victory', title:'Dungeon Conquered!', lede:'You defeated the Big Boss and cleared all three floors. Well fought, Adventurer.',
     seal:depthSealHTML(), relic:originRelicEarnedHTML(), again:'Play Again' });
   wireRunCard('victory');
+}
+// Free demo build (BUILD.demo, `node build.js --demo`): the run ends after the Floor 1 boss. It is recorded in Records and
+// play data as 'demo' (not a win: no depth badge, achievements or origin relic), and the screen points to the full game.
+function renderDemoEnd(){
+  if(!S.gameOverRecorded){
+    S.gameOverRecorded = true;
+    recordRunHistory('demo');
+    S.newAchievements = [];
+    clearSave();
+    if(typeof musicSting==='function') musicSting('win'); else playTone('grandVictory');
+    if(typeof spawnConfettiRain==='function') spawnConfettiRain();
+  }
+  app.innerHTML = endScreenHTML({ outcome:'demo', title:'Floor 1 Cleared!', lede:'That is the end of the free demo. The full dungeon goes two floors deeper, with new monsters, shrines, loot and two more bosses, then ten depth levels to climb.',
+    seal:'', relic:'', again:'Play Again' });
+  wireRunCard('demo');
 }
 function renderGameOver(){
   if(!S.gameOverRecorded){

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.41.77 (Oct 21, 2026)
+- Release prep, Phase 1 (from the release plan):
+  - Play data: saying yes now covers runs finished from then on only (no back-catalogue of older runs); the consent card says exactly what is sent (random device id, screen size, error messages).
+  - Title font (Metamorphous, OFL) is built into the game: no Google Fonts call, and it works offline from the first launch. Page title no longer says "Prototype".
+  - Saves no longer store the hero portrait picture (rebuilt on load): a saved run is ~5 KB instead of ~270 KB, so autosaves are faster. Saves carry a format version for future migrations.
+  - Records -> Backup: copy a code holding this device's progress (unlocks, dice, Codex, records, saved run) and paste it to restore on a new phone; also shows the device's play-data id.
+  - Build flavours: `node build.js --demo` makes a free Floor-1-only build (dist/demo/; beating the Floor 1 boss ends on a "Floor 1 Cleared!" screen, recorded as a demo, not a win); `--release` makes a public build (dist/release/). Both drop the 5-tap Debug unlock; the normal build is unchanged for testers.
+- Drafts in docs/release/: privacy policy page, App Store / Google Play listing text, press blurb.
 ## 1.41.76 (Oct 21, 2026)
 - Rename (Jeremy, "keep for now"): Goldberg's Rube Machine -> Goldman's Rube Machine; saves carry over. Rulebook PDF regenerated.
 ## 1.41.75 (Oct 21, 2026)

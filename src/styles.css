@@ -2859,11 +2859,13 @@ button.btn-records{ background:#4f6aa6; color:#fff3dc; }
 button.btn-howto{ background:#8a5aa0; color:#fff3dc; }
 button.btn-log{ background:#b5653a; color:#fff3dc; }
 button.btn-export{ background:#2f7f7a; color:#fff3dc; }
+button.btn-backup{ background:#9a7b2c; color:#fff3dc; } /* Oct 21: Back Up Progress */
 button.btn-codex:hover:not(:disabled){ background:#6e9c48; }
 button.btn-records:hover:not(:disabled){ background:#5d79b8; }
 button.btn-howto:hover:not(:disabled){ background:#9a6ab0; }
 button.btn-log:hover:not(:disabled){ background:#c47346; }
 button.btn-export:hover:not(:disabled){ background:#3a918b; }
+button.btn-backup:hover:not(:disabled){ background:#ad8c36; }
 /* Settings: a two-column grid of smaller buttons so Abandon / Reset / Close show without scrolling */
 .settings-btn-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px; }
 .settings-btn-grid button{ font-size:13px; padding:7px 6px; line-height:1.2; }

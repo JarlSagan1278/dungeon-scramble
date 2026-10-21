@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dungeon Scramble Privacy Policy</title>
+<meta name="description" content="Privacy policy for the game Dungeon Scramble: what stays on your device, what optional play data is sent, and how to opt out or ask for deletion.">
+<!--
+  Draft written Oct 21, 2026 from the code at build 1.41.76 plus the release-prep changes in progress
+  (opt-in sends only runs finished after opting in; Metamorphous self-hosted; no ads, accounts or third-party analytics;
+  purchases through Apple / Google in-app purchase).
+  Fill in every [BRACKETED] placeholder before publishing. Not legal advice: have it checked against the stores' rules.
+  Sources: src/logic.js (teleLog, finalizeTelemetry, PLAYDATA_URL, SHARE_KEY, flushRunUploads), src/main.js (error events),
+  src/render.js (consent card, Settings toggle, Export Play Data), tools/playdata/apps_script.gs (what the server stores).
+  If any of those change, update this page.
+-->
+<style>
+  :root { --bg:#2b1d14; --panel:#3a281b; --text:#f1e2c4; --muted:#d3bf98; --accent:#e0b35a; --line:#5a3f2a; }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family: Georgia, "Times New Roman", serif; font-size:17px; line-height:1.6; }
+  main { max-width: 720px; margin: 0 auto; padding: 28px 16px 56px; }
+  h1 { font-size: 1.9em; line-height:1.2; margin: 0 0 4px; color: var(--accent); }
+  h2 { font-size: 1.25em; margin: 34px 0 8px; color: var(--accent); border-bottom: 2px solid var(--line); padding-bottom: 4px; }
+  h3 { font-size: 1.05em; margin: 20px 0 6px; }
+  p, li { overflow-wrap: anywhere; }
+  ul { padding-left: 1.2em; }
+  li { margin: 4px 0; }
+  a { color: var(--accent); }
+  code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .88em; background: var(--panel); padding: 1px 5px; border-radius: 4px; }
+  .meta { color: var(--muted); margin: 0 0 18px; }
+  .box { background: var(--panel); border: 2px solid var(--line); border-radius: 12px; padding: 12px 16px; margin: 16px 0; }
+  .box p:first-child { margin-top: 0; } .box p:last-child { margin-bottom: 0; }
+  .ph { color: #ffd58a; font-weight: bold; }
+  table { width: 100%; border-collapse: collapse; font-size: .92em; margin: 10px 0; }
+  th, td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: normal; }
+  footer { margin-top: 40px; color: var(--muted); font-size: .9em; }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Dungeon Scramble Privacy Policy</h1>
+<p class="meta">Effective date: <span class="ph">[EFFECTIVE DATE]</span></p>
+
+<div class="box">
+  <p><strong>The short version.</strong> Dungeon Scramble has no ads, no accounts, no third-party analytics and no tracking across apps or websites. Your progress is saved on your device only. If you choose to, the game can send anonymous records of how your runs went, so I can balance the game and fix bugs. It is off until you say yes, and you can turn it off at any time in Settings.</p>
+</div>
+
+<h2>1. Who we are</h2>
+<p>Dungeon Scramble is made by one person, Jeremy Friedman (“I”, “me”, “the developer”). I am responsible for the data described here.</p>
+<p>Questions, requests or complaints: <span class="ph">[CONTACT EMAIL]</span></p>
+<p>Developer location: <span class="ph">[COUNTRY / STATE]</span></p>
+
+<h2>2. What the game stores on your device</h2>
+<p>The game saves these things in its own storage on your phone or computer. They are not sent anywhere (except the play data in section 3, and only if you opt in):</p>
+<ul>
+  <li>Your run in progress, so you can pick up where you left off.</li>
+  <li>Your progress and records: unlocks, dice you have found, relics you have found, achievements, best depth per class, lifetime totals and a history of your recent finished runs.</li>
+  <li>The character name you type, if you type one. It is used only on your screen and in your local run history. It is never sent.</li>
+  <li>Your settings: sound and music volume, motion and vibration options, tutorial and help pages already seen, and your answer to the play-data question.</li>
+  <li>A local play-data log: records of up to your last 40 finished runs (what is in one is listed in section 3), plus a queue of runs waiting to be sent if you opted in and were offline.</li>
+  <li>A random device id, for example <code>p-k3j9x0qa1b2c</code>. It is made up by the game on first use from random numbers and the time. It is not your phone's advertising id or hardware id, and it is not linked to your name, account or contact details.</li>
+  <li>If you play the web version, your browser also keeps a cached copy of the game files so it works offline.</li>
+</ul>
+<p>Deleting the app (or, for the web version, clearing this site's data in your browser) removes all of it. Note that <strong>Settings &rarr; Reset Progress</strong> clears your unlocks and records but does not clear the play-data log or the random device id.</p>
+<!-- TODO (Jeremy): decide whether Reset Progress should also clear the play-data log, the upload queue and the device id
+     (dungeonScrambleTelemetry_v1, dungeonScrambleUploadQueue_v1, dungeonScrambleUploaded_v1, dungeonScrambleTelePlayer_v1).
+     If it does, change the sentence above. -->
+
+<h2>3. Optional play data (only if you opt in)</h2>
+<p>At the end of your first run the game asks “Help balance the game?”. Nothing is sent unless you tap <strong>Yes, share</strong>. You can change your answer any time with the <strong>Share play data automatically</strong> switch in Settings.</p>
+<p>If you say yes, each run that <strong>finishes after you opt in</strong> (won, lost or abandoned) is sent once, when it ends. Runs you played before opting in are not sent. If you are offline, the run waits on your device and is sent the next time you open the game while online and still opted in.</p>
+
+<h3>What one upload contains</h3>
+<table>
+  <tr><th>Item</th><th>What it is</th></tr>
+  <tr><td>Random device id</td><td>The id described in section 2, so several runs from one device can be grouped together.</td></tr>
+  <tr><td>Screen size</td><td>The game window's width and height in pixels, e.g. <code>411x785</code>.</td></tr>
+  <tr><td>Game version</td><td>The build number, e.g. <code>1.41.76</code>.</td></tr>
+  <tr><td>Run id and timestamps</td><td>A random run id, the date and time the run started and ended.</td></tr>
+  <tr><td>Run summary</td><td>Origin and class played, result (victory, defeat or abandoned), floor reached, depth, how many runs you have started in total, relics held, and run stats (turns, damage dealt and blocked, rooms cleared, shrines visited, overkills, near misses, loot collected, best turn, longest path).</td></tr>
+  <tr><td>Run events</td><td>A step-by-step log of the run (up to 2,500 events). Each event has the active play time since the run started (pauses longer than 45 seconds are not counted), the floor and room number, and details such as:
+    <ul>
+      <li>run start: the starting dice, starting boon, depth options chosen and the character portrait style chosen;</li>
+      <li>each room: which monster, trap, shrine or camp it was, your health and the monster's health;</li>
+      <li>each turn: the dice faces in your tray, the path you built, your Block, your health and the monster's health, and whether a lethal-damage warning was showing;</li>
+      <li>hits taken, minions placed and cleared, boss moves, dice swapped or rerolled, class ability uses;</li>
+      <li>loot, relic and shrine choices: what was offered and what you picked, and what you equipped or replaced;</li>
+      <li>camp choices, times your health hit 0 and Back Pocket saves, rooms won (turns and time taken);</li>
+      <li>the end of the run.</li>
+    </ul></td></tr>
+  <tr><td>Error messages</td><td>If the game hits a programming error during the run: the error message (up to 200 characters), the first lines of its technical stack trace (up to 300 characters, naming places in the game's code), and which game screen was open.</td></tr>
+</table>
+
+<h3>What is never sent</h3>
+<ul>
+  <li>Your typed character name, or any other text you type.</li>
+  <li>Your name, email, phone number, contacts, photos, precise or approximate location, or any advertising or hardware id.</li>
+  <li>Your purchase details.</li>
+  <li>Your lifetime totals, achievements or local run history.</li>
+</ul>
+<p>The game itself does not read or send your IP address. However, like any internet request, the upload reaches Google's servers from your device's IP address together with standard connection information (see section 4).</p>
+
+<h3>Sending a file yourself (Export Play Data)</h3>
+<p>Settings also has <strong>Export Play Data</strong>, which makes a file (or copyable text) of the runs stored on your device. Nothing is sent by this button: the file only leaves your device if you send it to me yourself, for example by email. Besides the run records above, the file includes the random device id, your screen size and whether it is a touch screen, your lifetime totals, the names of achievements you have unlocked, a summary of your runs, any run in progress, and any note you choose to type into the box.</p>
+
+<h2>4. Where play data goes</h2>
+<p>Uploads are sent over an encrypted (HTTPS) connection to a small Google Apps Script program owned by me. It adds one row per run to a Google Sheet owned by me and saves the full run record as a file in my Google Drive. The data is therefore stored on Google's servers, under Google's own privacy and security terms (<a href="https://policies.google.com/privacy">policies.google.com/privacy</a>). Google may log technical information about the connection, such as your IP address, as part of running its service; I do not receive it through the game's data.</p>
+<p>Only I have access to the sheet and files. <span class="ph">[If anyone else, e.g. a collaborator, gets access, say who here.]</span> I do not sell, rent or share play data with anyone, and I do not use it for advertising. I may publish general findings that cannot identify anyone (for example, “Floor 2 ends 20% of runs”).</p>
+
+<h2>5. Why</h2>
+<p>Play data is used only to balance the game (which monsters, dice and choices are too strong or too weak, where runs end) and to find and fix bugs and crashes. The legal basis, where the law asks for one, is your consent, which you can withdraw at any time.</p>
+
+<h2>6. How long it is kept</h2>
+<p>Uploaded play data is kept for <span class="ph">[RETENTION, e.g. 2 years]</span> after it is received, then deleted. Data on your device stays until you delete the app or clear its data; the local play-data log keeps only your last 40 finished runs.</p>
+
+<h2>7. Opting out and asking for deletion</h2>
+<ul>
+  <li><strong>Stop sending:</strong> turn off <strong>Share play data automatically</strong> in Settings (the gear). Nothing more is sent from then on, including runs still waiting in the queue.</li>
+  <li><strong>Delete what was sent:</strong> email <span class="ph">[CONTACT EMAIL]</span> with your device id and I will delete every run recorded with it within <span class="ph">[30 days]</span>. Because I hold no names or contact details, the device id is the only way to find your runs.</li>
+  <li><strong>Finding your device id:</strong> open Records &rarr; Backup. The line &ldquo;Play data id for this device&rdquo; shows it (it starts with <code>p-</code>).</li>
+  <li><strong>Delete what is on your device:</strong> delete the app, or clear the site's data in your browser for the web version.</li>
+</ul>
+<p>Depending on where you live (for example the EU, UK or California), you may have rights to access, correct, delete or move your data, to withdraw consent and to complain to your data protection authority. Email me to use any of them.</p>
+
+<h2>8. Purchases</h2>
+<p>Dungeon Scramble is free to download with Floor 1 free to play. The rest of the dungeon is a one-time purchase (“Full Dungeon”). Purchases are handled entirely by the Apple App Store or Google Play. I never see your payment card or billing details; the store only tells the game whether the unlock has been bought, so it can unlock it on your device. The store's own privacy policy covers your purchase. <span class="ph">[If a web or Steam version sells the unlock differently, add it here.]</span></p>
+
+<h2>9. Ads, tracking and third parties</h2>
+<ul>
+  <li>No advertising and no ad networks.</li>
+  <li>No accounts or sign-in.</li>
+  <li>No third-party analytics, crash-reporting or social SDKs.</li>
+  <li>No tracking across other companies' apps or websites, and no selling or sharing of personal information.</li>
+  <li>The game's fonts, music and art are built into the game; it does not load them from other websites.</li>
+</ul>
+<p>The only places the game connects to are the app store for purchases and, if you opt in, the Google Apps Script address in section 4. <span class="ph">[For the web version: the website host (e.g. Netlify or itch.io) receives normal web requests, including your IP address, when you load the game; name the host and link its privacy policy.]</span></p>
+
+<h2>10. Children</h2>
+<p>The game is not directed at children under 13. I do not knowingly collect personal information from children. Play data is anonymous and optional, and contains no name, contact details or location. If you believe a child has sent play data and you would like it removed, email me with the device id (see section 7) and I will delete it.</p>
+
+<h2>11. Changes to this policy</h2>
+<p>If this policy changes, I will update it here and change the effective date at the top. If a change would send new kinds of data, the game will ask for your consent again before sending it.</p>
+
+<footer>
+  <p>Dungeon Scramble &middot; Jeremy Friedman &middot; <span class="ph">[CONTACT EMAIL]</span></p>
+</footer>
+
+</main>
+</body>
+</html>
