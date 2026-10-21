@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.41.72 (Oct 21, 2026)
+- Art consistency study, decisions 1 and 3 (Jeremy): 19 pictures that were stretched 1.3-1.8x on the phone were rebuilt at higher resolution from Jeremy's canvases (Golemancer, Grifter, Displacer Lair, Grosteque Grafter, Blastogenesis Engine, Fungal Flayer, Oilephant's Foot, Bio-Mutant Escape, Extruzeon, Myceleus, and the L-N shrines Surgery Community Theatre, Healthy Hearth, Ark of the Flood, Blood-Drive Treats, Ferrous Maiden, Goldberg's Rube Machine, Ruinous Rune Room, Charged Fae-Lines, Faustian Spreadsheet). Same size and footing in game. Targeted fixes: thinner outer outlines (Healthy Hearth, Sacred(?) Geometry, Adhesive Pest Traps), unified line colour (Oilephant's Foot, Ergot Eruption), more contrast (Anti-Euclidian Space, Blood-Drive Treats).
 ## 1.41.71 (Oct 21, 2026)
 - Monster Footing round 6 (Jeremy): sizes and heights for 18 monsters and shrines, mostly the new L-N shrines (Ferrous Maiden 1.65x, Surgery Community Theatre 1.55x, Goldberg's Rube Machine 1.4x, Thom's Guide 0.75x, and others); Cryotherapist, Healthy Hearth and Madpie Nest face the other way. Feet within 0.4 px of the page.
 
