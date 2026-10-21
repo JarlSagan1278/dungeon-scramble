@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.67';
+const GAME_VERSION = '1.41.68';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -645,21 +645,26 @@ const BOSS_KITS = {
 // Stand-in art for the v1.36.0 shrines until Jeremy's own art exists: each
 // borrows a related existing shrine's picture. Delete an entry once its real
 // art is in MONSTER_ART.
-const SHRINE_ART_STANDIN = {
-  'Surgery Community Theatre':'Enchanted Anvil','Blood of Spanneroth':'Enchanted Anvil','Ruinous Rune Room':'Enchanted Anvil',
-  'Healthy Hearth':'Sacred Bellows','Ferrous Maiden':'Sacred Bellows','Indoctrination Inoculation':'Alchemists Stone',
-  'Ark of the Flood':'Expediting Spores',"Thom's Guide":'Expediting Spores','Charged Fae-Lines':'Department Spore',
-  'Loot-Diagonalizer':'Ecclectrical Outlet','Madpie Nest':'Storied Emporium',
-  'Blood-Drive Treats':'Scrying Spheroid',"Goldberg's Rube Machine":'Scrying Spheroid','Faustian Spreadsheet':'Scrying Spheroid',
-  'Scroll Dispenser: AWSP':'Scroll Dispenser: CRELA','Scroll Dispenser: DOER':'Scroll Dispenser: GIB',
-  'Cryotherapist':'Half-Full Fountain','Correctly-Designed Fountain':"Heron's Fountain",
-};
+// Every shrine has its own art since Oct 21 (Jeremy's batches L-N); a new shrine without a picture can borrow one here.
+const SHRINE_ART_STANDIN = {};
 
 // ---- Monster presence: how large each monster is drawn in the face-off (1 = standard ~89px tall).
 // Under 1 = small/scuttling things; over 1 = hulking things that loom behind their own health bar.
 // Anything unlisted is 1 (Bosses default to 1.3).
 const ENCOUNTER_SIZE = {
-  'Viscous Orb':0.55,'Filement Bunny':.75,'Feral Pet Rock':0.55,'Beaker Breakers':0.6,'Leper Colonizers':0.95,
+  'Scrying Spheroid':1,
+  'Sacred Bellows':1.15,
+  'Myceleus, Co-consul of Rot':1.1,
+  'Heron\'s Fountain':1.2,
+  'Half-Full Fountain':1.2,
+  'Half-Empty Fountain':1.2,
+  'Extruzeon, Co-consul of Waste':1.2,
+  'Expediting Spores':0.65,
+  'Enchanted Anvil':1.05,
+  'Ecclectrical Outlet':1.45,
+  'Department Spore':1.05,
+  'Alchemists Stone':0.85,
+  'Viscous Orb':0.55,'Filement Bunny':0.9,'Feral Pet Rock':0.6,'Beaker Breakers':0.6,'Leper Colonizers':0.95,
   'Wooden Golem':1.1,'Amanitabomination':1.3,
   'Displacer Lair':1.1,'Rigged Sporks':0.75,'Leper Con-Trap':1.05,
   'Rogue Golemancer':1.6,'Heating Elemental':1.2,'Grosteque Grafter':1.45,
@@ -668,15 +673,15 @@ const ENCOUNTER_SIZE = {
   'The Necrorancher':1.05,'Bellicose Biomancer':1.35,'Ceramic Golem':1.25,
   'Morel Dilemma':1,'Chimeric Sludge':1.15,'Gnome Chomper':1.1,'Gnomeowners Association':1,'Gestalt Network':1.15,
   "Oilephant's Foot":1.3,
-  'Untamed Unicrows':0.65,'Prickly Porcupanther':0.75,'Rabbid Rabbats':0.7,'Roudy Rinotter':0.75,'Whence Wolf':0.9,'Eelagator Escapee':0.65,'Toadtaur Warrior':1.15,'Toadtaur Wizard, Assistant to the Co-consul':1.15,'Extractnid Matriarch':1.1,'The Punished':0.95,'Profane Geometry':1.15,'Sacred(?) Geometry':1,
+  'Untamed Unicrows':0.9,'Prickly Porcupanther':0.9,'Rabbid Rabbats':1.15,'Roudy Rinotter':0.9,'Whence Wolf':1.1,'Eelagator Escapee':0.6,'Toadtaur Warrior':1.1,'Toadtaur Wizard, Assistant to the Co-consul':1.15,'Extractnid Matriarch':1.1,'The Punished':0.95,'Profane Geometry':1.15,'Sacred(?) Geometry':1,
   // line-thickness pass (Oct 12): bosses that used the 1.35 default
   "Extruzeon, Co-consul of Waste":1.1,"Myceleus, Co-consul of Rot":1.1,
   'United Separatists':0.9,
-  'Grafted Grifter':1.3
+  'Grafted Grifter':1.4
   // Oct 15: sizes above were set by Jeremy on the Monster Footing page
 };
 // Oct 15 (Jeremy, Monster Footing page): how far each monster sits lower (+) or higher (-) in the face-off, in % of its
 // picture's height, so it scales with the screen. Set by dragging each one on the page; missing = 0.
-const ENCOUNTER_DROP = {"Gnomeowners Association":4.7,"Grosteque Grafter":3.1,"Amanitabomination":-5.3,"Beaker Breakers":1.0,"Bellicose Biomancer":8.3,"Ceramic Golem":2.1,"Chimeric Sludge":5.5,"Displacer Kitty":-2.9,"Eelagator Escapee":5.5,"Extractnid Matriarch":-7.8,"Feral Pet Rock":7.1,"Filement Bunny":-1.2,"Fungal Flayer":3.9,"Gestalt Network":4.2,"Gnome Chomper":15.3,"Grafted Grifter":4.1,"Half-life Host":3.6,"Leper Colonizers":5.7,"Lichen-Thrope":-3.4,"Morel Dilemma":1.6,"Myceleus, Co-consul of Rot":0.8,"Profane Geometry":3.9,"Rogue Golemancer":21.7,"Roudy Rinotter":1.2,"Sacred(?) Geometry":-8.9,"The Necrorancher":6.2,"The Punished":-12.4,"The Warcart":-10.4,"Toadtaur Warrior":4.0,"Toadtaur Wizard, Assistant to the Co-consul":7.8,"United Separatists":-2.0,"Whence Wolf":4.0,"Wooden Golem":4.9};
+const ENCOUNTER_DROP = {"Untamed Unicrows":-16.8,"Scrying Spheroid":-28.5,"Sacred Bellows":-2.4,"Rabbid Rabbats":-10.9,"Prickly Porcupanther":2.0,"Heron's Fountain":4.4,"Half-Full Fountain":4.4,"Half-Empty Fountain":4.4,"Extruzeon, Co-consul of Waste":-2.2,"Expediting Spores":0.0,"Enchanted Anvil":0.0,"Ecclectrical Outlet":-5.9,"Department Spore":-5.1,"Alchemists Stone":-36.7,"Gnomeowners Association":4.7,"Grosteque Grafter":3.1,"Amanitabomination":-5.3,"Beaker Breakers":1.0,"Bellicose Biomancer":8.3,"Ceramic Golem":2.1,"Chimeric Sludge":5.5,"Displacer Kitty":-2.9,"Eelagator Escapee":5.5,"Extractnid Matriarch":-7.8,"Feral Pet Rock":6.4,"Filement Bunny":-1.2,"Fungal Flayer":3.9,"Gestalt Network":4.2,"Gnome Chomper":15.3,"Grafted Grifter":-3.3,"Half-life Host":3.6,"Leper Colonizers":1.9,"Lichen-Thrope":-3.4,"Morel Dilemma":1.6,"Myceleus, Co-consul of Rot":2.4,"Profane Geometry":3.9,"Rogue Golemancer":21.7,"Roudy Rinotter":5.2,"Sacred(?) Geometry":-8.9,"The Necrorancher":6.2,"The Punished":-12.4,"The Warcart":-10.4,"Toadtaur Warrior":7.3,"Toadtaur Wizard, Assistant to the Co-consul":7.8,"United Separatists":-2.0,"Whence Wolf":8.1,"Wooden Golem":4.9};
 function encounterDrop(e){ return (e && ENCOUNTER_DROP[e.name]) || 0; }
 function encounterSize(e){ if(!e) return 1; const v = ENCOUNTER_SIZE[e.name]; return v || (/Boss/.test(e.type) ? 1.35 : 1); }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.41.68 (Oct 21, 2026)
+- Jeremy's art for the 18 shrines that were borrowing another shrine's picture (batches L-N), including Goldberg's Rube Machine. Every monster and shrine now has its own art; SHRINE_ART_STANDIN is empty.
+- Monster Footing round 5 (Jeremy, Oct 20): 23 size/height moves (Alchemists Stone, Department Spore, Ecclectrical Outlet, Eelagator Escapee, Enchanted Anvil, Expediting Spores, Extruzeon, Feral Pet Rock, Filement Bunny, Grafted Grifter, the three fountains, Leper Colonizers, Myceleus, Prickly Porcupanther, Rabbid Rabbats, Roudy Rinotter, Sacred Bellows, Scrying Spheroid, Toadtaur Warrior, Untamed Unicrows, Whence Wolf). Feet within 0.4 px of the page.
+
 ## 1.41.67 (Oct 20, 2026)
 - Jeremy's repaints: the four Magic dice (Axiom of Choice, Domesticated Displacer, 273.15 Kelvin Box, Exile Elixir; were silhouettes), the 14 shrines with their own art (batches P-R), all 47 remaining character portraits (S-Z) and 51 loot pictures (LOOT_1-4). Portraits capped at 400 px and loot at 220 px (sharp on a 3x phone, art file 5.7 MB).
 
