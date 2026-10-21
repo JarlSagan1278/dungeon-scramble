@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.41.76 (Oct 21, 2026)
+- Rename (Jeremy, "keep for now"): Goldberg's Rube Machine -> Goldman's Rube Machine; saves carry over. Rulebook PDF regenerated.
 ## 1.41.75 (Oct 21, 2026)
 - Renames (Jeremy, release prep: names that borrowed another game's trademark): Displacer Kitty -> Transposer Kitty, Displacer Lair -> Transposer Lair, Domesticated Displacer -> Trained Transposer. Saved runs, dice copies, the Codex and run history carry over (one-time rename on load). Rulebook PDF regenerated.
 ## 1.41.74 (Oct 21, 2026)

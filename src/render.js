@@ -4321,7 +4321,7 @@ function trainBlockedText(){
   return need ? `Needs ${need} spare ${need===1?'die':'dice'} in your Pocket` : 'No sets of 3 yet';
 }
 function campfireChoiceHTML(){
-  if(S.campFireOut) return `<div class="campfire-choice out"><div class="cf-label">The campfire is out ${infoDot('Goldberg&#39;s Rube Machine took all night: no Rest or upgrades at this Camp.')}</div></div>`;
+  if(S.campFireOut) return `<div class="campfire-choice out"><div class="cf-label">The campfire is out ${infoDot('Goldman&#39;s Rube Machine took all night: no Rest or upgrades at this Camp.')}</div></div>`;
   const ch = S.campChoice, n = campFusionsReady(), est = restHealEstimate();
   const restSub = ch==='rest' ? `Healed +${S.campHealed||0}` : (S.health>=S.maxHealth ? 'Already at full health' : (est>0 ? '' : 'Heals nothing here'));
   const trainSub = ch==='train' ? ((S.campUpgrades.attack||S.campUpgrades.maneuver) ? 'Dice combined' : 'Combine dice below') : (n ? 'Unlocks combining below' : trainBlockedText());

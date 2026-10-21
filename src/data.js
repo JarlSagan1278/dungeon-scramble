@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.75';
+const GAME_VERSION = '1.41.76';
 
 function face(str){
   if(str==null) return {type:'blank'};
@@ -476,7 +476,7 @@ const FLOOR2_SHRINES = [
   enc('Blood of Spanneroth','Shrine',0,{boon:'Choose one of three offense Relics.', effect:{type:'relicChoice', theme:'offense'}}),
   enc('Ferrous Maiden','Shrine',0,{boon:'Choose one of three defense Relics.', effect:{type:'relicChoice', theme:'defense'}}),
   enc("Thom's Guide",'Shrine',0,{boon:'Choose one of three path and movement Relics.', effect:{type:'relicChoice', theme:'path'}}),
-  enc("Goldberg's Rube Machine",'Shrine',0,{boon:'It takes all night to run: give up your next campfire (no Rest or Train) to choose two of four Relics.', effect:{type:'choice', options:[
+  enc("Goldman's Rube Machine",'Shrine',0,{boon:'It takes all night to run: give up your next campfire (no Rest or Train) to choose two of four Relics.', effect:{type:'choice', options:[
     {label:'Skip your next campfire: choose 2 Relics', effect:{type:'bargain', price:{skipRest:true}, then:{type:'relicChoice', count:4, take:2}}},
     {label:'Walk away', effect:{type:'leave'}},
   ]}}),
@@ -658,7 +658,7 @@ const ENCOUNTER_SIZE = {
   'Madpie Nest':1.25,
   'Loot-Diagonalizer':1.25,
   'Healthy Hearth':1.35,
-  'Goldberg\'s Rube Machine':1.4,
+  'Goldman\'s Rube Machine':1.4,
   'Ferrous Maiden':1.65,
   'Faustian Spreadsheet':1.2,
   'Cryotherapist':1.25,
@@ -695,6 +695,6 @@ const ENCOUNTER_SIZE = {
 };
 // Oct 15 (Jeremy, Monster Footing page): how far each monster sits lower (+) or higher (-) in the face-off, in % of its
 // picture's height, so it scales with the screen. Set by dragging each one on the page; missing = 0.
-const ENCOUNTER_DROP = {"Thom's Guide":-21.4,"Surgery Community Theatre":-16.0,"Ruinous Rune Room":-2.5,"Madpie Nest":11.4,"Loot-Diagonalizer":-3.6,"Healthy Hearth":-5.5,"Goldberg's Rube Machine":3.8,"Ferrous Maiden":-17.3,"Faustian Spreadsheet":4.4,"Cryotherapist":4.2,"Charged Fae-Lines":20.6,"Blood-Drive Treats":4.0,"Ark of the Flood":-1.5,"Untamed Unicrows":-16.8,"Scrying Spheroid":-28.5,"Sacred Bellows":-2.4,"Rabbid Rabbats":-10.9,"Prickly Porcupanther":2.0,"Heron's Fountain":4.4,"Half-Full Fountain":4.4,"Half-Empty Fountain":4.4,"Extruzeon, Co-consul of Waste":3.2,"Expediting Spores":0.0,"Enchanted Anvil":0.0,"Ecclectrical Outlet":-0.1,"Department Spore":-5.1,"Alchemists Stone":-15.7,"Gnomeowners Association":4.7,"Grosteque Grafter":3.1,"Amanitabomination":-5.3,"Beaker Breakers":1.0,"Bellicose Biomancer":8.3,"Ceramic Golem":2.1,"Chimeric Sludge":5.5,"Transposer Kitty":-2.9,"Eelagator Escapee":5.5,"Extractnid Matriarch":-7.8,"Feral Pet Rock":6.4,"Filement Bunny":-1.2,"Fungal Flayer":3.9,"Gestalt Network":4.2,"Gnome Chomper":15.3,"Grafted Grifter":-3.3,"Half-life Host":3.6,"Leper Colonizers":1.9,"Lichen-Thrope":-3.4,"Morel Dilemma":1.6,"Myceleus, Co-consul of Rot":2.4,"Profane Geometry":3.9,"Rogue Golemancer":21.7,"Roudy Rinotter":5.2,"Sacred(?) Geometry":-5.3,"The Necrorancher":6.2,"The Punished":-12.4,"The Warcart":-10.4,"Toadtaur Warrior":2.6,"Toadtaur Wizard, Assistant to the Co-consul":7.8,"United Separatists":-2.0,"Whence Wolf":8.1,"Wooden Golem":4.9};
+const ENCOUNTER_DROP = {"Thom's Guide":-21.4,"Surgery Community Theatre":-16.0,"Ruinous Rune Room":-2.5,"Madpie Nest":11.4,"Loot-Diagonalizer":-3.6,"Healthy Hearth":-5.5,"Goldman's Rube Machine":3.8,"Ferrous Maiden":-17.3,"Faustian Spreadsheet":4.4,"Cryotherapist":4.2,"Charged Fae-Lines":20.6,"Blood-Drive Treats":4.0,"Ark of the Flood":-1.5,"Untamed Unicrows":-16.8,"Scrying Spheroid":-28.5,"Sacred Bellows":-2.4,"Rabbid Rabbats":-10.9,"Prickly Porcupanther":2.0,"Heron's Fountain":4.4,"Half-Full Fountain":4.4,"Half-Empty Fountain":4.4,"Extruzeon, Co-consul of Waste":3.2,"Expediting Spores":0.0,"Enchanted Anvil":0.0,"Ecclectrical Outlet":-0.1,"Department Spore":-5.1,"Alchemists Stone":-15.7,"Gnomeowners Association":4.7,"Grosteque Grafter":3.1,"Amanitabomination":-5.3,"Beaker Breakers":1.0,"Bellicose Biomancer":8.3,"Ceramic Golem":2.1,"Chimeric Sludge":5.5,"Transposer Kitty":-2.9,"Eelagator Escapee":5.5,"Extractnid Matriarch":-7.8,"Feral Pet Rock":6.4,"Filement Bunny":-1.2,"Fungal Flayer":3.9,"Gestalt Network":4.2,"Gnome Chomper":15.3,"Grafted Grifter":-3.3,"Half-life Host":3.6,"Leper Colonizers":1.9,"Lichen-Thrope":-3.4,"Morel Dilemma":1.6,"Myceleus, Co-consul of Rot":2.4,"Profane Geometry":3.9,"Rogue Golemancer":21.7,"Roudy Rinotter":5.2,"Sacred(?) Geometry":-5.3,"The Necrorancher":6.2,"The Punished":-12.4,"The Warcart":-10.4,"Toadtaur Warrior":2.6,"Toadtaur Wizard, Assistant to the Co-consul":7.8,"United Separatists":-2.0,"Whence Wolf":8.1,"Wooden Golem":4.9};
 function encounterDrop(e){ return (e && ENCOUNTER_DROP[e.name]) || 0; }
 function encounterSize(e){ if(!e) return 1; const v = ENCOUNTER_SIZE[e.name]; return v || (/Boss/.test(e.type) ? 1.35 : 1); }

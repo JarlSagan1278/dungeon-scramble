@@ -4,16 +4,16 @@
    ========================================================================= */
 let S = null;
 
-// Renamed content (Oct 21, 1.41.75: names that borrowed other games' trademarks). Saves, dice copies, the Codex,
+// Renamed content (Oct 21, 1.41.75-76: names that borrowed other games' trademarks). Saves, dice copies, the Codex,
 // run history and play data store names as JSON strings, so swap the quoted old name for the new one in every
 // dungeonScramble* key, once per load, before anything reads storage.
-const RENAMED = { 'Domesticated Displacer':'Trained Transposer', 'Displacer Kitty':'Transposer Kitty', 'Displacer Lair':'Transposer Lair' };
+const RENAMED = { 'Domesticated Displacer':'Trained Transposer', 'Displacer Kitty':'Transposer Kitty', 'Displacer Lair':'Transposer Lair', "Goldberg's Rube Machine":"Goldman's Rube Machine" };
 (function migrateRenamed(){
   try{
     for(let i = 0; i < localStorage.length; i++){
       const k = localStorage.key(i);
       if(!k || k.indexOf('dungeonScramble') !== 0) continue;
-      const v = localStorage.getItem(k); if(!v || v.indexOf('Displacer') < 0) continue;
+      const v = localStorage.getItem(k); if(!v || (v.indexOf('Displacer') < 0 && v.indexOf('Goldberg') < 0)) continue;
       let out = v;
       for(const [a, b] of Object.entries(RENAMED)) out = out.split(JSON.stringify(a)).join(JSON.stringify(b));
       if(out !== v) localStorage.setItem(k, out);
@@ -1222,7 +1222,7 @@ function advanceRoute(){
     S.campRested = false; // true once the campfire is used (Rest or Train)
     S.campChoice = null;  // Oct 14 (Jeremy): the campfire is a choice, 'rest' or 'train' (= combining dice)
     S.campFireOut = false;
-    if(S.skipNextRest && !(S.floorIdx===0 && S.routeStep===0)){ S.campFireOut = true; S.skipNextRest = false; S.campRested = true; logMsg('sys', "Goldberg's Rube Machine took all night: this campfire is out (no Rest or upgrades here).", 'bad'); }
+    if(S.skipNextRest && !(S.floorIdx===0 && S.routeStep===0)){ S.campFireOut = true; S.skipNextRest = false; S.campRested = true; logMsg('sys', "Goldman's Rube Machine took all night: this campfire is out (no Rest or upgrades here).", 'bad'); }
     teleLog('room_start', {type:'Camp', hp:S.health, maxHp:S.maxHealth});
     // a new segment (the stretch of rooms up to the next Camp or the Boss)
     // starts fresh -- one Shrine and one Trap are allowed per segment
