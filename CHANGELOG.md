@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.73 (Oct 21, 2026)
+- Class depth badges have their own shapes (Jeremy, "try it"): Guard a shield, Armsmaster crossed swords behind the medal, Arcanist an eight-point star with its X, Dungeoneer a stone archway with a keystone. Bronze/silver/gold rims and ribbons as before.
+- Hand-drawn texture pass (Jeremy) on the 15 dwarf and gnome portraits that kept their original art (Dwarf 0-3, 5-8; Gnome 0, 2, 3, 5, 6, 8, 11): slightly wobbly outlines and brush grain so they sit with the repainted ones. Pixies unchanged.
 ## 1.41.72 (Oct 21, 2026)
 - Art consistency study, decisions 1 and 3 (Jeremy): 19 pictures that were stretched 1.3-1.8x on the phone were rebuilt at higher resolution from Jeremy's canvases (Golemancer, Grifter, Displacer Lair, Grosteque Grafter, Blastogenesis Engine, Fungal Flayer, Oilephant's Foot, Bio-Mutant Escape, Extruzeon, Myceleus, and the L-N shrines Surgery Community Theatre, Healthy Hearth, Ark of the Flood, Blood-Drive Treats, Ferrous Maiden, Goldberg's Rube Machine, Ruinous Rune Room, Charged Fae-Lines, Faustian Spreadsheet). Same size and footing in game. Targeted fixes: thinner outer outlines (Healthy Hearth, Sacred(?) Geometry, Adhesive Pest Traps), unified line colour (Oilephant's Foot, Ergot Eruption), more contrast (Anti-Euclidian Space, Blood-Drive Treats).
 ## 1.41.71 (Oct 21, 2026)

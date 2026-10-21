@@ -101,19 +101,46 @@ function recordDepthResult(outcome){
 
 /* ---- Class badge (rosette) ---- */
 const BADGE_RIM = { 1:['#d79a5a','#7a4a22'], 2:['#e3e8ec','#8a949c'], 3:['#f6d56a','#b8872a'], 4:['#fff0a8','#c08a1e'] };
-function depthBadgeSVG(classColor, depth, size){
+// Oct 21 (Jeremy, "try it"): each class has its own badge shape -- Guard a shield, Armsmaster crossed swords
+// behind the medal, Arcanist an eight-point star with its X, Dungeoneer a stone archway. The rim keeps the
+// bronze/silver/gold tier colours; unknown classes keep the old rosette.
+const BADGE_ROSETTE = 'M52 4L60 9L70 7L75 16L85 20L84 31L92 39L88 49L93 59L85 66L84 77L74 80L68 89L58 87L52 94L46 87L36 89L30 80L20 77L19 66L11 59L16 49L12 39L20 31L19 20L29 16L34 7L44 9Z';
+function badgeStar(){ let d=''; for(let i=0;i<16;i++){ const r=i%2?33:45, t=(i*22.5-90)*Math.PI/180; d+=(i?'L':'M')+(52+r*Math.cos(t)).toFixed(1)+' '+(48+r*Math.sin(t)).toFixed(1); } return d+'Z'; }
+function badgeSword(rot){
+  return `<g transform="rotate(${rot} 52 48)"><path d="M48.5 -6L52 -14L55.5 -6L55.5 80L48.5 80Z" fill="#dfe6ea" stroke="#0c0705" stroke-width="3.5" stroke-linejoin="round"/><path d="M52 -9L52 78" stroke="#9aa6ad" stroke-width="1.6"/>`
+    + `<rect x="38" y="80" width="28" height="7" rx="3" fill="#c99a3a" stroke="#0c0705" stroke-width="3.2"/><rect x="48.5" y="87" width="7" height="11" fill="#6b3f1e" stroke="#0c0705" stroke-width="3"/><circle cx="52" cy="101" r="4.5" fill="#c99a3a" stroke="#0c0705" stroke-width="3"/></g>`;
+}
+function depthBadgeSVG(classColor, depth, size, classId){
   size = size || 64;
   const tier = finishTierFor(depth);
   const [r1, r2] = BADGE_RIM[tier] || BADGE_RIM[1];
   const gid = 'bg' + Math.random().toString(36).slice(2,7);
+  const rim = (d)=>`<path d="${d}" fill="url(#${gid})" stroke="#0c0705" stroke-width="5" stroke-linejoin="round"/>`;
+  const field = (d)=>`<path d="${d}" fill="${classColor}" stroke="#0c0705" stroke-width="4.5" stroke-linejoin="round"/>`;
+  let body, ty = 38, ny = 66;
+  if(classId==='guard'){
+    body = rim('M52 4L92 15L92 46C92 73 74 88 52 99C30 88 12 73 12 46L12 15Z') + field('M52 15L82 23L82 46C82 66 68 79 52 88C36 79 22 66 22 46L22 23Z');
+    ty = 41; ny = 69;
+  } else if(classId==='armsmaster'){
+    body = badgeSword(-45) + badgeSword(45) + `<circle cx="52" cy="48" r="33" fill="url(#${gid})" stroke="#0c0705" stroke-width="5"/><circle cx="52" cy="48" r="26" fill="${classColor}" stroke="#0c0705" stroke-width="4.5"/>`;
+  } else if(classId==='arcanist'){
+    body = rim(badgeStar()) + `<circle cx="52" cy="48" r="29" fill="${classColor}" stroke="#0c0705" stroke-width="4.5"/>`
+      + `<path d="M33 29L71 67M71 29L33 67" stroke="#fff" stroke-opacity=".15" stroke-width="5" stroke-linecap="round"/>`;
+  } else if(classId==='dungeoneer'){
+    const bricks = [[-60,36],[-25,36],[25,36],[60,36],[-90,14],[90,14]].map(([a])=>{ const t=(a-90)*Math.PI/180; return `M${(52+29*Math.cos(t)).toFixed(1)} ${(52+29*Math.sin(t)).toFixed(1)}L${(52+39*Math.cos(t)).toFixed(1)} ${(52+39*Math.sin(t)).toFixed(1)}`; }).join('');
+    body = rim('M12 98L12 52A40 40 0 0 1 92 52L92 98Z') + `<path d="${bricks}M12 76L22 76M82 76L92 76" stroke="#0c0705" stroke-width="3" stroke-opacity=".55"/>`
+      + field('M22 98L22 54A30 30 0 0 1 82 54L82 98Z') + `<path d="M45 8L59 8L57 22L47 22Z" fill="url(#${gid})" stroke="#0c0705" stroke-width="3.5" stroke-linejoin="round"/>`;
+    ty = 50; ny = 78;
+  } else {
+    body = rim(BADGE_ROSETTE) + `<circle cx="52" cy="48" r="30" fill="${classColor}" stroke="#0c0705" stroke-width="4.5"/>`;
+  }
   return `<svg class="depth-badge" width="${size}" height="${Math.round(size*1.2)}" viewBox="0 0 104 124" aria-hidden="true">
 <defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${r1}"/><stop offset="1" stop-color="${r2}"/></linearGradient></defs>
 <path d="M30 70L20 120L36 108L48 122L56 76Z" fill="${classColor}" stroke="#0c0705" stroke-width="4.5" stroke-linejoin="round"/><path d="M74 70L84 120L68 108L56 122L48 76Z" fill="${classColor}" stroke="#0c0705" stroke-width="4.5" stroke-linejoin="round"/><path d="M30 70L20 120L36 108L48 122L56 76Z" fill="#000" opacity=".25"/>
-<path d="M52 4L60 9L70 7L75 16L85 20L84 31L92 39L88 49L93 59L85 66L84 77L74 80L68 89L58 87L52 94L46 87L36 89L30 80L20 77L19 66L11 59L16 49L12 39L20 31L19 20L29 16L34 7L44 9Z" fill="url(#${gid})" stroke="#0c0705" stroke-width="5" stroke-linejoin="round"/>
-<circle cx="52" cy="48" r="30" fill="${classColor}" stroke="#0c0705" stroke-width="4.5"/>
-<ellipse cx="44" cy="34" rx="17" ry="9" fill="#fff" opacity=".16" transform="rotate(-25 44 34)"/>
-<text x="52" y="38" text-anchor="middle" font-family="Georgia,serif" font-size="10" font-weight="800" fill="#fff" fill-opacity=".9" letter-spacing="2">DEPTH</text>
-<text x="52" y="66" text-anchor="middle" font-family="Georgia,serif" font-size="${depthLabel(depth)>9?26:32}" font-weight="800" fill="#fff" stroke="#0c0705" stroke-opacity=".75" stroke-width="1.6" paint-order="stroke">${depthLabel(depth)}</text></svg>`;
+${body}
+<ellipse cx="44" cy="${ty-4}" rx="17" ry="9" fill="#fff" opacity=".16" transform="rotate(-25 44 ${ty-4})"/>
+<text x="52" y="${ty}" text-anchor="middle" font-family="Georgia,serif" font-size="10" font-weight="800" fill="#fff" fill-opacity=".9" letter-spacing="2">DEPTH</text>
+<text x="52" y="${ny}" text-anchor="middle" font-family="Georgia,serif" font-size="${depthLabel(depth)>9?26:32}" font-weight="800" fill="#fff" stroke="#0c0705" stroke-opacity=".75" stroke-width="1.6" paint-order="stroke">${depthLabel(depth)}</text></svg>`;
 }
 function depthBadgeEmptySVG(size){
   size = size || 64;
@@ -122,7 +149,7 @@ function depthBadgeEmptySVG(size){
 function classBadgeHTML(klass, size, withScore){
   const b = DEPTH_BEST.byClass[klass.id];
   if(!b || !b.depth) return `<div class="depth-badge-wrap">${depthBadgeEmptySVG(size)}<div class="depth-badge-pill">Not cleared</div></div>`;
-  return `<div class="depth-badge-wrap">${depthBadgeSVG(klass.color, b.depth, size)}${withScore?`<div class="depth-badge-pill">${b.score.toLocaleString()}</div>`:''}</div>`;
+  return `<div class="depth-badge-wrap">${depthBadgeSVG(klass.color, b.depth, size, klass.id)}${withScore?`<div class="depth-badge-pill">${b.score.toLocaleString()}</div>`:''}</div>`;
 }
 
 /* ---- Dice finish (filigree border + corner plates), drawn as an overlay ----
@@ -173,7 +200,7 @@ function depthSealHTML(){
   const tier = finishTierFor(r.depth);
   const newTier = r.newTier ? `<div class="seal-unlock">New dice finish unlocked: <b>${FINISH_NAMES[r.newTier]}</b></div>` : '';
   return `<div class="depth-seal">
-    ${depthBadgeSVG(c, r.depth, 92)}
+    ${depthBadgeSVG(c, r.depth, 92, S.klass.id)}
     <div class="depth-seal-text">
       <div class="depth-seal-kicker">${r.newClassBest ? 'New best depth' : 'Depth '+depthLabel(r.depth)+' cleared'}</div>
       <div class="depth-seal-title">${depthTitleFor(r.depth)}</div>

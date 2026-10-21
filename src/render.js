@@ -881,7 +881,7 @@ function renderTitle(){
             <button id="title-history-btn" class="btn-records">Records</button>
             <button id="title-howto-btn" class="btn-howto">How to Play</button>
           </div>
-          ${(()=>{ const earned = CLASSES.filter(k=>!k.debug && DEPTH_BEST.byClass[k.id] && DEPTH_BEST.byClass[k.id].depth); return earned.length ? `<div class="title-badges">${earned.map(k=>`<div class="title-badge">${depthBadgeSVG(k.color, DEPTH_BEST.byClass[k.id].depth, 52)}</div>`).join('')}</div>` : ''; })()}
+          ${(()=>{ const earned = CLASSES.filter(k=>!k.debug && DEPTH_BEST.byClass[k.id] && DEPTH_BEST.byClass[k.id].depth); return earned.length ? `<div class="title-badges">${earned.map(k=>`<div class="title-badge">${depthBadgeSVG(k.color, DEPTH_BEST.byClass[k.id].depth, 52, k.id)}</div>`).join('')}</div>` : ''; })()}
           <p class="hint" style="text-align:center; margin:10px 0 0; font-size:12px;">Playtesting? After a few runs, tap the gear &rarr; Export Play Data and send the file.</p>
           <p class="hint" style="text-align:center; margin:6px 0 0; font-size:13px; font-weight:700; opacity:.8;">v${GAME_VERSION}</p>
         </div>

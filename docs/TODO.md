@@ -37,12 +37,12 @@
 
 ## Other items
 - **Tap responsiveness (ongoing):** path taps ~2.5x faster (1.39.2); idle animations compositor-only (1.40.0, idle board ~7x cheaper). Next candidates: Swap/Reroll and class-ability taps (still full render), camp screen, turn playback script. Measure at CPU x4 with studies paused.
-- **Shrine overhaul:** more presence in animation and timing; many more shrines as a way to add relics; conversion-relic idea (e.g. 1 damage per Shield gained). Use the shrine study's findings.
+- ~~Shrine overhaul~~ done (ritual, 30 shrines, relics, boosts). Leftover idea: a conversion relic (e.g. 1 damage per Shield gained).
 - **Sound effect pass:** waiting on Jeremy's ear test.
-- ~~Design-consistency audit~~ done Oct 17 (1.41.60-1.41.61). Left: six `--` strings in data.js; Rube Machine needs its own art.
-- **Redesign the class depth badges** so each one represents its class visually.
-- **When all the art is in (remind Jeremy):** (1) the consistency pass `tools/art/consistency.py` over ALL art, stronger than the Oct 12 test; (2) the hand-drawn texture pass `tools/art/handdrawn.py` on all 48 hero portraits, and try it on the chest and environment art.
-- **Art still needed:** the 4 Magic dice, the stand-in shrines (incl. the Scroll Dispensers), floor and archway bricks, eventually a chest paintover (last priority). Layered cover art parked.
+- ~~Design-consistency audit~~ done Oct 17 (1.41.60-1.41.61). Left: six `--` strings in data.js.
+- ~~Class depth badges~~ redesigned per class (1.41.73).
+- ~~Consistency + hand-drawn passes~~ done Oct 21 (study; targeted fixes + hi-res 1.41.72; hand-drawn on the 15 original dwarf/gnome portraits 1.41.73; global pass declined).
+- **Art still needed:** only BATCH_AA (the 4 restyles). Scenery paintover not needed for now (paper texture covers it). Layered cover art parked.
 - **Rulebook refresh** (rulebook is at build 1.32.28; many rules changed since). Armsmaster red Skill vs red Clear: options shown Oct 15, waiting on Jeremy.
 - **Relic look polish (later):** a bracelet view in the relic list, sockets that grow with depth.
 - **Replay tool** for the tray/path telemetry, once playtesters send exports.
