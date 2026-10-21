@@ -42,7 +42,7 @@
 - ~~Design-consistency audit~~ done Oct 17 (1.41.60-1.41.61). Left: six `--` strings in data.js.
 - ~~Class depth badges~~ redesigned per class (1.41.73).
 - ~~Consistency + hand-drawn passes~~ done Oct 21 (study; targeted fixes + hi-res 1.41.72; hand-drawn on the 15 original dwarf/gnome portraits 1.41.73; global pass declined).
-- **Art still needed:** none queued (all batches in as of 1.41.74). Scenery paintover not needed for now (paper texture covers it). Layered cover art parked.
+- **Art still needed:** new title-screen art drawn from scratch (canvas DungeonScramble_TitleArt_canvas.psd sent Oct 21: 2048x2434, layers Background/Scenery/Monsters/Heroes/Logo + guides for the title fade and Steam capsule crops; old cover as a hidden layout reference). Import as COVER_ART when it comes back; keep the logo layer for Steam. Scenery paintover not needed for now (paper texture covers it). Layered cover art parked.
 - **Rulebook refresh** (rulebook is at build 1.32.28; many rules changed since). Armsmaster red Skill vs red Clear: options shown Oct 15, waiting on Jeremy.
 - **Relic look polish (later):** a bracelet view in the relic list, sockets that grow with depth.
 - **Replay tool** for the tray/path telemetry, once playtesters send exports.
