@@ -20,7 +20,7 @@
 - Oct 15 (1.41.22-1.41.32): monster tuning, Floor 2 trims, shrine boosts, Extruzeon +10% HP, depth repricing, automatic play data, Batch E art, paper texture on all art (WebP) and in-world scenery, Monster Footing rounds 1-2. The Play Data sheet is still empty: needs the 1.41.24+ zip deployed and a finished run with sharing on.
 - Bug hunt on 1.41.32: 24/24 runs clean (bugsearch.js), every shrine option clean (new tools/test_shrines.js, 40/40). Rulebook PDF refreshed for today's changes.
 - Monster Footing page (https://claude.ai/artifact/6sxozXQfah2dSsRxnQEAkj) collection `lifts3` is round 3 (empty so far).
-- Art: 70 pictures came back unpainted from batches S-Z and LOOT_1-2 (R, LOOT_3, LOOT_4 fixed Oct 21; Sporific Staff still original) (list in PROJECT_CONTEXT); waiting on Jeremy to re-upload the painted versions. Then the art consistency pass (tools/art/consistency.py), which he asked to hold until all art is in.
+- Art: pixie portraits stay original (Jeremy, Oct 21); some dwarf/gnome portraits and LOOT_1/2 loot remain original. Consistency sweep/study in progress (Oct 21).
 
 ## Small follow-ups
 - Log whether a death was avoidable in the bot studies (literature review idea). Best-depth rewards: covered by dice finishes and relic gating (Jeremy, Oct 15); assist mode: not for now.
