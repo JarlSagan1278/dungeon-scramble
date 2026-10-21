@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.70 (Oct 21, 2026)
+- Jeremy's repainted loot, batches LOOT_3 and LOOT_4 (re-uploaded): 25 pictures. Sporific Staff came back unchanged; Dodecahedron of Future Pasts and Bonus Breakfast only lightly touched.
+
 ## 1.41.69 (Oct 21, 2026)
 - Jeremy's repainted Floor 3 shrines (new Batch R upload): Scrying Spheroid, Heron's Fountain, Storied Emporium, Scroll Dispenser: TSOP.
 
