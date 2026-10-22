@@ -26,7 +26,7 @@ Dungeon Scramble is a roguelike dungeon crawler where you roll a 4x4 tray of dic
 | Languages | English [CONFIRM] |
 | Pre-launch | App Store pre-order and Google Play pre-registration [LINKS WHEN LIVE] |
 | Website / press kit | [WEBSITE URL] |
-| Contact | [CONTACT EMAIL] |
+| Contact | dungeonscramblegame@gmail.com |
 | Art note | [DECIDE how to describe the art: the plan is to disclose AI-assisted art on Steam and to redraw the most-seen art (title screen first) by hand.] |
 | Development note | [DECIDE whether to mention that the digital version is built with an AI coding assistant.] |
 
