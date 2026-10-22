@@ -25,8 +25,8 @@ Dungeon Scramble is a roguelike dungeon crawler where you roll a 4x4 tray of dic
 | Content (build 1.41.76) | 4 origins, 4 classes, 3 floors, 37 monsters, 12 traps, 9 bosses (3 Big Bosses with a second phase), 32 shrines, 56 loot dice, 27 relics, 10 stackable depth modifiers |
 | Languages | English [CONFIRM] |
 | Pre-launch | App Store pre-order and Google Play pre-registration [LINKS WHEN LIVE] |
-| Website / press kit | [WEBSITE URL] |
-| Contact | dungeonscramblegame@gmail.com |
+| Website / press kit | https://dungeonscramble.com (press kit: https://dungeonscramble.com/press) |
+| Contact | contact@dungeonscramble.com |
 | Art note | [DECIDE how to describe the art: the plan is to disclose AI-assisted art on Steam and to redraw the most-seen art (title screen first) by hand.] |
 | Development note | [DECIDE whether to mention that the digital version is built with an AI coding assistant.] |
 
