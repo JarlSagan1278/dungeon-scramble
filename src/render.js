@@ -4862,7 +4862,7 @@ function demoTeaserHTML(){
   const dice = pickFrom(DEMO_TEASER_GILDED, GILDED, 1).concat(pickFrom(DEMO_TEASER_MAGIC, MAGIC, 2));
   if(!dice.length) return '';
   return `<div class="demo-teaser"><div class="demo-teaser-cap">Two more floors wait in the full game, with dice like these:</div>
-    <div class="demo-teaser-row">${dice.map((d,i)=>`<div class="demo-teaser-die" title="${d.name}: ${d.faces.map(f=>LABEL[f.type]+(f.value!=null&&f.type!=='blank'?' '+f.value:'')).join(', ')}"><img class="demo-teaser-art tier-${GILDED.includes(d)?'gilded':'magic'}" src="${LOOT_ART[d.name]}" alt="${d.name}"><span class="demo-teaser-name tier-${GILDED.includes(d)?'gilded':'magic'}">${d.name}</span></div>`).join('')}</div></div>`;
+    <div class="demo-teaser-row">${dice.map((d,i)=>`<div class="demo-teaser-die" title="${d.name}: ${d.faces.map(f=>LABEL[f.type]+(f.value!=null&&f.type!=='blank'?' '+f.value:'')).join(', ')}"><div class="demo-teaser-top"><img class="demo-teaser-art tier-${GILDED.includes(d)?'gilded':'magic'}" src="${LOOT_ART[d.name]}" alt="${d.name}"><div class="demo-teaser-faces">${d.faces.map(f=>`<span class="demo-face${f.type==='blank'?' blank':''}">${f.type==='blank'?'':iconSpan(f.type, f.value)}</span>`).join('')}</div></div><span class="demo-teaser-name tier-${GILDED.includes(d)?'gilded':'magic'}">${d.name}</span></div>`).join('')}</div></div>`;
 }
 function renderGameOver(){
   if(!S.gameOverRecorded){

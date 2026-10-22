@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.41.81 (Oct 22, 2026)
+- Demo end teaser (Jeremy): each teased loot die now shows its six faces in a small grid beside its picture (blank faces as dark squares). Still fits the card.
 ## 1.41.80 (Oct 22, 2026)
 - Demo build (Jeremy): the "Floor 1 Cleared!" screen shows three loot dice from the deeper floors (one Gilded, two Magic, picked at random from a showy shortlist with art), captioned "Two more floors wait in the full game, with dice like these". The intro line is shortened so the screen still fits the card with the play-data question showing.
 ## 1.41.79 (Oct 22, 2026)
