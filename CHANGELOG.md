@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased (Oct 21, 2026)
+## 1.41.78 (Oct 22, 2026)
+- Freeze (Jeremy): a regular enemy now skips its whole turn even on a heavy turn (before, Freeze only cancelled the doubling); the skipped heavy turn still counts, and the next-turn chips show 0. Bosses unchanged (Freeze cancels the special; the every-turn attack still lands). Rulebook updated.
+- Public builds (`--release`, `--demo`) hide the "Playtesting? Export Play Data" line on the title screen.
+- Press kit page (docs/release/presskit.html) and marketing media capture scripts (tools/media/; screenshots, App Store images, path/boss GIF+MP4 into the git-ignored docs/release/media/).
 - Rulebook text refreshed to the current game (1.41.77): Quest Health removed, current quest wording, health ranges now computed from the data, relic shrine offers, camp Train lock, minion and carried-die details, Records Backup, play-data wording. PDF regenerated (31 pages).
 - Demo build (`--demo`) strips Floors 2-3: their encounters, Big Bosses, boss kits and 60 pictures (5.1 MB vs 7.6 MB).
 ## 1.41.77 (Oct 21, 2026)

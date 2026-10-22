@@ -2310,16 +2310,18 @@ function runEncounterAction(){
   if(e.kit) return bossTakeTurn(e, frozen);
   const heavy = enemyHeavyNext(e);
   e.turnsActed = (e.turnsActed||0) + 1;
-  if(frozen && !heavy){
-    const text = `${e.name} is frozen and skips its action.`;
+  // Freeze (Jeremy, Oct 22): a regular enemy skips its whole turn, heavy or not; a skipped heavy turn still counts as used.
+  if(frozen){
+    const text = heavy ? `${e.name} is frozen: its heavy turn is skipped.` : `${e.name} is frozen and skips its action.`;
+    if(heavy) teleLog('heavy_turn', {name:e.name, frozen:true});
     logMsg('sys', text);
     return text;
   }
-  const hs = (heavy && !frozen) ? enemyHeavyStat(e) : null;
+  const hs = heavy ? enemyHeavyStat(e) : null;
   S._wardHalf = !!(hs && hasRelic('warding_bell') && !e._wardUsed); if(S._wardHalf) e._wardUsed = true;
   const x = k => (k===hs ? 2 : 1);
   const parts = [];
-  if(heavy) parts.push(frozen ? `${e.name} is frozen: its heavy turn is cancelled.` : 'Heavy turn!');
+  if(heavy) parts.push('Heavy turn!');
   S._heavyHit = !!hs;
   if(e.dmg>0) parts.push(dealEncounterDamage(e, e.dmg*x('dmg')));
   S._heavyHit = false;
@@ -2333,7 +2335,7 @@ function runEncounterAction(){
     if(t) parts.push(t);
   }
   S._wardHalf = false;
-  if(heavy) teleLog('heavy_turn', {name:e.name, frozen});
+  if(heavy) teleLog('heavy_turn', {name:e.name, frozen:false});
   return parts.length ? parts.join(' ') : `${e.name} takes no action.`;
 }
 
@@ -2353,8 +2355,8 @@ function enemyNextTurnPreview(e){
     const sp = bossNextSpecial(e), kit = bossKitNow(e);
     return {special:sp, heavy:!!sp.windup, dmg: dmgOf(kit.each, false) + (S.freezeNext ? 0 : dmgOf(sp.acts, true))};
   }
-  const heavy = enemyHeavyNext(e) && !S.freezeNext;
-  if(S.freezeNext && !enemyHeavyNext(e)) return {heavy:false, dmg:0};
+  if(S.freezeNext) return {heavy:false, dmg:0}; // frozen: the whole turn is skipped (Oct 22)
+  const heavy = enemyHeavyNext(e);
   return {heavy, heavyStat: heavy ? enemyHeavyStat(e) : null, dmg: hitOf((e.dmg||0) * (heavy && enemyHeavyStat(e)==='dmg' ? 2 : 1), heavy)};
 }
 

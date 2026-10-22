@@ -130,7 +130,7 @@ const fr=[['hit','Hit N','Deal N damage.'],
 ['boost','Boost ×N','Multiply the next Hit, Combo, D.O.T., Leech, Heal, H.O.T. or Block in your Path by N. Consecutive Boosts multiply (×2 then ×3 is ×6). Any other face in between wastes it.'],
 ['dodge','Dodge','Path may continue to a diagonal die. No other effect.'],['leap','Leap','Path may continue exactly two squares away in a straight line. Clears a Minion in the square it jumps over, and may land on one.'],
 ['pivot','Pivot','Path may continue to any of the eight neighbors. No other effect.'],['fumble','Fumble N','Add N to your <i>own</i> D.O.T. (never multiplied by Boost). The Path continues normally.'],
-['freeze','Freeze','Cancels the enemy\'s next move: a regular enemy skips its turn (on a heavy turn, only the heavy part is cancelled); a boss still makes its every-turn attack but its special is cancelled. It still takes D.O.T. and heals from H.O.T.'],['nullify','Nullify','Clears everything it can reach at once: every Minion, your D.O.T. and the enemy\'s H.O.T.'],
+['freeze','Freeze','Cancels the enemy\'s next move: a regular enemy skips its whole turn, even a heavy one; a boss still makes its every-turn attack but its special is cancelled. It still takes D.O.T. and heals from H.O.T.'],['nullify','Nullify','Clears everything it can reach at once: every Minion, your D.O.T. and the enemy\'s H.O.T.'],
 ['swap','Swap','Tap it, then another die: the two trade places. Afterwards it is a Pivot for the turn.'],['reroll','Reroll','Tap it, then another die: that die rolls a different face that isn\'t blank. Afterwards it is a Pivot for the turn.']];
 C+=ch(5,'Actions &amp; Statuses',`
 <h3>Action Faces</h3>
