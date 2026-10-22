@@ -251,3 +251,4 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - **Marketing (Jeremy, Oct 22):** no classroom/teacher channel (no classroom builds or worksheets). The creators' story stays as a press hook.
 - **Privacy policy (Jeremy, Oct 22):** uploaded play data kept 2 years, then deleted; deletion requests handled within 30 days.
 - **Contact email (Jeremy, Oct 22):** dungeonscramblegame@gmail.com (dedicated game address; public in the privacy policy, press kit and store listings). Plan: add a forwarding address on the game domain once bought.
+- **Play-data endpoint (Jeremy, Oct 22, #10):** keep the Apps Script, harden it: posts checked (size <=800 KB, device/run id formats, outcome, field types) and capped at 20 per device per hour; purgeOld() deletes runs older than 2 years daily (installDailyPurge, run once); deletePlayer(id) for deletion requests. Jeremy pastes tools/playdata/apps_script.gs and deploys a New version.
