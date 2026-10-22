@@ -8,14 +8,14 @@ Dungeon Scramble is a turn-based roguelike where every turn is a small puzzle. R
 
 ## Short version (3 sentences)
 
-Dungeon Scramble is a roguelike dungeon crawler where you roll a 4x4 tray of dice and trace one path through it to attack, block and heal. Monsters telegraph their next move, so each turn is a puzzle you can solve rather than a coin flip. It is made by a math teacher who first designed it as a board game, and it is coming to iPhone and Android with Floor 1 free and no ads.
+Dungeon Scramble is a roguelike dungeon crawler where you roll a 4x4 tray of dice and trace one path through it to attack, block and heal. Monsters telegraph their next move, so each turn is a puzzle you can solve rather than a coin flip. It was designed by Jeremy Friedman, a mechanical engineer turned math-teacher-in-training, and his wife Katlynn, first as a board game, and it is coming to iPhone and Android with Floor 1 free and no ads.
 
 ## Fact sheet
 
 | | |
 |---|---|
 | Game | Dungeon Scramble |
-| Developer | Jeremy Friedman (solo designer) [STUDIO OR TRADE NAME, if any] |
+| Developer | Jeremy Friedman (developer); board game and core mechanics designed by Jeremy and his wife Katlynn [STUDIO OR TRADE NAME, if any] |
 | Based in | [CITY / COUNTRY] |
 | Genre | Turn-based roguelike, dice-path puzzle, dungeon crawler |
 | Platforms | iPhone and Android first (launching together); Steam later (planned 3-6 months after the phone launch, Coming Soon page up at launch). A free web demo on itch.io is planned before launch. |
@@ -32,8 +32,8 @@ Dungeon Scramble is a roguelike dungeon crawler where you roll a 4x4 tray of dic
 
 ## The story (~150 words)
 
-Jeremy Friedman teaches math. Dungeon Scramble began as his own tabletop game: a word-game-style grid of dice where, instead of spelling words, you trace a path from die to die and every face you land on is an attack, a block or a trick. Add monsters, loot and a dungeon to kick your way through, and the board game was born.
+Dungeon Scramble began as a tabletop game designed by Jeremy Friedman and his wife Katlynn. Jeremy has a master's in engineering and worked as a mechanical engineer before switching careers toward teaching math. Together they built the game and its mechanics: a word-game-style grid of dice where, instead of spelling words, you trace a path from die to die and every face you land on is an attack, a block or a trick. Add monsters, loot and a dungeon to kick your way through, and the board game was born.
 
-Then he started building a digital version to test it, and it kept growing. The computer could handle the bigger numbers, stacking effects and bosses with whole move lists that would bog down a game played by hand. Somewhere along the way he decided, in his words, "this is a video game now." The board game edition was set aside, and the video game took over.
+Then Jeremy started building a digital version to test it, and it kept growing. The computer could handle the bigger numbers, stacking effects and bosses with whole move lists that would bog down a game played by hand. Somewhere along the way he decided, in his words, "this is a video game now." The board game edition was set aside, and the video game took over.
 
-The math teacher still shows. The monsters and items have names like the Anti-Euclidian Space, the N-th Dimensional Printer and the Gnomeowners Association. [ADD a personal line or quote from Jeremy, e.g. when he designed the board game or who he first played it with.]
+The engineer and the math lover both still show. The monsters and items have names like the Anti-Euclidian Space, the N-th Dimensional Printer and the Gnomeowners Association. [ADD a personal line or quote from Jeremy, e.g. when he designed the board game or who he first played it with.]

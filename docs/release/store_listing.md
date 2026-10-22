@@ -58,10 +58,10 @@ Some foes have a math problem. Others are the math problem. Expect the Anti-Eucl
 FAIR PRICE, NO ADS
 Floor 1 is free to play, start to finish. One purchase unlocks the Full Dungeon for good. No ads, no energy timers, no account. Your progress stays on your device, and the game plays offline.
 
-Designed by a math teacher who first built it as a board game.
+Designed by Jeremy and Katlynn, who first built it as a board game.
 ```
 
-Claims check: "see what each one plans to do next turn" = the face-off next-turn chips (`enemyNextTurnPreview`); "second phase" = Big Boss `phase2` kits; "unlock as starting boons" = 3 copies rule; "rest, or train your dice" = the camp fire is Rest OR Train; "plays offline" = true for the web build (service worker) and the native app, apart from the store purchase itself. "Designed by a math teacher who first built it as a board game" is from PROJECT_CONTEXT; remove it if Jeremy would rather keep the listing impersonal. [CONFIRM what exactly Floor 1 free includes, e.g. all four classes or only some, and update "Floor 1 is free to play, start to finish."]
+Claims check: "see what each one plans to do next turn" = the face-off next-turn chips (`enemyNextTurnPreview`); "second phase" = Big Boss `phase2` kits; "unlock as starting boons" = 3 copies rule; "rest, or train your dice" = the camp fire is Rest OR Train; "plays offline" = true for the web build (service worker) and the native app, apart from the store purchase itself. "Designed by Jeremy and Katlynn, who first built it as a board game" is from Jeremy (Oct 22); remove it if Jeremy would rather keep the listing impersonal. [CONFIRM what exactly Floor 1 free includes, e.g. all four classes or only some, and update "Floor 1 is free to play, start to finish."]
 
 ## App Store keywords (max 100)
 
