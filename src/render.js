@@ -4849,9 +4849,20 @@ function renderDemoEnd(){
     if(typeof musicSting==='function') musicSting('win'); else playTone('grandVictory');
     if(typeof spawnConfettiRain==='function') spawnConfettiRain();
   }
-  app.innerHTML = endScreenHTML({ outcome:'demo', title:'Floor 1 Cleared!', lede:'That is the end of the free demo. The full dungeon goes two floors deeper, with new monsters, shrines, loot and two more bosses, then ten depth levels to climb.',
-    seal:'', relic:'', again:'Play Again' });
+  app.innerHTML = endScreenHTML({ outcome:'demo', title:'Floor 1 Cleared!', lede:'That is the end of the free demo.',
+    seal:'', relic:'', again:'Play Again', note:demoTeaserHTML() });
   wireRunCard('demo');
+}
+// Demo end teaser (Jeremy, Oct 22): a peek at the Gilded and Magic loot dice the full game holds (one Gilded, two Magic,
+// picked from the showiest that have art). Loot dice stay in the demo build, so their art is available here.
+const DEMO_TEASER_GILDED = ['Greaterhammer','Drill Shield','Charge-Atlatl','Portable RNGenerator','Mining Mines','Cool Whip'];
+const DEMO_TEASER_MAGIC = ['Greatesthammer','Dodecahedron of Future Pasts','Warp Crossbow','N-th Dimensional Printer',"Hospitaler's Merciful Guillotine",'Straw of the Last Lamia','Axiom of Choice','273.15 Kelvin Box'];
+function demoTeaserHTML(){
+  const pickFrom = (names, pool, n)=>pickN(names.map(nm=>pool.find(d=>d.name===nm)).filter(d=>d && LOOT_ART[d.name]), n);
+  const dice = pickFrom(DEMO_TEASER_GILDED, GILDED, 1).concat(pickFrom(DEMO_TEASER_MAGIC, MAGIC, 2));
+  if(!dice.length) return '';
+  return `<div class="demo-teaser"><div class="demo-teaser-cap">Two more floors wait in the full game, with dice like these:</div>
+    <div class="demo-teaser-row">${dice.map((d,i)=>`<div class="demo-teaser-die" title="${d.name}: ${d.faces.map(f=>LABEL[f.type]+(f.value!=null&&f.type!=='blank'?' '+f.value:'')).join(', ')}"><img class="demo-teaser-art tier-${GILDED.includes(d)?'gilded':'magic'}" src="${LOOT_ART[d.name]}" alt="${d.name}"><span class="demo-teaser-name tier-${GILDED.includes(d)?'gilded':'magic'}">${d.name}</span></div>`).join('')}</div></div>`;
 }
 function renderGameOver(){
   if(!S.gameOverRecorded){

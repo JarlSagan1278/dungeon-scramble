@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.41.80 (Oct 22, 2026)
+- Demo build (Jeremy): the "Floor 1 Cleared!" screen shows three loot dice from the deeper floors (one Gilded, two Magic, picked at random from a showy shortlist with art), captioned "Two more floors wait in the full game, with dice like these". The intro line is shortened so the screen still fits the card with the play-data question showing.
 ## 1.41.79 (Oct 22, 2026)
 - Guided first fight (release checklist #23): a device's first run opens its first room on the Filement Bunny with a ready-made Path (Hit, Hit, Combo) in the middle row. A speech bubble and a glowing ring walk the player through tapping it and pressing Go (other dice just wiggle), then point at the enemy's next-move chip on turn 2 and let them finish the fight. Skippable at any step; never shown to returning players or bots. The class Skill card and "New Action" cards wait until it ends. The bubble and ring float over the game, so the card never moves or grows.
 ## 1.41.78 (Oct 22, 2026)
