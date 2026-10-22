@@ -2021,7 +2021,7 @@ function maybeAbilityCoach(){
   if(!META.coachSeen) META.coachSeen = {};
   if(META.coachSeen[id] || document.querySelector('.coach-overlay') || S.lootChoice || S.shrineChoice || S.relicChoice) return;
   // wait for the room banner ("You scramble into...") to be tapped away first
-  if(document.getElementById('room-callout') || document.querySelector('.modal-overlay')){ clearTimeout(maybeAbilityCoach._t); maybeAbilityCoach._t = setTimeout(maybeAbilityCoach, 400); return; }
+  if(document.getElementById('room-callout') || document.querySelector('.modal-overlay') || (S.guide && S.guide.stage!=='done')){ clearTimeout(maybeAbilityCoach._t); maybeAbilityCoach._t = setTimeout(maybeAbilityCoach, 400); return; } // the guided first fight goes first
   META.coachSeen[id] = Date.now(); saveMeta();
   const overlay = el(`<div class="modal-overlay coach-overlay"><div class="modal coach-card" style="text-align:center; max-width:320px; --class-color:${S.klass.color||'#d4af52'}">
       <h2 style="margin-top:0;">${S.klass.name} Skill</h2>
@@ -2393,6 +2393,7 @@ function placeVs(){
 window.addEventListener('resize', ()=> placeVs());
 function maybeShowSymbolIntro(){
   try{
+    if(S.guide && (S.guide.stage==='t1' || S.guide.stage==='t2')) return; // the guided first fight talks first; intros follow later
     if(document.getElementById('symbol-intro')) return;
     if(document.querySelector('.modal-overlay')) return;
     if(S.screen!=='game' || !S.encounter) return;
@@ -4924,3 +4925,66 @@ function newAchievementsHTML(newAchievements){
       ${rows}
     </div>`;
 }
+
+// ---- Guided first fight (Oct 22): the speech bubble above the tray and the glowing ring on the next die / Go.
+// Both are position:fixed overlays measured from the live layout, so the game card never moves or grows.
+// Polled (cheap) so it follows full renders, fast path renders and banners without hooking each one.
+const GUIDE_TEXT = {
+  t1: ['<b>This is your Tray.</b> Tap the glowing die to start a Path.',
+       'Now tap the glowing neighbor. Every die you step on fires its face.',
+       'One more! A <b>Combo</b> hits harder when it touches Hits.',
+       'That number is your Path\'s damage. Tap <b>Go</b>!'],
+  t2: 'Monsters show their <b>next move</b> under their name, so you can plan for it. Your Tray re-rolled: build any Path and finish the fight!',
+};
+function guideNudge(idx){
+  const d = document.querySelector(`#tray .die[data-idx="${idx}"]`); if(!d) return;
+  d.classList.remove('guide-nudge'); void d.offsetWidth; d.classList.add('guide-nudge');
+  const r = document.getElementById('guide-ring'); if(r){ r.classList.remove('guide-flash'); void r.offsetWidth; r.classList.add('guide-flash'); }
+}
+function guideSkip(){ guideFinish('skip'); updateGuide(); if(typeof saveGame==='function') saveGame(); }
+function updateGuide(){
+  let b = document.getElementById('guide-bubble'), r = document.getElementById('guide-ring');
+  const hide = ()=>{ if(b) b.hidden = true; if(r) r.hidden = true; };
+  if(typeof S==='undefined' || !S || !S.guide || S.guide.stage==='done' || S.guide.stage==='pending'){ if(b) b.remove(); if(r) r.remove(); return; }
+  if(S.screen!=='game' || !S.encounter || S.encounter.curHealth<=0){
+    guideFinish('won'); if(b) b.remove(); if(r) r.remove();
+    if(typeof showToast==='function') showToast('Nicely done! Long-press any die to see what its face does.', 'good');
+    return;
+  }
+  const tray = document.getElementById('tray');
+  if(!tray || S.transitioning || document.querySelector('.modal-overlay') || document.getElementById('room-callout') || document.getElementById('room-callout-scrim')) return hide();
+  let text = '', target = null;
+  if(S.guide.stage==='t1'){
+    const n = Math.min(S.path.length, GUIDE_TEXT.t1.length - 1);
+    text = GUIDE_TEXT.t1[n];
+    target = S.path.length < S.guide.plan.length ? tray.querySelector(`.die[data-idx="${S.guide.plan[S.path.length]}"]`) : document.getElementById('resolve-btn');
+  } else if(S.guide.stage==='t2'){
+    if(S.path.length) return hide();
+    text = GUIDE_TEXT.t2;
+    target = document.querySelector('#enc-panel .fo-enemy .fo-chips:not(.fo-buffs)'); // ring the next-move chips
+  }
+  if(!b){
+    b = document.createElement('div'); b.id = 'guide-bubble'; b.className = 'guide-bubble';
+    b.innerHTML = '<div class="guide-text"></div><span class="guide-skip" role="button" tabindex="0">Skip tutorial</span>';
+    b.querySelector('.guide-skip').onclick = guideSkip;
+    document.body.appendChild(b);
+  }
+  if(!r){ r = document.createElement('div'); r.id = 'guide-ring'; r.className = 'guide-ring'; document.body.appendChild(r); }
+  const t = b.querySelector('.guide-text'); if(t.innerHTML !== text) t.innerHTML = text;
+  // Left two-thirds above the tray: the enemy's next-move chips (right side) stay visible.
+  const tr = tray.getBoundingClientRect(), bw = Math.round(tr.width * 0.66);
+  b.hidden = false;
+  b.style.left = Math.round(tr.left) + 'px'; b.style.width = bw + 'px';
+  b.style.top = Math.round(tr.top - b.offsetHeight - 12) + 'px';
+  const q = target ? target.getBoundingClientRect() : null;
+  const pointsDown = !!(q && q.top >= tr.top - 2);
+  b.classList.toggle('no-arrow', !pointsDown);
+  if(pointsDown) b.style.setProperty('--arrow-x', Math.max(14, Math.min(bw - 14, q.left + q.width/2 - tr.left)) + 'px');
+  if(target){
+    r.hidden = false;
+    r.style.left = Math.round(q.left - 5) + 'px'; r.style.top = Math.round(q.top - 5) + 'px';
+    r.style.width = Math.round(q.width + 10) + 'px'; r.style.height = Math.round(q.height + 10) + 'px';
+  } else r.hidden = true;
+}
+if(typeof window!=='undefined') setInterval(()=>{ try{ updateGuide(); }catch(e){} }, 150);
+

@@ -1063,6 +1063,7 @@ function newGame(originId, classId, boonDieName, charName, depthMods){
     shrineResult: null,
     segmentShrineUsed: false,
     segmentTrapUsed: false,
+    guide: guideWanted() ? {stage:'pending'} : null, // guided first fight (Oct 22): first run on a device only
   };
   // Ability teaching (Oct 13): the Skill button pulses until used each turn for a class's first few runs.
   if(!META.classRuns) META.classRuns = {};
@@ -1180,7 +1181,9 @@ function drawEncounter(kind){
   if(kind==='boss'){
     e = clone(pickUnused(S.floorIdx===2 ? BIG_BOSSES : floor.bosses));
   } else {
-    e = clone(drawRoomCard(floor));
+    // Guided first fight: the very first room of a device's first run is always the gentle Filement Bunny.
+    const guideFoe = (S.guide && S.guide.stage==='pending' && S.floorIdx===0) ? FLOOR1_ENEMIES.find(x=>x.name==='Filement Bunny') : null;
+    e = clone(guideFoe || drawRoomCard(floor));
     if(e.type==='Trap') S.segmentTrapUsed = true;
     if(e.type==='Shrine') S.segmentShrineUsed = true;
   }
@@ -1287,6 +1290,7 @@ function advanceRoute(){
     // last one. campRest() already does this after a Camp; this covers
     // every enc-to-enc and enc-to-boss transition within a segment.
     scrambleTray();
+    if(S.guide && S.guide.stage==='pending') guideSetupTray();
     S.screen='game';
     S._roomStartedAt = teleActiveMs();
     applyRelicsOnRoomStart();
@@ -1428,7 +1432,47 @@ function anyMoveAvailable(){
   return false;
 }
 
+// ---- Guided first fight (Oct 22, release prep, checklist #23) ----
+// A device's first run: the first room is the Filement Bunny and its first tray has a ready-made Path in the middle
+// row (Hit, Hit, Combo). Stage 't1' walks the player through tapping it and pressing Go; 't2' points at the enemy's
+// next-turn chips and lets them finish the fight freely; the guide ends when the room ends or on Skip.
+const GUIDE_DONE_KEY = 'dungeonScrambleGuideDone_v1';
+function guideWanted(){
+  try{
+    if(typeof navigator!=='undefined' && navigator.webdriver && !localStorage.getItem('dungeonScrambleGuideTest')) return false; // bots and checks
+    return !localStorage.getItem(GUIDE_DONE_KEY) && !((META.lifetime && META.lifetime.runsPlayed) > 0);
+  }catch(e){ return false; }
+}
+function guideFinish(how){
+  if(!S || !S.guide || S.guide.stage==='done') return;
+  S.guide.stage = 'done';
+  try{ localStorage.setItem(GUIDE_DONE_KEY, '1'); }catch(e){}
+  teleLog('guide_end', {how});
+}
+function guideSetupTray(){
+  const T = [4, 5, 6]; // middle-left row: a straight Path anyone can see
+  const faceAt = (d, type)=> d.faces.findIndex(f=>f.type===type);
+  const used = new Set();
+  const pickDie = type=>{ for(let i=0;i<S.tray.length;i++){ const c = S.tray[i]; if(!used.has(i) && !c.minion && faceAt(c.die, type)>=0){ used.add(i); return i; } } return -1; };
+  const a = pickDie('hit'), b = pickDie('hit');
+  let c = pickDie('combo'), cType = 'combo';
+  if(c<0){ c = pickDie('hit'); cType = 'hit'; }
+  if(a<0 || b<0 || c<0){ guideFinish('nodice'); return; }
+  const src = [a, b, c], types = ['hit', 'hit', cType];
+  for(let k=0;k<3;k++){ // move each chosen die into its slot (whole cells swap, like a Swap face)
+    const from = src[k], to = T[k];
+    if(from!==to){ const tmp = S.tray[to]; S.tray[to] = S.tray[from]; S.tray[from] = tmp; for(let j=k+1;j<3;j++) if(src[j]===to) src[j] = from; }
+    const cell = S.tray[to]; cell.faceIdx = faceAt(cell.die, types[k]); cell.blank = false;
+  }
+  S.guide.plan = T; S.guide.stage = 't1';
+  teleLog('guide_start', {});
+}
+
 function toggleSelect(idx){
+  if(S.guide && S.guide.stage==='t1'){ // guided first turn: only the glowing die (or stepping back) works
+    const undo = S.path.length && S.path[S.path.length-1]===idx;
+    if(!undo && (S.path.length >= S.guide.plan.length || idx!==S.guide.plan[S.path.length])){ if(typeof guideNudge==='function') guideNudge(idx); return; }
+  }
   if(S.trayAct){ if(trayActTap(idx)) fastTrayRender(); return; } // v1.38.0: an armed Swap/Reroll takes the tap
   if(!S.path.includes(idx)){ const k = trayActFaceAt(idx); if(k){ armTrayAct(k, idx, false); fastTrayRender(); return; } } // Swap/Reroll also work mid-path (Oct 12)
   if(S.path.length && S.path[S.path.length-1]===idx){
@@ -2108,6 +2152,7 @@ function showToastIfAvailable(text, kind){ if(typeof showToast==='function') sho
 function endTurn(){
   S.transitioning = false;
   S.turnNumber++;
+  if(S.guide && S.guide.stage==='t1') S.guide.stage = 't2';
   S.path = [];
   S.classAbilityUsed = false;
   S.tray.forEach(c=>delete c.forcedFace);

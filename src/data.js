@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.78';
+const GAME_VERSION = '1.41.79';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false };
