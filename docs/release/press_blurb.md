@@ -8,18 +8,18 @@ Dungeon Scramble is a turn-based roguelike where every turn is a small puzzle. R
 
 ## Short version (3 sentences)
 
-Dungeon Scramble is a roguelike dungeon crawler where you roll a 4x4 tray of dice and trace one path through it to attack, block and heal. Monsters telegraph their next move, so each turn is a puzzle you can solve rather than a coin flip. It was designed by Jeremy Friedman, a mechanical engineer turned math-teacher-in-training, and his wife, Katlynn Friedman, first as a board game, and it is coming to iPhone and Android with Floor 1 free and no ads.
+Dungeon Scramble is a roguelike dungeon crawler where you roll a 4x4 tray of dice and trace one path through it to attack, block and heal. Monsters telegraph their next move, so each turn is a puzzle you can solve rather than a coin flip. Designed by Jeremy and Katlynn Friedman, it began as their own board game. Coming to iPhone and Android, with Floor 1 free and no ads.
 
 ## Fact sheet
 
 | | |
 |---|---|
 | Game | Dungeon Scramble |
-| Developer | Jeremy Friedman (developer); board game and core mechanics designed by Jeremy and Katlynn Friedman [STUDIO OR TRADE NAME, if any] |
+| Developer | Jeremy and Katlynn Friedman [STUDIO OR TRADE NAME, if any] |
 | Based in | [CITY / COUNTRY] |
 | Genre | Turn-based roguelike, dice-path puzzle, dungeon crawler |
 | Platforms | iPhone and Android first (launching together); Steam later (planned 3-6 months after the phone launch, Coming Soon page up at launch). A free web demo on itch.io is planned before launch. |
-| Release window | Around September 2027 [CONFIRM; the plan says release gates decide the date] |
+| Release window | 2027 (internal target: around September; release gates decide the date) |
 | Price model | Free to download, Floor 1 free. One-time "Full Dungeon" unlock, planned $5.99 on phones (Steam price [TBD, $7.99 suggested]). No ads, no subscriptions, no account. |
 | Players | Single player (co-op is being explored, not promised) |
 | Content (build 1.41.76) | 4 origins, 4 classes, 3 floors, 37 monsters, 12 traps, 9 bosses (3 Big Bosses with a second phase), 32 shrines, 56 loot dice, 27 relics, 10 stackable depth modifiers |

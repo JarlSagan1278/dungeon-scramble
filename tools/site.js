@@ -25,7 +25,7 @@ const head = press.slice(0, press.indexOf('</head>')).replace(/<title>[^<]*<\/ti
   + '<style>.links{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:26px 0}.links a{background:var(--gold);color:var(--line);text-decoration:none;padding:10px 18px;border-radius:12px;font-weight:bold;box-shadow:0 4px 0 var(--line)}.lead{max-width:640px;margin:0 auto;text-align:center}</style></head>';
 const home = `<!doctype html>\n${head.replace(/^<!doctype html>\s*/i, '')}<body><div class="wrap">
 <h1>Dungeon Scramble</h1>
-<p class="pitch">Roll a 4x4 tray of dice. Trace one path through it. Every die you step on fires: hit, block, combo, boost, freeze.</p>
+<p class="pitch">Roll a 4x4 tray of dice. Draw your path. Every step is an attack, a block or a skill.</p>
 <div class="hero"><figure><img src="press/media/path_turn.gif" alt="A path drawn through six dice, then the turn resolving with damage numbers on a monster"></figure></div>
 <p class="lead">Monsters always show their next move, so every turn is a puzzle you can plan for. Four origins, four classes, 56 loot dice, 27 relics and three floors of math-pun monsters.</p>
 <p class="lead"><strong>Coming to iPhone and Android.</strong> Floor 1 is free; one purchase unlocks the full dungeon. No ads. A free Floor 1 demo is coming soon to itch.io.</p>
