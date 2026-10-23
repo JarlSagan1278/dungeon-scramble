@@ -7,7 +7,7 @@ Upload: `dungeon_scramble_demo_itch.zip` (made from `node build.js --demo`: the 
 | Field | Value |
 |---|---|
 | Title | Dungeon Scramble |
-| Project URL | dungeon-scramble (under your itch username) |
+| Project URL | dungeon-scramble (account: dungeonscramble, so the page is dungeonscramble.itch.io/dungeon-scramble) |
 | Short description / tagline | Roll a 4x4 tray of dice. Draw your path. Free Floor 1 demo. |
 | Classification | Games |
 | Kind of project | HTML |
