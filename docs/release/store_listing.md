@@ -1,6 +1,6 @@
 # Dungeon Scramble: store listing draft
 
-Drafted Oct 21, 2026 from build 1.41.76 (content counts read from `src/data.js` and `src/depth.js`). Recount before submitting if content changes. Character counts were measured with a script (spaces included). Apple and Google count characters, not bytes; the em dash is avoided so nothing counts double anywhere.
+Drafted Oct 21, 2026 from build 1.41.76, text revised Oct 23 to match the press kit (content counts read from `src/data.js` and `src/depth.js`). Recount before submitting if content changes. Character counts were measured with a script (spaces included). Apple and Google count characters, not bytes; the em dash is avoided so nothing counts double anywhere.
 
 ## Content counts used (build 1.41.76)
 
@@ -32,28 +32,28 @@ Alternates: "Roguelike Dice-Path Dungeon" (27; repeats "Dungeon" from the name, 
 
 ## Promotional text (App Store, max 170)
 
-**Roll the dice, trace your path, kick in the door. A roguelike dungeon crawl where every turn is a small puzzle. Floor 1 is free; the rest is one purchase. No ads.** (162)
+**Roll the dice, draw your path, kick in the door. A roguelike dungeon crawl with telegraphed fights. Floor 1 is free; the rest is one purchase. No ads.** (150)
 
 Promotional text can be changed without a new build: use it later for launch news or a sale.
 
-## Full description (max 4000; this draft 1570)
+## Full description (max 4000; this draft 1420)
+
+Wording follows Jeremy's Oct 23 press-kit edits: "activates its face", telegraphed fights, class "skill", "three dungeon floors", rounded "50+ / 20+" counts, no "second phase", no story section.
 
 ```
 Kick in the door. Roll your dice. Find the path.
 
-Dungeon Scramble is a turn-based roguelike where every turn is a small puzzle. Your dice land in a 4x4 tray, and you trace one path through neighboring dice. Each die you step on fires its face: Hit, Block, Heal, Combo, Boost, Freeze and more. Maneuver faces like Leap, Dodge and Pivot bend the rules of the path. Chain them in the right order and a modest roll becomes a monster-flattening turn.
-
-The monsters fight back, but they play fair: you always see what each one plans to do next turn. Block the big hit, freeze the wind-up, or burst it down before it lands.
+Dungeon Scramble is a turn-based roguelike. Your dice land in a 4x4 tray, and you trace one path through neighboring dice. Each die you step on activates its face: Hit, Block, Heal, Combo, Boost, Freeze and more. Monsters always show their next move, so you can plan around it. Maneuver faces like Leap, Dodge and Pivot bend the rules of the path. Chain them in the right order and a modest roll becomes a monster-flattening turn. Block the big hit, freeze the wind-up, or burst it down before it lands.
 
 WHAT'S INSIDE
-- 4 origins (Dwarf, Gnome, Halfling, Pixie) and 4 classes, each with its own zone of the tray and a once-per-turn trick
-- 3 floors with 37 monsters, 12 traps and 9 bosses, including 3 Big Bosses with a second phase
-- 56 loot dice to find, equip and unlock as starting boons
-- 27 relics and 32 shrines, from fair trades to shady bargains
-- Camps where you choose: rest, or train your dice
-- Depth: 10 stackable modifiers for when the base dungeon stops being scary, plus class badges and dice finishes to show off
+- 4 origins (Dwarf, Gnome, Halfling, Pixie) and 4 classes, each with its own zone of the tray and a once-per-turn skill
+- 3 dungeon floors with 37 monsters, 12 traps and 9 bosses, including 3 Big Bosses
+- 50+ 6-sided loot dice to find, equip and unlock as starting boons
+- 20+ powerful relics and 32 shrines to discover
+- Camps where you choose to rest or train your dice
+- Depth: 10 stackable difficulty modifiers, with class badges and dice finishes to earn
 
-Some foes have a math problem. Others are the math problem. Expect the Anti-Euclidian Space, the Gnomeowners Association and a Co-consul of Waste.
+Expect monsters like the Anti-Euclidian Space, the Gnomeowners Association and Extruzeon, Co-consul of Waste.
 
 FAIR PRICE, NO ADS
 Floor 1 is free to play, start to finish. One purchase unlocks the Full Dungeon for good. No ads, no energy timers, no account. Your progress stays on your device, and the game plays offline.
@@ -61,7 +61,7 @@ Floor 1 is free to play, start to finish. One purchase unlocks the Full Dungeon 
 Designed by Jeremy and Katlynn, who first built it as a board game.
 ```
 
-Claims check: "see what each one plans to do next turn" = the face-off next-turn chips (`enemyNextTurnPreview`); "second phase" = Big Boss `phase2` kits; "unlock as starting boons" = 3 copies rule; "rest, or train your dice" = the camp fire is Rest OR Train; "plays offline" = true for the web build (service worker) and the native app, apart from the store purchase itself. "Designed by Jeremy and Katlynn, who first built it as a board game" is from Jeremy (Oct 22); remove it if Jeremy would rather keep the listing impersonal. [CONFIRM what exactly Floor 1 free includes, e.g. all four classes or only some, and update "Floor 1 is free to play, start to finish."]
+Claims check: "you always see / show their next move" = the face-off next-turn chips (`enemyNextTurnPreview`); "unlock as starting boons" = 3 copies rule; "rest or train your dice" = the camp fire is Rest OR Train; "plays offline" = true for the web build (service worker) and the native app, apart from the store purchase itself; "50+ loot dice" (56) and "20+ relics" (27) are deliberately rounded (Jeremy, Oct 23). [CONFIRM what exactly Floor 1 free includes, e.g. all four classes or only some, and update "Floor 1 is free to play, start to finish."]
 
 ## App Store keywords (max 100)
 
