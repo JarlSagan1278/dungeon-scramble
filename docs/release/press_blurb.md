@@ -36,4 +36,4 @@ Dungeon Scramble began as a tabletop game designed by Jeremy Friedman and his wi
 
 Then Jeremy started building a digital version to test it, and it kept growing. The computer could handle the bigger numbers, stacking effects and bosses with whole move lists that would bog down a game played by hand. Somewhere along the way he decided, in his words, "this is a video game now." The board game edition was set aside, and the video game took over.
 
-The engineer and the math lover both still show. The monsters and items have names like the Anti-Euclidian Space, the N-th Dimensional Printer and the Gnomeowners Association. [ADD a personal line or quote from Jeremy, e.g. when he designed the board game or who he first played it with.]
+The monsters kept their names: the Anti-Euclidian Space, the N-th Dimensional Printer and the Gnomeowners Association. [ADD a personal line or quote from Jeremy, e.g. when he designed the board game or who he first played it with.]
