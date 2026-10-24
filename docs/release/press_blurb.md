@@ -18,7 +18,7 @@ Dungeon Scramble is a roguelike dungeon crawler where you roll a 4x4 tray of dic
 | Developer | Jeremy and Katlynn Friedman |
 | Based in | California, USA |
 | Genre | Turn-based roguelike, dice-path puzzle, dungeon crawler |
-| Platforms | iPhone and Android first (launching together); Steam later (planned 3-6 months after the phone launch, Coming Soon page up at launch). A free web demo on itch.io is planned before launch. |
+| Platforms | iPhone and Android first (launching together); Steam later (planned 3-6 months after the phone launch, Coming Soon page up at launch). A free Floor 1 web demo is out now: https://dungeonscramble.itch.io/dungeon-scramble . |
 | Release window | 2027 (internal target: around September; release gates decide the date) |
 | Price model | Free to download, Floor 1 free. One-time "Full Dungeon" unlock, planned $5.99 on phones (Steam price to be announced). No ads, no subscriptions, no account. |
 | Players | Single player (co-op is being explored, not promised) |
