@@ -183,7 +183,7 @@ Written Oct 10, 2026 (build 1.34.0) to carry the owner's decisions and reasoning
 - **Enemy chips (Jeremy, Oct 14, 1.41.6):** icon + readable number, no word; named abilities only on boss specials.
 - **Solid icons (Jeremy, Oct 14, 1.41.7):** an icon whose number sits beside it (chips) is drawn solid (`iconSpanSolid` / `solidIcon` in data.js); the hole is only for numbers inside the icon (dice faces).
 - **Netlify zip 1.41.7 (Jeremy asked, Oct 14):** offline check passed (188 cached files incl. all 180 art, plays offline); full bug hunt on 1.41.7 clean (24/24, no findings).
-- **Netlify zip 1.41.82 (Jeremy asked, Oct 24):** full tester build with the new cover, for continued testing of the full game (live site was 1.41.73).
+- **Netlify zip 1.41.82 (Jeremy asked, Oct 24):** full tester build with the new cover, for continued testing of the full game; live on Netlify Oct 24.
 
 ## Oct 15, 2026: monster tuning, shrines, depth, play data, co-op
 - **Monster tuning (from the per-monster fight table):** The Strike/Break-er Hit 4->3; Myceleus HP 106->93. Slight nerfs: Heating Elemental's Melting Point 5->4, Extractnid Matriarch Hit 7->6, Rusty Golem HP 23->20 (35->30 shown), Half-life Host 26->22 (39->33 shown). Eelagator Escapee Hit 6->5. Slight buffs: Rogue Golemancer HP 24->30, Ditched Heist Hit 2->3, Fungal Flayer HP 20->24 (30->36 shown), Ergot Eruption Hit 6->7, Morel Dilemma HP 14->18 (25->32 shown).
