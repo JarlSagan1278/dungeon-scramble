@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.41.82 (Oct 24, 2026)
+- New title/cover art, hand-drawn by Jeremy (replaces the ChatGPT cover). Same size and fade on the title screen; also used on the rulebook cover.
 ## 1.41.81 (Oct 22, 2026)
 - Demo end teaser (Jeremy): each teased loot die now shows its six faces in a small grid beside its picture (blank faces as dark squares). Still fits the card.
 ## 1.41.80 (Oct 22, 2026)
