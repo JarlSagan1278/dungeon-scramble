@@ -19,7 +19,7 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     for (let g = 0; g < 10 && !(S.screen === 'game' && S.encounter && S.encounter.type !== 'Shrine'); g++) { if (S.screen === 'camp') campLeave(); else advanceRoute(); }
     S.newRoomFx = false; render();
     ok(S.needRoll === true, 'a new room waits for the flick');
-    ok(document.querySelectorAll('#tray .die.unrolled').length === 16 && !!document.querySelector('#resolve-btn.rail-scramble'), 'covered dice and the Scramble button show');
+    ok(document.querySelectorAll('#tray .die.unrolled').length === 16 && !!document.getElementById('chest-lid') && !!document.querySelector('#resolve-btn.rail-scramble'), 'the chest lid, hidden dice and the Scramble button show');
     const faces = S.tray.map(c => c.faceIdx).join();
     document.querySelector('#tray .die[data-idx="5"]').click();
     document.getElementById('resolve-btn').click();
@@ -27,7 +27,7 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     const ab = document.getElementById('ability-btn'); if (ab) { ab.click(); ok(!abilityArmed, 'Skill waits for the roll'); }
     const sv = serializeState(); ok(sv.needRoll === true, 'the save keeps the dice covered');
     scrambleRoll();
-    ok(!S.needRoll && S.tray.map(c => c.faceIdx).join() === faces && !document.querySelector('#tray .die.unrolled'), 'the flick reveals the faces rolled at turn start');
+    ok(!S.needRoll && S.tray.map(c => c.faceIdx).join() === faces && !document.querySelector('#tray .die.unrolled') && !document.getElementById('chest-lid'), 'the flick reveals the faces rolled at turn start');
     endTurn();
     ok(S.needRoll === true, 'the next turn waits again');
     PREFS.flickRoll = false; endTurn(); ok(!S.needRoll, 'with the setting off the dice roll by themselves'); PREFS.flickRoll = true;

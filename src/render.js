@@ -1389,9 +1389,9 @@ function minionEyeStyle(idx){
 }
 
 function renderDie(cell, idx){
-  if(S.needRoll){ // still in the cup (Scramble flick, Oct 24): the die's colour and name, no face yet
+  if(S.needRoll){ // under the chest lid (Scramble flick, Oct 24): the die's colour and name, no face yet
     const named = cell.die.cat!=='attack' && cell.die.cat!=='maneuver';
-    return `<div class="die dietype-${cell.die.cat} unrolled" data-idx="${idx}" style="--rd:${(idx*53)%7-3}deg"><i class="cup-pips" aria-hidden="true"></i>${named?`<div class="name-tag">${nameTagSVG(cell.die.name, idx)}</div>`:''}</div>`;
+    return `<div class="die dietype-${cell.die.cat} unrolled" data-idx="${idx}">${named?`<div class="name-tag">${nameTagSVG(cell.die.name, idx)}</div>`:''}</div>`;
   }
   const f = classFace(cell.forcedFace || currentFace(cell));
   const isBlank = f.type==='blank';
@@ -1840,6 +1840,7 @@ function renderGame(){
             <div class="tray-head"><span class="round-badge" title="Floor ${S.floorIdx+1}, round ${S.turnNumber+1}"><b class="rb-floor">F${S.floorIdx+1}</b>&middot; Rd ${S.turnNumber+1}</span><div class="path-strip" id="path-strip"></div></div>
             <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
               <div class="tray ${S.newRoomFx?'tray-room-in':''} ${abilityArmed?'ability-armed':''} ${S.trayAct?'trayact-armed':''}" id="tray" style="--class-color:${S.klass.color||'#ffffff'}; --gd:-${Math.round(performance.now()%4600)}ms"></div>
+              ${S.needRoll ? CHEST_LID_HTML : ''}
               ${chestTrimHTML()}
             </div>
             ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip</button>` : pathCounterHTML()}
@@ -1904,7 +1905,7 @@ function renderGame(){
     clearPathAll();
     render();
   };
-  if(S.needRoll){ bindScrambleFlick(document.getElementById('resolve-btn')); bindScrambleFlick(document.getElementById('tray')); }
+  if(S.needRoll){ bindScrambleFlick(document.getElementById('resolve-btn')); bindScrambleFlick(document.getElementById('chest-lid')); }
   document.getElementById('resolve-btn').onclick = ()=>{
     if(S.needRoll){ askMotionPermission(); scrambleHint(); return; } // a plain tap only teaches the flick
     // read the live path: path taps redraw with renderPathOnly(), which doesn't rebuild this handler (Oct 12 fix)
@@ -4952,15 +4953,34 @@ function newAchievementsHTML(newAchievements){
 /* ---- Scramble flick (Jeremy, Oct 24) ----
    The turn's dice sit in the cup until the player flicks the Scramble button or the tray (a quick drag in any direction),
    or shakes the phone. Dragging rattles the dice and pulls the tray along a little; a slow drag springs back. */
-function scrambleRoll(){
+// Closed chest (Jeremy, Oct 24): until the roll a wooden lid covers the tray; the flick throws it off in the flick's
+// direction, the lock pops and the dice tumble out.
+const CHEST_LID_HTML = `<div class="chest-lid" id="chest-lid" title="Flick to open (or shake your phone)"><i class="lid-band"></i><i class="lid-band"></i><div class="lid-plate"><span>Flick to open</span></div></div>`;
+function scrambleRoll(dx, dy){
+  if(!S || !S.needRoll) return;
+  const lid = document.getElementById('chest-lid');
+  const r = lid && lid.getBoundingClientRect();
   if(!rollNow()) return;
   vibrate([16,30,22]);
+  chestLockFxAt = performance.now(); // the padlock pops open with the lid
   render();
+  if(!r || PREFS.reducedMotion) return;
+  let vx = dx||0, vy = dy==null ? -1 : dy; const n = Math.hypot(vx, vy) || 1; vx /= n; vy /= n;
+  const fly = document.createElement('div');
+  fly.className = 'chest-lid lid-fly'; fly.innerHTML = lid.innerHTML;
+  Object.assign(fly.style, { left:r.left+'px', top:r.top+'px', width:r.width+'px', height:r.height+'px' });
+  document.body.appendChild(fly);
+  const far = 420 + r.height;
+  fly.animate([
+    { transform:'translate(0,0) rotate(0deg)', opacity:1 },
+    { transform:`translate(${vx*far*0.25}px,${vy*far*0.25 - 18}px) rotate(${vx>=0?8:-8}deg)`, opacity:1, offset:.3 },
+    { transform:`translate(${vx*far}px,${vy*far}px) rotate(${vx>=0?28:-28}deg)`, opacity:0 }
+  ], { duration:480, easing:'cubic-bezier(.3,.6,.4,1)', fill:'forwards' }).onfinish = ()=> fly.remove();
 }
 function scrambleHint(){
   const b = document.getElementById('resolve-btn'); if(!b) return;
   b.classList.remove('scr-hint'); void b.offsetWidth; b.classList.add('scr-hint');
-  if(!scrambleHint._told){ scrambleHint._told = true; showToast(isTouchUI() ? 'Flick Scramble (or the dice) to roll, or shake your phone.' : 'Flick Scramble (drag and let go fast) to roll.'); }
+  if(!scrambleHint._told){ scrambleHint._told = true; showToast(isTouchUI() ? 'Flick the lid (or Scramble) to roll, or shake your phone.' : 'Flick the lid or Scramble (drag and let go fast) to roll.'); }
 }
 function isTouchUI(){ try{ return matchMedia('(pointer: coarse)').matches; }catch(e){ return false; } }
 function askMotionPermission(){ // iPhone asks once, from a tap; Android and desktop need no permission
@@ -4971,7 +4991,7 @@ function bindScrambleFlick(el){
   if(!el) return;
   let on = false, sx = 0, sy = 0, pts = [];
   const wrap = ()=> document.querySelector('.tray-wrap');
-  const pull = (dx, dy)=>{ const w = wrap(); if(!w) return; const k = v=> Math.max(-16, Math.min(16, v*0.22)); w.style.setProperty('--fx', k(dx)+'px'); w.style.setProperty('--fy', k(dy)+'px'); };
+  const pull = (dx, dy)=>{ const w = wrap(); if(!w) return; const k = v=> Math.max(-18, Math.min(18, v*0.25)); w.style.setProperty('--fx', k(dx)+'px'); w.style.setProperty('--fy', k(dy)+'px'); };
   el.addEventListener('pointerdown', ev=>{
     if(!S.needRoll) return;
     on = true; sx = ev.clientX; sy = ev.clientY; pts = [[sx, sy, performance.now()]];
@@ -4989,7 +5009,7 @@ function bindScrambleFlick(el){
     const w = wrap(); if(w){ w.classList.remove('flick-hold'); w.style.setProperty('--fx', '0px'); w.style.setProperty('--fy', '0px'); }
     const dx = ev.clientX - sx, dy = ev.clientY - sy, dist = Math.hypot(dx, dy);
     const a = pts[0], dt = Math.max(1, performance.now() - a[2]), speed = Math.hypot(ev.clientX - a[0], ev.clientY - a[1]) / dt; // px per ms over the last ~90 ms
-    if(ev.type==='pointerup' && ((dist > 26 && speed > 0.35) || dist > 90)){ askMotionPermission(); scrambleRoll(); }
+    if(ev.type==='pointerup' && ((dist > 26 && speed > 0.35) || dist > 90)){ askMotionPermission(); scrambleRoll(dx, dy); }
   };
   el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
 }
@@ -5008,7 +5028,7 @@ function bindScrambleFlick(el){
     if(t - last < 120) return; // one jolt shows up as several samples; count it once
     hits = (t - last < 650) ? hits + 1 : 1; last = t;
     if(hits === 1){ const w = document.querySelector('.tray-wrap'); if(w){ w.classList.remove('shake-rattle'); void w.offsetWidth; w.classList.add('shake-rattle'); } }
-    if(hits >= 2){ hits = 0; scrambleRoll(); }
+    if(hits >= 2){ hits = 0; scrambleRoll(0, -1); }
   });
 })();
 

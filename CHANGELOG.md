@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.84 (Oct 24, 2026)
+- Closed chest (Jeremy picked option D): before each roll a wooden lid with iron bands and a "Flick to open" plate covers the tray (replaces the five-pip dice). Dragging the lid pulls it along and rattles it; a flick throws it off in that direction while the padlock pops and the dice tumble out. Scramble, Enter and shaking still work.
+- Shake to roll is more sensitive (Jeremy): two medium jolts within about half a second (was three hard ones).
 ## 1.41.83 (Oct 24, 2026)
 - Scramble flick (Jeremy): each turn's dice wait in the cup (covered, showing only their colour and name) until the player flicks the orange Scramble button (it takes Go's spot until the roll) or the tray itself; dragging rattles the dice and pulls the tray along. On phones, shaking the phone rolls too (iPhone asks for motion access once). A plain tap only shows the hint; Enter rolls on a keyboard. Settings has "Flick or shake to roll each turn" to turn it off. The guided first fight teaches it on turn 2. The faces are still decided at turn start, so saves, bots and studies are unchanged.
 - Depth presets (Jeremy): − and + beside the Depth number pick a ready-made set of modifiers for that depth (gentlest first), labelled Preset or Custom; the modifier list still adjusts each one. No extra height.
