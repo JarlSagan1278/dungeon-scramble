@@ -738,7 +738,7 @@ function saveSeen(seen){
 // should survive across runs (including after a run ends and the save is
 // cleared). ----
 const PREFS_KEY = 'dungeonScramblePrefs_v1';
-const DEFAULT_PREFS = { sound: true, music: true, reducedMotion: false, lowIntensity: false, vibration: true, sfxVol: 1, musicVol: 1 }; // volumes 0-1 (Oct 13 sliders; 0 also turns sound/music off)
+const DEFAULT_PREFS = { sound: true, music: true, reducedMotion: false, lowIntensity: false, vibration: true, sfxVol: 1, musicVol: 1, flickRoll: true }; // volumes 0-1 (Oct 13 sliders; 0 also turns sound/music off)
 let PREFS = loadPrefs();
 function loadPrefs(){
   try{
@@ -1289,7 +1289,7 @@ function advanceRoute(){
     // open a brand new fight with dice you'd already half-used against the
     // last one. campRest() already does this after a Camp; this covers
     // every enc-to-enc and enc-to-boss transition within a segment.
-    scrambleTray();
+    scrambleTray(true);
     if(S.guide && S.guide.stage==='pending') guideSetupTray();
     S.screen='game';
     S._roomStartedAt = teleActiveMs();
@@ -1303,7 +1303,7 @@ function advanceRoute(){
   } else if(step==='boss'){
     S.encounter = drawEncounter('boss');
     if(hasRelic('frost_charm')){ S.freezeTokens = (S.freezeTokens||0) + 1; fireRelic('frost_charm','+1 Freeze'); }
-    scrambleTray();
+    scrambleTray(true);
     S.screen='game';
     S._roomStartedAt = teleActiveMs();
     applyRelicsOnRoomStart();
@@ -1330,7 +1330,20 @@ function currentFace(cell){
   return cell.die.faces[cell.faceIdx];
 }
 
-function scrambleTray(){
+// Scramble flick (Jeremy, Oct 24): each turn's roll waits until the player flicks the Scramble button (or the dice, or
+// shakes the phone). The faces are decided when the turn starts, so saves, bots and the sim are unchanged; the tray just
+// stays covered (S.needRoll) until the flick. Off for bots/checks unless localStorage 'dungeonScrambleRollTest' is set.
+function rollGateOn(){
+  try{ if(typeof navigator!=='undefined' && navigator.webdriver && !localStorage.getItem('dungeonScrambleRollTest')) return false; }catch(e){ return false; }
+  return PREFS.flickRoll !== false;
+}
+function rollNow(){
+  if(!S || !S.needRoll) return false;
+  S.needRoll = false; S.justScrambled = true;
+  if(typeof playDiceRollSound==='function') playDiceRollSound();
+  return true;
+}
+function scrambleTray(gate){
   S._abilityReveal = null;
   S._reveals = [];
   S._pendingMinions = 0;
@@ -1339,7 +1352,9 @@ function scrambleTray(){
   S.swapLog = []; S.trayAct = null;
   S.classAbilityUsed = false;
   abilityArmed = false;
-  S.justScrambled = true;
+  S.justScrambled = true; S.needRoll = false;
+  // a turn's opening roll waits for the flick (the guided first turn's ready-made Path does not)
+  if(gate && rollGateOn() && !(S.guide && (S.guide.stage==='pending' || S.guide.stage==='t1'))){ S.needRoll = true; S.justScrambled = false; return; }
   if(typeof playDiceRollSound==='function') playDiceRollSound();
 }
 
@@ -1469,6 +1484,7 @@ function guideSetupTray(){
 }
 
 function toggleSelect(idx){
+  if(S.needRoll){ if(typeof scrambleHint==='function') scrambleHint(); return; } // dice are still in the cup
   if(S.guide && S.guide.stage==='t1'){ // guided first turn: only the glowing die (or stepping back) works
     const undo = S.path.length && S.path[S.path.length-1]===idx;
     if(!undo && (S.path.length >= S.guide.plan.length || idx!==S.guide.plan[S.path.length])){ if(typeof guideNudge==='function') guideNudge(idx); return; }
@@ -2157,7 +2173,7 @@ function endTurn(){
   S.classAbilityUsed = false;
   S.tray.forEach(c=>delete c.forcedFace);
   const pm = S._pendingMinions||0;
-  scrambleTray();
+  scrambleTray(true);
   placePendingMinions(pm);
   render();
   // v1.39.0: a rising rumble when a wind-up / heavy turn is now telegraphed.

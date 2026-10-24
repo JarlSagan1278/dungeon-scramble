@@ -32,6 +32,7 @@ document.addEventListener('keydown', (ev)=>{
   if(document.activeElement && document.activeElement.tagName==='INPUT') return;
   const key = ev.key.toLowerCase();
   if(key==='enter'){
+    if(S.needRoll){ scrambleRoll(); ev.preventDefault(); return; } // keyboard: Enter rolls
     const btn = document.getElementById('resolve-btn');
     if(btn) btn.click();
     ev.preventDefault();

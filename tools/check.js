@@ -16,8 +16,9 @@ const ALL = [
   ['trayfast',   'tools/test_trayfast.js'],       // fast tray redraw == full redraw
   ['trayact',    'tools/test_trayact.js'],        // Swap / Reroll
   ['shrines',    'tools/test_shrines.js'],        // every shrine option
+  ['scramble',   'tools/test_scramble.js'],       // Scramble flick gate + Depth presets
 ];
-const QUICK = new Set(['sim', 'pathrender', 'trayfast', 'ui']);
+const QUICK = new Set(['sim', 'pathrender', 'trayfast', 'ui', 'scramble']);
 
 (async () => {
   const which = process.argv[2] === 'quick' ? ALL.filter(([k]) => QUICK.has(k)) : ALL;

@@ -2227,6 +2227,10 @@ body{ -webkit-tap-highlight-color:transparent; }
 .depth-section{ gap:0 !important; }
 .depth-toggle{ display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:7px 10px; background:var(--b5); border:2px solid var(--line); border-radius:var(--r-lg); color:var(--parchment); cursor:pointer; font:inherit; box-shadow:var(--shadow-1); }
 .depth-toggle .depth-num{ width:38px; height:38px; font-size:20px; flex:none; }
+.depth-toggle{ gap:6px; cursor:default; }
+.depth-open{ display:flex; align-items:center; gap:8px; flex:1; min-width:0; padding:2px 0 2px 4px; background:none !important; border:0 !important; box-shadow:none !important; filter:none !important; color:inherit; text-align:left; font:inherit; cursor:pointer; }
+.depth-pm{ width:28px; height:28px; flex:none; padding:0; border-radius:50%; font:800 17px/1 var(--font-ui); background:var(--b3); color:var(--gold); border:2px solid var(--line); }
+.depth-pm:disabled{ opacity:.35; }
 .depth-toggle-text{ display:flex; flex-direction:column; flex:1; min-width:0; line-height:1.15; }
 .depth-toggle-title{ font-family:var(--font-display); font-size:13px; letter-spacing:2.5px; text-transform:uppercase; color:var(--gold); text-shadow:0 2px 0 #0c0705; }
 .depth-toggle-sub{ font-size:11.5px; font-weight:700; color:var(--parchment-dim); }
@@ -3052,3 +3056,26 @@ body:has(.modal-overlay) .settings-btn-floating{ visibility:hidden; }
 .demo-teaser-name.tier-gilded{ color:#f0c64a; }
 .demo-teaser-name.tier-magic{ color:#d0b0ff; }
 
+
+/* ---- Scramble flick (Oct 24): dice wait in the cup until the player flicks Scramble / the tray, or shakes the phone ---- */
+.die.unrolled{ cursor:grab; transform:rotate(var(--rd,0deg)); filter:drop-shadow(0 4px 0 var(--line)) saturate(.75) brightness(.92); }
+.die.unrolled .cup-pips{ position:absolute; inset:24%; border-radius:12%; opacity:.5;
+  background:radial-gradient(circle,#2a1d12 0 17%,transparent 19%) 0 0/50% 50%, radial-gradient(circle,#2a1d12 0 9%,transparent 10%) 50% 50%/100% 100% no-repeat; }
+.die.unrolled .name-tag{ opacity:.8; }
+.tray-wrap{ translate:var(--fx,0px) var(--fy,0px); transition:translate .25s cubic-bezier(.3,1.6,.5,1); }
+.tray-wrap.flick-hold{ transition:none; }
+.tray-wrap.flick-hold .die.unrolled{ animation:cup-rattle .11s steps(2) infinite; }
+.tray-wrap.shake-rattle .die.unrolled{ animation:cup-rattle .1s steps(2) 3; }
+.tray-wrap.flick-hold .die.unrolled:nth-child(3n){ animation-duration:.13s; }
+.tray-wrap.flick-hold .die.unrolled:nth-child(4n+1){ animation-direction:reverse; }
+@keyframes cup-rattle{ 0%{ transform:rotate(calc(var(--rd,0deg) - 4deg)) translate(-1px,1px); } 100%{ transform:rotate(calc(var(--rd,0deg) + 4deg)) translate(1px,-1px); } }
+.util-btn.rail-go.rail-scramble{ background:linear-gradient(#f08a3c,#d2601f) !important; color:#2a1406 !important; touch-action:none; cursor:grab; overflow:hidden; gap:6px; }
+.util-btn.rail-go.rail-scramble span{ writing-mode:vertical-rl; transform:rotate(180deg); font-size:19px !important; letter-spacing:2px; }
+.scr-chev{ width:22px; height:22px; flex:none; background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232a1406' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l7-7 7 7M5 20l7-7 7 7'/%3E%3C/svg%3E"); animation:scr-chev 1.4s ease-in-out infinite; }
+@keyframes scr-chev{ 0%,100%{ transform:translateY(3px); opacity:.65; } 50%{ transform:translateY(-4px); opacity:1; } }
+.rail-scramble.scr-hint{ animation:scr-hint .5s cubic-bezier(.3,1.6,.5,1); }
+@keyframes scr-hint{ 0%{ transform:translateY(0); } 35%{ transform:translateY(-14px); } 100%{ transform:translateY(0); } }
+.reduced-motion .scr-chev, .reduced-motion .tray-wrap.flick-hold .die.unrolled{ animation:none; }
+/* Oct 24: room for the Flick-to-roll toggle without making Settings scroll */
+.settings-toggles{ gap:3px !important; }
+.settings-toggle-row:not(.settings-slider-row){ padding-top:6px !important; padding-bottom:6px !important; }

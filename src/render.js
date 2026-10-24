@@ -1389,6 +1389,10 @@ function minionEyeStyle(idx){
 }
 
 function renderDie(cell, idx){
+  if(S.needRoll){ // still in the cup (Scramble flick, Oct 24): the die's colour and name, no face yet
+    const named = cell.die.cat!=='attack' && cell.die.cat!=='maneuver';
+    return `<div class="die dietype-${cell.die.cat} unrolled" data-idx="${idx}" style="--rd:${(idx*53)%7-3}deg"><i class="cup-pips" aria-hidden="true"></i>${named?`<div class="name-tag">${nameTagSVG(cell.die.name, idx)}</div>`:''}</div>`;
+  }
   const f = classFace(cell.forcedFace || currentFace(cell));
   const isBlank = f.type==='blank';
   const inPath = S.path.includes(idx);
@@ -1842,11 +1846,12 @@ function renderGame(){
           </div>
         </div>
         <div class="util-rail">
-          <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning)?'disabled':''} ${emphasizeResolve?'pulse':''}" id="resolve-btn"><span>Go</span></div>
+          ${S.needRoll ? `<div class="util-btn rail-go rail-scramble" id="resolve-btn" title="Flick up to roll (or shake your phone)"><i class="scr-chev" aria-hidden="true"></i><span>Scramble</span></div>`
+            : `<div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning)?'disabled':''} ${emphasizeResolve?'pulse':''}" id="resolve-btn"><span>Go</span></div>`}
           <div class="util-btn rail-pocket" id="open-backpocket-btn" title="${S.backPocket.length?'Safety net ready: if you fall to 0 Health, your Back Pocket can save you once (it spends every die in it).':'Back Pocket empty: no safety net until a die lands here.'}">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?'<span class="badge pocket-heart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.2 C 5.5 15.6 2 12.4 2 8.2 C 2 5.1 4.4 2.8 7.3 2.8 C 9.2 2.8 10.9 3.8 12 5.4 C 13.1 3.8 14.8 2.8 16.7 2.8 C 19.6 2.8 22 5.1 22 8.2 C 22 12.4 18.5 15.6 12 21.2 Z" fill="currentColor"/></svg></span>':''}</div>
-          <div class="util-btn rail-item ${totalTokens?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Item</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
-          <div class="util-btn danger-accent rail-clear ${S.transitioning?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
-          ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning)?'disabled':''} ${abilityArmed?'armed':''} ${(S.coachRun && !S.classAbilityUsed && !S.transitioning && !abilityArmed)?'pulse coach-pulse':''}" id="ability-btn" style="--class-color:${S.klass.color||'#d4af52'}"><span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
+          <div class="util-btn rail-item ${(totalTokens&&!S.needRoll)?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Item</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
+          <div class="util-btn danger-accent rail-clear ${(S.transitioning||S.needRoll)?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
+          ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning||S.needRoll)?'disabled':''} ${abilityArmed?'armed':''} ${(S.coachRun && !S.classAbilityUsed && !S.transitioning && !abilityArmed)?'pulse coach-pulse':''}" id="ability-btn" style="--class-color:${S.klass.color||'#d4af52'}"><span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
             : S.klass.debug ? `<div class="util-btn rail-ability ${(!S.encounter||S.transitioning)?'disabled':''}" id="debug-win-btn"><span>Win</span></div>` : ''}
         </div>
       </div>
@@ -1899,7 +1904,9 @@ function renderGame(){
     clearPathAll();
     render();
   };
+  if(S.needRoll){ bindScrambleFlick(document.getElementById('resolve-btn')); bindScrambleFlick(document.getElementById('tray')); }
   document.getElementById('resolve-btn').onclick = ()=>{
+    if(S.needRoll){ askMotionPermission(); scrambleHint(); return; } // a plain tap only teaches the flick
     // read the live path: path taps redraw with renderPathOnly(), which doesn't rebuild this handler (Oct 12 fix)
     if(S.transitioning || (S.path.length===0 && anyMoveAvailable())) return;
     getAudioCtx(); // warm up/unlock audio inside this user gesture; later queued tones (from setTimeout-driven transition steps) then play fine
@@ -1912,10 +1919,10 @@ function renderGame(){
   attachLongPressTooltips('.route-tooltip-target');
   { const kb=document.getElementById('open-key-btn'); if(kb) kb.onclick = ()=> openInfoModal('Action Key', keyCardHTML()); }
   document.getElementById('open-backpocket-btn').onclick = ()=> openInfoModal('Back Pocket', backPocketViewHTML());
-  document.getElementById('open-tokens-btn').onclick = ()=>{ if(totalTokens>0) openTokensModal(); };
+  document.getElementById('open-tokens-btn').onclick = ()=>{ if(totalTokens>0 && !S.needRoll) openTokensModal(); };
   const abilityBtn = document.getElementById('ability-btn');
   if(abilityBtn) abilityBtn.onclick = ()=>{
-    if(S.transitioning || S.classAbilityUsed) return;
+    if(S.transitioning || S.classAbilityUsed || S.needRoll) return;
     abilityArmed = !abilityArmed; // tap again to back out before picking a die
     playTone(abilityArmed ? 'skillArm' : 'skillDisarm');
     if(abilityArmed) logMsg('sys', `Click a die in your zone to convert it.`);
@@ -3055,8 +3062,9 @@ function openSettingsModal(){
         ${settingsSliderRowHTML('pref-sound', 'Sound effects', PREFS.sound ? (PREFS.sfxVol!=null?PREFS.sfxVol:1) : 0)}
         ${settingsSliderRowHTML('pref-music', 'Music', PREFS.music!==false ? (PREFS.musicVol!=null?PREFS.musicVol:1) : 0)}
         ${settingsToggleRowHTML('pref-reduced-motion', 'Reduce motion', PREFS.reducedMotion)}
-        ${settingsToggleRowHTML('pref-low-intensity', 'Gentler effects (smaller shakes, fewer sparks)', PREFS.lowIntensity)}
+        ${settingsToggleRowHTML('pref-low-intensity', 'Gentler effects (fewer sparks)', PREFS.lowIntensity)}
         ${settingsToggleRowHTML('pref-vibration', 'Vibration (phones)', PREFS.vibration!==false)}
+        ${settingsToggleRowHTML('pref-flick-roll', 'Flick or shake to roll each turn', PREFS.flickRoll!==false)}
         ${PLAYDATA_URL ? settingsToggleRowHTML('pref-share-data', 'Share play data automatically', shareDataPref()==='yes') : ''}
       </div>
       <p class="hint" style="text-align:left;">Keyboard shortcuts ${infoDot('Enter = Go · Backspace = Clear · 1234/qwer/asdf/zxcv tap a tray die (matches its grid position)')}</p>
@@ -3091,6 +3099,7 @@ function openSettingsModal(){
   musSl.oninput = ()=>{ const v = musSl.value/100; const was = PREFS.music!==false; setPref('musicVol', v); setPref('music', v>0); settingsSliderLabel(musSl); if(was!==(v>0)) musicUpdate(); else musicSetVolume(); };
   overlay.querySelector('#pref-reduced-motion').onchange = (ev)=> setPref('reducedMotion', ev.target.checked);
   overlay.querySelector('#pref-low-intensity').onchange = (ev)=> setPref('lowIntensity', ev.target.checked);
+  overlay.querySelector('#pref-flick-roll').onchange = (ev)=>{ setPref('flickRoll', ev.target.checked); if(!ev.target.checked && S && S.needRoll && rollNow()) render(); };
   overlay.querySelector('#pref-vibration').onchange = (ev)=>{ setPref('vibration', ev.target.checked); if(ev.target.checked) vibrate(30); };
   const restartBtn = overlay.querySelector('#settings-restart-btn');
   if(restartBtn) restartBtn.onclick = ()=>{
@@ -4940,11 +4949,74 @@ function newAchievementsHTML(newAchievements){
 // ---- Guided first fight (Oct 22): the speech bubble above the tray and the glowing ring on the next die / Go.
 // Both are position:fixed overlays measured from the live layout, so the game card never moves or grows.
 // Polled (cheap) so it follows full renders, fast path renders and banners without hooking each one.
+/* ---- Scramble flick (Jeremy, Oct 24) ----
+   The turn's dice sit in the cup until the player flicks the Scramble button or the tray (a quick drag in any direction),
+   or shakes the phone. Dragging rattles the dice and pulls the tray along a little; a slow drag springs back. */
+function scrambleRoll(){
+  if(!rollNow()) return;
+  vibrate([16,30,22]);
+  render();
+}
+function scrambleHint(){
+  const b = document.getElementById('resolve-btn'); if(!b) return;
+  b.classList.remove('scr-hint'); void b.offsetWidth; b.classList.add('scr-hint');
+  if(!scrambleHint._told){ scrambleHint._told = true; showToast(isTouchUI() ? 'Flick Scramble (or the dice) to roll, or shake your phone.' : 'Flick Scramble (drag and let go fast) to roll.'); }
+}
+function isTouchUI(){ try{ return matchMedia('(pointer: coarse)').matches; }catch(e){ return false; } }
+function askMotionPermission(){ // iPhone asks once, from a tap; Android and desktop need no permission
+  if(askMotionPermission._asked) return; askMotionPermission._asked = true;
+  try{ if(typeof DeviceMotionEvent!=='undefined' && typeof DeviceMotionEvent.requestPermission==='function') DeviceMotionEvent.requestPermission().catch(()=>{}); }catch(e){}
+}
+function bindScrambleFlick(el){
+  if(!el) return;
+  let on = false, sx = 0, sy = 0, pts = [];
+  const wrap = ()=> document.querySelector('.tray-wrap');
+  const pull = (dx, dy)=>{ const w = wrap(); if(!w) return; const k = v=> Math.max(-16, Math.min(16, v*0.22)); w.style.setProperty('--fx', k(dx)+'px'); w.style.setProperty('--fy', k(dy)+'px'); };
+  el.addEventListener('pointerdown', ev=>{
+    if(!S.needRoll) return;
+    on = true; sx = ev.clientX; sy = ev.clientY; pts = [[sx, sy, performance.now()]];
+    try{ el.setPointerCapture(ev.pointerId); }catch(e){}
+    const w = wrap(); if(w) w.classList.add('flick-hold');
+    if(!PREFS.reducedMotion) playTone('glint', 0);
+  });
+  el.addEventListener('pointermove', ev=>{
+    if(!on) return;
+    const t = performance.now(); pts.push([ev.clientX, ev.clientY, t]); while(pts.length > 2 && t - pts[0][2] > 90) pts.shift();
+    pull(ev.clientX - sx, ev.clientY - sy);
+  });
+  const end = ev=>{
+    if(!on) return; on = false;
+    const w = wrap(); if(w){ w.classList.remove('flick-hold'); w.style.setProperty('--fx', '0px'); w.style.setProperty('--fy', '0px'); }
+    const dx = ev.clientX - sx, dy = ev.clientY - sy, dist = Math.hypot(dx, dy);
+    const a = pts[0], dt = Math.max(1, performance.now() - a[2]), speed = Math.hypot(ev.clientX - a[0], ev.clientY - a[1]) / dt; // px per ms over the last ~90 ms
+    if(ev.type==='pointerup' && ((dist > 26 && speed > 0.35) || dist > 90)){ askMotionPermission(); scrambleRoll(); }
+  };
+  el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+}
+// Shake to roll: three hard jolts within a short window (the dice cup feel), only while the dice wait for their roll.
+(function(){
+  if(typeof window==='undefined') return;
+  let last = 0, hits = 0;
+  window.addEventListener('devicemotion', ev=>{
+    if(typeof S==='undefined' || !S || !S.needRoll || S.screen!=='game' || S.transitioning || document.querySelector('.modal-overlay')) return;
+    let m;
+    const a = ev.acceleration;
+    if(a && a.x!=null) m = Math.hypot(a.x, a.y, a.z);
+    else { const g = ev.accelerationIncludingGravity; if(!g || g.x==null) return; m = Math.abs(Math.hypot(g.x, g.y, g.z) - 9.81); }
+    if(m < 13) return;
+    const t = performance.now();
+    hits = (t - last < 450) ? hits + 1 : 1; last = t;
+    if(hits === 1){ const w = document.querySelector('.tray-wrap'); if(w){ w.classList.remove('shake-rattle'); void w.offsetWidth; w.classList.add('shake-rattle'); } }
+    if(hits >= 3){ hits = 0; scrambleRoll(); }
+  });
+})();
+
 const GUIDE_TEXT = {
   t1: ['<b>This is your Tray.</b> Tap the glowing die to start a Path.',
        'Now tap the glowing neighbor. Every die you step on fires its face.',
        'One more! A <b>Combo</b> hits harder when it touches Hits.',
        'That number is your Path\'s damage. Tap <b>Go</b>!'],
+  t2roll: 'New turn! <b>Flick Scramble</b> upward to roll your dice. On a phone, you can shake it instead.',
   t2: 'Monsters show their <b>next move</b> under their name, so you can plan for it. Your Tray re-rolled: build any Path and finish the fight!',
 };
 function guideNudge(idx){
@@ -4969,6 +5041,9 @@ function updateGuide(){
     const n = Math.min(S.path.length, GUIDE_TEXT.t1.length - 1);
     text = GUIDE_TEXT.t1[n];
     target = S.path.length < S.guide.plan.length ? tray.querySelector(`.die[data-idx="${S.guide.plan[S.path.length]}"]`) : document.getElementById('resolve-btn');
+  } else if(S.guide.stage==='t2' && S.needRoll){
+    text = GUIDE_TEXT.t2roll;
+    target = document.getElementById('resolve-btn');
   } else if(S.guide.stage==='t2'){
     if(S.path.length) return hide();
     text = GUIDE_TEXT.t2;

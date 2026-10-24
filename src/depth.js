@@ -30,6 +30,23 @@ const DEPTH_MODS = [
 ];
 const DEPTH_MOD_BY_ID = Object.fromEntries(DEPTH_MODS.map(m=>[m.id,m]));
 
+// Depth presets (Jeremy, Oct 24): the -/+ beside the Depth number picks a ready-made set of modifiers for that depth;
+// the modifier list still adjusts them one by one. Ranks are added in this order (gentlest first), skipping any that
+// would overshoot, so preset N always comes to exactly depth N (a 2- or 3-point rank can swap out a 1-point one).
+const DEPTH_PRESET_ORDER = ['foes','rest','frail','swarm','dread','foes','dues','gauntlet','rest','frail','dread','foes','slim','round','swarm','fury','dread','foes','frail','gauntlet','fury'];
+function depthPreset(n){
+  const mods = {}; let d = 0; const stop = new Set();
+  for(const id of DEPTH_PRESET_ORDER){
+    if(stop.has(id)) continue;
+    const m = DEPTH_MOD_BY_ID[id], r = mods[id]||0;
+    if(r>=m.max){ stop.add(id); continue; }
+    const c = m.costs[r];
+    if(d + c <= n){ mods[id] = r+1; d += c; } else stop.add(id);
+  }
+  return mods;
+}
+function sameMods(a, b){ const ka = Object.keys(a).filter(k=>a[k]), kb = Object.keys(b).filter(k=>b[k]); return ka.length===kb.length && ka.every(k=>a[k]===b[k]); }
+
 const DREAD_HP = 0.2; // Dread: extra HP per rank on Elite/Deadly foes
 // Depth added by the first r ranks of modifier m.
 function depthModCost(m, r){ let d = 0; for(let i=0;i<r;i++) d += m.costs[Math.min(i, m.costs.length-1)]; return d; }
@@ -212,11 +229,15 @@ function depthSealHTML(){
 
 function depthMenuHTML(){
   return `<div class="setup-section depth-section" id="depth-section">
-    <button type="button" class="depth-toggle" id="depth-toggle" aria-expanded="false">
+    <div class="depth-toggle" id="depth-bar">
+      <button type="button" class="depth-pm" id="depth-minus" aria-label="Shallower preset">&minus;</button>
       <span class="depth-num" id="depth-num">0</span>
-      <span class="depth-toggle-text"><span class="depth-toggle-title">Depth</span><span class="depth-toggle-sub" id="depth-sub"></span></span>
-      <span class="depth-chevron" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-    </button>
+      <button type="button" class="depth-pm" id="depth-plus" aria-label="Deeper preset">+</button>
+      <button type="button" class="depth-open" id="depth-toggle" aria-expanded="false">
+        <span class="depth-toggle-text"><span class="depth-toggle-title">Depth</span><span class="depth-toggle-sub" id="depth-sub"></span></span>
+        <span class="depth-chevron" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </button>
+    </div>
     <div class="depth-body" id="depth-body" hidden>
       <div class="depth-limit" id="depth-limit"></div>
       <div id="depth-rows"></div>
@@ -226,7 +247,8 @@ function wireDepthMenu(state){
   const rows = document.getElementById('depth-rows');
   if(!rows) return;
   const tg = document.getElementById('depth-toggle'), body = document.getElementById('depth-body');
-  const setOpen = (open)=>{ body.hidden = !open; tg.setAttribute('aria-expanded', open?'true':'false'); tg.classList.toggle('open', open); };
+  const bar = document.getElementById('depth-bar');
+  const setOpen = (open)=>{ body.hidden = !open; tg.setAttribute('aria-expanded', open?'true':'false'); bar.classList.toggle('open', open); };
   tg.onclick = (ev)=>{ ev.stopPropagation(); setOpen(body.hidden); };
   const sec = document.getElementById('depth-section');
   sec.addEventListener('click', ev=>ev.stopPropagation());
@@ -237,7 +259,10 @@ function wireDepthMenu(state){
     const d = depthFromMods(state.mods);
     document.getElementById('depth-num').textContent = depthLabel(d);
     const n = Object.keys(state.mods).length;
-    document.getElementById('depth-sub').innerHTML = d===1 ? 'Standard dungeon' : `${n} modifier${n>1?'s':''} &middot; score &times;${depthScoreMul(d).toFixed(2)}`;
+    const preset = d>1 && sameMods(state.mods, depthPreset(d-1));
+    document.getElementById('depth-sub').innerHTML = d===1 ? 'Standard dungeon' : `${preset?'Preset':'Custom'} &middot; ${n} modifier${n>1?'s':''} &middot; score &times;${depthScoreMul(d).toFixed(2)}`;
+    document.getElementById('depth-minus').disabled = d<=1;
+    document.getElementById('depth-plus').disabled = d>=maxSelectableDepth();
     document.getElementById('depth-limit').textContent = d>=maxSelectableDepth() ? `Clear depth ${depthLabel(maxSelectableDepth())} to unlock deeper.` : `Up to depth ${depthLabel(maxSelectableDepth())} unlocked.`;
     rows.innerHTML = DEPTH_MODS.map(m=>{
       const r = state.mods[m.id]||0;
@@ -250,5 +275,10 @@ function wireDepthMenu(state){
       b.onclick = ()=>{ const id=b.dataset.id; const v=(state.mods[id]||0)+Number(b.dataset.dir); state.mods[id]=Math.max(0,v); if(!state.mods[id]) delete state.mods[id]; draw(); };
     });
   }
+  // Preset stepper: one depth shallower/deeper, as that depth's ready-made set (replaces any custom picks).
+  const step = (dir)=>{ const shown = depthLabel(depthFromMods(state.mods)); const n = Math.max(0, Math.min(depthLabel(maxSelectableDepth()), shown+dir));
+    Object.keys(state.mods).forEach(k=>delete state.mods[k]); Object.assign(state.mods, depthPreset(n)); draw(); };
+  document.getElementById('depth-minus').onclick = (ev)=>{ ev.stopPropagation(); step(-1); };
+  document.getElementById('depth-plus').onclick = (ev)=>{ ev.stopPropagation(); step(1); };
   draw();
 }

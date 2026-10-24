@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.83 (Oct 24, 2026)
+- Scramble flick (Jeremy): each turn's dice wait in the cup (covered, showing only their colour and name) until the player flicks the orange Scramble button (it takes Go's spot until the roll) or the tray itself; dragging rattles the dice and pulls the tray along. On phones, shaking the phone rolls too (iPhone asks for motion access once). A plain tap only shows the hint; Enter rolls on a keyboard. Settings has "Flick or shake to roll each turn" to turn it off. The guided first fight teaches it on turn 2. The faces are still decided at turn start, so saves, bots and studies are unchanged.
+- Depth presets (Jeremy): − and + beside the Depth number pick a ready-made set of modifiers for that depth (gentlest first), labelled Preset or Custom; the modifier list still adjusts each one. No extra height.
 ## 1.41.82 (Oct 24, 2026)
 - New title/cover art, hand-drawn by Jeremy (replaces the ChatGPT cover). Same size and fade on the title screen; also used on the rulebook cover.
 ## 1.41.81 (Oct 22, 2026)
