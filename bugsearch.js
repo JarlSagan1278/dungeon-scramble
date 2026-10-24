@@ -12,6 +12,7 @@ const TICK_FN = () => {
 
   if (S.screen === 'victory') return { done: true, result: 'VICTORY' };
   if (S.screen === 'gameover') return { done: true, result: 'GAMEOVER' };
+  if (S.screen === 'demoEnd') return { done: true, result: 'DEMOEND' }; // demo build: Floor 1 cleared
 
   if (S.transitioning) {
     skipTransition();
@@ -140,7 +141,7 @@ const CHECK=()=>{
     let result='TIMEOUT'; const label=`${o}/${c}${relics?'+relics':''}${resume?'+resume':''}`;
     for(let t=0;t<MAXT&&!errs.length;t++){
       let tk; try{ tk=await page.evaluate(TICK_FN); }catch(e){ errs.push('eval: '+e.message); break; }
-      if(tk.done){ result=tk.result; break; }
+      if(tk.done){ result=tk.result; if(result==='DEMOEND'){ await page.waitForTimeout(1500); (await page.evaluate(CHECK)).forEach(b=>errs.push('INVARIANT '+b+' on demo end')); } break; }
       if(t%3===0){ const bad=await page.evaluate(CHECK); bad.forEach(b=>{ if(!seen.has(b.replace(/[\d.]+/g,'#'))){ seen.add(b.replace(/[\d.]+/g,'#')); errs.push('INVARIANT '+b+' @tick '+t+' note '+tk.note); } }); }
       if(resume && t>0 && t%40===0){ // save, reload the page, resume, and keep going
         const ok=await page.evaluate(()=>{ if(S.transitioning||S.lootChoice||S.shrineChoice||S.relicChoice||S.pendingLootDie||S.shrineResult) return false; try{saveGame();return hasSave();}catch(e){return false;} });
