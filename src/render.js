@@ -4993,7 +4993,7 @@ function bindScrambleFlick(el){
   };
   el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
 }
-// Shake to roll: three hard jolts within a short window (the dice cup feel), only while the dice wait for their roll.
+// Shake to roll: two jolts within a short window (the dice cup feel), only while the dice wait for their roll.
 (function(){
   if(typeof window==='undefined') return;
   let last = 0, hits = 0;
@@ -5003,11 +5003,12 @@ function bindScrambleFlick(el){
     const a = ev.acceleration;
     if(a && a.x!=null) m = Math.hypot(a.x, a.y, a.z);
     else { const g = ev.accelerationIncludingGravity; if(!g || g.x==null) return; m = Math.abs(Math.hypot(g.x, g.y, g.z) - 9.81); }
-    if(m < 13) return;
+    if(m < 8) return; // Oct 24 (Jeremy: not sensitive enough): was 13 m/s2 and three jolts
     const t = performance.now();
-    hits = (t - last < 450) ? hits + 1 : 1; last = t;
+    if(t - last < 120) return; // one jolt shows up as several samples; count it once
+    hits = (t - last < 650) ? hits + 1 : 1; last = t;
     if(hits === 1){ const w = document.querySelector('.tray-wrap'); if(w){ w.classList.remove('shake-rattle'); void w.offsetWidth; w.classList.add('shake-rattle'); } }
-    if(hits >= 3){ hits = 0; scrambleRoll(); }
+    if(hits >= 2){ hits = 0; scrambleRoll(); }
   });
 })();
 
