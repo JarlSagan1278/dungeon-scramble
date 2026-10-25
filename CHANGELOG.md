@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.86 (Oct 25, 2026)
+- Guard's zone is a full 2x2 square again (middle right: rows 2-3, columns 3-4), Jeremy; it was a 3-square L since Oct 12. Class text, coach line and rulebook updated.
+- Monster Footing: Filement Bunny 0.9x -> 0.65x (drop -1.2 -> -1.7 so its feet land where the page shows them).
 ## 1.41.85 (Oct 25, 2026)
 - Chest lid redesign (Jeremy picked A1): a domed lid as wide as the chest that rises 26px above it and covers the top corner brackets, with two upright riveted straps over the curve and a riveted rim, all in the chest's own steel. The round badge stays on top of it.
 - Go stays Go during the wait (greyed out like the other buttons; a tap rattles the lid). Double-tap or double-click the lid to open it; flick, shake and Enter still work. The guide's turn-2 bubble says so.

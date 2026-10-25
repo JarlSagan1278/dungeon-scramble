@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.85';
+const GAME_VERSION = '1.41.86';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false };
@@ -310,8 +310,8 @@ const ORIGINS = [
 const CLASSES = [
   {id:'armsmaster', name:'Armsmaster', color:'#7a45d6', ability:'Once per turn, turn any Action or Blank in your zone (right column) into a Hit (2).',
     zone:(r,c)=> c===3, convertTo:{type:'hit', value:2}},
-  {id:'guard', name:'Guard', color:'#2fb8b8', ability:'Once per turn, turn any Action or Blank in your zone (an L of three squares, middle right) into a Block (1).',
-    zone:(r,c)=> (r===1 && (c===2||c===3)) || (r===2 && c===3), convertTo:{type:'block', value:1}}, // 3-square L (Jeremy, Oct 12: 2x2 -> L, 63% -> 58% at depth 7) // Block 2 -> 1 (Jeremy, Oct 12 class study: Guard won 89% vs 40-67%)
+  {id:'guard', name:'Guard', color:'#2fb8b8', ability:'Once per turn, turn any Action or Blank in your zone (a 2x2 square, middle right) into a Block (1).',
+    zone:(r,c)=> (r===1||r===2) && (c===2||c===3), convertTo:{type:'block', value:1}}, // 2x2 square again (Jeremy, Oct 25; was a 3-square L from Oct 12, 63% -> 58% at depth 7) // Block 2 -> 1 (Jeremy, Oct 12 class study: Guard won 89% vs 40-67%)
   {id:'dungeoneer', name:'Dungeoneer', color:'#d4812e', ability:'Your zone (the left and right edges) wraps left-to-right when building a Path, on every row. Each wrap adds +1 damage to your next attacking die.',
     zone:(r,c)=> c===0 || c===3, wrap:true, seamDamage:1}, // seamDamage: Oct 16 study (experts at depth 7: 36% -> 55%) // every row wraps (Jeremy, Oct 12; was the two middle rows)
   {id:'arcanist', name:'Arcanist', color:'#b4419a', ability:'Your zone is both diagonals. Once on the X, you may step diagonally along it, as if using Dodge. Your Boosts are 1 stronger (x2 becomes x3).',
@@ -680,7 +680,7 @@ const ENCOUNTER_SIZE = {
   'Ecclectrical Outlet':1.3,
   'Department Spore':1.05,
   'Alchemists Stone':0.85,
-  'Viscous Orb':0.55,'Filement Bunny':0.9,'Feral Pet Rock':0.6,'Beaker Breakers':0.6,'Leper Colonizers':0.95,
+  'Viscous Orb':0.55,'Filement Bunny':0.65,'Feral Pet Rock':0.6,'Beaker Breakers':0.6,'Leper Colonizers':0.95,
   'Wooden Golem':1.1,'Amanitabomination':1.3,
   'Transposer Lair':1.1,'Rigged Sporks':0.75,'Leper Con-Trap':1.05,
   'Rogue Golemancer':1.6,'Heating Elemental':1.2,'Grosteque Grafter':1.45,
@@ -698,6 +698,6 @@ const ENCOUNTER_SIZE = {
 };
 // Oct 15 (Jeremy, Monster Footing page): how far each monster sits lower (+) or higher (-) in the face-off, in % of its
 // picture's height, so it scales with the screen. Set by dragging each one on the page; missing = 0.
-const ENCOUNTER_DROP = {"Thom's Guide":-21.4,"Surgery Community Theatre":-16.0,"Ruinous Rune Room":-2.5,"Madpie Nest":11.4,"Loot-Diagonalizer":-3.6,"Healthy Hearth":-5.5,"Goldman's Rube Machine":3.8,"Ferrous Maiden":-17.3,"Faustian Spreadsheet":4.4,"Cryotherapist":4.2,"Charged Fae-Lines":20.6,"Blood-Drive Treats":4.0,"Ark of the Flood":-1.5,"Untamed Unicrows":-16.8,"Scrying Spheroid":-28.5,"Sacred Bellows":-2.4,"Rabbid Rabbats":-10.9,"Prickly Porcupanther":2.0,"Heron's Fountain":4.4,"Half-Full Fountain":4.4,"Half-Empty Fountain":4.4,"Extruzeon, Co-consul of Waste":3.2,"Expediting Spores":0.0,"Enchanted Anvil":0.0,"Ecclectrical Outlet":-0.1,"Department Spore":-5.1,"Alchemists Stone":-15.7,"Gnomeowners Association":4.7,"Grosteque Grafter":3.1,"Amanitabomination":-5.3,"Beaker Breakers":1.0,"Bellicose Biomancer":8.3,"Ceramic Golem":2.1,"Chimeric Sludge":5.5,"Transposer Kitty":-2.9,"Eelagator Escapee":5.5,"Extractnid Matriarch":-7.8,"Feral Pet Rock":6.4,"Filement Bunny":-1.2,"Fungal Flayer":3.9,"Gestalt Network":4.2,"Gnome Chomper":15.3,"Grafted Grifter":-3.3,"Half-life Host":3.6,"Leper Colonizers":1.9,"Lichen-Thrope":-3.4,"Morel Dilemma":1.6,"Myceleus, Co-consul of Rot":2.4,"Profane Geometry":3.9,"Rogue Golemancer":21.7,"Roudy Rinotter":5.2,"Sacred(?) Geometry":-5.3,"The Necrorancher":6.2,"The Punished":-12.4,"The Warcart":-10.4,"Toadtaur Warrior":2.6,"Toadtaur Wizard, Assistant to the Co-consul":7.8,"United Separatists":-2.0,"Whence Wolf":8.1,"Wooden Golem":4.9};
+const ENCOUNTER_DROP = {"Thom's Guide":-21.4,"Surgery Community Theatre":-16.0,"Ruinous Rune Room":-2.5,"Madpie Nest":11.4,"Loot-Diagonalizer":-3.6,"Healthy Hearth":-5.5,"Goldman's Rube Machine":3.8,"Ferrous Maiden":-17.3,"Faustian Spreadsheet":4.4,"Cryotherapist":4.2,"Charged Fae-Lines":20.6,"Blood-Drive Treats":4.0,"Ark of the Flood":-1.5,"Untamed Unicrows":-16.8,"Scrying Spheroid":-28.5,"Sacred Bellows":-2.4,"Rabbid Rabbats":-10.9,"Prickly Porcupanther":2.0,"Heron's Fountain":4.4,"Half-Full Fountain":4.4,"Half-Empty Fountain":4.4,"Extruzeon, Co-consul of Waste":3.2,"Expediting Spores":0.0,"Enchanted Anvil":0.0,"Ecclectrical Outlet":-0.1,"Department Spore":-5.1,"Alchemists Stone":-15.7,"Gnomeowners Association":4.7,"Grosteque Grafter":3.1,"Amanitabomination":-5.3,"Beaker Breakers":1.0,"Bellicose Biomancer":8.3,"Ceramic Golem":2.1,"Chimeric Sludge":5.5,"Transposer Kitty":-2.9,"Eelagator Escapee":5.5,"Extractnid Matriarch":-7.8,"Feral Pet Rock":6.4,"Filement Bunny":-1.7,"Fungal Flayer":3.9,"Gestalt Network":4.2,"Gnome Chomper":15.3,"Grafted Grifter":-3.3,"Half-life Host":3.6,"Leper Colonizers":1.9,"Lichen-Thrope":-3.4,"Morel Dilemma":1.6,"Myceleus, Co-consul of Rot":2.4,"Profane Geometry":3.9,"Rogue Golemancer":21.7,"Roudy Rinotter":5.2,"Sacred(?) Geometry":-5.3,"The Necrorancher":6.2,"The Punished":-12.4,"The Warcart":-10.4,"Toadtaur Warrior":2.6,"Toadtaur Wizard, Assistant to the Co-consul":7.8,"United Separatists":-2.0,"Whence Wolf":8.1,"Wooden Golem":4.9};
 function encounterDrop(e){ return (e && ENCOUNTER_DROP[e.name]) || 0; }
 function encounterSize(e){ if(!e) return 1; const v = ENCOUNTER_SIZE[e.name]; return v || (/Boss/.test(e.type) ? 1.35 : 1); }

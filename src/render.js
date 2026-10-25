@@ -2017,7 +2017,7 @@ function renderPathStrip(){
 // placed high so the tray and its zone stay visible below it. Remembered per class in META.coachSeen.
 const ABILITY_COACH = {
   armsmaster:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the right column) to turn it into a Hit (2). Use it every turn: it is free damage.',
-  guard:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the L of three squares, middle right) to turn it into a Block (1). Use it every turn: Block stops damage before it lands.',
+  guard:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the 2x2 square, middle right) to turn it into a Block (1). Use it every turn: Block stops damage before it lands.',
   dungeoneer:'Always on: your dashed zone is the left and right edges, and your path can wrap from one edge straight to the other on any row. Each wrap adds +1 damage to your next attacking die. Look for long paths that cross the sides.',
   arcanist:'Always on: your dashed zone is both diagonals. Once your path is on the X, it may step diagonally to another square of the X. And every Boost you play is 1 stronger (x2 becomes x3). Look for paths that run along the X.',
 };
