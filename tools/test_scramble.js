@@ -19,11 +19,11 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     for (let g = 0; g < 10 && !(S.screen === 'game' && S.encounter && S.encounter.type !== 'Shrine'); g++) { if (S.screen === 'camp') campLeave(); else advanceRoute(); }
     S.newRoomFx = false; render();
     ok(S.needRoll === true, 'a new room waits for the flick');
-    ok(document.querySelectorAll('#tray .die.unrolled').length === 16 && !!document.getElementById('chest-lid') && !!document.querySelector('#resolve-btn.rail-scramble'), 'the chest lid, hidden dice and the Scramble button show');
+    ok(document.querySelectorAll('#tray .die.unrolled').length === 16 && !!document.getElementById('chest-lid') && !!document.querySelector('#resolve-btn.disabled'), 'the chest lid and hidden dice show, Go is greyed out');
     const faces = S.tray.map(c => c.faceIdx).join();
     document.querySelector('#tray .die[data-idx="5"]').click();
     document.getElementById('resolve-btn').click();
-    ok(S.needRoll && S.path.length === 0 && !S.transitioning, 'taps on dice and on Scramble do not roll or start a path');
+    ok(S.needRoll && S.path.length === 0 && !S.transitioning, 'taps on dice and on Go do not roll or start a path');
     const ab = document.getElementById('ability-btn'); if (ab) { ab.click(); ok(!abilityArmed, 'Skill waits for the roll'); }
     const sv = serializeState(); ok(sv.needRoll === true, 'the save keeps the dice covered');
     scrambleRoll();

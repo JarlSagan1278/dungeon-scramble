@@ -1847,8 +1847,7 @@ function renderGame(){
           </div>
         </div>
         <div class="util-rail">
-          ${S.needRoll ? `<div class="util-btn rail-go rail-scramble" id="resolve-btn" title="Flick up to roll (or shake your phone)"><i class="scr-chev" aria-hidden="true"></i><span>Scramble</span></div>`
-            : `<div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning)?'disabled':''} ${emphasizeResolve?'pulse':''}" id="resolve-btn"><span>Go</span></div>`}
+          <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning||S.needRoll)?'disabled':''} ${(emphasizeResolve&&!S.needRoll)?'pulse':''}" id="resolve-btn"><span>Go</span></div>
           <div class="util-btn rail-pocket" id="open-backpocket-btn" title="${S.backPocket.length?'Safety net ready: if you fall to 0 Health, your Back Pocket can save you once (it spends every die in it).':'Back Pocket empty: no safety net until a die lands here.'}">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?'<span class="badge pocket-heart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.2 C 5.5 15.6 2 12.4 2 8.2 C 2 5.1 4.4 2.8 7.3 2.8 C 9.2 2.8 10.9 3.8 12 5.4 C 13.1 3.8 14.8 2.8 16.7 2.8 C 19.6 2.8 22 5.1 22 8.2 C 22 12.4 18.5 15.6 12 21.2 Z" fill="currentColor"/></svg></span>':''}</div>
           <div class="util-btn rail-item ${(totalTokens&&!S.needRoll)?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Item</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
           <div class="util-btn danger-accent rail-clear ${(S.transitioning||S.needRoll)?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
@@ -1905,9 +1904,9 @@ function renderGame(){
     clearPathAll();
     render();
   };
-  if(S.needRoll){ bindScrambleFlick(document.getElementById('resolve-btn')); bindScrambleFlick(document.getElementById('chest-lid')); }
+  if(S.needRoll) bindScrambleFlick(document.getElementById('chest-lid'));
   document.getElementById('resolve-btn').onclick = ()=>{
-    if(S.needRoll){ askMotionPermission(); scrambleHint(); return; } // a plain tap only teaches the flick
+    if(S.needRoll){ askMotionPermission(); scrambleHint(); return; } // Go waits for the chest to open
     // read the live path: path taps redraw with renderPathOnly(), which doesn't rebuild this handler (Oct 12 fix)
     if(S.transitioning || (S.path.length===0 && anyMoveAvailable())) return;
     getAudioCtx(); // warm up/unlock audio inside this user gesture; later queued tones (from setTimeout-driven transition steps) then play fine
@@ -4978,9 +4977,9 @@ function scrambleRoll(dx, dy){
   ], { duration:480, easing:'cubic-bezier(.3,.6,.4,1)', fill:'forwards' }).onfinish = ()=> fly.remove();
 }
 function scrambleHint(){
-  const b = document.getElementById('resolve-btn'); if(!b) return;
-  b.classList.remove('scr-hint'); void b.offsetWidth; b.classList.add('scr-hint');
-  if(!scrambleHint._told){ scrambleHint._told = true; showToast(isTouchUI() ? 'Flick the lid (or Scramble) to roll, or shake your phone.' : 'Flick the lid or Scramble (drag and let go fast) to roll.'); }
+  const w = document.querySelector('.tray-wrap'); if(!w) return;
+  w.classList.remove('shake-rattle'); void w.offsetWidth; w.classList.add('shake-rattle');
+  if(!scrambleHint._told){ scrambleHint._told = true; showToast(isTouchUI() ? 'Flick the lid open (or double-tap it), or shake your phone.' : 'Flick the lid open (drag and let go fast), or double-click it.'); }
 }
 function isTouchUI(){ try{ return matchMedia('(pointer: coarse)').matches; }catch(e){ return false; } }
 function askMotionPermission(){ // iPhone asks once, from a tap; Android and desktop need no permission
@@ -4989,7 +4988,7 @@ function askMotionPermission(){ // iPhone asks once, from a tap; Android and des
 }
 function bindScrambleFlick(el){
   if(!el) return;
-  let on = false, sx = 0, sy = 0, pts = [];
+  let on = false, sx = 0, sy = 0, pts = [], lastTap = 0;
   const wrap = ()=> document.querySelector('.tray-wrap');
   const pull = (dx, dy)=>{ const w = wrap(); if(!w) return; const k = v=> Math.max(-18, Math.min(18, v*0.25)); w.style.setProperty('--fx', k(dx)+'px'); w.style.setProperty('--fy', k(dy)+'px'); };
   el.addEventListener('pointerdown', ev=>{
@@ -5009,7 +5008,13 @@ function bindScrambleFlick(el){
     const w = wrap(); if(w){ w.classList.remove('flick-hold'); w.style.setProperty('--fx', '0px'); w.style.setProperty('--fy', '0px'); }
     const dx = ev.clientX - sx, dy = ev.clientY - sy, dist = Math.hypot(dx, dy);
     const a = pts[0], dt = Math.max(1, performance.now() - a[2]), speed = Math.hypot(ev.clientX - a[0], ev.clientY - a[1]) / dt; // px per ms over the last ~90 ms
-    if(ev.type==='pointerup' && ((dist > 26 && speed > 0.35) || dist > 90)){ askMotionPermission(); scrambleRoll(dx, dy); }
+    if(ev.type!=='pointerup') return;
+    if((dist > 26 && speed > 0.35) || dist > 90){ askMotionPermission(); scrambleRoll(dx, dy); return; }
+    if(dist < 10){ // a tap: the second one within 350 ms opens the lid (double-tap / double-click, Jeremy Oct 25)
+      const t = performance.now();
+      if(t - lastTap < 350){ lastTap = 0; askMotionPermission(); scrambleRoll(0, -1); }
+      else { lastTap = t; askMotionPermission(); }
+    }
   };
   el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
 }
@@ -5037,7 +5042,7 @@ const GUIDE_TEXT = {
        'Now tap the glowing neighbor. Every die you step on fires its face.',
        'One more! A <b>Combo</b> hits harder when it touches Hits.',
        'That number is your Path\'s damage. Tap <b>Go</b>!'],
-  t2roll: 'New turn! <b>Flick Scramble</b> upward to roll your dice. On a phone, you can shake it instead.',
+  t2roll: 'New turn! <b>Flick the lid</b> open (or double-tap it) to roll your dice. On a phone, you can shake it instead.',
   t2: 'Monsters show their <b>next move</b> under their name, so you can plan for it. Your Tray re-rolled: build any Path and finish the fight!',
 };
 function guideNudge(idx){
@@ -5064,7 +5069,7 @@ function updateGuide(){
     target = S.path.length < S.guide.plan.length ? tray.querySelector(`.die[data-idx="${S.guide.plan[S.path.length]}"]`) : document.getElementById('resolve-btn');
   } else if(S.guide.stage==='t2' && S.needRoll){
     text = GUIDE_TEXT.t2roll;
-    target = document.getElementById('resolve-btn');
+    target = null; // the bubble sits right above the lid
   } else if(S.guide.stage==='t2'){
     if(S.path.length) return hide();
     text = GUIDE_TEXT.t2;

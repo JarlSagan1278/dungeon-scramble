@@ -3075,13 +3075,6 @@ body:has(.modal-overlay) .settings-btn-floating{ visibility:hidden; }
 .tray-wrap.shake-rattle .chest-lid{ animation:lid-rattle .09s steps(2) 4; }
 @keyframes lid-rattle{ 0%{ transform:rotate(-.8deg) translateY(1px); } 100%{ transform:rotate(.8deg) translateY(-2px); } }
 .chest-lid.lid-fly{ position:fixed; z-index:9000; pointer-events:none; translate:none; margin:0; }
-.util-btn.rail-go.rail-scramble{ background:linear-gradient(#f08a3c,#d2601f) !important; color:#2a1406 !important; touch-action:none; cursor:grab; overflow:hidden; gap:6px; }
-.util-btn.rail-go.rail-scramble span{ writing-mode:vertical-rl; transform:rotate(180deg); font-size:19px !important; letter-spacing:2px; }
-.scr-chev{ width:22px; height:22px; flex:none; background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232a1406' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l7-7 7 7M5 20l7-7 7 7'/%3E%3C/svg%3E"); animation:scr-chev 1.4s ease-in-out infinite; }
-@keyframes scr-chev{ 0%,100%{ transform:translateY(3px); opacity:.65; } 50%{ transform:translateY(-4px); opacity:1; } }
-.rail-scramble.scr-hint{ animation:scr-hint .5s cubic-bezier(.3,1.6,.5,1); }
-@keyframes scr-hint{ 0%{ transform:translateY(0); } 35%{ transform:translateY(-14px); } 100%{ transform:translateY(0); } }
-.reduced-motion .scr-chev{ animation:none; }
 /* Oct 24: room for the Flick-to-roll toggle without making Settings scroll */
 .settings-toggles{ gap:3px !important; }
 .settings-toggle-row:not(.settings-slider-row){ padding-top:6px !important; padding-bottom:6px !important; }
