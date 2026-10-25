@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.85 (Oct 25, 2026)
+- Chest lid redesign (Jeremy picked A1): a domed lid as wide as the chest that rises 26px above it and covers the top corner brackets, with two upright riveted straps over the curve and a riveted rim, all in the chest's own steel. The round badge stays on top of it.
+- Go stays Go during the wait (greyed out like the other buttons; a tap rattles the lid). Double-tap or double-click the lid to open it; flick, shake and Enter still work. The guide's turn-2 bubble says so.
 ## 1.41.84 (Oct 24, 2026)
 - Closed chest (Jeremy picked option D): before each roll a wooden lid with iron bands and a "Flick to open" plate covers the tray (replaces the five-pip dice). Dragging the lid pulls it along and rattles it; a flick throws it off in that direction while the padlock pops and the dice tumble out. Scramble, Enter and shaking still work.
 - Shake to roll is more sensitive (Jeremy): two medium jolts within about half a second (was three hard ones).

@@ -3059,18 +3059,21 @@ body:has(.modal-overlay) .settings-btn-floating{ visibility:hidden; }
 
 /* ---- Scramble flick (Oct 24): a closed chest lid covers the tray until the player flicks it open (or shakes the phone) ---- */
 .die.unrolled .name-tag{ opacity:.8; }
-.chest-lid{ position:absolute; left:5px; right:5px; top:5px; bottom:23px; z-index:3; border-radius:7px; cursor:grab; touch-action:none;
+.chest-lid{ box-sizing:border-box; position:absolute; left:-4px; right:-4px; top:-26px; bottom:23px; z-index:4; overflow:hidden; cursor:grab; touch-action:none;
+  border-radius:48% 48% 8px 8px / 26px 26px 8px 8px; border:3px solid var(--b0);
   translate:var(--fx,0px) var(--fy,0px); transition:translate .25s cubic-bezier(.3,1.6,.5,1);
-  background:repeating-linear-gradient(90deg,transparent 0 44px,rgba(0,0,0,.3) 44px 47px),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 6px),linear-gradient(180deg,#9a6a3c,#734a26);
-  border:3px solid var(--b0); box-shadow:inset 0 3px 0 rgba(255,225,170,.22),inset 0 -4px 0 rgba(0,0,0,.25),0 5px 0 var(--b0),0 10px 14px rgba(0,0,0,.45);
+  --steel:linear-gradient(135deg,#8d98a2,#4a5560); --rivet:radial-gradient(circle at 45% 45%,rgba(255,255,255,.5) 0 .9px,rgba(12,7,5,.6) 1.3px 2.2px,transparent 2.6px);
+  background:repeating-linear-gradient(90deg,transparent 0 30px,rgba(0,0,0,.32) 30px 32px),
+    linear-gradient(180deg,#5e3a1c 0%,#a8743f 16%,#b98549 24%,#8f5f33 55%,#6c4322 100%);
+  box-shadow:inset 0 3px 0 rgba(255,225,170,.18),0 5px 0 var(--b0),0 10px 14px rgba(0,0,0,.45);
   display:flex; align-items:center; justify-content:center; }
 .chest-lid::before{ content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:var(--paper-tile) repeat; background-size:110px 110px; mix-blend-mode:soft-light; }
-.chest-lid .lid-band{ position:absolute; left:-3px; right:-3px; height:15px; background:linear-gradient(#a9b2bb,#6b737c 60%,#545b63); border-top:3px solid var(--b0); border-bottom:3px solid var(--b0); }
-.chest-lid .lid-band:nth-child(1){ top:20%; } .chest-lid .lid-band:nth-child(2){ bottom:20%; }
-.chest-lid .lid-band::before,.chest-lid .lid-band::after{ content:""; position:absolute; top:3px; width:6px; height:6px; border-radius:50%; background:#3a3f45; box-shadow:0 0 0 1px rgba(255,255,255,.25); }
-.chest-lid .lid-band::before{ left:12px; } .chest-lid .lid-band::after{ right:12px; }
+.chest-lid .strap{ position:absolute; top:-4px; bottom:6px; width:15px; z-index:1; background:var(--rivet) center/100% 22px repeat-y, var(--steel); border:2.2px solid #0c0705; }
+.chest-lid .strap.s1{ left:18%; } .chest-lid .strap.s2{ right:18%; }
+.chest-lid .rim{ position:absolute; left:-3px; right:-3px; bottom:-3px; height:13px; z-index:1; background:var(--rivet) 6px 50%/26px 100% repeat-x, var(--steel); border:2.2px solid #0c0705; border-radius:0 0 7px 7px; }
 .lid-plate{ position:relative; z-index:2; padding:5px 14px; border-radius:10px; background:#3b2414; border:3px solid var(--b0); box-shadow:inset 0 2px 0 rgba(255,220,160,.15),0 3px 0 var(--b0); }
 .lid-plate span{ font:400 19px var(--font-display); color:#f1e2c4; letter-spacing:.5px; text-shadow:0 2px 0 #1a0f07; white-space:nowrap; }
+.tray-head{ position:relative; z-index:6; }
 .tray-wrap.flick-hold .chest-lid{ transition:none; animation:lid-rattle .09s steps(2) infinite; }
 .tray-wrap.shake-rattle .chest-lid{ animation:lid-rattle .09s steps(2) 4; }
 @keyframes lid-rattle{ 0%{ transform:rotate(-.8deg) translateY(1px); } 100%{ transform:rotate(.8deg) translateY(-2px); } }

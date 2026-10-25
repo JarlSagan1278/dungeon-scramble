@@ -4954,7 +4954,8 @@ function newAchievementsHTML(newAchievements){
    or shakes the phone. Dragging rattles the dice and pulls the tray along a little; a slow drag springs back. */
 // Closed chest (Jeremy, Oct 24): until the roll a wooden lid covers the tray; the flick throws it off in the flick's
 // direction, the lock pops and the dice tumble out.
-const CHEST_LID_HTML = `<div class="chest-lid" id="chest-lid" title="Flick to open (or shake your phone)"><i class="lid-band"></i><i class="lid-band"></i><div class="lid-plate"><span>Flick to open</span></div></div>`;
+// Domed lid (Jeremy picked A1, Oct 25): as wide as the chest, rising 26px above it so it covers the top corner brackets.
+const CHEST_LID_HTML = `<div class="chest-lid" id="chest-lid" title="Flick or double-tap to open (or shake your phone)"><i class="strap s1"></i><i class="strap s2"></i><i class="rim"></i><div class="lid-plate"><span>Flick to open</span></div></div>`;
 function scrambleRoll(dx, dy){
   if(!S || !S.needRoll) return;
   const lid = document.getElementById('chest-lid');
