@@ -14,6 +14,8 @@ const TICK_FN = () => {
   if (S.screen === 'gameover') return { done: true, result: 'GAMEOVER' };
   if (S.screen === 'demoEnd') return { done: true, result: 'DEMOEND' }; // demo build: Floor 1 cleared
 
+  if (S.needRoll && S.screen === 'game' && !S.transitioning) { scrambleRoll(0, -1); return { done: false, note: 'flick-roll' }; } // chest lid (1.41.83+), on when FLICK=1
+
   if (S.transitioning) {
     skipTransition();
     return { done: false, note: 'skip-transition' };
@@ -136,6 +138,7 @@ const CHECK=()=>{
   for(const [o,c,relics,resume] of combos){
     const VPS=[[360,740],[390,844],[411,785],[375,667]]; const vp=VPS[n%VPS.length]; const page=await browser.newPage({viewport:{width:vp[0],height:vp[1]}}); const errs=[];
     page.on('pageerror',e=>errs.push('pageerror: '+e.message)); page.on('console',m=>{ if(m.type()==='error' && !/Failed to load resource|ERR_TUNNEL/.test(m.text())) errs.push('console: '+m.text()); });
+    if(process.env.FLICK) await page.addInitScript(()=>{ try{ localStorage.setItem('dungeonScrambleRollTest','1'); }catch(e){} });
     await page.goto('file://'+FILE);
     await page.evaluate(({o,c,relics})=>{META.lifetime.victories=1;META.lifetime.bestFloorReached=3;META.achievements['origin_duo']={date:Date.now()};newGame(o,c);if(relics)RELICS.forEach(r=>grantRelic(r.id,{silent:true}));},{o,c,relics});
     let result='TIMEOUT'; const label=`${o}/${c}${relics?'+relics':''}${resume?'+resume':''}`;
