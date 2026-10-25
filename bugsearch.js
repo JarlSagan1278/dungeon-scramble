@@ -148,7 +148,7 @@ const CHECK=()=>{
       if(t%3===0){ const bad=await page.evaluate(CHECK); bad.forEach(b=>{ if(!seen.has(b.replace(/[\d.]+/g,'#'))){ seen.add(b.replace(/[\d.]+/g,'#')); errs.push('INVARIANT '+b+' @tick '+t+' note '+tk.note); } }); }
       if(resume && t>0 && t%40===0){ // save, reload the page, resume, and keep going
         const ok=await page.evaluate(()=>{ if(S.transitioning||S.lootChoice||S.shrineChoice||S.relicChoice||S.pendingLootDie||S.shrineResult) return false; try{saveGame();return hasSave();}catch(e){return false;} });
-        if(ok){ await page.waitForTimeout(1500); await page.goto('file://'+FILE); // let Chromium commit localStorage first: an instant reload of a file:// page can read storage from before the save (Oct 25: false 'resume failed' on 1 in 6 Debug runs) const lg=await page.evaluate(()=>{ try{ const r=loadGame(); if(r) render(); return r; }catch(e){ return 'ERR '+e.message; } }); if(lg!==true) errs.push('resume failed '+lg); else await page.waitForTimeout(80); }
+        if(ok){ await page.waitForTimeout(1500); await page.goto('file://'+FILE); /* the 1.5 s wait lets Chromium commit localStorage first: an instant reload of a file:// page can read storage from before the save (Oct 25: false resume failures on 1 in 6 Debug runs) */ const lg=await page.evaluate(()=>{ try{ const r=loadGame(); if(r) render(); return r; }catch(e){ return 'ERR '+e.message; } }); if(lg!==true) errs.push('resume failed '+lg); else await page.waitForTimeout(80); }
       }
       if(t%25===0) await page.waitForTimeout(30);
     }
