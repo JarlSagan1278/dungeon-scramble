@@ -10,7 +10,7 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.addInitScript(() => { try { localStorage.setItem('dungeonScrambleTutorialSeen_v1', '1'); localStorage.setItem('dungeonScrambleRollTest', '1'); } catch (e) {} });
   await page.goto('file://' + path.resolve(__dirname, '../dist/dungeon_scramble.html'));
-  const out = await page.evaluate(() => {
+  const out = await page.evaluate(async () => {
     const res = []; const ok = (c, m) => res.push((c ? 'ok   ' : 'FAIL ') + m);
     for (let n = 0; n <= 27; n++) { const d = depthFromMods(depthPreset(n)) - 1; if (d !== n) ok(false, `preset ${n} comes to depth ${d}`); }
     ok(true, 'presets 0-27 each come to their own depth');
@@ -26,7 +26,7 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     ok(S.needRoll && S.path.length === 0 && !S.transitioning, 'taps on dice and on Go do not roll or start a path');
     const ab = document.getElementById('ability-btn'); if (ab) { ab.click(); ok(!abilityArmed, 'Skill waits for the roll'); }
     const sv = serializeState(); ok(sv.needRoll === true, 'the save keeps the dice covered');
-    scrambleRoll();
+    scrambleRoll(); await new Promise(r => setTimeout(r, 200)); // the redraw follows the lid's take-off by a frame
     ok(!S.needRoll && S.tray.map(c => c.faceIdx).join() === faces && !document.querySelector('#tray .die.unrolled') && !document.getElementById('chest-lid'), 'the flick reveals the faces rolled at turn start');
     endTurn();
     ok(S.needRoll === true, 'the next turn waits again');

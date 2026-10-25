@@ -4963,19 +4963,23 @@ function scrambleRoll(dx, dy){
   if(!rollNow()) return;
   vibrate([16,30,22]);
   chestLockFxAt = performance.now(); // the padlock pops open with the lid
-  render();
-  if(!r || PREFS.reducedMotion) return;
-  let vx = dx||0, vy = dy==null ? -1 : dy; const n = Math.hypot(vx, vy) || 1; vx /= n; vy /= n;
-  const fly = document.createElement('div');
-  fly.className = 'chest-lid lid-fly'; fly.innerHTML = lid.innerHTML;
-  Object.assign(fly.style, { left:r.left+'px', top:r.top+'px', width:r.width+'px', height:r.height+'px' });
-  document.body.appendChild(fly);
-  const far = 420 + r.height;
-  fly.animate([
-    { transform:'translate(0,0) rotate(0deg)', opacity:1 },
-    { transform:`translate(${vx*far*0.25}px,${vy*far*0.25 - 18}px) rotate(${vx>=0?8:-8}deg)`, opacity:1, offset:.3 },
-    { transform:`translate(${vx*far}px,${vy*far}px) rotate(${vx>=0?28:-28}deg)`, opacity:0 }
-  ], { duration:480, easing:'cubic-bezier(.3,.6,.4,1)', fill:'forwards' }).onfinish = ()=> fly.remove();
+  // The lid takes off first and the redraw follows a frame later (Oct 25 speed check: a full redraw is ~0.6 s on a slow
+  // phone, which held the lid still after the flick). The flight is transform/opacity only, so it keeps moving during the redraw.
+  if(r && !PREFS.reducedMotion){
+    let vx = dx||0, vy = dy==null ? -1 : dy; const n = Math.hypot(vx, vy) || 1; vx /= n; vy /= n;
+    const fly = document.createElement('div');
+    fly.className = 'chest-lid lid-fly'; fly.innerHTML = lid.innerHTML;
+    Object.assign(fly.style, { left:r.left+'px', top:r.top+'px', width:r.width+'px', height:r.height+'px' });
+    document.body.appendChild(fly);
+    lid.style.visibility = 'hidden';
+    const far = 420 + r.height;
+    fly.animate([
+      { transform:'translate(0,0) rotate(0deg)', opacity:1 },
+      { transform:`translate(${vx*far*0.25}px,${vy*far*0.25 - 18}px) rotate(${vx>=0?8:-8}deg)`, opacity:1, offset:.3 },
+      { transform:`translate(${vx*far}px,${vy*far}px) rotate(${vx>=0?28:-28}deg)`, opacity:0 }
+    ], { duration:480, easing:'cubic-bezier(.3,.6,.4,1)', fill:'forwards' }).onfinish = ()=> fly.remove();
+    requestAnimationFrame(()=> setTimeout(()=>{ if(S && S.screen==='game') render(); }, 0));
+  } else render();
 }
 function scrambleHint(){
   const w = document.querySelector('.tray-wrap'); if(!w) return;

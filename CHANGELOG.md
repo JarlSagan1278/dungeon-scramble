@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.41.87 (Oct 25, 2026)
+- Speed (cheap-phone check): the chest lid now takes off the moment you flick and the screen redraws a frame later, so on a slow phone (CPU 6x slower) the lid no longer sits still for ~0.6 s after the flick.
 ## 1.41.86 (Oct 25, 2026)
 - Guard's zone is a full 2x2 square again (middle right: rows 2-3, columns 3-4), Jeremy; it was a 3-square L since Oct 12. Class text, coach line and rulebook updated.
 - Monster Footing: Filement Bunny 0.9x -> 0.65x (drop -1.2 -> -1.7 so its feet land where the page shows them).
