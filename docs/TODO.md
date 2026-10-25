@@ -5,7 +5,7 @@ The live checklist is the Checklist tab of the release plan doc (https://claude.
 
 ## Demo players (Oct 25)
 - Recruiting messages: docs/release/outreach.md. New-player report: `python3 tools/playdata/funnel.py <dir of run JSONs from Drive "Dungeon Scramble Play Data (runs)" and/or gear-menu exports> --out report.md`. Run it once ~10 demo players have shared runs.
-- Open question for Jeremy: a player's first run is never shared (consent is asked at its end and only future runs are sent).
+- First runs can now be shared (1.41.88: the end-of-run yes covers that run).
 
 - Bug hunt 1.41.86-87 with the chest lid on (FLICK=1): full game 22/24 clean, demo 12/12 clean. The 2 misses are an intermittent "resume failed" on the tester-only Debug class (the save is gone after the reload, nothing in the game removes it; not reproducible on demand, never seen on the four real classes). Low priority; Debug can't be picked in demo/release builds.
 

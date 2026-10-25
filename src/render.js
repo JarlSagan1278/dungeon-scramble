@@ -2866,6 +2866,7 @@ function juiceLow(){ return !!PREFS.lowIntensity; }
 
 function applyReducedMotionClass(){
   document.body.classList.toggle('reduced-motion', !!PREFS.reducedMotion);
+  document.body.classList.toggle('large-text', !!PREFS.largeText); // Oct 25 (Jeremy): bigger reading text in pop-ups and tooltips
 }
 
 // ---- Screen shake: a brief full-viewport shake for the two biggest combat
@@ -3061,7 +3062,7 @@ function openSettingsModal(){
       <div class="settings-toggles">
         ${settingsSliderRowHTML('pref-sound', 'Sound effects', PREFS.sound ? (PREFS.sfxVol!=null?PREFS.sfxVol:1) : 0)}
         ${settingsSliderRowHTML('pref-music', 'Music', PREFS.music!==false ? (PREFS.musicVol!=null?PREFS.musicVol:1) : 0)}
-        ${settingsToggleRowHTML('pref-reduced-motion', 'Reduce motion', PREFS.reducedMotion)}
+        <div class="settings-pair">${settingsToggleRowHTML('pref-reduced-motion', 'Reduce motion', PREFS.reducedMotion)}${settingsToggleRowHTML('pref-large-text', 'Larger text', PREFS.largeText)}</div>
         ${settingsToggleRowHTML('pref-low-intensity', 'Gentler effects (fewer sparks)', PREFS.lowIntensity)}
         ${settingsToggleRowHTML('pref-vibration', 'Vibration (phones)', PREFS.vibration!==false)}
         ${settingsToggleRowHTML('pref-flick-roll', 'Flick or shake to roll each turn', PREFS.flickRoll!==false)}
@@ -3098,6 +3099,7 @@ function openSettingsModal(){
   sfxSl.onchange = ()=>{ if(PREFS.sound) playTone('hit'); };
   musSl.oninput = ()=>{ const v = musSl.value/100; const was = PREFS.music!==false; setPref('musicVol', v); setPref('music', v>0); settingsSliderLabel(musSl); if(was!==(v>0)) musicUpdate(); else musicSetVolume(); };
   overlay.querySelector('#pref-reduced-motion').onchange = (ev)=> setPref('reducedMotion', ev.target.checked);
+  overlay.querySelector('#pref-large-text').onchange = (ev)=> setPref('largeText', ev.target.checked);
   overlay.querySelector('#pref-low-intensity').onchange = (ev)=> setPref('lowIntensity', ev.target.checked);
   overlay.querySelector('#pref-flick-roll').onchange = (ev)=>{ setPref('flickRoll', ev.target.checked); if(!ev.target.checked && S && S.needRoll && rollNow()) render(); };
   overlay.querySelector('#pref-vibration').onchange = (ev)=>{ setPref('vibration', ev.target.checked); if(ev.target.checked) vibrate(30); };
@@ -4734,14 +4736,15 @@ function summaryStatsHTML(){
 function shareDataAskHTML(){
   if(!PLAYDATA_URL || shareDataPref()) return '';
   return `<div class="share-ask" id="share-ask">
-      <p><strong>Help balance the game?</strong> Send how each run goes from now on (rooms, dice, what beat you), with a random id for this device, its screen size and any error messages. No names or personal info. You can turn it off in Settings.</p>
-      <div class="small-btn-row" style="justify-content:center;"><button class="primary" onclick="shareDataAnswer(true)">Yes, share</button><button onclick="shareDataAnswer(false)">No thanks</button></div>
+      <p><strong>Help balance the game?</strong> Send how this run and your future runs go (rooms, dice, what beat you), with a random id for this device, its screen size and any error messages. No names or personal info. You can turn it off in Settings.</p>
+      <div class="small-btn-row" style="justify-content:center;"><button class="primary" onclick="shareDataAnswer(true)">Yes, share this run and future ones</button><button onclick="shareDataAnswer(false)">No thanks</button></div>
     </div>`;
 }
 function shareDataAnswer(on){
-  setShareData(on);
+  const last = getTelemetryRuns().slice(-1)[0]; // the run that just ended (the question only shows on its end screen)
+  setShareData(on, on && last ? last.runId : null);
   const box = document.getElementById('share-ask');
-  if(box) box.innerHTML = `<p class="hint" style="margin:0;">${on ? 'Thanks! Your runs will be sent automatically.' : 'No problem. Nothing will be sent.'}</p>`;
+  if(box) box.innerHTML = `<p class="hint" style="margin:0;">${on ? 'Thanks! This run and your future runs will be sent automatically.' : 'No problem. Nothing will be sent.'}</p>`;
 }
 
 // Settings -> Export Play Data: nothing is uploaded; this just packages the

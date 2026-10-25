@@ -300,17 +300,21 @@ const SHARE_KEY = 'dungeonScrambleShareData_v1';      // 'yes' | 'no' | missing 
 const UPLOAD_QUEUE_KEY = 'dungeonScrambleUploadQueue_v1';
 const UPLOADED_KEY = 'dungeonScrambleUploaded_v1';
 function shareDataPref(){ try{ return localStorage.getItem(SHARE_KEY); }catch(e){ return null; } }
-function setShareData(on){
+function setShareData(on, alsoRunId){
   try{ localStorage.setItem(SHARE_KEY, on ? 'yes' : 'no'); }catch(e){}
   // Release prep (Oct 21): opting in covers runs finished from now on only. Runs already on the device are marked
   // as not-to-send, so saying yes never uploads a back-catalogue the player didn't know about.
+  // Oct 25 (Jeremy): the end-of-run question also covers the run just finished ("this run and future ones"), passed as
+  // alsoRunId, so a new player's first run can be sent. The Settings switch still covers future runs only.
   if(on){
     try{
       const done = JSON.parse(localStorage.getItem(UPLOADED_KEY)||'[]');
-      getTelemetryRuns().forEach(r=>{ if(r && r.runId && !done.includes(r.runId)) done.push(r.runId); });
+      getTelemetryRuns().forEach(r=>{ if(r && r.runId && r.runId!==alsoRunId && !done.includes(r.runId)) done.push(r.runId); });
       while(done.length>200) done.shift();
       localStorage.setItem(UPLOADED_KEY, JSON.stringify(done));
       localStorage.setItem('dungeonScrambleUploadConfirm_v2', '1'); // and resendUnconfirmedRuns() must not re-queue them
+      const rec = alsoRunId && getTelemetryRuns().find(r=>r && r.runId===alsoRunId);
+      if(rec){ queueRunUpload(rec); flushRunUploads(); }
     }catch(e){}
   }
 }
@@ -738,7 +742,7 @@ function saveSeen(seen){
 // should survive across runs (including after a run ends and the save is
 // cleared). ----
 const PREFS_KEY = 'dungeonScramblePrefs_v1';
-const DEFAULT_PREFS = { sound: true, music: true, reducedMotion: false, lowIntensity: false, vibration: true, sfxVol: 1, musicVol: 1, flickRoll: true }; // volumes 0-1 (Oct 13 sliders; 0 also turns sound/music off)
+const DEFAULT_PREFS = { sound: true, music: true, reducedMotion: false, lowIntensity: false, vibration: true, sfxVol: 1, musicVol: 1, flickRoll: true, largeText: false }; // volumes 0-1 (Oct 13 sliders; 0 also turns sound/music off)
 let PREFS = loadPrefs();
 function loadPrefs(){
   try{
@@ -753,7 +757,7 @@ function savePrefs(){
 function setPref(key, val){
   PREFS[key] = val;
   savePrefs();
-  if(key==='reducedMotion' && typeof applyReducedMotionClass==='function') applyReducedMotionClass();
+  if((key==='reducedMotion' || key==='largeText') && typeof applyReducedMotionClass==='function') applyReducedMotionClass();
 }
 
 // ---- First-run tutorial: shown once, ever, the first time a new game

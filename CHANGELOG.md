@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.88 (Oct 25, 2026)
+- Play data (Jeremy): the end-of-run question now reads "Yes, share this run and future ones" and sends the run that just ended too, so a new player's first run can be seen. Older runs on the device are still never sent; the Settings switch still covers future runs only. Privacy policy updated (effective Oct 25).
+- Larger text (Jeremy, #24): a Settings option that makes reading text in pop-ups, the Codex, How to Play and long-press tooltips about 20% bigger; the board keeps its size. "Reduce motion" and "Larger text" share one Settings row, so Settings still doesn't scroll.
 ## 1.41.87 (Oct 25, 2026)
 - Speed (cheap-phone check): the chest lid now takes off the moment you flick and the screen redraws a frame later, so on a slow phone (CPU 6x slower) the lid no longer sits still for ~0.6 s after the flick.
 ## 1.41.86 (Oct 25, 2026)

@@ -1,4 +1,4 @@
-// Scramble flick (Oct 24) and Depth presets.
+// Scramble flick (Oct 24), Depth presets, and the end-of-run play-data consent (Oct 25).
 // Flick: a turn's dice wait covered (S.needRoll) until the flick; taps, Go and the Skill do nothing meanwhile; the next
 // turn and a new room wait again; a save/reload keeps them covered. Presets: preset N always comes to exactly depth N.
 // usage: node tools/test_scramble.js   (prints ok/FAIL lines)
@@ -31,6 +31,16 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     endTurn();
     ok(S.needRoll === true, 'the next turn waits again');
     PREFS.flickRoll = false; endTurn(); ok(!S.needRoll, 'with the setting off the dice roll by themselves'); PREFS.flickRoll = true;
+    // Play-data consent (Oct 25): 'Yes' at a run's end sends that run and later ones, never older runs.
+    if (typeof PLAYDATA_URL !== 'undefined' && PLAYDATA_URL) {
+      window.fetch = () => new Promise(() => {}); // no network in the check
+      localStorage.removeItem('dungeonScrambleShareData_v1'); localStorage.removeItem('dungeonScrambleUploadQueue_v1'); localStorage.removeItem('dungeonScrambleUploaded_v1');
+      const list = [{ runId: 'r-old1', outcome: 'defeat', events: [] }, { runId: 'r-just1', outcome: 'defeat', events: [] }];
+      localStorage.setItem(TELE_KEY, JSON.stringify(list));
+      shareDataAnswer(true);
+      const q = JSON.parse(localStorage.getItem('dungeonScrambleUploadQueue_v1') || '[]').map(r => r.runId);
+      ok(q.length === 1 && q[0] === 'r-just1', 'saying yes queues the run that just ended, not older ones (' + q.join(',') + ')');
+    }
     return res;
   });
   out.forEach(l => console.log(l));

@@ -7,7 +7,7 @@
 <meta name="description" content="Privacy policy for the game Dungeon Scramble: what stays on your device, what optional play data is sent, and how to opt out or ask for deletion.">
 <!--
   Draft written Oct 21, 2026 from the code at build 1.41.76 plus the release-prep changes in progress
-  (opt-in sends only runs finished after opting in; Metamorphous self-hosted; no ads, accounts or third-party analytics;
+  (opt-in at the end of a run sends that run and later ones, Oct 25; the Settings switch sends later runs only; Metamorphous self-hosted; no ads, accounts or third-party analytics;
   purchases through Apple / Google in-app purchase).
   Fill in every [BRACKETED] placeholder before publishing. Not legal advice: have it checked against the stores' rules.
   Sources: src/logic.js (teleLog, finalizeTelemetry, PLAYDATA_URL, SHARE_KEY, flushRunUploads), src/main.js (error events),
@@ -42,7 +42,7 @@
 <main>
 
 <h1>Dungeon Scramble Privacy Policy</h1>
-<p class="meta">Effective date: October 22, 2026</p>
+<p class="meta">Effective date: October 25, 2026 (first version October 22, 2026)</p>
 
 <div class="box">
   <p><strong>The short version.</strong> Dungeon Scramble has no ads, no accounts, no third-party analytics and no tracking across apps or websites. Your progress is saved on your device only. If you choose to, the game can send anonymous records of how your runs went, so I can balance the game and fix bugs. It is off until you say yes, and you can turn it off at any time in Settings.</p>
@@ -70,8 +70,8 @@
      If it does, change the sentence above. -->
 
 <h2>3. Optional play data (only if you opt in)</h2>
-<p>At the end of your first run the game asks “Help balance the game?”. Nothing is sent unless you tap <strong>Yes, share</strong>. You can change your answer any time with the <strong>Share play data automatically</strong> switch in Settings.</p>
-<p>If you say yes, each run that <strong>finishes after you opt in</strong> (won, lost or abandoned) is sent once, when it ends. Runs you played before opting in are not sent. If you are offline, the run waits on your device and is sent the next time you open the game while online and still opted in.</p>
+<p>At the end of your first run the game asks “Help balance the game?”. Nothing is sent unless you tap <strong>Yes, share this run and future ones</strong>. You can change your answer any time with the <strong>Share play data automatically</strong> switch in Settings.</p>
+<p>If you say yes, the run you just finished is sent, and so is each run that <strong>finishes after that</strong> (won, lost or abandoned), once, when it ends. Other runs you played before opting in are not sent. If you turn sharing on later with the Settings switch, only runs that finish after that are sent. If you are offline, the run waits on your device and is sent the next time you open the game while online and still opted in.</p>
 
 <h3>What one upload contains</h3>
 <table>

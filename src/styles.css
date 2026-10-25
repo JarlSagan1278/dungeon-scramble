@@ -3081,3 +3081,12 @@ body:has(.modal-overlay) .settings-btn-floating{ visibility:hidden; }
 /* Oct 24: room for the Flick-to-roll toggle without making Settings scroll */
 .settings-toggles{ gap:3px !important; }
 .settings-toggle-row:not(.settings-slider-row){ padding-top:6px !important; padding-bottom:6px !important; }
+
+/* Larger text (Jeremy, Oct 25): reading text in pop-ups, the Codex, How to Play and long-press tooltips ~20% bigger.
+   The game board keeps its size (the 395x769 card can't grow). Settings: "Reduce motion" and "Larger text" share a row. */
+.settings-pair{ display:flex; gap:3px; }
+.settings-pair > .settings-toggle-row{ flex:1 1 0; min-width:0; }
+body.large-text .modal p, body.large-text .modal li, body.large-text .modal td, body.large-text .modal .hint, body.large-text .modal small,
+body.large-text .face-tooltip{ font-size:calc(1em * 1.2) !important; line-height:1.4 !important; }
+body.large-text .modal li p, body.large-text .modal td p{ font-size:1em !important; }
+body.large-text .face-tooltip{ max-width:260px !important; }
