@@ -1111,7 +1111,7 @@ function renderSetup(){
       <button class="primary" id="start-btn" disabled>Enter the Dungeon</button>
     </div>
   `;
-  const depthState = { mods:{} };
+  const depthState = depthMenuUnlocked() ? initialDepthState() : { mods:{} };
   wireDepthMenu(depthState);
   document.getElementById('setup-back-btn').onclick = ()=>{ preGameScreen='title'; render(); };
 
@@ -1241,7 +1241,7 @@ function renderSetup(){
   }
 
   function checkReady(){ document.getElementById('start-btn').disabled = !(chosenOrigin&&chosenClass); }
-  document.getElementById('start-btn').onclick=()=>{ newGame(chosenOrigin, chosenClass, chosenBoonName, charName, depthState.mods); };
+  document.getElementById('start-btn').onclick=()=>{ if(depthMenuUnlocked()) rememberDepthChoice(depthState.mods); newGame(chosenOrigin, chosenClass, chosenBoonName, charName, depthState.mods); };
   // Secret debug trigger: 5 clicks on "Choose Your Class" within a short
   // window. No visible button, so it can't be stumbled into by a normal
   // player, but stays quick to reach for testing. Two-step, since it does
@@ -5107,4 +5107,69 @@ function updateGuide(){
   } else r.hidden = true;
 }
 if(typeof window!=='undefined') setInterval(()=>{ try{ updateGuide(); }catch(e){} }, 150);
+
+/* ---- Floor tips (Jeremy, Oct 26): one-line lessons the first time a situation comes up ----
+   The "New Action" cards say what a face is; these say when it matters, on the turn it matters, with the guide's bubble
+   and ring on the die or chip in question. Each tip shows once per device, one at a time, never during the guided fight,
+   a room banner, a pop-up or a New Action card, and goes away on a tap, when the Path changes, or after 9 s. */
+const TIPS_KEY = 'dungeonScrambleTips_v1';
+let TIPS_SEEN = (()=>{ try{ return new Set(JSON.parse(localStorage.getItem(TIPS_KEY)||'[]')); }catch(e){ return new Set(); } })();
+function tipsWanted(){
+  try{ if(typeof navigator!=='undefined' && navigator.webdriver && !localStorage.getItem('dungeonScrambleTipsTest')) return false; }catch(e){ return false; }
+  return true;
+}
+function markTipSeen(k){ TIPS_SEEN.add(k); try{ localStorage.setItem(TIPS_KEY, JSON.stringify([...TIPS_SEEN])); }catch(e){} teleLog('tip', {k}); }
+const TIP_TEXT = {
+  combo: n=>`This <b>Combo</b> touches ${n} attacking dice, so it hits harder. The glow grows with every Hit, Combo, Shield, H.O.T. or D.O.T. beside it.`,
+  leap: ()=>'A <b>Leap</b> jumps over the next die in a straight line, so a Blank or Minion in the way doesn\'t have to end your Path.',
+  heavy: ()=>'A <b>heavy turn</b> is coming: this monster hits harder next turn. Block faces in this Path will soak it.',
+  minion: ()=>'<b>Minion</b> dice clog your Tray. Every point of damage you deal clears one, and a Leap clears any it jumps over.',
+  overkill: n=>`This Path wins the fight. Deal ${n} more for an <b>Overkill</b>: an extra loot choice.`,
+};
+let _tip = null; // {k, pathLen, at, targetSel}
+function tipTargets(){
+  const e = S.encounter, tray = document.getElementById('tray'); if(!tray || !e) return null;
+  const at = i=> `#tray .die[data-idx="${i}"]`;
+  if(!S.path.length){
+    if(!TIPS_SEEN.has('minion')){ const i = S.tray.findIndex(c=>c.minion); if(i>=0) return {k:'minion', el:at(i), arg:null}; }
+    if(!TIPS_SEEN.has('heavy')){ try{ if(enemyNextTurnPreview(e).heavy){ if(document.querySelector('#enc-panel .fo-enemy .fo-chips:not(.fo-buffs)')) return {k:'heavy', el:'#enc-panel .fo-enemy .fo-chips:not(.fo-buffs)', arg:null}; } }catch(err){} }
+    if(!TIPS_SEEN.has('combo')){ for(let i=0;i<16;i++){ const c=S.tray[i]; if(c.minion||c.blank) continue; const f=currentFace(c); if(f.type==='combo'){ const n=attackNeighborsCount(i); if(n>=2) return {k:'combo', el:at(i), arg:n}; } } }
+    if(!TIPS_SEEN.has('leap')){ for(let i=0;i<16;i++){ const c=S.tray[i]; if(c.minion||c.blank) continue; if(currentFace(c).type!=='leap') continue;
+      const r=Math.floor(i/4), q=i%4; const blocked=[[0,1],[0,-1],[1,0],[-1,0]].some(([dr,dc])=>{ const rr=r+dr, cc=q+dc, r2=r+2*dr, c2=q+2*dc; if(rr<0||rr>3||cc<0||cc>3||r2<0||r2>3||c2<0||c2>3) return false; const mid=S.tray[rr*4+cc]; return mid.minion || currentFace(mid).type==='blank'; });
+      if(blocked) return {k:'leap', el:at(i), arg:null}; } }
+  } else if(!TIPS_SEEN.has('overkill') && !(typeof depthRank==='function' && depthRank('slim'))){
+    try{ const pv=computePathEffects(S.path); const d=Math.max(0,pv.totalDamage-(e.curShield||0)), hp=e.curHealth, thr=(typeof hasRelic==='function' && hasRelic('hungry_blade'))?5:9;
+      if(hp>0 && d>=hp && d<=hp+thr){ const more=Math.floor(hp+thr)+1-d; if(more<=6) return {k:'overkill', el:'#enc-panel .fo-enemy .fo-hpwrap', arg:more}; } }catch(err){}
+  }
+  return null;
+}
+function hideTip(){ const b=document.getElementById('tip-bubble'), r=document.getElementById('tip-ring'); if(b) b.remove(); if(r) r.remove(); _tip=null; }
+function updateTips(){
+  if(typeof S==='undefined' || !S || S.screen!=='game' || !S.encounter || !tipsWanted()) return hideTip();
+  const busy = S.transitioning || S.needRoll || S.encounter.curHealth<=0 || (S.guide && S.guide.stage!=='done') || document.querySelector('.modal-overlay, .coach-overlay, #symbol-intro, #room-callout, #room-callout-scrim, #guide-bubble');
+  if(_tip){
+    if(busy || S.path.length!==_tip.pathLen || performance.now()-_tip.at>9000) return hideTip();
+  } else {
+    if(busy) return;
+    const t = tipTargets(); if(!t || !t.el || !document.querySelector(t.el)) return;
+    markTipSeen(t.k);
+    _tip = {k:t.k, pathLen:S.path.length, at:performance.now(), el:t.el};
+    const b = document.createElement('div'); b.id='tip-bubble'; b.className='guide-bubble tip-bubble';
+    b.innerHTML = `<div class="guide-text">${TIP_TEXT[t.k](t.arg)}</div>`; b.onclick = hideTip; document.body.appendChild(b);
+    const r = document.createElement('div'); r.id='tip-ring'; r.className='guide-ring'; document.body.appendChild(r);
+  }
+  const b=document.getElementById('tip-bubble'), r=document.getElementById('tip-ring'), tray=document.getElementById('tray');
+  const tel = _tip && document.querySelector(_tip.el);
+  if(!b || !r || !tray || !tel){ hideTip(); return; }
+  const tr=tray.getBoundingClientRect(), q=tel.getBoundingClientRect(), bw=Math.round(tr.width*0.72);
+  b.style.width=bw+'px';
+  const inTray = q.top >= tr.top-2;
+  if(inTray){ b.style.left=Math.round(tr.left)+'px'; b.style.top=Math.round(tr.top-b.offsetHeight-12)+'px'; b.classList.remove('no-arrow'); b.style.setProperty('--arrow-x', Math.max(14, Math.min(bw-14, q.left+q.width/2-tr.left))+'px'); }
+  else { // a chip or HP bar up in the room: the bubble sits above it, pointing down at it (it may cover the art for a moment, never the dice)
+    const left = Math.max(8, Math.min(innerWidth-bw-8, q.left+q.width/2-bw/2));
+    b.style.left=Math.round(left)+'px'; b.style.top=Math.round(Math.max(4, q.top-b.offsetHeight-12))+'px'; b.classList.remove('no-arrow');
+    b.style.setProperty('--arrow-x', Math.max(14, Math.min(bw-14, q.left+q.width/2-left))+'px'); }
+  r.style.left=Math.round(q.left-5)+'px'; r.style.top=Math.round(q.top-5)+'px'; r.style.width=Math.round(q.width+10)+'px'; r.style.height=Math.round(q.height+10)+'px';
+}
+if(typeof window!=='undefined') setInterval(()=>{ try{ updateTips(); }catch(e){} }, 300);
 

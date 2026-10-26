@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.89 (Oct 26, 2026)
+- Floor tips (Jeremy, flaw #1 "too much to learn at once"): one-line lessons the first time a situation comes up, in the guide's bubble with a ring on the die, chip or health bar in question: a Combo touching 2+ attacking dice, a Leap with a Blank or Minion beside it, a heavy turn coming, Minions on the Tray, and a winning Path a few points short of Overkill. Each shows once per device, one at a time, never over the guided fight, a banner, a pop-up or a New Action card; a tap, a Path change or 9 s hides it.
+- Next depth (Jeremy, flaw #3 "easy once learned"): after a win, the next Setup opens on the next depth's preset, marked "Suggested next step" (one tap on - steps back). Otherwise Setup opens on the depth last played.
 ## 1.41.88 (Oct 25, 2026)
 - Play data (Jeremy): the end-of-run question now reads "Yes, share this run and future ones" and sends the run that just ended too, so a new player's first run can be seen. Older runs on the device are still never sent; the Settings switch still covers future runs only. Privacy policy updated (effective Oct 25).
 - Larger text (Jeremy, #24): a Settings option that makes reading text in pop-ups, the Codex, How to Play and long-press tooltips about 20% bigger; the board keeps its size. "Reduce motion" and "Larger text" share one Settings row, so Settings still doesn't scroll.

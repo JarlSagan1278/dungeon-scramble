@@ -79,6 +79,20 @@ function saveDepthBest(){ try{ localStorage.setItem(DEPTH_BEST_KEY, JSON.stringi
 
 // How deep the Setup menu lets you go: two more than your deepest clear.
 function maxSelectableDepth(){ return Math.max(DEPTH_BEST.overall, 1) + 2; }
+// Next-depth suggestion (Jeremy, Oct 26): after a win, the next Setup opens on the next depth's preset, marked
+// "Suggested"; otherwise it opens on the depth last played. Either way the player can step it back with the - button.
+const LAST_DEPTH_KEY = 'dungeonScrambleLastDepth_v1', NEXT_DEPTH_KEY = 'dungeonScrambleNextDepth_v1';
+function initialDepthState(){
+  try{
+    const next = parseInt(localStorage.getItem(NEXT_DEPTH_KEY), 10);
+    if(next > 0){ const n = Math.min(next, depthLabel(maxSelectableDepth())); return { mods: depthPreset(n), suggested: true }; }
+    const last = JSON.parse(localStorage.getItem(LAST_DEPTH_KEY) || '{}');
+    const mods = {}; Object.keys(last||{}).forEach(k=>{ const m = DEPTH_MOD_BY_ID[k], r = last[k]|0; if(m && r>0) mods[k] = Math.min(r, m.max); });
+    if(depthFromMods(mods) <= maxSelectableDepth()) return { mods };
+  }catch(e){}
+  return { mods:{} };
+}
+function rememberDepthChoice(mods){ try{ localStorage.setItem(LAST_DEPTH_KEY, JSON.stringify(mods||{})); localStorage.removeItem(NEXT_DEPTH_KEY); }catch(e){} }
 function depthMenuUnlocked(){ return (META.lifetime.victories||0) >= 1 || (typeof debugArmed!=='undefined' && debugArmed); }
 
 /* ---- Finish tiers (dice borders), account-wide ---- */
@@ -102,6 +116,7 @@ function recordDepthResult(outcome){
   const res = { depth, outcome, score:0, newClassBest:false, newTier:0, title:'' };
   if(outcome==='victory'){
     res.score = computeRunScore();
+    try{ localStorage.setItem(NEXT_DEPTH_KEY, String(depthLabel(depth) + 1)); }catch(e){}
     const cid = S.klass.id;
     const prev = DEPTH_BEST.byClass[cid] || { depth:0, score:0 };
     if(depth > prev.depth){ res.newClassBest = true; }
@@ -260,7 +275,8 @@ function wireDepthMenu(state){
     document.getElementById('depth-num').textContent = depthLabel(d);
     const n = Object.keys(state.mods).length;
     const preset = d>1 && sameMods(state.mods, depthPreset(d-1));
-    document.getElementById('depth-sub').innerHTML = d===1 ? 'Standard dungeon' : `${preset?'Preset':'Custom'} &middot; ${n} modifier${n>1?'s':''} &middot; score &times;${depthScoreMul(d).toFixed(2)}`;
+    if(state.suggested && !preset) state.suggested = false;
+    document.getElementById('depth-sub').innerHTML = d===1 ? 'Standard dungeon' : `${state.suggested?'Suggested next step':(preset?'Preset':'Custom')} &middot; ${n} modifier${n>1?'s':''} &middot; score &times;${depthScoreMul(d).toFixed(2)}`;
     document.getElementById('depth-minus').disabled = d<=1;
     document.getElementById('depth-plus').disabled = d>=maxSelectableDepth();
     document.getElementById('depth-limit').textContent = d>=maxSelectableDepth() ? `Clear depth ${depthLabel(maxSelectableDepth())} to unlock deeper.` : `Up to depth ${depthLabel(maxSelectableDepth())} unlocked.`;
@@ -277,7 +293,7 @@ function wireDepthMenu(state){
   }
   // Preset stepper: one depth shallower/deeper, as that depth's ready-made set (replaces any custom picks).
   const step = (dir)=>{ const shown = depthLabel(depthFromMods(state.mods)); const n = Math.max(0, Math.min(depthLabel(maxSelectableDepth()), shown+dir));
-    Object.keys(state.mods).forEach(k=>delete state.mods[k]); Object.assign(state.mods, depthPreset(n)); draw(); };
+    Object.keys(state.mods).forEach(k=>delete state.mods[k]); Object.assign(state.mods, depthPreset(n)); state.suggested = false; draw(); };
   document.getElementById('depth-minus').onclick = (ev)=>{ ev.stopPropagation(); step(-1); };
   document.getElementById('depth-plus').onclick = (ev)=>{ ev.stopPropagation(); step(1); };
   draw();
