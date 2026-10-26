@@ -18,7 +18,9 @@ jobs:
         with: { node-version: '22' }
       - uses: actions/setup-java@v4
         with: { distribution: 'temurin', java-version: '21' }
-      - uses: android-actions/setup-android@v3
+      # The ubuntu runner already has the Android SDK (ANDROID_HOME); the setup-android action failed on it (Oct 26).
+      - name: Android SDK
+        run: echo "ANDROID_HOME=$ANDROID_HOME" && ls "$ANDROID_HOME/platforms" | tail -3
       - name: Build the game (release flavour)
         run: node build.js --release
       - name: Copy it into the app
