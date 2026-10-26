@@ -16,7 +16,7 @@ for d, k in DENS.items():
     f = round(108 * k); inner = round(f * 0.78)  # adaptive icon: the launcher shows roughly the middle 72 of 108
     fg = Image.new('RGBA', (f, f), (0, 0, 0, 0)); fg.paste(src.resize((inner, inner), Image.LANCZOS), ((f - inner) // 2, (f - inner) // 2))
     fg.save(f'{RES}/mipmap-{d}/ic_launcher_foreground.png')
-open(f'{RES}/values/ic_launcher_background.xml', 'w').write('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#6B4322</color>\n</resources>\n')
+open(f'{RES}/values/ic_launcher_background.xml', 'w').write('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#2B1D14</color>\n</resources>\n')
 for p in glob.glob(f'{RES}/drawable*/splash.png'):
     w, h = Image.open(p).size
     sp = Image.new('RGB', (w, h), (26, 17, 11)); s = round(min(w, h) * 0.32)
