@@ -14,6 +14,7 @@ Digital prototype of the board game Jeremy designed with his wife Katlynn (Boggl
 
 ## Release routine
 1. Bump `GAME_VERSION` in `src/data.js` (cache name `ds-<ver>` follows it). 2. `node build.js && node tools/check.js` (all ok). 3. Publish preview to the Artifact (`dist/dungeon_scramble.html`, same URL, label <=60 chars). 4. Commit as `<ver>: <summary>`; add a CHANGELOG line. 5. Push to origin. 6. Sync the names sheet (Google Sheet `1sT6kFeTvl_V7g3Mmwp2hrTC0FtQEdgsfgYSUDmJrLCE`): it is the living database of every name, stat, face, move, quest and flavor line, so update it with every change (Jeremy, Oct 12).
+- **Tester site (Oct 26):** https://dungeon-scramble.dungeonscramblegame.workers.dev (Cloudflare Workers, account dungeonscramblegame@gmail.com, project `dungeon-scramble`, Git-connected). Every push to `main` rebuilds it (`node build.js`, then `npx wrangler deploy` of dist/web per wrangler.jsonc), so only push to main once checks pass. Jeremy and Kat play here; Netlify is no longer needed for them.
 - **Netlify zips are made only when the owner (Jeremy) asks**, and previews are published separately from them (a preview publish never implies a zip). Each upload costs him ~5% of his monthly allotment. Zip: `cd dist/web && zip -qr /tmp/dungeon_scramble_web_<ver>.zip .` then SendUserFile.
 - Live: https://dungeon-scramble-mobile.netlify.app/ . Preview artifact: https://claude.ai/artifact/EgVZK1tuHgNfJpqhd92jPR
 - GitHub origin (`main`) is the source of truth. Commit regularly and push after each release commit.
