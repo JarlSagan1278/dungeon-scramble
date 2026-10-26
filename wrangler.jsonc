@@ -1,0 +1,11 @@
+// Cloudflare Workers static site for the tester build (Jeremy and Kat), Oct 26.
+// Cloudflare's Git integration runs `node build.js` then `npx wrangler deploy`, which publishes dist/web (the PWA).
+// The name must match the Cloudflare project name ("dungeon-scramble").
+{
+  "name": "dungeon-scramble",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist/web",
+    "not_found_handling": "single-page-application"
+  }
+}
