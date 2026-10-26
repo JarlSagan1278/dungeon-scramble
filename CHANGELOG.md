@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.92 (Oct 26, 2026)
+- Skin tones (Jeremy: "too blotchy"): the tint now finds each face as a whole patch (filling the specks the paper texture left, never crossing the black outlines) and tints it evenly, so faces are one colour with the paper grain still showing. The gnome holding a cream map keeps its original colours (the map read as skin).
+- Android build: fixed the build settings file (1.41.91's build didn't start).
 ## 1.41.91 (Oct 26, 2026)
 - Store app unlock (checklist #30): new `--app` build. After Floor 1 the run waits on a "Floor 1 Cleared!" unlock screen (saved there): Unlock the full dungeon (the same run carries on into Floor 2), Restore purchase, or End run here. The store connection is a stand-in for now (a free test unlock, labelled as such) until the Google Play account exists. The tester site and the itch.io demo are unchanged.
 - Android app: the Back button closes pop-ups first, pauses a run with the Settings menu, steps from character setup back to the title, and only sends the app to the background from the title. The screen stays on while the app is open, and the app is padded around Android's status and navigation bars.

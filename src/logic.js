@@ -865,7 +865,7 @@ const SKIN_TONES = [
   { id:'purple',   name:'Purple',   rgb:[180,130,220] },
   { id:'gray',     name:'Gray',     rgb:[165,170,175] },
 ];
-const SKIN_TINT_SKIP = { pixie:'all', gnome:[8,9] };
+const SKIN_TINT_SKIP = { pixie:'all', gnome:[2,8,9] }; // gnome 2 holds a cream map that reads as skin (Oct 26)
 const SKIN_PEACH = [250,203,157];
 const _skinTintCache = {};
 function skinTintEligible(originId, idx){
@@ -883,19 +883,41 @@ function tintSkinPixels(src, originId, rgb){
         const g = c.getContext('2d'); g.drawImage(im,0,0);
         const d = g.getImageData(0,0,c.width,c.height); const px = d.data;
         const peach = originId==='halfling';
-        for(let i=0;i<px.length;i+=4){
-          const a=px[i+3]; if(!a) continue;
+        // Oct 26 (Jeremy: "too blotchy"): the paper texture speckles the skin, so a per-pixel colour test left untinted
+        // dots. Now: score each pixel, keep the clearly-skin ones, close the gaps between them (never across the dark
+        // outlines), soften the edge by a pixel, then tint the whole patch; the paper grain still shows through its brightness.
+        const W = c.width, H = c.height, N = W*H;
+        const score = new Float32Array(N), dark = new Uint8Array(N), lumA = new Float32Array(N);
+        for(let k=0, i=0; k<N; k++, i+=4){
+          const a=px[i+3]; if(!a){ dark[k]=1; continue; }
           const r=px[i], gg=px[i+1], b=px[i+2];
-          let w, lum;
+          if(Math.max(r,gg,b) < 95) dark[k]=1;
           if(peach){
             const dr=r-SKIN_PEACH[0], dg=gg-SKIN_PEACH[1], db=b-SKIN_PEACH[2];
-            const dist=Math.sqrt(dr*dr+dg*dg+db*db);
-            w = Math.max(0,Math.min(1,(34-dist)/14)); lum = ((r+gg+b)/3)/203*1.15;
+            score[k] = Math.max(0,Math.min(1,(34-Math.sqrt(dr*dr+dg*dg+db*db))/14)); lumA[k] = ((r+gg+b)/3)/203*1.15;
           } else {
             const mn=Math.min(r,gg,b);
-            w = Math.max(0,Math.min(1,(mn-165)/35)) * Math.max(0,Math.min(1,((r-b)-3)/8)); lum = ((r+gg+b)/3)/236;
+            score[k] = Math.max(0,Math.min(1,(mn-165)/35)) * Math.max(0,Math.min(1,((r-b)-3)/8)); lumA[k] = ((r+gg+b)/3)/236;
           }
-          if(w<=0) continue;
+        }
+        let m = new Uint8Array(N); for(let k=0;k<N;k++) m[k] = score[k] > 0.3 ? 1 : 0;
+        const R = Math.max(2, Math.round(W/170)); // ~3 px on the 512 px portraits
+        const pass = (src, grow, horiz)=>{ const out = new Uint8Array(N);
+          for(let y=0;y<H;y++) for(let x=0;x<W;x++){ let v = grow ? 0 : 1;
+            for(let t=-R;t<=R;t++){ const xx = horiz ? x+t : x, yy = horiz ? y : y+t;
+              const q = (xx<0||yy<0||xx>=W||yy>=H) ? 0 : src[yy*W+xx];
+              if(grow ? q : !q){ v = grow ? 1 : 0; break; } }
+            out[y*W+x] = v; } return out; };
+        m = pass(pass(m,true,true),true,false);          // grow over the specks...
+        m = pass(pass(m,false,true),false,false);        // ...and shrink back, so the patch keeps its shape
+        for(let k=0;k<N;k++) if(dark[k]) m[k]=0;          // never paint the outlines or anything dark
+        const wv = new Float32Array(N);                   // soft 1 px edge
+        for(let y=0;y<H;y++) for(let x=0;x<W;x++){ const k=y*W+x; if(!m[k]){ continue; }
+          let n=0, s2=0; for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){ const xx=x+dx, yy=y+dy; if(xx<0||yy<0||xx>=W||yy>=H) continue; n++; s2+=m[yy*W+xx]; }
+          wv[k] = s2/n; }
+        for(let k=0, i=0; k<N; k++, i+=4){
+          const w = wv[k]; if(w<=0) continue;
+          const r=px[i], gg=px[i+1], b=px[i+2], lum = lumA[k];
           px[i]   = r*(1-w) + Math.min(255,rgb[0]*lum)*w;
           px[i+1] = gg*(1-w) + Math.min(255,rgb[1]*lum)*w;
           px[i+2] = b*(1-w) + Math.min(255,rgb[2]*lum)*w;
