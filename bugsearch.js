@@ -13,6 +13,7 @@ const TICK_FN = () => {
   if (S.screen === 'victory') return { done: true, result: 'VICTORY' };
   if (S.screen === 'gameover') return { done: true, result: 'GAMEOVER' };
   if (S.screen === 'demoEnd') return { done: true, result: 'DEMOEND' }; // demo build: Floor 1 cleared
+  if (S.screen === 'unlock') return { done: true, result: 'UNLOCK' }; // store app: Floor 1 cleared, waiting for the unlock
 
   if (S.needRoll && S.screen === 'game' && !S.transitioning) { scrambleRoll(0, -1); return { done: false, note: 'flick-roll' }; } // chest lid (1.41.83+), on when FLICK=1
 

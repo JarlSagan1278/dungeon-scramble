@@ -1,9 +1,9 @@
 // Copies the release web build into app/www for the Capacitor app (Oct 26).
 // The app serves its files itself, so the service worker (offline cache for the web version) is switched off here.
-// usage: node build.js --release && node tools/app/prepare.js
+// usage: node build.js --app && node tools/app/prepare.js
 const fs = require('fs'), path = require('path');
-const ROOT = path.resolve(__dirname, '../..'), SRC = path.join(ROOT, 'dist/release/web'), OUT = path.join(ROOT, 'app/www');
-if (!fs.existsSync(path.join(SRC, 'index.html'))) { console.error('No release build: run `node build.js --release` first.'); process.exit(1); }
+const ROOT = path.resolve(__dirname, '../..'), SRC = path.join(ROOT, 'dist/app/web'), OUT = path.join(ROOT, 'app/www');
+if (!fs.existsSync(path.join(SRC, 'index.html'))) { console.error('No app build: run `node build.js --app` first.'); process.exit(1); }
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.cpSync(SRC, OUT, { recursive: true });
 const idx = path.join(OUT, 'index.html');

@@ -115,3 +115,21 @@ setTimeout(()=>{ try{ resendUnconfirmedRuns(); flushRunUploads(); }catch(e){} },
   sp.addEventListener('pointerdown', go); sp.addEventListener('keydown', ev=>{ ev.preventDefault(); go(); }); sp.tabIndex = 0;
 })();
 
+
+// Android Back button in the store app (Oct 26): close what's on top first, pause a run with the Settings menu (it has
+// Abandon Run), step back from character setup to the title, and only from the title send the app to the background.
+(function(){
+  const cap = typeof window!=='undefined' && window.Capacitor;
+  if(!cap || !cap.isNativePlatform || !cap.isNativePlatform()) return;
+  const AppPlugin = cap.registerPlugin ? cap.registerPlugin('App') : (cap.Plugins && cap.Plugins.App);
+  if(!AppPlugin || !AppPlugin.addListener) return;
+  AppPlugin.addListener('backButton', ()=>{
+    const overlays = document.querySelectorAll('.modal-overlay');
+    if(overlays.length){ const top = overlays[overlays.length-1], x = top.querySelector('.modal-x-btn'); if(x) x.click(); else top.remove(); return; }
+    const pop = document.querySelector('#symbol-intro, #tip-bubble, .coach-overlay');
+    if(pop){ if(pop.id==='tip-bubble' && typeof hideTip==='function') hideTip(); else pop.click(); return; }
+    if(typeof S!=='undefined' && S && ['game','camp','shrine','unlock'].includes(S.screen)){ openSettingsModal(); return; }
+    if((typeof S==='undefined' || !S) && preGameScreen==='setup'){ preGameScreen='title'; render(); return; }
+    if(AppPlugin.minimizeApp) AppPlugin.minimizeApp();
+  });
+})();

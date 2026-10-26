@@ -12,8 +12,9 @@ const SRC = path.join(__dirname, 'src');
 // Build flavours (Oct 21, release prep): default = tester build in dist/ (as before);
 // --release = public/store build in dist/release/ (no Debug unlock); --demo = free Floor-1-only build in dist/demo/.
 const DEMO = process.argv.includes('--demo');
-const RELEASE = DEMO || process.argv.includes('--release');
-const DIST_DIR = path.join(__dirname, 'dist', DEMO ? 'demo' : RELEASE ? 'release' : '');
+const APP = process.argv.includes('--app'); // Oct 26: the store app (release + Floor 1 free, one purchase unlocks the rest) in dist/app/
+const RELEASE = DEMO || APP || process.argv.includes('--release');
+const DIST_DIR = path.join(__dirname, 'dist', DEMO ? 'demo' : APP ? 'app' : RELEASE ? 'release' : '');
 const OUT = path.join(DIST_DIR, DEMO ? 'dungeon_scramble_demo.html' : 'dungeon_scramble.html');
 
 function read(name) {
@@ -24,8 +25,8 @@ const head = read('_head.html').replace('<title>Dungeon Scramble</title>', DEMO 
 // Comments are for us, not the player: strip them from the shipped CSS (no string in styles.css contains "/*").
 const styles = read('styles.css').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\n[ \t]*(?=\n)/g, '').replace(/\n{2,}/g, '\n');
 const body = read('_body.html');
-let data = read('data.js').replace('var BUILD = { demo:false, release:false };', `var BUILD = { demo:${DEMO}, release:${RELEASE} };`);
-if (RELEASE && !/var BUILD = \{ demo:(true|false), release:true \}/.test(data)) throw new Error('build flags line not found in data.js');
+let data = read('data.js').replace('var BUILD = { demo:false, release:false, app:false };', `var BUILD = { demo:${DEMO}, release:${RELEASE}, app:${APP} };`);
+if (RELEASE && !/var BUILD = \{ demo:(true|false), release:true, app:(true|false) \}/.test(data)) throw new Error('build flags line not found in data.js');
 // LOGO_IMG is only used by the rulebook (tools/gen.js reads src/assets.js itself), so the game builds leave it out.
 let assets = read('assets.js').replace(/^const LOGO_IMG = "[^"]*";\n/m, '');
 // Demo build (Oct 21): the free file must not be the whole game. Floors 2-3 (their enemies, traps, shrines, bosses,
@@ -146,7 +147,7 @@ fs.writeFileSync(path.join(WEB, 'manifest.webmanifest'), JSON.stringify({
   ]
 }, null, 2), 'utf8');
 const SW = `// Dungeon Scramble service worker -- cache name is stamped with the game version.
-const CACHE = 'ds-${DEMO ? 'demo-' : ''}${VERSION}';
+const CACHE = 'ds-${DEMO ? 'demo-' : APP ? 'app-' : ''}${VERSION}';
 const FILES = ['./', 'index.html', 'manifest.webmanifest'].concat(${JSON.stringify(ICONS)}).concat(${JSON.stringify([...ART_FILES].map(f => 'art/' + f))});
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));

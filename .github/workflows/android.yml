@@ -21,8 +21,8 @@ jobs:
       # The ubuntu runner already has the Android SDK (ANDROID_HOME); the setup-android action failed on it (Oct 26).
       - name: Android SDK
         run: echo "ANDROID_HOME=$ANDROID_HOME" && ls "$ANDROID_HOME/platforms" | tail -3
-      - name: Build the game (release flavour)
-        run: node build.js --release
+      - name: Build the game (app flavour: Floor 1 free, unlock for the rest)
+        run: node build.js --app
       - name: Copy it into the app
         run: node tools/app/prepare.js
       - name: Install Capacitor and sync

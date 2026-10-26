@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.91 (Oct 26, 2026)
+- Store app unlock (checklist #30): new `--app` build. After Floor 1 the run waits on a "Floor 1 Cleared!" unlock screen (saved there): Unlock the full dungeon (the same run carries on into Floor 2), Restore purchase, or End run here. The store connection is a stand-in for now (a free test unlock, labelled as such) until the Google Play account exists. The tester site and the itch.io demo are unchanged.
+- Android app: the Back button closes pop-ups first, pauses a run with the Settings menu, steps from character setup back to the title, and only sends the app to the background from the title. The screen stays on while the app is open, and the app is padded around Android's status and navigation bars.
 ## 1.41.90 (Oct 26, 2026)
 - Shake to roll takes three jolts again (Jeremy: two rolled too easily in play); each jolt still only needs the lighter 8 m/s2 shake from 1.41.84.
 ## 1.41.89 (Oct 26, 2026)

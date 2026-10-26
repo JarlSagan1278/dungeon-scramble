@@ -254,6 +254,7 @@ function render(){
   }
   if(S.screen==='victory'){ clearPathTrail(); renderVictory(); maybeScreenTransition('victory'); return; }
   if(S.screen==='demoEnd'){ clearPathTrail(); renderDemoEnd(); maybeScreenTransition('victory'); return; }
+  if(S.screen==='unlock'){ clearPathTrail(); renderUnlock(); maybeAutosave(); maybeScreenTransition('victory'); return; }
   if(S.screen==='gameover'){ clearPathTrail(); renderGameOver(); maybeScreenTransition('gameover'); return; }
   if(S.screen==='camp'){ clearPathTrail(); renderCamp(); tuckCampCog(); maybeAutosave(); maybeScreenTransition('camp'); return; }
   if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); decorateArch(); maybeAutosave(); maybeScreenTransition('shrine'); return; }
@@ -4852,6 +4853,27 @@ function renderVictory(){
 }
 // Free demo build (BUILD.demo, `node build.js --demo`): the run ends after the Floor 1 boss. It is recorded in Records and
 // play data as 'demo' (not a win: no depth badge, achievements or origin relic), and the screen points to the full game.
+// Store app, end of Floor 1 without the unlock (Oct 26): the run waits here (it is saved) until the player unlocks the
+// full dungeon (the same run carries on into Floor 2), restores an earlier purchase, or ends the run here like the demo.
+function renderUnlock(){
+  if(!S._unlockFx){ S._unlockFx = true; if(typeof musicSting==='function') musicSting('win'); else playTone('grandVictory'); if(typeof spawnConfettiRain==='function') spawnConfettiRain(); }
+  const price = STORE.price(), test = !STORE.native();
+  app.innerHTML = `<div class="panel end-screen unlock-screen"><h2>Floor 1 Cleared!</h2>
+    <p class="end-lede">Unlock the full dungeon and this run keeps going: two more floors, every loot die and relic, and the depth challenges. One purchase, no ads.</p>
+    <div class="end-swap"><div class="end-main">${runCardHTML('demo')}${demoTeaserHTML()}</div></div>
+    <div class="unlock-actions">
+      <button class="primary unlock-buy" id="unlock-buy-btn">Unlock the full dungeon${price ? ` &middot; ${price}` : ''}</button>
+      <div class="unlock-row"><button id="unlock-restore-btn" class="btn-records">Restore purchase</button><button id="unlock-later-btn">End run here</button></div>
+      <p class="hint unlock-msg" id="unlock-msg">${test ? 'Test build: unlocking here is free and nothing is charged.' : ''}</p>
+    </div></div>`;
+  const msg = t=>{ const m = document.getElementById('unlock-msg'); if(m) m.textContent = t; };
+  const busy = on=>document.querySelectorAll('.unlock-actions button').forEach(b=>b.disabled = on);
+  document.getElementById('unlock-buy-btn').onclick = ()=>{ busy(true); msg('Opening the store...');
+    STORE.buy().then(ok=>{ if(ok){ grantFullGame(test ? 'test' : 'purchase'); S._unlockFx = false; continueAfterUnlock(); render(); } else { busy(false); msg('The purchase did not go through. Nothing was charged.'); } }); };
+  document.getElementById('unlock-restore-btn').onclick = ()=>{ busy(true); msg('Checking for an earlier purchase...');
+    STORE.restore().then(ok=>{ if(ok){ grantFullGame('restore'); S._unlockFx = false; continueAfterUnlock(); render(); } else { busy(false); msg(test ? 'Test build: there is no store to restore from yet.' : 'No earlier purchase was found on this account.'); } }); };
+  document.getElementById('unlock-later-btn').onclick = ()=>{ S._unlockFx = false; S.screen = 'demoEnd'; render(); };
+}
 function renderDemoEnd(){
   if(!S.gameOverRecorded){
     S.gameOverRecorded = true;
@@ -4861,7 +4883,7 @@ function renderDemoEnd(){
     if(typeof musicSting==='function') musicSting('win'); else playTone('grandVictory');
     if(typeof spawnConfettiRain==='function') spawnConfettiRain();
   }
-  app.innerHTML = endScreenHTML({ outcome:'demo', title:'Floor 1 Cleared!', lede:'That is the end of the free demo.',
+  app.innerHTML = endScreenHTML({ outcome:'demo', title:'Floor 1 Cleared!', lede: BUILD.app ? 'Your run ends here. Clear Floor 1 again any time to unlock the full dungeon.' : 'That is the end of the free demo.',
     seal:'', relic:'', again:'Play Again', note:demoTeaserHTML() });
   wireRunCard('demo');
 }

@@ -1231,6 +1231,7 @@ function advanceRoute(){
   if(S.routeStep >= S.route.length){
     // move to next floor
     if(BUILD.demo && S.floorIdx===0){ S.screen='demoEnd'; return; } // free demo build: Floor 1 only
+    if(S.floorIdx===0 && !hasFullGame()){ S.screen='unlock'; return; } // store app: Floor 1 is free, one purchase unlocks the rest
     if(S.floorIdx < FLOORS.length-1){
       S.floorIdx++;
       S.routeStep = 0;
@@ -1316,6 +1317,23 @@ function advanceRoute(){
     S.newRoomFx = {name: S.encounter.name, type: S.encounter.type, boss:true};
   }
 }
+
+/* ---- Full-game unlock (Oct 26): the store app is free to install, Floor 1 is free, one purchase unlocks the rest ----
+   Only the app build (BUILD.app) is gated; the tester site and the itch.io demo are not. The unlock is remembered on the
+   device; Restore asks the store again (after a reinstall or on a new phone). STORE talks to the native purchase plugin
+   once it exists (window.DSStore: { price, buy(), restore() } returning promises of true/false); until then a test
+   purchase stands in, and the unlock screen says so plainly. */
+const UNLOCK_KEY = 'dungeonScrambleFullGame_v1';
+function hasFullGame(){ if(!BUILD.app) return true; try{ return localStorage.getItem(UNLOCK_KEY)==='yes'; }catch(e){ return false; } }
+function grantFullGame(how){ try{ localStorage.setItem(UNLOCK_KEY, 'yes'); }catch(e){} teleLog('unlock', {how}); }
+const STORE = {
+  native(){ return typeof window!=='undefined' && !!window.DSStore; },
+  price(){ return (this.native() && window.DSStore.price) || null; },
+  buy(){ return this.native() ? Promise.resolve(window.DSStore.buy()).catch(()=>false) : new Promise(r=>setTimeout(()=>r(true), 400)); },
+  restore(){ return this.native() ? Promise.resolve(window.DSStore.restore()).catch(()=>false) : Promise.resolve(false); },
+};
+// After a purchase on the Floor 1 unlock screen the same run carries on into Floor 2.
+function continueAfterUnlock(){ if(!S || S.screen!=='unlock') return; S.screen='game'; advanceRoute(); }
 
 function finishStep(){
   S.routeStep++;
