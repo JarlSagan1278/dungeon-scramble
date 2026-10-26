@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.41.93 (Oct 26, 2026)
+- Skin tones: the three dwarves with white or grey beards keep their original colours (their beards are the same colour as their faces, so tinting turned the beards too; Jeremy).
 ## 1.41.92 (Oct 26, 2026)
 - Skin tones (Jeremy: "too blotchy"): the tint now finds each face as a whole patch (filling the specks the paper texture left, never crossing the black outlines) and tints it evenly, so faces are one colour with the paper grain still showing. The gnome holding a cream map keeps its original colours (the map read as skin).
 - Android build: fixed the build settings file (1.41.91's build didn't start).

@@ -164,7 +164,7 @@ const SHOTS = process.env.SHOTS || ''; // set SHOTS=<dir> to save screenshots
   const fb = await page.evaluate(() => { const f = document.querySelector('.fo-shrine .fo-enemy .fo-fig'); const r = f.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
   await page.mouse.click(fb.x, fb.y); await page.waitForTimeout(60);
   const wig = await page.evaluate(() => { const f = document.querySelector('.fo-shrine .fo-enemy .fo-fig'); return f.getAnimations().map(a => a.effect && a.effect.getKeyframes().length).join(',') + ' charging:' + document.getElementById('shrine-hold-btn').classList.contains('charging'); });
-  ok(/^7/.test(wig) && /charging:false/.test(wig), `tapping the shrine wiggles it (${wig})`);
+  ok(/(^|,)7(,|\s)/.test(wig) && /charging:false/.test(wig), `tapping the shrine wiggles it (${wig})`);
   // hold to receive
   const box = await page.evaluate(() => { const r = document.getElementById('shrine-hold-btn').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
   await page.mouse.move(box.x, box.y); await page.mouse.down(); await page.waitForTimeout(2600); await page.mouse.up(); await page.waitForTimeout(800);

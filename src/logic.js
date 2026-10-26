@@ -865,7 +865,7 @@ const SKIN_TONES = [
   { id:'purple',   name:'Purple',   rgb:[180,130,220] },
   { id:'gray',     name:'Gray',     rgb:[165,170,175] },
 ];
-const SKIN_TINT_SKIP = { pixie:'all', gnome:[2,8,9] }; // gnome 2 holds a cream map that reads as skin (Oct 26)
+const SKIN_TINT_SKIP = { pixie:'all', gnome:[2,8,9], dwarf:[2,5,10] }; // Oct 26: gnome 2 holds a cream map that reads as skin; dwarves 2, 5, 10 have white beards the same colour as their faces (Jeremy: skip them)
 const SKIN_PEACH = [250,203,157];
 const _skinTintCache = {};
 function skinTintEligible(originId, idx){
