@@ -4,16 +4,11 @@
 from PIL import Image
 BG = (43, 29, 20)
 C = Image.open('art/cover/characters_860.png').convert('RGBA')
-fig = C.crop((140, 430, 370, 700))
-# erase the neighbours that share the layer: a stray stick at the top left, the dwarf's sword and shield at the bottom right
-from PIL import ImageDraw
-_m = fig.getchannel('A'); _d = ImageDraw.Draw(_m)
-_d.rectangle([0, 0, 40, 45], fill=0); _d.rectangle([0, 0, 28, 70], fill=0); _d.polygon([(166, 270), (230, 270), (230, 190), (186, 214)], fill=0)
-fig.putalpha(_m)
+fig = C.crop((168, 492, 348, 672))  # zoomed in on her hood and face; the torch runs off the edge and a bit of the dwarf's sword may show (Jeremy: don't erase)
 def make(size, fill=1.0):
     c = Image.new('RGBA', (size, size), BG + (255,))
     k = size * fill / max(fig.size); f = fig.resize((round(fig.width * k), round(fig.height * k)), Image.LANCZOS)
-    c.alpha_composite(f, ((size - f.width) // 2, size - f.height if fill >= 1 else (size - f.height) // 2))
+    c.alpha_composite(f, ((size - f.width) // 2, (size - f.height) // 2))
     return c.convert('RGB')
 make(1024).save('art/icon/icon_1024.png')
 for name, s in [('icon-512.png', 512), ('icon-192.png', 192), ('apple-touch-icon.png', 180), ('favicon-48.png', 48)]:
