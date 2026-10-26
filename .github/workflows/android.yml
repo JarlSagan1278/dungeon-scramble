@@ -1,0 +1,36 @@
+# Builds the Android app (debug APK) on GitHub's servers, which have the Android SDK (Oct 26).
+# Runs on pushes to main that touch the game or the app, or by hand from the Actions tab ("Run workflow").
+# The APK is attached to the run as "dungeon-scramble-apk" (Actions tab > the run > Artifacts).
+name: Android APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['src/**', 'app/**', 'build.js', 'tools/app/**', '.github/workflows/android.yml']
+concurrency: { group: android-apk, cancel-in-progress: true }
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: actions/setup-java@v4
+        with: { distribution: 'temurin', java-version: '21' }
+      - uses: android-actions/setup-android@v3
+      - name: Build the game (release flavour)
+        run: node build.js --release
+      - name: Copy it into the app
+        run: node tools/app/prepare.js
+      - name: Install Capacitor and sync
+        working-directory: app
+        run: npm ci && npx cap sync android
+      - name: Build the APK
+        working-directory: app/android
+        run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dungeon-scramble-apk
+          path: app/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30

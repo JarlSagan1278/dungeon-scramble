@@ -1,0 +1,10 @@
+{
+  "appId": "com.dungeonscramble.game",
+  "appName": "Dungeon Scramble",
+  "webDir": "www",
+  "backgroundColor": "#1a110b",
+  "android": {
+    "backgroundColor": "#1a110b",
+    "allowMixedContent": false
+  }
+}

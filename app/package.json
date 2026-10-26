@@ -1,0 +1,16 @@
+{
+  "name": "dungeon-scramble-app",
+  "private": true,
+  "description": "Android (and later iPhone) app wrapper for Dungeon Scramble. Web files come from the release build via tools/app/prepare.js.",
+  "scripts": {
+    "prepare-web": "node ../tools/app/prepare.js",
+    "sync": "npm run prepare-web && npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  }
+}

@@ -15,3 +15,14 @@ __pycache__/
 
 # Marketing screenshots/GIFs (large, regenerable; delivered to Jeremy directly, Oct 21)
 docs/release/media/
+
+# Android app: dependencies and the copied web build are regenerated (tools/app/prepare.js)
+app/node_modules/
+app/www/
+app/android/app/build/
+app/android/.gradle/
+app/android/build/
+app/android/app/src/main/assets/public/
+app/android/app/src/main/assets/capacitor.config.json
+app/android/app/src/main/assets/capacitor.plugins.json
+app/android/capacitor-cordova-android-plugins/
