@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.41.90 (Oct 26, 2026)
+- Shake to roll takes three jolts again (Jeremy: two rolled too easily in play); each jolt still only needs the lighter 8 m/s2 shake from 1.41.84.
 ## 1.41.89 (Oct 26, 2026)
 - Floor tips (Jeremy, flaw #1 "too much to learn at once"): one-line lessons the first time a situation comes up, in the guide's bubble with a ring on the die, chip or health bar in question: a Combo touching 2+ attacking dice, a Leap with a Blank or Minion beside it, a heavy turn coming, Minions on the Tray, and a winning Path a few points short of Overkill. Each shows once per device, one at a time, never over the guided fight, a banner, a pop-up or a New Action card; a tap, a Path change or 9 s hides it.
 - Next depth (Jeremy, flaw #3 "easy once learned"): after a win, the next Setup opens on the next depth's preset, marked "Suggested next step" (one tap on - steps back). Otherwise Setup opens on the depth last played.
