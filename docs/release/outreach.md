@@ -81,6 +81,6 @@ Tips:
 | Board-game friends | | | |
 | r/WebGames | | | |
 | r/roguelites | | | |
-| r/playmygame | | | |
+| r/playmygame | Oct 27, 8:00 (promo + cover gallery) | | |
 | Discord | | | |
-| itch devlog | | | |
+| itch devlog | Oct 27 ("Floor 1 is free to play") | | |
