@@ -1,4 +1,19 @@
-# Posts and pitch, Nov 2-15 (drafted Oct 28)
+# Posts and pitch, Oct 28 - Nov 9 (drafted Oct 28; tighter schedule, Jeremy Oct 28)
+
+| Day | Post |
+|---|---|
+| Wed Oct 28 | itch devlog "Faster start" + Release Announcements forum post; check itch page settings; start commenting |
+| Thu Oct 29 | r/WebGames link post |
+| Fri Oct 30 | Indie Games Plus pitch email |
+| Sat Oct 31 | r/RoguelikeDev Sharing Saturday comment |
+| Sun Nov 1 | Log numbers (Reddit views, itch views/plays) in outreach.md |
+| Mon Nov 2 | r/indiegames video post |
+| Tue Nov 3 | nothing (US Election Day) |
+| Wed Nov 4 | r/playmygame redo (a week after the Oct 27 post) |
+| Thu Nov 5 | r/tabletopgamedesign design story |
+| Fri Nov 6 | emails to 3-5 small YouTubers |
+| Mon Nov 9 | r/IndieGaming video post |
+| Sun Nov 8 or 15 | devlog #2: what we changed because of your comments |
 
 Follows the two-week plan in `first_players/report.md`. Media: `docs/release/media/clip_turn.mp4` (11.6 s, portrait,
 one Floor 1 turn: flick the lid, draw a path, 18 damage, Overkill, Victory chest) and `clip_turn.gif` (same, for
@@ -15,7 +30,7 @@ summaries, not the live pages). Answer every comment the first day. Log the numb
 
 ---
 
-## Wed Nov 4 · r/WebGames (link post)
+## Thu Oct 29 · r/WebGames (link post)
 
 **Type:** link post to the itch page.
 
@@ -29,7 +44,7 @@ summaries, not the live pages). Answer every comment the first day. Log the numb
 
 ---
 
-## Thu Nov 5 · itch.io Release Announcements board (forum post)
+## Wed Oct 28 · itch.io Release Announcements board (forum post)
 
 **Title:**
 > Dungeon Scramble — a dice-path roguelike from our kitchen-table board game (free Floor 1, mobile-friendly)
@@ -49,7 +64,7 @@ summaries, not the live pages). Answer every comment the first day. Log the numb
 
 ---
 
-## Fri Nov 6 · r/playmygame (video post, redo)
+## Wed Nov 4 · r/playmygame (video post, redo)
 
 **Type:** video post with `clip_turn.mp4`. Flair: **[Web]** (or [Mobile] if the sub's flairs fit better). The
 sub wants a written description in the post itself; if the video post has no text box, put the description below
@@ -66,7 +81,7 @@ as the first comment immediately.
 
 ---
 
-## Sat Nov 7 · r/RoguelikeDev Sharing Saturday (comment in the weekly thread)
+## Sat Oct 31 · r/RoguelikeDev Sharing Saturday (comment in the weekly thread)
 
 > **Dungeon Scramble** — a dice-path roguelike (more roguelite: runs, loot dice, relics, three floors)
 >
@@ -80,7 +95,7 @@ as the first comment immediately.
 
 ---
 
-## Tue Nov 10 · r/indiegames (video post, no link in the post)
+## Mon Nov 2 · r/indiegames (video post, no link in the post)
 
 **Type:** video post with `clip_turn.mp4`. No store/itch link in the post or title. Add the link in a comment only
 if the live rules allow it.
@@ -93,7 +108,7 @@ if the live rules allow it.
 
 ---
 
-## Wed Nov 11 · r/tabletopgamedesign (design story, no link)
+## Thu Nov 5 · r/tabletopgamedesign (design story, no link)
 
 **Type:** text or image post with photos of the physical prototype (tray, dice, cards). Set the required flair.
 No link unless someone asks; then reply with it.
@@ -118,7 +133,7 @@ keep the shape: what was true at the table, what the screen let you do instead.)
 
 ---
 
-## Thu Nov 12 · r/IndieGaming (video post, different wording)
+## Mon Nov 9 · r/IndieGaming (video post, different wording)
 
 **Type:** video post with `clip_turn.mp4`. One self-promo post per two weeks there; disclose AI use if any of the art
 in the clip is AI-assisted (see PROJECT_CONTEXT on the remaining original art).
@@ -131,7 +146,7 @@ in the clip is AI-assisted (see PROJECT_CONTEXT on the remaining original art).
 
 ---
 
-## Mon Nov 9 · Pitch email to Indie Games Plus
+## Fri Oct 30 · Pitch email to Indie Games Plus
 
 **To:** editors@indiegamesplus.com
 **Subject:** Dungeon Scramble — a dice-path roguelike from our board game (free browser demo)
@@ -155,9 +170,9 @@ in the clip is AI-assisted (see PROJECT_CONTEXT on the remaining original art).
 > contact@dungeonscramble.com
 
 (Check that the press kit URL is live before sending; the report suggests the same short note to Jupiter Hadley once
-a current contact is found, and to 3-5 small dice/roguelike YouTubers on Fri Nov 13.)
+a current contact is found, and to 3-5 small dice/roguelike YouTubers on Fri Nov 6.)
 
-### Short version for YouTubers/streamers (Fri Nov 13)
+### Short version for YouTubers/streamers (Fri Nov 6)
 
 **Subject:** Free dice roguelike demo for your itch videos? (Dungeon Scramble)
 

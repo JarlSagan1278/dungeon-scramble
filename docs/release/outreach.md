@@ -79,7 +79,7 @@ Tips:
 |---|---|---|---|
 | Friends and family | | | |
 | Board-game friends | | | |
-| r/WebGames | | | |
+| r/WebGames | planned Thu Oct 29 | | |
 | r/roguelites | | | |
 | r/playmygame | Oct 27, 8:00 (promo + cover gallery) | | |
 | Discord | | | |
