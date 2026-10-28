@@ -34,7 +34,7 @@ hands). Ranked by how soon a stranger notices.
 7. **Button rainbow.** "Each button its own colour" makes Settings eight colours and the title four; with flat
    rectangles and drop shadows it reads busy rather than toy-like. Worth a second look: colour by role (go / info /
    danger) plus the chunky outline.
-8. **Equip window.** A large empty "compare" box until a die is tapped, and the disabled Replace button looks broken.
+8. **Equip window** (fixed 1.41.99: empty slots and "Pick a die first"). A large empty "compare" box until a die is tapped, and the disabled Replace button looks broken.
    Pre-select the Suggested die so the box is never empty.
 9. **No credits screen.** Nowhere names Jeremy and Katlynn, the font licence or the music. Stores and players expect it
    (a "Credits" tab in Records is enough).

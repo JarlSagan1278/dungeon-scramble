@@ -976,10 +976,10 @@ function applyRandomSkinTone(portrait, originId, idx){
 // staying fixed for the whole session.
 let setupPortraitCache = {};
 function resetSetupPortraitPreviews(){ setupPortraitCache = {}; }
-function rerollSetupPortrait(originId){ // a different look than the one showing (a few tries: same picture + same tone counts as the same)
+function rerollSetupPortrait(originId){ // a different look than the one showing (same picture + same tone counts as the same)
   const cur = setupPortraitCache[originId];
   let p = pickPortrait(originId);
-  for(let i=0; i<6 && cur && p.idx===cur.idx && p.tone===cur.tone; i++) p = pickPortrait(originId);
+  for(let i=0; i<60 && cur && p.idx===cur.idx && p.tone===cur.tone; i++) p = pickPortrait(originId); // Oct 28: 6 tries let a tap show the same look now and then
   setupPortraitCache[originId] = p;
   return p;
 }

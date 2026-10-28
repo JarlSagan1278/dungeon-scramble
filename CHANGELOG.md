@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.41.99 (Oct 28, 2026)
+Screen fixes (Jeremy's picks 1C, 2A, 3A, 7A, 8B):
+- Blank die sides show an engraved empty socket instead of a plain square.
+- Before your first tap, Go is a dark slot that says "Tap dice to draw a path"; disabled rail buttons keep their colour, dimmed.
+- The Victory chest takes the stage: no box, a big chest in turning gold rays, large "Victory!" and "Tap to open".
+- Equip window: six empty "Out" slots and a "Pick a die first" button until you pick a die.
+- Settings: icon tiles (Log, How to Play, Codex, Records, Credits), danger buttons on their own row, no Close button (the X closes).
+- Fix: re-rolling a hero's look on the setup screen could now and then show the same look again.
 ## 1.41.98 (Oct 28, 2026)
 - Cover art gets the same paper grain as the in-game art (Jeremy's pick C: medium on the scene and heroes, logo clean). Title screen, desktop backdrop, app and home-screen icons and the itch thumbnail match the game now. `tools/art/cover.py` rebuilds the cover from art/cover/.
 ## 1.41.97 (Oct 28, 2026)

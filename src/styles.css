@@ -3148,3 +3148,41 @@ button{ border-radius:12px; box-shadow: inset 0 3px 0 rgba(255,255,255,.30), ins
 button:active:not(:disabled){ box-shadow: inset 0 2px 0 rgba(255,255,255,.18), inset 0 -2px 0 rgba(0,0,0,.28); }
 button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(255,255,255,.12); }
 .loot-chest-btn, .loot-chest-btn:active{ box-shadow:none !important; }
+
+/* ---- Oct 28 screen fixes (Jeremy: 1C, 2A, 3A, 7A, 8B) ---- */
+/* 1C: a blank side is an engraved empty socket, so it reads as the die's empty face, not missing art. */
+.die .blank-socket{ position:absolute; inset:16%; border-radius:8px; pointer-events:none;
+  box-shadow:inset 0 2px 3px rgba(0,0,0,.40), 0 1px 0 rgba(255,255,255,.22);
+  background:repeating-linear-gradient(45deg, rgba(0,0,0,.07) 0 2px, transparent 2px 6px); }
+/* 2A: before the first tap Go is a dark slot that says what to do; disabled rail buttons keep their colour, dimmed. */
+.util-btn.rail-go .go-hint{ display:none; }
+.util-btn.rail-go.disabled{ opacity:1 !important; background:#2a1d13 !important; color:rgba(233,215,174,.5);
+  box-shadow:inset 0 3px 8px rgba(0,0,0,.65), inset 0 0 0 2px rgba(212,175,82,.35) !important; }
+.util-btn.rail-go.go-idle .go-word{ display:none; }
+.util-btn.rail-go.go-idle .go-hint{ display:block; font-size:12.5px !important; line-height:1.25; color:#e9d7ae; text-align:center; padding:0 3px; font-weight:700 !important; letter-spacing:.04em !important; line-height:1.25; text-transform:uppercase; }
+.util-rail .util-btn.disabled:not(.rail-go){ opacity:1; filter:saturate(.35) brightness(.72); }
+/* 3A: the closed chest takes the stage: no box, big chest in slowly turning gold rays. */
+.loot-overlay:has(.loot-modal-chest){ background:rgba(10,6,3,.78) !important; }
+.loot-modal.loot-modal-chest{ max-width:300px; background:transparent !important; border:none !important; box-shadow:none !important; overflow:visible !important; }
+.loot-modal.loot-modal-chest h2{ font-size:40px !important; color:#ffd75e !important; text-shadow:0 3px 0 #120b07, 0 0 18px rgba(255,200,80,.45); }
+.loot-modal.loot-modal-chest .loot-chest-btn{ position:relative; padding:26px 0 10px; gap:20px; }
+.loot-modal.loot-modal-chest .loot-chest-btn::before{ content:""; position:absolute; left:50%; top:44%; width:330px; height:330px; margin:-165px 0 0 -165px; border-radius:50%; pointer-events:none;
+  background:repeating-conic-gradient(rgba(255,215,94,.22) 0 9deg, transparent 9deg 22deg);
+  -webkit-mask:radial-gradient(circle, #000 18%, transparent 68%); mask:radial-gradient(circle, #000 18%, transparent 68%);
+  animation:loot-rays-turn 24s linear infinite; }
+.loot-modal.loot-modal-chest .loot-chest-btn.opening::before{ opacity:0; transition:opacity .3s; }
+@keyframes loot-rays-turn{ to{ transform:rotate(360deg); } }
+.loot-modal.loot-modal-chest .loot-chest{ width:190px; position:relative; }
+.loot-modal.loot-modal-chest .loot-chest svg{ width:170px; height:170px; filter:drop-shadow(0 8px 0 rgba(0,0,0,.45)); }
+.loot-modal.loot-modal-chest .loot-tap-hint{ position:relative; font-family:'Metamorphous',serif !important; font-size:21px !important; color:#ffd75e !important; opacity:1 !important; text-shadow:0 2px 0 #120b07; }
+/* 7A: the equip window shows six empty slots until a die is picked, and the button says why it waits. */
+.mini-face.mf-slot{ border:2px dashed rgba(233,215,174,.45) !important; background:rgba(0,0,0,.18) !important; box-shadow:none !important; }
+.swap-out-hint{ opacity:.7; }
+#swap-go:disabled{ opacity:1 !important; background:#5b4a3a !important; color:#e9d7ae !important; font-weight:700; }
+/* 8B: Settings links as toy tiles, three across; the danger buttons get their own row under a line. */
+.settings-btn-grid{ display:flex !important; flex-wrap:wrap; gap:8px; }
+.settings-btn-grid .settings-tile{ flex:1 1 28%; display:flex; flex-direction:column; align-items:center; gap:3px; padding:9px 2px 8px; font-size:13px; min-height:62px; }
+.settings-btn-grid:has(> :nth-child(4):last-child) .settings-tile{ flex-basis:40%; }
+.settings-tile svg{ width:26px; height:26px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.settings-danger-row{ display:flex; gap:8px; margin-top:10px; padding-top:10px; border-top:2px solid rgba(0,0,0,.35); }
+.settings-danger-row button{ flex:1; font-size:13px; padding:7px 4px; }

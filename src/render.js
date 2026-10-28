@@ -1476,6 +1476,7 @@ function renderDie(cell, idx){
             </div>` : ''}
             ${(!cell.minion && !cell.blank && ['gilded','alloy','magic'].includes(cell.die.cat)) ? `<span class="die-sheen sheen-${cell.die.cat}" style="--sd:${(idx*0.37).toFixed(2)}s"></span>` : ''}
             ${nameTag}
+            ${(isBlank && !cell.minion) ? '<i class="blank-socket" aria-hidden="true"></i>' : ''}
             ${comboRingHTML ? label.replace('<span class="icon-svg">','<span class="icon-svg">'+comboRingHTML) : label}
             ${resolveFx && resolveFx.text ? `<span class="delta-float ${resolveFx.cls}" ${resolveFx.size?`style="font-size:${resolveFx.size}px;"`:''}>${resolveFx.text}</span>` : ''}
           </div>`;
@@ -1849,7 +1850,7 @@ function renderGame(){
           </div>
         </div>
         <div class="util-rail">
-          <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning||S.needRoll)?'disabled':''} ${(emphasizeResolve&&!S.needRoll)?'pulse':''}" id="resolve-btn"><span>Go</span></div>
+          <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning||S.needRoll)?'disabled':''} ${(resolveDisabled&&!S.transitioning&&!S.needRoll&&!S.path.length)?'go-idle':''} ${(emphasizeResolve&&!S.needRoll)?'pulse':''}" id="resolve-btn"><span class="go-word">Go</span><span class="go-hint">Tap dice to draw a path</span></div>
           <div class="util-btn rail-pocket" id="open-backpocket-btn" title="${S.backPocket.length?'Safety net ready: if you fall to 0 Health, your Back Pocket can save you once (it spends every die in it).':'Back Pocket empty: no safety net until a die lands here.'}">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?'<span class="badge pocket-heart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.2 C 5.5 15.6 2 12.4 2 8.2 C 2 5.1 4.4 2.8 7.3 2.8 C 9.2 2.8 10.9 3.8 12 5.4 C 13.1 3.8 14.8 2.8 16.7 2.8 C 19.6 2.8 22 5.1 22 8.2 C 22 12.4 18.5 15.6 12 21.2 Z" fill="currentColor"/></svg></span>':''}</div>
           <div class="util-btn rail-item ${(totalTokens&&!S.needRoll)?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Item</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
           <div class="util-btn danger-accent rail-clear ${(S.transitioning||S.needRoll)?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
@@ -2101,7 +2102,7 @@ function refreshPathBits(){
   if(wrap){ wrap.querySelectorAll('.path-counter-float').forEach(n=>n.remove()); wrap.insertAdjacentHTML('beforeend', pathCounterHTML()); }
   const go = document.getElementById('resolve-btn');
   if(go){ const canExtend = anyMoveAvailable(), disabled = S.path.length===0 && canExtend;
-    go.classList.toggle('disabled', disabled); go.classList.toggle('pulse', !disabled && !canExtend); }
+    go.classList.toggle('disabled', disabled); go.classList.toggle('go-idle', disabled && !S.transitioning && !S.needRoll); go.classList.toggle('pulse', !disabled && !canExtend); }
   const lock = document.querySelector('.chest-lock');
   if(lock){ let ready = false; try{ if(S.path.length) ready = pcfTierFor(computePathEffects(S.path).totalDamage) >= 2; }catch(e){} lock.classList.toggle('ready', ready); }
   // enemy health bar (damage preview + Lethal/Overkill hint): rebuilt from the card markup, only that node swapped
@@ -3053,6 +3054,18 @@ function spawnConfettiRain(){
   }
 }
 
+// Oct 28 (Jeremy picked 8B): Settings' links are toy tiles, an icon over the word, each its own colour; no Close tile (the X closes).
+const SETTINGS_TILE_ICONS = {
+  log:'<path d="M6 3h10l3 3v15H6z M9 9h7M9 13h7M9 17h5"/>',
+  howto:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5v.7"/><circle cx="12" cy="17" r="1" fill="currentColor"/>',
+  codex:'<path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v14c-3-1-6-1-8 1-2-2-5-2-8-1z M12 6v14"/>',
+  records:'<path d="M7 4h10v5a5 5 0 0 1-10 0z M7 6H4v2a3 3 0 0 0 3 3 M17 6h3v2a3 3 0 0 1-3 3 M12 14v4 M8 20h8"/>',
+  credits:'<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',
+  export:'<path d="M12 4v11 M7 10l5 5 5-5 M5 20h14"/>',
+};
+function settingsTileHTML(id, cls, label, icon, title){
+  return `<button id="${id}" class="${cls} settings-tile"${title?` title="${title}"`:''}><svg viewBox="0 0 24 24" aria-hidden="true">${SETTINGS_TILE_ICONS[icon]}</svg><span>${label}</span></button>`;
+}
 function settingsSliderRowHTML(id, label, vol){
   const v = Math.round(vol*100);
   return `<label class="settings-toggle-row settings-slider-row" for="${id}">
@@ -3097,12 +3110,13 @@ function openSettingsModal(){
       </div>
       ${hasKeyboardPointer() ? `<p class="hint" style="text-align:left;">Keyboard shortcuts ${infoDot('Enter = Go · Backspace = Clear · 1234/qwer/asdf/zxcv tap a tray die (matches its grid position)')}</p>` : ''}
       <div class="settings-btn-grid">
-        ${inRun ? '<button id="settings-log-btn" class="btn-log">Log</button>' : ''}
-        <button id="settings-how-to-play-btn" class="btn-howto">How to Play</button>
-        <button id="settings-codex-btn" class="btn-codex" title="Bestiary, Dice, Relics, Key">Codex</button>
-        <button id="settings-records-btn" class="btn-records" title="Run History, Achievements">Records</button>
-        ${BUILD.release ? '<button id="settings-credits-btn" class="btn-credits">Credits</button>' : '<button id="settings-export-data-btn" class="btn-export">Export Play Data</button>'}
-        <button id="settings-close-btn">Close</button>
+        ${inRun ? settingsTileHTML('settings-log-btn', 'btn-log', 'Log', 'log') : ''}
+        ${settingsTileHTML('settings-how-to-play-btn', 'btn-howto', 'How to Play', 'howto')}
+        ${settingsTileHTML('settings-codex-btn', 'btn-codex', 'Codex', 'codex', 'Bestiary, Dice, Relics, Key')}
+        ${settingsTileHTML('settings-records-btn', 'btn-records', 'Records', 'records', 'Run History, Achievements')}
+        ${BUILD.release ? settingsTileHTML('settings-credits-btn', 'btn-credits', 'Credits', 'credits') : settingsTileHTML('settings-export-data-btn', 'btn-export', 'Export Data', 'export', 'Export Play Data')}
+      </div>
+      <div class="settings-danger-row">
         ${inRun ? '<button id="settings-restart-btn" class="danger">Abandon Run</button>' : ''}
         <button id="settings-reset-progress-btn" class="danger-outline">Reset Progress</button>
       </div>
@@ -3111,7 +3125,6 @@ function openSettingsModal(){
   openModal(overlay);
   const close = ()=> closeModal(overlay);
   overlay.querySelector('#settings-x-btn').onclick = close;
-  overlay.querySelector('#settings-close-btn').onclick = close;
   const logBtn = overlay.querySelector('#settings-log-btn');
   if(logBtn) logBtn.onclick = ()=>{ close(); openInfoModal('Log', logViewHTML()); };
   overlay.querySelector('#settings-how-to-play-btn').onclick = ()=>{ close(); openTutorialModal(0); };
@@ -3989,10 +4002,10 @@ function renderSwapModal(){
       <h2>Equip ${incoming.name} ${infoDot('Tap the die you want to replace. It goes to your Back Pocket. Or keep the new die in your Back Pocket and leave your Tray as it is.')}</h2>
       <div class="swap-compare" id="swap-compare">
         <div class="swap-compare-row swap-compare-in"><div class="swap-compare-label"><span>New</span> <b>${incoming.name}</b></div>${diceFacesRowHTML(incoming)}</div>
-        <div class="swap-compare-row swap-compare-out" id="swap-compare-out"><div class="swap-compare-hint">Select a die below to compare its faces.</div></div>
+        <div class="swap-compare-row swap-compare-out" id="swap-compare-out"><div class="swap-compare-label"><span>Out</span> <b class="swap-out-hint">tap a die below</b></div><div class="faces-tiles">${'<div class="mini-face mf-slot"></div>'.repeat(6)}</div></div>
       </div>
       <div class="swap-list" id="swap-list"></div>
-      <div class="small-btn-row" style="justify-content:center;"><button class="pocket-btn" id="swap-pocket" title="Keep the new die in your Back Pocket; your Tray stays as it is">Keep in Pocket</button><button class="primary" id="swap-go" disabled>Replace</button></div>
+      <div class="small-btn-row" style="justify-content:center;"><button class="pocket-btn" id="swap-pocket" title="Keep the new die in your Back Pocket; your Tray stays as it is">Keep in Pocket</button><button class="primary" id="swap-go" disabled>Pick a die first</button></div>
     </div></div>`);
   overlay.querySelector('.modal').classList.add('swap-modal');
   openUniqueOverlay('swap', overlay);
@@ -4027,7 +4040,7 @@ function renderSwapModal(){
       item.classList.add('selected');
       overlay.querySelector('#swap-compare-out').innerHTML = `<div class="swap-compare-label"><span>Replacing</span> <b>${die.name}</b></div>${diceFacesRowHTML(die)}`;
       overlay.querySelector('.swap-compare-in').innerHTML = `<div class="swap-compare-label"><span>New</span> <b>${incoming.name}</b></div>${diceFacesRowHTML(incoming, die)}`;
-      goBtn.disabled = false;
+      goBtn.disabled = false; goBtn.textContent = 'Replace';
     };
     list.appendChild(item);
   });
