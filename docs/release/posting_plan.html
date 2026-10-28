@@ -1,0 +1,187 @@
+<title>Dungeon Scramble Posting Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Metamorphous&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: one column of day cards, like route rooms down a dungeon floor; the next open day is lit. Single dark look, the game's own. */
+:root{
+  color-scheme: dark;
+  --bg:#1e140d; --panel:#3a2819; --window:#e8d6b0; --ink:#2b1d14; --line:#120b07;
+  --text:#f1e2c4; --muted:#bfa983; --gold:#d4af52; --done:#6f9a4f; --red:#b8463b; --blue:#4f6fa8;
+  --display:'Metamorphous','Trajan Pro',Georgia,serif;
+  --body:'Crimson Pro',Georgia,'Times New Roman',serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:18px;line-height:1.45;margin:0}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:flex;flex-direction:column;gap:14px}
+h1{font-family:var(--display);font-weight:400;color:var(--gold);font-size:30px;margin:0;text-wrap:balance;text-shadow:0 3px 0 var(--line)}
+.sub{color:var(--muted);margin:0}
+.top{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pill{font-family:var(--body);font-weight:600;font-size:15px;border:3px solid var(--line);border-radius:999px;padding:6px 14px;text-decoration:none;color:var(--ink);background:var(--gold);box-shadow:0 3px 0 var(--line)}
+.pill.alt{background:var(--window)}
+.status{font-size:14px;color:var(--muted)}
+.progress{height:10px;background:var(--panel);border:2px solid var(--line);border-radius:999px;overflow:hidden}
+.progress > i{display:block;height:100%;width:0;background:var(--done);transition:width .3s}
+.note-box{background:var(--panel);border:3px solid var(--line);border-radius:14px;padding:10px 14px;font-size:16px;color:var(--muted)}
+.note-box b{color:var(--text)}
+.day{background:var(--panel);border:3px solid var(--line);border-radius:16px;box-shadow:0 4px 0 var(--line);overflow:hidden}
+.day.next{border-color:var(--gold)}
+.day.isdone{opacity:.62}
+.day-head{display:flex;gap:12px;align-items:center;padding:12px 14px;cursor:pointer}
+.date{font-family:var(--display);color:var(--gold);font-size:15px;min-width:74px;line-height:1.15}
+.where{flex:1;min-width:0}
+.where h2{margin:0;font-family:var(--body);font-weight:600;font-size:19px;line-height:1.2}
+.where p{margin:2px 0 0;font-size:15px;color:var(--muted)}
+.tag-next{font-size:12px;letter-spacing:.08em;text-transform:uppercase;background:var(--gold);color:var(--ink);border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:2px}
+.check{appearance:none;width:30px;height:30px;border:3px solid var(--line);border-radius:8px;background:var(--window);cursor:pointer;flex:none;display:grid;place-items:center}
+.check:checked{background:var(--done)}
+.check:checked::after{content:"";width:9px;height:15px;border:solid var(--line);border-width:0 4px 4px 0;transform:rotate(45deg) translate(-1px,-2px)}
+.check:focus-visible,.copy:focus-visible,.pill:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.body{padding:0 14px 14px;display:flex;flex-direction:column;gap:10px}
+.day:not(.open) .body{display:none}
+.how{font-size:15px;color:var(--muted);margin:0}
+.block{background:var(--window);color:var(--ink);border:3px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.block-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.label{font-size:13px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:#6b4e2e}
+.copy{font-family:var(--body);font-weight:600;font-size:14px;border:2px solid var(--line);border-radius:999px;padding:3px 12px;background:var(--blue);color:#f6ecd8;cursor:pointer;box-shadow:0 2px 0 var(--line)}
+.copy.ok{background:var(--done)}
+.text{white-space:pre-wrap;margin:0;font-size:16.5px;overflow-wrap:anywhere}
+.warn{font-size:15px;background:#5a2a20;border:2px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--text)}
+.numbers{display:flex;flex-direction:column;gap:4px}
+.numbers label{font-size:14px;color:var(--muted)}
+.numbers textarea{font-family:var(--body);font-size:16px;background:var(--bg);color:var(--text);border:2px solid var(--line);border-radius:10px;padding:8px;min-height:44px;resize:vertical}
+@media (prefers-reduced-motion: reduce){ .progress > i{transition:none} }
+</style>
+
+<div class="wrap">
+  <h1>Posting Plan</h1>
+  <p class="sub">Oct 28 – Nov 9 · one place a day, so each day's itch views trace back to one post.</p>
+  <div class="top">
+    <a class="pill" href="https://dungeonscramble.itch.io/dungeon-scramble" target="_blank" rel="noopener">Open the itch page</a>
+    <a class="pill alt" href="https://itch.io/dashboard" target="_blank" rel="noopener">itch analytics</a>
+    <span class="status" id="sync">Checkmarks are saved on this device until sync connects…</span>
+  </div>
+  <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+  <div class="note-box">Before each post: read that subreddit's rules and skim this week's top posts. Stay an hour to answer comments. Next day, jot the numbers in the day's box: <b>Reddit views · itch views · itch plays</b>.</div>
+  <div id="days"></div>
+</div>
+
+<script>
+const LINK = "https://dungeonscramble.itch.io/dungeon-scramble";
+const AI = "AI art: some art in the clip is still AI-derived. Check this sub's AI rule; if it wants disclosure, add: \"Most art is hand-drawn by me; a few placeholder pieces are AI-assisted and being redrawn.\"";
+const DAYS = [
+ {id:"oct28", date:"Wed Oct 28", where:"itch devlog + forum post", how:"Devlog on the game page (Update, tags: update, roguelike, dice, turn-based, mobile; small GIF at top). Forum: Release Announcements board, tag Browser.", blocks:[
+  ["Devlog title","Faster start: three taps to your first die"],
+  ["Devlog body","We watched how new players reached the demo and saw it took 8 taps and 4 pop-up pages before you touched a single die. That's too long.\n\nNow your first run drops you straight into a short guided fight: tap Run game, New Run, then the room banner, and you're drawing your first path. Character setup and Base Camp show up from your second run on, once you know what you're choosing.\n\nAlso fixed: the welcome text no longer promises three floors in a one-floor demo, and the dwarves with white or grey beards keep their real colours.\n\nIf you play, tell us in the comments where your run ended and whether anything felt unfair. Thanks!\n\n— Jeremy and Katlynn"],
+  ["Forum title","Dungeon Scramble — a dice-path roguelike from our kitchen-table board game (free Floor 1, mobile-friendly)"],
+  ["Forum body","Hi all! Dungeon Scramble is a turn-based roguelike my wife Katlynn and I started as a board game. Each turn you roll 16 dice into a 4x4 tray and draw one path through them. Every die you step on fires its face: Hit, Block, Heal, Combo, Boost, Freeze. Maneuver faces like Leap, Dodge and Pivot bend the path. Monsters always show their next move, so you can plan around it.\n\nThe free demo is the whole first floor: pick up loot dice and relics, visit a shrine and a camp, and fight the Floor 1 boss. It runs in the browser and was built for phones (portrait), but works on a computer too.\n\nWhat changed recently: your first run now drops you straight into a short guided fight instead of menus, and you flick open the dice chest (or shake your phone) to roll each turn.\n\nPlay: "+LINK+"\n\nWe read every comment. Tell us where you died and whether it felt fair."]]},
+ {id:"oct29", date:"Thu Oct 29", where:"r/WebGames", how:"Link post straight to the itch page. Add the first comment right after posting.", blocks:[
+  ["Link",LINK],
+  ["Title","Dungeon Scramble: roll a 4x4 tray of dice, draw one path through it, and every die you step on fires. Free, plays on phones."],
+  ["First comment","My wife and I designed this as a board game, and I've been turning it into a phone game. It's a turn-based roguelike: each turn you get a tray of 16 dice and trace one path through them. Hits, blocks, heals and combos fire in the order you step on them, and the monsters always show what they'll do next turn, so every roll is a little puzzle.\n\nThe demo is the whole first floor (about 15 minutes) and runs in the browser, best on a phone held upright. I'd love to hear where you got stuck or what felt unfair."]]},
+ {id:"oct30", date:"Fri Oct 30", where:"Indie Games Plus pitch", how:"Email. Attach the small GIF. Check that the press kit link opens before sending.", blocks:[
+  ["To","editors@indiegamesplus.com"],
+  ["Subject","Dungeon Scramble — a dice-path roguelike from our board game (free browser demo)"],
+  ["Email","Hi,\n\nI'm Jeremy Friedman. My wife Katlynn and I make Dungeon Scramble, a turn-based roguelike that started as a board game we designed together.\n\nEach turn you roll 16 dice into a 4x4 tray and draw one path through them. Every die you step on fires its face, in order: hits, blocks, heals, combos that grow with the path, and maneuvers like Leap and Pivot that bend it. Monsters always show their next move, so every roll is a small puzzle about whether to block or race. The art is hand-drawn.\n\nThe first floor is a free demo in the browser, about 15 minutes, made for phones held upright but playable on a computer:\n"+LINK+"\n\nA short clip of one turn is attached.\n\nThe full game (three floors, 50+ loot dice, 20+ relics) is planned for Android and iPhone in 2027. A press kit is at https://dungeonscramble.com/presskit if useful.\n\nThanks for reading, and for covering small games.\n\nJeremy Friedman\ncontact@dungeonscramble.com"]]},
+ {id:"oct31", date:"Sat Oct 31", where:"r/RoguelikeDev Sharing Saturday", how:"A comment in that week's Sharing Saturday thread, with the GIF.", blocks:[
+  ["Comment","**Dungeon Scramble** — a dice-path roguelike (more roguelite: runs, loot dice, relics, three floors)\n\n[GIF]\n\nThis week I cut the first-run path from 8 taps and 4 popups to 3 taps: a brand-new player now lands straight in a guided first fight. Watching people on itch made it obvious the welcome pages were losing them before they ever touched a die.\n\nAlso ran a first-run difficulty check with a bot at four skill levels: nobody dies in the first fight, and the Floor 1 boss accounts for ~70% of Floor 1 deaths, which is where I want the wall to be.\n\nFree Floor 1 demo (browser, phone-first): "+LINK]]},
+ {id:"nov1", date:"Sun Nov 1", where:"Write down the numbers", how:"Reddit views and comments per post, itch views and browser plays per day. Put them in the boxes below each day.", blocks:[]},
+ {id:"nov2", date:"Mon Nov 2", where:"r/indiegames", how:"Video post with clip_turn.mp4. No itch link in the post or title; add it in a comment only if the rules allow.", warn:AI, blocks:[
+  ["Title","My wife and I turned our dice board game into a phone roguelike: draw one path through the tray and every die fires"],
+  ["Comment (if links allowed)","It's called Dungeon Scramble. The first floor is free in the browser: "+LINK+" — happy to answer questions about turning the board game into the digital version."]]},
+ {id:"nov3", date:"Tue Nov 3", where:"Rest day (Election Day)", how:"No posts. Answer any comments still coming in.", blocks:[]},
+ {id:"nov4", date:"Wed Nov 4", where:"r/playmygame (redo)", how:"Video post with clip_turn.mp4, flair [Web]. The sub wants a written description: put it in the body, or as the first comment right away if there's no text box.", warn:AI, blocks:[
+  ["Title","[Web/Mobile] Dungeon Scramble — draw a path through a tray of dice, every die fires. Free Floor 1 demo, looking for first-time players"],
+  ["Description","**What it is:** a turn-based dice roguelike. Roll 16 dice into a 4x4 tray, trace one path, and each die you step on fires its face in order. Monsters show their next move, so you plan around it.\n**Play (free, browser, best on a phone held upright, ~15 min):** "+LINK+"\n**Made by:** my wife and me; it started as our board game.\n**Feedback I'm after:** was your first turn clear? Where did your run end? Did any death feel unfair?"]]},
+ {id:"nov5", date:"Thu Nov 5", where:"r/tabletopgamedesign", how:"Text or photo post with prototype photos, required flair, no link unless someone asks. The four bullets are guesses: swap in what really changed from your prototype.", blocks:[
+  ["Title","What changed when we turned our dice-path board game into a phone game"],
+  ["Body","My wife and I designed a dungeon crawler where you roll dice into a 4x4 grid and trace one path through them; each die you step on fires its face (hit, block, heal, combo). At the table it worked, but turning it into a digital game forced a few changes I didn't expect:\n\n- **Minions became \"fog.\"** On the table, minion tokens covered dice and you knew what was under them. Digitally we hide the face until your path reaches it, so you can't plan around what you can't see.\n- **Upkeep disappeared, so the rules could get fiddlier.** Boost tokens, combos that scale with path length, enemies that act every N turns: all of these were bookkeeping-heavy on paper and are free on a screen.\n- **The roll needed a ritual.** Rolling 16 dice by hand is fun; tapping \"roll\" isn't. We added a chest lid you flick open (or shake your phone) to get some of the physical feel back.\n- **Telegraphing got stronger.** Every monster shows its next move, which made the \"do I block or race?\" decision the heart of each turn.\n\nHas anyone else moved a dice game between table and screen? What did you have to drop or add?"]]},
+ {id:"nov6", date:"Fri Nov 6", where:"Emails to 3–5 small YouTubers", how:"Pick channels under ~10K subscribers that already play itch or dice/roguelike games. Fill in the brackets; attach the GIF.", blocks:[
+  ["Subject","Free dice roguelike demo for your itch videos? (Dungeon Scramble)"],
+  ["Email","Hi [name], I enjoyed your video on [specific game/video]. My wife and I made Dungeon Scramble, a turn-based dice roguelike that started as our board game: roll 16 dice into a 4x4 tray, draw one path, every die fires. The first floor is free in the browser (~15 min, works on PC): "+LINK+" — clip attached. No strings; if it's not your thing, no reply needed. Thanks! — Jeremy"]]},
+ {id:"nov8", date:"Sun Nov 8", where:"Devlog #2", how:"\"What we changed because of your comments\": list each change and who or what prompted it. Write it once there's feedback to answer (or move it to Nov 15).", blocks:[]},
+ {id:"nov9", date:"Mon Nov 9", where:"r/IndieGaming", how:"Video post with clip_turn.mp4. One self-promo post per two weeks there, and AI use must be disclosed.", warn:AI, blocks:[
+  ["Title","Dungeon Scramble: every turn is a 4x4 tray of dice and one path through it. Free first floor in the browser."],
+  ["First comment","Hand-drawn, turn-based, built for phones in portrait. Monsters always show their next move, so each roll is a small puzzle. Demo: "+LINK]]},
+];
+
+const state = {};      // id -> {done, note}
+let db = null;
+const LS = "dsPostingPlan_v1";
+try{ Object.assign(state, JSON.parse(localStorage.getItem(LS)||"{}")); }catch(e){}
+const saveLocal = ()=>{ try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){} };
+
+const el = (tag, cls, txt)=>{ const n=document.createElement(tag); if(cls) n.className=cls; if(txt!=null) n.textContent=txt; return n; };
+const opened = new Set();
+
+function nextId(){ const d = DAYS.find(d=>!(state[d.id]&&state[d.id].done)); return d && d.id; }
+
+function render(){
+  const host = document.getElementById("days"); host.textContent = "";
+  const nx = nextId();
+  if(!opened.size && nx) opened.add(nx);
+  const done = DAYS.filter(d=>state[d.id]&&state[d.id].done).length;
+  document.getElementById("bar").style.width = (100*done/DAYS.length)+"%";
+  DAYS.forEach(d=>{
+    const s = state[d.id]||{};
+    const card = el("section","day"+(s.done?" isdone":"")+(d.id===nx?" next":"")+(opened.has(d.id)?" open":""));
+    const head = el("div","day-head");
+    head.appendChild(el("div","date",d.date));
+    const w = el("div","where"); const h = el("h2",null,d.where);
+    if(d.id===nx){ h.appendChild(el("span","tag-next","next")); }
+    w.appendChild(h); if(d.blocks.length) w.appendChild(el("p",null,d.blocks.length+" piece"+(d.blocks.length>1?"s":"")+" to paste"));
+    head.appendChild(w);
+    const cb = el("input","check"); cb.type="checkbox"; cb.id="done-"+d.id; cb.checked=!!s.done; cb.setAttribute("aria-label","Done: "+d.date+" "+d.where);
+    cb.addEventListener("click",ev=>ev.stopPropagation());
+    cb.addEventListener("change",()=>setDay(d.id,{done:cb.checked}));
+    head.appendChild(cb);
+    head.addEventListener("click",()=>{ opened.has(d.id)?opened.delete(d.id):opened.add(d.id); card.classList.toggle("open"); });
+    card.appendChild(head);
+    const body = el("div","body");
+    body.appendChild(el("p","how",d.how));
+    if(d.warn) body.appendChild(el("div","warn",d.warn));
+    d.blocks.forEach(([label,text])=>{
+      const b = el("div","block"); const bh = el("div","block-head");
+      bh.appendChild(el("span","label",label));
+      const btn = el("button","copy","Copy"); btn.type="button";
+      const pre = el("p","text",text);
+      btn.addEventListener("click",()=>copy(text,btn,pre));
+      bh.appendChild(btn); b.appendChild(bh); b.appendChild(pre); body.appendChild(b);
+    });
+    const nb = el("div","numbers");
+    const lab = el("label",null,"Numbers and notes"); lab.htmlFor="note-"+d.id;
+    const ta = el("textarea"); ta.id="note-"+d.id; ta.placeholder="e.g. 640 Reddit views, 3 comments · itch 31 views, 12 plays"; ta.value=s.note||"";
+    ta.addEventListener("change",()=>setDay(d.id,{note:ta.value}));
+    nb.appendChild(lab); nb.appendChild(ta); body.appendChild(nb);
+    card.appendChild(body); host.appendChild(card);
+  });
+}
+
+function copy(text,btn,pre){
+  const ok=()=>{ btn.textContent="Copied"; btn.classList.add("ok"); setTimeout(()=>{ btn.textContent="Copy"; btn.classList.remove("ok"); },1400); };
+  const fallback=()=>{ const r=document.createRange(); r.selectNodeContents(pre); const sel=getSelection(); sel.removeAllRanges(); sel.addRange(r); btn.textContent="Selected: copy it"; };
+  try{ navigator.clipboard.writeText(text).then(ok,fallback); }catch(e){ fallback(); }
+}
+
+let writing = Promise.resolve();
+function setDay(id, patch){
+  state[id] = Object.assign({}, state[id]||{}, patch); saveLocal(); render();
+  if(db){ const data = {done:!!state[id].done, note:state[id].note||""};
+    writing = writing.then(()=>db.collection("plan").doc(id).set(data)).catch(()=>{ document.getElementById("sync").textContent="Couldn't save to sync just now; it's kept on this device."; }); }
+}
+
+render();
+(async()=>{
+  try{
+    db = window.claude && await window.claude.use("db");
+  }catch(e){ db = null; }
+  const sync = document.getElementById("sync");
+  if(!db){ sync.textContent = "Checkmarks are saved on this device only."; return; }
+  sync.textContent = "Checkmarks sync between your phone and computer.";
+  db.collection("plan").onSnapshot(snap=>{
+    (snap.docs||[]).forEach(doc=>{ const v = doc.data()||{}; state[doc.id] = {done:!!v.done, note: typeof v.note==="string"?v.note:""}; });
+    saveLocal();
+    const active = document.activeElement; if(active && active.tagName==="TEXTAREA") return; // don't clobber typing
+    render();
+  }, ()=>{ sync.textContent = "Sync stopped; checkmarks are kept on this device."; });
+})();
+</script>

@@ -1,5 +1,7 @@
 # Posts and pitch, Oct 28 - Nov 9 (drafted Oct 28; tighter schedule, Jeremy Oct 28)
 
+Page version: https://claude.ai/artifact/EXsbT3N29MADimSzs15gaN (copy buttons, checkmarks synced across devices; source docs/release/posting_plan.html).
+
 | Day | Post |
 |---|---|
 | Wed Oct 28 | itch devlog "Faster start" + Release Announcements forum post; check itch page settings; start commenting |
