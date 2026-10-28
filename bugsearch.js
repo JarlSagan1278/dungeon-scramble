@@ -78,6 +78,10 @@ const TICK_FN = () => {
     // an empty path (some tray states / class zones can be very
     // restrictive, but resolvePath on an empty path is a no-op turn).
     // v1.38.0: sometimes spend Swap/Reroll tokens, and sometimes Clear (undoes swaps).
+    if (S.guide && S.guide.stage === 't1') { // guided first turn (QUICK=1): only the planned dice are tappable
+      for (const i of S.guide.plan) if (!S.path.includes(i)) toggleSelect(i);
+      endTurnButton(); return { done: false, note: 'guide-turn' };
+    }
     if ((S.swapTokens||0) > 0 && Math.random() < 0.4) { armTrayAct('swap', null, true); }
     else if ((S.rerollTokens||0) > 0 && Math.random() < 0.4) { armTrayAct('reroll', null, true); }
     for (let k = 0; k < 6 && S.trayAct; k++) toggleSelect(Math.floor(Math.random() * 16));
@@ -140,9 +144,12 @@ const CHECK=()=>{
     const VPS=[[360,740],[390,844],[411,785],[375,667]]; const vp=VPS[n%VPS.length]; const page=await browser.newPage({viewport:{width:vp[0],height:vp[1]}}); const errs=[];
     page.on('pageerror',e=>errs.push('pageerror: '+e.message)); page.on('console',m=>{ if(m.type()==='error' && !/Failed to load resource|ERR_TUNNEL/.test(m.text())) errs.push('console: '+m.text()); });
     if(process.env.FLICK) await page.addInitScript(()=>{ try{ localStorage.setItem('dungeonScrambleRollTest','1'); }catch(e){} });
+    if(process.env.QUICK) await page.addInitScript(()=>{ try{ ['dungeonScrambleGuideTest','dungeonScrambleTipsTest'].forEach(k=>localStorage.setItem(k,'1')); }catch(e){} });
     await page.goto('file://'+FILE);
-    await page.evaluate(({o,c,relics})=>{META.lifetime.victories=1;META.lifetime.bestFloorReached=3;META.achievements['origin_duo']={date:Date.now()};newGame(o,c);if(relics)RELICS.forEach(r=>grantRelic(r.id,{silent:true}));},{o,c,relics});
-    let result='TIMEOUT'; const label=`${o}/${c}${relics?'+relics':''}${resume?'+resume':''}`;
+    if(process.env.QUICK && n%2===0){ await page.click('#title-newrun-btn'); await page.waitForTimeout(600); } // Oct 28 quick start: a fresh device's first New Run (every other run)
+    else await page.evaluate(({o,c,relics})=>{META.lifetime.victories=1;META.lifetime.bestFloorReached=3;META.achievements['origin_duo']={date:Date.now()};newGame(o,c);if(relics)RELICS.forEach(r=>grantRelic(r.id,{silent:true}));},{o,c,relics});
+    const quick=!!(process.env.QUICK && n%2===0);
+    let result='TIMEOUT'; const label=quick?'quickstart dwarf/armsmaster'+(resume?'+resume':''):`${o}/${c}${relics?'+relics':''}${resume?'+resume':''}`;
     for(let t=0;t<MAXT&&!errs.length;t++){
       let tk; try{ tk=await page.evaluate(TICK_FN); }catch(e){ errs.push('eval: '+e.message); break; }
       if(tk.done){ result=tk.result; if(result==='DEMOEND'){ await page.waitForTimeout(1500); (await page.evaluate(CHECK)).forEach(b=>errs.push('INVARIANT '+b+' on demo end')); } break; }

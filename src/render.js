@@ -3548,6 +3548,7 @@ function renderLootModal(){
   // of an already-opened chest (render() can run again while the modal is
   // up), so the shake + sunray only play on the actual opening.
   function reveal(burst){
+    if(!S || !S.lootChoice || !overlay.isConnected) return; // the chest's open timer can outlive the pick (Oct 28 tour: page error)
     S.lootChoice.opened = true;
     overlay.querySelector('.modal').classList.remove('loot-modal-chest');
     if(burst){

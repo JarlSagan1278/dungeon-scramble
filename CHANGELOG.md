@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.95 (Oct 28, 2026)
+- Fix: the loot chest's opening timer could throw an error if the pick was already gone (seen in a test tour; could happen with Android Back mid-animation).
+- Bug hunt gains a quick-start mode (QUICK=1). First-run difficulty study: docs/studies/2026-10-28_first_run.md.
 ## 1.41.94 (Oct 28, 2026)
 - Quick start (Jeremy): a new player's first New Run skips character setup, Base Camp and the four welcome pages and opens straight on the guided first fight as a Dwarf Armsmaster (it took 8 taps and 4 popups to reach a die). Later runs show the setup screen as before; How to Play is still on the title and in Settings.
 - Demo: the welcome text now says to beat the Floor 1 boss instead of "Clear all three floors".
