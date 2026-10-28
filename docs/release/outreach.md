@@ -82,5 +82,6 @@ Tips:
 | r/WebGames | planned Thu Oct 29 | | |
 | r/roguelites | | | |
 | r/playmygame | Oct 27, 8:00 (promo + cover gallery) | | |
+| itch forum (Release Announcements) | Oct 28 (tag: Browser) | | |
 | Discord | | | |
-| itch devlog | Oct 27 ("Floor 1 is free to play") | | Oct 28: demo 1.41.94 uploaded (quick start: first run opens on the guided fight) |
+| itch devlog | Oct 27 ("Floor 1 is free to play"); Oct 28 ("Faster start: three taps to your first die") | | Oct 28: demo 1.41.94 uploaded (quick start: first run opens on the guided fight) |
