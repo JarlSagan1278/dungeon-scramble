@@ -16,8 +16,9 @@ the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
    regular/new bot profiles against the first real runs.
 
 ## Release gaps (review Oct 28)
-See `RELEASE_GAPS.md`: tutorial cards cover the tray; type (one bundled serif, ~12 px floor); defeat screen; copy
-(`--`, jargon); dev features in Settings; equip window; credits; desktop backdrop. Pending Jeremy's picks.
+Fixed in 1.41.96: tutorial cards, defeat screen, copy, dev features, credits, desktop backdrop, shrine text. Open: type and
+button colours (mockups https://claude.ai/artifact/1vPuNVnTkHXoEaPPN7egyD, waiting on Jeremy's pick); the credits' art
+line and AI disclosure wording (Jeremy); art style unification (planned).
 
 ## Waiting on Jeremy
 - **Title art:** new cover drawn from scratch on the 2048x2434 canvas (`DungeonScramble_TitleArt_canvas.psd`); the chat
@@ -34,7 +35,7 @@ See `RELEASE_GAPS.md`: tutorial cards cover the tray; type (one bundled serif, ~
   campfire Rest or Train, quick start). `npm run rulebook`.
 - **Performance on slow phones:** ~1.5 s of script per turn at CPU x4 (renderGame/placeVs) and ~500 ms of style work
   during playback; the demo's first load is ~5 MB (lazy-load art).
-- **Small:** six `--` strings in data.js; the intermittent "resume failed" on the tester-only Debug class in the bug
+- **Small:** the intermittent "resume failed" on the tester-only Debug class in the bug
   hunt (save gone after reload; never seen on the four real classes).
 
 ## Later

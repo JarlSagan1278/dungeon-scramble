@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.41.95';
+const GAME_VERSION = '1.41.96';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false };
@@ -59,7 +59,7 @@ const FACE_DESC = {
   leech: "Damages the enemy and heals you the same amount, over time.",
   fumble: "Backfires: applies damage-over-time to you.",
   dodge: "Continues the path in an adjacent diagonal direction.",
-  leap: "Continues your path to a non-adjacent die -- clears a Minion die if it jumps clean over one.",
+  leap: "Continues your path to a non-adjacent die, and clears a Minion die it jumps clean over.",
   pivot: "Continues your path in any adjacent direction.",
   freeze: "The enemy skips its next action.",
   swap: "Tap it, then tap any die: they trade places (works mid-path too, on dice outside the path). This die then becomes a Pivot for the rest of the turn. Clear undoes it.",
@@ -67,7 +67,7 @@ const FACE_DESC = {
   heal: "Restores your health immediately.",
   hot: "Heals you over time. Your H.O.T. can stack up to 6.",
   block: "Gain Block, which reduces the next hit you take.",
-  nullify: "Clears every harmful effect it can -- Minions, your D.O.T. and the enemy's H.O.T.",
+  nullify: "Clears every harmful effect it can: Minions, your D.O.T. and the enemy's H.O.T.",
   blank: "No effect this turn.",
 };
 
@@ -120,9 +120,9 @@ const STATUS_DESC = {
 // "enc" nodes cover monster/trap/shrine encounters -- which one it'll
 // actually be isn't decided until you reach it, so the tooltip says so.
 const ROUTE_STEP_DESC = {
-  camp: "Camp -- organize your tray, then use the campfire: Rest or Train (upgrade dice).",
-  enc: "Encounter -- Reveal a monster, trap, or shrine.",
-  boss: "Boss -- the floor's final, toughest fight.",
+  camp: "Camp: organize your tray, then use the campfire to Rest or Train (upgrade dice).",
+  enc: "Encounter: a monster, trap or shrine.",
+  boss: "Boss: the floor's final, toughest fight.",
 };
 
 // A short, dismissible first-run walkthrough shown once (before the very
@@ -297,7 +297,7 @@ function originRelicFor(originId){ return RELICS.find(r=>r.origin===originId); }
 const ORIGINS = [
   {id:'dwarf', name:'Dwarf', die:'Dwarven Doohickie', blurb:'Shield up, then pop it for a big Hit.', faces:faces(['Hit2','Boost1','Boost1','Pivot','Block2','Block2'])},
   {id:'gnome', name:'Gnome', die:'Gnomish Mushroom Cap', blurb:'Continuous damage and self-sustain over time.', faces:faces(['Combo1','Boost1','DOT2','DOT2','Leech1','Dodge'])},
-  {id:'halfling', name:'Halfling', die:'Bonus Breakfast', blurb:'Second breakfast and good cheer -- healing and buffs to keep the party going.', faces:faces(['Combo1','Boost1','Heal2','Heal2','HOT1','Nullify'])},
+  {id:'halfling', name:'Halfling', die:'Bonus Breakfast', blurb:'Second breakfast and good cheer: healing and buffs to keep the party going.', faces:faces(['Combo1','Boost1','Heal2','Heal2','HOT1','Nullify'])},
   {id:'pixie', name:'Pixie', die:'Pixie Powder', blurb:'Blinks past trouble and leaves a little mischief behind.', faces:faces(['Combo2','Boost1','DOT2','Swap','Leap','Freeze'])},
 ];
 

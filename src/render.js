@@ -871,7 +871,7 @@ function renderTitle(){
     <div class="title-screen-fill">
       <div class="panel title-panel">
         <div class="title-art-wrap">
-          <img class="title-cover-art" src="${COVER_ART}" alt="Dungeon Scramble: a dice-drafting deck-builder">
+          <img class="title-cover-art" src="${COVER_ART}" alt="Dungeon Scramble">
           <div class="title-art-fade"></div>
         </div>
         <div class="title-content">
@@ -885,7 +885,7 @@ function renderTitle(){
           </div>
           ${(()=>{ const earned = CLASSES.filter(k=>!k.debug && DEPTH_BEST.byClass[k.id] && DEPTH_BEST.byClass[k.id].depth); return earned.length ? `<div class="title-badges">${earned.map(k=>`<div class="title-badge">${depthBadgeSVG(k.color, DEPTH_BEST.byClass[k.id].depth, 52, k.id)}</div>`).join('')}</div>` : ''; })()}
           ${BUILD.release ? '' : `<p class="hint" style="text-align:center; margin:10px 0 0; font-size:12px;">Playtesting? After a few runs, tap the gear &rarr; Export Play Data and send the file.</p>`}
-          <p class="hint" style="text-align:center; margin:6px 0 0; font-size:13px; font-weight:700; opacity:.8;">v${GAME_VERSION}</p>
+          ${BUILD.release ? '' : `<p class="hint" style="text-align:center; margin:6px 0 0; font-size:13px; font-weight:700; opacity:.8;">v${GAME_VERSION}</p>`}
         </div>
       </div>
     </div>
@@ -1652,7 +1652,7 @@ function renderEncounterCard(e, mode){
               ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
               ${shieldBarHTML(e.curShield, e.maxHealth, hpPct, 'enemy')}<span class="bar-num">${curHealthClamped.toFixed(0)}${shieldNumHTML(e.curShield)}/${e.maxHealth}</span>
             </div>`}${fx.deltaHTML}${tickFloatersHTML('enemy')}<div class="kill-hint fo-hint ${killHint?'kill-hint-'+killHint.state:''}" ${killHint?`data-hint="${killHint.state}"`:''}>${killHint?killHint.text:'&nbsp;'}</div></div>
-          <div class="fo-name" ${e.flavor?`title="${e.flavor.replace(/"/g,'&quot;')}"`:''}>${typeTag}${e.name}</div>
+          <div class="fo-name" ${e.flavor?`title="${e.flavor.replace(/"/g,'&quot;')}"`:''}>${typeTag}${nbHyphen(e.name)}</div>
           <div class="fo-chips fo-buffs">${hudChips(statuses)}</div>
           ${chipsOnly?`<div class="fo-turnlabel${nextTurn.heavy?' heavy':''}" title="${isBoss?'Every turn the boss makes its base attack plus the special shown (Freeze cancels the special).':(HEAVY_EVERY[e.tier]?'The enemy does all of these every turn. Every '+HEAVY_EVERY[e.tier]+(HEAVY_EVERY[e.tier]===2?'nd':'rd')+' turn is a heavy turn that doubles one of them (Freeze cancels it).':'The enemy does all of these every turn.')}">${isBoss?(e.phase===2?(nextTurn.heavy?'Phase 2 &middot; Wind-up!':'Phase 2 &middot; Next turn'):(nextTurn.heavy?'Wind-up next!':'Next turn')):(nextTurn.heavy?'Heavy turn next!':(HEAVY_EVERY[e.tier]?'Heavy in '+(HEAVY_EVERY[e.tier]-((e.turnsActed||0)%HEAVY_EVERY[e.tier])):'Every turn'))}</div>`:''}
           <div class="fo-chips">${chipsOnly}</div>
@@ -1664,7 +1664,7 @@ function renderEncounterCard(e, mode){
   return `
     <div class="enc-card ${roomEnterCls}">
       <div class="enc-header">
-        <h3 class="enc-name-txt">${e.name}</h3>
+        <h3 class="enc-name-txt">${nbHyphen(e.name)}</h3>
         <span class="enc-type">${e.type}</span>
       </div>
       <div class="enc-card-body">
@@ -2400,6 +2400,8 @@ function placeVs(){
   }catch(e){}
 }
 window.addEventListener('resize', ()=> placeVs());
+// Names never break at their hyphen ("Co-/consul"): keep each hyphenated word on one line (Oct 28, release review).
+function nbHyphen(t){ return String(t).replace(/[^\s]*-[^\s]*/g, w=>`<span style="white-space:nowrap">${w}</span>`); }
 function maybeShowSymbolIntro(){
   try{
     if(S.guide && (S.guide.stage==='t1' || S.guide.stage==='t2')) return; // the guided first fight talks first; intros follow later
@@ -2428,10 +2430,21 @@ function maybeShowSymbolIntro(){
       if((document.getElementById('room-callout-scrim') || document.getElementById('room-callout') || document.querySelector('.modal-overlay')) && tries++ < 60){ setTimeout(showCard, 500); return; }
       const card = el(`<div id="symbol-intro" class="symbol-intro" role="status"><div class="symbol-intro-icon">${icon}</div><div class="symbol-intro-text"><div class="symbol-intro-kicker">New Action</div><strong>${name}</strong><span>${desc}</span></div></div>`);
       document.body.appendChild(card);
-      requestAnimationFrame(()=> card.classList.add('show'));
-      const kill = ()=>{ card.classList.remove('show'); setTimeout(()=>card.remove(), 250); };
+      // Oct 28 (release review): sit at the top of the fight scene (over the back wall), never over the dice, the rail
+      // buttons, the HP bars or the enemy's next-move chips
+      const place = ()=>{ const f = document.querySelector('.fo-side'); const scene = f && f.parentElement; if(!scene || !card.isConnected) return;
+        const r = scene.getBoundingClientRect(); card.style.top = Math.max(4, Math.round(r.top + 6)) + 'px'; };
+      place();
+      requestAnimationFrame(()=>{ place(); card.classList.add('show'); });
+      let gone = false, watch = 0;
+      const outside = ev=>{ if(!card.contains(ev.target)) kill(); };
+      const kill = ()=>{ if(gone) return; gone = true; clearInterval(watch); window.removeEventListener('resize', place); document.removeEventListener('pointerdown', outside, true);
+        card.classList.remove('show'); setTimeout(()=>card.remove(), 250); };
       card.onclick = kill;
-      setTimeout(kill, 7000);
+      window.addEventListener('resize', place);
+      setTimeout(()=>{ if(!gone) document.addEventListener('pointerdown', outside, true); }, 1500); // a tap elsewhere closes it, once it has been read a moment
+      watch = setInterval(()=>{ if(S.screen!=='game' || document.querySelector('.modal-overlay')) kill(); else place(); }, 300); // never over a pop-up or another screen
+      setTimeout(kill, 9000);
     };
     setTimeout(showCard, delay);
   }catch(err){}
@@ -3055,6 +3068,18 @@ function settingsToggleRowHTML(id, label, checked){
     </label>`;
 }
 
+// Keyboard shortcuts only matter with a mouse/trackpad (Oct 28, release review: not shown on phones).
+function hasKeyboardPointer(){ try{ return matchMedia('(pointer: fine)').matches; }catch(e){ return true; } }
+// Credits (Oct 28, release review).
+function openCreditsModal(){
+  openInfoModal('Credits', `<div class="credits">
+    <p class="credits-big">Dungeon Scramble</p>
+    <p>Created by <b>Jeremy and Katlynn Friedman</b>,<br>from the board game they designed together.</p>
+    <p class="hint">Metamorphous typeface &copy; Sorkin Type Co, used under the SIL Open Font License 1.1.</p>
+    <p class="hint">dungeonscramble.com &middot; contact@dungeonscramble.com</p>
+    <p class="hint">Version ${GAME_VERSION}</p>
+  </div>`);
+}
 function openSettingsModal(){
   const inRun = !!S;
   const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:340px;">
@@ -3070,13 +3095,13 @@ function openSettingsModal(){
         ${settingsToggleRowHTML('pref-flick-roll', 'Flick or shake to roll each turn', PREFS.flickRoll!==false)}
         ${PLAYDATA_URL ? settingsToggleRowHTML('pref-share-data', 'Share play data automatically', shareDataPref()==='yes') : ''}
       </div>
-      <p class="hint" style="text-align:left;">Keyboard shortcuts ${infoDot('Enter = Go · Backspace = Clear · 1234/qwer/asdf/zxcv tap a tray die (matches its grid position)')}</p>
+      ${hasKeyboardPointer() ? `<p class="hint" style="text-align:left;">Keyboard shortcuts ${infoDot('Enter = Go · Backspace = Clear · 1234/qwer/asdf/zxcv tap a tray die (matches its grid position)')}</p>` : ''}
       <div class="settings-btn-grid">
         ${inRun ? '<button id="settings-log-btn" class="btn-log">Log</button>' : ''}
         <button id="settings-how-to-play-btn" class="btn-howto">How to Play</button>
         <button id="settings-codex-btn" class="btn-codex" title="Bestiary, Dice, Relics, Key">Codex</button>
         <button id="settings-records-btn" class="btn-records" title="Run History, Achievements">Records</button>
-        <button id="settings-export-data-btn" class="btn-export">Export Play Data</button>
+        ${BUILD.release ? '<button id="settings-credits-btn" class="btn-credits">Credits</button>' : '<button id="settings-export-data-btn" class="btn-export">Export Play Data</button>'}
         <button id="settings-close-btn">Close</button>
         ${inRun ? '<button id="settings-restart-btn" class="danger">Abandon Run</button>' : ''}
         <button id="settings-reset-progress-btn" class="danger-outline">Reset Progress</button>
@@ -3092,7 +3117,8 @@ function openSettingsModal(){
   overlay.querySelector('#settings-how-to-play-btn').onclick = ()=>{ close(); openTutorialModal(0); };
   overlay.querySelector('#settings-codex-btn').onclick = ()=>{ close(); openCodexModal(); };
   overlay.querySelector('#settings-records-btn').onclick = ()=>{ close(); openRecordsModal(); };
-  overlay.querySelector('#settings-export-data-btn').onclick = ()=>{ close(); openExportDataModal(); };
+  { const ex = overlay.querySelector('#settings-export-data-btn'); if(ex) ex.onclick = ()=>{ close(); openExportDataModal(); }; }
+  { const cr = overlay.querySelector('#settings-credits-btn'); if(cr) cr.onclick = ()=>{ close(); openCreditsModal(); }; }
   { const sh = overlay.querySelector('#pref-share-data'); if(sh) sh.onchange = ()=> setShareData(sh.checked); }
   overlay.onclick = (ev)=>{ if(ev.target===overlay) close(); };
   // Volume sliders (Oct 13): 0 turns that channel off; the effects slider plays a test tone when you let go.
@@ -4138,7 +4164,7 @@ function renderShrineEncounter(){
             <div class="fo-vs">&nbsp;</div>
             <div class="fo-side fo-enemy">
               <div class="fo-fig ${art?'enc-portrait ':''}${ssz>1.05?'fo-big':''}" style="--sz:${ssz}">${shrineFig}</div>
-              <div class="fo-name">${e.name}</div>
+              <div class="fo-name">${nbHyphen(e.name)}</div>
               <small class="fo-type">Shrine</small>
               <div class="fo-quests" style="text-align:center;">${e.boon}</div>
             </div>
@@ -4681,7 +4707,7 @@ function endScreenHTML(o){
     <div class="end-swap">
       <div class="end-main">${runCardHTML(o.outcome)}${o.note||''}</div>
       <div class="end-details" hidden>${o.seal}${o.relic}${newAchievementsHTML(S.newAchievements)}${newBoonsHTML()}${summaryStatsHTML()}
-        <button class="btn-export end-send-btn" onclick="openExportDataModal()">Send Play Data</button></div>
+        ${BUILD.release ? '' : '<button class="btn-export end-send-btn" onclick="openExportDataModal()">Send Play Data</button>'}</div>
     </div>
     <div class="end-actions"><button id="save-run-card-btn">Save Card</button><button class="primary" onclick="location.reload()">${o.again}</button></div>
     <button id="end-details-btn" class="end-details-btn"><span class="end-details-word">Details</span><small>${news.join(' &middot; ')}</small></button>
@@ -4914,9 +4940,13 @@ function renderGameOver(){
   // way for repeat attempts to compound a little rather than starting from
   // zero every single time.
   if(S.carryoverOptions && S.carryoverOptions.length && !S.carryoverChosenName){
-    app.innerHTML = `<div class="panel"><h2>Defeated</h2>
-      <p>Your Adventurer retreats to town in temporary defeat... but gets to keep one die for next time. Choose a die to carry into your next run:</p>
-      <div class="swap-list" id="carryover-list"></div>
+    // Oct 28 (release review): the moment a player decides whether to go again gets the hero, what beat them and a clear choice
+    const rd = runCardData('defeat');
+    app.innerHTML = `<div class="panel end-screen defeat-keep"><h2>Defeated</h2>
+      <div class="dk-hero">${rd.portrait ? `<img class="dk-portrait" src="${rd.portrait}" alt=""/>` : ''}<div class="dk-id"><div class="dk-name">${(rd.name || rd.who).replace(/</g,'&lt;')}</div><div class="dk-fell">${rd.outcome}</div><div class="dk-sub">${rd.stats.map(([k,v])=>`${v} ${k.toLowerCase()}`).join(' &middot; ')}</div></div></div>
+      <div class="dk-box"><div class="dk-title">Keep one die for your next run</div>
+        <p class="dk-hint">It joins your tray at the start of the next run.</p>
+        <div class="swap-list" id="carryover-list"></div></div>
       </div>`;
     const list = document.getElementById('carryover-list');
     S.carryoverOptions.forEach(g=>{
@@ -4933,7 +4963,7 @@ function renderGameOver(){
     return;
   }
   const carryNote = S.carryoverChosenName ? `<p class="hint">${S.carryoverChosenName} will join your tray at the start of your next run.</p>` : '';
-  app.innerHTML = endScreenHTML({ outcome:'defeat', title:'Defeated', lede:'Your Adventurer retreats to town in temporary defeat...',
+  app.innerHTML = endScreenHTML({ outcome:'defeat', title:'Defeated', lede:'Your adventurer limps back to town. The dungeon will be waiting.',
     note:carryNote, seal:'', relic:'', again:'Try Again' });
   wireRunCard('defeat');
 }

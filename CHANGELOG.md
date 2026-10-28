@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.41.96 (Oct 28, 2026)
+Release-review fixes (docs/RELEASE_GAPS.md, items 1, 4 and 5):
+- New Action cards sit at the top of the fight scene, never over the dice, rail buttons, HP bars or next-move chips; they close on a tap elsewhere, after 9 s, or when a pop-up opens.
+- Defeat: the keep-a-die screen shows the hero, what beat them and the run's numbers, with a clear "Keep one die for your next run"; the end screen reads "Your adventurer limps back to town. The dungeon will be waiting."
+- Copy: no more double hyphens in tooltips (Leap, Nullify, route nodes, Halfling); hyphenated names never break across lines ("Co-consul").
+- Player builds hide Export Play Data, Send Play Data and the title's version number; Settings gets a Credits page in their place. Keyboard shortcuts show only with a mouse or trackpad.
+- Shrine descriptions are 12 px on a dark plate (were 10 px italic on the wall).
+- On a computer, the cover scene (blurred, dark) frames the game card, and the gear sits on the card's corner.
+- The title art's alt text no longer calls the game a deck-builder.
 ## 1.41.95 (Oct 28, 2026)
 - Fix: the loot chest's opening timer could throw an error if the pick was already gone (seen in a test tour; could happen with Android Back mid-animation).
 - Bug hunt gains a quick-start mode (QUICK=1). First-run difficulty study: docs/studies/2026-10-28_first_run.md.
