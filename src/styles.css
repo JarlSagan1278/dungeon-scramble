@@ -24,7 +24,7 @@
     --ease-pop: var(--ease-pop);
     --shadow-1: 0 2px 4px rgba(0,0,0,0.3);
     --shadow-2: 0 4px 12px rgba(0,0,0,0.5);
-    --font-ui: Georgia,'Iowan Old Style',serif;
+    --font-ui: 'Alegreya',Georgia,'Iowan Old Style',serif;
     --font-display: 'Metamorphous','Trajan Pro',Cambria,Georgia,serif;
   }
   *{box-sizing:border-box;}
@@ -1390,7 +1390,7 @@
 
   /* ===== Fonts: Metamorphous for titles/names/banners, MedievalSharp for buttons, numbers, chips and dice labels ===== */
   h1,h2,h3,.enc-name-txt,.origin-showcase-name,.class-showcase-name,.kill-callout-line,.room-callout-line,.floor-card-num,.floor-card-name,.char-name-input,.camp-section-title{ font-family:var(--font-display) !important; font-weight:400; }
-  body{ font-family: Georgia,'Iowan Old Style',serif !important; }
+  body{ font-family: 'Alegreya',Georgia,'Iowan Old Style',serif !important; }
   button,.util-btn,.pcf-num,.status-chip,.face-val,.face-word,.name-tag-svg text,.mini-face small,.kill-hint,.new-tag,.round-badge,.boss-cycle-item,.class-tab-btn{ font-family:var(--font-ui) !important; }
   
 
@@ -3127,3 +3127,24 @@ button.btn-credits:hover:not(:disabled){ background:#9c6834; }
     background: var(--backdrop, none) center / cover no-repeat; filter: blur(14px) brightness(.32) saturate(.8); }
   .settings-btn-floating{ right:calc(50% - 197px + 10px); } /* keep the gear on the game card's corner */
 }
+
+/* Typography (Jeremy, Oct 28: T1): Alegreya body text with lining figures (HP, counts and numbers sit on the line),
+   and a floor for the smallest words on a phone (chips, die labels, rail buttons, tips). The board doesn't grow. */
+body{ font-variant-numeric: lining-nums; }
+.fo-type{ font-size:10px !important; }
+.fo-chips{ font-size:11px !important; }
+.die .face-word{ font-size:10.5px !important; }
+.util-btn span, .util-btn.rail-pocket span:not(.badge), .util-btn.rail-item span:not(.badge){ font-size:11.5px !important; }
+.hint{ font-size:13px; }
+.mini-face small{ font-size:10px !important; }
+.loot-modal .loot-opt .faces span{ font-size:10px !important; }
+.symbol-intro-text{ font-size:13.5px; }
+.symbol-intro-kicker{ font-size:10.5px; }
+.round-badge{ font-size:13px; }
+
+/* Buttons (Jeremy, Oct 28: B3): every button keeps its own colour and gets a chunky toy bevel: a light top edge and a
+   dark bottom lip. Buttons with their own glow or shape (class rules) keep theirs. */
+button{ border-radius:12px; box-shadow: inset 0 3px 0 rgba(255,255,255,.30), inset 0 -5px 0 rgba(0,0,0,.28); }
+button:active:not(:disabled){ box-shadow: inset 0 2px 0 rgba(255,255,255,.18), inset 0 -2px 0 rgba(0,0,0,.28); }
+button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(255,255,255,.12); }
+.loot-chest-btn, .loot-chest-btn:active{ box-shadow:none !important; }

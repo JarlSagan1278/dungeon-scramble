@@ -90,5 +90,5 @@ tools/
 ## Art and fonts
 
 Art is drawn by Jeremy; some pieces are still AI-assisted placeholders being redrawn (tracked in
-`docs/DungeonScramble_art_inventory.xlsx`). Metamorphous is used under the SIL Open Font License
-(`docs/licenses/Metamorphous-OFL.txt`).
+`docs/DungeonScramble_art_inventory.xlsx`). Metamorphous (titles) and Alegreya (body text) are used under the SIL
+Open Font License (`docs/licenses/`).

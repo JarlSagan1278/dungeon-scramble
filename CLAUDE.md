@@ -37,7 +37,7 @@ Digital prototype of the board game Jeremy designed with his wife Katlynn (Boggl
 - Pocket/Organize fold in camp: measure positions after applying absolute positioning, cluster rows with ~16px tolerance.
 
 ## Design rules Jeremy has set
-- Toy-like look: chunky outlines, dark-brown base with light-brown windows; never the same color next to itself; each button its own color; Metamorphous titles, plain serif elsewhere.
+- Toy-like look: chunky outlines, dark-brown base with light-brown windows; never the same color next to itself; each button its own color; Metamorphous titles, Alegreya (bundled, Oct 28) elsewhere; buttons keep their own colours with a chunky toy bevel (Oct 28).
 - Every interaction should feel as good as possible; no room dressing (banners/skulls) for now; dice upgrades = filigree borders/emblazoned corners (no glows).
 - Rules: enemy Shield absorbs player damage; Block/statuses reset each room; minions clear one per damage dealt (+ Leap-over), never carry between fights; loot dice need 3 copies to unlock as Starting Boon; a Back Pocket save spends the whole Pocket (1.41.16); each Camp's fire is Rest OR Train (combining dice).
 - "Heat" difficulty was renamed **depth**; class badge shows highest depth cleared.

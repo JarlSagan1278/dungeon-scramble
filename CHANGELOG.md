@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.41.97 (Oct 28, 2026)
+- Type (Jeremy's pick T1): body text is Alegreya, bundled in the game so it looks the same on every phone (was Georgia, which Android swaps for its own serif). Numbers sit on the line. The smallest words (chips, die labels, rail buttons, tips) are 10-13 px. The board is unchanged.
+- Buttons (Jeremy's pick B3): every button keeps its own colour and gets a chunky toy bevel (light top edge, dark bottom lip, rounder corners). Buttons with their own glow or shape keep theirs.
+- Credits name both typefaces; Alegreya's licence is in docs/licenses/.
 ## 1.41.96 (Oct 28, 2026)
 Release-review fixes (docs/RELEASE_GAPS.md, items 1, 4 and 5):
 - New Action cards sit at the top of the fight scene, never over the dice, rail buttons, HP bars or next-move chips; they close on a tap elsewhere, after 9 s, or when a pop-up opens.

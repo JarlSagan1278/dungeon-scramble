@@ -3075,7 +3075,7 @@ function openCreditsModal(){
   openInfoModal('Credits', `<div class="credits">
     <p class="credits-big">Dungeon Scramble</p>
     <p>Created by <b>Jeremy and Katlynn Friedman</b>,<br>from the board game they designed together.</p>
-    <p class="hint">Metamorphous typeface &copy; Sorkin Type Co, used under the SIL Open Font License 1.1.</p>
+    <p class="hint">Typefaces: Metamorphous &copy; Sorkin Type Co; Alegreya &copy; The Alegreya Project Authors. Both used under the SIL Open Font License 1.1.</p>
     <p class="hint">dungeonscramble.com &middot; contact@dungeonscramble.com</p>
     <p class="hint">Version ${GAME_VERSION}</p>
   </div>`);
@@ -4664,25 +4664,25 @@ async function saveRunCard(outcome){
   const por = await rcLoadImg(d.portrait);
   let tx = pad+8;
   if(por){ const ph = 120, pw = ph*por.width/por.height; g.drawImage(por, pad+4, 26, pw, ph); tx = pad + 4 + pw + 16; }
-  g.fillStyle = '#ffd76a'; g.font = 'bold 30px Georgia, serif'; g.fillText(d.name || d.who, tx, 62, W-tx-pad);
-  g.fillStyle = '#fff1d6'; g.font = '18px Georgia, serif'; g.fillText((d.name ? d.who+' · ' : '')+'Depth '+d.depth, tx, 90, W-tx-pad);
-  g.fillStyle = d.win ? '#9affa0' : '#ff9a8a'; g.font = 'italic 18px Georgia, serif'; g.fillText(d.outcome, tx, 118, W-tx-pad);
+  g.fillStyle = '#ffd76a'; g.font = 'bold 30px Alegreya, Georgia, serif'; g.fillText(d.name || d.who, tx, 62, W-tx-pad);
+  g.fillStyle = '#fff1d6'; g.font = '18px Alegreya, Georgia, serif'; g.fillText((d.name ? d.who+' · ' : '')+'Depth '+d.depth, tx, 90, W-tx-pad);
+  g.fillStyle = d.win ? '#9affa0' : '#ff9a8a'; g.font = 'italic 18px Alegreya, Georgia, serif'; g.fillText(d.outcome, tx, 118, W-tx-pad);
   const sw = (W-2*pad-16)/4;
   d.stats.forEach(([k,v],i)=>{ const x = pad+8+i*sw; rr(x+3,166,sw-6,64,12); g.fillStyle = '#2a1c10'; g.fill();
-    g.textAlign = 'center'; g.fillStyle = '#ffd76a'; g.font = 'bold 26px Georgia, serif'; g.fillText(String(v), x+sw/2, 200);
-    g.fillStyle = '#e9dcc4'; g.font = '13px Georgia, serif'; g.fillText(k, x+sw/2, 220); g.textAlign = 'left'; });
+    g.textAlign = 'center'; g.fillStyle = '#ffd76a'; g.font = 'bold 26px Alegreya, Georgia, serif'; g.fillText(String(v), x+sw/2, 200);
+    g.fillStyle = '#e9dcc4'; g.font = '13px Alegreya, Georgia, serif'; g.fillText(k, x+sw/2, 220); g.textAlign = 'left'; });
   const gx = (W - (cols*dieS + (cols-1)*gap))/2, gy = 252;
   const icons = await Promise.all(d.dice.map(x=>{ const c = RC_DIE_COLORS[x.cat]||RC_DIE_COLORS.alloy; return rcSvgImg(x.type==='blank'?'':(ICON_SVG[x.type]||''), c[1]); }));
   d.dice.forEach((x,i)=>{ const c = RC_DIE_COLORS[x.cat]||RC_DIE_COLORS.alloy, X = gx+(i%cols)*(dieS+gap), Y = gy+Math.floor(i/cols)*(dieS+gap);
     rr(X,Y,dieS,dieS,10); g.fillStyle = c[0]; g.fill(); g.lineWidth = 3; g.strokeStyle = '#0c0705'; g.stroke();
     if(icons[i]) g.drawImage(icons[i], X+10, Y+8, dieS-20, dieS-20);
-    if(x.value && x.type!=='blank'){ g.fillStyle = c[1]; g.font = 'bold 13px Georgia, serif'; g.textAlign = 'right'; g.fillText(String(x.value), X+dieS-5, Y+dieS-5); g.textAlign = 'left'; } });
+    if(x.value && x.type!=='blank'){ g.fillStyle = c[1]; g.font = 'bold 13px Alegreya, Georgia, serif'; g.textAlign = 'right'; g.fillText(String(x.value), X+dieS-5, Y+dieS-5); g.textAlign = 'left'; } });
   if(d.relics.length){
     const gems = await Promise.all(d.relics.map(r=>rcSvgImg(relicGemSVG(r), '#fff')));
     const gs = 40, ry = gy + 4*(dieS+gap) + 12, rx0 = (W - (d.relics.length*(gs+6)-6))/2;
     gems.forEach((im,i)=>{ if(im) g.drawImage(im, rx0+i*(gs+6), ry, gs, gs); });
   }
-  g.fillStyle = 'rgba(255,241,214,.6)'; g.font = '13px Georgia, serif'; g.textAlign = 'center'; g.fillText('Dungeon Scramble v'+GAME_VERSION, W/2, H-20); g.textAlign = 'left';
+  g.fillStyle = 'rgba(255,241,214,.6)'; g.font = '13px Alegreya, Georgia, serif'; g.textAlign = 'center'; g.fillText('Dungeon Scramble v'+GAME_VERSION, W/2, H-20); g.textAlign = 'left';
   const blob = await new Promise(res=>cv.toBlob(res, 'image/png'));
   const fname = `dungeon-scramble-${outcome}-${Date.now()}.png`;
   try{

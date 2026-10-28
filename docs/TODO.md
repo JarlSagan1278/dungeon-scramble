@@ -16,8 +16,8 @@ the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
    regular/new bot profiles against the first real runs.
 
 ## Release gaps (review Oct 28)
-Fixed in 1.41.96: tutorial cards, defeat screen, copy, dev features, credits, desktop backdrop, shrine text. Open: type and
-button colours (mockups https://claude.ai/artifact/1vPuNVnTkHXoEaPPN7egyD, waiting on Jeremy's pick); the credits' art
+Fixed in 1.41.96: tutorial cards, defeat screen, copy, dev features, credits, desktop backdrop, shrine text. Type and buttons
+done in 1.41.97 (Alegreya, toy bevel). Open: the credits' art
 line and AI disclosure wording (Jeremy); art style unification (planned).
 
 ## Waiting on Jeremy
