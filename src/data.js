@@ -222,13 +222,13 @@ function iconSpan(type, value, small){
 // ---- Basic dice ----
 const BASIC_DICE = [
   // Oct 14 (Jeremy, "ship moderate"): level II/III basics are stronger so a Train (combine) at camp pays off;
-  // upgraded basics now hold their Tray slots against loot (docs/studies/2026-10-14_system_knockout.md).
+  // upgraded basics now hold their Tray slots against loot (2026-10-14 study, docs/STUDY_FINDINGS.md).
   {id:'atk1', name:'Attack Die I', cat:'attack', level:1, faces:faces(['Hit1','Hit1','Combo1','blank','blank','blank'])},
   {id:'atk2', name:'Attack Die II', cat:'attack', level:2, faces:faces(['Hit2','Hit2','Combo2','Hit1','blank','blank'])},
   {id:'atk3', name:'Attack Die III', cat:'attack', level:3, faces:faces(['Hit3','Hit3','Combo3','Hit2','Hit1','blank'])},
   {id:'man1', name:'Maneuver Die I', cat:'maneuver', level:1, faces:faces(['Dodge','Dodge','Leap','Leap','blank','blank'])},
   // Oct 13 (Jeremy): high Maneuver dice scale with a small Block ladder, so an upgraded Maneuver is worth as much as an
-  // upgraded Attack (regular bot: II 92% vs Attack II 89%, III 95% vs Attack III 95%; docs/studies/2026-10-13_floor3_extruzeon.md).
+  // upgraded Attack (regular bot: II 92% vs Attack II 89%, III 95% vs Attack III 95%; 2026-10-13 study, docs/STUDY_FINDINGS.md).
   {id:'man2', name:'Maneuver Die II', cat:'maneuver', level:2, faces:faces(['Dodge','Dodge','Leap','Pivot','Block2','Block2'])},
   {id:'man3', name:'Maneuver Die III', cat:'maneuver', level:3, faces:faces(['Dodge','Leap','Pivot','Block2','Block2','Boost1'])},
 ];
@@ -404,7 +404,7 @@ const FLOOR1_ENEMIES = [
   enc('Amanitabomination','Enemy',14,{dmg:2,shield:2,quests:['5 damage: 2 heals'],flavor:'"I was benevolent and good, misery made me a foe"'}),
   enc('Grafted Grifter','Enemy',15,{dmg:2,shield:2,quests:['5 damage: 2 leap'],flavor:'Known to charge an arm and a leg.'}),
   enc('Leper Colonizers','Enemy',12,{dmg:2,shield:2,flavor:'"May our crustulant new Chempire outlast its crumbling citizens!"'}),
-  // v1.39.0: Jeremy's spare monsters from the Mechanics Document; stats from the evened tiers (docs/studies/2026-10-11_new_content_plan.md).
+  // v1.39.0: Jeremy's spare monsters from the Mechanics Document; stats from the evened tiers (2026-10-11 study, docs/STUDY_FINDINGS.md).
   enc('Untamed Unicrows','Enemy',14,{dmg:2,dot:1,quests:['5 damage: 2 dodge'],flavor:'"A murderous parliament, or a parliamentary murder?"'}),
   enc('Prickly Porcupanther','Enemy',18,{dmg:2,shield:1,dreadOnly:true,quests:['5 damage: 2 block'],flavor:'"Prickly of both texture and temperament."'}),
 ];
@@ -552,7 +552,7 @@ const FLOORS = [
 // 'deadly' cards are the rare spawns: one occasionally takes an elite slot
 // on Floors 2-3 (DEADLY_CHANCE, raised by the Dread depth modifier).
 // Starting assignment from the Oct 11 2026 bot study
-// (docs/studies/2026-10-11_encounters_and_bosses.md).
+// (2026-10-11 study, docs/STUDY_FINDINGS.md).
 const ENCOUNTER_TIER = {
   // Floor 1
   'Filement Bunny':'easy','Wooden Golem':'easy','Beaker Breakers':'easy','United Separatists':'easy',

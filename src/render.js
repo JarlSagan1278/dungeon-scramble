@@ -2637,7 +2637,7 @@ const TONE_SEQUENCES = {
                  {freq:370, start:0.14, dur:0.16, type:'triangle', gain:0.22},
                  {freq:440, start:0.28, dur:0.16, type:'triangle', gain:0.22},
                  {freq:587, start:0.42, dur:0.45, type:'triangle', gain:0.26}],
-  // ---- v1.39.0 sound palette (docs/studies/2026-10-12_todo_studies.md s.4):
+  // ---- v1.39.0 sound palette (2026-10-12 study, docs/STUDY_FINDINGS.md s.4):
   // wood, metal and bells, one instrument per action family. Path steps all
   // ride the pentatonic ladder (pitchStep) so a long path keeps climbing.
   woodKnock: [{freq:220, freqTo:175, start:0, dur:0.07, type:'triangle', gain:0.2},

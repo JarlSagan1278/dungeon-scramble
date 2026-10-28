@@ -17,7 +17,7 @@ Page version: https://claude.ai/artifact/EXsbT3N29MADimSzs15gaN (copy buttons, c
 | Mon Nov 9 | r/IndieGaming video post |
 | Sun Nov 8 or 15 | devlog #2: what we changed because of your comments |
 
-Follows the two-week plan in `first_players/report.md`. Media: `docs/release/media/clip_turn.mp4` (11.6 s, portrait,
+Follows the two-week plan in `first_players.md`. Media: `docs/release/media/clip_turn.mp4` (11.6 s, portrait,
 one Floor 1 turn: flick the lid, draw a path, 18 damage, Overkill, Victory chest) and `clip_turn.gif` (same, for
 places that take GIFs). Remake with `node build.js --release && node tools/media/clip.js && python3 tools/media/mk.py turn 0 11.6 1 clip_turn`.
 

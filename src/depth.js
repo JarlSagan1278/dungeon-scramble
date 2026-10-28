@@ -13,7 +13,7 @@ const BASE_HP_MUL = [1, 1.5, 1.75];
 // (~6 win points for a skilled player). costs[] = depth added by each rank, in order.
 // Oct 13 (Jeremy): Swarming capped at 2 ranks (rank 3 was the cheap stack: +6 depth for little difficulty); rank 2 costs
 // 2 depth, not 3 (1.41.0 depth study: it was -4.3 win points per depth point vs about -6.5 elsewhere).
-// Oct 15 (per-modifier study, docs/studies/2026-10-15_depth_modifiers.md): Rounding Error 1 -> 2 depth (it cost ~17 win points),
+// Oct 15 (per-modifier study, docs/STUDY_FINDINGS.md): Rounding Error 1 -> 2 depth (it cost ~17 win points),
 // Rationing rank 2 2 -> 1 depth (~9 points for 2 depth). The rest stay: modest unevenness is part of the fun (Jeremy).
 const DEPTH_MODS = [
   { id:'foes',  name:'Tougher Scuffs', max:4, costs:[1,1,1,1], desc:r=>`Enemies and bosses have +${r*15}% HP.` },

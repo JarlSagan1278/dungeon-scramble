@@ -1935,7 +1935,7 @@ function checkQuests(e, ctx){
     let m;
     // v1.39.0 quest audit: every phrasing the quest card shows now has a check
     // ("20+ damage", "8 damage/turn", "survive turn 4", combos, hot, dot,
-    // "accumulate N block", "2 nullify"). See docs/studies/2026-10-12_quest_audit.md.
+    // "accumulate N block", "2 nullify"). See 2026-10-12 study, docs/STUDY_FINDINGS.md.
     // Survive (Oct 17, Jeremy): "survive (to) turn N" is done on the round the bubble shows as Rd N; "survive N" means
     // N enemy turns survived, so it's done on Rd N+1. The paper prints both as "Reach Rd X".
     if((m=cond.match(/survive (?:to )?turn (\d+)/))) done = ctx.turnNumber >= parseInt(m[1]) - 1;

@@ -2,9 +2,8 @@ node_modules/
 dist/
 *.log
 tools/balance/out_*.json
-tools/out_*
 
-# stray test screenshots at the repo root
+# stray screenshots at the repo root
 /*.png
 tools/balance/snap_*.html
 tools/rulebook.html

@@ -135,7 +135,7 @@ def main():
     print()
     print(f'{changed} image(s) updated, {skipped} unchanged, {missing} file(s) from manifest not found in folder.')
     if changed:
-        print('Now run: node build.js && node sim.js')
+        print('Now run: node build.js && node tools/check.js quick')
 
 if __name__ == '__main__':
     main()

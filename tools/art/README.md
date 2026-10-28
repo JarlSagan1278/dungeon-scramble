@@ -55,14 +55,14 @@ prints exactly what it updated, e.g.:
 ```
 updated MONSTER_ART[Filement Bunny]  <-  MONSTER_ART__Filement_Bunny.png  (15219 -> 15460 bytes)
 1 image(s) updated, 178 unchanged, 0 file(s) from manifest not found in folder.
-Now run: node build.js && node sim.js
+Now run: node build.js && node tools/check.js quick
 ```
 
 Then, as always:
 
 ```
 node build.js
-node sim.js
+node tools/check.js quick
 ```
 
 to rebuild `dist/dungeon_scramble.html` and run the regression sim

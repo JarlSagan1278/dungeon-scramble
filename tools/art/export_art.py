@@ -22,7 +22,7 @@ To make a small art tweak:
   3. Run import_art.py pointing at the edited folder. It only touches
      files that actually changed (by content hash), so you can leave the
      rest of the export folder untouched.
-  4. Run `node build.js` and `node sim.js` as usual.
+  4. Run `node build.js` and `node tools/check.js quick` as usual.
 """
 import re, base64, io, json, sys, os, hashlib
 

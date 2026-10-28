@@ -3,22 +3,22 @@
 // instead of every script launching Chromium and loading the 3.5 MB game separately.
 // usage: node tools/check.js            (all checks; build first with `node build.js`)
 //        node tools/check.js quick      (sim + the fast UI checks, for small changes)
-// Prints one line per check and exits 1 if any failed. bugsearch.js (long) stays separate.
+// Prints one line per check and exits 1 if any failed. tools/bugsearch.js (long) stays separate.
 const path = require('path');
 let pw; try { pw = require('playwright'); } catch (e) { pw = require('/opt/node22/lib/node_modules/playwright'); }
 const ROOT = path.resolve(__dirname, '..');
 const ALL = [
-  ['sim',        'sim.js'],                       // random-legal bot, 5 origin/class combos: JS errors only
-  ['classes',    'tools/test_bughunt_14154.js'],  // class passives, wraps, relic interactions, Boost tokens, save/load
-  ['wrap',       'tools/test_wrap.js'],           // Dungeoneer seam moves
-  ['ui',         'tools/test_bughunt_14154_ui.js'],             // camp flow, shrine screen, quest paper, music, portrait, uploads
-  ['pathrender', 'tools/test_pathrender.js'],     // fast path redraw == full redraw
-  ['trayfast',   'tools/test_trayfast.js'],       // fast tray redraw == full redraw
-  ['trayact',    'tools/test_trayact.js'],        // Swap / Reroll
-  ['shrines',    'tools/test_shrines.js'],        // every shrine option
-  ['scramble',   'tools/test_scramble.js'],       // Scramble flick gate + Depth presets
-  ['unlock',     'tools/test_unlock.js'],         // store app: Floor 1 unlock gate (needs node build.js --app)
-  ['quickstart', 'tools/test_quickstart.js'],     // first run: straight into the guided fight
+  ['sim',        'tools/sim.js'],                   // random-legal bot, 5 origin/class combos: JS errors only
+  ['classes',    'tools/tests/test_classes.js'],    // class passives, wraps, relic interactions, Boost tokens, save/load
+  ['wrap',       'tools/tests/test_wrap.js'],       // Dungeoneer seam moves
+  ['ui',         'tools/tests/test_ui.js'],         // camp flow, shrine screen, quest paper, music, portrait, uploads
+  ['pathrender', 'tools/tests/test_pathrender.js'], // fast path redraw == full redraw
+  ['trayfast',   'tools/tests/test_trayfast.js'],   // fast tray redraw == full redraw
+  ['trayact',    'tools/tests/test_trayact.js'],    // Swap / Reroll
+  ['shrines',    'tools/tests/test_shrines.js'],    // every shrine option
+  ['scramble',   'tools/tests/test_scramble.js'],   // Scramble flick gate + Depth presets
+  ['unlock',     'tools/tests/test_unlock.js'],     // store app: Floor 1 unlock gate (needs node build.js --app)
+  ['quickstart', 'tools/tests/test_quickstart.js'], // first run: straight into the guided fight
 ];
 const QUICK = new Set(['sim', 'pathrender', 'trayfast', 'ui', 'scramble']);
 
