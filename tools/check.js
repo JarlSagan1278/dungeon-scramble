@@ -18,6 +18,7 @@ const ALL = [
   ['shrines',    'tools/test_shrines.js'],        // every shrine option
   ['scramble',   'tools/test_scramble.js'],       // Scramble flick gate + Depth presets
   ['unlock',     'tools/test_unlock.js'],         // store app: Floor 1 unlock gate (needs node build.js --app)
+  ['quickstart', 'tools/test_quickstart.js'],     // first run: straight into the guided fight
 ];
 const QUICK = new Set(['sim', 'pathrender', 'trayfast', 'ui', 'scramble']);
 

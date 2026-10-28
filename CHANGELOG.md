@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.41.94 (Oct 28, 2026)
+- Quick start (Jeremy): a new player's first New Run skips character setup, Base Camp and the four welcome pages and opens straight on the guided first fight as a Dwarf Armsmaster (it took 8 taps and 4 popups to reach a die). Later runs show the setup screen as before; How to Play is still on the title and in Settings.
+- Demo: the welcome text now says to beat the Floor 1 boss instead of "Clear all three floors".
 ## 1.41.93 (Oct 26, 2026)
 - Skin tones: the three dwarves with white or grey beards keep their original colours (their beards are the same colour as their faces, so tinting turned the beards too; Jeremy).
 ## 1.41.92 (Oct 26, 2026)

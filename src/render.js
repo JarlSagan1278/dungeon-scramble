@@ -892,6 +892,7 @@ function renderTitle(){
   `;
   if(saved) document.getElementById('title-continue-btn').onclick = ()=>{ if(loadGame()) render(); };
   document.getElementById('title-newrun-btn').onclick = ()=>{
+    if(!saved && guideWanted()){ resetSetupPortraitPreviews(); newGame('dwarf', 'armsmaster'); return; } // quick start: first run picks Dwarf Armsmaster
     if(!saved){ resetSetupPortraitPreviews(); preGameScreen='setup'; render(); return; }
     const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
         <h2>Start a New Run?</h2>

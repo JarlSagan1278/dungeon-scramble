@@ -1108,6 +1108,9 @@ function newGame(originId, classId, boonDieName, charName, depthMods){
   // either from Rest or from advanceRoute()'s own scrambleTray() call when
   // the player actually leaves Camp into the first encounter.
   advanceRoute(); // triggers first encounter (or, since every route starts with Camp, just opens Camp)
+  // Quick start (Oct 28, Jeremy): a device's first run skips Base Camp and the welcome pages and opens on the guided
+  // fight (players from itch/Reddit took 8 taps and 4 popups to reach a die). How to Play stays on the title and in Settings.
+  if(S.guide && S.screen==='camp' && S.routeStep===0){ markTutorialSeen(); finishStep(); }
   render();
   if(!hasSeenTutorial()){
     markTutorialSeen();
