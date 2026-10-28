@@ -58,7 +58,7 @@ docs/                design decisions, to-do, study findings, release material, 
 tools/
   check.js, sim.js, bugsearch.js, tests/     automated checks
   balance/           headless balance harness (harness.js, study_maneuver.js) and a launcher/aggregator template
-  art/               art export/import, paper texture, hi-res re-import, icon
+  art/               art export/import, paper texture, cover, hi-res re-import, icon
   app/               copy the app build into app/www, draw icons and splash
   media/             screenshots, promo image, one-turn clip
   playdata/          Apps Script for the play-data sheet; funnel and analysis reports

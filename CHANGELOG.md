@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.41.98 (Oct 28, 2026)
+- Cover art gets the same paper grain as the in-game art (Jeremy's pick C: medium on the scene and heroes, logo clean). Title screen, desktop backdrop, app and home-screen icons and the itch thumbnail match the game now. `tools/art/cover.py` rebuilds the cover from art/cover/.
 ## 1.41.97 (Oct 28, 2026)
 - Type (Jeremy's pick T1): body text is Alegreya, bundled in the game so it looks the same on every phone (was Georgia, which Android swaps for its own serif). Numbers sit on the line. The smallest words (chips, die labels, rail buttons, tips) are 10-13 px. The board is unchanged.
 - Buttons (Jeremy's pick B3): every button keeps its own colour and gets a chunky toy bevel (light top edge, dark bottom lip, rounder corners). Buttons with their own glow or shape keep theirs.

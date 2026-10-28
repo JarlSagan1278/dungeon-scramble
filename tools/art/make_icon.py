@@ -1,10 +1,14 @@
 # App / home-screen icon (Jeremy, Oct 26: the red rogue with the torch from his cover's characters layer, on dark brown).
 # Writes art/icon/icon_1024.png (master) and the web app icons in src/pwa/. Android: python3 tools/app/icons.py art/icon/icon_1024.png
 # Source is the 860 px cover export, so the master is upscaled; re-run from a full-size export when there is one.
+import sys, os
+sys.path.insert(0, os.path.dirname(__file__))
+from paper import paper
 from PIL import Image
 BG = (43, 29, 20)
 C = Image.open('art/cover/characters_860.png').convert('RGBA')
 fig = C.crop((168, 492, 348, 672))  # zoomed in on her hood and face; the torch runs off the edge and a bit of the dwarf's sword may show (Jeremy: don't erase)
+fig = paper(fig.resize((1024, 1024), Image.LANCZOS))  # same paper as the cover (Oct 28, 1.41.98), added after upscaling so the grain stays fine
 def make(size, fill=1.0):
     c = Image.new('RGBA', (size, size), BG + (255,))
     k = size * fill / max(fig.size); f = fig.resize((round(fig.width * k), round(fig.height * k)), Image.LANCZOS)

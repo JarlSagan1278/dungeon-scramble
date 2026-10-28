@@ -17,7 +17,8 @@ hands). Ranked by how soon a stranger notices.
    pixie portraits is his own drawing, and side by side the cover and the in-game art share one style). What differs
    is our processing: the paper texture and grain filter speckle the flat fills, many pictures are shown above their
    pixel size (softer outlines), and the paper blend mutes the colours. Options for Jeremy: lighter or no grain on the
-   art (texture kept on walls, floor, chest), the same paper on the cover, or leave it.
+   art (texture kept on walls, floor, chest), the same paper on the cover, or leave it. **Done 1.41.98:** Jeremy kept
+   the grain; the cover now has the same paper.
 4. **The defeat screen is the plainest screen in the game.** Brown, text-only, mostly empty, with "...retreats to town
    in temporary defeat..." The moment a player decides whether to try again needs the run card (like victory), what
    killed them, and one big "Try again".
