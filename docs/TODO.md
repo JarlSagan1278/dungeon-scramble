@@ -15,6 +15,10 @@ the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 3. **Retune only from real data.** Bot win rates are not human ones (see `STUDY_FINDINGS.md`). Re-calibrate the
    regular/new bot profiles against the first real runs.
 
+## Release gaps (review Oct 28)
+See `RELEASE_GAPS.md`: tutorial cards cover the tray; type (one bundled serif, ~12 px floor); defeat screen; copy
+(`--`, jargon); dev features in Settings; equip window; credits; desktop backdrop. Pending Jeremy's picks.
+
 ## Waiting on Jeremy
 - **Title art:** new cover drawn from scratch on the 2048x2434 canvas (`DungeonScramble_TitleArt_canvas.psd`); the chat
   only passes 860 px, so export full size from Sketchbook or upload the PSD to the repo. Keep the logo layer for Steam.
