@@ -83,4 +83,4 @@ Tips:
 | r/roguelites | | | |
 | r/playmygame | Oct 27, 8:00 (promo + cover gallery) | | |
 | Discord | | | |
-| itch devlog | Oct 27 ("Floor 1 is free to play") | | |
+| itch devlog | Oct 27 ("Floor 1 is free to play") | | Oct 28: demo 1.41.94 uploaded (quick start: first run opens on the guided fight) |
