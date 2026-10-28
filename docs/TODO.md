@@ -18,7 +18,7 @@ the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 ## Release gaps (review Oct 28)
 Fixed in 1.41.96: tutorial cards, defeat screen, copy, dev features, credits, desktop backdrop, shrine text. Type and buttons
 done in 1.41.97 (Alegreya, toy bevel). Open: the credits' art
-line and AI disclosure wording (Jeremy); art style unification (planned).
+line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits) and the art treatment choice (paper grain on the art: lighter / none / add to cover / leave), both Jeremy's.
 
 ## Waiting on Jeremy
 - **Title art:** new cover drawn from scratch on the 2048x2434 canvas (`DungeonScramble_TitleArt_canvas.psd`); the chat

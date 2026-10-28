@@ -13,10 +13,11 @@ hands). Ranked by how soon a stranger notices.
    so phones differ), and over 100 rules set text at 5–11 px. Chips, die labels, tooltips and the shrine's italic
    description are hard to read on a phone. Fix: bundle one book serif (keeps "plain serif" but looks the same on
    every device), raise the floor to ~12 px for words (numbers on dice can stay smaller), drop italics on dark walls.
-3. **Two art styles.** The cover and icon are Jeremy's clean hand drawing; the game is textured, AI-derived art
-   retouched by hand. The heroes on the cover don't look like the in-game heroes. Players and store reviewers spot
-   this, and stores need the AI disclosure. Long-term the biggest gap; already planned (title art first, then the
-   remaining AI-assisted pieces).
+3. **Art treatment, not drawing style** (corrected Oct 28 after Jeremy's reply: all the art except the untouched
+   pixie portraits is his own drawing, and side by side the cover and the in-game art share one style). What differs
+   is our processing: the paper texture and grain filter speckle the flat fills, many pictures are shown above their
+   pixel size (softer outlines), and the paper blend mutes the colours. Options for Jeremy: lighter or no grain on the
+   art (texture kept on walls, floor, chest), the same paper on the cover, or leave it.
 4. **The defeat screen is the plainest screen in the game.** Brown, text-only, mostly empty, with "...retreats to town
    in temporary defeat..." The moment a player decides whether to try again needs the run card (like victory), what
    killed them, and one big "Try again".
