@@ -23,7 +23,7 @@ places that take GIFs). Remake with `node build.js --release && node tools/media
 
 Link everywhere: https://dungeonscramble.itch.io/dungeon-scramble
 
-**AI art:** some art in the game (and so in the clip) is still AI-derived (see PROJECT_CONTEXT, Oct 21/25). r/IndieGaming
+**AI art:** some art in the game (and so in the clip) is still AI-derived (see decisions/art_and_names.md and release_and_players.md, Oct 21/25). r/IndieGaming
 requires disclosure, and several game subs ban AI art outright. Read each sub's AI rule; where disclosure is required,
 add a line like "Most art is hand-drawn by me; a few placeholder pieces are AI-assisted and being redrawn."
 
@@ -138,7 +138,7 @@ keep the shape: what was true at the table, what the screen let you do instead.)
 ## Mon Nov 9 · r/IndieGaming (video post, different wording)
 
 **Type:** video post with `clip_turn.mp4`. One self-promo post per two weeks there; disclose AI use if any of the art
-in the clip is AI-assisted (see PROJECT_CONTEXT on the remaining original art).
+in the clip is AI-assisted (see decisions/art_and_names.md).
 
 **Title:**
 > Dungeon Scramble: every turn is a 4x4 tray of dice and one path through it. Free first floor in the browser.

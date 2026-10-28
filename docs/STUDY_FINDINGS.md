@@ -3,7 +3,7 @@
 What the bot studies, audits and research taught us, kept as reference. The full reports (32 study files,
 the literature-review notes, the first-players research notes and the old mockups) were removed from the tree
 on Oct 28; they are in git history at commit `44a9829` (`git show 44a9829:docs/studies/<file>`). Decisions that
-came out of them are recorded in `PROJECT_CONTEXT.md`; changes that shipped are in `CHANGELOG.md`.
+came out of them are recorded in `decisions/` (index in `PROJECT_CONTEXT.md`); changes that shipped are in `CHANGELOG.md`.
 
 All win rates are **bot** results, not human ones. Human experts will sit below the expert bot; the first real
 numbers come from the play-data sheet.
@@ -92,7 +92,7 @@ Measure: floor-by-floor run endings, take rates of loot/relics, warned vs unwarn
 - **C / duds:** Nature's Thorns +7, Strength in Mooks +5, Union Health Plan +4, Exponential Decay +2; FTLeporter,
   Equal and Opposite, Bloodthirst, Power Word: Safe ~0.
 - Flat defence (Block every fight, −1 per hit, steady healing) beats damage and loot effects. Jeremy's idea: space relic power out over many
-  runs by gating tiers (see PROJECT_CONTEXT for what shipped).
+  runs by gating tiers (see decisions/relics_and_shrines.md).
 
 ## Loot dice (Oct 13, die replaces one Attack I from the start, regular bot, base 71%)
 

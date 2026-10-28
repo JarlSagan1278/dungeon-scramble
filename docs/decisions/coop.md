@@ -1,0 +1,7 @@
+# Co-op
+
+Co-op direction (on hold). Jeremy's decisions, oldest first, with dates and the build they shipped in. Split out of PROJECT_CONTEXT.md on Oct 28, 2026; add new decisions at the bottom.
+
+- **Co-op direction (Jeremy, Oct 14; doc: claude.ai/code/artifact/1a2e8cb1-5527-400c-b4a2-defff09d6323):** live co-op (not a daily-seed race); two phones is the goal, but build pass-and-play first for testing and keep it as a player option; at 0 HP each player can spend their own Back Pocket, otherwise a small revive at camp (also weigh a SHARED health bar, which would let one player specialize in healing and the other in damage: check feasibility); loot is a shared draft (team decisions); he most wants paths that cross both boards (asked for step-by-step use cases). The board game is not being developed, so no tabletop co-op test.
+- **Co-op board interaction (Jeremy, Oct 14):** develop both Bridge paths and the relay, via his "Relay Exchange": each player's first leg ends on the Bridge edge and drops an entry marker on the partner's facing die; each then plays a second leg on their OWN board from the partner's marker, continuing the partner's chain; a bonus for meeting up on facing Bridge dice (D1 with E1). Concerns it answers: nobody waits, nobody steamrolls the partner's board. Details in the co-op doc.
+- **Co-op:** on hold. When it starts, simulate two phones on a computer by doubling the width of the current interface.

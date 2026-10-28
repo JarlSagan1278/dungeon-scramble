@@ -80,7 +80,7 @@ tools/
 | File | What's in it |
 |---|---|
 | `CLAUDE.md` | Working notes: commands, release routine, gotchas, Jeremy's design rules |
-| `docs/PROJECT_CONTEXT.md` | Every design decision, with dates |
+| `docs/PROJECT_CONTEXT.md` | What the game is, who makes it, working style, and the index of `docs/decisions/` (every design decision by topic, with dates) |
 | `docs/TODO.md` | Current priorities |
 | `docs/STUDY_FINDINGS.md` | What the balance studies, audits and research found |
 | `CHANGELOG.md` | Version history |

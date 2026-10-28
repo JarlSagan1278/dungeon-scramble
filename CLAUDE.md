@@ -2,7 +2,7 @@
 
 Digital prototype of the board game Jeremy designed with his wife Katlynn (Boggle-style dice-path dungeon crawler). Plain HTML/CSS/JS, no framework. Single owner/designer: Jeremy (playtests on his phone, 395x769 game card — it must not grow taller).
 
-**Every session: read `docs/PROJECT_CONTEXT.md` and `docs/TODO.md` first** (`docs/STUDY_FINDINGS.md` holds what the balance studies and research found; old reports are in git history). Whenever Jeremy makes a design decision, update `docs/PROJECT_CONTEXT.md` to record it (and commit).
+**Every session: read `docs/PROJECT_CONTEXT.md` and `docs/TODO.md` first** (`docs/STUDY_FINDINGS.md` holds what the balance studies and research found; old reports are in git history). Whenever Jeremy makes a design decision, record it (dated) at the bottom of the matching topic file in `docs/decisions/` (index in PROJECT_CONTEXT.md) and commit.
 
 ## Commands
 - `node build.js` → `dist/dungeon_scramble.html` (single file) + `dist/web/` (installable PWA; art extracted to `dist/web/art/`). Also syncs package.json version. `--demo` → `dist/demo/` (Floor 1 only, `BUILD.demo`); `--release` → `dist/release/` (no Debug unlock, `BUILD.release`); `--app` → `dist/app/` (store app: release + `BUILD.app`, Floor 1 free, then the unlock screen; `hasFullGame()`, `STORE` in logic.js). Tester builds stay the default. check.js's unlock check needs `node build.js --app` first.
