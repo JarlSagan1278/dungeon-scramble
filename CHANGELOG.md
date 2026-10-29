@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.2 (Oct 29, 2026)
+- Consistent outlines and shadows: the fight rail buttons (Skill, Pocket, Item, Clear, Go) get the same raised toy bevel and shadow as every other button; settings rows, the setup screen's showcases and the loot cards get the standard outline weight (nothing is outlined at 1px any more). No sizes change.
 ## 1.42.1 (Oct 29, 2026)
 - Codex (Jeremy's pick X1): a parchment monster book. Bestiary, Dice and Relics are card grids; tap a card for its own page.
 - Records (Jeremy's pick R2): runs as cards in their class colour; achievements as medals (tap one to see how to earn it).
