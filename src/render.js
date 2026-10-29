@@ -3080,10 +3080,10 @@ function settingsSliderRowHTML(id, label, vol){
   const v = Math.round(vol*100);
   return `<label class="settings-toggle-row settings-slider-row" for="${id}">
       <span>${label} <b class="settings-vol" id="${id}-val">${v ? v+'%' : 'Off'}</b></span>
-      <input type="range" id="${id}" min="0" max="100" step="5" value="${v}">
+      <input type="range" id="${id}" min="0" max="100" step="5" value="${v}" style="--pct:${v}%">
     </label>`;
 }
-function settingsSliderLabel(sl){ const b = document.getElementById(sl.id+'-val'); if(b) b.textContent = +sl.value ? sl.value+'%' : 'Off'; }
+function settingsSliderLabel(sl){ const b = document.getElementById(sl.id+'-val'); if(b) b.textContent = +sl.value ? sl.value+'%' : 'Off'; sl.style.setProperty('--pct', sl.value+'%'); }
 function settingsToggleRowHTML(id, label, checked){
   return `<label class="settings-toggle-row" for="${id}">
       <span>${label}</span>

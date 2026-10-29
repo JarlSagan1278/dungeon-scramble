@@ -3305,3 +3305,27 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 .parchment-page .tutorial-dot.active{ background:#8a2e22; }
 /* Option A (Jeremy, Oct 29): Metamorphous for titles and the one big main button on a screen. */
 #start-btn, #leave-btn{ font-family:'Metamorphous',serif !important; }
+/* Toyified controls (Jeremy, Oct 29: "go for it"): settings switches and volume sliders, info dots, tooltips and count badges
+   share the buttons' outline, bevel and drop shadow instead of the browser's own thin controls. */
+.settings-toggle-row{ padding-top:6px; padding-bottom:6px; }
+.settings-toggle-row input[type=checkbox]{ -webkit-appearance:none; appearance:none; flex:none; width:40px; height:22px; margin:0; position:relative; cursor:pointer;
+  border:2px solid var(--line); border-radius:12px; background:#2a1d13; box-shadow:inset 0 3px 4px rgba(0,0,0,.5); transition:background .15s; }
+.settings-toggle-row input[type=checkbox]::before{ content:""; position:absolute; top:1px; left:1px; width:16px; height:16px; box-sizing:border-box; border-radius:50%;
+  background:#e9d7ae; border:2px solid var(--line); box-shadow:inset 0 2px 0 rgba(255,255,255,.55), 0 1px 0 var(--line); transition:transform .15s; }
+.settings-toggle-row input[type=checkbox]:checked{ background:#5f8a3c; }
+.settings-toggle-row input[type=checkbox]:checked::before{ transform:translateX(18px); }
+.settings-toggle-row input[type=checkbox]:focus-visible, .settings-toggle-row input[type=range]:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+.settings-toggle-row.settings-slider-row input[type=range]{ -webkit-appearance:none; appearance:none; background:transparent; height:24px; margin:0; cursor:pointer; }
+.settings-toggle-row input[type=range]::-webkit-slider-runnable-track{ height:12px; border-radius:7px; border:2px solid var(--line); box-sizing:border-box;
+  background:linear-gradient(to right, #ffc93c var(--pct,100%), #2a1d13 var(--pct,100%)); box-shadow:inset 0 2px 3px rgba(0,0,0,.35); }
+.settings-toggle-row input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none; width:22px; height:22px; margin-top:-7px; border-radius:50%;
+  background:#e9d7ae; border:2px solid var(--line); box-shadow:inset 0 3px 0 rgba(255,255,255,.55), inset 0 -3px 0 rgba(0,0,0,.22), 0 2px 0 var(--line); }
+.settings-toggle-row input[type=range]::-moz-range-track{ height:8px; border-radius:7px; border:2px solid var(--line); background:#2a1d13; }
+.settings-toggle-row input[type=range]::-moz-range-progress{ height:8px; border-radius:7px; border:2px solid var(--line); background:#ffc93c; }
+.settings-toggle-row input[type=range]::-moz-range-thumb{ width:18px; height:18px; border-radius:50%; background:#e9d7ae; border:2px solid var(--line); box-shadow:0 2px 0 var(--line); }
+.info-dot{ width:18px; height:18px; border:2px solid var(--line); background:#e9d7ae; color:#3a2410; font:italic 800 12px/1 var(--font-ui);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.55), 0 2px 0 var(--line); }
+.info-dot:hover, .info-dot:focus{ color:#3a2410; background:#ffd75e; border-color:var(--line); }
+.face-tooltip{ border-width:3px; box-shadow:0 4px 0 var(--line), 0 4px 14px rgba(0,0,0,.45); }
+.swap-item .swap-count-badge, .camp-stack-badge{ border-width:2px; }
+.settings-pair > .settings-toggle-row{ gap:6px; padding-left:8px; padding-right:8px; } .settings-pair > .settings-toggle-row > span{ white-space:nowrap; }

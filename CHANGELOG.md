@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.4 (Oct 29, 2026)
+- Toy controls: Settings uses chunky on/off switches and volume sliders with a fat round knob instead of the browser's own; the "i" info dots are small raised buttons; tooltips and count badges get the standard outline and shadow.
 ## 1.42.3 (Oct 29, 2026)
 - How to Play is a parchment page, like the Codex (Jeremy: parchment is for in-world objects).
 - Enter the Dungeon and the camp's main button use the title font, like New Run (Jeremy: Metamorphous for titles and the one big main button on a screen).
