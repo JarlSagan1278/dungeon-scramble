@@ -2879,7 +2879,8 @@ function onPlayerDefeated(){
       onPlayerDefeated();
     }
   } else {
-    if(S.encounter && S.encounter.type!=='Shrine'){ bestiaryNote(S.encounter.name, 'lost'); S.stats.killedBy = S.encounter.name; }
+    if(S.encounter && S.encounter.type!=='Shrine'){ bestiaryNote(S.encounter.name, 'lost'); S.stats.killedBy = S.encounter.name;
+      S.stats.killedByInfo = {name:S.encounter.name, type:S.encounter.type, hp:Math.max(0, S.encounter.curHealth||0), max:S.encounter.maxHealth||0}; }
     S.carryoverOptions = highestTierTrayGroups();
     S.carryoverChosenName = null;
     S.screen='gameover';

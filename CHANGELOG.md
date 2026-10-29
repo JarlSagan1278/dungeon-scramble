@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.42.0 (Oct 29, 2026)
+Second screen pass (Jeremy's picks T3, D1, C2, K1):
+- Title: the cover fills more of the screen, New Run is the big button, Codex/Records/How to Play share a row, and a credit line names Jeremy and Katlynn.
+- Defeat: a "What beat you" card with the monster, how close you got, and a short tip.
+- Camp: upgrade rows show three small dice turning into one bigger die, and how many you own.
+- Boss fights: the health bar is bolted to the room and starts straight; the boss drops onto it after the room banner and it sags under the weight (thump, creak, dust, cracks).
+- The play-data question is one line ("Share your runs to help balance the game? Yes / No") on both win and defeat screens.
 ## 1.41.99 (Oct 28, 2026)
 Screen fixes (Jeremy's picks 1C, 2A, 3A, 7A, 8B):
 - Blank die sides show an engraved empty socket instead of a plain square.

@@ -488,8 +488,12 @@ function shieldBarHTML(val, max, hpPct, side){
 
 // Boss health bar: a U-shaped arc that starts and ends where the straight bar would, and dips below. Segments are
 // SVG strokes on one path (pathLength=100, so a segment is just "start, length" in percent of the bar).
+// Oct 28 (Jeremy): the bar starts straight and only sags when the boss drops onto it (bossDropIn, after the room banner),
+// and its ends are bolted to the room with stress cracks at the dip (K1).
+let BOSS_DROP_PENDING = false;
 function bossArcBarHTML(o){
   const W=160, D=24, T=8, mid=T, P='M 10 '+mid+' Q '+(W/2)+' '+(mid+2*D)+' '+(W-10)+' '+mid;
+  const sagPath = k => 'M 10 '+mid+' Q '+(W/2)+' '+(mid+2*D*k).toFixed(1)+' '+(W-10)+' '+mid;
   const H=T+D+T, seg=(a,len)=>`stroke-dasharray="0 ${Math.max(0,a).toFixed(2)} ${Math.max(0,len).toFixed(2)} 300"`;
   const fx = hpFillHTML('enemy','hp',o.hpPct,true);
   const hp = Math.max(0,Math.min(100,fx.pct));
@@ -514,7 +518,14 @@ function bossArcBarHTML(o){
   s = `<mask id="ba-mask" maskUnits="userSpaceOnUse" x="-20" y="-20" width="${W+40}" height="${H+40}"><path d="${P}" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round"/></mask>` + head + `<g mask="url(#ba-mask)">` + s + '</g>';
   // top-light highlight twins (the straight bars are light on top, darker below)
   s = s.replace(/<path class="ba-seg (ba-hp|ba-shield)([^"]*)"([^>]*)\/>/g, (m,k,rest,attrs)=> m + `<path class="ba-seg ba-hl ba-hl-${k.slice(3)}${rest}"${attrs}/>`);
-  return `<div class="bar bar-arc ${o.cls||''}"><svg viewBox="0 0 ${W} ${H}" width="100%" aria-hidden="true">${s}</svg>${o.numHTML}</div>`;
+  if(BOSS_DROP_PENDING){ // straight until the boss lands; then sag past the rest point and settle back (SMIL, started by bossDropIn)
+    const flat = sagPath(0), anim = `<animate class="ba-drop" attributeName="d" begin="indefinite" dur="0.75s" fill="freeze" values="${flat};${sagPath(1.3)};${sagPath(0.88)};${P}" keyTimes="0;0.38;0.72;1"/>`;
+    s = s.replace(/<path ([^>]*?)\/>/g, (m, attrs)=> attrs.includes(`d="${P}"`) ? `<path ${attrs.replace(`d="${P}"`, `d="${flat}"`)}>${anim}</path>` : m);
+  }
+  const bolts = (x)=>`<rect x="${x-7}" y="${mid-10}" width="14" height="20" rx="2" class="ba-bracket"/><circle cx="${x-3}" cy="${mid-5.5}" r="1.7" class="ba-rivet"/><circle cx="${x+3}" cy="${mid-5.5}" r="1.7" class="ba-rivet"/><circle cx="${x-3}" cy="${mid+5.5}" r="1.7" class="ba-rivet"/><circle cx="${x+3}" cy="${mid+5.5}" r="1.7" class="ba-rivet"/>`;
+  s += `<g class="ba-strain">${bolts(8)}${bolts(W-8)}<path class="ba-crack" d="M70 ${mid+22} l2 3 -2 2 2 3"/><path class="ba-crack" d="M90 ${mid+22} l-2 3 2 2 -1 3"/><path class="ba-crack" d="M80 ${mid+29} l1 3 -1 2"/>
+    <g class="ba-dust"><circle cx="20" cy="${mid+14}" r="2"/><circle cx="24" cy="${mid+18}" r="1.4"/><circle cx="17" cy="${mid+19}" r="1.1"/><circle cx="${W-20}" cy="${mid+14}" r="2"/><circle cx="${W-24}" cy="${mid+18}" r="1.4"/><circle cx="${W-17}" cy="${mid+19}" r="1.1"/></g></g>`;
+  return `<div class="bar bar-arc ${o.cls||''}${BOSS_DROP_PENDING?' ba-waiting':''}"><svg viewBox="0 0 ${W} ${H}" width="100%" overflow="visible" aria-hidden="true">${s}</svg>${o.numHTML}</div>`;
 }
 // ---- Stone-floor room: the doorway's back wall (brick, above a horizon ledge) and one flagstone floor that
 // runs from the horizon down behind the chest, so the top of the screen reads as a wall and the chest as
@@ -737,33 +748,8 @@ function lockSVG(size){
   return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>`;
 }
 
-// 3-small-dice-converge-into-1-bigger-die glyph (Camp's Upgrade Dice rows)
-// -- reads as "combine" at a glance in place of the plain "I -> II" arrow it
-// replaces. Three single-pip dice fan out on the left, an arrow, then one
-// bigger five-pip die on the right stands in for the stronger result.
-// The bottom (third) small die sits lowest in the fan -- its box used to run
-// to y=23.5 against a viewBox only 22 tall, so its bottom edge was silently
-// clipped by the SVG viewport and that one die read as open-bottomed instead
-// of a closed square. Shifted up so its box stays inside the viewBox.
-function mergeGlyphSVG(h){
-  const w = h*2.45;
-  return `<svg class="merge-glyph" viewBox="0 0 54 22" width="${w}" height="${h}" fill="none" stroke="currentColor" stroke-width="1.6">
-      <rect x="1" y="2" width="9" height="9" rx="2" transform="rotate(-12 5.5 6.5)"></rect>
-      <circle cx="5.5" cy="6.5" r="1" fill="currentColor" stroke="none" transform="rotate(-12 5.5 6.5)"></circle>
-      <rect x="6" y="9.5" width="9" height="9" rx="2"></rect>
-      <circle cx="10.5" cy="14" r="1" fill="currentColor" stroke="none"></circle>
-      <rect x="1" y="12" width="9" height="9" rx="2" transform="rotate(10 5.5 16.5)"></rect>
-      <circle cx="5.5" cy="16.5" r="1" fill="currentColor" stroke="none" transform="rotate(10 5.5 16.5)"></circle>
-      <path d="M19 11 H29" stroke-width="2"></path>
-      <path d="M25 7 L30 11 L25 15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-      <rect x="35" y="2" width="17" height="17" rx="3" stroke-width="2"></rect>
-      <circle cx="39.6" cy="6.6" r="1.3" fill="currentColor" stroke="none"></circle>
-      <circle cx="47.4" cy="6.6" r="1.3" fill="currentColor" stroke="none"></circle>
-      <circle cx="43.5" cy="10.5" r="1.3" fill="currentColor" stroke="none"></circle>
-      <circle cx="39.6" cy="14.4" r="1.3" fill="currentColor" stroke="none"></circle>
-      <circle cx="47.4" cy="14.4" r="1.3" fill="currentColor" stroke="none"></circle>
-    </svg>`;
-}
+// Oct 28 (Jeremy picked C2): upgrade rows show three small dice, an arrow and one bigger die, then how many you own.
+function upgDie(level, big){ return `<span class="upg-die${big?' upg-die-big':''}">${ROMAN[level]}</span>`; }
 
 // Plain chevron, used as the bouncing "tap here next" cue between Camp's
 // Organize Dice lists (see groupedCampTilesHTML()/organizeSwapArrowHTML()
@@ -879,10 +865,13 @@ function renderTitle(){
           <div class="title-btn-col">
             ${continueBtn}
             <button class="${saved?'':'primary'}" id="title-newrun-btn">${saved?'Start New Run':'New Run'}</button>
-            <button id="title-codex-btn" class="btn-codex">Codex</button>
-            <button id="title-history-btn" class="btn-records">Records</button>
-            <button id="title-howto-btn" class="btn-howto">How to Play</button>
+            <div class="title-links">
+              <button id="title-codex-btn" class="btn-codex">Codex</button>
+              <button id="title-history-btn" class="btn-records">Records</button>
+              <button id="title-howto-btn" class="btn-howto">How to Play</button>
+            </div>
           </div>
+          <p class="title-credit">A dice-path roguelike from the board game<br>by Jeremy and Katlynn Friedman</p>
           ${(()=>{ const earned = CLASSES.filter(k=>!k.debug && DEPTH_BEST.byClass[k.id] && DEPTH_BEST.byClass[k.id].depth); return earned.length ? `<div class="title-badges">${earned.map(k=>`<div class="title-badge">${depthBadgeSVG(k.color, DEPTH_BEST.byClass[k.id].depth, 52, k.id)}</div>`).join('')}</div>` : ''; })()}
           ${BUILD.release ? '' : `<p class="hint" style="text-align:center; margin:10px 0 0; font-size:12px;">Playtesting? After a few runs, tap the gear &rarr; Export Play Data and send the file.</p>`}
           ${BUILD.release ? '' : `<p class="hint" style="text-align:center; margin:6px 0 0; font-size:13px; font-weight:700; opacity:.8;">v${GAME_VERSION}</p>`}
@@ -1568,6 +1557,7 @@ function renderEncounterCard(e, mode){
   // in logic.js) so stepping into it actually registers, instead of the
   // card just silently having different stats than a moment ago.
   const roomEnterCls = S.newRoomFx ? (S.newRoomFx.boss ? 'room-enter room-enter-boss door-kick' : 'room-enter door-kick') : '';
+  if(S.newRoomFx && S.newRoomFx.boss && !PREFS.reducedMotion && /Boss/.test(e.type)) BOSS_DROP_PENDING = true;
   const doorDustHTML = S.newRoomFx ? '<div class="door-dust">'+[0,1,2,3,4,5,6].map(i=>`<i style="--dx:${(i-3)*17}px;--dy:${-10-((i*7)%5)*5}px;--d:${i*28}ms"></i>`).join('')+'</div>' : '';
   const isBoss = e.type==='Boss' || e.type==='Big Boss';
   // Regular (non-boss) encounters don't cycle through one action at a time
@@ -1647,7 +1637,7 @@ function renderEncounterCard(e, mode){
         </div>
         <div class="fo-vs"><span class="fo-vs-txt${(performance.now()-UIFX.vsAt)<3400?' vs-intro':''}" style="animation-delay:-${Math.max(0,Math.round(performance.now()-UIFX.vsAt))}ms">vs</span></div>
         <div class="fo-side fo-enemy${isBoss?' fo-boss-side':''}">
-          ${doorDustHTML}<div class="fo-fig enc-portrait ${sz>1.05?'fo-big ':''}${(sz>1.05&&/Boss/.test(e.type))?'fo-bossbig ':''}${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}" style="--sz:${sz}">${monsterFig}</div><div class="fo-floor"></div>
+          ${doorDustHTML}<div class="fo-fig enc-portrait ${(BOSS_DROP_PENDING&&/Boss/.test(e.type))?'boss-drop-wait ':''}${sz>1.05?'fo-big ':''}${(sz>1.05&&/Boss/.test(e.type))?'fo-bossbig ':''}${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}" style="--sz:${sz}">${monsterFig}</div><div class="fo-floor"></div>
           <div class="fo-hpwrap status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;">${isBoss ? bossArcBarHTML({hpPct, prevLeft:dmgPreviewLeftPct, prevW:dmgPreviewWidthPct, shieldVal:e.curShield, shieldMax:e.maxHealth, cls:`${fx.cls} ${killHint?'bar-'+killHint.state:''}`, numHTML:`<span class="bar-num">${curHealthClamped.toFixed(0)}${shieldNumHTML(e.curShield)}/${e.maxHealth}</span>`}) : `<div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
               ${hpFillHTML('enemy','hp',hpPct)}
               ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
@@ -1878,6 +1868,7 @@ function renderGame(){
       setTimeout(()=> playTone('questStart'), 420);
     }
     maybeShowSymbolIntro();
+    if(BOSS_DROP_PENDING && !document.getElementById('room-callout')) setTimeout(bossDropIn, 300);
     S.newRoomFx = null; // consumed -- plays once, on the render right after advanceRoute() set it
   } else maybeShowSymbolIntro();
   if(S.justScrambled){
@@ -2451,6 +2442,21 @@ function maybeShowSymbolIntro(){
   }catch(err){}
 }
 
+// Oct 28 (Jeremy): once the room banner is gone the boss drops in from above and lands on its straight health bar,
+// which sags under the weight (the SMIL animations bossArcBarHTML adds), with a thump, dust and a small shake.
+function bossDropIn(){
+  if(!BOSS_DROP_PENDING) return;
+  BOSS_DROP_PENDING = false;
+  const fig = document.querySelector('.fo-enemy .fo-fig.boss-drop-wait');
+  if(fig){ fig.classList.remove('boss-drop-wait'); fig.classList.add('boss-drop'); }
+  setTimeout(()=>{
+    const bar = document.querySelector('.fo-enemy .bar-arc');
+    if(bar){ bar.classList.remove('ba-waiting'); bar.classList.add('ba-landed');
+      bar.querySelectorAll('animate.ba-drop').forEach(a=>{ try{ a.beginElement(); }catch(err){} }); }
+    playTone('bossLand'); vibrate([40]);
+    if(typeof screenShake==='function') screenShake('small');
+  }, 330);
+}
 function showRoomCallout(fx, onDismiss){
   const old = document.getElementById('room-callout');
   if(old && old.parentNode) old.parentNode.removeChild(old);
@@ -2477,6 +2483,7 @@ function showRoomCallout(fx, onDismiss){
     node.style.top = mid+'px'; }
   const dismiss = ()=>{
     if(scrim.parentNode) scrim.parentNode.removeChild(scrim);
+    if(BOSS_DROP_PENDING) setTimeout(bossDropIn, 120);
     // the 'vs' mark plays its short intro once the room banner is out of the way
     UIFX.vsAt = performance.now();
     document.querySelectorAll('.fo-vs-txt').forEach(n=>{ n.classList.remove('vs-intro'); void n.offsetWidth; n.style.animationDelay='0ms'; n.classList.add('vs-intro'); });
@@ -2613,6 +2620,9 @@ const TONE_SEQUENCES = {
   // so it reads as a step up in stakes rather than just another door.
   bossRoomEnter: [{freq:110, start:0,    dur:0.16, type:'sawtooth', gain:0.18},
                   {freq:147, start:0.14, dur:0.28, type:'sawtooth', gain:0.2}],
+  // Oct 28: the boss lands on its health bar -- a low thump, then a short wooden creak as the bar sags.
+  bossLand: [{freq:70, start:0, dur:0.22, type:'sine', gain:0.35}, {freq:55, start:0.02, dur:0.3, type:'triangle', gain:0.25},
+             {freq:180, start:0.14, dur:0.3, type:'sawtooth', gain:0.04}, {freq:162, start:0.34, dur:0.28, type:'sawtooth', gain:0.03}],
   // Per-die turn-resolution tones (see describeStepFx()/playStepTone()) --
   // a short clink for Block, a light ping for a status effect (D.O.T.,
   // Nullify, Freeze, Boost) -- distinct from 'hit'/'heal' so each kind of
@@ -4451,13 +4461,13 @@ function renderCamp(){
       const needsBackfill = count>=3 && !canUpgrade(cat,level);
       const upgradeTitle = needsBackfill ? 'Needs more spare dice to backfill' : `Combine 3 ${label} ${ROMAN[level]} into 1 ${label} ${ROMAN[level+1]}`;
       upgradeRows.push(`<div class="upgrade-row upg-${cat}">
-          <button class="upgrade-btn${(eligible && !baseCamp)?' upgrade-ready':''}${locked?' upgrade-locked':''}" id="upgrade-${cat}-${level}" ${disabled?'disabled':''}${locked?' aria-disabled="true"':''} title="${locked?'Choose Train at the campfire first':upgradeTitle}"><span class="upg-lbl">${label} ${ROMAN[level]} ${mergeGlyphSVG(16)} ${ROMAN[level+1]} <span class="token-count">${count}</span></span></button>
+          <button class="upgrade-btn${(eligible && !baseCamp)?' upgrade-ready':''}${locked?' upgrade-locked':''}" id="upgrade-${cat}-${level}" ${disabled?'disabled':''}${locked?' aria-disabled="true"':''} title="${locked?'Choose Train at the campfire first':upgradeTitle}"><span class="upg-lbl upg-dice">${upgDie(level)}${upgDie(level)}${upgDie(level)}<span class="upg-arrow">&rarr;</span>${upgDie(level+1, true)}<span class="upg-own">${label} &middot; ${count} owned</span></span></button>
           <button id="preview-${cat}-${level}" class="upgrade-preview-btn" title="Preview the resulting die's faces">?</button>
         </div>`);
     });
   });
   app.innerHTML = `
-    <div class="panel">
+    <div class="panel ${baseCamp?'base-camp':''}">
       ${renderRoute()}
       <h2 style="margin-bottom:6px;">${baseCamp?'Base Camp':'Camp'} ${infoDot(baseCamp?'Your adventure begins here. Tinker with your dice if you like, then set out — nothing here is required.':'Prepare before pressing onward. The campfire gives you one choice: Rest or Train.')}</h2>
       ${baseCamp?'<p class="hint" style="margin:0 0 6px;">Nothing here is required — set out whenever you like.</p>':''}
@@ -4627,6 +4637,23 @@ function runHighlightsHTML(){
 // ended, four headline numbers, the final tray and the relics. "Save Card" draws the same card on a canvas
 // and shares it (phone share sheet) or downloads it as a PNG.
 const RC_DIE_COLORS = { attack:['#b33b3b','#fff3e6'], maneuver:['#e4d7ad','#241c10'], origin:['#4a8a5c','#eafbea'], alloy:['#9aa3ab','#1a1410'], gilded:['#d4af52','#241c10'], magic:['#8a5fb0','#f5eaff'] };
+// Oct 28 (Jeremy picked D1): the defeat screen names what beat you, how close you got, and one short tip.
+const DEFEAT_TIPS = [
+  'Combo dice grow with every attacking die next to them.',
+  "Rest at a Camp's fire when your Health is low.",
+  'Dice in your Back Pocket can save you from a killing blow.',
+  'Enemies show their next move. Block when a big hit is coming.',
+];
+function defeatKillerHTML(){
+  const k = S.stats && S.stats.killedByInfo;
+  if(!k || !k.name) return '';
+  const art = (typeof ART_WRONG!=='undefined' && ART_WRONG.has(k.name)) ? null : MONSTER_ART[k.name];
+  const boss = /Boss/.test(k.type||'');
+  const close = k.max && k.hp>0 && k.hp/k.max <= 0.25 ? `So close: it had only ${k.hp} Health left. ` : '';
+  const tip = boss ? 'Bosses show their next move above them, so you can Block before the big ones.' : DEFEAT_TIPS[(S.stats.turnsTaken||0) % DEFEAT_TIPS.length];
+  return `<div class="dk-killer">${art ? `<img src="${art}" alt="">` : ''}<div><div class="dk-k-kicker">What beat you</div>
+    <div class="dk-k-name">${nbHyphen(k.name)}</div><div class="dk-k-tip">${close}${tip}</div></div></div>`;
+}
 function runCardData(outcome){
   const st = S.stats;
   const name = S.charName && S.charName.trim() ? S.charName.trim() : '';
@@ -4774,12 +4801,13 @@ function summaryStatsHTML(){
     </div>`;
 }
 
-// Run-end consent card for automatic play data (Oct 15). Shown until the player answers; only when uploads are set up.
+// Run-end consent ask for automatic play data (Oct 15), on the win and defeat end screens until the player answers;
+// only when uploads are set up. Oct 28 (Jeremy): one line, the full explanation behind the info dot.
 function shareDataAskHTML(){
   if(!PLAYDATA_URL || shareDataPref()) return '';
-  return `<div class="share-ask" id="share-ask">
-      <p><strong>Help balance the game?</strong> Send how this run and your future runs go (rooms, dice, what beat you), with a random id for this device, its screen size and any error messages. No names or personal info. You can turn it off in Settings.</p>
-      <div class="small-btn-row" style="justify-content:center;"><button class="primary" onclick="shareDataAnswer(true)">Yes, share this run and future ones</button><button onclick="shareDataAnswer(false)">No thanks</button></div>
+  return `<div class="share-ask share-ask-line" id="share-ask">
+      <span>Share your runs to help balance the game? ${infoDot('Sends how this run and your future runs go (rooms, dice, what beat you), with a random id for this device, its screen size and any error messages. No names or personal info. You can turn it off in Settings.')}</span>
+      <button class="primary" onclick="shareDataAnswer(true)">Yes</button><button onclick="shareDataAnswer(false)">No</button>
     </div>`;
 }
 function shareDataAnswer(on){
@@ -4960,6 +4988,7 @@ function renderGameOver(){
       <div class="dk-box"><div class="dk-title">Keep one die for your next run</div>
         <p class="dk-hint">It joins your tray at the start of the next run.</p>
         <div class="swap-list" id="carryover-list"></div></div>
+      ${defeatKillerHTML()}
       </div>`;
     const list = document.getElementById('carryover-list');
     S.carryoverOptions.forEach(g=>{
