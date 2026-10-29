@@ -3224,52 +3224,43 @@ function openTutorialModal(stepIdx){
 // A persisted log of past runs (see recordRunHistory/getRunHistory in
 // logic.js), reachable any time from Settings -- including from the
 // Victory/Game Over screens, since the settings gear lives outside #app.
+// Oct 29 (Jeremy picked R2): each run is a small card topped with its class colour and the result.
 function runHistoryHTML(){
   const history = getRunHistory();
   const victories = history.filter(r=>r.outcome==='victory');
   const fastest = victories.length ? Math.min(...victories.map(r=>r.turnsTaken)) : null;
-  const summary = history.length
-    ? `<div class="statuses" style="justify-content:center; margin-bottom:10px;">
-        <span class="status-chip">Runs: ${history.length}</span>
-        <span class="status-chip">Victories: ${victories.length}</span>
-        ${fastest!=null ? `<span class="status-chip">Fastest clear: ${fastest} turns</span>` : ''}
-      </div>`
-    : '';
-  const rows = history.length ? history.map(r=>{
+  if(!history.length) return `<p class="hint">No runs recorded yet. Finish a run to see it here.</p>`;
+  const color = k => (CLASSES.find(c=>c.name===k) || {}).color || '#8a6a44';
+  const cards = history.map(r=>{
     const dateStr = new Date(r.date).toLocaleDateString(undefined, {month:'short', day:'numeric'});
-    return `<div class="run-history-row ${r.outcome}">
-        <span class="run-history-outcome">${r.outcome==='victory' ? '✔' : '✕'}</span>
-        <div class="run-history-main">
-          <div class="run-history-who">${r.charName?`${r.charName} the `:''}${r.origin} ${r.klass}</div>
-          <div class="run-history-detail">Floor ${r.floorReached}/3 &middot; ${r.turnsTaken} turns &middot; ${r.damageDealt} dmg &middot; ${r.overkills} overkill${r.overkills===1?'':'s'}</div>
-        </div>
-        <span class="run-history-date">${dateStr}</span>
+    const won = r.outcome==='victory';
+    return `<div class="rh-card ${won?'won':'lost'}" style="--c:${color(r.klass)}" title="${r.damageDealt} damage &middot; ${r.overkills} overkill${r.overkills===1?'':'s'}">
+        <span class="rh-date">${dateStr}</span>
+        <div class="rh-result">${won ? '&#10004; Conquered' : `&#10005; Fell on Floor ${r.floorReached}`}</div>
+        <div class="rh-who">${r.charName?`${r.charName}<br>`:''}${r.origin}<br>${r.klass}</div>
+        <div class="rh-meta">Depth ${r.depth!=null ? depthLabel(r.depth) : 0} &middot; ${r.turnsTaken} turns</div>
       </div>`;
-  }).join('') : `<p class="hint">No runs recorded yet. Finish a run to see it here.</p>`;
-  return `${summary}<div class="run-history-list">${rows}</div>
-    ${history.length ? '<div class="small-btn-row" style="justify-content:center;"><button id="run-history-clear-btn" class="danger">Clear History</button></div>' : ''}`;
+  }).join('');
+  return `<p class="hint">${history.length} run${history.length===1?'':'s'} &middot; ${victories.length} conquered${fastest!=null?` &middot; fastest ${fastest} turns`:''}</p>
+    <div class="rh-grid">${cards}</div>
+    <div class="small-btn-row" style="justify-content:center;"><button id="run-history-clear-btn" class="danger">Clear History</button></div>`;
 }
 
 // Lifetime Achievements (ACHIEVEMENTS, logic.js) -- locked entries show
 // greyed-out with just name+desc; unlocked entries show the date earned.
 // Reachable from Settings at any time (not just post-run), same as Run
 // History and the Dice Compendium.
+// Oct 29 (Jeremy picked R2): achievements are medals, gold once earned; tapping one shows how to earn it.
 function achievementsHTML(){
   const unlockedCount = ACHIEVEMENTS.filter(a=>META.achievements[a.id]).length;
-  const rows = ACHIEVEMENTS.map(a=>{
+  const medals = ACHIEVEMENTS.map(a=>{
     const unlocked = META.achievements[a.id];
     const dateStr = unlocked ? new Date(unlocked.date).toLocaleDateString(undefined, {month:'short', day:'numeric'}) : '';
-    return `<div class="achv-row ${unlocked?'unlocked':'locked'}">
-        <span class="achv-row-icon">${unlocked?'✦':lockSVG(16)}</span>
-        <div class="achv-row-main">
-          <div class="run-history-who">${a.name}</div>
-          <div class="run-history-detail">${a.desc}</div>
-        </div>
-        ${unlocked ? `<span class="run-history-date">${dateStr}</span>` : ''}
-      </div>`;
+    return `<div class="achv-medal ${unlocked?'on':''}" role="button" tabindex="0" data-name="${a.name.replace(/"/g,'&quot;')}" data-desc="${a.desc.replace(/"/g,'&quot;')}" data-date="${dateStr}">
+        <span class="achv-coin">${unlocked?'&#10022;':lockSVG(16)}</span><span class="achv-mname">${a.name}</span></div>`;
   }).join('');
-  return `<div class="statuses" style="justify-content:center; margin-bottom:10px;"><span class="status-chip">${unlockedCount}/${ACHIEVEMENTS.length} unlocked</span></div>
-    <div class="run-history-list">${rows}</div>`;
+  return `<p class="hint">${unlockedCount}/${ACHIEVEMENTS.length} earned &middot; tap a medal to see how to earn it</p>
+    <div class="achv-medals">${medals}</div><div class="achv-detail" id="achv-detail"></div>`;
 }
 // Records (Oct 13): Run History + Achievements in one tabbed window (shorter settings menu).
 function openRecordsModal(tab){
@@ -3285,6 +3276,11 @@ function openRecordsModal(tab){
     overlay.querySelectorAll('.codex-tab').forEach(b=>b.classList.toggle('on', b.dataset.tab===t));
     body.innerHTML = t==='achievements' ? achievementsHTML() : t==='backup' ? backupPanelHTML() : runHistoryHTML();
     if(t==='backup') wireBackupPanel(body);
+    body.querySelectorAll('.achv-medal').forEach(m=> m.onclick = ()=>{
+      body.querySelectorAll('.achv-medal').forEach(x=>x.classList.toggle('picked', x===m));
+      const d = body.querySelector('#achv-detail');
+      if(d) d.innerHTML = `<b>${m.dataset.name}</b> ${m.dataset.desc}${m.dataset.date?` <span class="hint">Earned ${m.dataset.date}.</span>`:''}`;
+    });
     const clr = body.querySelector('#run-history-clear-btn');
     if(clr) clr.onclick = ()=>{ clearRunHistory(); show('history'); };
   };
@@ -3312,59 +3308,24 @@ function diceCompendiumHTML(){
   tiers.forEach(t=>t.pool.forEach(d=>{ if(DISCOVERED_DICE.has(d.name) && !seen.dice.has(d.name)) newDice.add(d.name); }));
   const totalDice = tiers.reduce((n,t)=>n + t.pool.length, 0);
   const discoveredCount = tiers.reduce((n,t)=>n + t.pool.filter(d=>DISCOVERED_DICE.has(d.name)).length, 0);
-  const sections = tiers.map(t=>{
-    const rows = t.pool.map((d,i)=>{
-      const discovered = DISCOVERED_DICE.has(d.name);
-      if(!discovered){
-        // Spoiler-free until the player has actually found this die in a
-        // playthrough -- show that an entry exists without giving away its
-        // name, art or faces.
-        return `<div class="compendium-row compendium-row-locked">
-            <div class="compendium-thumb compendium-thumb-placeholder">${lockSVG(16)}</div>
-            <div class="compendium-main">
-              <div class="run-history-who">???</div>
-              <div class="compendium-faces hint">Take this die in a run to reveal it.</div>
-            </div>
-          </div>`;
-      }
-      const art = LOOT_ART[d.name];
-      const thumb = art
-        ? `<img class="compendium-thumb" src="${art}" alt="${d.name}"/>`
-        : `<div class="compendium-thumb compendium-thumb-placeholder"></div>`;
-      const facesHTML = d.faces.map(f=>`<span>${iconSpan(f.type, f.value)}</span>`).join('');
-      return `<div class="compendium-row">
-          ${thumb}
-          <div class="compendium-main">
-            <div class="run-history-who">${d.name}${newDice.has(d.name)?' <span class="new-tag">NEW!</span>':''}</div>
-            <div class="compendium-faces">${facesHTML}</div>
-            <div class="hint" style="font-size:11px; margin-top:2px;">${isBoonReady(d.name)?'Starting Boon ready':`Collected ${dieCopies(d.name)}/${BOON_COPIES_NEEDED} for a Starting Boon`}</div>
-          </div>
-        </div>`;
-    }).join('');
-    return `<div class="compendium-tier">
-        <div class="camp-section-title" style="font-weight:800;">${t.label} Dice</div>
-        <div class="compendium-list">${rows}</div>
-      </div>`;
-  }).join('');
+  CODEX_PAGES = {};
+  const facesHTML = faces => `<div class="cx-faces compendium-faces">${faces.map(f=>`<span>${iconSpan(f.type, f.value)}</span>`).join('')}</div>`;
+  const pic = name => LOOT_ART[name] ? `<img src="${LOOT_ART[name]}" alt="" loading="lazy"/>` : '<span class="cx-q">?</span>';
+  const page = (id, name, tag, tagCls, faces, note)=>{ CODEX_PAGES[id] = codexPageHTML('Dice', `${LOOT_ART[name]?`<img class="cx-big cx-big-die" src="${LOOT_ART[name]}" alt=""/>`:''}<div class="cx-pname">${name}</div>
+      <div><span class="cx-tag ${tagCls}">${tag}</span></div>${facesHTML(faces)}<p class="cx-note">${note}</p>`); };
   // Origin starting dice: always shown (every origin is visible on character select),
   // not counted in the found total (tester feedback Oct 14: couldn't find the Gnomish Mushroom Cap).
-  const originRows = ORIGINS.map(o=>{
-    const art = LOOT_ART[o.die];
-    const thumb = art ? `<img class="compendium-thumb" src="${art}" alt="${o.die}"/>` : `<div class="compendium-thumb compendium-thumb-placeholder"></div>`;
-    return `<div class="compendium-row">
-        ${thumb}
-        <div class="compendium-main">
-          <div class="run-history-who">${o.die}</div>
-          <div class="compendium-faces">${o.faces.map(f=>`<span>${iconSpan(f.type, f.value)}</span>`).join('')}</div>
-          <div class="hint" style="font-size:11px; margin-top:2px;">${o.name} starting die. ${o.blurb}</div>
-        </div>
-      </div>`;
-  }).join('');
-  const originSection = `<div class="compendium-tier">
-      <div class="camp-section-title" style="font-weight:800;">Origin Dice</div>
-      <div class="compendium-list">${originRows}</div>
-    </div>`;
-  return `${originSection}<p class="hint">Loot dice: ${discoveredCount}/${totalDice} found</p>${sections}`;
+  const originCards = ORIGINS.map((o,i)=>{ const id='o'+i; page(id, o.die, 'Origin', 't-origin', o.faces, `${o.name} starting die. ${o.blurb}`);
+    return codexCardHTML({page:id, pic:pic(o.die), name:o.die, tag:o.name, tagCls:'t-origin'}); });
+  const sections = tiers.map(t=>codexSectionHTML(`${t.label} Dice`, t.pool.map((d,i)=>{
+    const tagCls = 't-'+t.label.toLowerCase();
+    // Spoiler-free until the player has actually found this die in a playthrough.
+    if(!DISCOVERED_DICE.has(d.name)) return codexCardHTML({pic:`<span class="cx-q">${lockSVG(18)}</span>`, name:'???', tag:t.label, tagCls, locked:true});
+    const id = t.label[0]+i;
+    page(id, d.name, t.label, tagCls, d.faces, isBoonReady(d.name) ? 'Starting Boon ready.' : `Collected ${dieCopies(d.name)}/${BOON_COPIES_NEEDED} for a Starting Boon.`);
+    return codexCardHTML({page:id, pic:pic(d.name), name:d.name, tag:t.label, tagCls, isNew:newDice.has(d.name)});
+  }))).join('');
+  return `${codexSectionHTML('Origin Dice', originCards)}<p class="hint">Loot dice: ${discoveredCount}/${totalDice} found. Take a die in a run to reveal it.</p>${sections}`;
 }
 function markDiceSeen(){ const seen = loadSeen(); DISCOVERED_DICE.forEach(n=> seen.dice.add(n)); saveSeen(seen); } // viewed -- tags clear next visit
 
@@ -3831,10 +3792,19 @@ function relicCodexHTML(){
   const owned = (typeof S!=='undefined' && S && S.relics) ? S.relics : [];
   const isFound = r => found.has(r.id) || owned.includes(r.id) || (r.origin && (META.lifetime.victoriesByOrigin[r.origin]||0)>=1);
   const seenR = loadSeen();
-  const section = (title, list)=>`<h3 class="camp-section-title" style="margin:10px 0 4px;">${title}</h3>${list.map(r=>relicRowHTML(r, !isFound(r), isFound(r) && !seenR.relics.has(r.id))).join('')}`;
+  CODEX_PAGES = {};
+  const card = r=>{
+    const originName = r.origin ? ORIGINS.find(o=>o.id===r.origin).name : '';
+    if(!isFound(r)) return codexCardHTML({pic:'<span class="relic-badge relic-badge-lg relic-locked">?</span>', name:'???', tag:originName||'Shrine', tagCls:r.origin?'t-origin':'t-shrine', locked:true,
+      title: r.origin ? `Win a run as a ${originName} to earn this.` : 'Not found yet. Look for Relic Shrines.'});
+    const id = 'r'+r.id;
+    CODEX_PAGES[id] = codexPageHTML('Relics', `<div class="cx-big-relic">${relicBadgeHTML(r, 'relic-badge-lg')}</div><div class="cx-pname">${r.name}</div>
+      <div><span class="cx-tag ${r.origin?'t-origin':'t-shrine'}">${r.origin?`${originName} relic`:'Shrine relic'}</span></div><p class="cx-flav cx-desc">${r.desc}</p>`);
+    return codexCardHTML({page:id, pic:relicBadgeHTML(r, 'relic-badge-lg'), name:r.name, tag:originName||'Shrine', tagCls:r.origin?'t-origin':'t-shrine', isNew:!seenR.relics.has(r.id)});
+  };
   return `<p class="hint" style="text-align:left;">Relics ${infoDot('Permanent perks for a single run. Find them at Relic Shrines. Win a run with an Origin and it will start every later run with its own signature relic.')}</p>`
-    + section('Origin Relics', RELICS.filter(r=>r.origin))
-    + section('Shrine Relics', RELICS.filter(r=>!r.origin));
+    + codexSectionHTML('Origin Relics', RELICS.filter(r=>r.origin).map(card))
+    + codexSectionHTML('Shrine Relics', RELICS.filter(r=>!r.origin).map(card));
 }
 function markRelicsSeen(){
   const found = new Set(META.relicsFound||[]);
@@ -3845,6 +3815,15 @@ function markRelicsSeen(){
 
 // ---- Codex (Oct 13): one book with tabs, so the settings menu stays short. Bestiary is new: every
 // monster, trap and boss you've met (META.bestiary, logic.js); unmet ones show as a silhouette.
+// Oct 29 (Jeremy picked X1): the Codex is a monster book: every tab is a grid of cards on parchment, unfound entries
+// as silhouettes or locks, and tapping a found card opens its own page (CODEX_PAGES, filled by the tab's HTML function).
+let CODEX_PAGES = {};
+function codexCardHTML(o){
+  return `<div class="cx-card${o.locked?' locked':''}"${o.page?` data-page="${o.page}" role="button" tabindex="0"`:''}${o.title?` title="${o.title}"`:''}>
+    <span class="cx-pic">${o.pic}</span><span class="cx-name">${o.name}</span>${o.tag?`<span class="cx-tag ${o.tagCls||''}">${o.tag}</span>`:''}${o.isNew?'<span class="new-tag cx-new">NEW!</span>':''}</div>`;
+}
+function codexSectionHTML(title, cards){ return `<div class="cx-floor"><span>${title}</span></div><div class="cx-grid">${cards.join('')}</div>`; }
+function codexPageHTML(back, inner){ return `<div class="cx-page"><button type="button" class="cx-back">&larr; ${back}</button>${inner}</div>`; }
 const CODEX_TABS = [['bestiary','Bestiary'],['dice','Dice'],['relics','Relics'],['key','Key']];
 function bestiaryEntries(){
   const out = [];
@@ -3865,12 +3844,14 @@ function bestiaryHTML(){
   const B = META.bestiary || {};
   const all = bestiaryEntries();
   const metN = all.filter(x=>B[x.e.name]).length;
-  const row = ({e, floor})=>{
+  CODEX_PAGES = {};
+  const card = ({e, floor}, i)=>{
     const b = B[e.name]; const art = ART_WRONG.has(e.name) ? null : MONSTER_ART[e.name];
     const boss = /Boss/.test(e.type);
+    const tk = boss ? 'boss' : encounterTier(e);
     const tier = boss ? e.type : ({easy:'Easy',standard:'Standard',elite:'Elite',deadly:'Deadly'})[encounterTier(e)] + (e.type==='Trap'?' Trap':'');
-    const img = art ? `<img class="bst-art${b?'':' bst-unknown'}" src="${art}" alt="" loading="lazy"/>` : `<div class="bst-art bst-noart">?</div>`;
-    if(!b) return `<div class="bst-row locked">${img}<div class="bst-main"><div class="run-history-who">???</div><div class="hint bst-sub">${tier}</div></div></div>`;
+    const pic = art ? `<img src="${art}" alt="" loading="lazy"${b?'':' class="cx-sil"'}/>` : '<span class="cx-q">?</span>';
+    if(!b) return codexCardHTML({pic, name:'???', tag:tier, tagCls:'t-'+tk, locked:true});
     const hp = Math.round((e.health||0) * (BASE_HP_MUL[floor-1]||1));
     let moves = '';
     if(boss && BOSS_KITS[e.name]){
@@ -3880,24 +3861,22 @@ function bestiaryHTML(){
       const acts = [['dmg','hit'],['minion','minion'],['shield','block'],['heal','heal'],['hot','hot'],['dot','dot']].filter(([k])=>e[k]>0).map(([k,ic])=>`<span>${iconSpan(ic, e[k])}</span>`).join('');
       moves = `<div class="bst-moves compendium-faces">${acts}</div>`;
     }
-    return `<div class="bst-row">${img}<div class="bst-main">
-        <div class="run-history-who">${e.name}</div>
-        <div class="hint bst-sub">${tier} &middot; ${hp} HP</div>
-        ${moves}
-        ${bestiaryQuestsHTML(e)}
-        ${e.flavor ? `<div class="bst-flavor">${e.flavor}</div>` : ''}
-        <div class="bst-tally">Beaten ${b.won||0}${b.lost ? ` &middot; <span class="bst-lost">Beat you ${b.lost}</span>` : ''}</div>
-      </div></div>`;
+    const id = 'b'+i;
+    CODEX_PAGES[id] = codexPageHTML('Bestiary', `${art?`<img class="cx-big" src="${art}" alt=""/>`:''}<div class="cx-pname">${e.name}</div>
+      <div><span class="cx-tag t-${tk}">${tier} &middot; Floor ${floor} &middot; ${hp} HP</span></div>${moves}${bestiaryQuestsHTML(e)}
+      ${e.flavor ? `<p class="cx-flav">${e.flavor}</p>` : ''}
+      <div class="cx-tally">Beaten ${b.won||0}${b.lost ? ` &middot; <span class="bst-lost">Beat you ${b.lost}</span>` : ''}</div>`);
+    return codexCardHTML({page:id, pic, name:e.name, tag:tier, tagCls:'t-'+tk});
   };
   const sections = [1,2,3].map(fl=>{
-    const list = all.filter(x=>x.floor===fl).sort((a,b)=>(/Boss/.test(a.e.type)-/Boss/.test(b.e.type)) || ((TIER_ORDER[encounterTier(a.e)]||0)-(TIER_ORDER[encounterTier(b.e)]||0)));
-    return `<div class="camp-section-title" style="font-weight:800; margin:10px 0 4px;">Floor ${fl}</div>${list.map(row).join('')}`;
+    const list = all.map((x,i)=>({x,i})).filter(o=>o.x.floor===fl).sort((a,b)=>(/Boss/.test(a.x.e.type)-/Boss/.test(b.x.e.type)) || ((TIER_ORDER[encounterTier(a.x.e)]||0)-(TIER_ORDER[encounterTier(b.x.e)]||0)));
+    return codexSectionHTML(`Floor ${fl}`, list.map(o=>card(o.x, o.i)));
   }).join('');
-  return `<p class="hint">${metN}/${all.length} met</p>${sections}`;
+  return `<p class="hint">${metN}/${all.length} met &middot; tap one to read its page</p>${sections}`;
 }
 function openCodexModal(tab){
   tab = tab || 'bestiary';
-  const overlay = el(`<div class="modal-overlay"><div class="modal codex-modal" style="text-align:center; max-width:420px;">
+  const overlay = el(`<div class="modal-overlay"><div class="modal codex-modal codex-book" style="text-align:center; max-width:420px;">
       <button class="modal-x-btn" id="codex-x-btn" title="Close">✕</button>
       <h2 style="margin-top:0;">Codex</h2>
       <div class="codex-tabs">${CODEX_TABS.map(([id,l])=>`<button class="codex-tab" data-tab="${id}">${l}</button>`).join('')}</div>
@@ -3908,9 +3887,16 @@ function openCodexModal(tab){
   const show = t=>{
     overlay.querySelectorAll('.codex-tab').forEach(b=>b.classList.toggle('on', b.dataset.tab===t));
     body.innerHTML = t==='dice' ? diceCompendiumHTML() : t==='relics' ? relicCodexHTML() : t==='key' ? keyCardHTML() : bestiaryHTML();
-    body.scrollTop = 0;
+    body.scrollTop = 0; cur = t;
     if(t==='dice') markDiceSeen(); if(t==='relics') markRelicsSeen();
   };
+  let cur = tab, listScroll = 0;
+  const openPage = c=>{ const html = CODEX_PAGES[c.dataset.page]; if(!html) return; listScroll = body.scrollTop; body.innerHTML = html; body.scrollTop = 0; };
+  body.onclick = ev=>{
+    const c = ev.target.closest('.cx-card[data-page]'); if(c){ openPage(c); return; }
+    if(ev.target.closest('.cx-back')){ const y = listScroll; show(cur); body.scrollTop = y; }
+  };
+  body.onkeydown = ev=>{ const c = ev.target.closest && ev.target.closest('.cx-card[data-page]'); if(c && (ev.key==='Enter' || ev.key===' ')){ ev.preventDefault(); openPage(c); } };
   overlay.querySelectorAll('.codex-tab').forEach(b=> b.onclick = ()=> show(b.dataset.tab));
   show(tab);
   const close = ()=> closeModal(overlay);

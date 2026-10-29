@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.1 (Oct 29, 2026)
+- Codex (Jeremy's pick X1): a parchment monster book. Bestiary, Dice and Relics are card grids; tap a card for its own page.
+- Records (Jeremy's pick R2): runs as cards in their class colour; achievements as medals (tap one to see how to earn it).
 ## 1.42.0 (Oct 29, 2026)
 Second screen pass (Jeremy's picks T3, D1, C2, K1):
 - Title: the cover fills more of the screen, New Run is the big button, Codex/Records/How to Play share a row, and a credit line names Jeremy and Katlynn.

@@ -1,6 +1,6 @@
 # Dungeon Scramble — TODO
 
-Updated Oct 29, 2026 (build 1.42.0). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
+Updated Oct 29, 2026 (build 1.42.1). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
 study results in `STUDY_FINDINGS.md`. The release checklist (40 items, owner and status) is the Checklist tab of
 the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 
@@ -18,7 +18,7 @@ the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 ## Release gaps (review Oct 28)
 Fixed in 1.41.96: tutorial cards, defeat screen, copy, dev features, credits, desktop backdrop, shrine text. Type and buttons
 done in 1.41.97 (Alegreya, toy bevel). Open: the credits' art
-line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jeremy's. Art treatment settled in 1.41.98 (grain kept, cover matched). Second visual review (Oct 28): blank sides, idle Go, Victory chest, equip window and Settings fixed in 1.41.99; title, defeat, Base Camp, boss bar and consent line done in 1.42.0 (loot names in the tray stay). Open: Codex and Records polish (mockups next).
+line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jeremy's. Art treatment settled in 1.41.98 (grain kept, cover matched). Second visual review (Oct 28): blank sides, idle Go, Victory chest, equip window and Settings fixed in 1.41.99; title, defeat, Base Camp, boss bar and consent line done in 1.42.0 (loot names in the tray stay). Codex and Records polished in 1.42.1.
 
 ## Waiting on Jeremy
 - **Title art:** new cover drawn from scratch on the 2048x2434 canvas (`DungeonScramble_TitleArt_canvas.psd`); the chat
