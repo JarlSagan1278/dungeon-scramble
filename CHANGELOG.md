@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.5 (Oct 29, 2026)
+- Inked ivy (Jeremy's pick V2): the arch's moss and vines get the same dark outline as the rest of the art, and the hanging ivy gathers at the arch's two shoulders with real leaves, more strands on deeper floors.
+- Each floor looks deeper (Jeremy's pick D1): warm torchlight on Floor 1, cool and damp on Floor 2, deep violet with darker edges on Floor 3. Only the room behind the fight changes.
 ## 1.42.4 (Oct 29, 2026)
 - Toy controls: Settings uses chunky on/off switches and volume sliders with a fat round knob instead of the browser's own; the "i" info dots are small raised buttons; tooltips and count badges get the standard outline and shadow.
 ## 1.42.3 (Oct 29, 2026)

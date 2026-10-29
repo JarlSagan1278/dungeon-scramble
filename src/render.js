@@ -278,22 +278,47 @@ function archPoints(w,h,i,step){ const pts=[], rx=120, ry=90;
   for(let a=1.5*Math.PI;a<=2*Math.PI+0.001;a+=step/110) pts.push([w-rx+(rx-i)*Math.cos(a), ry+(ry-i)*Math.sin(a)]);
   for(let y=ry;y<=h-12;y+=step) pts.push([w-i,y]);
   return pts; }
+// Oct 29 (Jeremy picked V2): the greenery is inked like the rest of the art (dark outline on every leaf, blob and stem),
+// and the hanging ivy gathers at the arch's two shoulders, more strands on deeper floors, leaving the top middle clear.
+const IVY_INK = '#0c0705', IVY_G = ['#3f6a2c','#4f7a34','#5f8c3c','#6f9a46'];
+function ivyLeafSVG(x,y,ang,sz,c){
+  return `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${ang.toFixed(0)})"><path d="M0,0 C${(sz*.5).toFixed(1)},${(-sz*.55).toFixed(1)} ${(sz*1.2).toFixed(1)},${(-sz*.35).toFixed(1)} ${(sz*1.5).toFixed(1)},0 C${(sz*1.2).toFixed(1)},${(sz*.35).toFixed(1)} ${(sz*.5).toFixed(1)},${(sz*.55).toFixed(1)} 0,0Z" fill="${c}" stroke="${IVY_INK}" stroke-width="1.5" stroke-linejoin="round"/><path d="M1,0 L${(sz*1.2).toFixed(1)},0" stroke="rgba(255,255,255,.35)" stroke-width="1" fill="none"/></g>`;
+}
+function ivyStrandSVG(rnd,x,y0,len,sway,lvl){
+  const d = `M${x.toFixed(1)},${y0.toFixed(1)} q${sway.toFixed(1)},${(len/2).toFixed(1)} ${(sway/2).toFixed(1)},${len.toFixed(1)}`;
+  let s = `<path d="${d}" stroke="${IVY_INK}" stroke-width="${(4.6+lvl*.4).toFixed(1)}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${IVY_G[1]}" stroke-width="${(2+lvl*.4).toFixed(1)}" fill="none" stroke-linecap="round"/>`;
+  const nl = Math.max(2, Math.round(len/11));
+  for(let i=1;i<=nl;i++){ const t=i/(nl+.4), px=x+sway*2*t*(1-t)+sway/2*t*t, py=y0+len*t, side=i%2?1:-1;
+    s += ivyLeafSVG(px, py, side>0 ? 20+rnd()*25 : 160-rnd()*25, 5.5+rnd()*2.5, IVY_G[2+(i%2)]); }
+  return s;
+}
+function ivyCornersSVG(w,h,lvl){
+  let s=11*lvl+7; const rnd=()=>{ s=(s*9301+49297)%233280; return s/233280; };
+  const torchZone=(x,y)=>(x<40||x>w-40)&&y>34&&y<96;
+  let v=''; const N=[0,2,3,4][lvl];
+  for(let k=0;k<N;k++) for(const side of [-1,1]){
+    const t=.10+k*.075+rnd()*.03, tt=side<0?t:1-t, x=46+(w-92)*tt, y=Math.max(3,60*Math.pow(2*tt-1,2)*.9+4), len=18+rnd()*(16+lvl*12)-k*4;
+    if(torchZone(x,y+len)) continue;
+    v += ivyStrandSVG(rnd,x,y,len,side*(4+rnd()*6),lvl);
+  }
+  return v;
+}
 function archFrameSVG(w,h,lvl){
-  archFrameSVG.vines = '';
+  archFrameSVG.vines = ivyCornersSVG(w,h,Math.max(1,Math.min(3,lvl)));
   const AP = archPath(w,h,5);
   // Outlined bricks: one stone band over a black underlay, cut into bricks by thin black joints; a faint second pass on a
   // different period lightens a few bricks at irregular intervals so it reads as stonework, not stripes.
   const base = `<path d="${AP}" fill="none" stroke="#0c0705" stroke-width="14"/><path d="${AP}" fill="none" stroke="#8d7d68" stroke-width="10" stroke-dasharray="21 2.5"/><path d="${AP}" fill="none" stroke="#b3a48d" stroke-width="10" stroke-dasharray="21 47" stroke-dashoffset="-9" opacity=".32"/><path d="${AP}" fill="none" stroke="#6f6252" stroke-width="10" stroke-dasharray="21 61" stroke-dashoffset="-44" opacity=".35"/><path d="${archPath(w,h,2)}" fill="none" stroke="#a89880" stroke-width="1.5" opacity=".35"/>`;
   if(lvl<=1){
-    return base + `<g fill="#4f7a34" opacity=".92">
+    return base + `<g fill="#4f7a34" stroke="${IVY_INK}" stroke-width="1.6">
   <circle cx="70" cy="14" r="6"/><circle cx="80" cy="9" r="4.5"/><circle cx="60" cy="20" r="4"/><circle cx="92" cy="7" r="3.5"/>
   <circle cx="${w-70}" cy="14" r="6"/><circle cx="${w-80}" cy="9" r="4.5"/><circle cx="${w-60}" cy="20" r="4"/><circle cx="${w-92}" cy="7" r="3.5"/>
   <circle cx="9" cy="${h-40}" r="5"/><circle cx="8" cy="${h-28}" r="6.5"/><circle cx="14" cy="${h-16}" r="5"/>
   <circle cx="${w-9}" cy="${h-40}" r="5"/><circle cx="${w-8}" cy="${h-28}" r="6.5"/><circle cx="${w-14}" cy="${h-16}" r="5"/>
   <circle cx="${w/2-10}" cy="4" r="4"/><circle cx="${w/2+8}" cy="3" r="3.5"/></g>
- <g stroke="#4f7a34" stroke-width="2" fill="none" stroke-linecap="round" opacity=".92">
+ ${['#0c0705 5','#4f7a34 2'].map(st=>{ const [c,sw]=st.split(' '); return `<g stroke="${c}" stroke-width="${sw}" fill="none" stroke-linecap="round">
   <path d="M66,20 q-3,14 1,26"/><path d="M84,13 q2,12 -1,20"/><path d="M${w-66},20 q3,14 -1,26"/><path d="M${w-84},13 q-2,12 1,20"/>
-  <path d="M10,${h-44} q4,-10 1,-22"/><path d="M${w-10},${h-44} q-4,-10 -1,-22"/></g>`;
+  <path d="M10,${h-44} q4,-10 1,-22"/><path d="M${w-10},${h-44} q-4,-10 -1,-22"/></g>`; }).join('')}`;
   }
   let s=11*lvl+3; const rnd=()=>{ s=(s*9301+49297)%233280; return s/233280; };
   const G=['#3f6a2c','#4f7a34','#5f8c3c','#6f9a46'];
@@ -302,25 +327,17 @@ function archFrameSVG(w,h,lvl){
   const dens=[0,1,2.4,4.6][lvl];
   const pts=archPoints(w,h,5,6);
   let g='';
-  pts.forEach(p=>{ if(torchZone(p[0],p[1])) return; if(rnd()<0.10*dens){ const n=1+Math.floor(rnd()*2*lvl); for(let k=0;k<n;k++){ g+=`<circle cx="${(p[0]+(rnd()-.5)*10).toFixed(1)}" cy="${(p[1]+(rnd()-.5)*10).toFixed(1)}" r="${(2+rnd()*(2+lvl*1.6)).toFixed(1)}" fill="${G[Math.floor(rnd()*4)]}"/>`; } } });
+  pts.forEach(p=>{ if(torchZone(p[0],p[1])) return; if(rnd()<0.10*dens){ const n=1+Math.floor(rnd()*2*lvl); for(let k=0;k<n;k++){ g+=`<circle cx="${(p[0]+(rnd()-.5)*10).toFixed(1)}" cy="${(p[1]+(rnd()-.5)*10).toFixed(1)}" r="${(2+rnd()*(2+lvl*1.6)).toFixed(1)}" fill="${G[Math.floor(rnd()*4)]}" stroke="${IVY_INK}" stroke-width="1.6"/>`; } } });
   out+=`<g opacity=".93">${g}</g>`;
   if(lvl>=3){
     out+=`<path d="${archPath(w,h,5)}" fill="none" stroke="#4a7430" stroke-width="9" stroke-dasharray="14 5 6 7 11 4" opacity=".8"/>`;
     out+=`<path d="${archPath(w,h,2)}" fill="none" stroke="#6f9a46" stroke-width="3" stroke-dasharray="3 9" stroke-linecap="round" opacity=".8"/>`;
   }
-  const vineN=[0,4,8,13][lvl]; let v='';
-  for(let k=0;k<vineN;k++){
-    const t=(k+.5)/vineN, x=46+(w-92)*t+(rnd()-.5)*10, yTop=Math.max(3, 60*Math.pow(2*t-1,2)*0.9+4);
-    const len=10+rnd()*(10+lvl*10); if(torchZone(x,yTop+len)) continue;
-    const sway=(rnd()-.5)*10;
-    v+=`<path d="M${x.toFixed(1)},${yTop.toFixed(1)} q${sway.toFixed(1)},${(len/2).toFixed(1)} ${(sway/2).toFixed(1)},${len.toFixed(1)}" stroke="${G[1]}" stroke-width="${(1.6+lvl*.4).toFixed(1)}" fill="none" stroke-linecap="round"/>`;
-    if(lvl>=2){ const lx=(x+sway/2+3).toFixed(1), ly=(yTop+len*.6).toFixed(1), mx=(x+sway/2-3).toFixed(1), my=(yTop+len*.9).toFixed(1);
-      v+=`<ellipse cx="${lx}" cy="${ly}" rx="3.6" ry="2" fill="${G[2]}" transform="rotate(-30 ${lx} ${ly})"/><ellipse cx="${mx}" cy="${my}" rx="3.6" ry="2" fill="${G[3]}" transform="rotate(30 ${mx} ${my})"/>`; }
-  }
-  archFrameSVG.vines = v; // hanging vines go on their own layer behind the quest paper (decorateArch, Oct 17)
+  // hanging ivy (ivyCornersSVG, set above) goes on its own layer behind the quest paper (decorateArch, Oct 17)
   const n=[0,2,4,7][lvl]; let sv='';
   for(let k=0;k<n;k++){ const side=k%2?1:-1, x=side>0?w-9:9, y0=h-14-Math.floor(k/2)*10, len=22+rnd()*(14+lvl*8);
-    sv+=`<path d="M${x},${y0} q${side*-4},${-len/2} ${side*-1},${-len}" stroke="${G[1]}" stroke-width="${(1.6+lvl*.4).toFixed(1)}" fill="none" stroke-linecap="round"/>`; }
+    const d=`M${x},${y0} q${side*-4},${-len/2} ${side*-1},${-len}`;
+    sv+=`<path d="${d}" stroke="${IVY_INK}" stroke-width="${(4.6+lvl*.4).toFixed(1)}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${G[1]}" stroke-width="${(1.6+lvl*.4).toFixed(1)}" fill="none" stroke-linecap="round"/>`; }
   out+=sv;
   if(lvl>=2){ const fl=[0,0,5,9][lvl]; let f=''; for(let k=0;k<fl;k++){ const p=pts[Math.floor(rnd()*pts.length)]; if(torchZone(p[0],p[1])) continue; f+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.2" fill="${k%2?'#f2d35c':'#f4eee0'}"/>`; } out+=f; }
   if(lvl>=3){
@@ -675,6 +692,7 @@ function watchRoomFloor(card){
     ROOM_WATCHED = card;
   }catch(e){}
 }
+const ROOM_TINTS = [null, ['rgba(255,170,90,.10)','rgba(0,0,0,0)'], ['rgba(70,120,110,.28)','rgba(0,0,0,.18)'], ['rgba(80,60,150,.36)','rgba(0,0,0,.38)']];
 function decorateArch(){
   try{
     const card = document.querySelector('#enc-panel .fo-arch');
@@ -715,6 +733,11 @@ function decorateArch(){
     card.appendChild(decorateArch._c.img);
     // the vines layer goes first in the card, so the quest paper and the monster (same layer, later) paint over it
     if(decorateArch._c.vimg) card.insertBefore(decorateArch._c.vimg, card.firstChild);
+    // Oct 29 (Jeremy picked D1): the room's colour and light change with depth -- warm torchlight on Floor 1, cool and damp
+    // on Floor 2, deep violet with darker edges on Floor 3. Under everything else in the card, so figures and text are untouched.
+    card.querySelectorAll('.room-tint').forEach(n=>n.remove());
+    const T = ROOM_TINTS[lvl];
+    if(T) card.insertAdjacentHTML('afterbegin', `<div class="room-tint" style="background:${T[0]};mix-blend-mode:multiply"></div><div class="room-tint" style="background:radial-gradient(ellipse at 50% 45%, transparent 45%, ${T[1]} 100%)"></div>`);
     try{ document.body.classList.toggle('is-resolving', !!S.transitioning); }catch(e){}
     syncIdleBreath(); syncMascotHop(); rollHpNumbers();
     // Headroom above the monster (offset sizes again), so big monsters grow upward only until the arch would hide them.
