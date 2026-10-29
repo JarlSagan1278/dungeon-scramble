@@ -79,9 +79,9 @@ Tips:
 |---|---|---|---|
 | Friends and family | | | |
 | Board-game friends | | | |
-| r/WebGames | planned Thu Oct 29 | | |
+| r/WebGames | Oct 29 (link post + first comment) | | demo 1.42.2 live on itch; numbers due Oct 30 |
 | r/roguelites | | | |
 | r/playmygame | Oct 27, 8:00 (promo + cover gallery) | | |
 | itch forum (Release Announcements) | Oct 28 (tag: Browser) | | |
 | Discord | | | |
-| itch devlog | Oct 27 ("Floor 1 is free to play"); Oct 28 ("Faster start: three taps to your first die") | | Oct 28: demo 1.41.94 uploaded (quick start: first run opens on the guided fight) |
+| itch devlog | Oct 27 ("Floor 1 is free to play"); Oct 28 ("Faster start: three taps to your first die") | | Oct 28: demo 1.41.94 uploaded (quick start: first run opens on the guided fight); Oct 29: demo 1.42.2 uploaded (new font, toy buttons, grain cover, screen passes) |
