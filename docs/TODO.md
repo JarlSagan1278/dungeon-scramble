@@ -1,6 +1,6 @@
 # Dungeon Scramble — TODO
 
-Updated Oct 29, 2026 (build 1.42.2). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
+Updated Oct 29, 2026 (build 1.42.3). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
 study results in `STUDY_FINDINGS.md`. The release checklist (40 items, owner and status) is the Checklist tab of
 the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 
@@ -31,6 +31,7 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
 - **Custom domain** (play.dungeonscramble.com on Cloudflare): instructions given Oct 26.
 
 ## Next for Claude
+- **Room dressing (reopened Oct 29):** mock up a per-floor sense of going deeper (wall tint or one prop per floor) and a vines redo; Jeremy: "the vines need some work in particular".
 - **Rulebook text refresh** (checklist #16): the PDF's rules lag the game (minions, Boost tokens, Swap/Reroll,
   campfire Rest or Train, quick start). `npm run rulebook`.
 - **Performance on slow phones:** ~1.5 s of script per turn at CPU x4 (renderGame/placeVs) and ~500 ms of style work

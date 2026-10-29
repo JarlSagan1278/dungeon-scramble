@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.3 (Oct 29, 2026)
+- How to Play is a parchment page, like the Codex (Jeremy: parchment is for in-world objects).
+- Enter the Dungeon and the camp's main button use the title font, like New Run (Jeremy: Metamorphous for titles and the one big main button on a screen).
 ## 1.42.2 (Oct 29, 2026)
 - Consistent outlines and shadows: the fight rail buttons (Skill, Pocket, Item, Clear, Go) get the same raised toy bevel and shadow as every other button; settings rows, the setup screen's showcases and the loot cards get the standard outline weight (nothing is outlined at 1px any more). No sizes change.
 ## 1.42.1 (Oct 29, 2026)

@@ -37,8 +37,8 @@ Digital prototype of the board game Jeremy designed with his wife Katlynn (Boggl
 - Pocket/Organize fold in camp: measure positions after applying absolute positioning, cluster rows with ~16px tolerance.
 
 ## Design rules Jeremy has set
-- Toy-like look: chunky outlines, dark-brown base with light-brown windows; never the same color next to itself; each button its own color; Metamorphous titles, Alegreya (bundled, Oct 28) elsewhere; buttons keep their own colours with a chunky toy bevel (Oct 28).
-- Every interaction should feel as good as possible; no room dressing (banners/skulls) for now; dice upgrades = filigree borders/emblazoned corners (no glows).
+- Toy-like look: chunky outlines (3px windows/cards/dice, 2px buttons/chips, never 1px); every button a raised toy with its own colour (bevel + drop shadow); never the same color next to itself; gold = the main action. Surfaces (Oct 29): dark brown for menus and pop-ups, light brown for camp and character-select cards, parchment only for in-world objects (Quests sign, the Codex book, How to Play). Metamorphous for titles and the one big main button on a screen, Alegreya (bundled) elsewhere.
+- Every interaction should feel as good as possible; room dressing is open again (Oct 29: more props and a sense of going deeper per floor, the vines need work), refine rather than clutter; dice upgrades = filigree borders/emblazoned corners (no glows).
 - Rules: enemy Shield absorbs player damage; Block/statuses reset each room; minions clear one per damage dealt (+ Leap-over), never carry between fights; loot dice need 3 copies to unlock as Starting Boon; a Back Pocket save spends the whole Pocket (1.41.16); each Camp's fire is Rest OR Train (combining dice).
 - "Heat" difficulty was renamed **depth**; class badge shows highest depth cleared.
 - Boss action cycle rework is approved (Oct 11): bosses should be much more challenging and strategic around the next-turn info. Boost on Maneuver II/III is allowed now (Jeremy, Oct 13: it fits maneuvering); he prefers strong Block faces over passive riders for high Maneuver dice.

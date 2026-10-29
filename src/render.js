@@ -3202,7 +3202,7 @@ function openTutorialModal(stepIdx){
   const n = TUTORIAL_STEPS.length;
   const step = TUTORIAL_STEPS[stepIdx];
   const dots = TUTORIAL_STEPS.map((_,i)=>`<span class="tutorial-dot ${i===stepIdx?'active':''}"></span>`).join('');
-  const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:360px;">
+  const overlay = el(`<div class="modal-overlay"><div class="modal parchment-page" style="text-align:center; max-width:360px;">
       <h2 style="margin-top:0;">${step.title}</h2>
       <p>${step.body}</p>
       <div class="tutorial-dots">${dots}</div>
