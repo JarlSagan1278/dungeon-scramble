@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.8 (Oct 30, 2026)
+Jeremy's tutorial notes:
+- Guided first turn shows Hit vs Combo clearly: the Combo now touches three Hits, the dice feeding it glow, and the bubble uses the real numbers ("A Hit deals just its number. A Combo grows with every die touching it: this one touches 3, so it deals 4", then "Hits 3 + Combo 4 = 7 damage").
+- No shrine in the first two rooms of a run (a shrine as room 2 interrupted the tutorial).
 ## 1.42.7 (Oct 30, 2026)
 - Blank die sides are plain again (Jeremy's pick A): the engraved socket from 1.41.99 ran into the curved names on loot and origin dice.
 ## 1.42.6 (Oct 30, 2026)

@@ -1186,7 +1186,9 @@ function drawRoomCard(floor){
   const unused = c => !S.usedCards.has(c.name);
   // Shrine chances follow the room's normal tier, before Night Shift raises it (Jeremy, Oct 14: keep consistent access to shrines)
   const baseTier = ROOM_TIER_SLOTS[S.routeStep] || 'standard';
-  if(!isVeryFirstEncounter && baseTier!=='elite' && !S.segmentShrineUsed && floor.shrines.length && Math.random() < shrineSlotChance()){
+  // Oct 30 (Jeremy): no shrine in the first two rooms of a run either -- a shrine as room 2 interrupts the tutorial flow
+  const tooEarlyForShrine = S.floorIdx===0 && S.routeStep<=2;
+  if(!tooEarlyForShrine && baseTier!=='elite' && !S.segmentShrineUsed && floor.shrines.length && Math.random() < shrineSlotChance()){
     const sh = floor.shrines.filter(unused);
     return pick(sh.length ? sh : floor.shrines);
   }
@@ -1526,6 +1528,15 @@ function guideSetupTray(){
     if(from!==to){ const tmp = S.tray[to]; S.tray[to] = S.tray[from]; S.tray[from] = tmp; for(let j=k+1;j<3;j++) if(src[j]===to) src[j] = from; }
     const cell = S.tray[to]; cell.faceIdx = faceAt(cell.die, types[k]); cell.blank = false;
   }
+  // Oct 30 (Jeremy: make Hit vs Combo stand out): two more Hits touch the Combo (above and below it), so it clearly out-hits a Hit
+  if(cType==='combo') [2, 10].forEach(slot=>{
+    for(let i=0;i<S.tray.length;i++){
+      if(T.includes(i) || i===2 || i===10) continue;
+      const c = S.tray[i]; const fi = c.minion ? -1 : faceAt(c.die, 'hit');
+      if(fi<0) continue;
+      const tmp = S.tray[slot]; S.tray[slot] = c; S.tray[i] = tmp; S.tray[slot].faceIdx = fi; S.tray[slot].blank = false; break;
+    }
+  });
   S.guide.plan = T; S.guide.stage = 't1';
   teleLog('guide_start', {});
 }

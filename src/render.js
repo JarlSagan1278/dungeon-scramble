@@ -5175,6 +5175,22 @@ function updateGuide(){
   if(S.guide.stage==='t1'){
     const n = Math.min(S.path.length, GUIDE_TEXT.t1.length - 1);
     text = GUIDE_TEXT.t1[n];
+    // Oct 30 (Jeremy): make Hit vs Combo stand out -- real numbers from this tray, and the dice feeding the Combo glow
+    const plan = S.guide.plan, ci = plan[2];
+    tray.querySelectorAll('.guide-link').forEach(d=>d.classList.remove('guide-link'));
+    try{
+      const dmg = path => computePathEffects(path).totalDamage;
+      const comboIsCombo = getFaceForIdx(ci).type==='combo';
+      if(comboIsCombo && (n===2 || n===3)){
+        const nb = attackNeighborIndices(ci), x = dmg([ci]), h = dmg([plan[0]]) + dmg([plan[1]]);
+        if(n===2){
+          text = `One more! A <b>Hit</b> deals just its number. A <b>Combo</b> grows with every die touching it on the board: this one touches ${nb.length}, so it deals <b>${x}</b>.`;
+          nb.forEach(j=>{ const d = tray.querySelector(`.die[data-idx="${j}"]`); if(d) d.classList.add('guide-link'); });
+        } else if(S.path.length===plan.length){
+          text = `Hits ${h} + Combo ${x} = <b>${dmg(S.path)}</b> damage. Keep going through more dice, or tap <b>Go</b>!`;
+        }
+      }
+    }catch(e){}
     target = S.path.length < S.guide.plan.length ? tray.querySelector(`.die[data-idx="${S.guide.plan[S.path.length]}"]`) : document.getElementById('resolve-btn');
   } else if(S.guide.stage==='t2' && S.needRoll){
     text = GUIDE_TEXT.t2roll;
