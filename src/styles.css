@@ -3149,10 +3149,7 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 .loot-chest-btn, .loot-chest-btn:active{ box-shadow:none !important; }
 
 /* ---- Oct 28 screen fixes (Jeremy: 1C, 2A, 3A, 7A, 8B) ---- */
-/* 1C: a blank side is an engraved empty socket, so it reads as the die's empty face, not missing art. */
-.die .blank-socket{ position:absolute; inset:16%; border-radius:8px; pointer-events:none;
-  box-shadow:inset 0 2px 3px rgba(0,0,0,.40), 0 1px 0 rgba(255,255,255,.22);
-  background:repeating-linear-gradient(45deg, rgba(0,0,0,.07) 0 2px, transparent 2px 6px); }
+/* Blank sides stay plain (Jeremy, Oct 30: option A; the 1C socket collided with loot dice's curved names). */
 /* 2A: before the first tap Go is a dark slot that says what to do; disabled rail buttons keep their colour, dimmed. */
 .util-btn.rail-go .go-hint{ display:none; }
 .util-btn.rail-go.disabled{ opacity:1 !important; background:#2a1d13 !important; color:rgba(233,215,174,.5);

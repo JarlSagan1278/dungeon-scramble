@@ -1486,7 +1486,6 @@ function renderDie(cell, idx){
             </div>` : ''}
             ${(!cell.minion && !cell.blank && ['gilded','alloy','magic'].includes(cell.die.cat)) ? `<span class="die-sheen sheen-${cell.die.cat}" style="--sd:${(idx*0.37).toFixed(2)}s"></span>` : ''}
             ${nameTag}
-            ${(isBlank && !cell.minion) ? '<i class="blank-socket" aria-hidden="true"></i>' : ''}
             ${comboRingHTML ? label.replace('<span class="icon-svg">','<span class="icon-svg">'+comboRingHTML) : label}
             ${resolveFx && resolveFx.text ? `<span class="delta-float ${resolveFx.cls}" ${resolveFx.size?`style="font-size:${resolveFx.size}px;"`:''}>${resolveFx.text}</span>` : ''}
           </div>`;

@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.7 (Oct 30, 2026)
+- Blank die sides are plain again (Jeremy's pick A): the engraved socket from 1.41.99 ran into the curved names on loot and origin dice.
 ## 1.42.6 (Oct 30, 2026)
 Jeremy's playtest notes:
 - Title: the cover's logo is centred (the art has it a little right of centre), and the screen fits with every class's depth badge (smaller badges; the tester-only playtest note and version line are gone from the title, the version is in Settings).
