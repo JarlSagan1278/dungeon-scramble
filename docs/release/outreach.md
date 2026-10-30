@@ -84,7 +84,7 @@ Tips:
 | r/playmygame | Oct 27, 8:00 (promo + cover gallery) | | |
 | itch forum (Release Announcements) | Oct 28 (tag: Browser) | | |
 | Discord | | | |
-| itch devlog | Oct 27 ("Floor 1 is free to play"); Oct 28 ("Faster start: three taps to your first die") | | Oct 28: demo 1.41.94 uploaded (quick start: first run opens on the guided fight); Oct 29: demo 1.42.2 uploaded (new font, toy buttons, grain cover, screen passes) |
+| itch devlog | Oct 27 ("Floor 1 is free to play"); Oct 28 ("Faster start: three taps to your first die") | | Oct 28: demo 1.41.94 uploaded (quick start: first run opens on the guided fight); Oct 29: demo 1.42.2 uploaded (new font, toy buttons, grain cover, screen passes); Oct 30: demo 1.42.9 zip made (playtest fixes, tutorial Hit vs Combo and dice colours, no early shrine) |
 
 ### itch numbers, Oct 29 (last 30 days, from the dashboard)
 45 views, 16 browser plays (36% of views), 1 rating, 1 collection, 0 comments; 891 impressions in 7 days, 1.01% click-through. Best day so far is Oct 29 (r/WebGames day): about 11 views and 6 plays. Referrers: Reddit about 11 visits in total (reddit.com 7, r/WebGames, old/out.reddit, the Reddit app), itch browse and tag pages about 13, dungeonscramble.com 3. Play-data sheet: still no runs from anyone but the two testers (runs only arrive when a run ends and the player says yes).
