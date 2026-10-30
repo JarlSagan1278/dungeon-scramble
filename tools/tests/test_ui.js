@@ -101,7 +101,7 @@ const SHOTS = process.env.SHOTS || ''; // set SHOTS=<dir> to save screenshots
     render();
     const b = document.getElementById('upgrade-attack-1');
     res.btn = b ? { cls: b.className, disabled: b.disabled, aria: b.getAttribute('aria-disabled') } : null;
-    res.hint = !!document.querySelector('.upgrade-locked-hint');
+    res.hint = /Unlocks combining/.test((document.getElementById('train-btn')||document.querySelector('.cf-train')||{}).textContent||''); // Oct 30: the Train button's subtitle replaced the hint line
     res.trainDisabled = document.getElementById('train-btn').disabled;
     return res;
   });

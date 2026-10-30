@@ -870,7 +870,7 @@ function renderTitle(){
   const saved = hasSave() ? peekSave() : null;
   const L = META.lifetime;
   const lifetimeLine = L.runsPlayed>0
-    ? `<p class="hint" style="text-align:center; margin:0 0 12px;">${L.runsPlayed} run${L.runsPlayed===1?'':'s'} played &middot; ${L.victories} victor${L.victories===1?'y':'ies'}</p>`
+    ? `<p class="hint" style="text-align:center; margin:0 0 6px;">${L.runsPlayed} run${L.runsPlayed===1?'':'s'} played &middot; ${L.victories} victor${L.victories===1?'y':'ies'}</p>`
     : '';
   const continueBtn = saved ? `
       <button class="primary" id="title-continue-btn">Continue Saved Game</button>
@@ -895,9 +895,7 @@ function renderTitle(){
             </div>
           </div>
           <p class="title-credit">A dice-path roguelike from the board game<br>by Jeremy and Katlynn Friedman</p>
-          ${(()=>{ const earned = CLASSES.filter(k=>!k.debug && DEPTH_BEST.byClass[k.id] && DEPTH_BEST.byClass[k.id].depth); return earned.length ? `<div class="title-badges">${earned.map(k=>`<div class="title-badge">${depthBadgeSVG(k.color, DEPTH_BEST.byClass[k.id].depth, 52, k.id)}</div>`).join('')}</div>` : ''; })()}
-          ${BUILD.release ? '' : `<p class="hint" style="text-align:center; margin:10px 0 0; font-size:12px;">Playtesting? After a few runs, tap the gear &rarr; Export Play Data and send the file.</p>`}
-          ${BUILD.release ? '' : `<p class="hint" style="text-align:center; margin:6px 0 0; font-size:13px; font-weight:700; opacity:.8;">v${GAME_VERSION}</p>`}
+          ${(()=>{ const earned = CLASSES.filter(k=>!k.debug && DEPTH_BEST.byClass[k.id] && DEPTH_BEST.byClass[k.id].depth); return earned.length ? `<div class="title-badges">${earned.map(k=>`<div class="title-badge">${depthBadgeSVG(k.color, DEPTH_BEST.byClass[k.id].depth, 42, k.id)}</div>`).join('')}</div>` : ''; })()}
         </div>
       </div>
     </div>
@@ -1867,7 +1865,7 @@ function renderGame(){
           <div class="util-btn rail-pocket" id="open-backpocket-btn" title="${S.backPocket.length?'Safety net ready: if you fall to 0 Health, your Back Pocket can save you once (it spends every die in it).':'Back Pocket empty: no safety net until a die lands here.'}">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?'<span class="badge pocket-heart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.2 C 5.5 15.6 2 12.4 2 8.2 C 2 5.1 4.4 2.8 7.3 2.8 C 9.2 2.8 10.9 3.8 12 5.4 C 13.1 3.8 14.8 2.8 16.7 2.8 C 19.6 2.8 22 5.1 22 8.2 C 22 12.4 18.5 15.6 12 21.2 Z" fill="currentColor"/></svg></span>':''}</div>
           <div class="util-btn rail-item ${(totalTokens&&!S.needRoll)?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Item</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
           <div class="util-btn danger-accent rail-clear ${(S.transitioning||S.needRoll)?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
-          ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning||S.needRoll)?'disabled':''} ${abilityArmed?'armed':''} ${(S.coachRun && !S.classAbilityUsed && !S.transitioning && !abilityArmed)?'pulse coach-pulse':''}" id="ability-btn" style="--class-color:${S.klass.color||'#d4af52'}"><span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
+          ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning||S.needRoll)?'disabled':''} ${abilityArmed?'armed':''} ${(S.coachRun && !S.classAbilityUsed && !S.transitioning && !abilityArmed && !(S.encounter && S.encounter.type==='Shrine'))?'pulse coach-pulse':''}" id="ability-btn" style="--class-color:${S.klass.color||'#d4af52'}"><span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
             : S.klass.debug ? `<div class="util-btn rail-ability ${(!S.encounter||S.transitioning)?'disabled':''}" id="debug-win-btn"><span>Win</span></div>` : ''}
         </div>
       </div>
@@ -2090,7 +2088,7 @@ function renderTrayFast(){
   if(ab){
     ab.classList.toggle('disabled', !!(S.classAbilityUsed||S.transitioning));
     ab.classList.toggle('armed', abilityArmed);
-    const coach = !!(S.coachRun && !S.classAbilityUsed && !S.transitioning && !abilityArmed);
+    const coach = !!(S.coachRun && !S.classAbilityUsed && !S.transitioning && !abilityArmed && !(S.encounter && S.encounter.type==='Shrine')); // no Skill nudge at shrines (Jeremy, Oct 30)
     ab.classList.toggle('pulse', coach); ab.classList.toggle('coach-pulse', coach);
     const sp = ab.querySelector('span'); if(sp) sp.textContent = S.classAbilityUsed ? 'Used' : (abilityArmed ? 'Pick a Die' : 'Skill');
   }
@@ -4499,7 +4497,6 @@ function renderCamp(){
 
       <div class="camp-section">
         <h3 class="camp-section-title" id="camp-upgrade-title">${baseCamp?'Upgrade Dice':'Train: Upgrade Dice'} ${infoDot(baseCamp?'Combine 3 matching Basic dice into 1 of the next tier. You can upgrade 1 Attack and 1 Maneuver die per Camp.':'Combine 3 matching Basic dice into 1 of the next tier (1 Attack and 1 Maneuver per Camp). Training uses the campfire, so you can\'t also Rest here.')}</h3>
-        ${(trainLocked && upgradeRows.length) ? '<p class="hint upgrade-locked-hint" style="margin:0 0 4px;">Choose <b>Train</b> at the campfire above to combine dice.</p>' : ''}
         ${(!baseCamp && S.campChoice==='rest') ? '<p class="hint" style="margin:0 0 4px;">You rested at this fire, so no training here.</p>' : (!baseCamp && S.campFireOut) ? '<p class="hint" style="margin:0 0 4px;">The campfire is out.</p>' : ''}
         <div class="upgrade-rows-col">${upgradeRows.length? upgradeRows.join('') : '<span class="hint">No matching sets of 3 Basic dice to combine right now.</span>'}</div>
       </div>
@@ -5154,7 +5151,7 @@ const GUIDE_TEXT = {
   t1: ['<b>This is your Tray.</b> Tap the glowing die to start a Path.',
        'Now tap the glowing neighbor. Every die you step on fires its face.',
        'One more! A <b>Combo</b> hits harder when it touches Hits.',
-       'That number is your Path\'s damage. Tap <b>Go</b>!'],
+       'That number is your Path\'s damage. Keep going through more dice, or tap <b>Go</b>!'],
   t2roll: 'New turn! <b>Flick the lid</b> open (or double-tap it) to roll your dice. On a phone, you can shake it instead.',
   t2: 'Monsters show their <b>next move</b> under their name, so you can plan for it. Your Tray re-rolled: build any Path and finish the fight!',
 };

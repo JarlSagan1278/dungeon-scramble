@@ -3189,7 +3189,7 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 /* ---- Oct 28 second screen pass (Jeremy: T3, D1, C2, K1 + drop-in sag, consent line) ---- */
 /* T3: the cover fills more of the card; New Run is the big main button, the three links share a row, and a credit line. */
 .title-art-wrap{ overflow:hidden; }
-.title-cover-art{ width:128% !important; max-width:none !important; margin-left:-14%; }
+.title-cover-art{ width:128% !important; max-width:none !important; margin-left:-16.9%; } /* -14% centres the art; the extra -2.9% centres its logo (Jeremy, Oct 30) */
 .title-content{ margin-top:-96px !important; z-index:2; }
 .title-btn-col{ width:100% !important; gap:9px !important; }
 .title-btn-col > button.primary{ font-family:'Metamorphous',serif; font-size:24px !important; padding:16px !important; }
@@ -3213,8 +3213,6 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 .upg-maneuver .upg-die{ background:#fbe6b0; color:#3a2200; }
 .upg-arrow{ font-size:18px; margin:0 3px; opacity:.85; }
 .upg-own{ margin-left:auto; font-size:12.5px; opacity:.85; white-space:nowrap; }
-.base-camp .camp-fire-wrap{ min-height:150px !important; }
-.base-camp .camp-fire-wrap .camp-hero img{ width:84px !important; height:84px !important; }
 /* K1 + drop-in: bolted ends, stress cracks and dust on the boss bar; the boss falls onto it after the room banner */
 .bar-arc .ba-bracket{ fill:#3b3f45; stroke:var(--line); stroke-width:1.6; }
 .bar-arc .ba-rivet{ fill:#c9c2b5; stroke:var(--line); stroke-width:.8; }
@@ -3330,3 +3328,13 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 .swap-item .swap-count-badge, .camp-stack-badge{ border-width:2px; }
 .settings-pair > .settings-toggle-row{ gap:6px; padding-left:8px; padding-right:8px; } .settings-pair > .settings-toggle-row > span{ white-space:nowrap; }
 .room-tint{ position:absolute; inset:0; pointer-events:none; border-radius:inherit; z-index:0; }
+/* Jeremy's feedback (Oct 30): the camp must fit his phone with a full Back Pocket -- a smaller campfire scene and slimmer upgrade rows. */
+@media (min-height:770px){ .camp-fire-wrap{ zoom:1.2; margin:6px auto 12px !important; } }
+.upgrade-btn{ padding:5px 10px !important; }
+.upg-die{ width:20px; height:20px; font-size:10px; }
+.upg-die.upg-die-big{ width:28px; height:28px; font-size:13px; }
+/* Title fits with every class's depth badge (Jeremy's feedback, Oct 30) */
+.title-badges{ margin:8px 0 0 !important; }
+.title-credit{ margin-top:10px !important; }
+.title-content{ padding-bottom:8px !important; }
+.title-content{ margin-top:-106px !important; }

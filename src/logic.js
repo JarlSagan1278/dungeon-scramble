@@ -1532,9 +1532,10 @@ function guideSetupTray(){
 
 function toggleSelect(idx){
   if(S.needRoll){ if(typeof scrambleHint==='function') scrambleHint(); return; } // dice are still in the cup
-  if(S.guide && S.guide.stage==='t1'){ // guided first turn: only the glowing die (or stepping back) works
+  if(S.guide && S.guide.stage==='t1'){ // guided first turn: only the glowing dice (or stepping back) until the shown Path is built
     const undo = S.path.length && S.path[S.path.length-1]===idx;
-    if(!undo && (S.path.length >= S.guide.plan.length || idx!==S.guide.plan[S.path.length])){ if(typeof guideNudge==='function') guideNudge(idx); return; }
+    // Oct 30 (Jeremy): once the three glowing dice are in, the Path is the player's: any legal die may extend it
+    if(!undo && S.path.length < S.guide.plan.length && idx!==S.guide.plan[S.path.length]){ if(typeof guideNudge==='function') guideNudge(idx); return; }
   }
   if(S.trayAct){ if(trayActTap(idx)) fastTrayRender(); return; } // v1.38.0: an armed Swap/Reroll takes the tap
   if(!S.path.includes(idx)){ const k = trayActFaceAt(idx); if(k){ armTrayAct(k, idx, false); fastTrayRender(); return; } } // Swap/Reroll also work mid-path (Oct 12)

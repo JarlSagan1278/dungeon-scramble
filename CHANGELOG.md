@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.42.6 (Oct 30, 2026)
+Jeremy's playtest notes:
+- Title: the cover's logo is centred (the art has it a little right of centre), and the screen fits with every class's depth badge (smaller badges; the tester-only playtest note and version line are gone from the title, the version is in Settings).
+- Guided first turn: once the three glowing dice are in the Path, any other legal die can extend it before Go (it used to stop the Path there).
+- No "try your Skill" flashing in shrine rooms.
+- Camp fits the phone with a full Back Pocket: smaller campfire scene, slimmer upgrade rows, and the "Choose Train" hint line dropped (the Train button already says it unlocks combining).
 ## 1.42.5 (Oct 29, 2026)
 - Inked ivy (Jeremy's pick V2): the arch's moss and vines get the same dark outline as the rest of the art, and the hanging ivy gathers at the arch's two shoulders with real leaves, more strands on deeper floors.
 - Each floor looks deeper (Jeremy's pick D1): warm torchlight on Floor 1, cool and damp on Floor 2, deep violet with darker edges on Floor 3. Only the room behind the fight changes.
