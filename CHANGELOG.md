@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.9 (Oct 30, 2026)
+- Guided first turn introduces the dice colours: red dice are actions (Hit, Combo), white dice are Maneuvers that bend your Path (Leap, Dodge, Pivot).
 ## 1.42.8 (Oct 30, 2026)
 Jeremy's tutorial notes:
 - Guided first turn shows Hit vs Combo clearly: the Combo now touches three Hits, the dice feeding it glow, and the bubble uses the real numbers ("A Hit deals just its number. A Combo grows with every die touching it: this one touches 3, so it deals 4", then "Hits 3 + Combo 4 = 7 damage").
