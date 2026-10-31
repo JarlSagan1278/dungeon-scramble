@@ -83,3 +83,4 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **D.O.T. icon (Jeremy, Oct 31, 1.42.41):** with no number, it reads as three droplets (the number gap is filled in).
 - **App icon, Floor text, creak (Jeremy, Oct 31, 1.42.42):** icon option A (cut-out bust with the whole flame); Floor card text must be crisp; a different door creak (hinge groan + squeak + thud).
 - **Floor label colour (Jeremy, Oct 31, 1.42.44):** the floor label matches the floor's loot die colour (I Alloy steel, II Gilded gold, III Magic purple), on the tray badge and the Floor card.
+- **Oct 31, 2026:** The shrine's boon explanation sits between the two portraits on the quest-style paper notice (same spot as quests in a fight), not under the shrine.

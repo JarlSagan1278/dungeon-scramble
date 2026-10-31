@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.46 (Oct 31, 2026)
+- Music: a middle level for Elite and Deadly fights. They now play just the fast part's bass line (with its low octave on Floor 2 and the wood clicks on Floor 3), between the lonely downtime bass and the full action music, which is now for bosses only.
+- The gold path line no longer twitches when a hit shakes the screen: it now lives inside the tray panel and moves with the dice.
+- Shrines: the boon note is pinned between the two portraits on the same paper notice as a fight's quests, instead of under the shrine.
 ## 1.42.45 (Oct 31, 2026)
 - Title screen on short phone screens: the class depth badges under the buttons were cut off. The buttons and badges now keep their full height and the cover art gives way instead (cropped from the bottom, where it is only floor).
 ## 1.42.44 (Oct 31, 2026)

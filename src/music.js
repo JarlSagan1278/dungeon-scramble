@@ -131,6 +131,9 @@ function musicArrange(k){
     ['act.bass','act.lead'], ['act.bass','act.lead','counter'], ['act.bass','act.lead','act.drums','counter'], ['act.bass','act.lead','act.drums','counter'],
     ['act.bass'], ['act.bass']];
   if(k==='act') return [['bass','lead','drums'].concat(F.lowBass?['bassLow']:[])];
+  // Oct 31 (Jeremy): a middle intensity for Elite and Deadly fights: the action version's pumping bass alone (plus its
+  // low octave and the wood clicks on later floors), between the lonely downtime bass and the full boss arrangement.
+  if(k==='mid') return [['bass'].concat(F.lowBass?['bassLow']:[], F.wood?['wood']:[])];
   const quiet = ['bass'].concat(F.counter?['counter']:[], F.wood?['wood']:[]), loud = ['bass','lead'].concat(F.wood?['wood']:[]);
   return [quiet, quiet, loud, loud];
 }
@@ -139,7 +142,7 @@ function musicPartNotes(k, part){
   if(k==='shrine') return SHRINE_SONG[part] || [];
   if(part==='fillUp') return MUSIC_FILL_UP.map(n=>[Music.blockBeats + n[0], n[1], n[2], n[3], n[4]]); // ends the block, crash on the next downbeat
   if(part.includes('.')){ const [a,b] = part.split('.'); return (MUSIC_NOTES[a]||{})[b] || []; }
-  const N = MUSIC_NOTES[k] || {};
+  const N = MUSIC_NOTES[k==='mid' ? 'act' : k] || {}; // mid plays the action version's own bass parts
   if(part==='counter') return MUSIC_EXTRA.counter;
   if(part==='bassLow') return (N.bass||[]).map(n=>[n[0],n[1],n[2]-12,n[3]]);
   if(part==='wood') return (MUSIC_NOTES.act.drums||[]).filter(n=>n[2]===76||n[2]===77).map(n=>[n[0],n[1],n[2],Math.round(n[3]*0.6)]);
@@ -157,7 +160,7 @@ function musicStart(kind, mode){
   Music.gain = ctx.createGain(); Music.gain.connect(ctx.destination);
   Music.gain.gain.setValueAtTime(0.0001, t); Music.gain.gain.exponentialRampToValueAtTime(musicVolume(), t + 2.5); // gentle fade-in
   Music.groups = {};
-  const keys = kind==='dungeon' ? ['down','act'] : [kind];
+  const keys = kind==='dungeon' ? ['down','mid','act'] : [kind];
   for(const k of keys){ const g = { gain:ctx.createGain(), block:-1, events:null, idx:0, arrBase:0, from:(k===mode)?t:Infinity, until:(k===mode)?Infinity:0 }; g.gain.connect(Music.gain); Music.groups[k] = g; }
   musicTick(); Music.timer = setInterval(musicTick, 50);
 }
@@ -182,6 +185,7 @@ function musicSwitch(mode){
   newG.arrBase = Math.floor((bar - Music.origin)/(Music.blockBeats*musicSpb()) + 1e-6) + 1;
   try{ newG.gain.gain.cancelScheduledValues(0); newG.gain.gain.setValueAtTime(1, bar); }catch(e){}
   if(mode!=='act'){ Music.drums = false; Music.drumsFrom = Infinity; }
+  if(mode==='mid') newG.arrBase = 0;
   Music.mode = mode;
 }
 function musicSetDrums(on){
@@ -338,7 +342,7 @@ function musicSting(kind){
   setTimeout(()=>{ try{ musicUpdate(); }catch(e){} }, ms + 30);
 }
 // Which music fits right now (called on every render): camp lullaby at camp; in the dungeon, action for a live
-// Boss / Elite / Deadly fight, else downtime.
+// Boss fight, the action bass alone (mid) for Elite / Deadly fights (Oct 31), else downtime.
 function musicWanted(){
   if(PREFS.music===false || document.hidden) return null;
   if(typeof S==='undefined' || !S || !S.screen || S.screen==='gameover' || S.screen==='victory') return {kind:'theme', mode:'theme', drums:false}; // title, setup and the end screens
@@ -348,7 +352,9 @@ function musicWanted(){
   const fight = S.screen==='game' && e && e.type!=='Shrine' && e.curHealth>0 && !S.lootChoice && !S.pendingLootDie;
   if(!fight) return {kind:'dungeon', mode:'down', drums:false};
   const boss = e.type==='Boss' || e.type==='Big Boss', tier = encounterTier(e);
-  if(boss || tier==='elite' || tier==='deadly') return {kind:'dungeon', mode:'act', drums: boss && e.phase===2};
+  if(boss) return {kind:'dungeon', mode:'act', drums: e.phase===2};
+  if(tier==='elite' || tier==='deadly') return {kind:'dungeon', mode:'mid', drums:false}; // Oct 31 (Jeremy): the full action music is for bosses
+
   return {kind:'dungeon', mode:'down', drums:false};
 }
 // Phones keep audio locked until a tap, and a context made before that (or one the OS shut off while the app was

@@ -3662,3 +3662,10 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
    the cover art gives way instead (cropped from the bottom, where it is only floor); the logo and heroes stay. */
 .title-art-wrap{ flex:1 1 auto !important; min-height:0; }
 .title-content{ flex:0 0 auto !important; }
+/* Oct 31: the path line sits inside the tray panel (absolute, not fixed), so a screen shake carries it with the dice */
+.panel:has(> #path-trail-svg){ position:relative; }
+.panel > #path-trail-svg{ position:absolute; inset:0; left:0; top:0; width:100%; height:100%; overflow:visible; }
+/* Oct 31 (Jeremy): the shrine's boon is pinned between the two portraits, on the same paper notice as a fight's quests */
+.shrine-boon-float{ width:118px; }
+.shrine-boon-float .fo-quests{ font-size:10px !important; }
+.shrine-boon-float .boon-b, .shrine-boon-float b{ font-weight:800; color:#7a1f14; }

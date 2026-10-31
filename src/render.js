@@ -126,7 +126,13 @@ function pathTrailCenterOf(trayEl, idx){
   const node = trayEl.querySelector(`.die[data-idx="${idx}"]`);
   if(!node) return null;
   const r = node.getBoundingClientRect();
-  return {x: r.left+r.width/2, y: r.top+r.height/2};
+  // Oct 31 (Jeremy saw the path twitch while damage landed): the line is positioned inside its host panel, so points
+  // are measured from the panel's own corner. A screen shake moves the panel and the dice together, so the line
+  // stays on the dice instead of jumping against them.
+  const svg = document.getElementById('path-trail-svg'), host = svg && svg.parentNode;
+  let ox = 0, oy = 0;
+  if(host && host !== document.body){ const h = host.getBoundingClientRect(); ox = h.left + host.clientLeft; oy = h.top + host.clientTop; }
+  return {x: r.left+r.width/2-ox, y: r.top+r.height/2-oy};
 }
 function pathTrailAppendSegment(svg, a, b, animate, curved){
   // A Leap segment connects two tiles that are 2 apart in a straight line,
@@ -4460,6 +4466,7 @@ function renderShrineEncounter(){
           <div class="shrine-motes" aria-hidden="true">${[0,1,2,3,4,5,6,7,8].map(i=>`<i style="--x:${8+i*10.5}%;--d:${(i*0.37)%2.4}s;--t:${3.2+(i%3)*0.7}s"></i>`).join('')}</div>
           <svg class="fo-sconce fo-sconce-l" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><path d="M5 9.2 Q4.3 18 5.1 30 Q7.2 31.6 9.2 30 Q9.7 19 9 9.2Z" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/><path d="M1.6 15.4 Q7 13.9 12.4 15.2 Q13 17.6 12.2 19 Q7 20.3 1.8 19 Q1.1 17 1.6 15.4Z" fill="#55555e" stroke="#0c0705" stroke-width="1.5" stroke-linejoin="round"/><path d="M1.2 1.9 Q7 -0.7 12.8 1.7 Q12.2 6.6 9.7 9.7 Q7 10.7 4.4 9.5 Q2 6.6 1.2 1.9Z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-l"></div><svg class="fo-sconce fo-sconce-r" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><path d="M5 9.2 Q4.3 18 5.1 30 Q7.2 31.6 9.2 30 Q9.7 19 9 9.2Z" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/><path d="M1.6 15.4 Q7 13.9 12.4 15.2 Q13 17.6 12.2 19 Q7 20.3 1.8 19 Q1.1 17 1.6 15.4Z" fill="#55555e" stroke="#0c0705" stroke-width="1.5" stroke-linejoin="round"/><path d="M1.2 1.9 Q7 -0.7 12.8 1.7 Q12.2 6.6 9.7 9.7 Q7 10.7 4.4 9.5 Q2 6.6 1.2 1.9Z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-r"></div>
           <div class="fo-hud"></div>
+          <div class="fo-quests-float shrine-boon-float" title="What this shrine gives"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label">Boon</div><div class="fo-quests"><span class="fo-quest">${boonNoteHTML(e.boon)}</span></div></div>
           <div class="fo-band">
             <div class="fo-side fo-player">
               <div class="fo-fig" title="${S.origin.name} ${S.klass.name}">${heroFig}</div>
@@ -4472,7 +4479,6 @@ function renderShrineEncounter(){
               <div class="fo-fig ${art?'enc-portrait ':''}${ssz>1.05?'fo-big':''}" style="--sz:${ssz}">${shrineFig}</div>
               <div class="fo-name">${nbHyphen(e.name)}</div>
               <small class="fo-type">Shrine</small>
-              <div class="fo-quests boon-note">${boonNoteHTML(e.boon)}</div>
             </div>
           </div>
           ${S.shrineResult ? `<div class="shrine-result-banner"><div class="srb-title">${S.shrineResult.title}</div><div class="srb-text">${S.shrineResult.text}</div></div>` : ''}
