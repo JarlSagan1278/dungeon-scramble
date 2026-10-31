@@ -4196,6 +4196,24 @@ function renderRelicChoiceModal(){
 }
 
 // Each shrine option its own colour, matching what it gives (Oct 17 design fixes, item 10).
+// Oct 31 (Jeremy, S1): each shrine option is a card: drawn icon (a gold + badge when it adds or upgrades), the effect
+// in the title font and one plain line under it. The labels themselves (data.js) are unchanged.
+// Oct 31 (Jeremy, S2): the shrine's boon line is a pinned parchment note; the effect words are bold, the joining
+// words ("or", "and", "plus", "then") stay plain.
+function boonNoteHTML(t){ return '<b>' + String(t||'').replace(/(,? )(or|and|plus|then)( )/g, '</b>$1$2$3<b>') + '</b>'; }
+function shrineOptCard(label){
+  const l = String(label||''); let m;
+  if((m = l.match(/^Heal (\d+)/i))) return { icon:iconSpanSolid('heal'), bg:'#e8574f', title:`Heal ${m[1]}`, sub:`Get back up to ${m[1]} health now` };
+  if((m = l.match(/^\+(\d+) Max Health/i))) return { icon:iconSpanSolid('heal'), bg:'#5f8a3c', plus:true, title:`+${m[1]} max health`, sub:'Your health bar grows for the run' };
+  if(/^Forge/i.test(l)) return { icon:iconSpanSolid('combo'), bg:'#d6b25a', plus:true, title:'Forge a die', sub:'One of three Gilded dice' };
+  if(/Upgrade 2 Attack/i.test(l)) return { icon:iconSpanSolid('hit'), bg:'#e8574f', plus:true, title:'Upgrade 2 Attack', sub:'Two Attack dice go up a level' };
+  if(/Upgrade 2 Maneuver/i.test(l)) return { icon:iconSpanSolid('dodge'), bg:'#ffe9a8', fg:'#3a2410', plus:true, title:'Upgrade 2 Maneuver', sub:'Two Maneuver dice go up a level' };
+  if((m = l.match(/^Pay (\d+) max health: choose 2 of 4/i))) return { icon:MARK_STAR, bg:'#6a3fb0', title:'2 of 4 relics', sub:`Costs ${m[1]} max health` };
+  if((m = l.match(/^Pay (\d+) max health: choose from four/i))) return { icon:MARK_STAR, bg:'#6a3fb0', title:'1 of 4 relics', sub:`Costs ${m[1]} max health` };
+  if(/^Skip your next campfire/i.test(l)) return { icon:iconSpanSolid('camp'), bg:'#b0602a', title:'2 relics', sub:'Costs your next campfire' };
+  if(/^Walk away/i.test(l)) return { icon:iconSpanSolid('door'), bg:'#5a4a38', title:'Walk away', sub:'Take nothing' };
+  return { icon:MARK_STAR, bg:'#8a5a2b', title:l, sub:'' };
+}
 function shrineOptClass(label){
   const l = String(label||'');
   if(/^Heal/i.test(l)) return 'so-heal';
@@ -4211,13 +4229,14 @@ function renderShrineChoiceModal(){
   const {name, options} = S.shrineChoice;
   const overlay = el(`<div class="modal-overlay"><div class="modal">
       <h2>${name}</h2>
-      <p>Choose one boon:</p>
-      <div class="loot-options" id="shrine-options"></div>
+      <div class="pick-ribbon">Pick one</div>
+      <div class="loot-options shrine-pick${options.length>=3?' sp3':''}" id="shrine-options"></div>
     </div></div>`);
   openUniqueOverlay('shrine-choice', overlay);
   const container = overlay.querySelector('#shrine-options');
   options.forEach(opt=>{
-    const card = el(`<div class="loot-opt shrine-opt ${shrineOptClass(opt.label)}"><h4>${opt.label}</h4></div>`);
+    const c = shrineOptCard(opt.label);
+    const card = el(`<div class="loot-opt shrine-opt ${shrineOptClass(opt.label)}" role="button" title="${String(opt.label).replace(/"/g,'&quot;')}"><span class="sp-ic" style="background:${c.bg};color:${c.fg||'#fff6e0'}">${c.icon}${c.plus?'<i>+</i>':''}</span><h4>${c.title}</h4>${c.sub?`<span class="sp-sub">${c.sub}</span>`:''}</div>`);
     card.onclick = ()=> closeModal(overlay, ()=> chooseShrineOption(opt));
     container.appendChild(card);
   });
@@ -4437,7 +4456,7 @@ function renderShrineEncounter(){
               <div class="fo-fig ${art?'enc-portrait ':''}${ssz>1.05?'fo-big':''}" style="--sz:${ssz}">${shrineFig}</div>
               <div class="fo-name">${nbHyphen(e.name)}</div>
               <small class="fo-type">Shrine</small>
-              <div class="fo-quests" style="text-align:center;">${e.boon}</div>
+              <div class="fo-quests boon-note">${boonNoteHTML(e.boon)}</div>
             </div>
           </div>
           ${S.shrineResult ? `<div class="shrine-result-banner"><div class="srb-title">${S.shrineResult.title}</div><div class="srb-text">${S.shrineResult.text}</div></div>` : ''}

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.40 (Oct 31, 2026)
+Shrine choices (Jeremy picked S1, S2):
+- **Choices (S1):** a "Pick one" ribbon and a card per option: a drawn icon (gold + badge when it adds or upgrades), the effect in the title font and one plain line ("Heal 20 / Get back up to 20 health now", "1 of 4 relics / Costs 3 max health", "Walk away / Take nothing"). Two or three across.
+- **Boon text (S2):** a small parchment note pinned under the shrine, effect words in bold. Every shrine's line is reworded plainly ("Heal 20 or +10 max health", "5 Nullify tokens, plus one of two loot dice"); the rulebook picks it up too.
 ## 1.42.39 (Oct 31, 2026)
 - The last text-character icon is gone: new achievements and the class-converted die badge use the drawn star instead of ✦.
 ## 1.42.38 (Oct 31, 2026)
