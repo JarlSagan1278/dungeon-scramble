@@ -170,10 +170,15 @@ function updatePathTrail(){
     return;
   }
   let svg = document.getElementById('path-trail-svg');
+  // Oct 31 (Jeremy): the line lives inside the tray's panel (its own stacking context, z-index 2), still above the dice
+  // but under the damage badge (z-index 13 in the same context), so a big badge covers the line instead of being crossed by it
+  const host = trayEl.closest('.panel') || document.body;
+  if(svg && svg.parentNode !== host){ svg.remove(); svg = null; }
   if(!svg){
     svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
     svg.id = 'path-trail-svg';
-    document.body.appendChild(svg);
+    host.appendChild(svg);
+    trailLastPath = []; // a fresh layer: redraw every segment
   }
   const path = S.path;
   const isIncrementalAdd = path.length===trailLastPath.length+1
@@ -2287,31 +2292,77 @@ function ensureFxStack(){
 // Both overlay the scene, so they can't change the screen height. ----
 const RB_NOTICE_RE = /^(Equipped|Relic|Upgraded|Swapped|Rested|— Floor|Mandated Lunch Break|Not enough|Locked|Debug|Origin|Unlock|Debug)|joins your tray/i;
 function showToast(text, kind){
-  // Plain damage/heal numbers are already shown by the floating numbers + health bars; skip the redundant ribbon.
+  // Plain damage/heal numbers are already shown by the floating numbers + health bars; skip the redundant message.
   if(/^Path dealt|hits you for|takes \d+ D\.O\.T\. damage|You take \d+ D\.O\.T\. damage|You recover \d+ from H\.O\.T\.|heals \d+\./i.test(text)) return;
-  const notice = RB_NOTICE_RE.test(text) || (!kind && !/hit|damage|dealt|heal|block|nullify|leap|minion|quest|dot|hot|shield|freeze/i.test(text));
-  const toPlayer = !notice && (kind==='bad' || /hits you|you for|your D\.O\.T|desperate/i.test(text)) && !/dealt/i.test(text);
-  const arch = document.querySelector('#enc-panel .fo-arch');
-  const campCard = !arch && document.querySelector('.camp-status-card'); // Oct 17: camp ribbons sit under the Camp title, not on it
-  const base = arch || campCard || document.getElementById('app') || document.body;
+  // Oct 31 (Jeremy picked A + B after the banner research): the diagonal ribbons were gone before most messages could be
+  // read (~238 words a minute) and covered the fighters. Events about something on screen pop as a short chip right there (A);
+  // everything else is a short, level headline strip that stays long enough to read and queues (B). Taps pass through
+  // both, so a message never swallows a tap meant for the shrine, a die or a button underneath.
+  if(sourceChip(text)) return;
+  headlineStrip(text, kind);
+}
+// A: a 1-3 word chip on the thing the event happened to. Returns false when it has no anchor on screen.
+function sourceChip(text){
+  const arch = document.querySelector('#enc-panel .fo-arch'); if(!arch) return false;
+  let m, sel, label, icon = 'ok', place = 'below';
+  if((m = text.match(/^Quest complete: (.+)$/))){ sel = '.fo-quests-float'; label = 'Quest done!'; }
+  else if(/Leaped clean over a Minion/i.test(text)){ sel = '#enc-panel .fo-enemy .fo-fig'; label = 'Minion cleared!'; place = 'top'; }
+  else if((m = text.match(/^Relics grant (\d+) Block/))){ sel = '#enc-panel .fo-player .fo-hpwrap'; label = `+${m[1]} Block`; icon = 'block'; place = 'above'; }
+  else if((m = text.match(/mirrors as (\d+) D\.O\.T\. on it/))){ sel = '#enc-panel .fo-enemy .fo-hpwrap'; label = `+${m[1]} D.O.T.`; icon = 'dot'; place = 'above'; }
+  else if((m = text.match(/mirrors as (\d+) H\.O\.T\. for you/))){ sel = '#enc-panel .fo-player .fo-hpwrap'; label = `+${m[1]} H.O.T.`; icon = 'hot'; place = 'above'; }
+  else return false;
+  const anchor = document.querySelector(sel); if(!anchor) return false;
+  const r = anchor.getBoundingClientRect();
+  const busy = document.querySelectorAll(`.src-chip[data-sel="${sel}"]`).length; // a second chip on the same spot steps aside
+  const ic = icon==='ok' ? '<i class="sc-ic sc-ok">&#10003;</i>' : `<i class="sc-ic">${iconSpan(icon)}</i>`;
+  const chip = el(`<div class="src-chip" data-sel="${sel}" role="status">${ic}<span>${label}</span></div>`);
+  document.body.appendChild(chip);
+  const w = chip.offsetWidth, h = chip.offsetHeight;
+  const x = Math.max(6, Math.min(window.innerWidth - w - 6, r.left + r.width/2 - w/2));
+  const y = place==='below' ? r.bottom + 4 + busy*(h+4) : place==='top' ? r.top + 6 + busy*(h+4) : r.top - h - 4 - busy*(h+4);
+  chip.style.left = x + 'px'; chip.style.top = Math.max(4, y) + 'px';
+  setTimeout(()=>{ chip.classList.add('sc-out'); setTimeout(()=>chip.remove(), 260); }, 1000 + 300*label.split(/\s+/).length);
+  return true;
+}
+// B: short form of each message -- a bold keyword, then the detail.
+function headlineParts(text){
+  const R = [
+    [/^Relic gained: (.+?) — /, m=>['New relic', m[1]]],
+    [/^Equipped (.+?)\.?$/, m=>['Equipped', m[1]]],
+    [/^Kept (.+) in your Back Pocket/, m=>['To Back Pocket', m[1]]],
+    [/^Upgraded 3 .+? into one (.+?)\.?$/, m=>['Upgraded', m[1]]],
+    [/^Rested: (.+)$/, m=>['Rested', m[1]]],
+    [/Back Pocket saves you! \(\+(\d+) health\)/i, m=>['Saved!', `+${m[1]} Health, Pocket spent`]],
+    [/Desperate roll from the Back Pocket saves you! \(\+(\d+) health\)/i, m=>['Saved!', `+${m[1]} Health`]],
+    [/Every die in your Back Pocket came up blank/i, ()=>['Back Pocket', 'all blank']],
+    [/A die from the Back Pocket comes up blank/i, ()=>['Back Pocket', 'a blank, die lost']],
+    [/^(.+?) joins your tray/, m=>['Joins your tray', m[1]]],
+    [/^Swapped (.+?) into your Tray/, m=>['Swapped in', m[1]]],
+    [/^Union Dues: the shrine takes (\d+) HP/, m=>['Union Dues', `-${m[1]} HP`]],
+    [/^— Floor (\d+) —$/, m=>[`Floor ${m[1]}`, '']],
+  ];
+  for(const [re, f] of R){ const m = text.match(re); if(m) return f(m); }
+  return [text.replace(/[.!]$/, ''), ''];
+}
+let HEADLINE_Q = [];
+function headlineStrip(text, kind){
+  HEADLINE_Q.push({text, kind});
+  if(!document.getElementById('headline-strip')) nextHeadline();
+}
+function nextHeadline(){
+  const item = HEADLINE_Q.shift(); if(!item) return;
+  const [key, detail] = headlineParts(item.text);
+  const bad = item.kind==='bad' || /blank|not enough|locked|dues/i.test(item.text);
+  const tone = bad ? 'bad' : item.kind==='good' ? 'good' : 'gold';
+  const base = document.querySelector('#enc-panel .fo-arch') || document.querySelector('.camp-status-card') || document.getElementById('app') || document.body;
   const r = base.getBoundingClientRect();
-  const layerId = notice ? 'rb-layer-notice' : 'rb-layer-combat';
-  let layer = document.getElementById(layerId);
-  if(layer) layer.remove();
-  layer = document.createElement('div');
-  layer.id = layerId; layer.className = 'rb-layer';
-  const h = (arch || campCard) ? r.height : Math.min(r.height, 280);
-  layer.style.cssText = `left:${r.left}px;top:${Math.max(0,r.top)}px;width:${r.width}px;height:${h}px;`;
-  const tone = notice ? 'gold' : (kind==='bad'||toPlayer ? 'bad' : kind==='good' ? 'good' : 'neutral');
-  const dir = notice ? 'n' : (toPlayer ? 'l' : 'r');
-  const iconKey = notice ? null : (/block/i.test(text)?'block':/heal/i.test(text)?'heal':/hit|damage|dealt/i.test(text)?'hit':null);
-  const ic = (iconKey && typeof iconSpan==='function') ? `<span class="rb-ic">${iconSpan(iconKey)}</span>` : '';
-  const label = (!notice && /hits you/i.test(text)) ? '<small>Enemy turn</small>' : '';
-  const len = text.length;
-  const rb = el(`<div class="rb rb-${tone} rb-${dir} ${len>34?'rb-long':''}"><div class="rb-in">${label}${ic}${text}</div></div>`);
-  layer.appendChild(rb);
-  document.body.appendChild(layer);
-  setTimeout(()=>{ if(layer.parentNode) layer.parentNode.removeChild(layer); }, notice ? 1500 : 1300);
+  const strip = el(`<div id="headline-strip" class="hl-strip hl-${tone}" role="status"><i class="hl-ic">${bad ? '!' : tone==='good' ? '&#10003;' : '&#10022;'}</i><span><b>${key}</b>${detail ? ` &middot; ${detail}` : ''}</span></div>`);
+  strip.style.left = (r.left + 10) + 'px'; strip.style.width = Math.max(200, r.width - 20) + 'px'; strip.style.top = Math.max(4, r.top + 8) + 'px';
+  document.body.appendChild(strip);
+  const words = (key + ' ' + detail).trim().split(/\s+/).length;
+  let done = false;
+  const close = ()=>{ if(done) return; done = true; strip.classList.add('hl-out'); setTimeout(()=>{ strip.remove(); nextHeadline(); }, 220); };
+  setTimeout(close, Math.min(5000, 1000 + 300*words));
 }
 
 // ---- Kill callout: a brief banner for the two kill moments worth

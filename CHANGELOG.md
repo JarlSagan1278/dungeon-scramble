@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.42.15 (Oct 31, 2026)
+New banners (Jeremy's picks A + B from the banner research; the diagonal ribbons are gone):
+- At the source: quest done, minion cleared, relic Block and mirrored H.O.T./D.O.T. pop as a short chip on the quest sign, the monster or the health bar they belong to.
+- Headline strip: everything else (new relic, equipped, upgraded, rested, Back Pocket saves...) is one level line at the top of the scene, a bold keyword plus detail, shown 1 s + 0.3 s per word, queued instead of replacing each other. Taps pass through both.
+- Quest messages use the sign's wording ("2 Dodges") instead of the internal code ("5 damage: 2 dodge").
+Also:
+- The damage badge now covers the path line when a big total grows over the dice (the line was drawn on a layer above it).
+- No sticky hover on phones: the option or button under your last tap no longer looks highlighted (the shrine's middle option looked picked).
 ## 1.42.14 (Oct 31, 2026)
 - Fix: monsters stand at their Monster Footing height all the time. The idle sway animation replaced the footing drop, so a monster stood at the wrong height while swaying and jumped to the right one during a turn's playback (Jeremy saw the Rogue Golemancer float up, then sink when hit).
 - Rogue Golemancer's drop 21.7% -> 10.8%: its feet rest in the dip of its sagging health bar.

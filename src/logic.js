@@ -1974,7 +1974,7 @@ function checkQuests(e, ctx){
     if(done){
       e.questsDone[i] = true;
       applyQuestReward(e, rewardText);
-      logMsg('sys', `Quest complete: "${q}"`, 'good');
+      logMsg('sys', `Quest complete: ${typeof questCondShort==='function' ? questCondShort(parseQuestSpec(q).cond) : q}`, 'good');
       if(typeof fxQuest==='function') fxQuest(e.name, i);
     }
   });
@@ -2000,7 +2000,7 @@ function geometryMirror(e, kind, n){
     e.questMirror[i] = used+amt;
     if(isProfane){ e.curDOT += amt; logMsg('sys', `${e.name}: your H.O.T. mirrors as ${amt} D.O.T. on it.`, 'good'); }
     else { addPlayerHOT(amt); logMsg('sys', `${e.name}: its D.O.T. mirrors as ${amt} H.O.T. for you.`, 'good'); }
-    if(e.questMirror[i] >= cap){ e.questsDone[i] = true; logMsg('sys', `Quest complete: "${q}"`, 'good'); if(typeof fxQuest==='function') fxQuest(e.name, i); }
+    if(e.questMirror[i] >= cap){ e.questsDone[i] = true; logMsg('sys', `Quest complete: ${typeof questCondShort==='function' ? questCondShort(parseQuestSpec(q).cond) : q}`, 'good'); if(typeof fxQuest==='function') fxQuest(e.name, i); }
   });
 }
 
