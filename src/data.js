@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.42.18';
+const GAME_VERSION = '1.42.19';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false };
@@ -635,13 +635,15 @@ const BOSS_KITS = {
     phase2:{ name:'Fruiting Body', each:[{type:'dmg',value:5},{type:'minion',value:1}], specials:[
       {name:'R.O.T.', acts:[{type:'dot',value:3}]},
       {name:'Be Fruitful and Multiply!', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]} ]}},
-  // v1.39.0: the third Big Boss. Phase 2 (Leap Year): the Toadtaur Warrior joins.
+  // v1.39.0: the third Big Boss. Phase 2 (Leap Year): the Toadtaur Warrior joins -- since Oct 31 (Jeremy, option 1) it
+  // drops into the doorway beside the Wizard (picture only, `ally`) and its blows are the Warrior Smash special.
   'Toadtaur Wizard, Assistant to the Co-consul':{ each:[{type:'dmg',value:5}], specials:[
     {name:'Toxic Trample', acts:[{type:'dot',value:2}]},
     {name:'Lily Padding', acts:[{type:'shield',value:5}]},
     {name:'Chimeronslaught', windup:true, acts:[{type:'dmg',value:9}]} ],
-    phase2:{ name:'Leap Year', each:[{type:'dmg',value:5},{type:'minion',value:1}], specials:[
+    phase2:{ name:'Leap Year', ally:'Toadtaur Warrior', each:[{type:'dmg',value:5},{type:'minion',value:1}], specials:[
       {name:'Lily Pod', windup:true, herald:{type:'minion',value:3}, acts:[{type:'dmgPerMinion',value:3}]},
+      {name:'Warrior Smash', acts:[{type:'dmg',value:10}]},
       {name:'Chimeronslaught', windup:true, acts:[{type:'dmg',value:9}]} ]}},
 };
 

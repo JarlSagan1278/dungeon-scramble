@@ -2299,6 +2299,7 @@ function bossTakeTurn(e, frozen){
     if(typeof screenShake==='function') screenShake('small');
     if(typeof playTone==='function') playTone('closeCall');
     teleLog('boss_phase', {name:e.name, phase:2});
+    if(e.kit.phase2.ally){ S._allyDrop = true; logMsg('sys', `${e.kit.phase2.ally} joins the fight!`, 'bad'); } // Oct 31: it drops into the doorway (render.js)
   }
   { const t = bossHerald(e); if(t) parts.push(t); }
   return parts.join(' ');

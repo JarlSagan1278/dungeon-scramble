@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.19 (Oct 31, 2026)
+- The Toadtaur Warrior really joins the Toadtaur Wizard at Leap Year (its second half): "Toadtaur Warrior joins the fight!", it drops into the doorway at the Wizard's side, and Leap Year gains its move, Warrior Smash (10 damage), between Lily Pod and Chimeronslaught.
 ## 1.42.18 (Oct 31, 2026)
 - The final boss gives no loot: its chest (the purple Magic chest) bursts open straight onto the victory screen.
 ## 1.42.17 (Oct 31, 2026)
