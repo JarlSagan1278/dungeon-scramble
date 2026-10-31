@@ -2426,18 +2426,17 @@ function showFloorCard(num, _name){
   if(old) old.remove();
   // Oct 31 (Jeremy, F1): a stairway going down through the room's stone arch, lit by two torches, with a carved stone
   // tablet for the floor and a parchment strip for its name (same pieces and paper texture as the new-room door).
-  // stairs in perspective: treads and risers narrowing toward a dark vanishing point, so they read as going down
-  const W = 188, H = 234, vx = W/2, vy = 70;
+  // Oct 31 (Jeremy): simple stairs: four big steps going down, each a light tread over a dark riser, narrowing and
+  // darkening toward the black doorway at the top
+  const W = 188, H = 234;
   let st = `<rect width="${W}" height="${H}" fill="#0b0704"/>`;
-  const ys = k => vy + (H - vy) / (1 + 0.55*k), hw = k => (W/2 + 6) / (1 + 0.55*k);
-  st += `<path d="M0 ${H} L${vx-hw(7)} ${ys(7)} L${vx+hw(7)} ${ys(7)} L${W} ${H} Z" fill="#2a2420"/>`;
-  for(let k=6; k>=0; k--){
-    const y0 = ys(k+1), y1 = ys(k), riser = (y1 - y0) * 0.42, sh = Math.round(46 + 26*(1 - k/6));
-    st += `<path d="M${vx-hw(k+1)} ${y0} L${vx+hw(k+1)} ${y0} L${vx+hw(k)} ${y1-riser} L${vx-hw(k)} ${y1-riser} Z" fill="hsl(28 6% ${sh}%)" stroke="#120b07" stroke-width="2.5" stroke-linejoin="round"/>`;
-    st += `<path d="M${vx-hw(k)} ${y1-riser} L${vx+hw(k)} ${y1-riser} L${vx+hw(k)} ${y1} L${vx-hw(k)} ${y1} Z" fill="hsl(28 6% ${sh-16}%)" stroke="#120b07" stroke-width="2.5" stroke-linejoin="round"/>`;
-  }
-  st += `<path d="M0 ${H} L${vx-hw(7)} ${ys(7)} M${W} ${H} L${vx+hw(7)} ${ys(7)}" stroke="#120b07" stroke-width="3"/>`;
-  st += `<rect width="${W}" height="${H}" fill="url(#fcfade)"/><defs><linearGradient id="fcfade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b0704"/><stop offset=".42" stop-color="#0b0704" stop-opacity=".85"/><stop offset=".7" stop-color="#0b0704" stop-opacity="0"/></linearGradient></defs>`;
+  const rows = [[H-46, H, 0.98], [H-82, H-46, 0.8], [H-110, H-82, 0.63], [H-132, H-110, 0.48]];
+  st += `<path d="M${W/2-W/2*0.98} ${H} L${W/2-W/2*0.48} ${H-132} L${W/2+W/2*0.48} ${H-132} L${W/2+W/2*0.98} ${H} Z" fill="#5a5049" stroke="#120b07" stroke-width="3" stroke-linejoin="round"/>`;
+  rows.forEach(([top, bot, w], k)=>{
+    const hw = W/2*w, mid = top + (bot-top)*0.55, l = 64 - k*12;
+    st += `<rect x="${W/2-hw}" y="${top}" width="${hw*2}" height="${mid-top}" fill="hsl(30 6% ${l}%)" stroke="#120b07" stroke-width="3" stroke-linejoin="round"/>`;
+    st += `<rect x="${W/2-hw}" y="${mid}" width="${hw*2}" height="${bot-mid}" fill="hsl(30 6% ${l-22}%)" stroke="#120b07" stroke-width="3" stroke-linejoin="round"/>`;
+  });
   const steps = `<svg class="fc-stairs" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${st}</svg>`;
   const node = el(`<div id="floor-card"><div class="floor-card-box fc-scene" aria-label="Floor ${num}: ${FLOOR_TITLES[num-1]||''}">
       <div class="rc-arch fc-arch"><div class="fc-hole">${steps}<i class="fc-torch l"></i><i class="fc-torch r"></i></div></div>

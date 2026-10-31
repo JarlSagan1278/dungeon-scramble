@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.34 (Oct 31, 2026)
+- Floor card stairs simplified (Jeremy): four big steps, each a light tread over a dark riser, on one stone stair body, narrowing toward the dark doorway.
 ## 1.42.33 (Oct 31, 2026)
 - **Door creak:** opening a room's door creaks (stick-slip wood, then a soft thud); boss doors creak lower and slower.
 - **Floor card fixed:** it looked warped: an old ribbon-shaped clip notched the arch's sides, and the stacked steps read as a pyramid going up. The arch is whole now and the stairs are drawn in perspective, going down into the dark.
