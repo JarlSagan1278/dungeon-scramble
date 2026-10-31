@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.42.26';
+const GAME_VERSION = '1.42.27';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false };
@@ -130,22 +130,19 @@ const ROUTE_STEP_DESC = {
 // aren't self-explanatory from tooltips alone -- the actual icon-by-icon
 // glossary lives in the always-available "Key" reference card instead of
 // being repeated here.
+// Oct 31 (Jeremy, 4A): every page shows what it explains (pic, drawn in render.js tutorialPicHTML), so the text is shorter.
 const TUTORIAL_STEPS = [
-  {
-    title: "Welcome, Adventurer",
-    body: "Build a path across your dice tray each turn to fight, heal, and move. " + (BUILD.demo ? "Beat the Floor 1 boss to clear the demo." : "Clear all three floors to win."),
+  { title: "Welcome, Adventurer", pic:'path',
+    body: "Each turn, draw a path across your dice. Every die on it does its thing, in order. " + (BUILD.demo ? "Beat the Floor 1 boss to clear the demo." : "Clear all three floors to win."),
   },
-  {
-    title: "Your Tray",
-    body: "Tap a die to start a path, then tap an adjacent die to extend it (some dice let you jump or change direction!). Longer paths combo for bigger effects. Long-press any die to see what its face does.",
+  { title: "Your Tray", pic:'leap',
+    body: "Tap a die, then a neighbor, to grow your path. Some dice hop over a die or turn a corner. Hold any die to read it.",
   },
-  {
-    title: "The Route",
-    body: "The bar at the top shows this floor. There are campsites where you either rest or train (upgrade dice), both Boons and Banes to encounter, and a Boss at the end. Long-press a node to see more.",
+  { title: "The Route", pic:'route',
+    body: "The doors at the top are this floor: fights, shrines, camps where you Rest or Train, and a Boss at the end. Hold a door to peek.",
   },
-  {
-    title: "One More Thing",
-    body: "The Codex in Settings (the gear) holds the Action Key, a full glossary of every icon in the game, plus a Bestiary of every monster you meet. Check it any time you forget what something does. Good luck!",
+  { title: "One More Thing", pic:'codex',
+    body: "Forget what an icon means? The Codex in the gear menu has the Key to every icon and a page for every monster you meet. Good luck!",
   },
 ];
 

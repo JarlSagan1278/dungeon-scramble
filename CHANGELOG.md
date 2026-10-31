@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.42.27 (Oct 31, 2026)
+Screen polish (Jeremy picked 2A, 3A, 4A, 5A, 6A):
+- **Character select (2A):** class and die text 12-13 px; the hero's name sits on a parchment nameplate; locked origins are dimmed with a gold padlock badge.
+- **Records (3A):** no runs yet shows a drawn, bare trophy shelf ("The trophy shelf is bare").
+- **How to Play (4A):** every page has a picture (a tray with a numbered path, a path with a hop, the route doors, the Codex book) and shorter text.
+- **Defeat / victory (5A):** title and line centred and bigger, with room above.
+- **Loot chest (6A):** the fighters' names, health bars and chips hide while the chest is up.
 ## 1.42.26 (Oct 31, 2026)
 - Headings and paragraphs with a note (Camp, Campfire, Train, Organize, Equip, the Back Pocket) get a small toy "?" coin instead of a dotted underline (in the title font it read like a spelling squiggle). Short inline labels (the consent line) keep the dotted underline.
 ## 1.42.25 (Oct 31, 2026)

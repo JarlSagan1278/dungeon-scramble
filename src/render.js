@@ -3324,12 +3324,34 @@ function openSettingsModal(){
 // not just on a new player's very first game. Re-renders in place (rather
 // than closing/reopening a new overlay) so Prev/Next feels like one modal
 // paging through, not a stack of separate popups.
+// Oct 31 (Jeremy, 4A): a small drawn picture per How to Play page.
+function tutorialPicHTML(kind){
+  if(!kind) return '';
+  const C = {a:'#e8574f', m:'#ffe9a8', s:'#d6b25a', b:'#3a2819'};
+  const tray = (path, leaps)=>{
+    const cells = ['a','m','s','a', 'm','a','b','m', 's','a','m','a', 'a','b','m','s'];
+    const pt = i=>[(i%4)*25+12.5, Math.floor(i/4)*25+12.5];
+    let d = '';
+    path.forEach((i,k)=>{ const [x,y]=pt(i); if(!k){ d+=`M${x},${y}`; return; } const [px,py]=pt(path[k-1]);
+      d += leaps.includes(k) ? ` Q${(px+x)/2},${Math.min(py,y)-16} ${x},${y}` : ` L${x},${y}`; });
+    return `<div class="tut-pic tut-tray">${cells.map((c,i)=>{ const k=path.indexOf(i); return `<i style="background:${C[c]}" class="${k>=0?'on':''}">${k>=0?`<b>${k+1}</b>`:''}</i>`; }).join('')}<svg viewBox="0 0 100 100" aria-hidden="true"><path d="${d}" fill="none" stroke="#ffd75e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
+  };
+  if(kind==='path') return tray([4,5,9,10,14], []);
+  if(kind==='leap') return tray([8,10,6,7], [1]);
+  if(kind==='route'){
+    const door = (inner, cls)=>`<span class="tut-door ${cls||''}">${inner}</span>`;
+    return `<div class="tut-pic tut-route">${door(iconSpan('camp'),'done')}${door(MARK_CHECK,'done')}${door('<b>?</b>','now')}${door('<b>?</b>')}${door(iconSpan('camp'))}${door(iconSpan('boss'),'boss')}</div>`;
+  }
+  if(kind==='codex') return `<div class="tut-pic tut-book"><svg viewBox="0 0 120 80" aria-hidden="true"><path d="M8 14c18-8 36-8 52 4v56c-16-12-34-12-52-4z" fill="#f3e3bf" stroke="#120b07" stroke-width="3.5" stroke-linejoin="round"/><path d="M112 14c-18-8-36-8-52 4v56c16-12 34-12 52-4z" fill="#e9d2a0" stroke="#120b07" stroke-width="3.5" stroke-linejoin="round"/><path d="M34 30l3 7 7-3-3 7 7 3-7 3 3 7-7-3-3 7-3-7-7 3 3-7-7-3 7-3-3-7 7 3z" fill="#e8574f" stroke="#120b07" stroke-width="2.5" stroke-linejoin="round"/><path d="M70 30h28M70 40h28M70 50h20" stroke="#8a5a2b" stroke-width="3" stroke-linecap="round"/></svg></div>`;
+  return '';
+}
 function openTutorialModal(stepIdx){
   const n = TUTORIAL_STEPS.length;
   const step = TUTORIAL_STEPS[stepIdx];
   const dots = TUTORIAL_STEPS.map((_,i)=>`<span class="tutorial-dot ${i===stepIdx?'active':''}"></span>`).join('');
   const overlay = el(`<div class="modal-overlay"><div class="modal parchment-page" style="text-align:center; max-width:360px;">
       <h2 style="margin-top:0;">${step.title}</h2>
+      ${tutorialPicHTML(step.pic)}
       <p>${step.body}</p>
       <div class="tutorial-dots">${dots}</div>
       <div class="small-btn-row" style="justify-content:center;">
@@ -3355,7 +3377,7 @@ function runHistoryHTML(){
   const history = getRunHistory();
   const victories = history.filter(r=>r.outcome==='victory');
   const fastest = victories.length ? Math.min(...victories.map(r=>r.turnsTaken)) : null;
-  if(!history.length) return `<p class="hint">No runs recorded yet. Finish a run to see it here.</p>`;
+  if(!history.length) return `<div class="empty-pouch"><svg viewBox="0 0 120 90" style="width:150px;height:110px" aria-hidden="true"><rect x="8" y="62" width="104" height="10" rx="3" fill="#8a5a2b" stroke="#120b07" stroke-width="3.5"/><path d="M20 72v12M100 72v12" stroke="#120b07" stroke-width="4" stroke-linecap="round"/><path d="M50 30h20v8a10 10 0 0 1-20 0z M57 48h6v8h-6z M52 60h16" fill="none" stroke="rgba(233,215,174,.45)" stroke-width="3" stroke-dasharray="4 4"/><g class="ep-moth" style="transform-origin:92px 54px"><circle cx="92" cy="54" r="4" fill="#d9cfc0" stroke="#120b07" stroke-width="2.5"/><path d="M88 49q-5-5-10-1M96 49q5-5 10-1" fill="none" stroke="#120b07" stroke-width="2.5" stroke-linecap="round"/></g></svg><div class="ep-big">The trophy shelf is bare</div><p>Finish a run, win or lose, and its card goes up here.</p></div>`;
   const color = k => (CLASSES.find(c=>c.name===k) || {}).color || '#8a6a44';
   const cards = history.map(r=>{
     const dateStr = new Date(r.date).toLocaleDateString(undefined, {month:'short', day:'numeric'});

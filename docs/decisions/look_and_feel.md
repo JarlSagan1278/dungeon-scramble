@@ -71,3 +71,4 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Text (Jeremy, Oct 31, 1.42.24):** the empty Back Pocket references Bilbo's "What have I got in my pocket?" riddle; no flavor text in the enemy action note; no em dashes in player-facing text (Base Camp first).
 - **Icon holes (Jeremy, Oct 31, 1.42.25):** the general action icons don't show the empty number hole when there is no number; they are drawn solid.
 - **Tap-for-more (Jeremy, Oct 31, 1.42.26):** headings and paragraphs use a small toy "?" coin (like the Train rows' "?"), short inline labels a dotted underline; never the old (i) dot.
+- **Screen polish (Jeremy, Oct 31, 1.42.27):** picked 2A (character select: bigger text, parchment nameplate, padlock badges), 3A (drawn empty trophy shelf in Records), 4A (a picture on every How to Play page, shorter text), 5A (centred end-screen headers), 6A (fighter labels hide behind the loot chest).
