@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.18 (Oct 31, 2026)
+- The final boss gives no loot: its chest (the purple Magic chest) bursts open straight onto the victory screen.
 ## 1.42.17 (Oct 31, 2026)
 - Each floor's room colour now also covers the stone floor below the arch, down to the bottom of the screen.
 - The Skill button doesn't pulse until the lid is off.

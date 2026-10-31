@@ -344,6 +344,7 @@ let res = await page.evaluate((cfg)=>{
     if(S.screen==='victory') return 'VICTORY';
     if(S.screen==='gameover') return 'GAMEOVER';
     if(S.transitioning){ skipTransition(); return null; }
+    if(S.lootChoice && S.lootChoice.final){ openFinalChest(); return null; }
     if(S.lootChoice){ const arr=S.lootChoice.options.slice().sort((a,b)=>lootScore(b)-lootScore(a)); const o = cfg.lootMode==='worst'?arr[arr.length-1]:((cfg.lootMode==='random' || Math.random() < cfg.lootRandomRate)?arr[Math.floor(Math.random()*arr.length)]:arr[0]); chooseLoot(o); return null; }
     if(S.shrineChoice){ const walk = cfg.relicLock && S.shrineChoice.options.find(o=>/walk away/i.test(o.label)); chooseShrineOption(walk || (cfg.playerLike ? pickShrineOption(S.shrineChoice.options) : S.shrineChoice.options[Math.floor(Math.random()*S.shrineChoice.options.length)])); return null; }
     if(S.relicChoice && cfg.relicLock){ S.relicChoice=null; S.shrineResult={title:'Relic', text:'(study: declined)'}; return null; }

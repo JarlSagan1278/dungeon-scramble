@@ -2643,10 +2643,12 @@ function onEncounterDefeated(){
   if(depthRank('slim')) drawCount = Math.max(1, drawCount - depthRank('slim')); // Burden of Choice
   if(hasRelic('lucky_coin')){ drawCount += 1; fireRelic('lucky_coin','+1 option'); }
   if(hasRelic('iron_rations')){ S.health = cap(S.health+2, S.maxHealth); logMsg('heal', relicById('iron_rations').name+': healed 2.', 'good'); fireRelic('iron_rations','+2 HP'); }
-  const options = pickLootNUnused(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
-  S.lootChoice = { options, lootName: floor.lootName, overkill, nearMiss };
+  // Oct 31 (Jeremy): the final boss needs no loot -- its chest opens straight onto the victory screen (openFinalChest)
+  const isFinal = e.type==='Big Boss' && S.floorIdx===FLOORS.length-1;
+  const options = isFinal ? [] : pickLootNUnused(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
+  S.lootChoice = { options, lootName: floor.lootName, overkill, nearMiss, final: isFinal };
   teleLog('room_win', {name:e.name, type:e.type, turns:S.turnNumber+1, ms:(S._roomStartedAt!=null)?Math.max(0,teleActiveMs()-S._roomStartedAt):null, overkill, overBy:Math.max(0,Math.round(-e.curHealth)), nearMiss, offered:options.length, hp:S.health});
-  teleLog('loot_offer', {tier:(options[0]&&options[0].cat)||null, overkill, offered:options.map(o=>o.name)});
+  if(!isFinal) teleLog('loot_offer', {tier:(options[0]&&options[0].cat)||null, overkill, offered:options.map(o=>o.name)});
   if(typeof markDiceDiscovered==='function') S.lootChoice.fresh = peekFreshDice(options);
   // A Boss/Big Boss kill or an Overkill each get a distinct sound + a big
   // callout banner, so the moment registers as it happens instead of only
@@ -2698,6 +2700,13 @@ function debugWinEncounter(){
   S.encounter.curHealth = 0;
   logMsg('sys', `[Debug] ${S.encounter.name} auto-defeated.`);
   onEncounterDefeated();
+}
+
+function openFinalChest(){
+  if(!S || !S.lootChoice || !S.lootChoice.final) return;
+  S.lootChoice = null;
+  finishStep(); // past the last room of the last floor: the victory screen
+  if(typeof render==='function') render();
 }
 
 function chooseLoot(dieOption){

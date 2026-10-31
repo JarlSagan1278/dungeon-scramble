@@ -3614,7 +3614,8 @@ function lootChestSVG(tier){
 
 function renderLootModal(){
   const {options, lootName, overkill, fromShrine} = S.lootChoice;
-  const tier = (options[0] && options[0].cat) || 'alloy';
+  const fin = !!S.lootChoice.final; // the final boss's chest: the grandest look, and nothing about options
+  const tier = fin ? 'magic' : ((options[0] && options[0].cat) || 'alloy');
   const accent = LOOT_TIER_ACCENT[tier] || LOOT_TIER_ACCENT.alloy;
   // Overkill's 3rd option (or a Boss's 3-option draw) gets the bigger,
   // denser burst below -- reads as "bigger haul", not just a recolor.
@@ -3623,8 +3624,8 @@ function renderLootModal(){
       <div class="modal loot-modal ${S.lootChoice.opened?'':'loot-modal-chest'} ${options.length<=2?'loot-modal-n2':''}">
       <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:4px;">
         <h2 style="margin:0; width:100%; text-align:center; padding-right:0;">${fromShrine ? (S.lootChoice.title || 'Shrine Boon') : 'Victory!'}</h2>
-        ${overkill?'<span class="status-chip" style="background:var(--gold);color:#241c10;">Overkill! +1 option</span>':''}
-        ${(!overkill && S.lootChoice.nearMiss)?`<span class="status-chip near-miss-chip">So close! ${S.lootChoice.nearMiss} short of Overkill</span>`:''}
+        ${(overkill && !fin)?'<span class="status-chip" style="background:var(--gold);color:#241c10;">Overkill! +1 option</span>':''}
+        ${(!overkill && !fin && S.lootChoice.nearMiss)?`<span class="status-chip near-miss-chip">So close! ${S.lootChoice.nearMiss} short of Overkill</span>`:''}
       </div>
       <div id="loot-body"></div>
     </div></div>`);
@@ -3685,6 +3686,12 @@ function renderLootModal(){
     chestBtn.dataset.opening = '1';
     chestBtn.classList.add('opening');
     const reduced = typeof PREFS!=='undefined' && PREFS.reducedMotion;
+    if(S.lootChoice && S.lootChoice.final){ // the last boss: the chest bursts open onto the victory screen, no dice to pick
+      if(!reduced) overlay.insertAdjacentHTML('afterbegin', `<div class="loot-sunray-burst" style="--sunray-color:${accent.color};"><div class="loot-sunray-wheel loot-sunray-wheel-big"></div></div>`);
+      if(typeof playTone==='function') playTone('encounterKill');
+      setTimeout(()=> closeModal(overlay, openFinalChest), reduced ? 150 : 900);
+      return;
+    }
     if(reduced){ reveal(true); return; }
     const n = options.length;
     for(let i=0;i<n;i++) setTimeout(()=>{ if(typeof playTone==='function') playTone('pathTick', i+1); }, 140 + i*170);

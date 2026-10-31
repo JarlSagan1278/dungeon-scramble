@@ -40,6 +40,7 @@ const TICK_FN = () => {
     skipTransition();
     return { done: false, note: 'skip-transition' };
   }
+  if (S.lootChoice && S.lootChoice.final) { openFinalChest(); return { done: false, note: 'final chest' }; }
   if (S.lootChoice) {
     const opts = S.lootChoice.options;
     chooseLoot(opts[Math.floor(Math.random() * opts.length)]);

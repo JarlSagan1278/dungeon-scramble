@@ -68,6 +68,7 @@ let res = await page.evaluate((cfg)=>{
     if(S.screen==='victory') return 'VICTORY';
     if(S.screen==='gameover') return 'GAMEOVER';
     if(S.transitioning){ skipTransition(); return null; }
+    if(S.lootChoice && S.lootChoice.final){ openFinalChest(); return null; }
     if(S.lootChoice){ const arr=S.lootChoice.options.slice().sort((a,b)=>lootScore(b)-lootScore(a)); const o = cfg.lootMode==='worst'?arr[arr.length-1]:(cfg.lootMode==='random'?arr[Math.floor(Math.random()*arr.length)]:arr[0]); chooseLoot(o); return null; }
     if(S.shrineChoice){ chooseShrineOption(S.shrineChoice.options[Math.floor(Math.random()*S.shrineChoice.options.length)]); return null; }
     if(S.relicChoice){ chooseRelic(S.relicChoice.options[Math.floor(Math.random()*S.relicChoice.options.length)]); return null; }
