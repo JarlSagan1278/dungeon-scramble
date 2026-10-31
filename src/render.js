@@ -660,6 +660,9 @@ function syncRoomFloor(card){
     const fcv = bakedFloorCanvas(vw, Math.max(1, Math.round(app.offsetHeight - hy - floorBelow)));
     if(fcv){ fl.innerHTML = '<div class="rf-light"></div>'; fl.insertBefore(fcv, fl.firstChild); }
     else fl.innerHTML = '<div class="rf-plane"></div><div class="rf-fade"></div><div class="rf-light"></div><div class="rf-vig"></div>';
+    // Oct 31 (Jeremy): the floor's colour per floor (ROOM_TINTS) carries on below the arch, down the rest of the screen;
+    // the part inside the arch is already tinted by the card's own layer, so this starts at the card's bottom edge
+    { const T = ROOM_TINTS[Math.min(3,(S.floorIdx||0)+1)]; if(T) fl.insertAdjacentHTML('beforeend', `<div class="room-tint" style="top:${yb}px;background:${T[0]};mix-blend-mode:multiply"></div>`); }
     // Ground shadows: a feet shadow plus a tall soft pool running down through the health bar, name and chips.
     // All measuring happens before anything is inserted, so this costs one layout, not two (Oct 12).
     const hf = card.querySelector('.hall-fx');
@@ -1871,7 +1874,7 @@ function renderGame(){
           <div class="util-btn rail-pocket" id="open-backpocket-btn" title="${S.backPocket.length?'Safety net ready: if you fall to 0 Health, your Back Pocket can save you once (it spends every die in it).':'Back Pocket empty: no safety net until a die lands here.'}">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?'<span class="badge pocket-heart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.2 C 5.5 15.6 2 12.4 2 8.2 C 2 5.1 4.4 2.8 7.3 2.8 C 9.2 2.8 10.9 3.8 12 5.4 C 13.1 3.8 14.8 2.8 16.7 2.8 C 19.6 2.8 22 5.1 22 8.2 C 22 12.4 18.5 15.6 12 21.2 Z" fill="currentColor"/></svg></span>':''}</div>
           <div class="util-btn rail-item ${(totalTokens&&!S.needRoll)?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Item</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
           <div class="util-btn danger-accent rail-clear ${(S.transitioning||S.needRoll)?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
-          ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning||S.needRoll)?'disabled':''} ${abilityArmed?'armed':''} ${(S.coachRun && !S.classAbilityUsed && !S.transitioning && !abilityArmed && !(S.encounter && S.encounter.type==='Shrine'))?'pulse coach-pulse':''}" id="ability-btn" style="--class-color:${S.klass.color||'#d4af52'}"><span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
+          ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning||S.needRoll)?'disabled':''} ${abilityArmed?'armed':''} ${(S.coachRun && !S.classAbilityUsed && !S.transitioning && !S.needRoll && !abilityArmed && !(S.encounter && S.encounter.type==='Shrine'))?'pulse coach-pulse':''}" id="ability-btn" style="--class-color:${S.klass.color||'#d4af52'}"><span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
             : S.klass.debug ? `<div class="util-btn rail-ability ${(!S.encounter||S.transitioning)?'disabled':''}" id="debug-win-btn"><span>Win</span></div>` : ''}
         </div>
       </div>
@@ -2094,7 +2097,7 @@ function renderTrayFast(){
   if(ab){
     ab.classList.toggle('disabled', !!(S.classAbilityUsed||S.transitioning));
     ab.classList.toggle('armed', abilityArmed);
-    const coach = !!(S.coachRun && !S.classAbilityUsed && !S.transitioning && !abilityArmed && !(S.encounter && S.encounter.type==='Shrine')); // no Skill nudge at shrines (Jeremy, Oct 30)
+    const coach = !!(S.coachRun && !S.classAbilityUsed && !S.transitioning && !S.needRoll && !abilityArmed && !(S.encounter && S.encounter.type==='Shrine')); // no Skill nudge at shrines (Jeremy, Oct 30) or while the lid is on (Oct 31)
     ab.classList.toggle('pulse', coach); ab.classList.toggle('coach-pulse', coach);
     const sp = ab.querySelector('span'); if(sp) sp.textContent = S.classAbilityUsed ? 'Used' : (abilityArmed ? 'Pick a Die' : 'Skill');
   }

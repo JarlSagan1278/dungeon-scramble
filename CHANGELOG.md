@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.17 (Oct 31, 2026)
+- Each floor's room colour now also covers the stone floor below the arch, down to the bottom of the screen.
+- The Skill button doesn't pulse until the lid is off.
 ## 1.42.16 (Oct 31, 2026)
 - Every health bar (hero, monsters, traps, camp) is held by iron brackets with rivets at both ends, like the boss bar.
 - Nothing shows outside the arch: torch light and monsters too tall for the doorway are cut at the stonework's outer edge.
