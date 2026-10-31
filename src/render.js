@@ -2024,18 +2024,15 @@ function bindTrayDice(){
 }
 function renderPathStrip(){
   { // Path as a rightward-growing stack of overlapping coins, one per move (latest on top).
-    const n = S.path.length;
-    // Oct 31 (Jeremy): the head now spans the rail too, so the coins spread out as far as the path total allows.
-    // (a fixed reserve for the path total, not its live width: that can be one tap stale on the fast redraw)
-    const strip = document.getElementById('path-strip');
-    const room = (strip && strip.parentNode) ? strip.parentNode.getBoundingClientRect().right - strip.getBoundingClientRect().left - 80 : 180;
-    const step = n>1 ? Math.max(6, Math.min(26, (room-30)/(n-1))) : 26;
+    // Oct 31: each coin sits in a flex slot that shrinks when the strip runs out of room (CSS, .path-slot), so the coins
+    // spread out as far as the path total allows and overlap more as the path grows, with no measuring mid-render
+    // (measuring here forced an extra layout on every redraw).
     const ta = S.trayAct;
     if(ta){ document.getElementById('path-strip').innerHTML = `<span class="trayact-hint">${iconSpan(ta.kind)} ${ta.kind==='swap' ? (ta.token ? (ta.first==null ? 'Tap the first die to swap' : 'Tap the second die') : 'Tap a die to trade places') : 'Tap a die to reroll'}</span>`; }
     else document.getElementById('path-strip').innerHTML = S.path.map((idx,k)=>{
       const f = classFace(getFaceForIdx(idx));
       const tip = `${k+1}. ${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?(' '+f.value):''}`;
-      return `<span class="path-coin" style="${k?`margin-left:${(step-30).toFixed(1)}px;`:''}z-index:${k+1}" title="${tip}">${iconSpan(f.type, f.value)}</span>`;
+      return `<span class="path-slot" style="z-index:${k+1}"><span class="path-coin" title="${tip}">${iconSpan(f.type, f.value)}</span></span>`;
     }).join('');
   }
 }

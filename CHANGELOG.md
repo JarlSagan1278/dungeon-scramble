@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.35 (Oct 31, 2026)
+- **Speed:** a full screen redraw is about a third faster (124 -> 84 ms with the CPU slowed 6x like a cheap phone). The path coins no longer measure the screen mid-redraw (that forced an extra layout every time); each coin sits in a CSS slot that shrinks as the path grows, so they overlap on their own.
 ## 1.42.34 (Oct 31, 2026)
 - Floor card stairs simplified (Jeremy): four big steps, each a light tread over a dark riser, on one stone stair body, narrowing toward the dark doorway.
 ## 1.42.33 (Oct 31, 2026)

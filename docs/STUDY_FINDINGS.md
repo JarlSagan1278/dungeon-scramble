@@ -137,3 +137,11 @@ bot undervalues tokens, so token shrines may read better with real players.
   ~37% of page views into plays; comparable games (Balatro, Dicey Dungeons, Vampire Survivors, Die in the Dungeon)
   started slowly and took off when a streamer or curator picked them up. Post a short clip of one turn, one community
   a day; pitch creators.
+
+## Speed check, build 1.42.34-35 (Oct 31, 2026)
+Chromium, 395x769 at 2x, CPU slowed 6x (cheap phone). Load to title 3.3 s (7.8 MB single file). Full redraw 124 ms -> 84 ms after
+removing a mid-render measurement in the path coins (renderPathStrip); one forced layout per redraw remains (placeVs /
+decorateArch / fitFoChips read positions; batching them would save ~1 ms unthrottled each). Path tap 45-52 ms, lid flick to dice
+~170-210 ms, room change ~215-260 ms. Turn playback: median frame 16.7 ms, 95th percentile 50 ms, a few frames up to ~180-220 ms
+(the room/loot redraws). Memory: 40 auto turns across rooms, JS heap 25.2 -> 25.3 MB and page elements flat (no leak); no leftover
+effect elements after the run.

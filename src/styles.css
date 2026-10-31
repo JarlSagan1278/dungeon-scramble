@@ -3574,3 +3574,9 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 @keyframes fc-in{ 0%{ opacity:0; transform:translateY(12px); } 15%{ opacity:1; transform:none; } 82%{ opacity:1; } 100%{ opacity:0; transform:translateY(-8px); } }
 #floor-card .floor-card-box.fc-scene{ clip-path:none !important; filter:none !important; } /* the old ribbon clip notched the arch's sides */
 #floor-card{ background:rgba(8,5,3,.6) !important; }
+/* path coins: a slot per coin, 26px apart when there's room, shrinking toward 6px as the path grows; the 30px coin
+   overflows its slot so later coins overlap earlier ones. The strip leaves 80px on the right for the path total. */
+.tray-panel .path-strip{ flex:1 1 0; min-width:0; margin-right:80px; }
+.path-slot{ position:relative; flex:0 1 26px; min-width:6px; height:30px; overflow:visible; }
+.path-slot:last-child{ flex:0 0 30px; }
+.path-slot .path-coin{ position:absolute; left:0; top:0; margin:0 !important; }
