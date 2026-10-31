@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.20 (Oct 31, 2026)
+- The Toadtaur Warrior and Wizard stay separate (Jeremy): the Warrior no longer joins Leap Year, Warrior Smash is gone, and Leap Year is back to Lily Pod and Chimeronslaught. The Warrior is still a Floor 3 elite.
 ## 1.42.19 (Oct 31, 2026)
 - The Toadtaur Warrior really joins the Toadtaur Wizard at Leap Year (its second half): "Toadtaur Warrior joins the fight!", it drops into the doorway at the Wizard's side, and Leap Year gains its move, Warrior Smash (10 damage), between Lily Pod and Chimeronslaught.
 ## 1.42.18 (Oct 31, 2026)

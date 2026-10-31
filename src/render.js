@@ -1649,13 +1649,8 @@ function renderEncounterCard(e, mode){
       ? `<div class="fo-quests-float"${questPaperStyle(e)} title="Complete these during the fight for bonus rewards"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label">Quests</div>${e.quests.some(q=>!QUEST_ALL_FIGHT.test(parseQuestSpec(q).cond)) ? '<div class="fo-quests-sub">in one turn</div>' : ''}<div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, e.questsDone[i])}</span>`; }).join('')}</div></div>` : '';
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
     const sz = encounterSize(e);
-    // Oct 31 (Jeremy, option 1): a boss's phase-2 ally stands beside it in the doorway (picture only; its blows are in the kit)
-    const allyName = (e.phase===2 && e.kit && e.kit.phase2 && e.kit.phase2.ally) || null;
-    const allyArt = allyName && MONSTER_ART[allyName];
-    const allyFig = allyArt ? `<img class="fo-img ${ENCOUNTER_NO_FLIP.has(allyName)?'':'fo-flip'} enc-art fo-ally${S._allyDrop?' ally-drop':''}" src="${allyArt}" alt="${allyName}" style="--drop:${encounterDrop({name:allyName})}%"/>` : '';
-    if(S._allyDrop) setTimeout(()=>{ S._allyDrop = false; }, 700); // the drop plays once, on the render right after it joins
-    const monsterFig = (art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz};--drop:${encounterDrop(e)}%"/>`
-      : `<div class="fo-img ${flipCls} fo-mystery">${mysteryFigureHTML('width:70%; aspect-ratio:1/1;')}</div>`) + allyFig;
+    const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz};--drop:${encounterDrop(e)}%"/>`
+      : `<div class="fo-img ${flipCls} fo-mystery">${mysteryFigureHTML('width:70%; aspect-ratio:1/1;')}</div>`;
     const p = foPlayer || {};
     return `
     <div class="enc-card fo-arch fo-lvl${Math.min(3,(S.floorIdx||0)+1)} ${roomEnterCls}">
