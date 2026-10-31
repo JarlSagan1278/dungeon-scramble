@@ -846,90 +846,10 @@ function pickPortrait(originId){
   const arr = originPortraitArray(originId);
   if(!arr) return { img: GNOME_SILHOUETTE, placeholder:true };
   const idx = rand(arr.length);
-  const portrait = { img: arr[idx], placeholder:false, tone:'original', origin:originId, idx }; // origin + idx (Oct 16): a resumed run redraws it from the current art
-  applyRandomSkinTone(portrait, originId, idx);
-  return portrait;
+  // Oct 31 (Jeremy): no random skin tone any more -- every hero is shown as drawn
+  return { img: arr[idx], placeholder:false, tone:'original', origin:originId, idx }; // origin + idx (Oct 16): a resumed run redraws it from the current art
 }
 
-// ---- Random skin tone per run ----
-// Each fresh portrait pick rolls one of five skin tones (Original keeps the
-// art as drawn). The tint is done at runtime on a canvas, only on the skin
-// pixels, so outlines, hair, clothes and props never change and the source
-// PNGs stay untouched. Dwarf and Halfling art is fully supported; two Gnome
-// portraits (a cream robe, a scroll) and every Pixie (their face colours are
-// per-portrait palette choices) keep their original colours.
-const SKIN_TONES = [
-  { id:'original', name:'Original', rgb:null },
-  { id:'green',    name:'Green',    rgb:[120,200,100] },
-  { id:'blue',     name:'Blue',     rgb:[120,170,235] },
-  { id:'purple',   name:'Purple',   rgb:[180,130,220] },
-  { id:'gray',     name:'Gray',     rgb:[165,170,175] },
-];
-const SKIN_TINT_SKIP = { pixie:'all', gnome:[2,8,9], dwarf:[2,5,10] }; // Oct 26: gnome 2 holds a cream map that reads as skin; dwarves 2, 5, 10 have white beards the same colour as their faces (Jeremy: skip them)
-const SKIN_PEACH = [250,203,157];
-const _skinTintCache = {};
-function skinTintEligible(originId, idx){
-  const skip = SKIN_TINT_SKIP[originId];
-  if(skip==='all') return false;
-  if(Array.isArray(skip) && skip.indexOf(idx)>=0) return false;
-  return originId==='dwarf' || originId==='gnome' || originId==='halfling';
-}
-function tintSkinPixels(src, originId, rgb){
-  return new Promise((resolve)=>{
-    const im = new Image();
-    im.onload = ()=>{
-      try{
-        const c = document.createElement('canvas'); c.width = im.width; c.height = im.height;
-        const g = c.getContext('2d'); g.drawImage(im,0,0);
-        const d = g.getImageData(0,0,c.width,c.height); const px = d.data;
-        const peach = originId==='halfling';
-        // Oct 26 (Jeremy: "too blotchy"): the paper texture speckles the skin, so a per-pixel colour test left untinted
-        // dots. Now: score each pixel, keep the clearly-skin ones, close the gaps between them (never across the dark
-        // outlines), soften the edge by a pixel, then tint the whole patch; the paper grain still shows through its brightness.
-        const W = c.width, H = c.height, N = W*H;
-        const score = new Float32Array(N), dark = new Uint8Array(N), lumA = new Float32Array(N);
-        for(let k=0, i=0; k<N; k++, i+=4){
-          const a=px[i+3]; if(!a){ dark[k]=1; continue; }
-          const r=px[i], gg=px[i+1], b=px[i+2];
-          if(Math.max(r,gg,b) < 95) dark[k]=1;
-          if(peach){
-            const dr=r-SKIN_PEACH[0], dg=gg-SKIN_PEACH[1], db=b-SKIN_PEACH[2];
-            score[k] = Math.max(0,Math.min(1,(34-Math.sqrt(dr*dr+dg*dg+db*db))/14)); lumA[k] = ((r+gg+b)/3)/203*1.15;
-          } else {
-            const mn=Math.min(r,gg,b);
-            score[k] = Math.max(0,Math.min(1,(mn-165)/35)) * Math.max(0,Math.min(1,((r-b)-3)/8)); lumA[k] = ((r+gg+b)/3)/236;
-          }
-        }
-        let m = new Uint8Array(N); for(let k=0;k<N;k++) m[k] = score[k] > 0.3 ? 1 : 0;
-        const R = Math.max(2, Math.round(W/170)); // ~3 px on the 512 px portraits
-        const pass = (src, grow, horiz)=>{ const out = new Uint8Array(N);
-          for(let y=0;y<H;y++) for(let x=0;x<W;x++){ let v = grow ? 0 : 1;
-            for(let t=-R;t<=R;t++){ const xx = horiz ? x+t : x, yy = horiz ? y : y+t;
-              const q = (xx<0||yy<0||xx>=W||yy>=H) ? 0 : src[yy*W+xx];
-              if(grow ? q : !q){ v = grow ? 1 : 0; break; } }
-            out[y*W+x] = v; } return out; };
-        m = pass(pass(m,true,true),true,false);          // grow over the specks...
-        m = pass(pass(m,false,true),false,false);        // ...and shrink back, so the patch keeps its shape
-        for(let k=0;k<N;k++) if(dark[k]) m[k]=0;          // never paint the outlines or anything dark
-        const wv = new Float32Array(N);                   // soft 1 px edge
-        for(let y=0;y<H;y++) for(let x=0;x<W;x++){ const k=y*W+x; if(!m[k]){ continue; }
-          let n=0, s2=0; for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){ const xx=x+dx, yy=y+dy; if(xx<0||yy<0||xx>=W||yy>=H) continue; n++; s2+=m[yy*W+xx]; }
-          wv[k] = s2/n; }
-        for(let k=0, i=0; k<N; k++, i+=4){
-          const w = wv[k]; if(w<=0) continue;
-          const r=px[i], gg=px[i+1], b=px[i+2], lum = lumA[k];
-          px[i]   = r*(1-w) + Math.min(255,rgb[0]*lum)*w;
-          px[i+1] = gg*(1-w) + Math.min(255,rgb[1]*lum)*w;
-          px[i+2] = b*(1-w) + Math.min(255,rgb[2]*lum)*w;
-        }
-        g.putImageData(d,0,0);
-        resolve(c.toDataURL('image/png'));
-      }catch(e){ resolve(null); }
-    };
-    im.onerror = ()=>resolve(null);
-    im.src = src;
-  });
-}
 // Oct 16 (Jeremy: a run started before the paper texture kept its old portrait): saves used to keep only the finished
 // picture, so a resumed run showed whatever art existed when it began. Saves now also keep which portrait and tint it
 // is, and loading rebuilds the picture from the current art. Older saves without that stay as they are.
@@ -937,29 +857,8 @@ function refreshSavedPortrait(p){
   try{
     if(!p || p.placeholder || p.idx==null || !p.origin) return;
     const arr = originPortraitArray(p.origin); if(!arr || !arr[p.idx]) return;
-    p.img = arr[p.idx];
-    const tone = SKIN_TONES.find(t=>t.id===p.tone);
-    if(!tone || !tone.rgb || !skinTintEligible(p.origin, p.idx)) return;
-    const key = p.origin+':'+p.idx+':'+tone.id;
-    if(_skinTintCache[key]){ p.img = _skinTintCache[key]; return; }
-    tintSkinPixels(p.img, p.origin, tone.rgb).then(url=>{ if(!url) return; _skinTintCache[key] = url; p.img = url; if(typeof render==='function' && typeof S!=='undefined' && S) render(); });
+    p.img = arr[p.idx]; p.tone = 'original'; // Oct 31: skin tints removed; an older save's tinted hero comes back as drawn
   }catch(e){}
-}
-function applyRandomSkinTone(portrait, originId, idx){
-  if(!skinTintEligible(originId, idx)) return;
-  const tone = SKIN_TONES[rand(SKIN_TONES.length)];
-  portrait.tone = tone.id;
-  if(!tone.rgb) return;
-  const key = originId+':'+idx+':'+tone.id;
-  if(_skinTintCache[key]){ portrait.img = _skinTintCache[key]; return; }
-  const orig = portrait.img;
-  tintSkinPixels(orig, originId, tone.rgb).then(url=>{
-    if(!url) return;
-    _skinTintCache[key] = url;
-    portrait.img = url;
-    if(portrait._onTint){ try{ portrait._onTint(url); }catch(e){} } // the setup screen's re-roll swaps the picture in place
-    if(typeof render==='function' && typeof S!=='undefined' && S) render();
-  });
 }
 
 // The character-select screen shows a portrait per Origin card before a
@@ -976,10 +875,10 @@ function applyRandomSkinTone(portrait, originId, idx){
 // staying fixed for the whole session.
 let setupPortraitCache = {};
 function resetSetupPortraitPreviews(){ setupPortraitCache = {}; }
-function rerollSetupPortrait(originId){ // a different look than the one showing (same picture + same tone counts as the same)
+function rerollSetupPortrait(originId){ // a different picture than the one showing
   const cur = setupPortraitCache[originId];
   let p = pickPortrait(originId);
-  for(let i=0; i<60 && cur && p.idx===cur.idx && p.tone===cur.tone; i++) p = pickPortrait(originId); // Oct 28: 6 tries let a tap show the same look now and then
+  for(let i=0; i<60 && cur && p.idx===cur.idx; i++) p = pickPortrait(originId); // Oct 28: 6 tries let a tap show the same look now and then
   setupPortraitCache[originId] = p;
   return p;
 }

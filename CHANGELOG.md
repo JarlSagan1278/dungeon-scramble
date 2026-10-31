@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.16 (Oct 31, 2026)
+- Every health bar (hero, monsters, traps, camp) is held by iron brackets with rivets at both ends, like the boss bar.
+- Nothing shows outside the arch: torch light and monsters too tall for the doorway are cut at the stonework's outer edge.
+- No random skin tones at character creation; heroes appear as drawn (older saves with a tinted hero load in the drawn colours).
+- Equip window: the button says Suggest until you pick a die; pressing it highlights and compares the suggested die and turns into Replace, so a quick double press equips the suggestion.
 ## 1.42.15 (Oct 31, 2026)
 New banners (Jeremy's picks A + B from the banner research; the diagonal ribbons are gone):
 - At the source: quest done, minion cleared, relic Block and mirrored H.O.T./D.O.T. pop as a short chip on the quest sign, the monster or the health bar they belong to.

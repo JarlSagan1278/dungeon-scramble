@@ -707,6 +707,10 @@ function decorateArch(){
     const r = card.getBoundingClientRect();
     const w = Math.round(card.offsetWidth), h = Math.round(card.offsetHeight+10);
     const lvl = Math.min(3,(S.floorIdx||0)+1);
+    // Oct 31 (Jeremy): nothing shows outside the arch -- torch light and monsters too tall for the doorway are cut at the
+    // stonework's outer edge. The frame is drawn 5px left and 10px up of the card (see the frame img below).
+    { const ox=-5, oy=-10, rx=120, ry=90, i=-3;
+      card.style.clipPath = `path("M${i+ox},${h+60} L${i+ox},${ry+oy} A${rx-i},${ry-i} 0 0 1 ${rx+ox},${i+oy} L${w-rx+ox},${i+oy} A${rx-i},${ry-i} 0 0 1 ${w-i+ox},${ry+oy} L${w-i+ox},${h+60} Z")`; }
     syncRoomFloor(card);
     watchRoomFloor(card);
     // The arch (thousands of brick/moss shapes) is drawn once per size+floor into a cached SVG image: one <img> to
@@ -1177,11 +1181,10 @@ function renderSetup(){
   }
   renderOriginTabs();
   renderOriginShowcaseNow();
-  // Oct 16 (Jeremy): the little refresh button on the portrait re-rolls the character's look (portrait + skin tone).
+  // Oct 16 (Jeremy): the little refresh button on the portrait re-rolls the character's look (another portrait; skin tones removed Oct 31).
   originShowcase.addEventListener('click', ev=>{
     const b = ev.target.closest && ev.target.closest('#portrait-reroll'); if(!b) return;
-    const oid = previewedOriginId, np = rerollSetupPortrait(oid);
-    np._onTint = url=>{ const im = document.querySelector('#origin-showcase .portrait-img'); if(im && previewedOriginId===oid && setupPortraitCache[oid]===np) im.src = url; };
+    rerollSetupPortrait(previewedOriginId);
     if(typeof playTone==='function') playTone('uiTick');
     renderOriginShowcaseNow();
     const nb = document.getElementById('portrait-reroll'); if(nb){ nb.classList.remove('spin'); void nb.offsetWidth; nb.classList.add('spin'); }
@@ -4072,7 +4075,7 @@ function renderSwapModal(){
         <div class="swap-compare-row swap-compare-out" id="swap-compare-out"><div class="swap-compare-label"><span>Out</span> <b class="swap-out-hint">tap a die below</b></div><div class="faces-tiles">${'<div class="mini-face mf-slot"></div>'.repeat(6)}</div></div>
       </div>
       <div class="swap-list" id="swap-list"></div>
-      <div class="small-btn-row" style="justify-content:center;"><button class="pocket-btn" id="swap-pocket" title="Keep the new die in your Back Pocket; your Tray stays as it is">Keep in Pocket</button><button class="primary" id="swap-go" disabled>Pick a die first</button></div>
+      <div class="small-btn-row" style="justify-content:center;"><button class="pocket-btn" id="swap-pocket" title="Keep the new die in your Back Pocket; your Tray stays as it is">Keep in Pocket</button><button class="primary swap-suggest-mode" id="swap-go">Suggest</button></div>
     </div></div>`);
   overlay.querySelector('.modal').classList.add('swap-modal');
   openUniqueOverlay('swap', overlay);
@@ -4107,19 +4110,22 @@ function renderSwapModal(){
       item.classList.add('selected');
       overlay.querySelector('#swap-compare-out').innerHTML = `<div class="swap-compare-label"><span>Replacing</span> <b>${die.name}</b></div>${diceFacesRowHTML(die)}`;
       overlay.querySelector('.swap-compare-in').innerHTML = `<div class="swap-compare-label"><span>New</span> <b>${incoming.name}</b></div>${diceFacesRowHTML(incoming, die)}`;
-      goBtn.disabled = false; goBtn.textContent = 'Replace';
+      goBtn.textContent = 'Replace'; goBtn.classList.remove('swap-suggest-mode');
     };
     list.appendChild(item);
   });
-  if(suggestItem) setTimeout(()=>{
-    if(chosen || !overlay.isConnected) return; // the player already picked something, or the picker closed
+  const showSuggest = ()=>{
+    if(chosen || !overlay.isConnected || !suggestItem) return; // the player already picked something, or the picker closed
     suggestItem.classList.add('swap-suggest'); suggestItem.title = 'Suggested: your weakest die by face value';
-    suggestItem.insertAdjacentHTML('afterbegin', '<span class="swap-suggest-ribbon">Suggested</span>');
+    if(!suggestItem.querySelector('.swap-suggest-ribbon')) suggestItem.insertAdjacentHTML('afterbegin', '<span class="swap-suggest-ribbon">Suggested</span>');
     suggestItem.onclick(); // pre-compare it
-  }, SWAP_SUGGEST_DELAY_MS);
+  };
+  if(suggestItem) setTimeout(showSuggest, SWAP_SUGGEST_DELAY_MS);
   overlay.querySelector('#swap-pocket').onclick = () => closeModal(overlay, ()=> pocketLootDie());
+  // Oct 31 (Jeremy): until a die is picked the button says Suggest and shows the suggestion on demand; it then says
+  // Replace, so a quick double press equips the suggested die
   goBtn.onclick = () => {
-    if(!chosen) return;
+    if(!chosen){ showSuggest(); return; }
     const die = S.tray[chosen.indices[0]].die;
     const isBasic = die.cat==='attack' || die.cat==='maneuver';
     // The comparison above already shows exactly what is being traded, so the Replace button is the confirmation.

@@ -3123,7 +3123,7 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 /* 7A: the equip window shows six empty slots until a die is picked, and the button says why it waits. */
 .mini-face.mf-slot{ border:2px dashed rgba(233,215,174,.45) !important; background:rgba(0,0,0,.18) !important; box-shadow:none !important; }
 .swap-out-hint{ opacity:.7; }
-#swap-go:disabled{ opacity:1 !important; background:#5b4a3a !important; color:#e9d7ae !important; font-weight:700; }
+#swap-go.swap-suggest-mode{ background:#4f6aa6 !important; color:#fff3dc !important; } /* Oct 31: Suggest until a die is picked, then gold Replace */
 /* 8B: Settings links as toy tiles, three across; the danger buttons get their own row under a line. */
 .settings-btn-grid{ display:flex !important; flex-wrap:wrap; gap:8px; }
 .settings-btn-grid .settings-tile{ flex:1 1 28%; display:flex; flex-direction:column; align-items:center; gap:3px; padding:9px 2px 8px; font-size:13px; min-height:62px; }
@@ -3314,3 +3314,11 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 @keyframes hl-in{ from{ transform:translateY(-10px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes hl-out{ to{ transform:translateY(-10px); opacity:0; } }
 .reduced-motion .src-chip, .reduced-motion .hl-strip{ animation:none !important; }
+/* Oct 31 (Jeremy): every health bar is held by iron brackets with rivets at both ends, like the boss's bar */
+.fo-hpwrap:not(:has(.bar-arc)){ position:relative; }
+.fo-hpwrap:not(:has(.bar-arc))::before, .fo-hpwrap:not(:has(.bar-arc))::after{ content:""; position:absolute; top:50%; width:11px; height:calc(100% + 4px); max-height:26px; transform:translateY(-50%);
+  z-index:5; pointer-events:none; box-sizing:border-box; border:1.6px solid var(--line); border-radius:2px; background:
+  radial-gradient(circle at 50% 27%, #c9c2b5 0 1.6px, var(--line) 1.7px 2.4px, transparent 2.5px),
+  radial-gradient(circle at 50% 73%, #c9c2b5 0 1.6px, var(--line) 1.7px 2.4px, transparent 2.5px), #3b3f45; }
+.fo-hpwrap:not(:has(.bar-arc))::before{ left:-4px; }
+.fo-hpwrap:not(:has(.bar-arc))::after{ right:-4px; }
