@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.43 (Oct 31, 2026)
+- The title screen no longer scrolls slightly on phones whose browser leaves less than 736 px of height: it fills the real screen height instead of the game card's 720 px minimum.
 ## 1.42.42 (Oct 31, 2026)
 - **App icon (Jeremy picked A):** a clean cut-out bust of the red rogue with the whole torch flame, on the dark brown with the paper grain (the old crop sliced the flame at the corner and showed a corner of the dwarf's sword). Web icons, Android launcher icons and splash screens all regenerated.
 - **Floor card text crisp:** the old banner's dark text-shadow doubled the letters on the light stone and parchment, and the tablet's slight tilt softened them.

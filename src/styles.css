@@ -3648,3 +3648,8 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
    light stone and parchment, and the tablet's 1-degree tilt softened them. Crisp, flat text now. */
 #floor-card .fc-tablet, #floor-card .fc-name{ text-shadow:none !important; -webkit-text-stroke:0 !important; }
 #floor-card .fc-tablet{ transform:none !important; }
+/* Oct 31 (Jeremy: the title screen scrolled a little): the shared --screen-h has a 720px floor for the game card, but
+   a phone browser with its address bar can be shorter than 720 + the 16px margins. The title fills the real height. */
+.wrap:has(.title-screen-fill){ min-height:0 !important; }
+#app:has(.title-screen-fill){ min-height:0 !important; }
+.title-screen-fill{ min-height:0 !important; height:calc(100dvh - 16px) !important; max-height:var(--screen-h); }
