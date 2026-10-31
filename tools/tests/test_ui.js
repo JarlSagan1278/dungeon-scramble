@@ -14,7 +14,17 @@ const SHOTS = process.env.SHOTS || ''; // set SHOTS=<dir> to save screenshots
     window.__posts = []; window.__reply = 'ok';
     window.fetch = (url, opt) => { window.__posts.push({ url, body: opt && opt.body }); const t = window.__reply; return t === 'FAIL' ? Promise.reject(new Error('offline')) : Promise.resolve({ text: () => Promise.resolve(t) }); };
   });
-  const file = 'file://' + path.resolve(__dirname, '../../dist/dungeon_scramble.html');
+  // Served over http, like the real sites (Oct 31): on a file:// page headless Chromium sometimes drops every
+  // localStorage write of the session on location.reload(), which made the Abandon Run check fail ~1 run in 5.
+  const http = require('http'), fs = require('fs'), DIST = path.resolve(__dirname, '../../dist');
+  const server = http.createServer((req, res) => {
+    const p = path.join(DIST, decodeURIComponent(req.url.split('?')[0]));
+    if (!p.startsWith(DIST) || !fs.existsSync(p) || fs.statSync(p).isDirectory()) { res.writeHead(404); return res.end(); }
+    res.writeHead(200, { 'Content-Type': p.endsWith('.html') ? 'text/html; charset=utf-8' : p.endsWith('.js') ? 'text/javascript' : 'application/octet-stream' });
+    fs.createReadStream(p).pipe(res);
+  });
+  await new Promise(r => server.listen(0, '127.0.0.1', r));
+  const file = `http://127.0.0.1:${server.address().port}/dungeon_scramble.html`;
   await page.goto(file);
   const out = []; process.on('unhandledRejection', e => { console.log(out.join('\n')); console.log('CRASH ' + e.message.split('\n')[0]); console.log(errors.join('\n')); process.exit(1); });
   const ok = (c, msg) => out.push((c ? 'ok   ' : 'FAIL ') + msg);
@@ -241,4 +251,5 @@ const SHOTS = process.env.SHOTS || ''; // set SHOTS=<dir> to save screenshots
   console.log(out.join('\n'));
   console.log(errors.length ? 'PAGE ERRORS:\n' + errors.join('\n') : 'no page errors');
   await browser.close();
+  server.close();
 })();
