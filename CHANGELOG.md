@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.31 (Oct 31, 2026)
+- Boss Phase 2 label is "Phase 2" (or "Phase 2 · Wind-up!") on one line; "Phase 2 · Next turn" wrapped and pushed the move chips onto the tray. Enemy turn labels never wrap.
+- The Minion count chip under your name shows a tiny minion die (dark, two eyes, like on the tray) and the number, instead of "Min 3".
 ## 1.42.30 (Oct 31, 2026)
 - The new-room door's handle read as a 0: it is now an iron backplate with a round brass knob and a keyhole, below the plaque.
 ## 1.42.29 (Oct 31, 2026)

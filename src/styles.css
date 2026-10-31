@@ -3510,3 +3510,8 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 .rc-sign .rc-plaque{ position:relative; top:auto; left:auto; transform:rotate(-1.5deg); }
 .rc-sign .rc-kind{ position:relative; top:auto; left:auto; transform:none; margin-top:-2px; }
 .rc-door > .rc-tap{ grid-area:2/1; }
+/* Oct 31 (Jeremy): the enemy turn label never wraps (Phase 2 used to push the chips onto the tray) */
+.fo-turnlabel{ white-space:nowrap; }
+/* the Minion count chip shows a tiny minion die (dark, two eyes, like on the tray) instead of "Min" */
+.chip-minion{ display:inline-flex; align-items:center; justify-content:center; gap:3px; width:15px; height:15px; border-radius:4px; background:#2a1d13; border:1.5px solid var(--line); vertical-align:-3px; margin-right:3px; box-sizing:border-box; }
+.chip-minion i{ width:3px; height:4.5px; border-radius:50%; background:#ffcf4a; }

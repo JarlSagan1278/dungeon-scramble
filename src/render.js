@@ -1676,7 +1676,7 @@ function renderEncounterCard(e, mode){
             </div>`}${fx.deltaHTML}${tickFloatersHTML('enemy')}<div class="kill-hint fo-hint ${killHint?'kill-hint-'+killHint.state:''}" ${killHint?`data-hint="${killHint.state}"`:''}>${killHint?killHint.text:'&nbsp;'}</div></div>
           <div class="fo-name" ${e.flavor?`title="${e.flavor.replace(/"/g,'&quot;')}"`:''}>${typeTag}${nbHyphen(e.name)}</div>
           <div class="fo-chips fo-buffs">${hudChips(statuses)}</div>
-          ${chipsOnly?`<div class="fo-turnlabel${nextTurn.heavy?' heavy':''}" title="${isBoss?'Every turn the boss makes its base attack plus the special shown (Freeze cancels the special).':(HEAVY_EVERY[e.tier]?'The enemy does all of these every turn. Every '+HEAVY_EVERY[e.tier]+(HEAVY_EVERY[e.tier]===2?'nd':'rd')+' turn is a heavy turn that doubles one of them (Freeze cancels it).':'The enemy does all of these every turn.')}">${isBoss?(e.phase===2?(nextTurn.heavy?'Phase 2 &middot; Wind-up!':'Phase 2 &middot; Next turn'):(nextTurn.heavy?'Wind-up next!':'Next turn')):(nextTurn.heavy?'Heavy turn next!':(HEAVY_EVERY[e.tier]?'Heavy in '+(HEAVY_EVERY[e.tier]-((e.turnsActed||0)%HEAVY_EVERY[e.tier])):'Every turn'))}</div>`:''}
+          ${chipsOnly?`<div class="fo-turnlabel${nextTurn.heavy?' heavy':''}" title="${isBoss?'Every turn the boss makes its base attack plus the special shown (Freeze cancels the special).':(HEAVY_EVERY[e.tier]?'The enemy does all of these every turn. Every '+HEAVY_EVERY[e.tier]+(HEAVY_EVERY[e.tier]===2?'nd':'rd')+' turn is a heavy turn that doubles one of them (Freeze cancels it).':'The enemy does all of these every turn.')}">${isBoss?(e.phase===2?(nextTurn.heavy?'Phase 2 &middot; Wind-up!':'Phase 2'):(nextTurn.heavy?'Wind-up next!':'Next turn')):(nextTurn.heavy?'Heavy turn next!':(HEAVY_EVERY[e.tier]?'Heavy in '+(HEAVY_EVERY[e.tier]-((e.turnsActed||0)%HEAVY_EVERY[e.tier])):'Every turn'))}</div>`:''}
           <div class="fo-chips">${chipsOnly}</div>
         </div>
       </div>
@@ -1845,7 +1845,7 @@ function renderGame(){
   if(S.pendingFreeBoost) playerStatusTipLines.push(`Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}`);
   const playerStatusTip = playerStatusTipLines.join('\n');
   { const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
-    foPlayer = { statusHTML:`${S.playerDOT?`<span class="status-chip status-tooltip-target" title="D.O.T. ${S.playerDOT}: ${STATUS_DESC.dot}">${iconSpan('dot', S.playerDOT)} DOT</span>`:''}        ${S.playerHOT?`<span class="status-chip status-tooltip-target" title="H.O.T. ${S.playerHOT}: ${STATUS_DESC.hot}">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}        ${S.playerBlock?`<span class="status-chip status-tooltip-target" title="Block ${S.playerBlock}: ${STATUS_DESC.block}">${iconSpan('block', S.playerBlock)} Block</span>`:''}        ${minionCount?`<span class="status-chip status-tooltip-target" title="Minions ${minionCount}: ${STATUS_DESC.minions}">Minions ${minionCount}</span>`:''}${S.pendingFreeBoost?`<span class="status-chip status-tooltip-target" style="background:var(--gold);color:#241c10;" title="Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}">${iconSpan('boost')} Boost x${S.pendingFreeBoost} armed</span>`:''}`, fxCls:playerFx.cls, deltaHTML:playerFx.deltaHTML, hpPct, tip:playerStatusTip,
+    foPlayer = { statusHTML:`${S.playerDOT?`<span class="status-chip status-tooltip-target" title="D.O.T. ${S.playerDOT}: ${STATUS_DESC.dot}">${iconSpan('dot', S.playerDOT)} DOT</span>`:''}        ${S.playerHOT?`<span class="status-chip status-tooltip-target" title="H.O.T. ${S.playerHOT}: ${STATUS_DESC.hot}">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}        ${S.playerBlock?`<span class="status-chip status-tooltip-target" title="Block ${S.playerBlock}: ${STATUS_DESC.block}">${iconSpan('block', S.playerBlock)} Block</span>`:''}        ${minionCount?`<span class="status-chip status-tooltip-target" title="Minions ${minionCount}: ${STATUS_DESC.minions}"><span class="chip-minion" aria-hidden="true"><i></i><i></i></span><b class="chip-n">${minionCount}</b></span>`:''}${S.pendingFreeBoost?`<span class="status-chip status-tooltip-target" style="background:var(--gold);color:#241c10;" title="Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}">${iconSpan('boost')} Boost x${S.pendingFreeBoost} armed</span>`:''}`, fxCls:playerFx.cls, deltaHTML:playerFx.deltaHTML, hpPct, tip:playerStatusTip,
       figCls: playerFx.cls==='flash-damage'?'dmg-flash':playerFx.cls==='flash-heal'?'heal-flash':'',
       figHTML: portrait.placeholder ? mysteryFigureHTML('width:60px; height:60px;') : `<img class="fo-img" src="${portrait.img}" alt="${S.origin.name}">` }; }
   app.innerHTML = `
@@ -3884,8 +3884,7 @@ function hudChips(h){
   return (h||'')
     .replace(/<span class="icon-svg">(<svg[\s\S]*?<\/svg>)<span class="icon-value-overlay">[^<]*<\/span><\/span>/g, (m, svg)=>{ const t = Object.keys(ICON_SVG).find(k=>ICON_SVG[k]===svg); return t ? iconSpanSolid(t) : m; })
     .replace(/(<span class="status-chip[^>]*title="[^"]*? (\d+(?:\.\d+)?):[^"]*"[^>]*>)([\s\S]*?) (?:DOT|HOT|Block|Shield)<\/span>/g, '$1$3<b class="chip-n">$2</b></span>')
-    .replace(/ Boost x(\d+) armed<\/span>/g, '<b class="chip-n">x$1</b></span>')
-    .replace(/Minions (\d+)<\/span>/g, 'Min <b class="chip-n">$1</b></span>');
+    .replace(/ Boost x(\d+) armed<\/span>/g, '<b class="chip-n">x$1</b></span>');
 }
 function relicStripHTML(){
   if(!S.relics || !S.relics.length) return '';

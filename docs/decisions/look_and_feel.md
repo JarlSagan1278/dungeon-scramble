@@ -74,3 +74,4 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Screen polish (Jeremy, Oct 31, 1.42.27):** picked 2A (character select: bigger text, parchment nameplate, padlock badges), 3A (drawn empty trophy shelf in Records), 4A (a picture on every How to Play page, shorter text), 5A (centred end-screen headers), 6A (fighter labels hide behind the loot chest).
 - **How to Play trays (Jeremy, Oct 31, 1.42.28):** all dice in the picture trays are the same size.
 - **Screen polish two (Jeremy, Oct 31, 1.42.29):** picked 1A (equip shows the real 4x4 tray), 2A (silhouette achievement medals, gold when earned), 3A (new-room door with plaque and kind ribbon; Jeremy: make the door consistent with the game, so it reuses the room's stone arch and the dice chest's wood/iron/rivets), 4A (Pick one ribbon, dark-well blanks).
+- **Small fixes (Jeremy, Oct 31, 1.42.31):** boss Phase 2 label on one line; the Minion chip shows a minion die instead of "Min".
