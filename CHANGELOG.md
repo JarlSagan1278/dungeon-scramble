@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.45 (Oct 31, 2026)
+- Title screen on short phone screens: the class depth badges under the buttons were cut off. The buttons and badges now keep their full height and the cover art gives way instead (cropped from the bottom, where it is only floor).
 ## 1.42.44 (Oct 31, 2026)
 - The floor label takes its floor's loot die colour (Jeremy): Floor I steel (Alloy), Floor II gold (Gilded), Floor III purple (Magic), on the tray badge and the Floor card tablet.
 ## 1.42.43 (Oct 31, 2026)

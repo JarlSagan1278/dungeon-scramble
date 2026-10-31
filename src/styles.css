@@ -3658,3 +3658,7 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 .tray-head .round-badge .rb-floor.rb-gilded, #floor-card .fc-tablet.rb-gilded{ background:var(--paper-tile) repeat, linear-gradient(180deg,#e6c86e,#c49a3c) !important; color:#241c10 !important; }
 .tray-head .round-badge .rb-floor.rb-magic, #floor-card .fc-tablet.rb-magic{ background:var(--paper-tile) repeat, linear-gradient(180deg,#a47ac8,#7a4fa0) !important; color:#f5eaff !important; }
 .tray-head .round-badge .rb-floor[class*="rb-"], #floor-card .fc-tablet[class*="rb-"]{ background-size:110px 110px, auto !important; background-blend-mode:soft-light, normal !important; }
+/* Oct 31 (Jeremy: the depth badges were cut off on short screens): the buttons and badges keep their full height and
+   the cover art gives way instead (cropped from the bottom, where it is only floor); the logo and heroes stay. */
+.title-art-wrap{ flex:1 1 auto !important; min-height:0; }
+.title-content{ flex:0 0 auto !important; }
