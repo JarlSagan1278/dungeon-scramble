@@ -81,3 +81,4 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Kill callouts and Log (Jeremy, Oct 31, 1.42.38):** K1 (Overkill = wax seal stamped over the defeated enemy, Jeremy's change; boss = wooden plaque + DEFEATED ribbon), G1 (Log as a parchment journal with icons and floor headings).
 - **Shrine choices (Jeremy, Oct 31, 1.42.40):** S1 (option cards with icons under a Pick one ribbon), S2 (boon line as a pinned parchment note; all boon lines reworded plainly, in the names sheet Shrines tab for review).
 - **D.O.T. icon (Jeremy, Oct 31, 1.42.41):** with no number, it reads as three droplets (the number gap is filled in).
+- **App icon, Floor text, creak (Jeremy, Oct 31, 1.42.42):** icon option A (cut-out bust with the whole flame); Floor card text must be crisp; a different door creak (hinge groan + squeak + thud).

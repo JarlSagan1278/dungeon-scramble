@@ -2917,24 +2917,40 @@ function playTone(kind, pitchStep){
 // chopped into irregular little catches whose rate climbs then slows, and a pitch that wanders, plus a soft wooden thud.
 // Boss doors are lower and slower.
 function playDoorCreak(heavy){
+  // v2 (Oct 31, Jeremy: try a different creak): an old hinge groaning open. Two detuned triangle tones through a
+  // narrow resonant filter, pitch sliding up then sagging, with a slow random wobble (a hinge never turns evenly),
+  // a short squeak on top and a dull wooden bump as the door stops. Boss doors are lower and slower.
   if(!PREFS.sound) return;
   const ctx = getAudioCtx(); if(!ctx) return;
-  const now = ctx.currentTime, dur = heavy ? 0.95 : 0.7, out = sfxOut(ctx);
-  const osc = ctx.createOscillator(), bp = ctx.createBiquadFilter(), g = ctx.createGain();
-  osc.type = 'sawtooth'; bp.type = 'bandpass'; bp.Q.value = 6; bp.frequency.value = heavy ? 620 : 900;
-  const base = heavy ? 95 : 140;
-  for(let t=0; t<=dur; t+=0.03){ const u = t/dur; osc.frequency.setValueAtTime(base * (1 + 0.35*Math.sin(u*Math.PI*1.3) + (Math.random()-0.5)*0.08), now+t); }
-  const n = Math.floor(ctx.sampleRate*dur/64), curve = new Float32Array(n);
-  let next = 0;
-  for(let i=0;i<n;i++){
-    const u = i/n, env = Math.sin(Math.PI*Math.min(1, u*1.15)) * 0.95;
-    if(i >= next){ next = i + Math.max(2, Math.round((heavy?9:6) + 5*Math.sin(u*Math.PI*2) + Math.random()*4)); }
-    curve[i] = env * (next - i > 2 ? 0.25 : 1);
-  }
-  g.gain.setValueAtTime(0, now); g.gain.setValueCurveAtTime(curve, now, dur);
-  osc.connect(bp).connect(g).connect(out);
-  osc.start(now); osc.stop(now+dur+0.05);
-  playNoiseBurst(ctx, now+dur*0.82, 0.14, heavy ? 0.4 : 0.28, 'lowpass', heavy ? 160 : 220, 0.8);
+  const now = ctx.currentTime, out = sfxOut(ctx), dur = heavy ? 1.15 : 0.85;
+  const base = heavy ? 150 : 210;
+  const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 9; bp.frequency.value = heavy ? 520 : 780;
+  const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, now);
+  g.gain.exponentialRampToValueAtTime(0.22, now + 0.06);
+  g.gain.setValueAtTime(0.22, now + dur*0.7); g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+  bp.connect(g).connect(out);
+  [1, 1.012].forEach((det, i)=>{
+    const o = ctx.createOscillator(); o.type = 'triangle';
+    for(let t=0; t<=dur; t+=0.025){
+      const u = t/dur, curve = 1 + 0.55*Math.sin(Math.min(1,u*1.25)*Math.PI*0.9) - 0.15*u;
+      const wob = 1 + 0.045*Math.sin(t*37 + i) + (Math.random()-0.5)*0.03;
+      o.frequency.setValueAtTime(base*det*curve*wob, now+t);
+    }
+    o.connect(bp); o.start(now); o.stop(now+dur+0.05);
+  });
+  // the squeak: a thin high chirp early in the swing
+  const sq = ctx.createOscillator(), sg = ctx.createGain(); sq.type = 'sine';
+  const s0 = now + dur*0.18;
+  sq.frequency.setValueAtTime(heavy ? 900 : 1300, s0); sq.frequency.exponentialRampToValueAtTime(heavy ? 1150 : 1700, s0+0.12);
+  sg.gain.setValueAtTime(0.0001, s0); sg.gain.exponentialRampToValueAtTime(0.07, s0+0.02); sg.gain.exponentialRampToValueAtTime(0.0001, s0+0.14);
+  sq.connect(sg).connect(out); sq.start(s0); sq.stop(s0+0.16);
+  // the door stops: a dull wooden bump
+  const th = ctx.createOscillator(), tg = ctx.createGain(); th.type = 'sine';
+  const t0 = now + dur*0.92;
+  th.frequency.setValueAtTime(heavy ? 85 : 120, t0); th.frequency.exponentialRampToValueAtTime(heavy ? 50 : 70, t0+0.16);
+  tg.gain.setValueAtTime(0.0001, t0); tg.gain.exponentialRampToValueAtTime(heavy ? 0.38 : 0.28, t0+0.01); tg.gain.exponentialRampToValueAtTime(0.0001, t0+0.2);
+  th.connect(tg).connect(out); th.start(t0); th.stop(t0+0.22);
+  playNoiseBurst(ctx, t0, 0.09, heavy ? 0.22 : 0.16, 'lowpass', 300, 0.7);
 }
 
 // A tray scramble gets its own noise-based rattle rather than another
