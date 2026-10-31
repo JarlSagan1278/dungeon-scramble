@@ -3515,3 +3515,54 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 /* the Minion count chip shows a tiny minion die (dark, two eyes, like on the tray) instead of "Min" */
 .chip-minion{ display:inline-flex; align-items:center; justify-content:center; gap:3px; width:15px; height:15px; border-radius:4px; background:#2a1d13; border:1.5px solid var(--line); vertical-align:-3px; margin-right:3px; box-sizing:border-box; }
 .chip-minion i{ width:3px; height:4.5px; border-radius:50%; background:#ffcf4a; }
+/* Oct 31 (Jeremy, R1): the floor/round badge is a two-part tag: "Floor II" on a stone tab, "Round 3" on parchment.
+   A chip, so 2px outlines; both halves carry the paper texture like the rest of the art. */
+.tray-head .round-badge{ display:inline-flex !important; align-items:stretch !important; height:30px; padding:0 !important; gap:0 !important; overflow:hidden;
+  border:2px solid var(--line) !important; border-radius:9px !important; box-shadow:0 3px 0 var(--line) !important; background:none !important; font-size:12.5px !important; }
+.tray-head .round-badge .rb-floor{ display:flex; align-items:center; margin:0 !important; padding:0 8px; border-right:2px solid var(--line);
+  background:var(--paper-tile) repeat, linear-gradient(180deg,#b9bec3,#8a8f94); background-size:110px 110px, auto; background-blend-mode:soft-light, normal;
+  color:#2a2522 !important; font:400 13px var(--font-display) !important; box-shadow:inset 0 2px 0 rgba(255,255,255,.35); }
+.tray-head .round-badge .rb-round{ display:flex; align-items:center; padding:0 9px;
+  background:var(--paper-tile) repeat, #f3e3bf; background-size:110px 110px, auto; background-blend-mode:soft-light, normal; color:#3a2410; font-weight:800; }
+/* Oct 31 (Jeremy): the door follows the art rules: one paper overlay over stone, wood, iron and knob alike (like the
+   dice chest), 3px outlines on the big shapes; plaque and ribbon carry the paper too. */
+.rc-arch{ background:repeating-conic-gradient(from -90deg at 50% 100%, #9aa0a6 0deg 13deg, #3d4247 13deg 14.5deg) !important; }
+.rc-leaf{ background:repeating-linear-gradient(90deg,transparent 0 30px,rgba(0,0,0,.32) 30px 32px), linear-gradient(180deg,#5e3a1c 0%,#a8743f 16%,#b98549 24%,#8f5f33 55%,#6c4322 100%) !important; }
+.rc-arch::after{ content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:3; background:var(--paper-tile) repeat; background-size:110px 110px; mix-blend-mode:soft-light; }
+.rc-plaque{ background:var(--paper-tile) repeat, #f3e3bf !important; background-size:110px 110px, auto !important; background-blend-mode:soft-light, normal; }
+.rc-kind{ background:var(--paper-tile) repeat, var(--rk,#6b4220) !important; background-size:110px 110px, auto !important; background-blend-mode:soft-light, normal; }
+/* B1: the boss door: reddish stone, a darker door, studded iron plates, a skull knocker and a red glow */
+.k-boss .rc-arch{ background:repeating-conic-gradient(from -90deg at 50% 100%, #6e5a55 0deg 13deg, #2a1f1c 13deg 14.5deg) !important;
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.18), 0 6px 0 var(--line), 0 0 34px 6px rgba(255,70,40,.55) !important; }
+.k-boss .rc-leaf{ background:repeating-linear-gradient(90deg,transparent 0 30px,rgba(0,0,0,.4) 30px 32px), linear-gradient(180deg,#3a2414 0%,#6b4220 30%,#4a2c16 100%) !important; }
+.rc-plate{ position:absolute; left:-3px; right:-3px; height:24px; border:2.2px solid #0c0705;
+  background:radial-gradient(circle at 45% 45%,rgba(255,255,255,.55) 0 1.2px,rgba(12,7,5,.7) 1.8px 3px,transparent 3.4px) 10px 50%/26px 24px repeat-x, linear-gradient(135deg,#7d8790,#3f4851); }
+.rc-plate.p1{ top:30px; } .rc-plate.p2{ top:226px; }
+.k-boss .rc-band{ height:18px; }
+.rc-ring.rc-skull{ width:34px !important; height:44px !important; right:12px !important; top:146px !important; }
+/* F1: the Floor card is a stairway through the stone arch (the door's .rc-arch), with a stone tablet and parchment strip */
+#floor-card{ background:rgba(8,5,3,.6); }
+#floor-card .floor-card-box.fc-scene{ width:auto !important; padding:0 !important; background:none !important; border:none !important; box-shadow:none !important; display:grid; justify-items:center; }
+#floor-card .fc-scene::before, #floor-card .fc-scene::after{ display:none !important; }
+.fc-scene > *{ grid-area:1/1; }
+.fc-arch{ width:220px; height:250px; }
+.fc-hole{ position:relative; width:100%; height:100%; box-sizing:border-box; border:3px solid var(--line); border-bottom:none; border-radius:94px 94px 0 0; overflow:hidden;
+  background:radial-gradient(ellipse at 50% 85%, #3a2614 0%, #140c07 55%, #080503 100%); }
+.fc-step{ position:absolute; left:calc(14% + var(--i)*7%); right:calc(14% + var(--i)*7%); bottom:calc(var(--i)*17px); height:17px; box-sizing:border-box;
+  border:2.5px solid var(--line); background:linear-gradient(180deg, hsl(210 4% calc(60% - var(--i)*9%)), hsl(210 4% calc(48% - var(--i)*9%))); box-shadow:inset 0 2px 0 rgba(255,255,255,.25); }
+.fc-torch{ position:absolute; top:112px; width:9px; height:20px; background:#5e3a1c; border:2px solid var(--line); border-radius:2px; }
+.fc-torch.l{ left:22px; } .fc-torch.r{ right:22px; }
+.fc-torch::before{ content:''; position:absolute; left:50%; top:-15px; width:14px; height:17px; margin-left:-7px; border-radius:50% 50% 45% 45%; background:radial-gradient(circle at 50% 70%, #fff3b0, #ffb43c 55%, #e0603a); box-shadow:0 0 16px 6px rgba(255,170,60,.45); animation:fc-flicker .5s ease-in-out infinite alternate; }
+@keyframes fc-flicker{ to{ transform:scale(.88,1.08) translateY(-1px); } }
+.fc-sign{ align-self:start; margin-top:22px; display:flex; flex-direction:column; align-items:center; z-index:4; }
+#floor-card .fc-tablet{ padding:8px 24px 7px; border:3px solid var(--line); border-radius:10px; transform:rotate(-1deg); -webkit-text-stroke:0 !important;
+  background:var(--paper-tile) repeat, linear-gradient(180deg,#b9bec3,#8a8f94); background-size:110px 110px, auto; background-blend-mode:soft-light, normal;
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.35), inset 0 -4px 0 rgba(0,0,0,.25), 0 5px 0 var(--line); color:#2a2522 !important; font-size:32px !important; letter-spacing:.04em !important; text-transform:none !important; line-height:1; }
+#floor-card .fc-name{ margin-top:-2px; padding:3px 12px; border:3px solid var(--line); border-radius:4px; color:#3a2410 !important; font-size:16px !important; letter-spacing:.02em !important;
+  background:var(--paper-tile) repeat, #f3e3bf; background-size:110px 110px, auto; background-blend-mode:soft-light, normal; box-shadow:0 3px 0 var(--line); }
+.reduced-motion .fc-torch::before{ animation:none; }
+/* D3: the class crest decal sits between the lid's straps; the lid's paper overlay now covers it (and the straps) too */
+.chest-lid::before{ z-index:3; }
+.lid-crest{ position:absolute; left:50%; top:44%; width:66px; height:72px; transform:translate(-50%,-50%) rotate(-5deg); z-index:2; pointer-events:none; filter:drop-shadow(0 3px 0 rgba(12,7,5,.55)); }
+.lid-crest svg{ width:100%; height:100%; display:block; }
+.lid-crest .icon-svg{ position:absolute; left:50%; top:44%; width:30px; height:30px; transform:translate(-50%,-50%); color:#fff6e0; filter:drop-shadow(0 0 0 #120b07) drop-shadow(1.5px 1.5px 0 #120b07) drop-shadow(-1px -1px 0 #120b07); }

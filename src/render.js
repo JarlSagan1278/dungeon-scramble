@@ -1861,10 +1861,10 @@ function renderGame(){
       <div class="enc-rail-row">
         <div class="enc-card-col">
           <div class="tray-float-wrap">
-            <div class="tray-head"><span class="round-badge" title="Floor ${S.floorIdx+1}, round ${S.turnNumber+1}"><b class="rb-floor">F${S.floorIdx+1}</b>&middot; Rd ${S.turnNumber+1}</span><div class="path-strip" id="path-strip"></div></div>
+            <div class="tray-head"><span class="round-badge" title="Floor ${S.floorIdx+1}, round ${S.turnNumber+1}"><b class="rb-floor">Floor ${ROMAN[S.floorIdx+1]||S.floorIdx+1}</b><span class="rb-round">Round ${S.turnNumber+1}</span></span><div class="path-strip" id="path-strip"></div></div>
             <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
               <div class="tray ${S.newRoomFx?'tray-room-in':''} ${abilityArmed?'ability-armed':''} ${S.trayAct?'trayact-armed':''}" id="tray" style="--class-color:${S.klass.color||'#ffffff'}; --gd:-${Math.round(performance.now()%4600)}ms"></div>
-              ${S.needRoll ? CHEST_LID_HTML : ''}
+              ${S.needRoll ? chestLidHTML() : ''}
               ${chestTrimHTML()}
             </div>
             ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip</button>` : pathCounterHTML()}
@@ -2423,7 +2423,13 @@ const FLOOR_TITLES = ['The Upper Halls','The Gilded Vaults','The Magic Deep'];
 function showFloorCard(num, _name){
   const old = document.getElementById('floor-card');
   if(old) old.remove();
-  const node = el(`<div id="floor-card"><div class="floor-card-box"><div class="floor-card-num">Floor ${num}</div><div class="floor-card-name">${FLOOR_TITLES[num-1]||''}</div></div></div>`);
+  // Oct 31 (Jeremy, F1): a stairway going down through the room's stone arch, lit by two torches, with a carved stone
+  // tablet for the floor and a parchment strip for its name (same pieces and paper texture as the new-room door).
+  const steps = [0,1,2,3,4].map(i=>`<i class="fc-step" style="--i:${i}"></i>`).join('');
+  const node = el(`<div id="floor-card"><div class="floor-card-box fc-scene" aria-label="Floor ${num}: ${FLOOR_TITLES[num-1]||''}">
+      <div class="rc-arch fc-arch"><div class="fc-hole">${steps}<i class="fc-torch l"></i><i class="fc-torch r"></i></div></div>
+      <div class="fc-sign"><div class="floor-card-num fc-tablet">Floor ${ROMAN[num]||num}</div><div class="floor-card-name fc-name">${FLOOR_TITLES[num-1]||''}</div></div>
+    </div></div>`);
   document.body.appendChild(node);
   setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, PREFS.reducedMotion ? 1100 : 1700);
 }
@@ -2585,7 +2591,7 @@ function showRoomCallout(fx, onDismiss){
   const kindCls = fx.boss ? 'k-boss' : ({Elite:'k-elite', Deadly:'k-deadly', Trap:'k-trap', Shrine:'k-shrine'})[kind] || 'k-enemy';
   const node = el(`<div id="room-callout" class="${fx.boss?'rc-boss':''}">
       <div class="rc-door ${kindCls}">
-        <div class="rc-arch"><div class="rc-leaf"><i class="rc-band b1"></i><i class="rc-band b2"></i><svg class="rc-ring" viewBox="0 0 30 46" aria-hidden="true"><rect x="7" y="2" width="16" height="42" rx="5" fill="#5a646d" stroke="#120b07" stroke-width="2.5"/><circle cx="15" cy="7" r="1.4" fill="#120b07"/><circle cx="15" cy="39" r="1.4" fill="#120b07"/><circle cx="15" cy="17" r="8.5" fill="#d6b25a" stroke="#120b07" stroke-width="2.5"/><circle cx="12.5" cy="14.5" r="2.6" fill="#fff1b8"/><path d="M15 26.5a2.6 2.6 0 0 1 1.3 4.9l1 4.6h-4.6l1-4.6a2.6 2.6 0 0 1 1.3-4.9z" fill="#120b07"/></svg></div></div>
+        <div class="rc-arch"><div class="rc-leaf"><i class="rc-band b1"></i><i class="rc-band b2"></i>${fx.boss?'<i class="rc-plate p1"></i><i class="rc-plate p2"></i>':''}${fx.boss ? '<svg class="rc-ring rc-skull" viewBox="0 0 40 52" aria-hidden="true"><path d="M20 4c-9 0-15 6-15 14 0 5 2 8 5 10v6h20v-6c3-2 5-5 5-10 0-8-6-14-15-14z" fill="#d9cfc0" stroke="#120b07" stroke-width="3"/><circle cx="14" cy="19" r="4" fill="#120b07"/><circle cx="26" cy="19" r="4" fill="#120b07"/><path d="M18 27l2-4 2 4z" fill="#120b07"/><path d="M15 34v-4M20 34v-4M25 34v-4" stroke="#120b07" stroke-width="2"/><path d="M20 36c-8 0-11 5-11 9 0 4 3 6 11 6s11-2 11-6c0-4-3-9-11-9" fill="none" stroke="#120b07" stroke-width="6"/><path d="M20 36c-8 0-11 5-11 9 0 4 3 6 11 6s11-2 11-6c0-4-3-9-11-9" fill="none" stroke="#8d98a2" stroke-width="2.6"/></svg>' : '<svg class="rc-ring" viewBox="0 0 30 46" aria-hidden="true"><rect x="7" y="2" width="16" height="42" rx="5" fill="#5a646d" stroke="#120b07" stroke-width="2.5"/><circle cx="15" cy="7" r="1.4" fill="#120b07"/><circle cx="15" cy="39" r="1.4" fill="#120b07"/><circle cx="15" cy="17" r="8.5" fill="#d6b25a" stroke="#120b07" stroke-width="2.5"/><circle cx="12.5" cy="14.5" r="2.6" fill="#fff1b8"/><path d="M15 26.5a2.6 2.6 0 0 1 1.3 4.9l1 4.6h-4.6l1-4.6a2.6 2.6 0 0 1 1.3-4.9z" fill="#120b07"/></svg>'}</div></div>
         <div class="rc-sign"><div class="rc-plaque"><span>${fx.name}</span></div><div class="rc-kind">${kind}</div></div>
         <div class="rc-tap">tap to enter</div>
       </div>
@@ -4365,10 +4371,10 @@ function renderShrineEncounter(){
       <div class="enc-rail-row">
         <div class="enc-card-col">
           <div class="tray-float-wrap">
-            <div class="tray-head"><span class="round-badge"><b class="rb-floor">F${S.floorIdx+1}</b>&middot; Shrine</span><div class="path-strip"></div></div>
+            <div class="tray-head"><span class="round-badge"><b class="rb-floor">Floor ${ROMAN[S.floorIdx+1]||S.floorIdx+1}</b><span class="rb-round">Shrine</span></span><div class="path-strip"></div></div>
             <div class="tray-wrap tray-wrap-full">
               <div class="tray" id="tray" style="--class-color:${S.klass.color||'#ffffff'}"></div>
-              ${CHEST_LID_HTML.replace('id="chest-lid"', 'id="shrine-lid"').replace(/title="[^"]*"/, '')}
+              ${chestLidHTML().replace('id="chest-lid"', 'id="shrine-lid"').replace(/title="[^"]*"/, '')}
               ${chestTrimHTML()}
             </div>
           </div>
@@ -4442,7 +4448,7 @@ function syncCampHeal(){
 // ---- Quest paper rows: "do this  ->  get that". The data string is "REWARD: CONDITION"
 // (e.g. "5 damage: 3 maneuvers"); the paper shows the condition first, an arrow, then the reward as a badge. ----
 // Quest paper wording (Oct 17 audit, approved by Jeremy): counts of dice in one path ("3 Maneuvers", "2 Heal dice"),
-// thresholds noun-first ("Damage 10+", "Path 6+", "Block 5+", "Blanks 10+"), rounds as the tray bubble shows them ("Reach Rd 5").
+// thresholds noun-first ("Damage 10+", "Path 6+", "Block 5+", "Blanks 10+"), rounds as the tray badge shows them ("Reach Round 5").
 function questCondShort(cond){
   const c = cond.toLowerCase().trim(); let m;
   const cap = t=> t.charAt(0).toUpperCase()+t.slice(1);
@@ -4452,8 +4458,8 @@ function questCondShort(cond){
   if((m=c.match(/any (\d+) actions/))) return `Path ${m[1]}+`;
   if((m=c.match(/(\d+)\s*support actions/))) return `${m[1]} Support`;
   if((m=c.match(/accumulate (\d+) block/))) return `Block ${m[1]}+`;
-  if((m=c.match(/survive (?:to )?turn (\d+)/))) return `Reach Rd ${m[1]}`;
-  if((m=c.match(/survive (\d+)/))) return `Reach Rd ${parseInt(m[1])+1}`;
+  if((m=c.match(/survive (?:to )?turn (\d+)/))) return `Reach Round ${m[1]}`;
+  if((m=c.match(/survive (\d+)/))) return `Reach Round ${parseInt(m[1])+1}`;
   if((m=c.match(/gain (\d+)\s*hot\b/))) return `Gain ${m[1]}+ H.O.T.`;
   if((m=c.match(/deal (\d+)\s*dot\b/))) return `Deal ${m[1]}+ D.O.T.`;
   if((m=c.match(/(?:deal )?(\d+)\+?\s*damage/))) return `Damage ${m[1]}+`;
@@ -5220,6 +5226,13 @@ function newAchievementsHTML(newAchievements){
 // direction, the lock pops and the dice tumble out.
 // Domed lid (Jeremy picked A1, Oct 25): as wide as the chest, rising 26px above it so it covers the top corner brackets.
 const CHEST_LID_HTML = `<div class="chest-lid" id="chest-lid" title="Flick or double-tap to open (or shake your phone)"><i class="strap s1"></i><i class="strap s2"></i><i class="rim"></i></div>`;
+// Oct 31 (Jeremy, D3): a class crest decal on the lid: your class colour and its icon on a shield, under the lid's paper.
+const CLASS_CREST_ICON = { armsmaster:'hit', guard:'block', dungeoneer:'leap', arcanist:'boost', debug:'key' };
+function chestLidHTML(){
+  const k = S && S.klass; if(!k) return CHEST_LID_HTML;
+  const crest = `<div class="lid-crest" style="--cc:${k.color||'#7a45d6'}" aria-hidden="true"><svg viewBox="0 0 120 130"><path d="M60 8l44 14v34c0 30-20 52-44 64C36 108 16 86 16 56V22z" fill="#fff6e0" stroke="#120b07" stroke-width="5" stroke-linejoin="round"/><path d="M60 18l36 11v27c0 25-16 44-36 54C40 100 24 81 24 56V29z" fill="var(--cc)" stroke="#120b07" stroke-width="3.5" stroke-linejoin="round"/></svg>${iconSpanSolid(CLASS_CREST_ICON[k.id]||'combo')}</div>`;
+  return CHEST_LID_HTML.replace('<i class="rim"></i>', '<i class="rim"></i>'+crest);
+}
 function scrambleRoll(dx, dy){
   if(!S || !S.needRoll) return;
   const lid = document.getElementById('chest-lid');

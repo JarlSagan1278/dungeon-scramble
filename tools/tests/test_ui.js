@@ -58,7 +58,7 @@ const SHOTS = process.env.SHOTS || ''; // set SHOTS=<dir> to save screenshots
   await page.evaluate(() => { newGame('dwarf', 'guard'); for (let g = 0; g < 12 && !(S.screen === 'game' && S.encounter && S.encounter.type !== 'Shrine'); g++) { if (S.screen === 'camp') campLeave(); else advanceRoute(); } S.transitioning = false; try { skipTransition(); } catch (e) {} S.newRoomFx = false; render(); });
   await clean();
   const badge = await page.evaluate(() => (document.querySelector('.round-badge') || {}).textContent);
-  ok(/^F1\s*·\s*Rd 1$/.test((badge || '').trim()), `fight floor badge text: "${badge}"`);
+  ok(/^Floor I\s*Round 1$/.test((badge || '').trim()), `fight floor badge text: "${badge}"`);
   for (const nq of [0, 1, 3]) {
     const q = await page.evaluate((nq) => {
       const e = S.encounter; e.quests = ['10 damage: 3 maneuvers', '2 dot: 2 heal', 'nullify: 5 block'].slice(0, nq); e.questsDone = e.quests.map(() => false); render();
@@ -160,7 +160,7 @@ const SHOTS = process.env.SHOTS || ''; // set SHOTS=<dir> to save screenshots
   const sh = await page.evaluate(() => { const b = document.getElementById('shrine-hold-btn'); if (!b) return null; const r = b.getBoundingClientRect(); return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, vw: document.documentElement.clientWidth, vh: innerHeight, badge: (document.querySelector('.round-badge') || {}).textContent }; });
   await shot('shrine_hold');
   ok(sh && Math.abs(sh.cx - sh.vw / 2) < 2 && Math.abs(sh.cy - sh.vh / 2) < 4, `shrine Hold orb centred (${JSON.stringify(sh)})`);
-  ok(sh && /^F2\s*·\s*Shrine$/.test(sh.badge.trim()), `shrine floor badge: "${sh && sh.badge}"`);
+  ok(sh && /^Floor II\s*Shrine$/.test(sh.badge.trim()), `shrine floor badge: "${sh && sh.badge}"`);
   const fb = await page.evaluate(() => { const f = document.querySelector('.fo-shrine .fo-enemy .fo-fig'); const r = f.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
   await page.mouse.click(fb.x, fb.y); await page.waitForTimeout(60);
   const wig = await page.evaluate(() => { const f = document.querySelector('.fo-shrine .fo-enemy .fo-fig'); return f.getAnimations().map(a => a.effect && a.effect.getKeyframes().length).join(',') + ' charging:' + document.getElementById('shrine-hold-btn').classList.contains('charging'); });

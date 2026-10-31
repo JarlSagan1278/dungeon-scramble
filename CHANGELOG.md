@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.42.32 (Oct 31, 2026)
+Jeremy picked R1, B1, F1, D3 (all built to the art rules: 3px outlines on big shapes, 2px on chips, the paper texture on every new surface):
+- **Round badge (R1):** "F2 · Rd 3" is now a two-part tag, "Floor II" on a stone tab and "Round 3" on parchment ("Floor II | Shrine" at shrines). Quests read "Reach Round 4".
+- **Boss door (B1):** reddish stone, a darker door with studded iron plates, a skull knocker and a red glow. All doors now share one paper overlay over stone, wood, iron and knob, like the dice chest.
+- **Floor card (F1):** a stairway going down through the same stone arch, two flickering torches, the floor on a carved stone tablet and its name on a parchment strip.
+- **Lid crest (D3):** the closed dice-box lid shows your class crest, your class colour and icon on a shield (Hit, Block, Leap, Boost), under the lid's paper texture.
 ## 1.42.31 (Oct 31, 2026)
 - Boss Phase 2 label is "Phase 2" (or "Phase 2 · Wind-up!") on one line; "Phase 2 · Next turn" wrapped and pushed the move chips onto the tray. Enemy turn labels never wrap.
 - The Minion count chip under your name shows a tiny minion die (dark, two eyes, like on the tray) and the number, instead of "Min 3".
