@@ -13,7 +13,7 @@ async function openPage(browser,opts={}){
 }
 // returning player: some unlocks and a bestiary
 async function seedMeta(p){
-  await p.evaluate(()=>{ META.lifetime.victories=1; META.lifetime.bestFloorReached=3; META.achievements['origin_duo']={date:Date.now()-864e5};
+  await p.evaluate(()=>{ META.lifetime.victories=1; META.lifetime.bestFloorReached=3; META.achievements['origin_duo']={date:Date.now()-864e5}; META.relicHintSeen=Date.now(); /* no first-relic hint in media */
     saveMeta(); });
 }
 async function startRun(p,origin,klass){

@@ -157,7 +157,7 @@ in the clip is AI-assisted (see decisions/art_and_names.md).
 >
 > I'm Jeremy Friedman. My wife Katlynn and I make Dungeon Scramble, a turn-based roguelike that started as a board game we designed together.
 >
-> Each turn you roll 16 dice into a 4x4 tray and draw one path through them. Every die you step on fires its face, in order: hits, blocks, heals, combos that grow with the path, and maneuvers like Leap and Pivot that bend it. Monsters always show their next move, so every roll is a small puzzle about whether to block or race. The art is hand-drawn.
+> Each turn you roll 16 dice into a 4x4 tray and draw one path through them. Every die you step on fires its face, in order: hits, blocks, heals, combos that grow with the path, and maneuvers like Leap and Pivot that bend it. Monsters always show their next move, so every roll is a small puzzle about whether to block or race.
 >
 > The first floor is a free demo in the browser, about 15 minutes, made for phones held upright but playable on a computer:
 > https://dungeonscramble.itch.io/dungeon-scramble
@@ -171,7 +171,7 @@ in the clip is AI-assisted (see decisions/art_and_names.md).
 > Jeremy Friedman
 > contact@dungeonscramble.com
 
-(Check that the press kit URL is live before sending; the report suggests the same short note to Jupiter Hadley once
+(Oct 31: "The art is hand-drawn" removed, since some art is still AI-assisted; clip remade from 1.42.36. Check that the press kit URL is live before sending; the report suggests the same short note to Jupiter Hadley once
 a current contact is found, and to 3-5 small dice/roguelike YouTubers on Fri Nov 6.)
 
 ### Short version for YouTubers/streamers (Fri Nov 6)
