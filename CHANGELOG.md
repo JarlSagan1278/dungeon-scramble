@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.14 (Oct 31, 2026)
+- Fix: monsters stand at their Monster Footing height all the time. The idle sway animation replaced the footing drop, so a monster stood at the wrong height while swaying and jumped to the right one during a turn's playback (Jeremy saw the Rogue Golemancer float up, then sink when hit).
+- Rogue Golemancer's drop 21.7% -> 10.8%: its feet rest in the dip of its sagging health bar.
 ## 1.42.13 (Oct 31, 2026)
 - Shrines keep the whole button rail (Go, Skill, Pocket, Item, Clear) in place, greyed out, instead of hiding it.
 ## 1.42.12 (Oct 31, 2026)
