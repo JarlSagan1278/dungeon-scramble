@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.10 (Oct 31, 2026)
+- Title: the "A dice-path roguelike from the board game by Jeremy and Katlynn Friedman" line is gone (Jeremy). The credit stays in Settings > Credits.
 ## 1.42.9 (Oct 30, 2026)
 - Guided first turn introduces the dice colours: red dice are actions (Hit, Combo), white dice are Maneuvers that bend your Path (Leap, Dodge, Pivot).
 ## 1.42.8 (Oct 30, 2026)

@@ -1,6 +1,6 @@
 # Dungeon Scramble — TODO
 
-Updated Oct 29, 2026 (build 1.42.9). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
+Updated Oct 29, 2026 (build 1.42.10). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
 study results in `STUDY_FINDINGS.md`. The release checklist (40 items, owner and status) is the Checklist tab of
 the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 

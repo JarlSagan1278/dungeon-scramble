@@ -894,7 +894,6 @@ function renderTitle(){
               <button id="title-howto-btn" class="btn-howto">How to Play</button>
             </div>
           </div>
-          <p class="title-credit">A dice-path roguelike from the board game<br>by Jeremy and Katlynn Friedman</p>
           ${(()=>{ const earned = CLASSES.filter(k=>!k.debug && DEPTH_BEST.byClass[k.id] && DEPTH_BEST.byClass[k.id].depth); return earned.length ? `<div class="title-badges">${earned.map(k=>`<div class="title-badge">${depthBadgeSVG(k.color, DEPTH_BEST.byClass[k.id].depth, 42, k.id)}</div>`).join('')}</div>` : ''; })()}
         </div>
       </div>
