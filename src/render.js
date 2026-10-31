@@ -2450,14 +2450,31 @@ document.addEventListener('pointerdown', ev=>{
   playTone('uiTick');
 }, true);
 
+// Oct 31 (Jeremy, K1): an Overkill is a red wax seal stamped onto the defeated enemy; a boss kill is a wooden plaque
+// (the doors' wood and rivets) with the boss's name and a red DEFEATED ribbon, plus the seal on the boss if it was
+// also an Overkill. Same 1.4 s as the old text callouts.
+const WAX_SEAL_SVG = `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 C58 4 60 10 66 9 C73 8 78 14 82 18 C88 24 90 30 92 36 C96 44 94 52 96 58 C97 66 91 72 87 78 C82 85 76 88 70 92 C62 96 56 95 50 97 C43 98 36 94 30 92 C22 89 17 84 13 78 C8 71 5 64 4 56 C3 48 6 42 8 35 C11 27 15 21 21 16 C28 10 36 6 42 5 C45 4 47 4 50 4Z" fill="#b02a1c" stroke="#120b07" stroke-width="3"/><circle cx="50" cy="50" r="33" fill="none" stroke="#7a1f14" stroke-width="3"/><circle cx="50" cy="50" r="33" fill="none" stroke="#e8746b" stroke-width="1.2" stroke-dasharray="2 5"/></svg>`;
 function showKillCallout(lines){
-  const stack = ensureFxStack();
-  const old = document.getElementById('kill-callout');
-  if(old && old.parentNode) old.parentNode.removeChild(old);
-  const node = el(`<div id="kill-callout">${lines.map(l=>
-    `<div class="kill-callout-line ${l.cls}">${l.text}</div>`).join('')}</div>`);
-  stack.appendChild(node);
-  setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 1400);
+  document.querySelectorAll('#kill-callout, .kill-seal').forEach(n=>n.remove());
+  const boss = lines.find(l=>/\bboss\b/.test(l.cls||''));
+  const overkill = lines.some(l=>/overkill/.test(l.cls||''));
+  const nodes = [];
+  if(boss){
+    const name = String(boss.text).replace(/\s+Defeated$/,'');
+    const arch = document.querySelector('#enc-panel .fo-arch'), r = arch ? arch.getBoundingClientRect() : {left:0, width:window.innerWidth, top:0, height:300};
+    const pl = el(`<div id="kill-callout" class="kill-plaque" role="status"><div class="kp-board"><span>${name}</span></div><div class="kp-ribbon">Defeated</div></div>`);
+    pl.style.left = (r.left + r.width/2)+'px'; pl.style.top = (r.top + r.height*0.8)+'px'; // low in the room, under the seal on the boss
+    document.body.appendChild(pl); nodes.push(pl);
+  }
+  if(overkill){
+    const fig = document.querySelector('#enc-panel .fo-enemy .fo-img') || document.querySelector('#enc-panel .fo-enemy .fo-fig');
+    const r = fig ? fig.getBoundingClientRect() : null;
+    const seal = el(`<div class="kill-seal${boss?' ks-boss':''}" role="status" aria-label="Overkill">${WAX_SEAL_SVG}<b>Overkill!</b></div>`);
+    if(r){ seal.style.left = (r.left + r.width/2)+'px'; seal.style.top = (r.top + r.height*0.55)+'px'; }
+    else { seal.style.left = '50%'; seal.style.top = '30%'; }
+    document.body.appendChild(seal); nodes.push(seal);
+  }
+  setTimeout(()=> nodes.forEach(n=>{ if(n.parentNode) n.parentNode.removeChild(n); }), 1400);
 }
 
 // ---- Room callout: a banner naming whatever's just been stepped into (a
@@ -3303,7 +3320,7 @@ function openSettingsModal(){
   const close = ()=> closeModal(overlay);
   overlay.querySelector('#settings-x-btn').onclick = close;
   const logBtn = overlay.querySelector('#settings-log-btn');
-  if(logBtn) logBtn.onclick = ()=>{ close(); openInfoModal('Log', logViewHTML()); };
+  if(logBtn) logBtn.onclick = ()=>{ close(); openInfoModal('Log', logViewHTML()); const j = document.getElementById('log-journal'); if(j) j.scrollTop = j.scrollHeight; };
   overlay.querySelector('#settings-how-to-play-btn').onclick = ()=>{ close(); openTutorialModal(0); };
   overlay.querySelector('#settings-codex-btn').onclick = ()=>{ close(); openCodexModal(); };
   overlay.querySelector('#settings-records-btn').onclick = ()=>{ close(); openRecordsModal(); };
@@ -3576,8 +3593,33 @@ function backPocketViewHTML(){
     <p class="hint" style="margin-top:8px;"><b style="color:#e8746b">&#9829; Safety net ready.</b> If you fall to 0 Health, these dice are rolled until one isn't blank: it saves you at 5 Health, and <b>every</b> die here is spent. ${infoDot('Visit Camp to swap these into your Tray.')}</p>`;
 }
 
+// Oct 31 (Jeremy, G1): the Log is a parchment journal: rooms grouped under floor headings, a small coloured icon per
+// entry, the key word in bold and details on a smaller line. The messages themselves are unchanged (the headline
+// strip reads them); they are reworded here, for display only.
+function logEntryHTML(t){
+  const ic = (bg, h)=>`<span class="lg-i" style="background:${bg}">${h}</span>`;
+  const row = (i, main, sub)=>`<div class="lg-e">${i}<div>${main}${sub?`<small>${sub}</small>`:''}</div></div>`;
+  let m;
+  if((m = t.match(/^A door creaks open: (.+) \((.+)\)$/))) return row(ic('#6b4220', iconSpanSolid('door')), `Entered <b>${m[1]}</b>`, m[2]);
+  if((m = t.match(/^Boss Encounter: (.+)$/))) return row(ic('#b02a1c', iconSpanSolid('boss')), `Boss: <b>${m[1]}</b>`);
+  if((m = t.match(/^Path dealt ([\d.]+) damage\.?$/))) return row(ic('#e8574f', iconSpanSolid('hit')), `Your path dealt <b>${+(+m[1]).toFixed(1)}</b>`);
+  if((m = t.match(/^(.+?) hits you for (.+)$/))) return row(ic('#3a2819', iconSpanSolid('hit')), `${m[1]} hit you for <b>${m[2].replace(/\.$/,'')}</b>`);
+  if((m = t.match(/^Relic gained: (.+?) \u2014 (.+)$/))) return row(ic('#d6b25a', MARK_STAR), `New relic: <b>${m[1]}</b>`, m[2]);
+  if((m = t.match(/^Quest complete: (.+)$/))) return row(ic('#5f8a3c', MARK_CHECK), `Quest done: <b>${m[1]}</b>`);
+  if((m = t.match(/^You take (\d+) D\.O\.T\. damage\.?$/))) return row(ic('#7a1f14', iconSpanSolid('dot')), `D.O.T. hurt you for <b>${m[1]}</b>`);
+  if((m = t.match(/^You recover (\d+) from H\.O\.T\.?$/))) return row(ic('#5f8a3c', iconSpanSolid('hot')), `H.O.T. healed <b>${m[1]}</b>`);
+  return row(ic('#8a5a2b', '<i class="lg-dot"></i>'), t.replace(/ \u2014 /g, ': ').replace(/\.\.\.$/, '.'));
+}
 function logViewHTML(){
-  return `<div class="log" style="height:min(60vh,400px);">${S.log.slice(-150).map(l=>`<div class="${l.cls}">${l.text}</div>`).join('')}</div>`;
+  let out = '', any = false;
+  S.log.slice(-150).forEach(l=>{
+    const t = String(l.text||'');
+    let m;
+    if((m = t.match(/^\u2014 Floor (\d+) \u2014$/))){ out += `<h4>Floor ${ROMAN[+m[1]]||m[1]}</h4>`; return; }
+    if((m = t.match(/^A (.+) descends into the dungeon/))){ out += `<h4>Floor I</h4><div class="lg-e"><span class="lg-i" style="background:#6b4220">${iconSpanSolid('camp')}</span><div>Set out as <b>${m[1]}</b></div></div>`; any = true; return; }
+    out += logEntryHTML(t); any = true;
+  });
+  return `<div class="log-journal" id="log-journal">${any ? out : '<p class="hint">Nothing yet.</p>'}</div>`;
 }
 
 // A static (non-clickable) preview tile that looks like a real tray die --
