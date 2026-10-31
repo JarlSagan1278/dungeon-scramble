@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.37 (Oct 31, 2026)
+- Codex: locked loot dice show a dark die silhouette (like the Bestiary's monster shadows) instead of a thin padlock; the Relics tab loses its stray "Relics ?" line and gets a count line like the Dice tab ("Shrine relics: 2/23 found").
+- The lethal warning's skull is drawn, not a text character.
 ## 1.42.36 (Oct 31, 2026)
 - Camp: Rest has a subtitle like Train's, "Scramble & heal" (still no heal number, per the Oct 16 decision).
 ## 1.42.35 (Oct 31, 2026)

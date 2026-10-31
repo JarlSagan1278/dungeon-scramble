@@ -77,3 +77,4 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Small fixes (Jeremy, Oct 31, 1.42.31):** boss Phase 2 label on one line; the Minion chip shows a minion die instead of "Min".
 - **Doors, floors, badge, crest (Jeremy, Oct 31, 1.42.32):** R1 (Floor II | Round 3 tag; quests say Round), B1 (boss door: iron plates, skull knocker, red glow), F1 (Floor card: stairway through the stone arch, stone tablet + parchment name), D3 (class crest decal on the dice-box lid). Jeremy: new pieces must match the old art and follow the line-width and paper-texture rules.
 - **Door creak, lid stickers (Jeremy, Oct 31, 1.42.33):** doors creak when they open; no class crest on the lid; instead rare gag stickers like the FRAGILE one ("this side toward enemy", etc.), about 1 room in 10.
+- **Codex leftovers + lethal skull (Jeremy, Oct 31, 1.42.37):** locked dice are silhouettes; no orphan "Relics ?" line; drawn skull on the lethal tag.

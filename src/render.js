@@ -2076,7 +2076,7 @@ function syncLethalWarning(){
   const old = pw.querySelector('.lethal-tag'); if(old) old.remove();
   if(L){
     const tip = `Lethal: hit ${L.hit}${L.block?` - Block ${L.block}`:''}${L.dot?` + D.O.T. ${L.dot}`:''}${L.hot?` - H.O.T. ${L.hot}`:''} vs your ${L.hp} HP. Block, heal, Freeze, Nullify, or kill it this turn.`;
-    pw.insertAdjacentHTML('beforeend', `<span class="lethal-tag" title="${tip}">&#9760; Lethal next turn</span>`);
+    pw.insertAdjacentHTML('beforeend', `<span class="lethal-tag" title="${tip}">${MARK_SKULL} Lethal next turn</span>`);
   }
 }
 // Fast update for Swap/Reroll and class-Skill taps (Oct 14): same idea as renderPathOnly, plus the tray's armed
@@ -3512,7 +3512,7 @@ function diceCompendiumHTML(){
   const sections = tiers.map(t=>codexSectionHTML(`${t.label} Dice`, t.pool.map((d,i)=>{
     const tagCls = 't-'+t.label.toLowerCase();
     // Spoiler-free until the player has actually found this die in a playthrough.
-    if(!DISCOVERED_DICE.has(d.name)) return codexCardHTML({pic:`<span class="cx-q">${lockSVG(18)}</span>`, name:'???', tag:t.label, tagCls, locked:true});
+    if(!DISCOVERED_DICE.has(d.name)) return codexCardHTML({pic:`<span class="cx-die-shadow" aria-hidden="true"><i></i></span>`, name:'???', tag:t.label, tagCls, locked:true});
     const id = t.label[0]+i;
     page(id, d.name, t.label, tagCls, d.faces, isBoonReady(d.name) ? 'Starting Boon ready.' : `Collected ${dieCopies(d.name)}/${BOON_COPIES_NEEDED} for a Starting Boon.`);
     return codexCardHTML({page:id, pic:pic(d.name), name:d.name, tag:t.label, tagCls, isNew:newDice.has(d.name)});
@@ -3562,6 +3562,7 @@ function keyShow(cell){
 // Small drawn marks for chips and strips (Oct 31: no unicode check marks or arrows).
 const MARK_CHECK = '<svg class="mark-svg" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const MARK_LEFT = '<svg class="mark-svg" viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5M9.5 5L4.5 10l5 5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const MARK_SKULL = '<svg class="mark-svg" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.2c-4.3 0-7 2.8-7 6.6 0 2.3 1 3.8 2.5 4.7v2.6h9v-2.6c1.5-.9 2.5-2.4 2.5-4.7 0-3.8-2.7-6.6-7-6.6z" fill="currentColor"/><circle cx="7.2" cy="9.2" r="1.9" fill="#3a0d08"/><circle cx="12.8" cy="9.2" r="1.9" fill="#3a0d08"/><path d="M9.1 13.2l.9-1.7.9 1.7z" fill="#3a0d08"/><path d="M8 16.1v1.7M10 16.1v1.7M12 16.1v1.7" stroke="currentColor" stroke-width="1.4"/></svg>';
 const MARK_STAR = '<svg class="mark-svg" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5l2.2 5 5.3.5-4 3.6 1.2 5.3L10 14.2 5.3 16.9l1.2-5.3-4-3.6 5.3-.5z" fill="currentColor"/></svg>';
 function emptyPouchHTML(color, big, line){
   const dark = color==='#8a5a2b' ? '#6b4220' : '#44535d';
@@ -4025,9 +4026,11 @@ function relicCodexHTML(){
       <div><span class="cx-tag ${r.origin?'t-origin':'t-shrine'}">${r.origin?`${originName} relic`:'Shrine relic'}</span></div><p class="cx-flav cx-desc">${r.desc}</p>`);
     return codexCardHTML({page:id, pic:relicBadgeHTML(r, 'relic-badge-lg'), name:r.name, tag:originName||'Shrine', tagCls:r.origin?'t-origin':'t-shrine', isNew:!seenR.relics.has(r.id)});
   };
-  return `<p class="hint" style="text-align:left;">Relics ${infoDot('Permanent perks for a single run. Find them at Relic Shrines. Win a run with an Origin and it will start every later run with its own signature relic.')}</p>`
-    + codexSectionHTML('Origin Relics', RELICS.filter(r=>r.origin).map(card))
-    + codexSectionHTML('Shrine Relics', RELICS.filter(r=>!r.origin).map(card));
+  // Oct 31 (Jeremy): no stray "Relics ?" line; a count line like the Dice tab's instead
+  const shrineR = RELICS.filter(r=>!r.origin);
+  return codexSectionHTML('Origin Relics', RELICS.filter(r=>r.origin).map(card))
+    + `<p class="hint">Win a run with an Origin and every later run starts with its signature relic. Shrine relics: ${shrineR.filter(isFound).length}/${shrineR.length} found. Relic Shrines offer a choice of three.</p>`
+    + codexSectionHTML('Shrine Relics', shrineR.map(card));
 }
 function markRelicsSeen(){
   const found = new Set(META.relicsFound||[]);
