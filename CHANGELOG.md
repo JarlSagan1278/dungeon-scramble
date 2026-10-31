@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.28 (Oct 31, 2026)
+- How to Play trays: every die is the same size (the selected ones were drawn bigger), step numbers sit in the dice corners above the path line, and the hop example no longer lands on a dark blank die.
 ## 1.42.27 (Oct 31, 2026)
 Screen polish (Jeremy picked 2A, 3A, 4A, 5A, 6A):
 - **Character select (2A):** class and die text 12-13 px; the hero's name sits on a parchment nameplate; locked origins are dimmed with a gold padlock badge.

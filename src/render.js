@@ -3337,7 +3337,7 @@ function tutorialPicHTML(kind){
     return `<div class="tut-pic tut-tray">${cells.map((c,i)=>{ const k=path.indexOf(i); return `<i style="background:${C[c]}" class="${k>=0?'on':''}">${k>=0?`<b>${k+1}</b>`:''}</i>`; }).join('')}<svg viewBox="0 0 100 100" aria-hidden="true"><path d="${d}" fill="none" stroke="#ffd75e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
   };
   if(kind==='path') return tray([4,5,9,10,14], []);
-  if(kind==='leap') return tray([8,10,6,7], [1]);
+  if(kind==='leap') return tray([8,10,11,7], [1]);
   if(kind==='route'){
     const door = (inner, cls)=>`<span class="tut-door ${cls||''}">${inner}</span>`;
     return `<div class="tut-pic tut-route">${door(iconSpan('camp'),'done')}${door(MARK_CHECK,'done')}${door('<b>?</b>','now')}${door('<b>?</b>')}${door(iconSpan('camp'))}${door(iconSpan('boss'),'boss')}</div>`;
