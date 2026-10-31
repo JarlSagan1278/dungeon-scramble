@@ -2026,8 +2026,9 @@ function renderPathStrip(){
   { // Path as a rightward-growing stack of overlapping coins, one per move (latest on top).
     const n = S.path.length;
     // Oct 31 (Jeremy): the head now spans the rail too, so the coins spread out as far as the path total allows.
-    const strip = document.getElementById('path-strip'), pc = document.querySelector('.tray-panel .path-counter-float');
-    const room = (strip && strip.parentNode) ? strip.parentNode.getBoundingClientRect().right - strip.getBoundingClientRect().left - (pc ? Math.max(64, pc.offsetWidth) : 64) - 8 : 180;
+    // (a fixed reserve for the path total, not its live width: that can be one tap stale on the fast redraw)
+    const strip = document.getElementById('path-strip');
+    const room = (strip && strip.parentNode) ? strip.parentNode.getBoundingClientRect().right - strip.getBoundingClientRect().left - 80 : 180;
     const step = n>1 ? Math.max(6, Math.min(26, (room-30)/(n-1))) : 26;
     const ta = S.trayAct;
     if(ta){ document.getElementById('path-strip').innerHTML = `<span class="trayact-hint">${iconSpan(ta.kind)} ${ta.kind==='swap' ? (ta.token ? (ta.first==null ? 'Tap the first die to swap' : 'Tap the second die') : 'Tap a die to trade places') : 'Tap a die to reroll'}</span>`; }
@@ -2425,7 +2426,19 @@ function showFloorCard(num, _name){
   if(old) old.remove();
   // Oct 31 (Jeremy, F1): a stairway going down through the room's stone arch, lit by two torches, with a carved stone
   // tablet for the floor and a parchment strip for its name (same pieces and paper texture as the new-room door).
-  const steps = [0,1,2,3,4].map(i=>`<i class="fc-step" style="--i:${i}"></i>`).join('');
+  // stairs in perspective: treads and risers narrowing toward a dark vanishing point, so they read as going down
+  const W = 188, H = 234, vx = W/2, vy = 70;
+  let st = `<rect width="${W}" height="${H}" fill="#0b0704"/>`;
+  const ys = k => vy + (H - vy) / (1 + 0.55*k), hw = k => (W/2 + 6) / (1 + 0.55*k);
+  st += `<path d="M0 ${H} L${vx-hw(7)} ${ys(7)} L${vx+hw(7)} ${ys(7)} L${W} ${H} Z" fill="#2a2420"/>`;
+  for(let k=6; k>=0; k--){
+    const y0 = ys(k+1), y1 = ys(k), riser = (y1 - y0) * 0.42, sh = Math.round(46 + 26*(1 - k/6));
+    st += `<path d="M${vx-hw(k+1)} ${y0} L${vx+hw(k+1)} ${y0} L${vx+hw(k)} ${y1-riser} L${vx-hw(k)} ${y1-riser} Z" fill="hsl(28 6% ${sh}%)" stroke="#120b07" stroke-width="2.5" stroke-linejoin="round"/>`;
+    st += `<path d="M${vx-hw(k)} ${y1-riser} L${vx+hw(k)} ${y1-riser} L${vx+hw(k)} ${y1} L${vx-hw(k)} ${y1} Z" fill="hsl(28 6% ${sh-16}%)" stroke="#120b07" stroke-width="2.5" stroke-linejoin="round"/>`;
+  }
+  st += `<path d="M0 ${H} L${vx-hw(7)} ${ys(7)} M${W} ${H} L${vx+hw(7)} ${ys(7)}" stroke="#120b07" stroke-width="3"/>`;
+  st += `<rect width="${W}" height="${H}" fill="url(#fcfade)"/><defs><linearGradient id="fcfade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b0704"/><stop offset=".42" stop-color="#0b0704" stop-opacity=".85"/><stop offset=".7" stop-color="#0b0704" stop-opacity="0"/></linearGradient></defs>`;
+  const steps = `<svg class="fc-stairs" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${st}</svg>`;
   const node = el(`<div id="floor-card"><div class="floor-card-box fc-scene" aria-label="Floor ${num}: ${FLOOR_TITLES[num-1]||''}">
       <div class="rc-arch fc-arch"><div class="fc-hole">${steps}<i class="fc-torch l"></i><i class="fc-torch r"></i></div></div>
       <div class="fc-sign"><div class="floor-card-num fc-tablet">Floor ${ROMAN[num]||num}</div><div class="floor-card-name fc-name">${FLOOR_TITLES[num-1]||''}</div></div>
@@ -2614,6 +2627,7 @@ function showRoomCallout(fx, onDismiss){
     // outside the templated app.innerHTML (in #fx-stack), so render()
     // rebuilding the panel no longer removes it along with it -- remove it
     // explicitly before handing off, and skip the fade-out in that case.
+    playDoorCreak(!!fx.boss);
     if(onDismiss){ if(node.parentNode) node.parentNode.removeChild(node); onDismiss(); return; }
     node.classList.add('dismissing');
     setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 360); // after the door swings
@@ -2884,6 +2898,30 @@ function playTone(kind, pitchStep){
     osc.start(now+n.start);
     osc.stop(now+n.start+n.dur+0.02);
   });
+}
+
+// Oct 31 (Jeremy): a door creaks open. Stick-slip friction: a buzzy sawtooth through a resonant bandpass, its volume
+// chopped into irregular little catches whose rate climbs then slows, and a pitch that wanders, plus a soft wooden thud.
+// Boss doors are lower and slower.
+function playDoorCreak(heavy){
+  if(!PREFS.sound) return;
+  const ctx = getAudioCtx(); if(!ctx) return;
+  const now = ctx.currentTime, dur = heavy ? 0.95 : 0.7, out = sfxOut(ctx);
+  const osc = ctx.createOscillator(), bp = ctx.createBiquadFilter(), g = ctx.createGain();
+  osc.type = 'sawtooth'; bp.type = 'bandpass'; bp.Q.value = 6; bp.frequency.value = heavy ? 620 : 900;
+  const base = heavy ? 95 : 140;
+  for(let t=0; t<=dur; t+=0.03){ const u = t/dur; osc.frequency.setValueAtTime(base * (1 + 0.35*Math.sin(u*Math.PI*1.3) + (Math.random()-0.5)*0.08), now+t); }
+  const n = Math.floor(ctx.sampleRate*dur/64), curve = new Float32Array(n);
+  let next = 0;
+  for(let i=0;i<n;i++){
+    const u = i/n, env = Math.sin(Math.PI*Math.min(1, u*1.15)) * 0.95;
+    if(i >= next){ next = i + Math.max(2, Math.round((heavy?9:6) + 5*Math.sin(u*Math.PI*2) + Math.random()*4)); }
+    curve[i] = env * (next - i > 2 ? 0.25 : 1);
+  }
+  g.gain.setValueAtTime(0, now); g.gain.setValueCurveAtTime(curve, now, dur);
+  osc.connect(bp).connect(g).connect(out);
+  osc.start(now); osc.stop(now+dur+0.05);
+  playNoiseBurst(ctx, now+dur*0.82, 0.14, heavy ? 0.4 : 0.28, 'lowpass', heavy ? 160 : 220, 0.8);
 }
 
 // A tray scramble gets its own noise-based rattle rather than another
@@ -5226,13 +5264,37 @@ function newAchievementsHTML(newAchievements){
 // direction, the lock pops and the dice tumble out.
 // Domed lid (Jeremy picked A1, Oct 25): as wide as the chest, rising 26px above it so it covers the top corner brackets.
 const CHEST_LID_HTML = `<div class="chest-lid" id="chest-lid" title="Flick or double-tap to open (or shake your phone)"><i class="strap s1"></i><i class="strap s2"></i><i class="rim"></i></div>`;
-// Oct 31 (Jeremy, D3): a class crest decal on the lid: your class colour and its icon on a shield, under the lid's paper.
-const CLASS_CREST_ICON = { armsmaster:'hit', guard:'block', dungeoneer:'leap', arcanist:'boost', debug:'key' };
-function chestLidHTML(){
-  const k = S && S.klass; if(!k) return CHEST_LID_HTML;
-  const crest = `<div class="lid-crest" style="--cc:${k.color||'#7a45d6'}" aria-hidden="true"><svg viewBox="0 0 120 130"><path d="M60 8l44 14v34c0 30-20 52-44 64C36 108 16 86 16 56V22z" fill="#fff6e0" stroke="#120b07" stroke-width="5" stroke-linejoin="round"/><path d="M60 18l36 11v27c0 25-16 44-36 54C40 100 24 81 24 56V29z" fill="var(--cc)" stroke="#120b07" stroke-width="3.5" stroke-linejoin="round"/></svg>${iconSpanSolid(CLASS_CREST_ICON[k.id]||'combo')}</div>`;
-  return CHEST_LID_HTML.replace('<i class="rim"></i>', '<i class="rim"></i>'+crest);
+// Oct 31 (Jeremy): no class crest; instead a rare gag sticker on the lid, like a well-travelled crate. About 1 room in
+// 10 gets one, picked per room (same sticker every turn of that room), never in the guided first fight.
+const stkT = (x,y,size,fill,txt,len,font)=>`<text x="${x}" y="${y}" text-anchor="middle" style="font-family:${font==='d'?'var(--font-display)':'var(--font-ui)'};font-weight:${font==='d'?400:800}" font-size="${size}" fill="${fill}"${len?` textLength="${len}" lengthAdjust="spacingAndGlyphs"`:''}>${txt}</text>`;
+const LID_STICKERS = [
+  // FRAGILE, contents may bite
+  `<svg viewBox="0 0 150 100"><rect x="4" y="6" width="142" height="88" rx="8" fill="#f3e3bf" stroke="#120b07" stroke-width="3"/>${stkT(75,40,22,'#7a1f14','FRAGILE',104,'d')}${stkT(75,62,14,'#3a2410','contents may bite',112)}<path d="M28 76h94" stroke="#7a1f14" stroke-width="3" stroke-dasharray="6 5"/></svg>`,
+  // THIS SIDE TOWARD ENEMY
+  `<svg viewBox="0 0 150 104"><rect x="4" y="4" width="142" height="96" rx="6" fill="#ffd75e" stroke="#120b07" stroke-width="3"/><path d="M75 14l17 18h-10v14h-14v-14h-10z" fill="#120b07"/>${stkT(75,66,15,'#120b07','THIS SIDE',96)}${stkT(75,86,15,'#120b07','TOWARD ENEMY',122)}</svg>`,
+  // SHAKE WELL BEFORE USE
+  `<svg viewBox="0 0 150 80"><rect x="4" y="4" width="142" height="72" rx="36" fill="#fff6e0" stroke="#120b07" stroke-width="3"/><rect x="10" y="10" width="130" height="60" rx="30" fill="none" stroke="#3d6fa3" stroke-width="2.5"/>${stkT(75,38,16,'#3d6fa3','SHAKE WELL',104)}${stkT(75,58,13,'#3a2410','before use',76)}</svg>`,
+  // DO NOT FEED THE MINIONS
+  `<svg viewBox="0 0 150 100"><rect x="4" y="4" width="142" height="92" rx="8" fill="#e9f2df" stroke="#120b07" stroke-width="3"/><rect x="58" y="12" width="34" height="34" rx="7" fill="#2a1d13" stroke="#120b07" stroke-width="3"/><ellipse cx="69" cy="28" rx="3" ry="4.5" fill="#ffcf4a"/><ellipse cx="81" cy="28" rx="3" ry="4.5" fill="#ffcf4a"/><path d="M52 50L98 8" stroke="#b02a1c" stroke-width="5" stroke-linecap="round"/>${stkT(75,68,14,'#2d5a2f','DO NOT FEED',100)}${stkT(75,86,14,'#2d5a2f','THE MINIONS',100)}</svg>`,
+  // IF FOUND, RETURN TO DUNGEON (luggage tag)
+  `<svg viewBox="0 0 160 84"><path d="M30 6h124v72H30L6 42z" fill="#d6b25a" stroke="#120b07" stroke-width="3" stroke-linejoin="round"/><circle cx="30" cy="42" r="6" fill="#6b4220" stroke="#120b07" stroke-width="2.5"/>${stkT(94,36,13,'#3a2410','IF FOUND, RETURN TO',104)}${stkT(94,58,17,'#7a1f14','the Dungeon',96,'d')}</svg>`,
+  // WARNING: CONTAINS PROBABILITY
+  `<svg viewBox="0 0 150 96"><defs><pattern id="lid-hz" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="14" fill="#120b07"/></pattern></defs><rect x="4" y="4" width="142" height="88" rx="6" fill="#ffd75e" stroke="#120b07" stroke-width="3"/><rect x="4" y="4" width="142" height="14" fill="url(#lid-hz)"/><rect x="4" y="78" width="142" height="14" fill="url(#lid-hz)"/><rect x="4" y="4" width="142" height="88" rx="6" fill="none" stroke="#120b07" stroke-width="3"/>${stkT(75,42,14,'#120b07','WARNING:',74)}${stkT(75,63,13,'#120b07','CONTAINS PROBABILITY',126)}</svg>`,
+];
+function lidStickerFor(){
+  if(!S || S.coachRun) return '';
+  if(!S._stickerSalt) S._stickerSalt = 1 + Math.floor(Math.random()*1e9);
+  let h = (S._stickerSalt ^ ((S.floorIdx+1)*2654435761) ^ ((S.routeStep+1)*40503)) >>> 0;
+  h = Math.imul(h ^ (h >>> 15), 2246822519) >>> 0; h = (h ^ (h >>> 13)) >>> 0;
+  if(h % 100 >= 10) return '';
+  const tilt = ((h >> 8) % 13) - 6;
+  return `<div class="lid-sticker" style="--tilt:${tilt}deg" aria-hidden="true">${LID_STICKERS[(h >> 4) % LID_STICKERS.length]}</div>`;
 }
+function chestLidHTML(){
+  const st = lidStickerFor();
+  return st ? CHEST_LID_HTML.replace('<i class="rim"></i>', '<i class="rim"></i>'+st) : CHEST_LID_HTML;
+}
+
 function scrambleRoll(dx, dy){
   if(!S || !S.needRoll) return;
   const lid = document.getElementById('chest-lid');

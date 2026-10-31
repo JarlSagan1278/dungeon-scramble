@@ -3561,8 +3561,16 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 #floor-card .fc-name{ margin-top:-2px; padding:3px 12px; border:3px solid var(--line); border-radius:4px; color:#3a2410 !important; font-size:16px !important; letter-spacing:.02em !important;
   background:var(--paper-tile) repeat, #f3e3bf; background-size:110px 110px, auto; background-blend-mode:soft-light, normal; box-shadow:0 3px 0 var(--line); }
 .reduced-motion .fc-torch::before{ animation:none; }
-/* D3: the class crest decal sits between the lid's straps; the lid's paper overlay now covers it (and the straps) too */
+/* Oct 31 (Jeremy): rare gag stickers on the lid (no class crest); the lid's paper overlay covers them and the straps */
 .chest-lid::before{ z-index:3; }
-.lid-crest{ position:absolute; left:50%; top:44%; width:66px; height:72px; transform:translate(-50%,-50%) rotate(-5deg); z-index:2; pointer-events:none; filter:drop-shadow(0 3px 0 rgba(12,7,5,.55)); }
-.lid-crest svg{ width:100%; height:100%; display:block; }
-.lid-crest .icon-svg{ position:absolute; left:50%; top:44%; width:30px; height:30px; transform:translate(-50%,-50%); color:#fff6e0; filter:drop-shadow(0 0 0 #120b07) drop-shadow(1.5px 1.5px 0 #120b07) drop-shadow(-1px -1px 0 #120b07); }
+.lid-sticker{ position:absolute; left:50%; top:45%; width:136px; transform:translate(-50%,-50%) rotate(var(--tilt,-4deg)); z-index:2; pointer-events:none; filter:drop-shadow(0 3px 0 rgba(12,7,5,.5)); }
+.lid-sticker svg{ width:100%; height:auto; display:block; }
+/* Floor card stairs in perspective (Oct 31: the stacked steps read as a pyramid going up); mortar lines like a normal arch */
+.fc-stairs{ position:absolute; inset:0; width:100%; height:100%; }
+.fc-hole{ background:#0b0704 !important; }
+.fc-torch{ z-index:1; }
+.fc-arch{ background:repeating-conic-gradient(from -90deg at 50% 46%, #9aa0a6 0deg 15deg, #3d4247 15deg 16.5deg) !important; }
+#floor-card .floor-card-box.fc-scene{ animation:fc-in 1.7s ease-out both !important; }
+@keyframes fc-in{ 0%{ opacity:0; transform:translateY(12px); } 15%{ opacity:1; transform:none; } 82%{ opacity:1; } 100%{ opacity:0; transform:translateY(-8px); } }
+#floor-card .floor-card-box.fc-scene{ clip-path:none !important; filter:none !important; } /* the old ribbon clip notched the arch's sides */
+#floor-card{ background:rgba(8,5,3,.6) !important; }

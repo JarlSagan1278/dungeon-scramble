@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.33 (Oct 31, 2026)
+- **Door creak:** opening a room's door creaks (stick-slip wood, then a soft thud); boss doors creak lower and slower.
+- **Floor card fixed:** it looked warped: an old ribbon-shaped clip notched the arch's sides, and the stacked steps read as a pyramid going up. The arch is whole now and the stairs are drawn in perspective, going down into the dark.
+- **Lid stickers:** the class crest is gone. About 1 room in 10, the closed dice-box lid wears a gag sticker (picked per room, never in the guided first fight): FRAGILE / contents may bite, THIS SIDE TOWARD ENEMY, SHAKE WELL before use, DO NOT FEED THE MINIONS, IF FOUND, RETURN TO the Dungeon, WARNING: CONTAINS PROBABILITY.
+- Path coins keep a fixed space for the path total (their spacing could differ by a tap between the fast and full redraw).
 ## 1.42.32 (Oct 31, 2026)
 Jeremy picked R1, B1, F1, D3 (all built to the art rules: 3px outlines on big shapes, 2px on chips, the paper texture on every new surface):
 - **Round badge (R1):** "F2 · Rd 3" is now a two-part tag, "Floor II" on a stone tab and "Round 3" on parchment ("Floor II | Shrine" at shrines). Quests read "Reach Round 4".
