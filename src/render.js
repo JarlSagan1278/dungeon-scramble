@@ -995,7 +995,7 @@ let debugArmed = false;
 function dieFaceChipsHTML(faceArr, toneCls){
   return faceArr.map(f=>{
     const label = `${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}`;
-    const tip = `${label} — ${FACE_DESC[f.type]||''}`;
+    const tip = `${label}: ${FACE_DESC[f.type]||''}`;
     if(f.type==='blank') return `<div class="die-face-chip ${toneCls} blank" title="${tip}"></div>`;
     return `<div class="die-face-chip ${toneCls}" title="${tip}">${iconSpan(f.type, f.value)}</div>`;
   }).join('');
@@ -1798,7 +1798,7 @@ function openTokensModal(){
     if(S.transitioning || !S.encounter || S.freezeTokens<=0) return;
     S.freezeTokens--;
     S.freezeNext = true;
-    logMsg('sys', 'Freeze token used — the encounter will skip its next action.');
+    logMsg('sys', 'Freeze token used: the enemy skips its next action.');
     closeModal(overlay, render);
   };
   const swapBtn = overlay.querySelector('#use-swap-token');
@@ -1818,7 +1818,7 @@ function openTokensModal(){
     if(S.transitioning || !S.encounter || S.boostTokenCharges<=0 || S.pendingFreeBoost) return;
     S.boostTokenCharges--;
     S.pendingFreeBoost = S.boostTokenValue;
-    logMsg('sys', `Boost token armed — your next path action gets x${S.boostTokenValue}.`);
+    logMsg('sys', `Boost token armed: your next path action gets x${S.boostTokenValue}.`);
     closeModal(overlay, render);
   };
 }
@@ -2189,7 +2189,7 @@ document.addEventListener('click', ev=>{
 }, true);
 // Tap a status chip or enemy action badge -> a small popup about it (same idea as the relic strip's list).
 // Oct 31 (Jeremy, E1): a parchment note pinned next to the chip instead of a full modal: icon and number, when it
-// comes, the monster's own line (its flavor text), then the plain rule. Any tap closes it.
+// comes, then the plain rule (no flavor line: Jeremy, Oct 31). Any tap closes it.
 let actionNoteEl = null;
 function closeActionNote(){ if(actionNoteEl){ actionNoteEl.remove(); actionNoteEl = null; } }
 document.addEventListener('pointerdown', ev=>{ if(actionNoteEl && !(ev.target.closest && ev.target.closest('.action-note'))) closeActionNote(); }, true);
@@ -2210,9 +2210,8 @@ document.addEventListener('click', ev=>{
   const num = (head.match(/(\d+)\s*$/)||[])[1];
   const name = num ? head.replace(/\s*\d+\s*$/,'') : head;
   const icon = chip.querySelector('.icon-svg');
-  const flavor = enemySide && S && S.encounter && S.encounter.flavor ? S.encounter.flavor.replace(/^["“]|["”]$/g,'') : '';
   const hot = chip.classList.contains('enemy-action-badge') || chip.classList.contains('boss-cycle-item');
-  const n = el(`<div class="action-note${hot?'':' an-status'}" role="dialog"><div class="an-h">${icon?`<span class="an-ic">${icon.outerHTML}</span>`:''}<div><div class="an-t">${name}${num?`<b>${num}</b>`:''}</div>${when?`<div class="an-w">${when}</div>`:''}</div></div>${flavor?`<div class="an-q">“${flavor}”</div>`:''}<div class="an-b">${body}</div><i class="an-tail"></i></div>`);
+  const n = el(`<div class="action-note${hot?'':' an-status'}" role="dialog"><div class="an-h">${icon?`<span class="an-ic">${icon.outerHTML}</span>`:''}<div><div class="an-t">${name}${num?`<b>${num}</b>`:''}</div>${when?`<div class="an-w">${when}</div>`:''}</div></div><div class="an-b">${body}</div><i class="an-tail"></i></div>`);
   document.body.appendChild(n); n._chip = chip; actionNoteEl = n;
   const r = chip.getBoundingClientRect(), w = n.offsetWidth, h = n.offsetHeight;
   const left = Math.max(8, Math.min(window.innerWidth - w - 8, r.left + r.width/2 - w/2));
@@ -3504,7 +3503,7 @@ function emptyPouchHTML(color, big, line){
 }
 function backPocketViewHTML(){
   if(!S.backPocket.length){
-    return emptyPouchHTML('#8a5a2b', 'Just lint and a moth', 'Your safety net is empty. Dice land here when loot replaces one in your Tray or a Shrine upgrades one, and then they can save you once from 0 Health.');
+    return emptyPouchHTML('#8a5a2b', 'What have I got in my pocket?', 'Nothing, not even a ring. Your safety net is empty. Dice land here when loot replaces one in your Tray or a Shrine upgrades one, and then they can save you once from 0 Health.');
   }
   return `<div class="camp-dice-grid">${S.backPocket.map(d=>`<div class="die dietype-${d.cat} camp-die-tile" style="cursor:default;" title="${d.name}"><span class="camp-die-label">${d.name.replace(/^Maneuver\b/,'Mvr').replace(/^Attack\b/,'Atk')}</span></div>`).join('')}</div>
     <p class="hint" style="margin-top:8px;"><b style="color:#e8746b">&#9829; Safety net ready.</b> If you fall to 0 Health, these dice are rolled until one isn't blank: it saves you at 5 Health, and <b>every</b> die here is spent. ${infoDot('Visit Camp to swap these into your Tray.')}</p>`;
@@ -4618,8 +4617,8 @@ function renderCamp(){
   app.innerHTML = `
     <div class="panel ${baseCamp?'base-camp':''}">
       ${renderRoute()}
-      <h2 style="margin-bottom:6px;">${baseCamp?'Base Camp':'Camp'} ${infoDot(baseCamp?'Your adventure begins here. Tinker with your dice if you like, then set out — nothing here is required.':'Prepare before pressing onward. The campfire gives you one choice: Rest or Train.')}</h2>
-      ${baseCamp?'<p class="hint" style="margin:0 0 6px;">Nothing here is required — set out whenever you like.</p>':''}
+      <h2 style="margin-bottom:6px;">${baseCamp?'Base Camp':'Camp'} ${infoDot(baseCamp?'Your adventure begins here. Upgrade or organize your dice if you like.':'Prepare before pressing onward. The campfire gives you one choice: Rest or Train.')}</h2>
+      ${baseCamp?'<p class="hint" style="margin:0 0 6px;">Nothing here is required. Set out whenever you&#39;re ready.</p>':''}
 
       <div class="camp-section camp-status-card">
         <div class="bar-row camp-hp-row" style="position:relative;"><span style="flex:0 0 auto;">Health</span><div class="fo-hpwrap camp-hpwrap" style="position:relative;"><div class="bar ${campFx.cls}"><div class="bar-fill hp player camp-hp-fill" style="width:${S.health/S.maxHealth*100}%"></div></div><span class="bar-num camp-hp-num">${S.health}/${S.maxHealth}</span></div>${campFx.deltaHTML}</div>

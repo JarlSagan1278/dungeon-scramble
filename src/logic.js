@@ -2844,7 +2844,7 @@ function campUpgrade(cat, level){
   if(S.campUpgrades[cat]) return;
   if(!isBaseCamp() && (S.campFireOut || S.campChoice==='rest')) return; // the fire went to Rest (or is out)
   if(!canUpgrade(cat, level)){
-    logMsg('sys', `Not enough spare dice to fully back that upgrade — nothing changed.`, 'bad');
+    logMsg('sys', `Not enough spare dice to fully back that upgrade, so nothing changed.`, 'bad');
     render();
     return;
   }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.24 (Oct 31, 2026)
+- The empty Back Pocket nods to Bilbo's riddle: "What have I got in my pocket?" / "Nothing, not even a ring."
+- Enemy action notes drop the monster's flavor line (icon, number, when, and the rule only).
+- Em dashes out of player text: Base Camp ("Nothing here is required. Set out whenever you're ready."), the Freeze/Boost token messages, the camp "not enough spare dice" warning and the loot-die face tip.
 ## 1.42.23 (Oct 31, 2026)
 Giving it character (Jeremy picked E1, T1, G1, B1, K1, R1, S1 and the small fixes):
 - **Enemy actions (E1):** tapping an enemy's action or a status chip pins a parchment note next to it (icon and number, when it comes, the monster's flavor line, the plain rule) instead of opening a full window. Any tap closes it.
