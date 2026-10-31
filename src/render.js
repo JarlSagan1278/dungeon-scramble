@@ -1646,7 +1646,7 @@ function renderEncounterCard(e, mode){
     const typeWord = isBoss ? (e.type + '') : [tierWord, e.type!=='Enemy'?e.type:''].filter(Boolean).join(' ');
     const typeTag = typeWord ? `<small class="fo-type${isBoss?' fo-type-inline':''}${e.tier==='deadly'?' fo-type-deadly':''}">${typeWord}</small>` : '';
     const questLine = (e.quests && e.quests.length)
-      ? `<div class="fo-quests-float"${questPaperStyle(e)} title="Complete these during the fight for bonus rewards"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label">Quests</div>${e.quests.some(q=>!QUEST_ALL_FIGHT.test(parseQuestSpec(q).cond)) ? '<div class="fo-quests-sub">in one turn</div>' : ''}<div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, e.questsDone[i])}</span>`; }).join('')}</div></div>` : '';
+      ? `<div class="fo-quests-float"${questPaperStyle(e)} title="Complete these during the fight for bonus rewards"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i>${e.quests.some(q=>!QUEST_ALL_FIGHT.test(parseQuestSpec(q).cond)) ? '<div class="fo-quests-label">In one turn</div>' : '<div class="fo-quests-label">Quests</div>'}<div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, e.questsDone[i])}</span>`; }).join('')}</div></div>` : '';
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
     const sz = encounterSize(e);
     const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz};--drop:${encounterDrop(e)}%"/>`
@@ -2024,7 +2024,10 @@ function bindTrayDice(){
 function renderPathStrip(){
   { // Path as a rightward-growing stack of overlapping coins, one per move (latest on top).
     const n = S.path.length;
-    const step = n>1 ? Math.min(16, 180/(n-1)) : 16;
+    // Oct 31 (Jeremy): the head now spans the rail too, so the coins spread out as far as the path total allows.
+    const strip = document.getElementById('path-strip'), pc = document.querySelector('.tray-panel .path-counter-float');
+    const room = (strip && strip.parentNode) ? strip.parentNode.getBoundingClientRect().right - strip.getBoundingClientRect().left - (pc ? Math.max(64, pc.offsetWidth) : 64) - 8 : 180;
+    const step = n>1 ? Math.max(6, Math.min(26, (room-30)/(n-1))) : 26;
     const ta = S.trayAct;
     if(ta){ document.getElementById('path-strip').innerHTML = `<span class="trayact-hint">${iconSpan(ta.kind)} ${ta.kind==='swap' ? (ta.token ? (ta.first==null ? 'Tap the first die to swap' : 'Tap the second die') : 'Tap a die to trade places') : 'Tap a die to reroll'}</span>`; }
     else document.getElementById('path-strip').innerHTML = S.path.map((idx,k)=>{
@@ -2317,6 +2320,11 @@ function sourceChip(text){
   else if((m = text.match(/mirrors as (\d+) D\.O\.T\. on it/))){ sel = '#enc-panel .fo-enemy .fo-hpwrap'; label = `+${m[1]} D.O.T.`; icon = 'dot'; place = 'above'; }
   else if((m = text.match(/mirrors as (\d+) H\.O\.T\. for you/))){ sel = '#enc-panel .fo-player .fo-hpwrap'; label = `+${m[1]} H.O.T.`; icon = 'hot'; place = 'above'; }
   else return false;
+  const anchor = document.querySelector(sel); if(!anchor) return false;
+  if(label==='Quest done!'){ const d = questBeat() - performance.now(); setTimeout(()=>placeSourceChip(sel, label, icon, place), Math.max(0, d)); return true; }
+  return placeSourceChip(sel, label, icon, place);
+}
+function placeSourceChip(sel, label, icon, place){
   const anchor = document.querySelector(sel); if(!anchor) return false;
   const r = anchor.getBoundingClientRect();
   const busy = document.querySelectorAll(`.src-chip[data-sel="${sel}"]`).length; // a second chip on the same spot steps aside
@@ -3005,14 +3013,24 @@ function tickFloatersHTML(side){
   const now=performance.now(); UIFX.ticks=UIFX.ticks.filter(x=>now-x.t<1300);
   return UIFX.ticks.filter(x=>x.side===side).map((x,k)=>`<span class="tick-float tf-${x.type}" style="animation-delay:-${Math.round(now-x.t)}ms; --k:${k%3}">${iconSpan(x.type)}${x.type==='block'?`<b>${x.amt}</b>&nbsp;blocked`:`<b>${x.type==='dot'?'-':'+'}${x.amt}</b>`}</span>`).join('');
 }
+// Oct 31 (Jeremy, weak spots P1): a finished quest gets its own beat at the end of the turn: its stamp and "Quest done!"
+// chip land 0.35 s after the damage total, and a second quest 0.35 s after that, instead of everything in one instant.
+const QUEST_BEAT = 350;
+function questBeat(){ // the "Quest complete" message comes first (sourceChip), then fxQuest: both use the same beat
+  const now = performance.now();
+  const t = Math.max(now + QUEST_BEAT, (UIFX.lastBeat||0) + QUEST_BEAT);
+  UIFX.lastBeat = t; UIFX.pendingBeat = {t};
+  return t;
+}
 function fxQuest(name,i){
-  UIFX.quests.push({name,i,t:performance.now()});
-  setTimeout(()=>{ try{ if(!PREFS.reducedMotion) spawnParticleBurstAtEl('.fo-quests-float', ['#ffd76a','#fff5d6','#e0603a']); }catch(e){} }, 160);
+  const t = UIFX.pendingBeat ? UIFX.pendingBeat.t : questBeat(); UIFX.pendingBeat = null;
+  UIFX.quests.push({name,i,t});
+  setTimeout(()=>{ try{ if(!PREFS.reducedMotion) spawnParticleBurstAtEl('.fo-quests-float', ['#ffd76a','#fff5d6','#e0603a']); }catch(e){} }, Math.max(0, t - performance.now()) + 160);
 }
 function questStampAttrs(name,i){
   const now=performance.now(); UIFX.quests=UIFX.quests.filter(x=>now-x.t<1200);
   const q=UIFX.quests.find(x=>x.name===name&&x.i===i);
-  return q ? {cls:'q-stamp', style:` style="--qd:-${Math.round(now-q.t)}ms"`} : {cls:'', style:''};
+  return q ? {cls:'q-stamp', style:` style="--qd:${Math.round(q.t-now)}ms"`} : {cls:'', style:''};
 }
 // Hit-stop: a brief freeze of every running animation plus a white-hot flash on the target.
 function hitStop(ms){
@@ -3813,7 +3831,23 @@ function attachRelicStrip(){
   // The fight's gem column stops above the HP bar; extra gems wrap into a second column.
   const col = document.querySelector('.fo-player > .relic-strip'), hp = col && col.parentNode.querySelector('.fo-hpwrap');
   if(col && hp){ const h = hp.getBoundingClientRect().top - col.getBoundingClientRect().top - 4; if(h > 40) col.style.setProperty('--relic-col-h', h+'px'); }
+  if(col) maybeRelicHint(col);
   consumeRelicPulses();
+}
+// First relic ever (Oct 31, Jeremy, weak spots R2): the column glows once and a chip says what it is. Once per device.
+function maybeRelicHint(col){
+  if(META.relicHintSeen || !S.relics.some(id=>{ const r = relicById(id); return r && !r.origin; }) || S.needRoll || S.transitioning || S.relicChoice || S.lootChoice || S.shrineChoice || document.querySelector('.modal-overlay, .coach-overlay, .relic-hint-chip, #symbol-intro')) return;
+  META.relicHintSeen = Date.now(); saveMeta();
+  setTimeout(()=>{
+    const c = document.querySelector('.fo-player > .relic-strip'); if(!c) return;
+    c.classList.add('relic-hint');
+    const r = c.getBoundingClientRect();
+    const chip = el(`<div class="src-chip relic-hint-chip" role="status"><i class="sc-ic sc-ok">&#8592;</i><span>Your relics: tap to read</span></div>`);
+    chip.style.left = (r.right+6)+'px'; chip.style.top = (r.top+Math.min(r.height,60)/2-14)+'px';
+    document.body.appendChild(chip);
+    const done = ()=>{ chip.classList.add('sc-out'); setTimeout(()=>chip.remove(), 300); const cc = document.querySelector('.fo-player > .relic-strip'); if(cc) cc.classList.remove('relic-hint'); };
+    setTimeout(done, 5200); c.addEventListener('click', done, {once:true});
+  }, 500);
 }
 
 // A relic just did something: its badge pops and a short label floats up (queued by

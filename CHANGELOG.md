@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.21 (Oct 31, 2026)
+- **Tray rail:** Go's top lines up with the top of the open dice box and Clear's bottom with the box's bottom. The round badge and path tokens now run across the full width, so the tokens spread out (less overlap); the path total sits over Go's top corner, and Skip appears in that slot above Go during playback (a blue toy button).
+- **Quests sign (Q2):** the "Quests" title is gone and "In one turn" is the header (or "Quests" when every quest runs all fight); the rows go from 8.5 to 11 px. The enemy's "Every turn / Heavy in 3" label goes 8.5 -> 10 px.
+- **Relics (R1 + R2):** a small gold "Relics" tag sits on top of the relic column; the first time you ever get a relic, the column glows and a chip says "Your relics: tap to read".
+- **Quest beats (P1):** a quest finished at the end of a turn gets its own beat: its DONE stamp and "Quest done!" chip land 0.35 s after the damage total, a second quest 0.35 s after that.
 ## 1.42.20 (Oct 31, 2026)
 - The Toadtaur Warrior and Wizard stay separate (Jeremy): the Warrior no longer joins Leap Year, Warrior Smash is gone, and Leap Year is back to Lily Pod and Chimeronslaught. The Warrior is still a Floor 3 elite.
 ## 1.42.19 (Oct 31, 2026)
