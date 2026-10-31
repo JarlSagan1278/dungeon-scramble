@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.44 (Oct 31, 2026)
+- The floor label takes its floor's loot die colour (Jeremy): Floor I steel (Alloy), Floor II gold (Gilded), Floor III purple (Magic), on the tray badge and the Floor card tablet.
 ## 1.42.43 (Oct 31, 2026)
 - The title screen no longer scrolls slightly on phones whose browser leaves less than 736 px of height: it fills the real screen height instead of the game card's 720 px minimum.
 ## 1.42.42 (Oct 31, 2026)

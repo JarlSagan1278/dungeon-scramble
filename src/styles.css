@@ -3653,3 +3653,8 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 .wrap:has(.title-screen-fill){ min-height:0 !important; }
 #app:has(.title-screen-fill){ min-height:0 !important; }
 .title-screen-fill{ min-height:0 !important; height:calc(100dvh - 16px) !important; max-height:var(--screen-h); }
+/* Oct 31 (Jeremy): the floor label takes its floor's loot die colour: Floor I Alloy (steel), II Gilded (gold), III Magic (purple) */
+.tray-head .round-badge .rb-floor.rb-alloy, #floor-card .fc-tablet.rb-alloy{ background:var(--paper-tile) repeat, linear-gradient(180deg,#b6bec5,#8a939b) !important; color:#1a1410 !important; }
+.tray-head .round-badge .rb-floor.rb-gilded, #floor-card .fc-tablet.rb-gilded{ background:var(--paper-tile) repeat, linear-gradient(180deg,#e6c86e,#c49a3c) !important; color:#241c10 !important; }
+.tray-head .round-badge .rb-floor.rb-magic, #floor-card .fc-tablet.rb-magic{ background:var(--paper-tile) repeat, linear-gradient(180deg,#a47ac8,#7a4fa0) !important; color:#f5eaff !important; }
+.tray-head .round-badge .rb-floor[class*="rb-"], #floor-card .fc-tablet[class*="rb-"]{ background-size:110px 110px, auto !important; background-blend-mode:soft-light, normal !important; }

@@ -1861,7 +1861,7 @@ function renderGame(){
       <div class="enc-rail-row">
         <div class="enc-card-col">
           <div class="tray-float-wrap">
-            <div class="tray-head"><span class="round-badge" title="Floor ${S.floorIdx+1}, round ${S.turnNumber+1}"><b class="rb-floor">Floor ${ROMAN[S.floorIdx+1]||S.floorIdx+1}</b><span class="rb-round">Round ${S.turnNumber+1}</span></span><div class="path-strip" id="path-strip"></div></div>
+            <div class="tray-head"><span class="round-badge" title="Floor ${S.floorIdx+1}, round ${S.turnNumber+1}"><b class="rb-floor rb-${(FLOORS[S.floorIdx]&&FLOORS[S.floorIdx].lootName||'Alloy').toLowerCase()}">Floor ${ROMAN[S.floorIdx+1]||S.floorIdx+1}</b><span class="rb-round">Round ${S.turnNumber+1}</span></span><div class="path-strip" id="path-strip"></div></div>
             <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
               <div class="tray ${S.newRoomFx?'tray-room-in':''} ${abilityArmed?'ability-armed':''} ${S.trayAct?'trayact-armed':''}" id="tray" style="--class-color:${S.klass.color||'#ffffff'}; --gd:-${Math.round(performance.now()%4600)}ms"></div>
               ${S.needRoll ? chestLidHTML() : ''}
@@ -2437,7 +2437,7 @@ function showFloorCard(num, _name){
   const steps = `<svg class="fc-stairs" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${st}</svg>`;
   const node = el(`<div id="floor-card"><div class="floor-card-box fc-scene" aria-label="Floor ${num}: ${FLOOR_TITLES[num-1]||''}">
       <div class="rc-arch fc-arch"><div class="fc-hole">${steps}<i class="fc-torch l"></i><i class="fc-torch r"></i></div></div>
-      <div class="fc-sign"><div class="floor-card-num fc-tablet">Floor ${ROMAN[num]||num}</div><div class="floor-card-name fc-name">${FLOOR_TITLES[num-1]||''}</div></div>
+      <div class="fc-sign"><div class="floor-card-num fc-tablet rb-${(FLOORS[num-1]&&FLOORS[num-1].lootName||'Alloy').toLowerCase()}">Floor ${ROMAN[num]||num}</div><div class="floor-card-name fc-name">${FLOOR_TITLES[num-1]||''}</div></div>
     </div></div>`);
   document.body.appendChild(node);
   setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, PREFS.reducedMotion ? 1100 : 1700);
@@ -4485,7 +4485,7 @@ function renderShrineEncounter(){
       <div class="enc-rail-row">
         <div class="enc-card-col">
           <div class="tray-float-wrap">
-            <div class="tray-head"><span class="round-badge"><b class="rb-floor">Floor ${ROMAN[S.floorIdx+1]||S.floorIdx+1}</b><span class="rb-round">Shrine</span></span><div class="path-strip"></div></div>
+            <div class="tray-head"><span class="round-badge"><b class="rb-floor rb-${(FLOORS[S.floorIdx]&&FLOORS[S.floorIdx].lootName||'Alloy').toLowerCase()}">Floor ${ROMAN[S.floorIdx+1]||S.floorIdx+1}</b><span class="rb-round">Shrine</span></span><div class="path-strip"></div></div>
             <div class="tray-wrap tray-wrap-full">
               <div class="tray" id="tray" style="--class-color:${S.klass.color||'#ffffff'}"></div>
               ${chestLidHTML().replace('id="chest-lid"', 'id="shrine-lid"').replace(/title="[^"]*"/, '')}
