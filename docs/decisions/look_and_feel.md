@@ -80,3 +80,4 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Codex leftovers + lethal skull (Jeremy, Oct 31, 1.42.37):** locked dice are silhouettes; no orphan "Relics ?" line; drawn skull on the lethal tag.
 - **Kill callouts and Log (Jeremy, Oct 31, 1.42.38):** K1 (Overkill = wax seal stamped over the defeated enemy, Jeremy's change; boss = wooden plaque + DEFEATED ribbon), G1 (Log as a parchment journal with icons and floor headings).
 - **Shrine choices (Jeremy, Oct 31, 1.42.40):** S1 (option cards with icons under a Pick one ribbon), S2 (boon line as a pinned parchment note; all boon lines reworded plainly, in the names sheet Shrines tab for review).
+- **D.O.T. icon (Jeremy, Oct 31, 1.42.41):** with no number, it reads as three droplets (the number gap is filled in).

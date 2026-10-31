@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.41 (Oct 31, 2026)
+- The D.O.T. icon without a number reads as three whole droplets: the middle drop is one shape instead of a tip and a body with a gap (the gap is kept only where a number sits in it).
 ## 1.42.40 (Oct 31, 2026)
 Shrine choices (Jeremy picked S1, S2):
 - **Choices (S1):** a "Pick one" ribbon and a card per option: a drawn icon (gold + badge when it adds or upgrades), the effect in the title font and one plain line ("Heal 20 / Get back up to 20 health now", "1 of 4 relics / Costs 3 max health", "Walk away / Take nothing"). Two or three across.

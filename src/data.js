@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.42.40';
+const GAME_VERSION = '1.42.41';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false };
@@ -207,6 +207,9 @@ function solidIcon(type){
   }).replace(' fill-rule="evenodd"', '');
   return (ICON_SVG_SOLID[type] = out);
 }
+// Oct 31 (Jeremy): with no number to show, D.O.T. reads as three whole droplets: the middle drop's tip and body are
+// one shape (the number gap is closed), not the generic hole-dropping solid version.
+ICON_SVG_SOLID.dot = '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M 11.85,0.4 C 11.3,4.6 6.7,11.4 6.7,17.9 C 6.7,21.5 9.0,23.7 11.7,23.7 C 14.4,23.7 16.7,21.5 16.7,17.9 C 16.7,11.4 12.4,4.6 11.85,0.4 Z M 19.75,6.68 L 18.53,10.33 L 18.53,11.85 L 19.14,12.46 L 20.05,12.46 L 20.96,11.54 Z M 4.25,3.04 L 3.65,6.68 L 2.73,8.51 L 2.73,10.33 L 3.65,11.24 L 5.16,10.94 L 5.77,10.03 Z"/></svg>';
 function iconSpanSolid(type){ return ICON_SVG[type] ? `<span class="icon-svg">${ICON_VALUE_SLOT.has(type) ? solidIcon(type) : ICON_SVG[type]}</span>` : ''; }
 function iconSpan(type, value, small){
   if(!ICON_SVG[type]) return '';
