@@ -2585,7 +2585,7 @@ function showRoomCallout(fx, onDismiss){
   const kindCls = fx.boss ? 'k-boss' : ({Elite:'k-elite', Deadly:'k-deadly', Trap:'k-trap', Shrine:'k-shrine'})[kind] || 'k-enemy';
   const node = el(`<div id="room-callout" class="${fx.boss?'rc-boss':''}">
       <div class="rc-door ${kindCls}">
-        <div class="rc-arch"><div class="rc-leaf"><i class="rc-band b1"></i><i class="rc-band b2"></i><i class="rc-ring"></i></div></div>
+        <div class="rc-arch"><div class="rc-leaf"><i class="rc-band b1"></i><i class="rc-band b2"></i><svg class="rc-ring" viewBox="0 0 30 46" aria-hidden="true"><rect x="7" y="2" width="16" height="42" rx="5" fill="#5a646d" stroke="#120b07" stroke-width="2.5"/><circle cx="15" cy="7" r="1.4" fill="#120b07"/><circle cx="15" cy="39" r="1.4" fill="#120b07"/><circle cx="15" cy="17" r="8.5" fill="#d6b25a" stroke="#120b07" stroke-width="2.5"/><circle cx="12.5" cy="14.5" r="2.6" fill="#fff1b8"/><path d="M15 26.5a2.6 2.6 0 0 1 1.3 4.9l1 4.6h-4.6l1-4.6a2.6 2.6 0 0 1 1.3-4.9z" fill="#120b07"/></svg></div></div>
         <div class="rc-sign"><div class="rc-plaque"><span>${fx.name}</span></div><div class="rc-kind">${kind}</div></div>
         <div class="rc-tap">tap to enter</div>
       </div>

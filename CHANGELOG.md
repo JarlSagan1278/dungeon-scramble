@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.30 (Oct 31, 2026)
+- The new-room door's handle read as a 0: it is now an iron backplate with a round brass knob and a keyhole, below the plaque.
 ## 1.42.29 (Oct 31, 2026)
 Screen polish two (Jeremy picked 1A, 2A, 3A, 4A):
 - **Equip (1A):** your tray shows in its real 4x4 layout, one tile per slot, and fits without scrolling; the picked die lifts and tilts and its faces fill the OUT row (a quiet dark well until then). The "?" sits next to OUT; the title fits on one line.

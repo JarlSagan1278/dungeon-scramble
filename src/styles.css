@@ -3488,8 +3488,8 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
   background-size:110px 110px, auto, auto; background-blend-mode:soft-light, normal, normal; box-shadow:inset 0 3px 0 rgba(255,225,170,.18), inset 0 -10px 16px rgba(0,0,0,.35);
   transition:transform .32s cubic-bezier(.5,0,.3,1); }
 .rc-band{ position:absolute; left:-3px; right:-3px; height:14px; background:var(--rivet) 6px 50%/22px 100% repeat-x, var(--steel); border:2.2px solid #0c0705; }
-.rc-band.b1{ top:70px; } .rc-band.b2{ top:196px; }
-.rc-ring{ position:absolute; right:20px; top:160px; width:14px; height:18px; border:3px solid var(--line); border-radius:50%; background:transparent; box-shadow:inset 0 0 0 2px #d6b25a, 0 0 0 2px #d6b25a; }
+.rc-band.b1{ top:70px; } .rc-band.b2{ top:204px; }
+.rc-ring{ position:absolute; right:14px; top:146px; width:28px; height:43px; z-index:1; filter:drop-shadow(0 2px 0 rgba(0,0,0,.45)); } /* brass knocker (it read as a 0 as a plain ring) */
 .rc-plaque{ position:absolute; top:100px; left:50%; transform:translateX(-50%) rotate(-1.5deg); width:max-content; min-width:170px; max-width:260px; box-sizing:border-box; padding:9px 16px 8px; background:#f3e3bf; color:#3a2410;
   border:3px solid var(--line); border-radius:6px; box-shadow:0 4px 0 var(--line); text-align:center; font-family:var(--font-display); font-size:21px; line-height:1.1; text-wrap:balance; z-index:2; }
 .rc-plaque::before, .rc-plaque::after{ content:''; position:absolute; top:6px; width:7px; height:7px; border-radius:50%; background:#8d98a2; border:2px solid var(--line); }
