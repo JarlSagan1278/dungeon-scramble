@@ -4465,7 +4465,9 @@ function questRowHTML(q, done){
   const rt = /adventurer h\.?o\.?t\.? = d\.?o\.?t/.test(cond) ? (rewardText||'').replace(/damage/i,'dot') : /encounter d\.?o\.?t\.? = h\.?o\.?t/.test(cond) ? (rewardText||'').replace(/damage/i,'hot') : rewardText;
   return `<span class="q-cond">${questCondShort(cond)}</span><span class="q-arrow">→</span>${questRewardHTML(rt)}`;
 }
-function infoDot(text){ return `<span class="info-tap" data-tip="${String(text).replace(/"/g,'&quot;')}" hidden></span>`; }
+// Oct 31 (Jeremy): in headings and paragraphs the note sits behind a small toy "?" coin (same family as the Train rows'
+// "?" buttons); in a short inline label (a <span>) the label itself is underlined and tappable instead.
+function infoDot(text){ return `<span class="info-tap" data-tip="${String(text).replace(/"/g,'&quot;')}" role="button" aria-label="More info">?</span>`; }
 // If the Camp screen would scroll, fold the Back Pocket down to its first two rows;
 // tapping the fold grows the full pocket UP over the Tray rows above it.
 function campOverflows(from){

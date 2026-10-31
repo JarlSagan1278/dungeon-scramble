@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.26 (Oct 31, 2026)
+- Headings and paragraphs with a note (Camp, Campfire, Train, Organize, Equip, the Back Pocket) get a small toy "?" coin instead of a dotted underline (in the title font it read like a spelling squiggle). Short inline labels (the consent line) keep the dotted underline.
 ## 1.42.25 (Oct 31, 2026)
 - Action icons that normally hold a number (Hit, Combo, Block, Heal, D.O.T., H.O.T., Leech) are solid when there is no number to show: the Codex key, tooltips, floating Block/Heal numbers, quest rewards, chips. Dice and anything with a value keep the hole with the number in it.
 ## 1.42.24 (Oct 31, 2026)
