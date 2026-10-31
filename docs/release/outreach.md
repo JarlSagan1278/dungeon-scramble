@@ -83,6 +83,7 @@ Tips:
 | r/roguelites | | | |
 | r/playmygame | Oct 27, 8:00 (promo + cover gallery) | | |
 | itch forum (Release Announcements) | Oct 28 (tag: Browser) | | |
+| r/RoguelikeDev Sharing Saturday | Oct 31 (comment: doors, intent notes, lid stickers, perf; 16:9 still of the 26-damage path, GIFs were rejected) | | |
 | Discord | | | |
 | Indie Games Plus (press email) | Oct 31 (pitch to editors@indiegamesplus.com, clip_turn from 1.42.36 attached) | | no reply yet |
 | itch devlog | Oct 27 ("Floor 1 is free to play"); Oct 28 ("Faster start: three taps to your first die"); Oct 31 ("Doors, dice and a lot of polish", 4 screenshots: door, monster note, How to Play, lid sticker) | | Oct 28: demo 1.41.94 uploaded (quick start: first run opens on the guided fight); Oct 29: demo 1.42.2 uploaded (new font, toy buttons, grain cover, screen passes); Oct 30: demo 1.42.9 zip made (playtest fixes, tutorial Hit vs Combo and dice colours, no early shrine); Oct 31: demo 1.42.35 zip made (character pass: doors, action notes, settings, How to Play pictures, stickers, speed), then 1.42.36 (Rest subtitle), uploaded to itch Oct 31 |
