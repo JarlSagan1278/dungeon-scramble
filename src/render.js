@@ -4595,7 +4595,8 @@ function trainBlockedText(){
 function campfireChoiceHTML(){
   if(S.campFireOut) return `<div class="campfire-choice out"><div class="cf-label">The campfire is out ${infoDot('Goldman&#39;s Rube Machine took all night: no Rest or upgrades at this Camp.')}</div></div>`;
   const ch = S.campChoice, n = campFusionsReady(), est = restHealEstimate();
-  const restSub = ch==='rest' ? `Healed +${S.campHealed||0}` : (S.health>=S.maxHealth ? 'Already at full health' : (est>0 ? '' : 'Heals nothing here'));
+  // Oct 31 (Jeremy): Rest gets a subtitle like Train's (what it does, still no number: Oct 16 decision)
+  const restSub = ch==='rest' ? `Healed +${S.campHealed||0}` : (S.health>=S.maxHealth ? 'Already at full health' : (est>0 ? 'Scramble &amp; heal' : 'Heals nothing here'));
   const trainSub = ch==='train' ? ((S.campUpgrades.attack||S.campUpgrades.maneuver) ? 'Dice combined' : 'Combine dice below') : (n ? 'Unlocks combining below' : trainBlockedText());
   const cls = k => ch ? (ch===k ? ' chosen' : ' skipped') : '';
   return `<div class="campfire-choice${ch?' done':''}">
