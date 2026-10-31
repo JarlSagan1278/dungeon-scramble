@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.25 (Oct 31, 2026)
+- Action icons that normally hold a number (Hit, Combo, Block, Heal, D.O.T., H.O.T., Leech) are solid when there is no number to show: the Codex key, tooltips, floating Block/Heal numbers, quest rewards, chips. Dice and anything with a value keep the hole with the number in it.
 ## 1.42.24 (Oct 31, 2026)
 - The empty Back Pocket nods to Bilbo's riddle: "What have I got in my pocket?" / "Nothing, not even a ring."
 - Enemy action notes drop the monster's flavor line (icon, number, when, and the rule only).

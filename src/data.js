@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.42.24';
+const GAME_VERSION = '1.42.25';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false };
@@ -214,6 +214,8 @@ function iconSpanSolid(type){ return ICON_SVG[type] ? `<span class="icon-svg">${
 function iconSpan(type, value, small){
   if(!ICON_SVG[type]) return '';
   if(small && ICON_SVG_SMALL[type]) return `<span class="icon-svg">${ICON_SVG_SMALL[type]}</span>`;
+  // Oct 31 (Jeremy): with no number to show, the icon is solid (no empty hole in the middle).
+  if(value==null && ICON_VALUE_SLOT.has(type)) return iconSpanSolid(type);
   const overlay = (value!=null && ICON_VALUE_SLOT.has(type))
     ? `<span class="icon-value-overlay">${value}</span>` : '';
   return `<span class="icon-svg">${ICON_SVG[type]}${overlay}</span>`;
