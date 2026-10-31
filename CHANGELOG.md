@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.42.29 (Oct 31, 2026)
+Screen polish two (Jeremy picked 1A, 2A, 3A, 4A):
+- **Equip (1A):** your tray shows in its real 4x4 layout, one tile per slot, and fits without scrolling; the picked die lifts and tilts and its faces fill the OUT row (a quiet dark well until then). The "?" sits next to OUT; the title fits on one line.
+- **Achievements (2A):** each medal shows its own icon, a dark silhouette until earned, then a gold coin.
+- **New-room intro (3A):** a dungeon door built from the game's own pieces (the room's stone arch, the dice chest's wood, iron straps and rivets) with the room's name on a pinned parchment plaque and a ribbon for its kind (Enemy, Elite, Deadly, Trap, Shrine, Boss). It swings open on tap. "You scramble into a ... room" is gone.
+- **Loot (4A):** a bigger Victory! with a gold "Pick one" ribbon; blank faces are dark wells instead of dashed boxes.
 ## 1.42.28 (Oct 31, 2026)
 - How to Play trays: every die is the same size (the selected ones were drawn bigger), step numbers sit in the dice corners above the path line, and the hop example no longer lands on a dark blank die.
 ## 1.42.27 (Oct 31, 2026)

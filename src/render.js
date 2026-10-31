@@ -2577,16 +2577,17 @@ function showRoomCallout(fx, onDismiss){
   if(old && old.parentNode) old.parentNode.removeChild(old);
   const oldScrim = document.getElementById('room-callout-scrim');
   if(oldScrim && oldScrim.parentNode) oldScrim.parentNode.removeChild(oldScrim);
-  const isShrine = fx.type==='Shrine';
-  const introCls = fx.boss ? 'intro boss' : (isShrine ? 'intro shrine' : 'intro');
-  const introText = fx.boss ? 'You scramble into a hostile room...' : (isShrine ? 'You scramble into a welcoming room...' : 'You scramble into a mysterious room...');
-  const nameCls = fx.boss ? 'name boss' : 'name';
-  const node = el(`<div id="room-callout">
-      <div class="room-callout-box">
-        <div class="room-callout-line ${introCls}">${introText}</div>
-        <div class="room-callout-line ${nameCls}">${fx.name}</div>
-        <div class="room-callout-line sub">${fx.type}</div>
-        <div class="room-callout-line hint">Tap to continue</div>
+  // Oct 31 (Jeremy, 3A): a dungeon door built from the game's own pieces (the room's stone arch, the dice chest's
+  // wood, iron straps and rivets) with the room's name on a pinned plaque and a ribbon for its kind. It swings open on tap.
+  const e = S && S.encounter && S.encounter.name===fx.name ? S.encounter : null;
+  const tierWord = e && (e.tier==='elite' ? 'Elite' : e.tier==='deadly' ? 'Deadly' : '');
+  const kind = fx.boss ? fx.type : (tierWord || fx.type);
+  const kindCls = fx.boss ? 'k-boss' : ({Elite:'k-elite', Deadly:'k-deadly', Trap:'k-trap', Shrine:'k-shrine'})[kind] || 'k-enemy';
+  const node = el(`<div id="room-callout" class="${fx.boss?'rc-boss':''}">
+      <div class="rc-door ${kindCls}">
+        <div class="rc-arch"><div class="rc-leaf"><i class="rc-band b1"></i><i class="rc-band b2"></i><i class="rc-ring"></i></div></div>
+        <div class="rc-sign"><div class="rc-plaque"><span>${fx.name}</span></div><div class="rc-kind">${kind}</div></div>
+        <div class="rc-tap">tap to enter</div>
       </div>
     </div>`);
   const scrim = el(`<div id="room-callout-scrim"></div>`);
@@ -2609,7 +2610,7 @@ function showRoomCallout(fx, onDismiss){
     // explicitly before handing off, and skip the fade-out in that case.
     if(onDismiss){ if(node.parentNode) node.parentNode.removeChild(node); onDismiss(); return; }
     node.classList.add('dismissing');
-    setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 200);
+    setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 360); // after the door swings
   };
   node.addEventListener('click', dismiss);
   scrim.addEventListener('click', dismiss);
@@ -3399,13 +3400,16 @@ function runHistoryHTML(){
 // Reachable from Settings at any time (not just post-run), same as Run
 // History and the Dice Compendium.
 // Oct 29 (Jeremy picked R2): achievements are medals, gold once earned; tapping one shows how to earn it.
+// Oct 31 (Jeremy, 2A): each medal shows its own icon: a dark silhouette until earned, then a gold coin.
+const ACH_ICON = { first_blood:'hit', first_victory:'boss', all_origins:'dodge', all_classes:'pivot', floor_3:'door', overkill_10:'combo',
+  shrines_25:'heal', monster_hunter_100:'boss', veteran_10:'camp', damage_1000:'boost', origin_duo:'leap' };
 function achievementsHTML(){
   const unlockedCount = ACHIEVEMENTS.filter(a=>META.achievements[a.id]).length;
   const medals = ACHIEVEMENTS.map(a=>{
     const unlocked = META.achievements[a.id];
     const dateStr = unlocked ? new Date(unlocked.date).toLocaleDateString(undefined, {month:'short', day:'numeric'}) : '';
     return `<div class="achv-medal ${unlocked?'on':''}" role="button" tabindex="0" data-name="${a.name.replace(/"/g,'&quot;')}" data-desc="${a.desc.replace(/"/g,'&quot;')}" data-date="${dateStr}">
-        <span class="achv-coin">${unlocked?'&#10022;':lockSVG(16)}</span><span class="achv-mname">${a.name}</span></div>`;
+        <span class="achv-coin">${iconSpanSolid(ACH_ICON[a.id]||'combo')}</span><span class="achv-mname">${a.name}</span></div>`;
   }).join('');
   return `<p class="hint">${unlockedCount}/${ACHIEVEMENTS.length} earned &middot; tap a medal to see how to earn it</p>
     <div class="achv-medals">${medals}</div><div class="achv-detail" id="achv-detail"></div>`;
@@ -3725,7 +3729,7 @@ function renderLootModal(){
       // (Oct 13, Jeremy: the page shake here made the chest opening lag on phones -- the flip and burst carry it)
       if(typeof playTone==='function') playTone({alloy:'lootBurstAlloy', gilded:'lootBurstGilded', magic:'lootBurstMagic'}[tier] || 'lootBurstAlloy');
     }
-    body.innerHTML = `<p class="modal-lead">Choose one ${lootName} Loot Die to add to your tray:</p><div class="loot-options" id="loot-options"></div>`;
+    body.innerHTML = `<div class="pick-ribbon" title="Choose one ${lootName} Loot Die to add to your tray">Pick one</div><div class="loot-options" id="loot-options"></div>`;
     const container = body.querySelector('#loot-options');
     let locked = false; // guards against picking a second option once one's chosen
     options.forEach((opt,i)=>{
@@ -4175,30 +4179,21 @@ function dieWorth(d){
 function renderSwapModal(){
   const incoming = S.pendingLootDie;
   const overlay = el(`<div class="modal-overlay modal-bottom"><div class="modal">
-      <h2>Equip ${incoming.name} ${infoDot('Tap the die you want to replace. It goes to your Back Pocket. Or keep the new die in your Back Pocket and leave your Tray as it is.')}</h2>
+      <h2>Equip ${incoming.name}</h2>
       <div class="swap-compare" id="swap-compare">
         <div class="swap-compare-row swap-compare-in"><div class="swap-compare-label"><span>New</span> <b>${incoming.name}</b></div>${diceFacesRowHTML(incoming)}</div>
-        <div class="swap-compare-row swap-compare-out" id="swap-compare-out"><div class="swap-compare-label"><span>Out</span> <b class="swap-out-hint">tap a die below</b></div><div class="faces-tiles">${'<div class="mini-face mf-slot"></div>'.repeat(6)}</div></div>
+        <div class="swap-compare-row swap-compare-out" id="swap-compare-out"><div class="swap-compare-label"><span>Out</span> <b class="swap-out-hint">pick a die in your tray</b>${infoDot('Tap the die you want to replace. It goes to your Back Pocket. Or keep the new die in your Back Pocket and leave your Tray as it is.')}</div><div class="swap-out-empty"></div></div>
       </div>
-      <div class="swap-list" id="swap-list"></div>
+      <div class="swap-tray-head">Your Tray</div>
+      <div class="swap-list swap-tray" id="swap-list"></div>
       <div class="small-btn-row" style="justify-content:center;"><button class="pocket-btn" id="swap-pocket" title="Keep the new die in your Back Pocket; your Tray stays as it is">Keep in Pocket</button><button class="primary swap-suggest-mode" id="swap-go">Suggest</button></div>
     </div></div>`);
   overlay.querySelector('.modal').classList.add('swap-modal');
   openUniqueOverlay('swap', overlay);
   const list = overlay.querySelector('#swap-list');
-  // Group tray slots by die name -- identical dice show as one entry with a
-  // count; which specific slot gets replaced doesn't matter when they're the same die.
-  const groups = [];
-  const byName = new Map();
-  S.tray.forEach((cell,i)=>{
-    const key = cell.die.name;
-    if(!byName.has(key)){
-      const g = { name: key, indices: [] };
-      byName.set(key, g);
-      groups.push(g);
-    }
-    byName.get(key).indices.push(i);
-  });
+  // Oct 31 (Jeremy, 1A): the tray shows in its real 4x4 layout, one tile per slot (it used to be a scrolling list of
+  // unique dice), so you pick the die where you know it is.
+  const groups = S.tray.map((cell,i)=>({ name: cell.die.name, indices: [i] }));
   let chosen = null;
   const goBtn = overlay.querySelector('#swap-go');
   let suggestIdx = 0;
