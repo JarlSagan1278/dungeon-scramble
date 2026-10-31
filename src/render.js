@@ -4218,7 +4218,7 @@ function renderShrineEncounter(){
         </div>
         <div class="util-rail rail-shrine" aria-hidden="true">
           <div class="util-btn primary-accent rail-go disabled"><span>Go</span></div>
-          <div class="util-btn rail-pocket">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?`<span class="badge">${S.backPocket.length}</span>`:''}</div>
+          <div class="util-btn rail-pocket disabled">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?`<span class="badge">${S.backPocket.length}</span>`:''}</div>
           <div class="util-btn rail-item disabled">${iconSpan('use')}<span>Item</span></div>
           <div class="util-btn danger-accent rail-clear disabled">${iconSpan('fumble')}<span>Clear</span></div>
           ${S.klass.convertTo ? `<div class="util-btn rail-ability disabled" style="--class-color:${S.klass.color||'#d4af52'}"><span>Skill</span></div>` : ''}

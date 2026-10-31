@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.13 (Oct 31, 2026)
+- Shrines keep the whole button rail (Go, Skill, Pocket, Item, Clear) in place, greyed out, instead of hiding it.
 ## 1.42.12 (Oct 31, 2026)
 - Shrines keep the chest lid closed over the dice (nothing to roll there).
 ## 1.42.11 (Oct 31, 2026)

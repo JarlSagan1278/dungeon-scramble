@@ -2958,7 +2958,7 @@ body:has(.modal-overlay) .settings-btn-floating{ visibility:hidden; }
 .origin-relic-line{ border:2px solid var(--line); }
 .origin-relic-line.locked{ border-style:dashed; }
 /* 21: no dead tray rail on shrines; a disabled rail button is darkened, never see-through */
-.util-rail.rail-shrine > *{ visibility:hidden; }
+.util-rail.rail-shrine > *{ visibility:visible; } /* Oct 31 (Jeremy): the rail stays at shrines, all greyed out */
 .util-btn.disabled:not(.rail-go){ opacity:1 !important; position:relative; }
 .util-btn.disabled:not(.rail-go)::before{ content:''; position:absolute; inset:0; border-radius:inherit; background:rgba(28,17,9,.6); pointer-events:none; z-index:3; }
 .cf-btn:disabled:not(.chosen){ opacity:1 !important; }
