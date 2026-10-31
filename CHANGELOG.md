@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.11 (Oct 31, 2026)
+- The "New Action" card for a die face waits until the lid is off (it used to pop up over the closed lid).
+- "Flick to open" moved off the lid onto the Go slot ("Flick the lid to open"), which turns into "Tap dice to draw a path" once the dice are out.
 ## 1.42.10 (Oct 31, 2026)
 - Title: the "A dice-path roguelike from the board game by Jeremy and Katlynn Friedman" line is gone (Jeremy). The credit stays in Settings > Credits.
 ## 1.42.9 (Oct 30, 2026)

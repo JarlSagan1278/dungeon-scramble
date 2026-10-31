@@ -1859,7 +1859,7 @@ function renderGame(){
           </div>
         </div>
         <div class="util-rail">
-          <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning||S.needRoll)?'disabled':''} ${(resolveDisabled&&!S.transitioning&&!S.needRoll&&!S.path.length)?'go-idle':''} ${(emphasizeResolve&&!S.needRoll)?'pulse':''}" id="resolve-btn"><span class="go-word">Go</span><span class="go-hint">Tap dice to draw a path</span></div>
+          <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning||S.needRoll)?'disabled':''} ${(resolveDisabled&&!S.transitioning&&!S.needRoll&&!S.path.length)?'go-idle':''} ${(S.needRoll&&!S.transitioning)?'go-flick':''} ${(emphasizeResolve&&!S.needRoll)?'pulse':''}" id="resolve-btn"><span class="go-word">Go</span><span class="go-hint">Tap dice to draw a path</span><span class="go-flick-txt">Flick the lid to open</span></div>
           <div class="util-btn rail-pocket" id="open-backpocket-btn" title="${S.backPocket.length?'Safety net ready: if you fall to 0 Health, your Back Pocket can save you once (it spends every die in it).':'Back Pocket empty: no safety net until a die lands here.'}">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?'<span class="badge pocket-heart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.2 C 5.5 15.6 2 12.4 2 8.2 C 2 5.1 4.4 2.8 7.3 2.8 C 9.2 2.8 10.9 3.8 12 5.4 C 13.1 3.8 14.8 2.8 16.7 2.8 C 19.6 2.8 22 5.1 22 8.2 C 22 12.4 18.5 15.6 12 21.2 Z" fill="currentColor"/></svg></span>':''}</div>
           <div class="util-btn rail-item ${(totalTokens&&!S.needRoll)?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Item</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
           <div class="util-btn danger-accent rail-clear ${(S.transitioning||S.needRoll)?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
@@ -2416,6 +2416,7 @@ function nbHyphen(t){ return String(t).replace(/[^\s]*-[^\s]*/g, w=>`<span style
 function maybeShowSymbolIntro(){
   try{
     if(S.guide && (S.guide.stage==='t1' || S.guide.stage==='t2')) return; // the guided first fight talks first; intros follow later
+    if(S.needRoll) return; // Oct 31 (Jeremy): no new-face card while the lid is still on -- it shows once the dice are out
     if(document.getElementById('symbol-intro')) return;
     if(document.querySelector('.modal-overlay')) return;
     if(S.screen!=='game' || !S.encounter) return;
@@ -5058,7 +5059,7 @@ function newAchievementsHTML(newAchievements){
 // Closed chest (Jeremy, Oct 24): until the roll a wooden lid covers the tray; the flick throws it off in the flick's
 // direction, the lock pops and the dice tumble out.
 // Domed lid (Jeremy picked A1, Oct 25): as wide as the chest, rising 26px above it so it covers the top corner brackets.
-const CHEST_LID_HTML = `<div class="chest-lid" id="chest-lid" title="Flick or double-tap to open (or shake your phone)"><i class="strap s1"></i><i class="strap s2"></i><i class="rim"></i><div class="lid-plate"><span>Flick to open</span></div></div>`;
+const CHEST_LID_HTML = `<div class="chest-lid" id="chest-lid" title="Flick or double-tap to open (or shake your phone)"><i class="strap s1"></i><i class="strap s2"></i><i class="rim"></i></div>`;
 function scrambleRoll(dx, dy){
   if(!S || !S.needRoll) return;
   const lid = document.getElementById('chest-lid');
