@@ -77,7 +77,7 @@ Tips:
 
 | Where | Posted | Players (rough) | Notes |
 |---|---|---|---|
-| Friends and family | | | |
+| Friends and family | Oct 31 (text #1) | most had played | Most played before the end-of-run sharing question existed, so their runs never reached the sheet (old runs stay on the phone and are never sent, by design). Ask for a replay of the new demo + the 3 questions. |
 | Board-game friends | | | |
 | r/WebGames | Oct 29 (link post + first comment) | | demo 1.42.2 live on itch; numbers due Oct 30 |
 | r/roguelites | | | |
