@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.22 (Oct 31, 2026)
+- The Leap line on the path is a real hop now: it arcs upward (sideways on a vertical leap), peaking about a sixth of the leap above the straight line (was a slight 9px bow).
 ## 1.42.21 (Oct 31, 2026)
 - **Tray rail:** Go's top lines up with the top of the open dice box and Clear's bottom with the box's bottom. The round badge and path tokens now run across the full width, so the tokens spread out (less overlap); the path total sits over Go's top corner, and Skip appears in that slot above Go during playback (a blue toy button).
 - **Quests sign (Q2):** the "Quests" title is gone and "In one turn" is the header (or "Quests" when every quest runs all fight); the rows go from 8.5 to 11 px. The enemy's "Every turn / Heavy in 3" label goes 8.5 -> 10 px.

@@ -139,8 +139,9 @@ function pathTrailAppendSegment(svg, a, b, animate, curved){
     const dx = b.x-a.x, dy = b.y-a.y;
     const len = Math.hypot(dx,dy) || 1;
     const ux = dx/len, uy = dy/len;
-    const px = -uy, py = ux; // perpendicular unit vector
-    const bow = Math.min(len*0.1, 9);
+    let px = -uy, py = ux; // perpendicular unit vector
+    if(py > 0.01){ px = -px; py = -py; } // Oct 31 (Jeremy): a real hop -- it arcs upward (sideways on a vertical leap)
+    const bow = len*0.32; // peak ~1/6 of the leap above the straight line (was a 9px max bow)
     const mx = (a.x+b.x)/2 + px*bow, my = (a.y+b.y)/2 + py*bow;
     el = document.createElementNS('http://www.w3.org/2000/svg','path');
     el.setAttribute('d', `M ${a.x},${a.y} Q ${mx},${my} ${b.x},${b.y}`);
