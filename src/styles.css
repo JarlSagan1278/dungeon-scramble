@@ -3617,3 +3617,6 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 .lg-dot{ width:5px; height:5px; border-radius:50%; background:#fff6e0; }
 .kill-plaque{ width:max-content; max-width:92vw; }
 .kp-board span{ max-width:min(300px, 84vw); }
+/* Oct 31: drawn star instead of the ✦ character (achievement rows, the class-converted die badge) */
+.achv-unlock-icon .mark-svg{ width:18px; height:18px; color:var(--gold); }
+.die .forced-badge .mark-svg{ width:8px; height:8px; }

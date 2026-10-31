@@ -1492,7 +1492,7 @@ function renderDie(cell, idx){
             ${num?`<div class="pathnum">${num}</div>`:''}
             ${cell.minion?`<div class="minion-eyes" aria-hidden="true" style="${minionEyeStyle(idx)}"><i class="minion-eye"></i><i class="minion-eye"></i></div>`:''}
             ${(cell.forcedFace || boostTargetCls) ? `<div class="corner-badges">
-              ${cell.forcedFace?`<span class="forced-badge ${justConverted?'badge-pop-in':''}" title="Converted by a class ability">✦</span>`:''}
+              ${cell.forcedFace?`<span class="forced-badge ${justConverted?'badge-pop-in':''}" title="Converted by a class ability">${MARK_STAR}</span>`:''}
               ${boostTargetCls?`<span class="boost-target-badge" title="Your armed Boost token will apply to this action">${iconSpan('boost')}</span>`:''}
             </div>` : ''}
             ${(!cell.minion && !cell.blank && ['gilded','alloy','magic'].includes(cell.die.cat)) ? `<span class="die-sheen sheen-${cell.die.cat}" style="--sd:${(idx*0.37).toFixed(2)}s"></span>` : ''}
@@ -5274,7 +5274,7 @@ function newBoonsHTML(){
   const rows = names.map(n=>{
     const tier = Object.keys(BOON_TIER_POOLS).find(t=>BOON_TIER_POOLS[t].some(d=>d.name===n));
     const open = !tier || tiersOpen.includes(tier);
-    return `<div class="achv-unlock-row"><span class="achv-unlock-icon">✦</span><div>
+    return `<div class="achv-unlock-row"><span class="achv-unlock-icon">${MARK_STAR}</span><div>
        <div class="achv-unlock-name">${n}</div>
        <div class="achv-unlock-desc">${open ? 'Now available as a Starting Boon on the setup screen.' : `Collected ${BOON_COPIES_NEEDED} times. It becomes a Starting Boon once the ${BOON_TIER_LABELS[tier]} tier unlocks.`}</div>
      </div></div>`; }).join('');
@@ -5286,7 +5286,7 @@ function newBoonsHTML(){
 function newAchievementsHTML(newAchievements){
   if(!newAchievements || !newAchievements.length) return '';
   const rows = newAchievements.map(a=>
-    `<div class="achv-unlock-row"><span class="achv-unlock-icon">✦</span><div>
+    `<div class="achv-unlock-row"><span class="achv-unlock-icon">${MARK_STAR}</span><div>
        <div class="achv-unlock-name">${a.name}</div>
        <div class="achv-unlock-desc">${a.desc}</div>
      </div></div>`).join('');

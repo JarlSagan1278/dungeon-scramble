@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.39 (Oct 31, 2026)
+- The last text-character icon is gone: new achievements and the class-converted die badge use the drawn star instead of ✦.
 ## 1.42.38 (Oct 31, 2026)
 - **Kill callouts (K1):** an Overkill stamps a red wax seal onto the defeated enemy. A boss kill shows a wooden plaque (the doors' wood and rivets) with the boss's name and a red DEFEATED ribbon low in the room, with the seal on the boss if it was also an Overkill. No more outlined words over the tray.
 - **Log (G1):** a parchment journal: rooms grouped under floor headings, a small coloured icon per entry (door, hit, quest, relic, D.O.T., H.O.T.), the key word in bold and details on a second line, shorter wording ("Entered Rusty Golem"). Opens scrolled to the newest entry.
