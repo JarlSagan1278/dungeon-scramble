@@ -3345,3 +3345,68 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 .fo-player > .relic-strip.relic-hint{ animation:relic-hint-glow 1.1s ease-in-out 4; border-radius:10px; }
 @keyframes relic-hint-glow{ 0%,100%{ filter:drop-shadow(0 0 0 rgba(255,215,94,0)); } 50%{ filter:drop-shadow(0 0 7px rgba(255,215,94,.95)); } }
 .reduced-motion .fo-player > .relic-strip.relic-hint{ animation:none; outline:3px dashed #ffd75e; outline-offset:3px; }
+/* Oct 31 (Jeremy, T1): tooltips are toy bubbles: dark brown, 3px outline, a tail toward what was pressed, the name in the
+   title font and (for dice) the face icon in a little tile. */
+.face-tooltip{ display:flex; gap:9px; align-items:center; max-width:250px; padding:8px 12px; background:#2a1b10 !important; color:#f1e2c4; border:3px solid var(--line) !important; border-radius:14px !important;
+  box-shadow:0 4px 0 var(--line) !important; font-family:var(--font-ui); font-size:13.5px; line-height:1.3; }
+.face-tooltip.ft-has-ic{ padding-left:8px; }
+.face-tooltip .ft-ic{ flex:0 0 auto; width:40px; height:40px; border-radius:10px; border:2px solid var(--line); background:#e9d7ae; color:#2a1b10; display:flex; align-items:center; justify-content:center; }
+.face-tooltip .ft-ic .icon-svg{ width:28px; height:28px; }
+.face-tooltip .ft-ic b{ font:400 24px/1 var(--font-display); }
+.face-tooltip .ft-txt strong, .face-tooltip .ft-txt b:first-child{ display:block; color:var(--gold); font-family:var(--font-display); font-weight:400; font-size:16px; line-height:1.15; }
+.face-tooltip .ft-tail{ position:absolute; bottom:-10px; left:var(--tx,50%); width:14px; height:14px; margin-left:-7px; background:#2a1b10; border-right:3px solid var(--line); border-bottom:3px solid var(--line); transform:rotate(45deg); }
+.face-tooltip.ft-below .ft-tail{ bottom:auto; top:-10px; transform:rotate(225deg); }
+.face-tooltip.flavor-bubble .ft-tail{ display:none; }
+/* E1: the pinned parchment note for an enemy's action (and status chips). Parchment because it lives in the room. */
+.action-note{ position:fixed; z-index:95; width:214px; padding:12px 12px 11px; background:#f3e3bf; color:#3a2410; border:3px solid var(--line); border-radius:6px; rotate:-1.5deg;
+  box-shadow:0 5px 0 var(--line), 0 10px 18px rgba(0,0,0,.45); font-family:var(--font-ui); animation:an-in .18s cubic-bezier(.3,1.5,.5,1) both; }
+@keyframes an-in{ from{ opacity:0; transform:translateY(6px) scale(.92); } }
+.reduced-motion .action-note{ animation:none; }
+.action-note::before{ content:''; position:absolute; top:-8px; left:50%; width:14px; height:14px; margin-left:-7px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#ff9a7a,#b02a1c 70%); border:2px solid var(--line); }
+.action-note .an-tail{ position:absolute; bottom:-12px; left:var(--tx,50%); width:18px; height:18px; margin-left:-9px; background:#f3e3bf; border-right:3px solid var(--line); border-bottom:3px solid var(--line); transform:rotate(45deg); }
+.action-note.an-below .an-tail{ bottom:auto; top:-12px; transform:rotate(225deg); }
+.action-note.an-below::before{ display:none; }
+.action-note .an-h{ display:flex; align-items:center; gap:8px; }
+.action-note .an-ic{ flex:0 0 auto; width:42px; height:42px; border-radius:10px; background:#c9473a; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; color:#fff7e6; box-shadow:inset 0 -3px 0 rgba(0,0,0,.25); }
+.action-note.an-status .an-ic{ background:#5b4a7a; }
+.action-note .an-ic .icon-svg{ width:30px; height:30px; color:#fff7e6; }
+.action-note .an-t{ font-family:var(--font-display); font-size:20px; line-height:1.05; color:#7a1f14; }
+.action-note .an-t b{ font-family:var(--font-display); font-size:25px; color:#3a2410; margin-left:5px; }
+.action-note .an-w{ margin-top:2px; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#8a5a2b; }
+.action-note .an-q{ margin-top:8px; font-size:14px; line-height:1.3; font-style:italic; }
+.action-note .an-b{ margin-top:6px; font-size:12.5px; line-height:1.3; color:#6b4a2a; }
+/* No more (i) dots: a label holding a note gets a dotted underline and is itself the thing you tap. */
+:has(> .info-tap){ text-decoration:underline dotted 2px; text-decoration-color:rgba(233,215,174,.55); text-underline-offset:4px; cursor:help; }
+/* B1/K1: drawn empty pouch */
+.empty-pouch{ display:flex; flex-direction:column; align-items:center; gap:8px; padding:4px 4px 2px; text-align:center; }
+.empty-pouch svg{ width:92px; height:92px; }
+.empty-pouch .ep-moth{ animation:ep-moth 2.4s ease-in-out infinite; transform-origin:74px 20px; }
+@keyframes ep-moth{ 0%,100%{ transform:translate(0,0); } 50%{ transform:translate(-3px,-4px); } }
+.reduced-motion .empty-pouch .ep-moth{ animation:none; }
+.empty-pouch .ep-big{ font-family:var(--font-display); font-size:17px; color:var(--gold); }
+.empty-pouch p{ margin:0; font-size:14px; line-height:1.35; color:#e9d7ae; max-width:260px; }
+/* R1: relic display case */
+.relic-case{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.relic-case-card{ background:#3a2819; border:3px solid var(--line); border-radius:12px; box-shadow:0 3px 0 var(--line), inset 0 2px 0 rgba(255,255,255,.08); padding:10px 8px 9px; display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center; }
+.relic-case-card .relic-badge{ width:64px !important; height:64px !important; margin-bottom:2px; }
+.relic-case-card .relic-badge svg{ width:100%; height:100%; }
+.relic-case-card b{ font-family:var(--font-display); font-weight:400; color:var(--gold); font-size:13.5px; line-height:1.1; }
+.relic-case-card span{ font-size:12px; line-height:1.25; color:#e9d7ae; }
+/* S1: Settings sit on the menu itself: stitched dividers instead of pills, little dice for toggles (a gold die with a
+   pip is on), no "100%" readouts, and drawn toy icons on the tiles. */
+.settings-toggle-row{ box-shadow:none !important; background:none !important; border:none !important; border-bottom:2px dashed rgba(233,215,174,.18) !important; border-radius:0 !important; padding:5px 4px !important; font-size:14px !important; }
+.settings-pair{ gap:14px !important; }
+.settings-vol{ display:none !important; }
+.settings-toggle-row input[type=checkbox]{ width:26px !important; height:26px !important; border-radius:8px !important; border:2px solid var(--line) !important; background:#2a1d13 !important; box-shadow:inset 0 -3px 0 rgba(0,0,0,.35) !important; transition:background .12s, transform .12s !important; }
+.settings-toggle-row input[type=checkbox]::before{ display:none !important; }
+.settings-toggle-row input[type=checkbox]:checked{ background:#ffd75e !important; box-shadow:inset 0 3px 0 rgba(255,255,255,.4), inset 0 -3px 0 rgba(0,0,0,.25) !important; }
+.settings-toggle-row input[type=checkbox]:checked::after{ content:''; position:absolute; left:50%; top:50%; width:8px; height:8px; margin:-4px 0 0 -4px; border-radius:50%; background:#241c10; }
+.settings-toggle-row input[type=checkbox]:active{ transform:rotate(-12deg) scale(.92); }
+.settings-tile svg.toy-ic{ width:30px; height:30px; stroke:var(--line); stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+/* G1: the idle Go keeps a faint GO with "pick dice" on one line under it. */
+.util-btn.rail-go.go-idle .go-word{ display:block !important; color:#e9d7ae; opacity:.45; }
+.util-btn.rail-go.go-idle .go-hint{ position:absolute; left:0; right:0; bottom:10px; font-size:11px !important; letter-spacing:.06em !important; opacity:.85; }
+/* Small fix: the greyed-out Go at shrines shows a faint GO instead of an empty slot. */
+.util-rail.rail-shrine .rail-go span{ color:#e9d7ae !important; opacity:.4; }
+.mark-svg{ width:1em; height:1em; vertical-align:-.12em; }
+.src-chip .sc-ic .mark-svg, .hl-strip .hl-ic .mark-svg{ width:14px; height:14px; }

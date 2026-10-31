@@ -243,7 +243,7 @@ function maybeScreenTransition(key){
 let preGameScreen = 'title';
 
 function render(){
-  hideFaceTooltip();
+  hideFaceTooltip(); closeActionNote();
   if(typeof musicUpdate==='function') musicUpdate(); // start/stop the music for this screen
   if(typeof applyDiceFinish==='function') applyDiceFinish();
   document.body.classList.remove('cog-arch');
@@ -1559,7 +1559,7 @@ function renderEncounterCard(e, mode){
       const more = Math.floor(hp + thr) + 1 - d;
       killHint = {state:'kill', text:`Lethal${more<=3?` \u00b7 +${more} for Overkill`:''}`};
     }
-    else if(d > 0 && hp - d > 0 && hp - d <= 3) killHint = {state:'close', text:`So close \u2014 ${Math.ceil(hp-d)} short`};
+    else if(d > 0 && hp - d > 0 && hp - d <= 3) killHint = {state:'close', text:`${Math.ceil(hp-d)} short!`};
   }
   const fx = healthFX(curHealthClamped, e._lastHealth);
   e._lastHealth = curHealthClamped;
@@ -1785,7 +1785,7 @@ function tokensRowHTML(){
 }
 
 function openTokensModal(){
-  const overlay = openInfoModal('Use a Token', tokensRowHTML() || '<p class="hint">No tokens available.</p>');
+  const overlay = openInfoModal(tokensRowHTML() ? 'Use a Token' : 'Items', tokensRowHTML() || emptyPouchHTML('#5b6f7c', 'Nothing to use yet', 'Quests and shrines pay out Swap and Reroll tokens. They show up here.'));
   const nullifyBtn = overlay.querySelector('#use-nullify-token');
   if(nullifyBtn) nullifyBtn.onclick = ()=>{
     if(S.transitioning || !S.encounter || S.nullifyTokens<=0) return;
@@ -1871,7 +1871,7 @@ function renderGame(){
           </div>
         </div>
         <div class="util-rail">
-          <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning||S.needRoll)?'disabled':''} ${(resolveDisabled&&!S.transitioning&&!S.needRoll&&!S.path.length)?'go-idle':''} ${(S.needRoll&&!S.transitioning)?'go-flick':''} ${(emphasizeResolve&&!S.needRoll)?'pulse':''}" id="resolve-btn"><span class="go-word">Go</span><span class="go-hint">Tap dice to draw a path</span><span class="go-flick-txt">Flick the lid to open</span></div>
+          <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning||S.needRoll)?'disabled':''} ${(resolveDisabled&&!S.transitioning&&!S.needRoll&&!S.path.length)?'go-idle':''} ${(S.needRoll&&!S.transitioning)?'go-flick':''} ${(emphasizeResolve&&!S.needRoll)?'pulse':''}" id="resolve-btn"><span class="go-word">Go</span><span class="go-hint">pick dice</span><span class="go-flick-txt">Flick the lid to open</span></div>
           <div class="util-btn rail-pocket" id="open-backpocket-btn" title="${S.backPocket.length?'Safety net ready: if you fall to 0 Health, your Back Pocket can save you once (it spends every die in it).':'Back Pocket empty: no safety net until a die lands here.'}">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?'<span class="badge pocket-heart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.2 C 5.5 15.6 2 12.4 2 8.2 C 2 5.1 4.4 2.8 7.3 2.8 C 9.2 2.8 10.9 3.8 12 5.4 C 13.1 3.8 14.8 2.8 16.7 2.8 C 19.6 2.8 22 5.1 22 8.2 C 22 12.4 18.5 15.6 12 21.2 Z" fill="currentColor"/></svg></span>':''}</div>
           <div class="util-btn rail-item ${(totalTokens&&!S.needRoll)?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Item</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
           <div class="util-btn danger-accent rail-clear ${(S.transitioning||S.needRoll)?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
@@ -2001,11 +2001,11 @@ function bindTrayDice(){
         longPressed = true;
         const cell = S.tray[idx];
         if(cell.minion){
-          showFaceTooltip(rect, `<strong>Minion die</strong> — clogs this space; each damage you deal clears one, or Leap clean over it.`);
+          showFaceTooltip(rect, `<strong>Minion</strong>It clogs this space. Every point of damage you deal clears one, or Leap clean over it.`, 'minion');
           return;
         }
         const f = classFace(cell.forcedFace || currentFace(cell));
-        showFaceTooltip(rect, `<strong>${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</strong> — ${FACE_DESC[f.type]||''}`);
+        showFaceTooltip(rect, `<strong>${f.type==='blank' ? 'Blank' : LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</strong>${FACE_DESC[f.type]||''}`, (f.type==='blank' || !ICON_SVG[f.type]) ? null : f.type);
       }, 420);
     });
     ['pointerup','pointerleave','pointercancel'].forEach(evt=> node.addEventListener(evt, cancelPress));
@@ -2150,15 +2150,18 @@ function pickPreviewFace(dieFaces){
 // pressed die's on-screen position, so it never participates in layout
 // (no height impact) and works on touch, unlike a native `title` attribute.
 let faceTooltipEl = null;
-function showFaceTooltip(anchorRect, text){
+// Oct 31 (Jeremy, T1): a toy bubble with a tail toward what was pressed; dice get their face icon in a little tile.
+function showFaceTooltip(anchorRect, text, icon){
   hideFaceTooltip();
-  const bubble = el(`<div class="face-tooltip">${text}</div>`);
+  const ic = icon ? `<span class="ft-ic">${icon==='minion' ? '<b>?</b>' : iconSpanSolid(icon)}</span>` : '';
+  const bubble = el(`<div class="face-tooltip${icon?' ft-has-ic':''}">${ic}<div class="ft-txt">${text}</div><i class="ft-tail"></i></div>`);
   document.body.appendChild(bubble);
   const bw = bubble.offsetWidth, bh = bubble.offsetHeight;
   let left = anchorRect.left + anchorRect.width/2 - bw/2;
   left = Math.max(6, Math.min(left, window.innerWidth - bw - 6));
-  let top = anchorRect.top - bh - 8;
-  if(top < 6) top = anchorRect.bottom + 8;
+  let top = anchorRect.top - bh - 12;
+  if(top < 6){ top = anchorRect.bottom + 12; bubble.classList.add('ft-below'); }
+  bubble.style.setProperty('--tx', Math.max(16, Math.min(bw-16, anchorRect.left + anchorRect.width/2 - left))+'px');
   bubble.style.left = `${left}px`;
   bubble.style.top = `${top}px`;
   requestAnimationFrame(()=> bubble.classList.add('show'));
@@ -2174,22 +2177,49 @@ function hideFaceTooltip(){
 // own tooltip -- this just adds the touch equivalent, reusing the same
 // fixed-position bubble as the die-face tooltip). Call after the elements
 // matching `selector` exist in the DOM.
+// Oct 31 (Jeremy): no more (i) dots. infoDot() leaves a hidden note in a label; the label itself gets a dotted
+// underline and tapping it shows the note.
 document.addEventListener('click', ev=>{
-  const d = ev.target && ev.target.closest ? ev.target.closest('.info-dot') : null;
-  if(!d) return;
+  let n = ev.target, d = null;
+  for(let k=0; n && n.querySelector && k<4; k++, n=n.parentElement){ d = n.querySelector(':scope > .info-tap'); if(d) break; }
+  if(!d || (ev.target.closest && ev.target.closest('button, input, a'))) return;
   ev.stopImmediatePropagation();
-  showFaceTooltip(d.getBoundingClientRect(), d.getAttribute('title'));
-  setTimeout(hideFaceTooltip, 4500);
+  showFaceTooltip(n.getBoundingClientRect(), d.dataset.tip);
+  clearTimeout(window._infoTapT); window._infoTapT = setTimeout(hideFaceTooltip, 5000);
 }, true);
 // Tap a status chip or enemy action badge -> a small popup about it (same idea as the relic strip's list).
+// Oct 31 (Jeremy, E1): a parchment note pinned next to the chip instead of a full modal: icon and number, when it
+// comes, the monster's own line (its flavor text), then the plain rule. Any tap closes it.
+let actionNoteEl = null;
+function closeActionNote(){ if(actionNoteEl){ actionNoteEl.remove(); actionNoteEl = null; } }
+document.addEventListener('pointerdown', ev=>{ if(actionNoteEl && !(ev.target.closest && ev.target.closest('.action-note'))) closeActionNote(); }, true);
 document.addEventListener('click', ev=>{
   const chip = ev.target && ev.target.closest ? ev.target.closest('.status-chip[title], .enemy-action-badge[title], .boss-cycle-item[title]') : null;
-  if(!chip) return;
+  if(!chip){ if(ev.target.closest && ev.target.closest('.action-note')) closeActionNote(); return; }
+  if(actionNoteEl && actionNoteEl._chip === chip){ closeActionNote(); return; }
+  closeActionNote(); hideFaceTooltip();
   const t = chip.getAttribute('title') || '';
   const i = t.indexOf(': ');
-  const head = i>0 ? t.slice(0,i) : chip.textContent.trim();
+  let head = i>0 ? t.slice(0,i) : chip.textContent.trim();
   const body = i>0 ? t.slice(i+2) : t;
-  const m = openInfoModal(head, `<p style="text-align:left;">${body}</p>`);
+  let when = '';
+  const hm = head.match(/^(.*?)\s*\((heavy turn[^)]*)\)$/i); if(hm){ head = hm[1]; when = hm[2]; }
+  const enemySide = chip.closest('.fo-enemy');
+  if(!when && enemySide){ const tl = enemySide.querySelector('.fo-turnlabel'); if(tl) when = tl.textContent.trim(); }
+  if(chip.classList.contains('boss-special') && !when) when = 'Special move';
+  const num = (head.match(/(\d+)\s*$/)||[])[1];
+  const name = num ? head.replace(/\s*\d+\s*$/,'') : head;
+  const icon = chip.querySelector('.icon-svg');
+  const flavor = enemySide && S && S.encounter && S.encounter.flavor ? S.encounter.flavor.replace(/^["“]|["”]$/g,'') : '';
+  const hot = chip.classList.contains('enemy-action-badge') || chip.classList.contains('boss-cycle-item');
+  const n = el(`<div class="action-note${hot?'':' an-status'}" role="dialog"><div class="an-h">${icon?`<span class="an-ic">${icon.outerHTML}</span>`:''}<div><div class="an-t">${name}${num?`<b>${num}</b>`:''}</div>${when?`<div class="an-w">${when}</div>`:''}</div></div>${flavor?`<div class="an-q">“${flavor}”</div>`:''}<div class="an-b">${body}</div><i class="an-tail"></i></div>`);
+  document.body.appendChild(n); n._chip = chip; actionNoteEl = n;
+  const r = chip.getBoundingClientRect(), w = n.offsetWidth, h = n.offsetHeight;
+  const left = Math.max(8, Math.min(window.innerWidth - w - 8, r.left + r.width/2 - w/2));
+  let top = r.top - h - 16;
+  if(top < 8){ top = r.bottom + 16; n.classList.add('an-below'); }
+  n.style.left = left+'px'; n.style.top = top+'px';
+  n.style.setProperty('--tx', Math.max(20, Math.min(w-20, r.left + r.width/2 - left))+'px');
 }, false);
 // Poke animations run through the Web Animations API on the individual translate/rotate properties, so they never
 // replace the element's own CSS animation (which would replay its entrance when the class came off).
@@ -2329,7 +2359,7 @@ function placeSourceChip(sel, label, icon, place){
   const anchor = document.querySelector(sel); if(!anchor) return false;
   const r = anchor.getBoundingClientRect();
   const busy = document.querySelectorAll(`.src-chip[data-sel="${sel}"]`).length; // a second chip on the same spot steps aside
-  const ic = icon==='ok' ? '<i class="sc-ic sc-ok">&#10003;</i>' : `<i class="sc-ic">${iconSpan(icon)}</i>`;
+  const ic = icon==='ok' ? `<i class="sc-ic sc-ok">${MARK_CHECK}</i>` : `<i class="sc-ic">${iconSpan(icon)}</i>`;
   const chip = el(`<div class="src-chip" data-sel="${sel}" role="status">${ic}<span>${label}</span></div>`);
   document.body.appendChild(chip);
   const w = chip.offsetWidth, h = chip.offsetHeight;
@@ -2371,7 +2401,7 @@ function nextHeadline(){
   const tone = bad ? 'bad' : item.kind==='good' ? 'good' : 'gold';
   const base = document.querySelector('#enc-panel .fo-arch') || document.querySelector('.camp-status-card') || document.getElementById('app') || document.body;
   const r = base.getBoundingClientRect();
-  const strip = el(`<div id="headline-strip" class="hl-strip hl-${tone}" role="status"><i class="hl-ic">${bad ? '!' : tone==='good' ? '&#10003;' : '&#10022;'}</i><span><b>${key}</b>${detail ? ` &middot; ${detail}` : ''}</span></div>`);
+  const strip = el(`<div id="headline-strip" class="hl-strip hl-${tone}" role="status"><i class="hl-ic">${bad ? '!' : tone==='good' ? MARK_CHECK : MARK_STAR}</i><span><b>${key}</b>${detail ? ` &middot; ${detail}` : ''}</span></div>`);
   strip.style.left = (r.left + 10) + 'px'; strip.style.width = Math.max(200, r.width - 20) + 'px'; strip.style.top = Math.max(4, r.top + 8) + 'px';
   document.body.appendChild(strip);
   const words = (key + ' ' + detail).trim().split(/\s+/).length;
@@ -3161,16 +3191,17 @@ function spawnConfettiRain(){
 }
 
 // Oct 28 (Jeremy picked 8B): Settings' links are toy tiles, an icon over the word, each its own colour; no Close tile (the X closes).
+// Oct 31 (Jeremy, S1): chunky drawn icons in the toy style (filled, dark outline) instead of thin generic line icons.
 const SETTINGS_TILE_ICONS = {
-  log:'<path d="M6 3h10l3 3v15H6z M9 9h7M9 13h7M9 17h5"/>',
-  howto:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5v.7"/><circle cx="12" cy="17" r="1" fill="currentColor"/>',
-  codex:'<path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v14c-3-1-6-1-8 1-2-2-5-2-8-1z M12 6v14"/>',
-  records:'<path d="M7 4h10v5a5 5 0 0 1-10 0z M7 6H4v2a3 3 0 0 0 3 3 M17 6h3v2a3 3 0 0 1-3 3 M12 14v4 M8 20h8"/>',
-  credits:'<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',
-  export:'<path d="M12 4v11 M7 10l5 5 5-5 M5 20h14"/>',
+  log:'<rect x="6" y="5" width="20" height="23" rx="3" fill="#f3e3bf"/><path d="M11 12h10M11 17h10M11 22h6" stroke="#8a5a2b"/><rect x="4" y="3" width="24" height="5" rx="2.5" fill="#c9a66b"/>',
+  howto:'<rect x="5" y="5" width="22" height="22" rx="6" fill="#fff4dc"/><circle cx="11" cy="11" r="2.4" fill="#120b07" stroke="none"/><circle cx="21" cy="21" r="2.4" fill="#120b07" stroke="none"/><circle cx="16" cy="16" r="2.4" fill="#120b07" stroke="none"/>',
+  codex:'<path d="M5 7c4-2 8-2 11 1v18c-3-3-7-3-11-1z" fill="#f3e3bf"/><path d="M27 7c-4-2-8-2-11 1v18c3-3 7-3 11-1z" fill="#e9d2a0"/><path d="M20 12l4-1M20 16l4-1" stroke="#8a5a2b" stroke-width="2"/>',
+  records:'<path d="M9 5h14v6a7 7 0 0 1-14 0z" fill="#ffd75e"/><path d="M9 7H5c0 4 2 6 5 6M23 7h4c0 4-2 6-5 6" fill="none"/><path d="M16 18v4M11 27h10l-1-5h-8z" fill="#c99a2e"/>',
+  credits:'<path d="M16 27s-10-6.2-10-14a5.5 5.5 0 0 1 10-3.2A5.5 5.5 0 0 1 26 13c0 7.8-10 14-10 14z" fill="#e8746b"/>',
+  export:'<rect x="5" y="11" width="22" height="16" rx="3" fill="#a8743f"/><path d="M5 16h22" fill="none"/><path d="M16 3v10M12 9l4 4 4-4" fill="none" stroke-width="2.8"/>',
 };
 function settingsTileHTML(id, cls, label, icon, title){
-  return `<button id="${id}" class="${cls} settings-tile"${title?` title="${title}"`:''}><svg viewBox="0 0 24 24" aria-hidden="true">${SETTINGS_TILE_ICONS[icon]}</svg><span>${label}</span></button>`;
+  return `<button id="${id}" class="${cls} settings-tile"${title?` title="${title}"`:''}><svg class="toy-ic" viewBox="0 0 32 32" aria-hidden="true">${SETTINGS_TILE_ICONS[icon]}</svg><span>${label}</span></button>`;
 }
 function settingsSliderRowHTML(id, label, vol){
   const v = Math.round(vol*100);
@@ -3462,10 +3493,18 @@ function keyShow(cell){
   box.innerHTML = `<b>${LABEL[t]||t}:</b> ${FACE_DESC[t]||''}`;
 }
 
+// Oct 31 (Jeremy, B1/K1): empty pouches are drawn, with a small joke and one line on how they fill up.
+// Small drawn marks for chips and strips (Oct 31: no unicode check marks or arrows).
+const MARK_CHECK = '<svg class="mark-svg" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const MARK_LEFT = '<svg class="mark-svg" viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5M9.5 5L4.5 10l5 5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const MARK_STAR = '<svg class="mark-svg" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5l2.2 5 5.3.5-4 3.6 1.2 5.3L10 14.2 5.3 16.9l1.2-5.3-4-3.6 5.3-.5z" fill="currentColor"/></svg>';
+function emptyPouchHTML(color, big, line){
+  const dark = color==='#8a5a2b' ? '#6b4220' : '#44535d';
+  return `<div class="empty-pouch"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M30 34 C 18 50 16 78 30 88 C 42 96 58 96 70 88 C 84 78 82 50 70 34 Z" fill="${color}" stroke="#120b07" stroke-width="4" stroke-linejoin="round"/><path d="M30 34 C 40 30 60 30 70 34 C 66 26 60 22 50 22 C 40 22 34 26 30 34 Z" fill="${dark}" stroke="#120b07" stroke-width="4" stroke-linejoin="round"/><path d="M33 36 C 44 42 56 42 67 36" fill="none" stroke="#e0b860" stroke-width="4" stroke-linecap="round"/><g class="ep-moth"><circle cx="74" cy="20" r="5" fill="#d9cfc0" stroke="#120b07" stroke-width="3"/><path d="M70 14 q -6 -6 -12 -2 M78 14 q 6 -6 12 -2" fill="none" stroke="#120b07" stroke-width="3" stroke-linecap="round"/></g><path d="M42 64 q 8 6 16 0" fill="none" stroke="#120b07" stroke-width="3" stroke-linecap="round"/></svg><div class="ep-big">${big}</div><p>${line}</p></div>`;
+}
 function backPocketViewHTML(){
   if(!S.backPocket.length){
-    return `<p class="hint">Empty ${infoDot('Dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one. Visit Camp to swap them into your Tray.')}</p>
-      <p class="hint">No safety net right now: your next die here arms it again.</p>`;
+    return emptyPouchHTML('#8a5a2b', 'Just lint and a moth', 'Your safety net is empty. Dice land here when loot replaces one in your Tray or a Shrine upgrades one, and then they can save you once from 0 Health.');
   }
   return `<div class="camp-dice-grid">${S.backPocket.map(d=>`<div class="die dietype-${d.cat} camp-die-tile" style="cursor:default;" title="${d.name}"><span class="camp-die-label">${d.name.replace(/^Maneuver\b/,'Mvr').replace(/^Attack\b/,'Atk')}</span></div>`).join('')}</div>
     <p class="hint" style="margin-top:8px;"><b style="color:#e8746b">&#9829; Safety net ready.</b> If you fall to 0 Health, these dice are rolled until one isn't blank: it saves you at 5 Health, and <b>every</b> die here is spent. ${infoDot('Visit Camp to swap these into your Tray.')}</p>`;
@@ -3843,7 +3882,7 @@ function maybeRelicHint(col){
     const c = document.querySelector('.fo-player > .relic-strip'); if(!c) return;
     c.classList.add('relic-hint');
     const r = c.getBoundingClientRect();
-    const chip = el(`<div class="src-chip relic-hint-chip" role="status"><i class="sc-ic sc-ok">&#8592;</i><span>Your relics: tap to read</span></div>`);
+    const chip = el(`<div class="src-chip relic-hint-chip" role="status"><i class="sc-ic sc-ok">${MARK_LEFT}</i><span>Your relics: tap to read</span></div>`);
     chip.style.left = (r.right+6)+'px'; chip.style.top = (r.top+Math.min(r.height,60)/2-14)+'px';
     document.body.appendChild(chip);
     const done = ()=>{ chip.classList.add('sc-out'); setTimeout(()=>chip.remove(), 300); const cc = document.querySelector('.fo-player > .relic-strip'); if(cc) cc.classList.remove('relic-hint'); };
@@ -3902,8 +3941,9 @@ function relicRowHTML(r, locked, isNew){
 }
 
 function openRunRelicsModal(){
-  const rows = (S.relics||[]).map(id=>relicRowHTML(relicById(id), false)).join('');
-  openInfoModal('Your Relics', rows || '<p class="hint">No relics yet. Relic Shrines offer a choice of three.</p>');
+  // Oct 31 (Jeremy, R1): a display case -- big gems, name in the title font, two per row.
+  const rows = (S.relics||[]).map(id=>{ const r = relicById(id); return `<div class="relic-case-card">${relicBadgeHTML(r, 'relic-badge-lg')}<b>${r.name}</b><span>${r.desc}</span></div>`; }).join('');
+  openInfoModal('Your Relics', rows ? `<div class="relic-case">${rows}</div>` : '<p class="hint">No relics yet. Relic Shrines offer a choice of three.</p>');
 }
 
 function relicCodexHTML(){
@@ -4426,7 +4466,7 @@ function questRowHTML(q, done){
   const rt = /adventurer h\.?o\.?t\.? = d\.?o\.?t/.test(cond) ? (rewardText||'').replace(/damage/i,'dot') : /encounter d\.?o\.?t\.? = h\.?o\.?t/.test(cond) ? (rewardText||'').replace(/damage/i,'hot') : rewardText;
   return `<span class="q-cond">${questCondShort(cond)}</span><span class="q-arrow">→</span>${questRewardHTML(rt)}`;
 }
-function infoDot(text){ return `<span class="info-dot" title="${String(text).replace(/"/g,'&quot;')}" tabindex="0">i</span>`; }
+function infoDot(text){ return `<span class="info-tap" data-tip="${String(text).replace(/"/g,'&quot;')}" hidden></span>`; }
 // If the Camp screen would scroll, fold the Back Pocket down to its first two rows;
 // tapping the fold grows the full pocket UP over the Tray rows above it.
 function campOverflows(from){
@@ -4504,9 +4544,9 @@ function campfireChoiceHTML(){
   return `<div class="campfire-choice${ch?' done':''}">
       <div class="cf-label">${ch ? 'Campfire used' : 'Campfire: choose one'} ${infoDot('Each Camp\'s fire gives you ONE of these. Rest: scramble your Tray and heal half the faces that aren\'t blank. Train: combine 3 matching dice into 1 of the next level (up to one Attack and one Maneuver). Organizing is always free.')}</div>
       <div class="cf-row">
-        <button id="rest-btn" class="cf-btn cf-rest${cls('rest')}" ${ch?'disabled':''} title="Scramble your Tray's faces, then heal for half the non-blank faces showing">${ch==='rest'?'&#10003; ':''}Rest${restSub?`<small>${restSub}</small>`:''}</button>
+        <button id="rest-btn" class="cf-btn cf-rest${cls('rest')}" ${ch?'disabled':''} title="Scramble your Tray's faces, then heal for half the non-blank faces showing">${ch==='rest'?MARK_CHECK+' ':''}Rest${restSub?`<small>${restSub}</small>`:''}</button>
         <span class="cf-or">or</span>
-        <button id="train-btn" class="cf-btn cf-train${cls('train')}" ${(ch||!n)?'disabled':''} title="Combine 3 matching dice in the Upgrade section below">${ch==='train'?'&#10003; ':''}Train<small>${trainSub}</small></button>
+        <button id="train-btn" class="cf-btn cf-train${cls('train')}" ${(ch||!n)?'disabled':''} title="Combine 3 matching dice in the Upgrade section below">${ch==='train'?MARK_CHECK+' ':''}Train<small>${trainSub}</small></button>
       </div>
     </div>`;
 }

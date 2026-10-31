@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.42.23 (Oct 31, 2026)
+Giving it character (Jeremy picked E1, T1, G1, B1, K1, R1, S1 and the small fixes):
+- **Enemy actions (E1):** tapping an enemy's action or a status chip pins a parchment note next to it (icon and number, when it comes, the monster's flavor line, the plain rule) instead of opening a full window. Any tap closes it.
+- **Tooltips (T1):** long-press bubbles are toy bubbles with a tail, the face icon in a tile and the name in the title font; no more "Name — text".
+- **Go (G1):** idle Go shows a faint GO with "pick dice" under it.
+- **Empty pouches (B1, K1):** a drawn pouch with a joke and one line on how it fills ("Just lint and a moth"; "Nothing to use yet").
+- **Your Relics (R1):** a display case, big gems two per row.
+- **Settings (S1):** stitched dividers instead of pills, little dice as toggles, no "100%" readouts, drawn toy icons on the tiles.
+- **Small fixes:** "N short!" instead of "So close — N short"; drawn check, arrow and star marks in chips; a faint GO on the greyed Go at shrines; the (i) dots are gone (the label gets a dotted underline and tapping it shows the note).
 ## 1.42.22 (Oct 31, 2026)
 - The Leap line on the path is a real hop now: it arcs upward (sideways on a vertical leap), peaking about a sixth of the leap above the straight line (was a slight 9px bow).
 ## 1.42.21 (Oct 31, 2026)
