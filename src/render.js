@@ -4211,6 +4211,7 @@ function renderShrineEncounter(){
             <div class="tray-head"><span class="round-badge"><b class="rb-floor">F${S.floorIdx+1}</b>&middot; Shrine</span><div class="path-strip"></div></div>
             <div class="tray-wrap tray-wrap-full">
               <div class="tray" id="tray" style="--class-color:${S.klass.color||'#ffffff'}"></div>
+              ${CHEST_LID_HTML.replace('id="chest-lid"', 'id="shrine-lid"').replace(/title="[^"]*"/, '')}
               ${chestTrimHTML()}
             </div>
           </div>

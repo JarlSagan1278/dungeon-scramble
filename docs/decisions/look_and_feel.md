@@ -58,3 +58,4 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Tutorial: dice colours (Jeremy, Oct 30, 1.42.9):** the guided turn's first bubble says red dice are actions (Hit, Combo) and white dice are Maneuvers that bend your Path (Leap, Dodge, Pivot).
 - **Title credit line removed (Jeremy, Oct 31, 1.42.10):** the T3 line "A dice-path roguelike from the board game by Jeremy and Katlynn Friedman" is taken off the title screen; the credit stays in Settings > Credits.
 - **Lid and new-face cards (Jeremy, Oct 31, 1.42.11):** a die face's New Action card never shows while the lid is on; it appears after the roll. The lid has no label; the Go slot says "Flick the lid to open" (gold) until the roll, then "Tap dice to draw a path".
+- **Shrines keep the lid on (Jeremy, Oct 31, 1.42.12):** the shrine screen shows the closed chest lid over the tray (not flickable; no roll happens at a shrine).

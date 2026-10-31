@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.12 (Oct 31, 2026)
+- Shrines keep the chest lid closed over the dice (nothing to roll there).
 ## 1.42.11 (Oct 31, 2026)
 - The "New Action" card for a die face waits until the lid is off (it used to pop up over the closed lid).
 - "Flick to open" moved off the lid onto the Go slot ("Flick the lid to open"), which turns into "Tap dice to draw a path" once the dice are out.
