@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.49 (Nov 1, 2026)
+- Sound Board round 2: the boss door creak loses its low rumble (it read as "farty"); Boost is now a charge-up (pips climbing and getting louder over a rising sweep, stopping at the top) so it promises a payoff.
 ## 1.42.48 (Nov 1, 2026)
 - Sound pass from Jeremy's Sound Board notes. Redone: door creak (a real wooden stick-slip creak instead of a ghostly tone; boss door lower and longer), enemy-turn drum (louder, two beats), new-floor sound (walks down instead of up), shrine burst (finishes the shrine-room chime's phrase) and blessing (its home chord), and a fully Blocked hit / enemy Shield now uses the Block sound. Tweaked: boss landing louder, dice roll (dice bouncing to rest instead of a card shuffle), chest opening (an octave leap), Freeze (ice crackle), strong-die glint (shimmer), D.O.T./Leech (a darker cousin of the attack), quest start (sounds like a question), relic trigger (a shine on top), Reroll (lower, hollower), Skill and Swap trade sounds, Nullify (a friendly bell), strong-turn tally (lands home instead of hanging), Boost (magical sparkle), Maneuver whoosh (louder and longer).
 ## 1.42.47 (Nov 1, 2026)

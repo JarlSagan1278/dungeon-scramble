@@ -2873,10 +2873,16 @@ const TONE_SEQUENCES = {
   // Nov 1 (Jeremy): Nullify = a friendly little bell (two soft strikes), Boost = a magical rising sparkle.
   swell:     [{freq:587, start:0,    dur:0.45, type:'sine', gain:0.1}, {freq:1175, start:0, dur:0.25, type:'sine', gain:0.03},
               {freq:880, start:0.09, dur:0.5,  type:'sine', gain:0.09}, {freq:1760, start:0.09, dur:0.25, type:'sine', gain:0.025}],
-  whistle:   [{freq:620, freqTo:1500, start:0, dur:0.16, type:'sine', gain:0.08},
-              {freq:1760, start:0.1, dur:0.2, type:'sine', gain:0.05}, {freq:1775, rel:1.008, start:0.1, dur:0.2, type:'sine', gain:0.04},
-              {freq:2349, start:0.15, dur:0.22, type:'sine', gain:0.045},{freq:2366, rel:1.008, start:0.15, dur:0.22, type:'sine', gain:0.035},
-              {freq:3136, start:0.2, dur:0.25, type:'sine', gain:0.035}],
+  // Boost (Nov 1, Jeremy, 2nd note: "more like a charge up, implies a payoff"): a rising sweep under quick pips that
+  // climb and get louder, stopping at the top -- energy stored, not released. The next die is the payoff.
+  whistle:   [{freq:294, freqTo:1175, start:0, dur:0.3, type:'triangle', gain:0.07},
+              {freq:587, start:0,    dur:0.05, type:'sine', gain:0.04},
+              {freq:698, start:0.05, dur:0.05, type:'sine', gain:0.055},
+              {freq:880, start:0.1,  dur:0.05, type:'sine', gain:0.07},
+              {freq:1047,start:0.15, dur:0.05, type:'sine', gain:0.085},
+              {freq:1175,start:0.2,  dur:0.05, type:'sine', gain:0.1},
+              {freq:1397,start:0.25, dur:0.07, type:'sine', gain:0.12},
+              {freq:1760,start:0.25, dur:0.07, type:'triangle', gain:0.05}],
   sour:      [{freq:150, freqTo:110, start:0, dur:0.14, type:'sawtooth', gain:0.08}],
   swapFlip:  [{freq:520, freqTo:1560, start:0, dur:0.13, type:'sine', gain:0.14},
               {freq:2093,start:0.09, dur:0.14, type:'sine',     gain:0.07},
@@ -2982,19 +2988,23 @@ function playDoorCreak(heavy){
   while(t < dur - 0.04){
     const u = t/dur;
     // catch rate (Hz): starts slow and gritty, speeds into a groan, slows as the door swings free
-    const rate = (heavy ? 22 : 30) + (heavy ? 45 : 70)*Math.sin(Math.PI*Math.min(1, u*1.15)) * (0.85 + 0.3*Math.sin(t*9));
+    const rate = (heavy ? 30 : 30) + (heavy ? 52 : 70)*Math.sin(Math.PI*Math.min(1, u*1.15)) * (0.85 + 0.3*Math.sin(t*9));
     const amp = Math.min(1, u*8) * (1 - 0.6*u) * (0.6 + Math.random()*0.6);
     const i0 = Math.floor(t*sr), len = Math.floor(sr*0.004);
     for(let k=0; k<len && i0+k<d.length; k++) d[i0+k] += amp * (Math.random()*2-1) * Math.pow(1-k/len, 2);
     t += (1/rate) * (0.8 + Math.random()*0.4);
   }
   const src = ctx.createBufferSource(); src.buffer = buf;
-  const body1 = ctx.createBiquadFilter(); body1.type = 'bandpass'; body1.frequency.value = heavy ? 380 : 520; body1.Q.value = 6;
-  const body2 = ctx.createBiquadFilter(); body2.type = 'bandpass'; body2.frequency.value = heavy ? 1150 : 1500; body2.Q.value = 8;
-  const g1 = ctx.createGain(); g1.gain.value = heavy ? 1.6 : 1.3;
-  const g2 = ctx.createGain(); g2.gain.value = heavy ? 0.6 : 0.7;
-  src.connect(body1).connect(g1).connect(out);
-  src.connect(body2).connect(g2).connect(out);
+  // Nov 1 (Jeremy: the boss door was "a bit too farty"): its weight now comes from the length and the bigger thud,
+  // not from a low, slow body band -- the creak itself sits only a little lower than a normal door's.
+  const body1 = ctx.createBiquadFilter(); body1.type = 'bandpass'; body1.frequency.value = heavy ? 470 : 520; body1.Q.value = 6;
+  const body2 = ctx.createBiquadFilter(); body2.type = 'bandpass'; body2.frequency.value = heavy ? 1300 : 1500; body2.Q.value = 8;
+  const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = heavy ? 300 : 200;
+  const g1 = ctx.createGain(); g1.gain.value = heavy ? 1.0 : 1.3;
+  const g2 = ctx.createGain(); g2.gain.value = heavy ? 0.9 : 0.7;
+  src.connect(hp);
+  hp.connect(body1).connect(g1).connect(out);
+  hp.connect(body2).connect(g2).connect(out);
   src.start(now); src.stop(now+dur);
   // the door stops: a dull wooden bump
   const th = ctx.createOscillator(), tg = ctx.createGain(); th.type = 'sine';
