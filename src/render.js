@@ -57,19 +57,36 @@ function playStepTone(fx, pitchStep, step){
   if(step && step.dmg>0) return playTone('hit', pitchStep);
   const kind = {block:'woodKnock', heal:'bell', hot:'bell', dot:'pluck', leech:'pluck', freeze:'glass', nullify:'swell',
     boost:'whistle', fumble:'sour'}[t];
+  if(t==='freeze') playIceCrackle();
   if(kind) return playTone(kind, pitchStep);
   if(t==='dodge' || t==='leap' || t==='pivot' || t==='swap' || t==='reroll') return playWhoosh(pitchStep);
   if(fx.pulse==='move') return;
   const old = {heal:'heal', block:'block', status:'status'}[fx.pulse];
   if(old) playTone(old, 0);
 }
-// An airy whoosh for Maneuvers: a short band-passed noise sweep, a touch higher each step.
+// An airy whoosh for Maneuvers. Nov 1 (Jeremy: too quiet, more of a whoosh): louder and longer, with the filter
+// sweeping up and back down so the air moves past you; a touch higher each step.
 function playWhoosh(pitchStep){
   if(!PREFS.sound) return;
   const ctx = getAudioCtx(); if(!ctx) return;
-  const now = ctx.currentTime, f = 900*Math.pow(2, Math.min(10, pitchStep||0)*0.12);
-  playNoiseBurst(ctx, now, 0.14, 0.09, 'bandpass', f, 1.4);
-  playNoiseBurst(ctx, now+0.04, 0.1, 0.05, 'bandpass', f*1.6, 1.8);
+  const now = ctx.currentTime, f = 500*Math.pow(2, Math.min(10, pitchStep||0)*0.1), dur = 0.3, sr = ctx.sampleRate;
+  const buf = ctx.createBuffer(1, Math.floor(sr*dur), sr), d = buf.getChannelData(0);
+  for(let j=0;j<d.length;j++) d[j] = Math.random()*2-1;
+  const src = ctx.createBufferSource(); src.buffer = buf;
+  const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 1.1;
+  bp.frequency.setValueAtTime(f, now); bp.frequency.exponentialRampToValueAtTime(f*3.2, now+dur*0.45); bp.frequency.exponentialRampToValueAtTime(f*1.4, now+dur);
+  const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, now); g.gain.linearRampToValueAtTime(0.42, now+dur*0.4); g.gain.exponentialRampToValueAtTime(0.0001, now+dur);
+  src.connect(bp).connect(g).connect(sfxOut(ctx)); src.start(now); src.stop(now+dur);
+}
+// Nov 1 (Jeremy: Freeze should crackle): ice forming -- a scatter of tiny bright cracks over the glassy ring.
+function playIceCrackle(){
+  if(!PREFS.sound) return;
+  const ctx = getAudioCtx(); if(!ctx) return;
+  const now = ctx.currentTime;
+  for(let i=0;i<14;i++){
+    const at = now + 0.01 + Math.pow(i/14, 1.4)*0.32 + Math.random()*0.015;
+    playNoiseBurst(ctx, at, 0.006 + Math.random()*0.01, (0.16 + Math.random()*0.14)*(1 - i/20), 'highpass', 3000 + Math.random()*3500, 0.8);
+  }
 }
 
 function updateHeaderMeta(){
@@ -2699,8 +2716,13 @@ const TONE_SEQUENCES = {
   // Soft tick as each die joins the path (pitch climbs with path length via
   // playTone's pentatonic ladder); a brighter 3-note sparkle when the path's
   // damage badge crosses a tier; and the turn's closing 'tally' chord.
-  relicProc: [{freq:1175,start:0,    dur:0.09, type:'sine',     gain:0.12},
-              {freq:1568,start:0.06, dur:0.12, type:'sine',     gain:0.10}],
+  // Nov 1 (Jeremy, Sound Board): a shine on top so a relic isn't lost among the dice sounds.
+  relicProc: [{freq:1175,start:0,    dur:0.09, type:'sine',     gain:0.13},
+              {freq:1568,start:0.06, dur:0.12, type:'sine',     gain:0.11},
+              {freq:2349,start:0.12, dur:0.45, type:'sine',     gain:0.06},
+              {freq:2360,rel:1.006, start:0.125,dur:0.42, type:'sine', gain:0.05},
+              {freq:3136,start:0.16, dur:0.35, type:'sine',     gain:0.035},
+              {freq:3520,start:0.2,  dur:0.3,  type:'sine',     gain:0.025}],
   fuse:      [{freq:587, start:0,    dur:0.1,  type:'triangle', gain:0.16},
               {freq:698, start:0.09, dur:0.1,  type:'triangle', gain:0.16},
               {freq:880, start:0.18, dur:0.1,  type:'triangle', gain:0.16},
@@ -2711,11 +2733,14 @@ const TONE_SEQUENCES = {
                 {freq:990, start:0.05, dur:0.09, type:'triangle', gain:0.12}],
   skillDisarm: [{freq:990, start:0,    dur:0.06, type:'triangle', gain:0.1},
                 {freq:660, start:0.05, dur:0.09, type:'triangle', gain:0.1}],
-  skillUse:    [{freq:520, freqTo:1560, start:0, dur:0.13, type:'sine', gain:0.14},
-                {freq:2093,start:0.09, dur:0.14, type:'sine',     gain:0.07},
-                {freq:1568,start:0.09, dur:0.12, type:'triangle', gain:0.05}],
-  glint:     [{freq:1760,start:0,    dur:0.07, type:'sine',     gain:0.07},
-              {freq:2637,start:0.05, dur:0.1,  type:'sine',     gain:0.06}],
+  // Nov 1 (Jeremy, Sound Board): Skill and Swap trade sounds.
+  skillUse:    [{freq:330, start:0, dur:0.05, type:'triangle', gain:0.14},
+                {freq:440, start:0.07, dur:0.06, type:'triangle', gain:0.14}],
+  // Nov 1 (Jeremy): more of a shimmer -- a quick run of high notes, each with a slightly detuned twin.
+  glint:     [{freq:1760,start:0,    dur:0.22, type:'sine', gain:0.05}, {freq:1770,rel:1.007,start:0.003,dur:0.2, type:'sine', gain:0.04},
+              {freq:2349,start:0.05, dur:0.22, type:'sine', gain:0.045},{freq:2360,rel:1.007,start:0.053,dur:0.2, type:'sine', gain:0.035},
+              {freq:2637,start:0.1,  dur:0.25, type:'sine', gain:0.04}, {freq:2650,rel:1.007,start:0.103,dur:0.23, type:'sine', gain:0.03},
+              {freq:3520,start:0.15, dur:0.3,  type:'sine', gain:0.03}, {freq:3540,rel:1.007,start:0.153,dur:0.28, type:'sine', gain:0.025}],
   closeCall: [{freq:330, start:0,    dur:0.09, type:'sine',     gain:0.1},
               {freq:330, start:0.14, dur:0.12, type:'sine',     gain:0.1}],
   pathTick:  [{freq:440, start:0,    dur:0.07, type:'sine',     gain:0.11},
@@ -2723,10 +2748,12 @@ const TONE_SEQUENCES = {
   tierUp:    [{freq:880, start:0,    dur:0.08, type:'triangle', gain:0.14},
               {freq:1109,start:0.07, dur:0.08, type:'triangle', gain:0.14},
               {freq:1319,start:0.14, dur:0.16, type:'triangle', gain:0.14}],
-  tally:     [{freq:440, start:0,    dur:0.16, type:'triangle', gain:0.18},
-              {freq:554, start:0,    dur:0.16, type:'triangle', gain:0.14},
-              {freq:659, start:0,    dur:0.16, type:'triangle', gain:0.14},
-              {freq:880, start:0.05, dur:0.26, type:'sine',     gain:0.16}],
+  // Nov 1 (Jeremy: too negative): a quick upward run that lands home (A C# E, then up to D), not a held chord.
+  tally:     [{freq:440, start:0,    dur:0.1,  type:'triangle', gain:0.14},
+              {freq:554, start:0.05, dur:0.1,  type:'triangle', gain:0.14},
+              {freq:659, start:0.1,  dur:0.1,  type:'triangle', gain:0.14},
+              {freq:1175,start:0.16, dur:0.32, type:'sine',     gain:0.17},
+              {freq:587, start:0.16, dur:0.32, type:'triangle', gain:0.1}],
   heal:      [{freq:659, start:0,    dur:0.12, type:'sine',     gain:0.14},
               {freq:880, start:0.09, dur:0.16, type:'sine',     gain:0.14}],
   defeat:    [{freq:220, start:0,    dur:0.2,  type:'sawtooth', gain:0.16},
@@ -2745,7 +2772,7 @@ const TONE_SEQUENCES = {
   // cue of its own, instead of only the per-die 'hit' sound from whichever
   // die happened to land the final blow.
   encounterKill: [{freq:587, start:0,    dur:0.1,  type:'square',   gain:0.16},
-                  {freq:880, start:0.08, dur:0.16, type:'triangle', gain:0.18}],
+                  {freq:1175,start:0.08, dur:0.2,  type:'triangle', gain:0.18}], // Nov 1 (Jeremy): a full octave, not a fifth
   // A sharp thump+ding "crunch" for an Overkill -- distinct from a normal
   // kill so the bonus-loot-option moment actually registers as it happens,
   // not just as a chip on the next screen.
@@ -2767,17 +2794,19 @@ const TONE_SEQUENCES = {
                 {freq:1175, start:0.18, dur:0.3,  type:'sine', gain:0.04}],
   // Quest cue: a bright three-note flourish (rising triad plus a sparkle) so
   // bonus objectives are heard, distinct from the soft door knock.
-  questStart: [{freq:440, start:0,    dur:0.12, type:'triangle', gain:0.16},
-               {freq:554, start:0.09, dur:0.12, type:'triangle', gain:0.16},
-               {freq:659, start:0.18, dur:0.14, type:'triangle', gain:0.17},
-               {freq:1760,start:0.3,  dur:0.3,  type:'sine',     gain:0.09}],
+  // Nov 1 (Jeremy: a question mark, not an exclamation): down, then up to the leading tone and a little upward bend that
+  // never resolves -- the way a voice rises at the end of a question.
+  questStart: [{freq:880, start:0,    dur:0.1,  type:'triangle', gain:0.15},
+               {freq:659, start:0.11, dur:0.1,  type:'triangle', gain:0.15},
+               {freq:1109,freqTo:1160, start:0.23, dur:0.3, type:'triangle', gain:0.16}],
   // A heavier, ominous version for a Boss room -- lower and a touch longer,
   // so it reads as a step up in stakes rather than just another door.
   bossRoomEnter: [{freq:110, start:0,    dur:0.16, type:'sawtooth', gain:0.18},
                   {freq:147, start:0.14, dur:0.28, type:'sawtooth', gain:0.2}],
   // Oct 28: the boss lands on its health bar -- a low thump, then a short wooden creak as the bar sags.
-  bossLand: [{freq:70, start:0, dur:0.22, type:'sine', gain:0.35}, {freq:55, start:0.02, dur:0.3, type:'triangle', gain:0.25},
-             {freq:180, start:0.14, dur:0.3, type:'sawtooth', gain:0.04}, {freq:162, start:0.34, dur:0.28, type:'sawtooth', gain:0.03}],
+  bossLand: [{freq:70, start:0, dur:0.3, type:'sine', gain:0.6}, {freq:55, start:0.02, dur:0.4, type:'triangle', gain:0.45},
+             {freq:110, freqTo:60, start:0, dur:0.12, type:'square', gain:0.08},
+             {freq:180, start:0.14, dur:0.3, type:'sawtooth', gain:0.07}, {freq:162, start:0.34, dur:0.28, type:'sawtooth', gain:0.055}], // Nov 1: louder
   // Per-die turn-resolution tones (see describeStepFx()/playStepTone()) --
   // a short clink for Block, a light ping for a status effect (D.O.T.,
   // Nullify, Freeze, Boost) -- distinct from 'hit'/'heal' so each kind of
@@ -2792,9 +2821,12 @@ const TONE_SEQUENCES = {
             {freq:1175,start:0.16, dur:0.18, type:'triangle', gain:0.2}],
   // A short ascending sparkle for reaching a new Floor -- celebratory, not
   // combat-weighted, so it reads as "level up" rather than another kill.
-  floorUp: [{freq:440, start:0,    dur:0.12, type:'triangle', gain:0.2},
-            {freq:554, start:0.1,  dur:0.12, type:'triangle', gain:0.2},
-            {freq:659, start:0.2,  dur:0.26, type:'triangle', gain:0.22}],
+  // Nov 1 (Jeremy): going down a floor, so the notes walk down the stairs and land on a low D.
+  floorUp: [{freq:880, start:0,    dur:0.12, type:'triangle', gain:0.18},
+            {freq:698, start:0.11, dur:0.12, type:'triangle', gain:0.19},
+            {freq:554, start:0.22, dur:0.12, type:'triangle', gain:0.2},
+            {freq:440, start:0.33, dur:0.12, type:'triangle', gain:0.21},
+            {freq:294, start:0.44, dur:0.4,  type:'triangle', gain:0.23}],
   // A soft magical chime for a Shrine actually granting its blessing --
   // gentle high sine notes, deliberately quieter/softer than any combat or
   // reward tone so a Shrine visit reads as a calm moment, not another hit.
@@ -2803,12 +2835,19 @@ const TONE_SEQUENCES = {
   shrineEnter: [{freq:440, start:0,    dur:0.35, type:'sine', gain:0.08},
                 {freq:659, start:0.18, dur:0.4,  type:'sine', gain:0.08},
                 {freq:932, start:0.38, dur:0.6,  type:'sine', gain:0.07}],
-  shrineBurst: [{freq:880, start:0,    dur:0.12, type:'triangle', gain:0.12},
-                {freq:1109,start:0.06, dur:0.14, type:'sine', gain:0.12},
-                {freq:1319,start:0.12, dur:0.35, type:'sine', gain:0.13}],
-  blessing: [{freq:659,  start:0,    dur:0.18, type:'sine', gain:0.12},
-             {freq:880,  start:0.12, dur:0.18, type:'sine', gain:0.12},
-             {freq:1109, start:0.26, dur:0.3,  type:'sine', gain:0.14}],
+  // Nov 1 (Jeremy): the burst answers the entrance chime. Entrance: A E Bb (rising, unfinished). Burst: Bb falls to A,
+  // then C# up to D -- the phrase comes home. Blessing: the home chord (D minor, with the entrance's A on top) blooms.
+  shrineBurst: [{freq:932, start:0,    dur:0.1,  type:'sine', gain:0.11},
+                {freq:880, start:0.08, dur:0.1,  type:'sine', gain:0.11},
+                {freq:1109,start:0.16, dur:0.1,  type:'triangle', gain:0.12},
+                {freq:1175,start:0.24, dur:0.5,  type:'sine', gain:0.14},
+                {freq:587, start:0.24, dur:0.5,  type:'sine', gain:0.07}],
+  blessing: [{freq:294,  start:0,    dur:1.0,  type:'sine', gain:0.09},
+             {freq:440,  start:0.04, dur:0.95, type:'sine', gain:0.08},
+             {freq:587,  start:0.08, dur:0.9,  type:'sine', gain:0.08},
+             {freq:698,  start:0.12, dur:0.85, type:'sine', gain:0.07},
+             {freq:880,  start:0.16, dur:0.8,  type:'sine', gain:0.07},
+             {freq:1760, start:0.2,  dur:0.6,  type:'sine', gain:0.025}],
   // A bigger, grander flourish for clearing the whole dungeon, replacing
   // the plain 'victory' sting -- plays alongside the new confetti burst as
   // the Victory screen first appears.
@@ -2824,22 +2863,33 @@ const TONE_SEQUENCES = {
   bell:      [{freq:880, start:0, dur:0.5, type:'sine', gain:0.11},
               {freq:1760, start:0, dur:0.3, type:'sine', gain:0.04},
               {freq:2640, start:0.005, dur:0.18, type:'sine', gain:0.02}],
-  pluck:     [{freq:220, freqTo:196, start:0, dur:0.16, type:'triangle', gain:0.16},
-              {freq:440, start:0, dur:0.06, type:'sine', gain:0.05}],
+  // Nov 1 (Jeremy: sounded like Block): D.O.T./Leech now sound like a smaller, darker cousin of the hit's slash.
+  pluck:     [{freq:587, freqTo:147, start:0, dur:0.09, type:'sawtooth', gain:0.14},
+              {freq:740, start:0.04, dur:0.08, type:'triangle', gain:0.08},
+              {freq:294, freqTo:220, start:0.05, dur:0.12, type:'triangle', gain:0.09}],
   glass:     [{freq:1760, start:0, dur:0.45, type:'sine', gain:0.07},
               {freq:1780, rel:1.0115, start:0.01, dur:0.4, type:'sine', gain:0.05},
               {freq:2637, start:0.03, dur:0.3, type:'sine', gain:0.04}],
-  swell:     [{freq:300, freqTo:900, start:0, dur:0.22, type:'sine', gain:0.1}],
-  whistle:   [{freq:620, freqTo:1500, start:0, dur:0.14, type:'sine', gain:0.1}],
+  // Nov 1 (Jeremy): Nullify = a friendly little bell (two soft strikes), Boost = a magical rising sparkle.
+  swell:     [{freq:587, start:0,    dur:0.45, type:'sine', gain:0.1}, {freq:1175, start:0, dur:0.25, type:'sine', gain:0.03},
+              {freq:880, start:0.09, dur:0.5,  type:'sine', gain:0.09}, {freq:1760, start:0.09, dur:0.25, type:'sine', gain:0.025}],
+  whistle:   [{freq:620, freqTo:1500, start:0, dur:0.16, type:'sine', gain:0.08},
+              {freq:1760, start:0.1, dur:0.2, type:'sine', gain:0.05}, {freq:1775, rel:1.008, start:0.1, dur:0.2, type:'sine', gain:0.04},
+              {freq:2349, start:0.15, dur:0.22, type:'sine', gain:0.045},{freq:2366, rel:1.008, start:0.15, dur:0.22, type:'sine', gain:0.035},
+              {freq:3136, start:0.2, dur:0.25, type:'sine', gain:0.035}],
   sour:      [{freq:150, freqTo:110, start:0, dur:0.14, type:'sawtooth', gain:0.08}],
-  swapFlip:  [{freq:330, start:0, dur:0.05, type:'triangle', gain:0.14},
-              {freq:440, start:0.07, dur:0.06, type:'triangle', gain:0.14}],
+  swapFlip:  [{freq:520, freqTo:1560, start:0, dur:0.13, type:'sine', gain:0.14},
+              {freq:2093,start:0.09, dur:0.14, type:'sine',     gain:0.07},
+              {freq:1568,start:0.09, dur:0.12, type:'triangle', gain:0.05}],
   // Enemy turn: a low drum as it acts, then what it did.
-  enemyDrum: [{freq:95, freqTo:60, start:0, dur:0.16, type:'sine', gain:0.24},
-              {freq:180, freqTo:90, start:0, dur:0.05, type:'triangle', gain:0.08}],
-  clank:     [{freq:620, start:0, dur:0.12, type:'square', gain:0.07},
-              {freq:931, start:0.005, dur:0.1, type:'square', gain:0.05},
-              {freq:1480, start:0.01, dur:0.06, type:'triangle', gain:0.05}],
+  // Nov 1 (Jeremy: too quiet, easy to miss): a louder two-beat war drum (da-DUM).
+  enemyDrum: [{freq:110, freqTo:70, start:0, dur:0.12, type:'sine', gain:0.3},
+              {freq:220, freqTo:110, start:0, dur:0.04, type:'triangle', gain:0.12},
+              {freq:95, freqTo:52, start:0.14, dur:0.24, type:'sine', gain:0.5},
+              {freq:190, freqTo:95, start:0.14, dur:0.06, type:'triangle', gain:0.16}],
+  // Nov 1 (Jeremy): a fully Blocked hit / an enemy Shield sounds like the Block face itself, a touch heavier.
+  clank:     [{freq:196, freqTo:156, start:0, dur:0.09, type:'triangle', gain:0.24},
+              {freq:392, start:0, dur:0.035, type:'square', gain:0.06}],
   enemyBell: [{freq:440, start:0, dur:0.35, type:'sine', gain:0.09},
               {freq:660, start:0.02, dur:0.25, type:'sine', gain:0.04}],
   squeak:    [{freq:900, freqTo:1500, start:0, dur:0.06, type:'triangle', gain:0.08},
@@ -2867,7 +2917,7 @@ const TONE_SEQUENCES = {
 // Sound-effect key (v1.39.5): pitch classes of D harmonic minor (D E F G A Bb C#), the notes of A freygish.
 const SFX_KEY_PCS = [2,4,5,7,9,10,1];
 // Tones that keep their own pitch: percussion, metal, deliberate dissonance, and the victory's D-major (Picardy) ending.
-const SFX_FREE_PITCH = new Set(['clank','squeak','heartbeat','enemyDrum','windup','sour','overkill','alloyShine','grandVictory']);
+const SFX_FREE_PITCH = new Set(['squeak','heartbeat','enemyDrum','windup','sour','overkill','alloyShine','grandVictory']);
 // The music moves up a key on Floors 2 and 3 (MUSIC_FLOORS in music.js); the sound effects follow it.
 function sfxShift(){ return (typeof MUSIC_FLOORS!=='undefined' && typeof S!=='undefined' && S) ? (MUSIC_FLOORS[Math.max(0,Math.min(2,S.floorIdx||0))].shift||0) : 0; }
 function sfxInScale(m){ return SFX_KEY_PCS.includes((((m - sfxShift())%12)+12)%12); }
@@ -2919,44 +2969,40 @@ function playTone(kind, pitchStep){
   });
 }
 
-// Oct 31 (Jeremy): a door creaks open. Stick-slip friction: a buzzy sawtooth through a resonant bandpass, its volume
-// chopped into irregular little catches whose rate climbs then slows, and a pitch that wanders, plus a soft wooden thud.
-// Boss doors are lower and slower.
+// Nov 1 (Jeremy, Sound Board: v2 "sounds more like a ghost"): a real wooden creak is not a tone but stick-slip
+// friction -- the hinge grabs and lets go dozens of times a second. So: a train of tiny clicks whose rate wanders
+// (slow catches, a faster groan in the middle, slowing again), each click ringing the door's wooden body (two
+// resonant bands), then the door bumps to a stop. Boss doors are lower, slower and longer.
 function playDoorCreak(heavy){
-  // v2 (Oct 31, Jeremy: try a different creak): an old hinge groaning open. Two detuned triangle tones through a
-  // narrow resonant filter, pitch sliding up then sagging, with a slow random wobble (a hinge never turns evenly),
-  // a short squeak on top and a dull wooden bump as the door stops. Boss doors are lower and slower.
   if(!PREFS.sound) return;
   const ctx = getAudioCtx(); if(!ctx) return;
-  const now = ctx.currentTime, out = sfxOut(ctx), dur = heavy ? 1.15 : 0.85;
-  const base = heavy ? 150 : 210;
-  const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 9; bp.frequency.value = heavy ? 520 : 780;
-  const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, now);
-  g.gain.exponentialRampToValueAtTime(0.22, now + 0.06);
-  g.gain.setValueAtTime(0.22, now + dur*0.7); g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
-  bp.connect(g).connect(out);
-  [1, 1.012].forEach((det, i)=>{
-    const o = ctx.createOscillator(); o.type = 'triangle';
-    for(let t=0; t<=dur; t+=0.025){
-      const u = t/dur, curve = 1 + 0.55*Math.sin(Math.min(1,u*1.25)*Math.PI*0.9) - 0.15*u;
-      const wob = 1 + 0.045*Math.sin(t*37 + i) + (Math.random()-0.5)*0.03;
-      o.frequency.setValueAtTime(base*det*curve*wob, now+t);
-    }
-    o.connect(bp); o.start(now); o.stop(now+dur+0.05);
-  });
-  // the squeak: a thin high chirp early in the swing
-  const sq = ctx.createOscillator(), sg = ctx.createGain(); sq.type = 'sine';
-  const s0 = now + dur*0.18;
-  sq.frequency.setValueAtTime(heavy ? 900 : 1300, s0); sq.frequency.exponentialRampToValueAtTime(heavy ? 1150 : 1700, s0+0.12);
-  sg.gain.setValueAtTime(0.0001, s0); sg.gain.exponentialRampToValueAtTime(0.07, s0+0.02); sg.gain.exponentialRampToValueAtTime(0.0001, s0+0.14);
-  sq.connect(sg).connect(out); sq.start(s0); sq.stop(s0+0.16);
+  const now = ctx.currentTime, out = sfxOut(ctx), dur = heavy ? 1.2 : 0.8, sr = ctx.sampleRate;
+  const buf = ctx.createBuffer(1, Math.floor(sr*dur), sr), d = buf.getChannelData(0);
+  let t = 0.02;
+  while(t < dur - 0.04){
+    const u = t/dur;
+    // catch rate (Hz): starts slow and gritty, speeds into a groan, slows as the door swings free
+    const rate = (heavy ? 22 : 30) + (heavy ? 45 : 70)*Math.sin(Math.PI*Math.min(1, u*1.15)) * (0.85 + 0.3*Math.sin(t*9));
+    const amp = Math.min(1, u*8) * (1 - 0.6*u) * (0.6 + Math.random()*0.6);
+    const i0 = Math.floor(t*sr), len = Math.floor(sr*0.004);
+    for(let k=0; k<len && i0+k<d.length; k++) d[i0+k] += amp * (Math.random()*2-1) * Math.pow(1-k/len, 2);
+    t += (1/rate) * (0.8 + Math.random()*0.4);
+  }
+  const src = ctx.createBufferSource(); src.buffer = buf;
+  const body1 = ctx.createBiquadFilter(); body1.type = 'bandpass'; body1.frequency.value = heavy ? 380 : 520; body1.Q.value = 6;
+  const body2 = ctx.createBiquadFilter(); body2.type = 'bandpass'; body2.frequency.value = heavy ? 1150 : 1500; body2.Q.value = 8;
+  const g1 = ctx.createGain(); g1.gain.value = heavy ? 1.6 : 1.3;
+  const g2 = ctx.createGain(); g2.gain.value = heavy ? 0.6 : 0.7;
+  src.connect(body1).connect(g1).connect(out);
+  src.connect(body2).connect(g2).connect(out);
+  src.start(now); src.stop(now+dur);
   // the door stops: a dull wooden bump
   const th = ctx.createOscillator(), tg = ctx.createGain(); th.type = 'sine';
-  const t0 = now + dur*0.92;
+  const t0 = now + dur*0.95;
   th.frequency.setValueAtTime(heavy ? 85 : 120, t0); th.frequency.exponentialRampToValueAtTime(heavy ? 50 : 70, t0+0.16);
-  tg.gain.setValueAtTime(0.0001, t0); tg.gain.exponentialRampToValueAtTime(heavy ? 0.38 : 0.28, t0+0.01); tg.gain.exponentialRampToValueAtTime(0.0001, t0+0.2);
+  tg.gain.setValueAtTime(0.0001, t0); tg.gain.exponentialRampToValueAtTime(heavy ? 0.4 : 0.3, t0+0.01); tg.gain.exponentialRampToValueAtTime(0.0001, t0+0.2);
   th.connect(tg).connect(out); th.start(t0); th.stop(t0+0.22);
-  playNoiseBurst(ctx, t0, 0.09, heavy ? 0.22 : 0.16, 'lowpass', 300, 0.7);
+  playNoiseBurst(ctx, t0, 0.09, heavy ? 0.24 : 0.18, 'lowpass', 300, 0.7);
 }
 
 // A tray scramble gets its own noise-based rattle rather than another
@@ -2994,28 +3040,30 @@ function playNoiseBurst(ctx, startTime, dur, gainPeak, filterType, filterFreq, f
 // loose objects colliding, where evenly-spaced identical clicks read as a
 // machine. Knocks taper off in both volume and spacing as they "settle".
 function playDiceRollSound(){
+  // Nov 1 (Jeremy, Sound Board: "sounds more like a deck of cards"): the old soft rumble bed and dense noise bursts
+  // read as shuffling. Dice are a few hard, separate objects: each one bounces 3-4 times, its clicks getting closer
+  // together and quieter (like a ball bouncing to rest), each click a sharp tap with a short woody ring.
   if(!PREFS.sound) return;
   const ctx = getAudioCtx();
   if(!ctx) return;
-  const now = ctx.currentTime;
-  playNoiseBurst(ctx, now, 0.3, 0.13, 'lowpass', 1200);
-  const hits = 11;
-  let t = 0;
-  for(let i=0;i<hits;i++){
-    const progress = i/hits;
-    t += 0.018 + Math.random()*0.03*(1-progress*0.5); // gaps tighten slightly as the dice settle
-    const dur = 0.022 + Math.random()*0.025;
-    const g = 0.32 * (1-progress*0.65) * (0.75+Math.random()*0.5);
-    playNoiseBurst(ctx, now+t, dur, g, 'bandpass', 900+Math.random()*1800, 1+Math.random()*0.8);
+  const now = ctx.currentTime, out = sfxOut(ctx);
+  const tap = (at, gain, ring)=>{
+    playNoiseBurst(ctx, at, 0.012, gain, 'highpass', 2200, 0.7);
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(ring, at);
+    g.gain.setValueAtTime(0.0001, at); g.gain.linearRampToValueAtTime(gain*0.35, at+0.002); g.gain.exponentialRampToValueAtTime(0.0001, at+0.045);
+    o.connect(g).connect(out); o.start(at); o.stop(at+0.06);
+  };
+  const dice = juiceLow() ? 3 : 5;
+  for(let k=0;k<dice;k++){
+    let at = now + 0.01 + k*0.045 + Math.random()*0.04, gap = 0.09 + Math.random()*0.05, g = 0.3*(0.8+Math.random()*0.4);
+    const ring = 1300 + Math.random()*1400;
+    for(let b=0;b<4;b++){ tap(at, g, ring*(1+(Math.random()-0.5)*0.05)); at += gap; gap *= 0.62; g *= 0.55; }
   }
-  // Landing click-clacks, timed to the tray's staggered settle (dice land
-  // left-to-right), each a touch higher and crisper than the rattle.
-  // v1.39.3: each landing clack takes the material of a die in the tray (wood, Alloy metal,
-  // Gilded bright metal, Magic glass), so a tray full of loot sounds richer than the starting set.
+  // Landing click-clacks in the tray's dice materials (v1.39.3), after the bounces
   const mats = diceMaterials();
-  const clacks = juiceLow() ? 3 : 6;
+  const clacks = juiceLow() ? 2 : 4;
   for(let i=0;i<clacks;i++){
-    const at = 0.26 + i*(0.34/clacks) + Math.random()*0.02;
+    const at = 0.3 + i*(0.2/clacks) + Math.random()*0.02;
     playMaterialClack(ctx, now+at, mats[i % mats.length], i);
   }
 }
@@ -3042,14 +3090,21 @@ function playMaterialClack(ctx, t, mat, i){
 }
 // v1.39.3: a single Reroll is one die, not the whole tray: two quick tumbles and a landing in that die's material.
 function playRerollSound(die){
+  // Nov 1 (Jeremy): lower and hollower -- the die tumbles in a cupped hand: two low, round knocks, then it lands.
   if(!PREFS.sound) return;
   const ctx = getAudioCtx();
   if(!ctx) return;
-  const now = ctx.currentTime;
-  playNoiseBurst(ctx, now, 0.035, 0.18, 'bandpass', 1300, 1.2);
-  playNoiseBurst(ctx, now+0.07, 0.03, 0.15, 'bandpass', 1900, 1.2);
+  const now = ctx.currentTime, out = sfxOut(ctx);
+  const knock = (at, f, gain)=>{
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine';
+    o.frequency.setValueAtTime(f, at); o.frequency.exponentialRampToValueAtTime(f*0.8, at+0.07);
+    g.gain.setValueAtTime(0.0001, at); g.gain.linearRampToValueAtTime(gain, at+0.003); g.gain.exponentialRampToValueAtTime(0.0001, at+0.09);
+    o.connect(g).connect(out); o.start(at); o.stop(at+0.1);
+    playNoiseBurst(ctx, at, 0.025, gain*0.5, 'bandpass', f*2.2, 2);
+  };
+  knock(now, 300, 0.22); knock(now+0.08, 360, 0.18);
   const cat = die && die.cat;
-  playMaterialClack(ctx, now+0.14, (cat==='alloy'||cat==='gilded'||cat==='magic') ? cat : 'wood', 2);
+  playMaterialClack(ctx, now+0.16, (cat==='alloy'||cat==='gilded'||cat==='magic') ? cat : 'wood', 2);
 }
 
 // A sharp, broadband noise "crash" (the breaking/clattering sound of a real

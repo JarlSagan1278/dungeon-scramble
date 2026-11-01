@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.48 (Nov 1, 2026)
+- Sound pass from Jeremy's Sound Board notes. Redone: door creak (a real wooden stick-slip creak instead of a ghostly tone; boss door lower and longer), enemy-turn drum (louder, two beats), new-floor sound (walks down instead of up), shrine burst (finishes the shrine-room chime's phrase) and blessing (its home chord), and a fully Blocked hit / enemy Shield now uses the Block sound. Tweaked: boss landing louder, dice roll (dice bouncing to rest instead of a card shuffle), chest opening (an octave leap), Freeze (ice crackle), strong-die glint (shimmer), D.O.T./Leech (a darker cousin of the attack), quest start (sounds like a question), relic trigger (a shine on top), Reroll (lower, hollower), Skill and Swap trade sounds, Nullify (a friendly bell), strong-turn tally (lands home instead of hanging), Boost (magical sparkle), Maneuver whoosh (louder and longer).
 ## 1.42.47 (Nov 1, 2026)
 - New Hataxe art: the axe stuck in a miner's helmet (Jeremy's drawing, with the paper texture).
 ## 1.42.46 (Oct 31, 2026)
