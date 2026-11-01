@@ -9,7 +9,7 @@ Designed by Jeremy and Katlynn Friedman, from their board game of the same name.
 no framework; the build concatenates `src/` into one self-contained HTML file.
 
 - **Free demo (Floor 1):** https://dungeonscramble.itch.io/dungeon-scramble
-- **Tester site (full game, rebuilt on every push to `main`):** https://dungeon-scramble.dungeonscramblegame.workers.dev
+- **Tester site (full game, rebuilt on every push to `main`):** https://playtest.dungeonscramble.com (also https://dungeon-scramble.dungeonscramblegame.workers.dev)
 
 ## Quick start
 

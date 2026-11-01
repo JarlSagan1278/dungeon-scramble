@@ -28,12 +28,9 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
   listing (`release/store_listing.md`), feature graphic and screenshots.
 - **Sound effect pass:** his ear test.
 - **Armsmaster red Skill vs red Clear:** options shown Oct 15.
-- **Custom domain** (play.dungeonscramble.com on Cloudflare): instructions given Oct 26.
 
 ## Next for Claude
 - **Room dressing (reopened Oct 29):** inked corner ivy and per-floor room colour shipped in 1.42.5. Still open if Jeremy wants them: his own drawn ivy strands (V3) and one drawn prop per floor (D2).
-- **Rulebook text refresh** (checklist #16): the PDF's rules lag the game (minions, Boost tokens, Swap/Reroll,
-  campfire Rest or Train, quick start). `npm run rulebook`.
 - **Performance on slow phones:** ~1.5 s of script per turn at CPU x4 (renderGame/placeVs) and ~500 ms of style work
   during playback; the demo's first load is ~5 MB (lazy-load art).
 - **Small:** the intermittent "resume failed" on the tester-only Debug class in the bug
@@ -41,7 +38,7 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
 
 ## Later
 - **Optional caps, only if play feels unfair:** damage-per-Minion specials count at most 8 Minions; Extruzeon layers max +12.
-- **Free print-and-play edition** (component sheets + current rules) for the BGG solo contest (see `release/first_players.md`).
+- **Free print-and-play edition** (refresh the rulebook then: it lags the game -- minions, Boost tokens, Swap/Reroll, Rest or Train; `npm run rulebook`) (component sheets + current rules) for the BGG solo contest (see `release/first_players.md`).
 - **Relic look polish:** a bracelet view in the relic list, sockets that grow with depth.
 - **Replay tool** for the tray/path telemetry.
 - **A conversion relic** (e.g. 1 damage per Shield gained).
