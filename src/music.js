@@ -128,12 +128,15 @@ function musicArrange(k){
   // Title / end theme, long version (Jeremy, Oct 13): 8-bar blocks -- downtime bass x2, downtime full x2 (the last one ends
   // with the transition fill), action without drums, action + countermelody without drums, action full x2, action bass x2.
   if(k==='theme') return [['down.bass'], ['down.bass'], ['down.bass','down.lead'], ['down.bass','down.lead','fillUp'],
-    ['act.bass','act.lead'], ['act.bass','act.lead','counter'], ['act.bass','act.lead','act.drums','counter'], ['act.bass','act.lead','act.drums','counter'],
+    // Nov 1 (Jeremy): a step between quiet and full -- the fast bass under the quiet melody -- before the action melody comes in
+    ['act.bass','down.lead'], ['act.bass','down.lead','counter'],
+    ['act.bass','act.lead','counter'], ['act.bass','act.lead','act.drums','counter'], ['act.bass','act.lead','act.drums','counter'],
     ['act.bass'], ['act.bass']];
   if(k==='act') return [['bass','lead','drums'].concat(F.lowBass?['bassLow']:[])];
-  // Oct 31 (Jeremy): a middle intensity for Elite and Deadly fights: the action version's pumping bass alone (plus its
-  // low octave and the wood clicks on later floors), between the lonely downtime bass and the full boss arrangement.
-  if(k==='mid') return [['bass'].concat(F.lowBass?['bassLow']:[], F.wood?['wood']:[])];
+  // Oct 31 (Jeremy): a middle intensity for Elite and Deadly fights, between the lonely downtime bass and the full boss
+  // arrangement. Nov 1: the action version's pumping bass (plus its low octave and the wood clicks on later floors) under
+  // the downtime melody -- both share the same eight-bar chords (Dm Dm Bb A) and tempo.
+  if(k==='mid') return [['bass','down.lead'].concat(F.lowBass?['bassLow']:[], F.wood?['wood']:[])];
   const quiet = ['bass'].concat(F.counter?['counter']:[], F.wood?['wood']:[]), loud = ['bass','lead'].concat(F.wood?['wood']:[]);
   return [quiet, quiet, loud, loud];
 }
@@ -342,7 +345,7 @@ function musicSting(kind){
   setTimeout(()=>{ try{ musicUpdate(); }catch(e){} }, ms + 30);
 }
 // Which music fits right now (called on every render): camp lullaby at camp; in the dungeon, action for a live
-// Boss fight, the action bass alone (mid) for Elite / Deadly fights (Oct 31), else downtime.
+// Boss fight, the action bass under the downtime melody (mid) for Elite / Deadly fights (Oct 31 / Nov 1), else downtime.
 function musicWanted(){
   if(PREFS.music===false || document.hidden) return null;
   if(typeof S==='undefined' || !S || !S.screen || S.screen==='gameover' || S.screen==='victory') return {kind:'theme', mode:'theme', drums:false}; // title, setup and the end screens

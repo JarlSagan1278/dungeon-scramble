@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.50 (Nov 1, 2026)
+- Music: Elite and Deadly fights now play the fast bass with the quiet melody over it (it was the fast bass alone). The title overture gains the same pairing as a step between the quiet half and the action melody (two new sections; the build is now quiet bass, + quiet melody, fast bass + quiet melody, then the full action).
 ## 1.42.49 (Nov 1, 2026)
 - Sound Board round 2: the boss door creak loses its low rumble (it read as "farty"); Boost is now a charge-up (pips climbing and getting louder over a rising sweep, stopping at the top) so it promises a payoff.
 ## 1.42.48 (Nov 1, 2026)
