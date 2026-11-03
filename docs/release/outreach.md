@@ -91,3 +91,11 @@ Tips:
 ### itch numbers, Oct 29 (last 30 days, from the dashboard)
 45 views, 16 browser plays (36% of views), 1 rating, 1 collection, 0 comments; 891 impressions in 7 days, 1.01% click-through. Best day so far is Oct 29 (r/WebGames day): about 11 views and 6 plays. Referrers: Reddit about 11 visits in total (reddit.com 7, r/WebGames, old/out.reddit, the Reddit app), itch browse and tag pages about 13, dungeonscramble.com 3. Play-data sheet: still no runs from anyone but the two testers (runs only arrive when a run ends and the player says yes).
 
+### itch numbers, Nov 3 (daily, from the dashboard)
+| Day | Oct 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | Nov 1 | 2 | 3 (part) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Views | 5 | 8 | 5 | 5 | 11 | 12 | 6 | 2 | 0 | 3 | 1 |
+| Browser plays | 1 | 4 | 1 | 2 | 2 | 6 | 3 | 1 | 0 | 1 | 1 |
+
+Totals: 58 views, 22 plays (38%). Referrers (30 days): reddit.com 13, dungeonscramble.com 3, itch.io front 2, itch browse/tag pages 6 (newest puzzle, new-and-popular dungeon-crawler, mobile/singleplayer, free mobile-web), itch feed 1. Read: Reddit sent 2 more visits since Oct 29, so the r/indiegames video (no link in the post) and Sharing Saturday brought almost no clicks; the itch-link posts (r/WebGames, r/playmygame) did most of the work. The demo was still 1.42.36 through Nov 3; 1.42.50 demo zip made Nov 3 for the Nov 4 r/playmygame redo.
+

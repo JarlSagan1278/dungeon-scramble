@@ -43,3 +43,4 @@ Distribution, hosting, play data, privacy, release plan, monetization, store, it
 - **Play-data ask stays at the end of a run (Jeremy, Oct 29):** itch showed 45 views and 16 plays but no shared runs from strangers. Asking earlier (after the first fight is won) was offered and declined as too aggressive; the question stays on the win/defeat end screens only (plus the Settings switch). Early quits are judged from itch's views/plays instead.
 - **Nov 1, 2026:** The tester site has its own address, https://playtest.dungeonscramble.com (Jeremy set it up on Cloudflare); the workers.dev address still works. Use the playtest address when inviting testers.
 - **Nov 1, 2026:** The rulebook PDF is not shown to players (the game teaches through the guided fight, How to Play and the Codex). Its refresh waits for the print-and-play edition.
+- **Nov 3, 2026:** Netlify is no longer used. The demo is hosted on itch, the playtest build on Cloudflare (playtest.dungeonscramble.com).
