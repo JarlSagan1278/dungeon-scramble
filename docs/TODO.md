@@ -1,6 +1,6 @@
 # Dungeon Scramble — TODO
 
-Updated Oct 31, 2026 (build 1.42.45). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
+Updated Nov 4, 2026 (build 1.42.54). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
 study results in `STUDY_FINDINGS.md`. The release checklist (40 items, owner and status) is the Checklist tab of
 the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 
@@ -26,7 +26,6 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
 - **Redraw the remaining AI-assisted art** (pixie portraits, the remaining original loot) to shrink the disclosure.
 - **Google Play account** (personal): then real billing behind `STORE` / `window.DSStore` (logic.js), the store
   listing (`release/store_listing.md`), feature graphic and screenshots.
-- **Sound effect pass:** his ear test.
 - **Armsmaster red Skill vs red Clear:** options shown Oct 15.
 
 ## Next for Claude
