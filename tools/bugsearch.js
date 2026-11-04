@@ -135,9 +135,16 @@ const CHECK=()=>{
   return bad;
 };
 (async()=>{
+  // Nov 4: served over http, like tools/tests/test_ui.js -- on a file:// page headless Chromium sometimes drops the
+  // session's localStorage writes on reload, which showed up here as a "resume failed" on random runs.
+  const http=require('http'), fs=require('fs'), DIR=path.dirname(FILE);
+  const server=http.createServer((req,res)=>{ const f=path.join(DIR, decodeURIComponent(req.url.split('?')[0])); if(!f.startsWith(DIR)||!fs.existsSync(f)||fs.statSync(f).isDirectory()){ res.writeHead(404); return res.end(); }
+    res.writeHead(200,{'Content-Type': f.endsWith('.html')?'text/html; charset=utf-8':f.endsWith('.js')?'text/javascript':f.endsWith('.webp')?'image/webp':f.endsWith('.png')?'image/png':'application/octet-stream'}); fs.createReadStream(f).pipe(res); });
+  await new Promise(r=>server.listen(0,'127.0.0.1',r));
+  const URL_=`http://127.0.0.1:${server.address().port}/${encodeURIComponent(path.basename(FILE))}`;
   const browser=await chromium.launch(); const out=[]; const seen=new Set();
   const combos=[]; 
-  const probe=await browser.newPage(); await probe.goto('file://'+FILE);
+  const probe=await browser.newPage(); await probe.goto(URL_);
   const lists=await probe.evaluate(()=>({o:ORIGINS.map(o=>o.id),c:CLASSES.map(c=>c.id)})); await probe.close();
   for(let r=0;r<RUNS;r++) combos.push([lists.o[r%lists.o.length],lists.c[(r*3+Math.floor(r/lists.o.length))%lists.c.length],r%2===1,r%3===0]);
   let n=0;
@@ -146,7 +153,7 @@ const CHECK=()=>{
     page.on('pageerror',e=>errs.push('pageerror: '+e.message)); page.on('console',m=>{ if(m.type()==='error' && !/Failed to load resource|ERR_TUNNEL/.test(m.text())) errs.push('console: '+m.text()); });
     if(process.env.FLICK) await page.addInitScript(()=>{ try{ localStorage.setItem('dungeonScrambleRollTest','1'); }catch(e){} });
     if(process.env.QUICK) await page.addInitScript(()=>{ try{ ['dungeonScrambleGuideTest','dungeonScrambleTipsTest'].forEach(k=>localStorage.setItem(k,'1')); }catch(e){} });
-    await page.goto('file://'+FILE);
+    await page.goto(URL_);
     if(process.env.QUICK && n%2===0){ await page.click('#title-newrun-btn'); await page.waitForTimeout(600); } // Oct 28 quick start: a fresh device's first New Run (every other run)
     else await page.evaluate(({o,c,relics})=>{META.lifetime.victories=1;META.lifetime.bestFloorReached=3;META.achievements['origin_duo']={date:Date.now()};newGame(o,c);if(relics)RELICS.forEach(r=>grantRelic(r.id,{silent:true}));},{o,c,relics});
     const quick=!!(process.env.QUICK && n%2===0);
@@ -157,12 +164,12 @@ const CHECK=()=>{
       if(t%3===0){ const bad=await page.evaluate(CHECK); bad.forEach(b=>{ if(!seen.has(b.replace(/[\d.]+/g,'#'))){ seen.add(b.replace(/[\d.]+/g,'#')); errs.push('INVARIANT '+b+' @tick '+t+' note '+tk.note); } }); }
       if(resume && t>0 && t%40===0){ // save, reload the page, resume, and keep going
         const ok=await page.evaluate(()=>{ if(S.transitioning||S.lootChoice||S.shrineChoice||S.relicChoice||S.pendingLootDie||S.shrineResult) return false; try{saveGame();return hasSave();}catch(e){return false;} });
-        if(ok){ await page.waitForTimeout(3500); await page.goto('file://'+FILE); /* the 3.5 s wait (1.5 s was not always enough) lets Chromium commit localStorage first: an instant reload of a file:// page can read storage from before the save (Oct 25: false resume failures on 1 in 6 Debug runs) */ const lg=await page.evaluate(()=>{ try{ const r=loadGame(); if(r) render(); return r; }catch(e){ return 'ERR '+e.message; } }); if(lg!==true) errs.push('resume failed '+lg); else await page.waitForTimeout(80); }
+        if(ok){ await page.waitForTimeout(3500); await page.goto(URL_); /* the 3.5 s wait (1.5 s was not always enough) lets Chromium commit localStorage first: an instant reload of a file:// page can read storage from before the save (Oct 25: false resume failures on 1 in 6 Debug runs) */ const lg=await page.evaluate(()=>{ try{ const r=loadGame(); if(r) render(); return r; }catch(e){ return 'ERR '+e.message; } }); if(lg!==true) errs.push('resume failed '+lg); else await page.waitForTimeout(80); }
       }
       if(t%25===0) await page.waitForTimeout(30);
     }
     n++; console.log(`${errs.length?'BUG ':'ok  '} ${label.padEnd(34)} ${result}${errs.length?'\n    '+errs.slice(0,6).join('\n    '):''}`);
     out.push(...errs.map(e=>label+': '+e)); await page.close();
   }
-  await browser.close(); console.log('\n'+(out.length?out.length+' finding(s)':'No findings')); 
+  await browser.close(); server.close(); console.log('\n'+(out.length?out.length+' finding(s)':'No findings')); 
 })();
