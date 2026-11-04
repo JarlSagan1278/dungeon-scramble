@@ -3353,25 +3353,40 @@ function hitStop(ms){
 // Impact frames on a kill (Nov 4, Jeremy): the comic/anime beat at the moment of the blow. During the hit-stop the
 // room flips to a stark ink negative for one frame, then a high-contrast frame with speed lines bursting out of the
 // enemy, then snaps back. Bosses get an extra negative frame. Off with Reduce Motion or Low intensity (it flashes).
+// Kill impact frame (Nov 4, redone after Jeremy: the flickering negative read as a glitch). A held comic-style panel
+// over the doorway: paper background, the monster as a solid ink silhouette punched slightly forward, ink speed lines
+// aimed at it; on a boss it flips once to ink-on-paper reversed. Then it eases out instead of cutting. Nothing in the
+// room itself is filtered, so the room never flickers.
 function impactFrames(big){
   if(PREFS.reducedMotion || juiceLow()) return;
   const fig = document.querySelector('#enc-panel .fo-enemy .fo-fig'), card = document.querySelector('#enc-panel .enc-card');
   if(!fig || !card) return;
-  const r = fig.getBoundingClientRect(), c = card.getBoundingClientRect();
-  const cx = r.left + r.width/2, cy = r.top + r.height*0.55, R = Math.hypot(c.width, c.height);
+  const art = fig.querySelector('img') || fig.querySelector('.fo-img') || fig;
+  const r = art.getBoundingClientRect(), c = card.getBoundingClientRect();
+  if(!r.width || !c.width) return;
+  const cx = r.left + r.width/2 - c.left, cy = r.top + r.height*0.5 - c.top, R = Math.hypot(c.width, c.height);
   let lines = '';
-  for(let i=0;i<28;i++){
-    const a = (i/28)*Math.PI*2 + (i%2 ? 0.06 : -0.04), w = 0.035 + (i%3)*0.018, r0 = R*(0.26 + (i%4)*0.04);
-    const p = (ang, rad)=>`${(Math.cos(ang)*rad).toFixed(1)},${(Math.sin(ang)*rad).toFixed(1)}`;
+  for(let i=0;i<32;i++){
+    const a = (i/32)*Math.PI*2 + ((i*7)%5-2)*0.02, w = 0.022 + (i%3)*0.012, r0 = Math.max(r.width, r.height)*(0.62 + (i%4)*0.07);
+    const p = (ang, rad)=>`${(cx+Math.cos(ang)*rad).toFixed(1)},${(cy+Math.sin(ang)*rad).toFixed(1)}`;
     lines += `<polygon points="${p(a-w, R)} ${p(a+w, R)} ${p(a, r0)}"/>`;
   }
-  const ov = document.createElement('div'); ov.className = 'impact-lines';
-  ov.style.cssText = `left:${c.left}px;top:${c.top}px;width:${c.width}px;height:${c.height}px;`;
-  ov.innerHTML = `<svg viewBox="${-(cx-c.left)} ${-(cy-c.top)} ${c.width} ${c.height}" width="100%" height="100%" aria-hidden="true">${lines}</svg>`;
+  const ov = document.createElement('div'); ov.className = 'impact-frame';
+  ov.style.cssText = `left:${c.left}px;top:${c.top}px;width:${c.width}px;height:${c.height}px;` + (card.style.clipPath ? `clip-path:${card.style.clipPath};` : '');
+  ov.innerHTML = `<svg viewBox="0 0 ${c.width.toFixed(1)} ${c.height.toFixed(1)}" width="100%" height="100%" aria-hidden="true">${lines}</svg>`;
+  let sil = null;
+  if(art.tagName === 'IMG'){
+    sil = art.cloneNode(false); sil.removeAttribute('class'); sil.removeAttribute('style'); sil.className = 'if-sil';
+    const flip = /scaleX\(-1\)|matrix\(-1/.test(getComputedStyle(art).transform) || art.classList.contains('fo-flip');
+    sil.style.cssText = `left:${r.left-c.left}px;top:${r.top-c.top}px;width:${r.width}px;height:${r.height}px;--flip:${flip?-1:1};`;
+    ov.appendChild(sil);
+  }
   document.body.appendChild(ov);
-  const set = cls=>{ document.body.classList.remove('impact-a','impact-b'); if(cls) document.body.classList.add(cls); };
-  const seq = big ? ['impact-a','impact-b','impact-a',null] : ['impact-a','impact-b',null];
-  seq.forEach((cls,k)=> setTimeout(()=>{ set(cls); if(!cls && ov.parentNode) ov.parentNode.removeChild(ov); }, k*55));
+  const steps = big ? [['if-a',0],['if-b',95],['if-a',170],['if-out',260],[null,430]] : [['if-a',0],['if-out',150],[null,320]];
+  steps.forEach(([cls,t])=> setTimeout(()=>{
+    if(!cls){ if(ov.parentNode) ov.parentNode.removeChild(ov); return; }
+    ov.classList.remove('if-a','if-b'); if(cls==='if-out') ov.classList.add(ov.dataset.last||'if-a', 'if-out'); else { ov.classList.add(cls); ov.dataset.last = cls; }
+  }, t));
 }
 // Camp upgrade: clones of the dice being combined fly into the new die's tile.
 function flyDiceToFuse(cat, level, run){

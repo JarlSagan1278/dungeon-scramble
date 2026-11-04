@@ -92,3 +92,4 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Nov 4, 2026:** cut the door-opening swing after tapping the room door (it fades out). The Bonus quest poster stays one size all fight while quests progress or complete.
 - **Nov 4, 2026:** fork markers in the room tracker must match the existing tracker doors: two narrow arched doorways side by side, kind shown by border colour + glyph.
 - **Nov 4, 2026:** side by side fork doors read as sequential, not a choice: the two tracker doorways stack vertically instead.
+- **Nov 4, 2026:** the kill impact frame looked like a glitch; redone as a held two-tone comic panel (paper + ink silhouette + speed lines) that eases out, no full-room negative flicker.

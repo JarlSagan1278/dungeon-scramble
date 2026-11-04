@@ -3670,12 +3670,16 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 .shrine-boon-float .fo-quests{ font-size:10px !important; }
 .shrine-boon-float .boon-b, .shrine-boon-float b{ font-weight:800; color:#7a1f14; }
 /* Impact frames on a kill (Nov 4): frame A = ink negative of the room, frame B = stark black-and-cream with speed lines */
-body.impact-a #enc-panel .enc-card.fo-arch{ filter:grayscale(1) invert(1) contrast(2.6) brightness(1.05) !important; }
-body.impact-b #enc-panel .enc-card.fo-arch{ filter:grayscale(1) contrast(3.2) brightness(1.15) sepia(.35) !important; }
-.impact-lines{ position:fixed; z-index:40; pointer-events:none; overflow:hidden; display:none; }
-body.impact-b .impact-lines{ display:block; }
-.impact-lines svg{ display:block; overflow:hidden; }
-.impact-lines polygon{ fill:#0c0705; }
+/* Kill impact frame (Nov 4 redo): a held two-tone comic panel over the doorway, then an ease-out (see impactFrames) */
+.impact-frame{ position:fixed; z-index:40; pointer-events:none; overflow:hidden; background:#f3e3bf; opacity:1; }
+.impact-frame svg{ position:absolute; inset:0; display:block; }
+.impact-frame polygon{ fill:#1a0f08; }
+.impact-frame .if-sil{ position:absolute; object-fit:contain; filter:brightness(0); transform:scaleX(var(--flip,1)) scale(1.07); transform-origin:50% 60%; }
+.impact-frame.if-b{ background:#1a0f08; }
+.impact-frame.if-b polygon{ fill:#f3e3bf; }
+.impact-frame.if-b .if-sil{ filter:brightness(0) invert(.92) sepia(.4); transform:scaleX(var(--flip,1)) scale(1.1); }
+.impact-frame.if-out{ opacity:0; transition:opacity .16s ease-out; }
+.impact-frame.if-out .if-sil{ transform:scaleX(var(--flip,1)) scale(1.0); transition:transform .16s ease-out; }
 /* Nov 4 (Jeremy): Swap/Reroll faces are used before you path, so until the path starts the whole die gives a little
    wiggle every couple of seconds (rotate only -- a scale would blur the face). */
 .die.trayact-nudge:not(.shaking):not(.just-rerolled):not(.just-swapped):not(.resolving):not(.guide-nudge):not(.minion){ animation: trayact-nudge 2.2s ease-in-out 0.6s infinite; }
