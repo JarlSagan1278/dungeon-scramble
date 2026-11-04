@@ -286,8 +286,7 @@ function render(){
   if(S.screen==='unlock'){ clearPathTrail(); renderUnlock(); maybeAutosave(); maybeScreenTransition('victory'); return; }
   if(S.screen==='gameover'){ clearPathTrail(); renderGameOver(); maybeScreenTransition('gameover'); return; }
   if(S.screen==='camp'){ clearPathTrail(); renderCamp(); tuckCampCog(); maybeAutosave(); maybeScreenTransition('camp'); return; }
-  if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); decorateArch(); maybeAutosave(); maybeScreenTransition('shrine'); return; }
-  if(S.screen==='fork'){ clearPathTrail(); renderFork(); maybeAutosave(); maybeScreenTransition('fork'); return; }
+  if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); decorateArch(); maybeAutosave(); maybeScreenTransition('shrine'); syncForkCallout(); return; }
   placeVs._inRender = true;
   try{ renderGame(); } finally { placeVs._inRender = false; }
   // Nov 4 (speed pass): measure everything first, write after -- the chips are fitted while the layout placeVs already
@@ -297,6 +296,7 @@ function render(){
   flushVs();
   maybeAutosave();
   maybeScreenTransition('game');
+  syncForkCallout();
 }
 
 // ---- Doorway frame: a stone arch (with floor-by-floor creeping moss) drawn as SVG over the
@@ -1387,19 +1387,42 @@ function forkDoorHTML(d, i){
     </div>
   </div>`;
 }
-function renderFork(){
-  const fc = S.forkChoice; if(!fc){ S.screen='game'; return render(); }
+// The fork overlay (Nov 4, Jeremy): two doors float over the finished room behind the same scrim as the room door.
+// Picking one glides it to the middle and grows it into the room's own "tap to enter" door (showRoomCallout), which
+// then appears in exactly that spot with no entrance animation, so the chosen door simply becomes the room's door.
+const FORK_ZOOM = 0.7;
+function forkMid(){ const a = document.getElementById('app'); const r = a ? a.getBoundingClientRect() : {top:0,height:window.innerHeight};
+  return Math.max(110, Math.min(window.innerHeight-110, r.top + r.height/2)); }
+function removeForkCallout(){ ['fork-callout','fork-scrim','fork-ghost'].forEach(id=>{ const n=document.getElementById(id); if(n) n.remove(); }); }
+function syncForkCallout(){
+  if(!S || !S.forkChoice){ removeForkCallout(); return; }
+  if(document.getElementById('fork-callout')) return;
   document.querySelectorAll('#room-callout, #room-callout-scrim').forEach(n=>n.remove());
-  // Nov 4 (Jeremy): just the two doors, floating like the loot chest -- no panel, no text around them
-  app.innerHTML = `<div class="wrap fork-screen">${renderRoute()}
-    <div class="fork-hall"><div class="fork-doors">${fc.doors.map(forkDoorHTML).join('')}</div></div></div>`;
-  app.querySelectorAll('.fork-door').forEach(b=> b.onkeydown = ev=>{ if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); b.click(); } });
-  app.querySelectorAll('.fork-door').forEach(b=> b.onclick = ()=>{
-    if(b.classList.contains('opening')) return;
-    const i = +b.dataset.fork;
-    app.querySelectorAll('.fork-door').forEach(x=> x.classList.add(x===b ? 'opening' : 'passed'));
-    try{ playDoorCreak(/Elite|Deadly/.test(fc.doors[i].kind)); }catch(e){}
-    setTimeout(()=> pickForkDoor(i), PREFS.reducedMotion ? 0 : 360);
+  const fc = S.forkChoice, mid = forkMid();
+  const scrim = el(`<div id="fork-scrim"></div>`);
+  const node = el(`<div id="fork-callout"><div class="fork-doors">${fc.doors.map(forkDoorHTML).join('')}</div></div>`);
+  // an invisible copy of the room door, placed exactly where showRoomCallout will put it: the glide's target
+  const ghost = el(`<div id="fork-ghost" aria-hidden="true"><div class="rc-door"><div class="rc-arch"><div class="rc-leaf"></div></div><div class="rc-sign"><div class="rc-plaque"><span>?</span></div><div class="rc-kind">Enemy</div></div><div class="rc-tap">tap to enter</div></div></div>`);
+  document.body.appendChild(scrim); document.body.appendChild(ghost); document.body.appendChild(node);
+  node.style.top = mid+'px'; ghost.style.top = mid+'px';
+  node.querySelectorAll('.fork-door').forEach(b=>{
+    b.onkeydown = ev=>{ if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); b.click(); } };
+    b.onclick = ()=>{
+      if(node.classList.contains('picking')) return;
+      node.classList.add('picking');
+      const i = +b.dataset.fork, door = b.querySelector('.rc-door'), target = ghost.querySelector('.rc-door');
+      node.querySelectorAll('.fork-door').forEach(x=>{ if(x!==b) x.classList.add('passed'); });
+      const go = ()=>{ S._forkSeamless = true; removeForkCallout(); pickForkDoor(i); };
+      if(PREFS.reducedMotion || !door.animate){ go(); return; }
+      b.style.animation = 'none';
+      const a = door.getBoundingClientRect(), t = target.getBoundingClientRect();
+      const sc = t.width / a.width, dx = (t.left + t.width/2) - (a.left + a.width/2), dy = (t.top + t.height/2) - (a.top + a.height/2);
+      door.style.transformOrigin = '50% 50%';
+      // translate is in the door's own (zoomed) pixels, so divide by its zoom
+      const anim = door.animate([{transform:'none'}, {transform:`translate(${dx/FORK_ZOOM}px, ${dy/FORK_ZOOM}px) scale(${sc})`}], {duration:340, easing:'cubic-bezier(.3,.9,.35,1)', fill:'forwards'});
+      try{ playTone('uiTick'); }catch(e){}
+      anim.onfinish = go;
+    };
   });
 }
 function renderRoute(){
@@ -1413,7 +1436,7 @@ function renderRoute(){
     const statusSuffix = cls==='done' ? ' (cleared)' : (cls==='current' ? ' (current)' : ' (ahead)');
     const tip = (ROUTE_STEP_DESC[step]||'') + statusSuffix;
     // Nov 4: a fork still ahead (or being chosen) shows as two stacked mini doors
-    const fork = step==='enc' && i>=S.routeStep && typeof FORK_SLOTS!=='undefined' && FORK_SLOTS.includes(i) && !(i===S.routeStep && S.screen!=='fork') && !(S.guide && S.guide.stage && S.guide.stage!=='done') && !(typeof depthRank==='function' && depthRank('gauntlet')>=2);
+    const fork = step==='enc' && i>=S.routeStep && typeof FORK_SLOTS!=='undefined' && FORK_SLOTS.includes(i) && !(i===S.routeStep && !S.forkChoice) && !(S.guide && S.guide.stage && S.guide.stage!=='done') && !(typeof depthRank==='function' && depthRank('gauntlet')>=2);
     if(fork){
       const kinds = (i===S.routeStep && S.forkChoice) ? S.forkChoice.doors.map(d=>d.kind) : ['?','Elite'];
       const kc = k=> k==='Elite'||k==='Deadly'||k==='Elite Trap' ? 'el' : k==='Shrine' ? 'sh' : k==='Trap' ? 'tr' : '';
@@ -2690,7 +2713,8 @@ function showRoomCallout(fx, onDismiss){
   const tierWord = e && (e.tier==='elite' ? 'Elite' : e.tier==='deadly' ? 'Deadly' : '');
   const kind = fx.boss ? fx.type : (tierWord || fx.type);
   const kindCls = fx.boss ? 'k-boss' : ({Elite:'k-elite', Deadly:'k-deadly', Trap:'k-trap', Shrine:'k-shrine'})[kind] || 'k-enemy';
-  const node = el(`<div id="room-callout" class="${fx.boss?'rc-boss':''}">
+  const seamless = !!(S && S._forkSeamless); if(S) S._forkSeamless = false; // came from a fork: this door is the one just chosen
+  const node = el(`<div id="room-callout" class="${fx.boss?'rc-boss':''}${seamless?' rc-seamless':''}">
       <div class="rc-door ${kindCls}">
         <div class="rc-arch"><div class="rc-leaf"><i class="rc-band b1"></i><i class="rc-band b2"></i>${fx.boss?'<i class="rc-plate p1"></i><i class="rc-plate p2"></i>':''}${fx.boss ? '<svg class="rc-ring rc-skull" viewBox="0 0 40 52" aria-hidden="true"><path d="M20 4c-9 0-15 6-15 14 0 5 2 8 5 10v6h20v-6c3-2 5-5 5-10 0-8-6-14-15-14z" fill="#d9cfc0" stroke="#120b07" stroke-width="3"/><circle cx="14" cy="19" r="4" fill="#120b07"/><circle cx="26" cy="19" r="4" fill="#120b07"/><path d="M18 27l2-4 2 4z" fill="#120b07"/><path d="M15 34v-4M20 34v-4M25 34v-4" stroke="#120b07" stroke-width="2"/><path d="M20 36c-8 0-11 5-11 9 0 4 3 6 11 6s11-2 11-6c0-4-3-9-11-9" fill="none" stroke="#120b07" stroke-width="6"/><path d="M20 36c-8 0-11 5-11 9 0 4 3 6 11 6s11-2 11-6c0-4-3-9-11-9" fill="none" stroke="#8d98a2" stroke-width="2.6"/></svg>' : '<svg class="rc-ring" viewBox="0 0 30 46" aria-hidden="true"><rect x="7" y="2" width="16" height="42" rx="5" fill="#5a646d" stroke="#120b07" stroke-width="2.5"/><circle cx="15" cy="7" r="1.4" fill="#120b07"/><circle cx="15" cy="39" r="1.4" fill="#120b07"/><circle cx="15" cy="17" r="8.5" fill="#d6b25a" stroke="#120b07" stroke-width="2.5"/><circle cx="12.5" cy="14.5" r="2.6" fill="#fff1b8"/><path d="M15 26.5a2.6 2.6 0 0 1 1.3 4.9l1 4.6h-4.6l1-4.6a2.6 2.6 0 0 1 1.3-4.9z" fill="#120b07"/></svg>'}</div></div>
         <div class="rc-sign"><div class="rc-plaque"><span>${fx.name}</span></div><div class="rc-kind">${kind}</div></div>

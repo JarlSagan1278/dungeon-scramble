@@ -82,7 +82,7 @@ let res = await page.evaluate((cfg)=>{
       for(const cat of ['attack','maneuver']){ if(S.campUpgrades[cat]) continue; for(const lv of [2,1]){ if(canUpgrade(cat,lv)){ campUpgrade(cat,lv); if(S.campUpgrades[cat]) return null; } } }
       if(!S.campRested){ campRest(); if(S.campRested) return null; }
       campLeave(); return null; }
-    if(S.screen==='fork'){ const pol=cfg.fork||'elite'; pickForkDoor(pol==='standard'?0:pol==='random'?(Math.random()<.5?0:1):1); return null; } // Nov 4 forks: cfg.fork = 'elite' (default, as before forks) | 'standard' | 'random'
+    if(S.forkChoice){ const pol=cfg.fork||'elite'; pickForkDoor(pol==='standard'?0:pol==='random'?(Math.random()<.5?0:1):1); return null; } // Nov 4 forks: cfg.fork = 'elite' (default, as before forks) | 'standard' | 'random'
     if(S.screen==='shrine'){ applyShrineBoon(S.encounter); return null; }
     if(S.screen==='game'){ log.turns++; doTurn(); return null; }
     return null;

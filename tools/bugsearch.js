@@ -67,7 +67,7 @@ const TICK_FN = () => {
     campLeave();
     return { done: false, note: 'camp-leave' };
   }
-  if (S.screen === 'fork') { pickForkDoor(Math.random() < 0.5 ? 0 : 1); return { done: false, note: 'fork' }; } // Nov 4 forks: a random door
+  if (S.forkChoice) { pickForkDoor(Math.random() < 0.5 ? 0 : 1); return { done: false, note: 'fork' }; } // Nov 4 forks: a random door
   if (S.screen === 'shrine') {
     // No pending shrine UI: a player would hold the shrine to activate it
     // (v1.36.0 ritual), so trigger the boon directly.

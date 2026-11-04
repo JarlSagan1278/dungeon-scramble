@@ -3734,3 +3734,17 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 @keyframes fork-bob{ 0%,100%{ translate:0 0; } 50%{ translate:0 -6px; } }
 .fork-door:hover .rc-door, .fork-door:focus-visible .rc-door{ filter:drop-shadow(0 14px 14px rgba(0,0,0,.6)) drop-shadow(0 0 12px rgba(255,215,106,.55)); }
 .fork-door.opening, .reduced-motion .fork-door{ animation:none; }
+/* Nov 4 (Jeremy): the fork's doors float over the finished room, behind the room door's own scrim; the chosen one
+   glides to the middle and becomes the room's "tap to enter" door. (Overrides the earlier fork-screen rules above.) */
+#fork-scrim{ position:fixed; inset:0; z-index:90; background:rgba(8,5,3,.62); }
+#fork-callout{ position:fixed; left:50%; z-index:97; transform:translate(-50%,-50%); width:min(100vw, 395px); }
+#fork-ghost{ position:fixed; left:50%; z-index:-1; transform:translate(-50%,-50%); visibility:hidden; pointer-events:none; display:flex; justify-content:center; }
+#fork-callout .fork-doors{ display:flex; justify-content:center; gap:14px; align-items:center; width:100%; }
+#fork-callout .fork-door{ cursor:pointer; flex:0 0 auto; width:auto; -webkit-tap-highlight-color:transparent; outline:none; animation:fork-bob 1.8s ease-in-out infinite; animation-delay:var(--bob, 0s); }
+#fork-callout .fork-door .rc-door{ zoom:.7; margin:0; transform:none; animation:none; filter:drop-shadow(0 14px 14px rgba(0,0,0,.6)); }
+#fork-callout .fork-door .rc-tap{ display:none; }
+#fork-callout .fork-door:hover .rc-door, #fork-callout .fork-door:focus-visible .rc-door{ filter:drop-shadow(0 14px 14px rgba(0,0,0,.6)) drop-shadow(0 0 12px rgba(255,215,106,.55)); }
+#fork-callout .fork-door.passed{ opacity:0; transition:opacity .22s ease; }
+.reduced-motion #fork-callout .fork-door{ animation:none; }
+#room-callout.rc-seamless .rc-door{ animation:none !important; }
+#room-callout.rc-seamless{ animation:none !important; opacity:1 !important; }

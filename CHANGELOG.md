@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.58 (Nov 4, 2026)
+- Forks: the two doors now float over the room you just finished, behind the same dimming as the room door and the loot chest (no separate screen). Picking one glides it to the middle and grows it into the room's own "tap to enter" door, which takes over in exactly that spot (no pop-in), so the chosen door becomes the room's door; the other door fades away.
 ## 1.42.57 (Nov 4, 2026)
 - Fork screen: just the two doors, floating on their own like the loot chest (no panel, no title, no notes; each door keeps its kind ribbon), slightly bigger, with a gentle offset bob. What each door pays is still in its hover text.
 ## 1.42.56 (Nov 4, 2026)

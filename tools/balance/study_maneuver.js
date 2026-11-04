@@ -365,7 +365,7 @@ let res = await page.evaluate((cfg)=>{
       if(!cfg.noFuse && fuse()) return null;
       if(!cfg.noRest && !S.campChoice && !S.campFireOut && !isBaseCamp()){ campRest(); return null; }
       campLeave(); return null; }
-    if(S.screen==='fork'){ const pol=cfg.fork||'elite'; pickForkDoor(pol==='standard'?0:pol==='random'?(Math.random()<.5?0:1):1); return null; } // Nov 4 forks: cfg.fork = 'elite' (default, as before forks) | 'standard' | 'random'
+    if(S.forkChoice){ const pol=cfg.fork||'elite'; pickForkDoor(pol==='standard'?0:pol==='random'?(Math.random()<.5?0:1):1); return null; } // Nov 4 forks: cfg.fork = 'elite' (default, as before forks) | 'standard' | 'random'
     if(S.screen==='shrine'){ applyShrineBoon(S.encounter); return null; }
     if(S.screen==='game'){ log.turns++; doTurn(); return null; }
     return null;

@@ -105,7 +105,7 @@ const SHOTS = process.env.SHOTS || ''; // set SHOTS=<dir> to save screenshots
   // ---- camp: Train lock, nudge, confirms, Break Camp confirm
   const camp = await page.evaluate(() => {
     const res = {};
-    S.screen = 'camp'; S.floorIdx = 0; S.routeStep = 2; S.campChoice = null; S.campRested = false; S.campFireOut = false; S.campUpgrades = {}; S.health = Math.max(1, S.maxHealth - 5);
+    S.screen = 'camp'; S.floorIdx = 0; S.routeStep = 4; S.campChoice = null; /* a real camp slot: slot 3 is a fork since Nov 4 */ S.campRested = false; S.campFireOut = false; S.campUpgrades = {}; S.health = Math.max(1, S.maxHealth - 5);
     // give 3 Attack I in the pocket so a combine is possible
     S.backPocket = [clone(basic('attack', 1)), clone(basic('attack', 1)), clone(basic('attack', 1)), clone(basic('maneuver', 1))];
     render();
@@ -144,7 +144,7 @@ const SHOTS = process.env.SHOTS || ''; // set SHOTS=<dir> to save screenshots
   const leave2 = await page.evaluate(() => ({ modal: !!document.querySelector('.modal-overlay'), screen: S.screen }));
   ok(!leave2.modal && leave2.screen !== 'camp', `Break Camp after using fire leaves without confirm (${JSON.stringify(leave2)})`);
   // Rest confirm
-  await page.evaluate(() => { S.screen = 'camp'; S.floorIdx = 0; S.routeStep = 2; S.campChoice = null; S.campRested = false; S.campFireOut = false; S.campUpgrades = {}; S.health = Math.max(1, S.maxHealth - 5); render(); });
+  await page.evaluate(() => { S.screen = 'camp'; S.floorIdx = 0; S.routeStep = 4; S.campChoice = null; /* a real camp slot: slot 3 is a fork since Nov 4 */ S.campRested = false; S.campFireOut = false; S.campUpgrades = {}; S.health = Math.max(1, S.maxHealth - 5); render(); });
   await clean(); await page.click('#rest-btn'); await page.waitForTimeout(150);
   const r1 = await page.evaluate(() => { const m = document.querySelector('.modal-overlay h2'); return m && m.textContent; });
   await page.evaluate(() => document.getElementById('cf-confirm-go').click()); await page.waitForTimeout(500);

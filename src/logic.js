@@ -821,7 +821,7 @@ function loadGame(){
 // survive being written to JSON (see serializeState).
 function maybeAutosave(){
   if(!S || S.transitioning || S.lootChoice || S.shrineChoice || S.relicChoice || S.pendingLootDie) return;
-  if(S.screen!=='game' && S.screen!=='camp' && S.screen!=='shrine' && S.screen!=='fork') return;
+  if(S.screen!=='game' && S.screen!=='camp' && S.screen!=='shrine') return;
   saveGame();
 }
 
@@ -1230,7 +1230,9 @@ function advanceRoute(){
     // a fork: show two doors first; picking one comes back here with S.forkPick set
     if(!S.forkPick && forkHere()){
       if(!S.forkChoice || S.forkChoice.step!==S.routeStep) S.forkChoice = buildForkChoice();
-      S.encounter = null; S.screen = 'fork'; S.newRoomFx = null; // a fork never shows the old room's door
+      // Nov 4 (Jeremy): the two doors float over the room you just finished (like the loot chest), so the screen and the
+      // finished encounter stay as they are underneath; render() draws the doors on top while S.forkChoice is set.
+      S.newRoomFx = null;
       teleLog('fork', {step:S.routeStep, doors:S.forkChoice.doors.map(d=>d.kind)});
       return;
     }
