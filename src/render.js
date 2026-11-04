@@ -1444,8 +1444,11 @@ function renderRoute(){
     const fork = step==='enc' && i>=S.routeStep && typeof FORK_SLOTS!=='undefined' && FORK_SLOTS.includes(i) && !(i===S.routeStep && !S.forkChoice) && !(S.guide && S.guide.stage && S.guide.stage!=='done') && !(typeof depthRank==='function' && depthRank('gauntlet')>=2);
     if(fork){
       const kinds = (i===S.routeStep && S.forkChoice) ? S.forkChoice.doors.map(d=>d.kind) : ['?','Elite'];
-      const kc = k=> k==='Elite'||k==='Deadly'||k==='Elite Trap' ? 'el' : k==='Shrine' ? 'sh' : k==='Trap' ? 'tr' : '';
-      html += `<div class="node rt-door rt-room rt-fork ${floorCls} ${cls} route-tooltip-target" title="A fork: choose one of two doors${statusSuffix}"><span class="rt-pair">${kinds.map(k=>`<i class="${kc(k)}">${k}</i>`).join('')}</span></div>`;
+      // Nov 4 (Jeremy): two narrow copies of the tracker's own arched doorway, side by side; the kind shows as the
+      // doorway's border colour plus a glyph ("!" = Elite or Deadly), not as a text label
+      const kc = k=> k==='Elite'||k==='Elite Trap' ? 'el' : k==='Deadly' ? 'dl' : k==='Shrine' ? 'sh' : k==='Trap' ? 'tr' : '';
+      const kg = k=> k==='Elite'||k==='Elite Trap' ? '!' : k==='Deadly' ? '!!' : '?';
+      html += `<div class="node rt-door rt-room rt-fork ${floorCls} ${cls} route-tooltip-target" title="A fork: choose one of two doors (${kinds.map(k=>k==='?'?'unknown':k).join(' or ')})${statusSuffix}"><span class="rt-pair">${kinds.map(k=>`<i class="rt-arch rt-mini ${kc(k)}"><span class="rt-q">${kg(k)}</span></i>`).join('')}</span></div>`;
       return;
     }
     html += `<div class="node rt-door rt-${step==='camp'?'camp':(step==='boss'?'boss':'room')} ${floorCls} ${cls} route-tooltip-target" title="${tip}"><i class="rt-arch">${icon}</i></div>`;

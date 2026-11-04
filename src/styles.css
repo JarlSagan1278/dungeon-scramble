@@ -3755,3 +3755,13 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .fo-quests-label .q-lbl{ display:inline-grid; }
 .fo-quests-label .q-lbl > span{ grid-area:1/1; }
 .fo-quests-label .q-lbl > .q-off{ visibility:hidden; }
+/* Nov 4 (Jeremy): fork markers in the room tracker are two narrow copies of the tracker's arched doorway */
+.rt-pair{ flex-direction:row !important; gap:3px !important; width:100%; max-width:46px; height:40px !important; }
+.rt-pair .rt-arch.rt-mini{ flex:1 1 0; min-width:0; width:auto; height:40px; border-radius:12px 12px 2px 2px; font:800 15px/1 Georgia,serif; letter-spacing:-1px; filter:url(#fx-paper);
+  background:linear-gradient(#1a120c,#0c0705); border:2px solid #5a4630; border-bottom-width:3px; color:#7a6347; }
+.rt-pair .rt-arch.rt-mini.el{ border-color:#8a5fd0; color:#c9a8ff; }
+.rt-pair .rt-arch.rt-mini.dl{ border-color:#a83a24; color:#ff9a80; }
+.rt-pair .rt-arch.rt-mini.sh{ border-color:#2f8a86; color:#a9e9e4; }
+.rt-pair .rt-arch.rt-mini.tr{ border-color:#5e8048; color:#cfe6a8; }
+.rt-door.current .rt-pair .rt-arch.rt-mini{ background:radial-gradient(ellipse at 50% 85%, #7a3a10, #1a0e07 75%); box-shadow:0 0 8px rgba(255,150,50,.5), inset 0 0 6px rgba(255,150,50,.3); }
+.rt-door.current .rt-pair .rt-arch.rt-mini:not(.el):not(.dl):not(.sh):not(.tr){ border-color:#e8a33d; }
