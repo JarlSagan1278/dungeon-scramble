@@ -22,6 +22,7 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
         go: cls(q('#resolve-btn')),
         lock: cls(q('.chest-lock')),
         ebar: strip(q('#enc-panel .fo-enemy .fo-hpwrap') && q('#enc-panel .fo-enemy .fo-hpwrap').outerHTML),
+        sign: strip(q('#enc-panel .fo-quests-float') && q('#enc-panel .fo-quests-float').outerHTML), // live quest count (Nov 4)
       });
     };
     META.lifetime.victories = 1;

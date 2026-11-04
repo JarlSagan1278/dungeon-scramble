@@ -1838,38 +1838,52 @@ function parseQuestSpec(q){
   return {rewardText, cond: cond.toLowerCase()};
 }
 
+// Nov 4 (quest salience): one rule table for both the end-of-turn check and the sign's live "2/3" count while a path
+// is being built. questEval returns {done, have, need}; have/need are null when there is nothing to count this turn.
+function questEval(cond, ctx){
+  let m; const n = x=>parseInt(x);
+  const count = (have, need)=>({done: have >= need, have, need});
+  // Survive (Oct 17, Jeremy): "survive (to) turn N" is done on the round the bubble shows as Rd N; "survive N" means
+  // N enemy turns survived, so it's done on Rd N+1. The paper prints both as "Reach Rd X".
+  if((m=cond.match(/survive (?:to )?turn (\d+)/))) return {done: ctx.turnNumber >= n(m[1]) - 1, have:null, need:null};
+  if((m=cond.match(/survive (\d+)/))) return {done: ctx.turnNumber >= n(m[1]), have:null, need:null};
+  if((m=cond.match(/gain (\d+)\s*hot\b/))) return count(ctx.hotGained||0, n(m[1]));   // amounts (Oct 17), not dice
+  if((m=cond.match(/deal (\d+)\s*dot\b/))) return count(ctx.dotDealt||0, n(m[1]));
+  if((m=cond.match(/(\d+)\+?\s*damage/))) return count(Math.floor(ctx.totalDamageThisRound||0), n(m[1]));
+  if((m=cond.match(/any (\d+)(?:\s*or fewer)? actions/))) return cond.includes('or fewer') ? {done: ctx.totalActions>0 && ctx.totalActions<=n(m[1]), have:null, need:null} : count(ctx.totalActions, n(m[1]));
+  if((m=cond.match(/(\d+)\s*blanks/))) return count(ctx.blankCount, n(m[1]));
+  if((m=cond.match(/(\d+)\s*maneuvers/))) return count(ctx.maneuverCount, n(m[1]));
+  if((m=cond.match(/(\d+)\s*dodge/))) return count(ctx.dodgeCount, n(m[1]));
+  if((m=cond.match(/(\d+)\s*leap/))) return count(ctx.leapCount, n(m[1]));
+  if((m=cond.match(/(\d+)\s*pivot/))) return count(ctx.pivotCount, n(m[1]));
+  if((m=cond.match(/(\d+)\s*heal/))) return count(ctx.healCount, n(m[1]));
+  if((m=cond.match(/accumulate (\d+) block/))) return {done: (S.playerBlock||0) >= n(m[1]), have:null, need:null};
+  if((m=cond.match(/(\d+)\s*block/))) return count(ctx.blockCount, n(m[1]));
+  if((m=cond.match(/(\d+)\s*combos?/))) return count(ctx.comboCount, n(m[1]));
+  if((m=cond.match(/(\d+)\s*hot\b/))) return count(ctx.hotCount||0, n(m[1]));
+  if((m=cond.match(/(\d+)\s*dot\b/))) return count(ctx.dotCount||0, n(m[1]));
+  if((m=cond.match(/(\d+)\s*boost/))) return count(ctx.boostCount, n(m[1]));
+  if((m=cond.match(/(\d+)\s*support/))) return count(ctx.supportCount, n(m[1]));
+  if((m=cond.match(/(\d+)\s*nullify/))) return count(ctx.nullifyCount, n(m[1]));
+  if(cond.includes('nullify')) return count(ctx.nullifyCount, 1);
+  return {done:false, have:null, need:null};
+}
+function questCtxFromEffects(effects){
+  return {
+    maneuverCount: effects.maneuverCount, totalActions: effects.totalActions, blankCount: effects.blankCount,
+    turnNumber:S.turnNumber, totalDamageThisRound: effects.totalDamage, hitCount:effects.hitCount,
+    comboCount:effects.comboCount, healCount:effects.healCount, blockCount:effects.blockCount,
+    boostCount:effects.boostCount, dodgeCount:effects.dodgeCount, leapCount:effects.leapCount,
+    pivotCount:effects.pivotCount, nullifyCount:effects.nullifyCount, supportCount:effects.supportCount,
+    hotCount:effects.hotCount, dotCount:effects.dotCount, hotGained:effects.hotToPlayer, dotDealt:effects.dotToEncounter
+  };
+}
 function checkQuests(e, ctx){
   (e.quests||[]).forEach((q,i)=>{
     if(e.questsDone[i]) return;
     const {rewardText, cond} = parseQuestSpec(q);
-    let done = false;
-    let m;
-    // v1.39.0 quest audit: every phrasing the quest card shows now has a check
-    // ("20+ damage", "8 damage/turn", "survive turn 4", combos, hot, dot,
-    // "accumulate N block", "2 nullify"). See 2026-10-12 study, docs/STUDY_FINDINGS.md.
-    // Survive (Oct 17, Jeremy): "survive (to) turn N" is done on the round the bubble shows as Rd N; "survive N" means
-    // N enemy turns survived, so it's done on Rd N+1. The paper prints both as "Reach Rd X".
-    if((m=cond.match(/survive (?:to )?turn (\d+)/))) done = ctx.turnNumber >= parseInt(m[1]) - 1;
-    else if((m=cond.match(/survive (\d+)/))) done = ctx.turnNumber >= parseInt(m[1]);
-    else if((m=cond.match(/gain (\d+)\s*hot\b/))) done = (ctx.hotGained||0) >= parseInt(m[1]);   // amounts (Oct 17), not dice
-    else if((m=cond.match(/deal (\d+)\s*dot\b/))) done = (ctx.dotDealt||0) >= parseInt(m[1]);
-    else if((m=cond.match(/(\d+)\+?\s*damage/))) done = ctx.totalDamageThisRound >= parseInt(m[1]);
-    else if((m=cond.match(/any (\d+)(?:\s*or fewer)? actions/))) done = cond.includes('or fewer') ? (ctx.totalActions>0 && ctx.totalActions<=parseInt(m[1])) : ctx.totalActions>=parseInt(m[1]);
-    else if((m=cond.match(/(\d+)\s*blanks/))) done = ctx.blankCount >= parseInt(m[1]);
-    else if((m=cond.match(/(\d+)\s*maneuvers/))) done = ctx.maneuverCount >= parseInt(m[1]);
-    else if((m=cond.match(/(\d+)\s*dodge/))) done = ctx.dodgeCount >= parseInt(m[1]);
-    else if((m=cond.match(/(\d+)\s*leap/))) done = ctx.leapCount >= parseInt(m[1]);
-    else if((m=cond.match(/(\d+)\s*pivot/))) done = ctx.pivotCount >= parseInt(m[1]);
-    else if((m=cond.match(/(\d+)\s*heal/))) done = ctx.healCount >= parseInt(m[1]);
-    else if((m=cond.match(/accumulate (\d+) block/))) done = (S.playerBlock||0) >= parseInt(m[1]);
-    else if((m=cond.match(/(\d+)\s*block/))) done = ctx.blockCount >= parseInt(m[1]);
-    else if((m=cond.match(/(\d+)\s*combos?/))) done = ctx.comboCount >= parseInt(m[1]);
-    else if((m=cond.match(/(\d+)\s*hot\b/))) done = (ctx.hotCount||0) >= parseInt(m[1]);
-    else if((m=cond.match(/(\d+)\s*dot\b/))) done = (ctx.dotCount||0) >= parseInt(m[1]);
-    else if((m=cond.match(/(\d+)\s*boost/))) done = ctx.boostCount >= parseInt(m[1]);
-    else if((m=cond.match(/(\d+)\s*support/))) done = ctx.supportCount >= parseInt(m[1]);
-    else if((m=cond.match(/(\d+)\s*nullify/))) done = ctx.nullifyCount >= parseInt(m[1]);
-    else if(cond.includes('nullify')) done = ctx.nullifyCount>=1;
+    // v1.39.0 quest audit: every phrasing the quest card shows has a check (see questEval)
+    const done = questEval(cond, ctx).done;
     if(done){
       e.questsDone[i] = true;
       applyQuestReward(e, rewardText);
@@ -2021,14 +2035,7 @@ function runPlayerPathSteps(steps, i, path, effects){
 function finishPlayerPath(path, effects){
   const e = S.encounter;
   if(effects.totalDamage>0) logMsg('dmg', `Path dealt ${effects.totalDamage.toFixed(1)} damage.`);
-  checkQuests(e, {
-    maneuverCount: effects.maneuverCount, totalActions: effects.totalActions, blankCount: effects.blankCount,
-    turnNumber:S.turnNumber, totalDamageThisRound: effects.totalDamage, hitCount:effects.hitCount,
-    comboCount:effects.comboCount, healCount:effects.healCount, blockCount:effects.blockCount,
-    boostCount:effects.boostCount, dodgeCount:effects.dodgeCount, leapCount:effects.leapCount,
-    pivotCount:effects.pivotCount, nullifyCount:effects.nullifyCount, supportCount:effects.supportCount,
-    hotCount:effects.hotCount, dotCount:effects.dotCount, hotGained:effects.hotToPlayer, dotDealt:effects.dotToEncounter
-  });
+  checkQuests(e, questCtxFromEffects(effects));
   { const tt = Math.round(S.resolveTotal||0);
     if(tt > (S.stats.bestTurn||0)){ S.stats.bestTurn = tt; S.stats.bestTurnFoe = e.name; } }
   if(hasRelic('bloodletter')){ const n = Math.floor((S.resolveTotal||0)/6); if(n>0){ healPlayer(n); fireRelic('bloodletter','+'+n+' HP'); } }

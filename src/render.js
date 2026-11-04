@@ -1669,8 +1669,7 @@ function renderEncounterCard(e, mode){
     const tierWord = (e.tier==='elite'||e.tier==='deadly') ? (e.tier==='elite'?'Elite':'Deadly') : '';
     const typeWord = isBoss ? (e.type + '') : [tierWord, e.type!=='Enemy'?e.type:''].filter(Boolean).join(' ');
     const typeTag = typeWord ? `<small class="fo-type${isBoss?' fo-type-inline':''}${e.tier==='deadly'?' fo-type-deadly':''}">${typeWord}</small>` : '';
-    const questLine = (e.quests && e.quests.length)
-      ? `<div class="fo-quests-float"${questPaperStyle(e)} title="Complete these during the fight for bonus rewards"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i>${e.quests.some(q=>!QUEST_ALL_FIGHT.test(parseQuestSpec(q).cond)) ? '<div class="fo-quests-label">In one turn</div>' : '<div class="fo-quests-label">Quests</div>'}<div class="fo-quests">${e.quests.map((q,i)=>{ const qs=questStampAttrs(e.name,i); return `<span class="fo-quest ${e.questsDone[i]?'complete':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, e.questsDone[i])}</span>`; }).join('')}</div></div>` : '';
+    const questLine = questSignHTML(e);
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
     const sz = encounterSize(e);
     const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz};--drop:${encounterDrop(e)}%"/>`
@@ -2155,6 +2154,9 @@ function refreshPathBits(){
   const old = document.querySelector('#enc-panel .fo-enemy .fo-hpwrap');
   if(old){ const t = document.createElement('div'); t.innerHTML = renderEncounterCard(S.encounter,'faceoff');
     const nw = t.querySelector('.fo-enemy .fo-hpwrap'); if(nw) old.replaceWith(nw); }
+  // the quest sign's live count (Nov 4)
+  const sign = document.querySelector('#enc-panel .fo-quests-float');
+  if(sign){ const t = document.createElement('div'); t.innerHTML = questSignHTML(S.encounter); if(t.firstElementChild) sign.replaceWith(t.firstElementChild); }
   syncLethalWarning();
   updatePathTrail();
   rollPathCounter();
@@ -4690,11 +4692,32 @@ function questRewardHTML(rewardText){
   const num = (type==='nullify' || type==='freeze') ? '' : n; // a Freeze is always one skipped turn
   return `<span class="q-reward q-reward-${type}" title="Reward: ${rewardText}">${iconSpan(type)}${num?`<b>${num}</b>`:''}</span>`;
 }
-function questRowHTML(q, done){
+// The quest sign (Nov 4, Jeremy: quests were hard to read for new players). A "Bonus" badge says it's optional; while a
+// path is being built, each one-turn quest shows its live count ("2/3 Maneuvers"), and when this path would complete
+// one, its row lights gold and the heading reads "This path!". Redrawn on every path tap by refreshPathBits().
+function questSignHTML(e){
+  if(!e || !e.quests || !e.quests.length) return '';
+  let ctx = null;
+  if(S.path && S.path.length && !S.transitioning){ try{ ctx = questCtxFromEffects(computePathEffects(S.path)); }catch(err){ ctx = null; } }
+  const oneTurn = e.quests.some(q=>!QUEST_ALL_FIGHT.test(parseQuestSpec(q).cond));
+  let anyLive = false;
+  const rows = e.quests.map((q,i)=>{
+    const qs = questStampAttrs(e.name,i), done = e.questsDone[i];
+    let live = null;
+    if(ctx && !done){ const cond = parseQuestSpec(q).cond; if(!QUEST_ALL_FIGHT.test(cond)){ live = questEval(cond, ctx); if(live.done) anyLive = true; } }
+    return `<span class="fo-quest ${done?'complete':''} ${live&&live.done?'q-live-done':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, done, live)}</span>`;
+  }).join('');
+  const label = anyLive ? '<span class="q-yes">&#10003; This path!</span>' : (oneTurn ? 'In one turn' : 'This fight');
+  return `<div class="fo-quests-float${anyLive?' q-glow':''}"${questPaperStyle(e)} title="Bonus quests: optional, each pays the reward on its right"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label"><b class="q-bonus-b">Bonus</b><br>${label}</div><div class="fo-quests">${rows}</div></div>`;
+}
+function questRowHTML(q, done, live){
   const {rewardText, cond} = parseQuestSpec(q);
   // Geometry mirrors pay D.O.T. on it (Profane) or H.O.T. for you (Sacred), not damage (Oct 17 audit).
   const rt = /adventurer h\.?o\.?t\.? = d\.?o\.?t/.test(cond) ? (rewardText||'').replace(/damage/i,'dot') : /encounter d\.?o\.?t\.? = h\.?o\.?t/.test(cond) ? (rewardText||'').replace(/damage/i,'hot') : rewardText;
-  return `<span class="q-cond">${questCondShort(cond)}</span><span class="q-arrow">→</span>${questRewardHTML(rt)}`;
+  let short = questCondShort(cond);
+  // live count while building a path: the target number becomes "have/need" (only the first number, e.g. "2/3 Maneuvers")
+  if(live && live.have!=null && live.need!=null){ const h = Math.min(live.have, live.need); short = short.replace(String(live.need), `<b class="q-count${live.done?' q-full':''}">${h}/${live.need}</b>`).replace(/(\/\d+<\/b>)\+/, '$1'); }
+  return `<span class="q-cond">${short}</span><span class="q-arrow">→</span>${questRewardHTML(rt)}`;
 }
 // Oct 31 (Jeremy): in headings and paragraphs the note sits behind a small toy "?" coin (same family as the Train rows'
 // "?" buttons); in a short inline label (a <span>) the label itself is underlined and tappable instead.
@@ -5649,12 +5672,18 @@ const TIP_TEXT = {
   heavy: ()=>'A <b>heavy turn</b> is coming: this monster hits harder next turn. Block faces in this Path will soak it.',
   minion: ()=>'<b>Minion</b> dice clog your Tray. Every point of damage you deal clears one, and a Leap clears any it jumps over.',
   overkill: n=>`This Path wins the fight. Deal ${n} more for an <b>Overkill</b>: an extra loot choice.`,
+  // Nov 4 (Jeremy): quests were hard to understand. Name this fight's own quest and reward so the lesson is concrete.
+  quest: q=>{ const {rewardText, cond} = parseQuestSpec(q); const allFight = QUEST_ALL_FIGHT.test(cond);
+    const rw = rewardText ? ` (here: <b>${rewardText.toLowerCase()}</b>)` : '';
+    return `<b>Bonus quest!</b> Do what the sign says ${allFight ? 'during this fight' : 'in a single turn'} (${questCondShort(cond)}) to earn the reward on its right${rw}. It's optional.`; },
 };
 let _tip = null; // {k, pathLen, at, targetSel}
 function tipTargets(){
   const e = S.encounter, tray = document.getElementById('tray'); if(!tray || !e) return null;
   const at = i=> `#tray .die[data-idx="${i}"]`;
   if(!S.path.length){
+    if(!TIPS_SEEN.has('quest') && e.quests && e.quests.length && !e.questsDone.some(Boolean) && document.querySelector('#enc-panel .fo-quests-float')){
+      const qi = e.quests.findIndex(q=>!QUEST_ALL_FIGHT.test(parseQuestSpec(q).cond)); return {k:'quest', el:'#enc-panel .fo-quests-float', arg:e.quests[qi>=0?qi:0]}; }
     if(!TIPS_SEEN.has('minion')){ const i = S.tray.findIndex(c=>c.minion); if(i>=0) return {k:'minion', el:at(i), arg:null}; }
     if(!TIPS_SEEN.has('heavy')){ try{ if(enemyNextTurnPreview(e).heavy){ if(document.querySelector('#enc-panel .fo-enemy .fo-chips:not(.fo-buffs)')) return {k:'heavy', el:'#enc-panel .fo-enemy .fo-chips:not(.fo-buffs)', arg:null}; } }catch(err){} }
     if(!TIPS_SEEN.has('combo')){ for(let i=0;i<16;i++){ const c=S.tray[i]; if(c.minion||c.blank) continue; const f=currentFace(c); if(f.type==='combo'){ const n=attackNeighborsCount(i); if(n>=2) return {k:'combo', el:at(i), arg:n}; } } }
@@ -5689,6 +5718,9 @@ function updateTips(){
   b.style.width=bw+'px';
   const inTray = q.top >= tr.top-2;
   if(inTray){ b.style.left=Math.round(tr.left)+'px'; b.style.top=Math.round(tr.top-b.offsetHeight-12)+'px'; b.classList.remove('no-arrow'); b.style.setProperty('--arrow-x', Math.max(14, Math.min(bw-14, q.left+q.width/2-tr.left))+'px'); }
+  else if(_tip.k==='quest'){ // the quest sign hangs near the top of the room: the bubble sits just under it, the ring says where
+    const left = Math.max(8, Math.min(innerWidth-bw-8, q.left+q.width/2-bw/2));
+    b.style.left=Math.round(left)+'px'; b.style.top=Math.round(q.bottom+12)+'px'; b.classList.add('no-arrow'); }
   else { // a chip or HP bar up in the room: the bubble sits above it, pointing down at it (it may cover the art for a moment, never the dice)
     const left = Math.max(8, Math.min(innerWidth-bw-8, q.left+q.width/2-bw/2));
     b.style.left=Math.round(left)+'px'; b.style.top=Math.round(Math.max(4, q.top-b.offsetHeight-12))+'px'; b.classList.remove('no-arrow');

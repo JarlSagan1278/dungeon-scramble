@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.53 (Nov 4, 2026)
+- Quests easier to understand: the sign now carries a red "Bonus" badge and shows each reward as a red "+N" chip; while you build a path it counts live ("2/3 Maneuvers"), and when the path would complete a quest the row lights gold and the heading reads "This path!". The first fight with a quest shows a one-time tip naming that quest and its reward. Quest rules now live in one function (questEval) used by both the live count and the end-of-turn check.
 ## 1.42.52 (Nov 4, 2026)
 - Swap and Reroll faces in the tray now wiggle every couple of seconds until you start your path, so they read as "use me first".
 - Enemy ability notes: a boss's plain attack is named ("Hit 5", not just "5"), long move names stay on one line at a smaller size, a little more space before the number and between the header and the rule, and "damage-over-time" no longer breaks across lines.
