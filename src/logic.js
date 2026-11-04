@@ -1230,7 +1230,7 @@ function advanceRoute(){
     // a fork: show two doors first; picking one comes back here with S.forkPick set
     if(!S.forkPick && forkHere()){
       if(!S.forkChoice || S.forkChoice.step!==S.routeStep) S.forkChoice = buildForkChoice();
-      S.encounter = null; S.screen = 'fork';
+      S.encounter = null; S.screen = 'fork'; S.newRoomFx = null; // a fork never shows the old room's door
       teleLog('fork', {step:S.routeStep, doors:S.forkChoice.doors.map(d=>d.kind)});
       return;
     }
@@ -2700,7 +2700,10 @@ function onEncounterDefeated(){
   if(hasRelic('iron_rations')){ S.health = cap(S.health+2, S.maxHealth); logMsg('heal', relicById('iron_rations').name+': healed 2.', 'good'); fireRelic('iron_rations','+2 HP'); }
   // Oct 31 (Jeremy): the final boss needs no loot -- its chest opens straight onto the victory screen (openFinalChest)
   const isFinal = e.type==='Big Boss' && S.floorIdx===FLOORS.length-1;
-  const options = isFinal ? [] : pickLootNUnused(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
+  let options = isFinal ? [] : pickLootNUnused(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
+  // Nov 4 (Jeremy): the Elite door's extra choice comes from the next floor's better loot (on the last floor it stays Magic).
+  const deeper = !isFinal && e.forkBonus && FLOORS[S.floorIdx+1] && FLOORS[S.floorIdx+1].lootPool.length;
+  if(deeper){ const d = pickLootNUnused(FLOORS[S.floorIdx+1].lootPool, 1)[0]; if(d){ options = options.slice(0, Math.max(1, options.length-1)).concat([d]); } }
   S.lootChoice = { options, lootName: floor.lootName, overkill, nearMiss, final: isFinal };
   teleLog('room_win', {name:e.name, type:e.type, turns:S.turnNumber+1, ms:(S._roomStartedAt!=null)?Math.max(0,teleActiveMs()-S._roomStartedAt):null, overkill, overBy:Math.max(0,Math.round(-e.curHealth)), nearMiss, offered:options.length, hp:S.health});
   if(!isFinal) teleLog('loot_offer', {tier:(options[0]&&options[0].cat)||null, overkill, offered:options.map(o=>o.name)});

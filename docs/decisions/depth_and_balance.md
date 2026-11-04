@@ -19,3 +19,4 @@ The depth system and its modifiers, dice finishes, and the balance philosophy be
 - **Assist mode that grows after losses:** not for now.
 - **Zeal rank 1 (Jeremy, Oct 22): the code is right** — rank 1 adds +1 to every enemy hit (rank 2 adds +1 more on heavy turns and boss specials). The Oct 12 note saying "heavy turns and specials only" for rank 1 is superseded.
 - **Nov 4, 2026 (forks, Jeremy):** forks in the road = two doors. Start with 2 forks per floor (the two Elite slots). Doors show the room type only (Standard / Elite / Deadly / Shrine), not the monster. The harder door pays an extra loot choice (Elite: pick 1 of 3 loot dice instead of 1 of 2).
+- **Nov 4, 2026 (Jeremy):** the Elite door's extra loot choice comes from the next floor's better loot (Alloy floor -> one Gilded die, Gilded floor -> one Magic die; on the Magic floor it stays Magic). Bots showed one more same-tier choice did not pay for the Elite fight (Standard door 40% wins vs Elite 20%).

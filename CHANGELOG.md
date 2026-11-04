@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.56 (Nov 4, 2026)
+- The Elite door's reward is richer: its third loot choice now comes from the next floor's better loot (a Gilded die on Floor 1, a Magic die on Floor 2; on Floor 3 it stays Magic). The door says so ("one from the Gilded floor") and the loot card wears its own tier colour with a "Deeper loot" tag. A fork no longer shows a leftover door from the room before.
 ## 1.42.55 (Nov 4, 2026)
 - Forks in the road. At the two Elite rooms of each floor you now choose between two doors, seeing only the room type: the Elite (or Deadly, or Elite Trap) door, or a Standard-slot door (a Standard monster, a Shrine or a Trap). The harder door pays one more loot choice (pick 1 of 3 instead of 1 of 2). The route bar shows forks ahead as two stacked mini doors; the fork screen reuses the room doors, with what each costs and pays. No forks during the guided first fight or at Night Shift II (where every room is Elite). A run saved at a fork resumes on the same two doors. New automated check (check.js: forks); the sim, bug hunt and balance bots know how to pick a door (balance bots: cfg.fork = elite | standard | random, default elite).
 ## 1.42.54 (Nov 4, 2026)

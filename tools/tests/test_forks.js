@@ -29,6 +29,10 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
             const want = i === 1 ? 3 : 2; S.encounter.curHealth = 0; onEncounterDefeated();
             const got = S.lootChoice ? S.lootChoice.options.length : -1;
             if (S.lootChoice && !S.lootChoice.final && got !== Math.min(want, FLOORS[S.floorIdx].lootPool.length)) bad.push(`loot ${got} for ${kinds[i]}`);
+            if (i === 1 && S.lootChoice && !S.lootChoice.final && FLOORS[S.floorIdx + 1]) {
+              const deep = S.lootChoice.options.filter(op => FLOORS[S.floorIdx + 1].lootPool.some(d => d.name === op.name)).length;
+              if (deep !== 1) bad.push(`${deep} deeper-floor dice behind the Elite door on floor ${S.floorIdx + 1}`);
+            }
             S.lootChoice = null; S.screen = 'game';
           }
           S.routeStep++; advanceRoute(); continue;
@@ -39,7 +43,7 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     }
     const slots = new Set(forks.map(f => f.f + ':' + f.step));
     ok(['0:3','0:6','1:3','1:6','2:3','2:6'].every(k => slots.has(k)), 'a fork at both Elite slots on all three floors (' + [...slots].sort().join(' ') + ')');
-    ok(!bad.length, 'left door is a Standard-slot room, right is Elite/Deadly, and loot is 2 vs 3 choices' + (bad.length ? ' -- ' + bad.slice(0, 4).join('; ') : ''));
+    ok(!bad.length, 'left door is a Standard-slot room, right is Elite/Deadly; loot is 2 vs 3 choices, one of the 3 from the next floor' + (bad.length ? ' -- ' + bad.slice(0, 4).join('; ') : ''));
     // save and resume while standing at a fork; a real tap on a door
     newGame('dwarf', 'armsmaster'); S.guide = null;
     for (let g = 0; g < 12 && S.screen !== 'fork'; g++) { if (S.screen === 'camp') campLeave(); else { if (S.screen !== 'fork' && S.routeStep > 0) S.routeStep++; advanceRoute(); } }

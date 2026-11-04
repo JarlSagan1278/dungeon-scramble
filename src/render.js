@@ -1372,11 +1372,11 @@ function fitSetup(opts){
 // side, each showing only its room type and what it pays. Tapping one swings it open and enters that room.
 const FORK_DOOR_TEXT = {
   Standard:'A regular monster.<br>Pick 1 of 2 loot dice.',
-  Elite:'Hits harder, with heavy turns.<br>Pick 1 of <b>3</b> loot dice.',
-  Deadly:'The most dangerous kind.<br>Pick 1 of <b>3</b> loot dice.',
+  Elite:'Hits harder, with heavy turns.<br>Pick 1 of <b>3</b> loot dice%DEEP%.',
+  Deadly:'The most dangerous kind.<br>Pick 1 of <b>3</b> loot dice%DEEP%.',
   Shrine:'No fight.<br>A boon, sometimes with a price.',
   Trap:'A trap to get through.<br>Pick 1 of 2 loot dice.',
-  'Elite Trap':'A hard trap to get through.<br>Pick 1 of <b>3</b> loot dice.',
+  'Elite Trap':'A hard trap to get through.<br>Pick 1 of <b>3</b> loot dice%DEEP%.',
 };
 function forkDoorHTML(d, i){
   const kindCls = ({Elite:'k-elite', Deadly:'k-deadly', Trap:'k-trap', 'Elite Trap':'k-trap', Shrine:'k-shrine'})[d.kind] || 'k-enemy';
@@ -1385,11 +1385,12 @@ function forkDoorHTML(d, i){
       <div class="rc-arch"><div class="rc-leaf"><i class="rc-band b1"></i><i class="rc-band b2"></i><svg class="rc-ring" viewBox="0 0 30 46" aria-hidden="true"><rect x="7" y="2" width="16" height="42" rx="5" fill="#5a646d" stroke="#120b07" stroke-width="2.5"/><circle cx="15" cy="7" r="1.4" fill="#120b07"/><circle cx="15" cy="39" r="1.4" fill="#120b07"/><circle cx="15" cy="17" r="8.5" fill="#d6b25a" stroke="#120b07" stroke-width="2.5"/><circle cx="12.5" cy="14.5" r="2.6" fill="#fff1b8"/><path d="M15 26.5a2.6 2.6 0 0 1 1.3 4.9l1 4.6h-4.6l1-4.6a2.6 2.6 0 0 1 1.3-4.9z" fill="#120b07"/></svg></div></div>
       <div class="rc-sign"><div class="rc-plaque"><span>?</span></div><div class="rc-kind">${d.kind}</div></div>
     </div>
-    <span class="fork-note">${FORK_DOOR_TEXT[d.kind]||''}</span>
+    <span class="fork-note">${(FORK_DOOR_TEXT[d.kind]||'').replace('%DEEP%', FLOORS[S.floorIdx+1] ? `, one from the <b>${FLOORS[S.floorIdx+1].lootName}</b> floor` : '')}</span>
   </div>`;
 }
 function renderFork(){
   const fc = S.forkChoice; if(!fc){ S.screen='game'; return render(); }
+  document.querySelectorAll('#room-callout, #room-callout-scrim').forEach(n=>n.remove());
   app.innerHTML = `<div class="wrap fork-screen">${renderRoute()}
     <div class="panel fork-hall">
       <h2 class="fork-title">Which door?</h2>
@@ -3984,8 +3985,11 @@ function renderLootModal(){
     options.forEach((opt,i)=>{
       const art = LOOT_ART[opt.name];
       const isNew = (S.lootChoice.fresh||[]).includes(opt.name);
-      const card = el(`<div class="loot-opt loot-opt-reveal" style="--loot-tier-color:${accent.color}; --loot-tier-glow:${accent.glow}; animation-delay:${(i*0.1).toFixed(2)}s;">
-          ${isNew?'<span class="new-tag new-tag-card">NEW!</span>':''}
+      // Nov 4: a die from a deeper floor (the Elite door's extra choice) keeps its own tier colour and says where it came from
+      const deep = !fin && opt.cat && opt.cat!==tier && LOOT_TIER_ACCENT[opt.cat];
+      const acc = deep ? LOOT_TIER_ACCENT[opt.cat] : accent;
+      const card = el(`<div class="loot-opt loot-opt-reveal${deep?' loot-opt-deeper':''}" style="--loot-tier-color:${acc.color}; --loot-tier-glow:${acc.glow}; animation-delay:${(i*0.1).toFixed(2)}s;">
+          ${isNew?'<span class="new-tag new-tag-card">NEW!</span>':''}${deep?`<span class="deeper-tag">Deeper loot</span>`:''}
           <div class="loot-opt-streaks">${lootStreaksHTML(0.5+i*0.12)}</div>
           ${lootPreviewTileHTML(opt, `loot-${i}`, art)}
           <div class="faces-tiles">${opt.faces.map(f=>f.type==='blank'

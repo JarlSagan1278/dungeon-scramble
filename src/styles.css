@@ -3722,3 +3722,6 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .fork-door.passed{ opacity:.45; transition:opacity .2s ease; }
 .fork-foot{ margin:12px 0 0; font-size:13px; color:#c9b48e; }
 .reduced-motion .fork-door.opening .rc-leaf{ transition:none; }
+/* Nov 4: the Elite door's deeper-floor loot die */
+.loot-opt-deeper{ position:relative; }
+.deeper-tag{ position:absolute; left:50%; top:-11px; transform:translateX(-50%); z-index:3; white-space:nowrap; font:800 10px/1 var(--font-ui); letter-spacing:.08em; text-transform:uppercase; color:#241c10; background:var(--loot-tier-color, #ffd76a); border:2px solid var(--line); border-radius:999px; padding:3px 8px; box-shadow:0 2px 0 var(--line); }
