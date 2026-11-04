@@ -605,9 +605,11 @@ function bakedFloorCanvas(W, H){
     g.fillStyle = '#0a0604'; g.fillRect(0, 0, cv.width, cv.height);
     for(let py=0; py<cv.height; py++){
       const Y = (py+0.5)/dpr, y = Y*d/(co*d + Y*sn), sc = d/(d - y*sn);
-      g.setTransform(sc*dpr, 0, 0, 1, (cx - 0.9*W*sc)*dpr, py);
-      pat.setTransform(new DOMMatrix([k, 0, 0, k, 0, -y]));
-      g.fillStyle = pat; g.fillRect(0, 0, PW, 1);
+      // Nov 4: the texture's scale (k) and row offset (y) live in the context transform, not pattern.setTransform --
+      // some embedded browsers (the Claude artifact viewer on iPad) ignore a pattern's own transform, which drew every
+      // row from the texture's first line (vertical streaks). Same pixels: device = row * [k,0,0,k,0,-y] * texture.
+      g.setTransform(sc*dpr*k, 0, 0, k, (cx - 0.9*W*sc)*dpr, py - y);
+      g.fillStyle = pat; g.fillRect(0, y/k, PW/k, 1/k);
     }
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     let gr = g.createLinearGradient(0, 0, 0, H);

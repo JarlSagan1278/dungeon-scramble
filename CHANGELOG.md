@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.60 (Nov 4, 2026)
+- Room floor streaks in the Claude preview (iPad): the floor's perspective rows set the texture's scale and offset with the pattern's own transform, which that viewer ignores, so every row drew the texture's first line. The scale and offset now go in the canvas transform instead (same picture everywhere).
 ## 1.42.59 (Nov 4, 2026)
 - The room door no longer swings open after you tap it; it just fades away.
 - The Bonus quest poster keeps the same size all fight: the live count ("2/3") is the same size as the quest text, "This path!" takes the place of "In one turn" without resizing, and the sign stays at the height it had when the room started.
