@@ -81,7 +81,7 @@ Tips:
 | Board-game friends | | | |
 | r/WebGames | Oct 29 (link post + first comment) | | demo 1.42.2 live on itch; numbers due Oct 30 |
 | r/roguelites | | | |
-| r/playmygame | Oct 27, 8:00 (promo + cover gallery) | | |
+| r/playmygame | Oct 27, 8:00 (promo + cover gallery); Nov 4 redo (clip_turn video, demo 1.42.53 uploaded to itch first) | | |
 | itch forum (Release Announcements) | Oct 28 (tag: Browser) | | |
 | r/RoguelikeDev Sharing Saturday | Oct 31 (comment: doors, intent notes, lid stickers, perf; 16:9 still of the 26-damage path, GIFs were rejected) | | |
 | Discord | | | |

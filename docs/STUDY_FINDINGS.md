@@ -145,3 +145,13 @@ decorateArch / fitFoChips read positions; batching them would save ~1 ms unthrot
 ~170-210 ms, room change ~215-260 ms. Turn playback: median frame 16.7 ms, 95th percentile 50 ms, a few frames up to ~180-220 ms
 (the room/loot redraws). Memory: 40 auto turns across rooms, JS heap 25.2 -> 25.3 MB and page elements flat (no leak); no leftover
 effect elements after the run.
+
+## Speed check, build 1.42.53-54 (Nov 4, 2026)
+Itch demo, Chromium 395x769 at 2x. **Load** (4 Mbps, 150 ms latency, CPU x4): single 5.6 MB file 12.3 s to a usable title; split web
+build (1.07 MB page + art files on demand) 3.4 s, first fight art +0.1 s. Shipped: itch gets the split build. **Redraw** (CPU x6):
+~90-110 ms per full render(), of which ~45 ms is the one style+layout of the new 339-node tree and ~20 ms the innerHTML parse (in the
+single-file build ~100 KB of it is the three portraits' data URIs; the web build uses short art/ paths). Forced layouts per render
+6 -> 1 after batching reads before writes, but time is unchanged within noise: the remaining cost is the full rebuild itself and the
+117 KB stylesheet. A turn does ~7 full renders (3 path steps + enemy beats). Next lever if needed: a playback fast path like
+renderPathOnly for the per-die steps and enemy beats.
+

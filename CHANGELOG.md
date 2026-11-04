@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.54 (Nov 4, 2026)
+- Speed pass. The itch demo now ships as the split web build (page plus art files fetched as needed) instead of one 5.6 MB file: on a 4 Mbps connection with a phone-speed CPU the title screen shows in about 3.4 s instead of 12.3 s, and the first fight's art arrives ~0.1 s later. Each full redraw now measures everything before writing (fitFoChips, decorateArch, syncRoomFloor, the VS mark), so it lays the page out once instead of up to six times (redraw time itself is unchanged within noise, about 90 ms at 6x CPU).
 ## 1.42.53 (Nov 4, 2026)
 - Quests easier to understand: the sign now carries a red "Bonus" badge and shows each reward as a red "+N" chip; while you build a path it counts live ("2/3 Maneuvers"), and when the path would complete a quest the row lights gold and the heading reads "This path!". The first fight with a quest shows a one-time tip naming that quest and its reward. Quest rules now live in one function (questEval) used by both the live count and the end-of-turn check.
 ## 1.42.52 (Nov 4, 2026)

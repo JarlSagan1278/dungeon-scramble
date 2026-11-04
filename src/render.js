@@ -287,9 +287,13 @@ function render(){
   if(S.screen==='gameover'){ clearPathTrail(); renderGameOver(); maybeScreenTransition('gameover'); return; }
   if(S.screen==='camp'){ clearPathTrail(); renderCamp(); tuckCampCog(); maybeAutosave(); maybeScreenTransition('camp'); return; }
   if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); decorateArch(); maybeAutosave(); maybeScreenTransition('shrine'); return; }
-  renderGame();
-  decorateArch();
+  placeVs._inRender = true;
+  try{ renderGame(); } finally { placeVs._inRender = false; }
+  // Nov 4 (speed pass): measure everything first, write after -- the chips are fitted while the layout placeVs already
+  // forced is still clean, the arch decoration measures before it writes, and the VS mark's position is applied last.
   fitFoChips();
+  decorateArch();
+  flushVs();
   maybeAutosave();
   maybeScreenTransition('game');
 }
@@ -663,8 +667,7 @@ function syncRoomFloor(card){
   try{
     const app = document.getElementById('app'); if(!app || !card) return;
     ensureRoomTextures();
-    app.classList.add('has-room-floor');
-    document.querySelectorAll('#room-floor, .rf-shadow').forEach(n=>n.remove());
+    if(!app.classList.contains('has-room-floor')) app.classList.add('has-room-floor');
     const off = el=>{ let t=0,l=0,n=el; while(n && n!==app){ t+=n.offsetTop; l+=n.offsetLeft; n=n.offsetParent; } return {t,l}; };
     const c = off(card), cw = card.offsetWidth, ch = card.offsetHeight;
     const appL = 0, vw = app.offsetWidth; // hard cutoff at the app's own width
@@ -701,6 +704,7 @@ function syncRoomFloor(card){
         shadows.push({cx:(r.left + r.width/2 - cr.left)/sc, fb:(r.bottom - cr.top)/sc, H:(B - r.bottom)/sc + 16});
       });
     }
+    document.querySelectorAll('#room-floor, .rf-shadow').forEach(n=>n.remove()); // Nov 4: removed after measuring, not before
     app.insertBefore(fl, app.firstChild);
     shadows.forEach(({cx, fb, H})=>{
       const pool = document.createElement('div'); pool.className = 'rf-shadow rf-pool'; pool.style.cssText = `left:${cx-96}px;top:${fb-18}px;height:${H}px;`;
@@ -729,21 +733,23 @@ function decorateArch(){
   try{
     const card = document.querySelector('#enc-panel .fo-arch');
     if(!card) return;
-    card.querySelectorAll('.fo-frame').forEach(n=>n.remove());
     // offset sizes, NOT getBoundingClientRect: the room-enter animation scales the card while this runs
     const r = card.getBoundingClientRect();
     const w = Math.round(card.offsetWidth), h = Math.round(card.offsetHeight+10);
     const lvl = Math.min(3,(S.floorIdx||0)+1);
+    // Nov 4 (speed pass): every measurement this function needs is taken here, before its first write
+    const vw = document.documentElement.clientWidth || window.innerWidth, sy = window.scrollY;
+    const efig = card.querySelector('.fo-enemy .fo-fig');
+    let efTop = null; if(efig){ efTop = 0; let n = efig; while(n && n !== card){ efTop += n.offsetTop; n = n.offsetParent; } }
+    syncRoomFloor(card);
     // Oct 31 (Jeremy): nothing shows outside the arch -- torch light and monsters too tall for the doorway are cut at the
     // stonework's outer edge. The frame is drawn 5px left and 10px up of the card (see the frame img below).
     { const ox=-5, oy=-10, rx=120, ry=90, i=-3;
       card.style.clipPath = `path("M${i+ox},${h+60} L${i+ox},${ry+oy} A${rx-i},${ry-i} 0 0 1 ${rx+ox},${i+oy} L${w-rx+ox},${i+oy} A${rx-i},${ry-i} 0 0 1 ${w-i+ox},${ry+oy} L${w-i+ox},${h+60} Z")`; }
-    syncRoomFloor(card);
     watchRoomFloor(card);
     // The arch (thousands of brick/moss shapes) is drawn once per size+floor into a cached SVG image: one <img> to
     // lay out instead of rebuilding and laying out the whole SVG on every render, i.e. every path tap (Oct 12).
     // padding for moss that hangs past the frame (up to 8px), but never past the screen edge
-    const vw = document.documentElement.clientWidth || window.innerWidth;
     const PX = Math.max(0, Math.min(8, Math.floor(r.left) - 5, Math.floor(vw - r.right) - 5)), PY = 8;
     const key = w+'x'+h+'x'+lvl+'x'+PX;
     if(!decorateArch._c || decorateArch._c.key !== key){
@@ -766,6 +772,7 @@ function decorateArch(){
       }
       decorateArch._c = { key, img, vimg };
     }
+    card.querySelectorAll('.fo-frame').forEach(n=>{ if(n!==decorateArch._c.img && n!==decorateArch._c.vimg) n.remove(); }); // after measuring (Nov 4)
     card.appendChild(decorateArch._c.img);
     // the vines layer goes first in the card, so the quest paper and the monster (same layer, later) paint over it
     if(decorateArch._c.vimg) card.insertBefore(decorateArch._c.vimg, card.firstChild);
@@ -777,12 +784,10 @@ function decorateArch(){
     try{ document.body.classList.toggle('is-resolving', !!S.transitioning); }catch(e){}
     syncIdleBreath(); syncMascotHop(); rollHpNumbers();
     // Headroom above the monster (offset sizes again), so big monsters grow upward only until the arch would hide them.
-    const efig = card.querySelector('.fo-enemy .fo-fig');
-    if(efig){ let top = 0, n = efig; while(n && n !== card){ top += n.offsetTop; n = n.offsetParent; }
-      card.style.setProperty('--head', Math.max(0, Math.round(top - 16)) + 'px'); }
+    if(efTop != null) card.style.setProperty('--head', Math.max(0, Math.round(efTop - 16)) + 'px');
     // The settings cog tucks into the empty corner beside the arch's right shoulder.
     document.body.classList.add('cog-arch');
-    document.body.style.setProperty('--cog-top', Math.max(2, Math.round(r.top + window.scrollY - 10))+'px');
+    document.body.style.setProperty('--cog-top', Math.max(2, Math.round(r.top + sy - 10))+'px');
   } catch(err){ /* decoration only -- never let it break the game */ }
 }
 // Camp: the cog sits in the empty space to the right of the "Camp" heading.
@@ -2543,12 +2548,11 @@ function markSymbolSeen(k){
 // shift that row left so it ends at the column edge, spilling into the empty space under the hero.
 function fitFoChips(){
   try{
-    document.querySelectorAll('.fo-chips').forEach(c=>{
-      c.style.transform = '';
-      const p = c.parentElement; if(!p || !c.children.length) return;
-      const dx = c.getBoundingClientRect().right - p.getBoundingClientRect().right;
-      if(dx > 1) c.style.transform = `translateX(${-Math.ceil(dx)}px)`;
-    });
+    const rows = [...document.querySelectorAll('.fo-chips')].filter(c=>c.parentElement && c.children.length);
+    // a row shifted by an earlier fit (resize) starts from zero; fresh rows have no transform and need no reset
+    rows.forEach(c=>{ if(c.style.transform) c.style.transform = ''; });
+    const dxs = rows.map(c=> c.getBoundingClientRect().right - c.parentElement.getBoundingClientRect().right); // reads
+    rows.forEach((c,i)=>{ if(dxs[i] > 1) c.style.transform = `translateX(${-Math.ceil(dxs[i])}px)`; });     // writes
   }catch(e){}
 }
 function placeVs(){
@@ -2560,9 +2564,11 @@ function placeVs(){
     const t = vs.querySelector('.fo-vs-txt'); if(!t) return;
     const a = pb.getBoundingClientRect(), b = eb.getBoundingClientRect(), v = vs.getBoundingClientRect();
     const mid = ((a.top + a.height/2) + (b.top + b.height/2)) / 2;
-    t.style.top = (mid - v.top - t.offsetHeight/2) + 'px';
+    placeVs._pending = {t, top: (mid - v.top - t.offsetHeight/2) + 'px'};
+    if(!placeVs._inRender) flushVs();
   }catch(e){}
 }
+function flushVs(){ const q = placeVs._pending; placeVs._pending = null; if(q && q.t.isConnected) q.t.style.top = q.top; }
 window.addEventListener('resize', ()=> placeVs());
 // Names never break at their hyphen ("Co-/consul"): keep each hyphenated word on one line (Oct 28, release review).
 function nbHyphen(t){ return String(t).replace(/[^\s]*-[^\s]*/g, w=>`<span style="white-space:nowrap">${w}</span>`); }

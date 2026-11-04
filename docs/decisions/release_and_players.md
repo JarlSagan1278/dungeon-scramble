@@ -44,3 +44,4 @@ Distribution, hosting, play data, privacy, release plan, monetization, store, it
 - **Nov 1, 2026:** The tester site has its own address, https://playtest.dungeonscramble.com (Jeremy set it up on Cloudflare); the workers.dev address still works. Use the playtest address when inviting testers.
 - **Nov 1, 2026:** The rulebook PDF is not shown to players (the game teaches through the guided fight, How to Play and the Codex). Its refresh waits for the print-and-play edition.
 - **Nov 3, 2026:** Netlify is no longer used. The demo is hosted on itch, the playtest build on Cloudflare (playtest.dungeonscramble.com).
+- **Nov 4, 2026:** the itch demo is uploaded as the split web build (dist/demo/web zipped), not the single file: 3.4 s vs 12.3 s to the title on a 4 Mbps phone.
