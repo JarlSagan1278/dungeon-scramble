@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.59 (Nov 4, 2026)
+- The room door no longer swings open after you tap it; it just fades away.
+- The Bonus quest poster keeps the same size all fight: the live count ("2/3") is the same size as the quest text, "This path!" takes the place of "In one turn" without resizing, and the sign stays at the height it had when the room started.
+- Room floor: the floor picture is drawn on a fresh canvas each time instead of redrawing the one on screen (1.42.55 started redrawing it while still visible, a likely cause of streaky floors on phones).
 ## 1.42.58 (Nov 4, 2026)
 - Forks: the two doors now float over the room you just finished, behind the same dimming as the room door and the loot chest (no separate screen). Picking one glides it to the middle and grows it into the room's own "tap to enter" door, which takes over in exactly that spot (no pop-in), so the chosen door becomes the room's door; the other door fades away.
 ## 1.42.57 (Nov 4, 2026)

@@ -170,4 +170,8 @@ always Elite (pick 1 of 3 loot) 20%, random 33%, always Standard 40% (reached Fl
 6-24-18 / 4-17-19 / 1-14-21). Noise is about +-6 points at n=60. Read: for this bot one extra loot choice does not pay for an
 Elite fight, so the safe door dominates. If players should face a real dilemma, the Elite door needs a bigger reward (ideas: the
 extra choice drawn from the next floor's loot tier, a relic offer, or a small heal) -- Jeremy's call; re-run this study after.
+Re-run with the deeper-floor extra choice (1.42.56+, 80 runs each, same setup): always Elite 50% wins, always Standard 39%
+(reached Floor 3: 58 / 63 of 80; deaths by floor 5-17-18 / 4-13-32). Damage taken on Floor 3 fights drops from 7.3 to 5.0 a fight
+for the Elite path, so the deeper die pays for the harder rooms over a run. The Elite door is now the stronger pick for this bot;
+that is a player-power edge (fine by the balance philosophy), and the Standard door stays the safer short-term choice.
 

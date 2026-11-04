@@ -294,6 +294,7 @@ function render(){
   fitFoChips();
   decorateArch();
   flushVs();
+  lockQuestSign();
   maybeAutosave();
   maybeScreenTransition('game');
   syncForkCallout();
@@ -594,7 +595,9 @@ function bakedFloorCanvas(W, H){
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     const key = W+'x'+H+'x'+dpr+'x'+ROOM_TEX_VER;
     if(bakedFloorCanvas._c && bakedFloorCanvas._c.key === key) return bakedFloorCanvas._c.cv;
-    const cv = (bakedFloorCanvas._c && bakedFloorCanvas._c.cv) || document.createElement('canvas');
+    // Nov 4: always a fresh canvas -- redrawing the one still on screen (the old floor is now removed after measuring)
+    // could show torn, streaky rows on phones while the GPU layer was being repainted
+    const cv = document.createElement('canvas');
     cv.className = 'rf-canvas'; cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
     const g = cv.getContext('2d');
     const d = 880, a = 70*Math.PI/180, sn = Math.sin(a), co = Math.cos(a), cx = W/2, PW = 1.8*W, k = 170/ROOM_FLOOR_SRC.width;
@@ -2742,7 +2745,7 @@ function showRoomCallout(fx, onDismiss){
     playDoorCreak(!!fx.boss);
     if(onDismiss){ if(node.parentNode) node.parentNode.removeChild(node); onDismiss(); return; }
     node.classList.add('dismissing');
-    setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 360); // after the door swings
+    setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 140); // Nov 4 (Jeremy): no door swing, a quick fade
   };
   node.addEventListener('click', dismiss);
   scrim.addEventListener('click', dismiss);
@@ -4771,6 +4774,16 @@ function questRewardHTML(rewardText){
 // The quest sign (Nov 4, Jeremy: quests were hard to read for new players). A "Bonus" badge says it's optional; while a
 // path is being built, each one-turn quest shows its live count ("2/3 Maneuvers"), and when this path would complete
 // one, its row lights gold and the heading reads "This path!". Redrawn on every path tap by refreshPathBits().
+const QSIGN_H = new WeakMap();
+// Measures the quest sign once per fight, while it shows no path (the resting sign), and pins that height.
+function lockQuestSign(){
+  try{
+    const e = S.encounter, el = document.querySelector('#enc-panel .fo-quests-float:not(.shrine-boon-float)');
+    if(!e || !el || QSIGN_H.has(e) || el.classList.contains('q-glow') || el.querySelector('.q-count')) return;
+    const h = el.offsetHeight; if(!h) return;
+    QSIGN_H.set(e, h); el.style.setProperty('--qh', h+'px'); el.classList.add('q-locked');
+  }catch(err){}
+}
 function questSignHTML(e){
   if(!e || !e.quests || !e.quests.length) return '';
   let ctx = null;
@@ -4783,8 +4796,14 @@ function questSignHTML(e){
     if(ctx && !done){ const cond = parseQuestSpec(q).cond; if(!QUEST_ALL_FIGHT.test(cond)){ live = questEval(cond, ctx); if(live.done) anyLive = true; } }
     return `<span class="fo-quest ${done?'complete':''} ${live&&live.done?'q-live-done':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, done, live)}</span>`;
   }).join('');
-  const label = anyLive ? '<span class="q-yes">&#10003; This path!</span>' : (oneTurn ? 'In one turn' : 'This fight');
-  return `<div class="fo-quests-float${anyLive?' q-glow':''}"${questPaperStyle(e)} title="Bonus quests: optional, each pays the reward on its right"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label"><b class="q-bonus-b">Bonus</b><br>${label}</div><div class="fo-quests">${rows}</div></div>`;
+  // Nov 4 (Jeremy: the poster grew as quests progressed): both labels share one grid cell, so swapping them never resizes
+  // the sign, and the sign keeps the height it had at the start of the fight (QSIGN_H, measured by lockQuestSign).
+  const rest = oneTurn ? 'In one turn' : 'This fight';
+  const label = `<span class="q-lbl"><span${anyLive?' class="q-off"':''}>${rest}</span><span class="q-yes${anyLive?'':' q-off'}">&#10003; This path!</span></span>`;
+  const lockH = QSIGN_H.get(e);
+  const style = questPaperStyle(e), hs = lockH ? `--qh:${lockH}px;` : '';
+  const st = !hs ? style : style ? style.replace('style="', 'style="'+hs) : ` style="${hs}"`;
+  return `<div class="fo-quests-float${anyLive?' q-glow':''}${lockH?' q-locked':''}"${st} title="Bonus quests: optional, each pays the reward on its right"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label"><b class="q-bonus-b">Bonus</b><br>${label}</div><div class="fo-quests">${rows}</div></div>`;
 }
 function questRowHTML(q, done, live){
   const {rewardText, cond} = parseQuestSpec(q);

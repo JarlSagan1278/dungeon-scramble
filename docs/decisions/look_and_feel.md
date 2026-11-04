@@ -89,3 +89,4 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Nov 4, 2026 (quest salience, Jeremy picked 1-3 of the mockups):** quest sign = "Bonus" badge + "In one turn"/"This fight", reward as a red +N chip, live count while pathing with a gold "This path!" state; a one-time tip on the first quest fight. The swing-on-the-nail idea was not taken.
 - **Nov 4, 2026:** the fork screen shows only the two doors, floating like the loot chest: no panel, no descriptions, no text above or below.
 - **Nov 4, 2026:** fork doors float over the existing screen (like the loot chest), not a blank screen; the picked door glides to the middle and becomes the room's tap-to-enter door (no opening animation).
+- **Nov 4, 2026:** cut the door-opening swing after tapping the room door (it fades out). The Bonus quest poster stays one size all fight while quests progress or complete.
