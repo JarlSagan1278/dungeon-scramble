@@ -19,6 +19,7 @@ const ALL = [
   ['scramble',   'tools/tests/test_scramble.js'],   // Scramble flick gate + Depth presets
   ['unlock',     'tools/tests/test_unlock.js'],     // store app: Floor 1 unlock gate (needs node build.js --app)
   ['quickstart', 'tools/tests/test_quickstart.js'], // first run: straight into the guided fight
+  ['forks',      'tools/tests/test_forks.js'],      // forks in the road: two doors, loot per door, save/resume
 ];
 const QUICK = new Set(['sim', 'pathrender', 'trayfast', 'ui', 'scramble']);
 

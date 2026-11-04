@@ -3700,3 +3700,25 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .fo-quests-float .q-reward .icon-svg{ color:#fff7e6 !important; }
 .fo-quests-float .q-reward b::before{ content:'+'; }
 .fo-quests-float .fo-quest.complete .q-reward{ background:#2d6a2f !important; }
+/* Forks in the road (Nov 4): the two-door screen and the route bar's stacked pairs */
+.route .node.rt-fork{ display:flex; align-items:center; justify-content:center; }
+.rt-pair{ display:flex; flex-direction:column; gap:2px; width:100%; height:100%; align-items:center; justify-content:center; }
+.rt-pair i{ display:flex; align-items:center; justify-content:center; width:80%; height:46%; border:2px solid var(--line); border-radius:9px 9px 3px 3px; font:800 8.5px/1 var(--font-ui); letter-spacing:.02em; color:#d9c39a; background:#2a1d13; font-style:normal; }
+.rt-pair i.el{ background:#5a2018; color:#ffb3a3; } .rt-pair i.sh{ background:#1f3a4a; color:#a9e1ff; } .rt-pair i.tr{ background:#4a3a14; color:#ffe08a; }
+.route .node.rt-fork.done{ opacity:.5; }
+.fork-screen{ display:flex; flex-direction:column; gap:10px; min-height:calc(100dvh - 16px); max-height:var(--screen-h, 769px); }
+.fork-hall{ border:3px solid var(--line) !important; border-radius:16px; box-shadow:0 4px 0 var(--line); flex:1 1 auto; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:18px 8px 20px;
+  background:radial-gradient(ellipse at 50% 38%, rgba(255,170,80,.16), transparent 62%), var(--brown-dark); }
+.fork-title{ margin:0; font-size:30px; color:var(--gold); text-shadow:0 2px 0 var(--line); }
+.fork-sub{ margin:0 0 10px; font-size:13.5px; color:#c9b48e; text-align:center; }
+.fork-doors{ display:flex; justify-content:center; gap:10px; width:100%; }
+.fork-door{ cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:10px; flex:1 1 0; min-width:0; -webkit-tap-highlight-color:transparent; outline:none; }
+.fork-door .rc-door{ zoom:.64; animation:none; }
+.fork-door .rc-tap{ display:none; }
+.fork-note{ display:block; width:100%; box-sizing:border-box; text-align:center; font:600 13px/1.3 var(--font-ui); color:#f2e4c8; background:#2a1b10; border:2px solid var(--line); border-radius:10px; padding:7px 6px; box-shadow:0 3px 0 var(--line); }
+.fork-note b{ color:var(--gold); }
+.fork-door:hover .rc-door, .fork-door:focus-visible .rc-door{ filter:drop-shadow(0 0 10px rgba(255,215,106,.55)); }
+.fork-door.opening .rc-leaf{ transform:rotateY(-82deg); transition:transform .32s ease; }
+.fork-door.passed{ opacity:.45; transition:opacity .2s ease; }
+.fork-foot{ margin:12px 0 0; font-size:13px; color:#c9b48e; }
+.reduced-motion .fork-door.opening .rc-leaf{ transition:none; }

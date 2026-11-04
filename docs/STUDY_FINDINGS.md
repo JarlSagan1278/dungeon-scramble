@@ -164,3 +164,10 @@ the game over http; the 16-run re-check (resume runs included) was clean. Quest 
 checkQuests on all 56 quests x 400 random turns (22,400 cases). Live sign vs result: over 61 random turns the sign promised
 "This path!" 6 times and the quest paid all 6; no quest paid without the promise.
 
+## Forks: Elite door vs Standard door (Nov 4, 2026, build 1.42.55)
+tools/balance/harness.js, 60 runs each, skill 1500, Dwarf Armsmaster, depth 0, cfg.fork = elite / random / standard. Win rate:
+always Elite (pick 1 of 3 loot) 20%, random 33%, always Standard 40% (reached Floor 3: 30 / 39 / 45 of 60; deaths by floor
+6-24-18 / 4-17-19 / 1-14-21). Noise is about +-6 points at n=60. Read: for this bot one extra loot choice does not pay for an
+Elite fight, so the safe door dominates. If players should face a real dilemma, the Elite door needs a bigger reward (ideas: the
+extra choice drawn from the next floor's loot tier, a relic offer, or a small heal) -- Jeremy's call; re-run this study after.
+

@@ -287,6 +287,7 @@ function render(){
   if(S.screen==='gameover'){ clearPathTrail(); renderGameOver(); maybeScreenTransition('gameover'); return; }
   if(S.screen==='camp'){ clearPathTrail(); renderCamp(); tuckCampCog(); maybeAutosave(); maybeScreenTransition('camp'); return; }
   if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); decorateArch(); maybeAutosave(); maybeScreenTransition('shrine'); return; }
+  if(S.screen==='fork'){ clearPathTrail(); renderFork(); maybeAutosave(); maybeScreenTransition('fork'); return; }
   placeVs._inRender = true;
   try{ renderGame(); } finally { placeVs._inRender = false; }
   // Nov 4 (speed pass): measure everything first, write after -- the chips are fitted while the layout placeVs already
@@ -1367,6 +1368,44 @@ function fitSetup(opts){
   for(const c of ['fit1','fit2','fit3','fit4']){ if(se.scrollHeight <= window.innerHeight + 1) break; p.classList.add(c); lockHeights(); }
 }
 
+// Forks (Nov 4, Jeremy picked two doors): after the room before an Elite slot, two of the game's doors stand side by
+// side, each showing only its room type and what it pays. Tapping one swings it open and enters that room.
+const FORK_DOOR_TEXT = {
+  Standard:'A regular monster.<br>Pick 1 of 2 loot dice.',
+  Elite:'Hits harder, with heavy turns.<br>Pick 1 of <b>3</b> loot dice.',
+  Deadly:'The most dangerous kind.<br>Pick 1 of <b>3</b> loot dice.',
+  Shrine:'No fight.<br>A boon, sometimes with a price.',
+  Trap:'A trap to get through.<br>Pick 1 of 2 loot dice.',
+  'Elite Trap':'A hard trap to get through.<br>Pick 1 of <b>3</b> loot dice.',
+};
+function forkDoorHTML(d, i){
+  const kindCls = ({Elite:'k-elite', Deadly:'k-deadly', Trap:'k-trap', 'Elite Trap':'k-trap', Shrine:'k-shrine'})[d.kind] || 'k-enemy';
+  return `<div class="fork-door" role="button" tabindex="0" data-fork="${i}" aria-label="${d.kind} door">
+    <div class="rc-door ${kindCls}">
+      <div class="rc-arch"><div class="rc-leaf"><i class="rc-band b1"></i><i class="rc-band b2"></i><svg class="rc-ring" viewBox="0 0 30 46" aria-hidden="true"><rect x="7" y="2" width="16" height="42" rx="5" fill="#5a646d" stroke="#120b07" stroke-width="2.5"/><circle cx="15" cy="7" r="1.4" fill="#120b07"/><circle cx="15" cy="39" r="1.4" fill="#120b07"/><circle cx="15" cy="17" r="8.5" fill="#d6b25a" stroke="#120b07" stroke-width="2.5"/><circle cx="12.5" cy="14.5" r="2.6" fill="#fff1b8"/><path d="M15 26.5a2.6 2.6 0 0 1 1.3 4.9l1 4.6h-4.6l1-4.6a2.6 2.6 0 0 1 1.3-4.9z" fill="#120b07"/></svg></div></div>
+      <div class="rc-sign"><div class="rc-plaque"><span>?</span></div><div class="rc-kind">${d.kind}</div></div>
+    </div>
+    <span class="fork-note">${FORK_DOOR_TEXT[d.kind]||''}</span>
+  </div>`;
+}
+function renderFork(){
+  const fc = S.forkChoice; if(!fc){ S.screen='game'; return render(); }
+  app.innerHTML = `<div class="wrap fork-screen">${renderRoute()}
+    <div class="panel fork-hall">
+      <h2 class="fork-title">Which door?</h2>
+      <p class="fork-sub">You see what kind of room each holds, not what's inside.</p>
+      <div class="fork-doors">${fc.doors.map(forkDoorHTML).join('')}</div>
+      <p class="fork-foot">Health ${S.health} / ${S.maxHealth}${S.backPocket && S.backPocket.length ? ` &middot; ${S.backPocket.length} ${S.backPocket.length===1?'die':'dice'} in the Back Pocket` : ''}</p>
+    </div></div>`;
+  app.querySelectorAll('.fork-door').forEach(b=> b.onkeydown = ev=>{ if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); b.click(); } });
+  app.querySelectorAll('.fork-door').forEach(b=> b.onclick = ()=>{
+    if(b.classList.contains('opening')) return;
+    const i = +b.dataset.fork;
+    app.querySelectorAll('.fork-door').forEach(x=> x.classList.add(x===b ? 'opening' : 'passed'));
+    try{ playDoorCreak(/Elite|Deadly/.test(fc.doors[i].kind)); }catch(e){}
+    setTimeout(()=> pickForkDoor(i), PREFS.reducedMotion ? 0 : 360);
+  });
+}
 function renderRoute(){
   const floorCls = `floor${S.floorIdx+1}`;
   const n = S.route.length;
@@ -1377,6 +1416,14 @@ function renderRoute(){
     const icon = step==='camp'?iconSpan('camp'):(step==='boss'?iconSpan('boss'):(i<S.routeStep?'<span class="rt-tick">\u2713</span>':'<span class="rt-q">?</span>'));
     const statusSuffix = cls==='done' ? ' (cleared)' : (cls==='current' ? ' (current)' : ' (ahead)');
     const tip = (ROUTE_STEP_DESC[step]||'') + statusSuffix;
+    // Nov 4: a fork still ahead (or being chosen) shows as two stacked mini doors
+    const fork = step==='enc' && i>=S.routeStep && typeof FORK_SLOTS!=='undefined' && FORK_SLOTS.includes(i) && !(i===S.routeStep && S.screen!=='fork') && !(S.guide && S.guide.stage && S.guide.stage!=='done') && !(typeof depthRank==='function' && depthRank('gauntlet')>=2);
+    if(fork){
+      const kinds = (i===S.routeStep && S.forkChoice) ? S.forkChoice.doors.map(d=>d.kind) : ['?','Elite'];
+      const kc = k=> k==='Elite'||k==='Deadly'||k==='Elite Trap' ? 'el' : k==='Shrine' ? 'sh' : k==='Trap' ? 'tr' : '';
+      html += `<div class="node rt-door rt-room rt-fork ${floorCls} ${cls} route-tooltip-target" title="A fork: choose one of two doors${statusSuffix}"><span class="rt-pair">${kinds.map(k=>`<i class="${kc(k)}">${k}</i>`).join('')}</span></div>`;
+      return;
+    }
     html += `<div class="node rt-door rt-${step==='camp'?'camp':(step==='boss'?'boss':'room')} ${floorCls} ${cls} route-tooltip-target" title="${tip}"><i class="rt-arch">${icon}</i></div>`;
   });
   html += '</div>';

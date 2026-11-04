@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.42.54';
+const GAME_VERSION = '1.42.55';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false };
@@ -577,6 +577,11 @@ const ENCOUNTER_TIER = {
 function encounterTier(e){ return (e && ENCOUNTER_TIER[e.name]) || 'standard'; }
 // Room tier by route step (buildRoute(): camp, enc, enc, enc, camp, enc, enc, boss).
 const ROOM_TIER_SLOTS = {1:'easy', 2:'standard', 3:'elite', 5:'standard', 6:'elite'};
+// Forks in the road (Nov 4, Jeremy): at these route slots (the two Elite rooms of each floor) the player picks one of
+// two doors, seeing only the room type: the slot's Elite (or Deadly) room, or a Standard one (which may roll a Shrine
+// or a Trap, as a Standard slot would). The harder door pays an extra loot choice (FORK_ELITE_BONUS).
+const FORK_SLOTS = [3, 6];
+const FORK_ELITE_BONUS = 1;
 const DEADLY_CHANCE = 0.12;      // per elite slot; Floor 1's only deadly card (Prickly Porcupanther) is dreadOnly
 // Chance a Shrine takes an easy/standard slot (max one per segment): rises by
 // floor and with depth (v1.36.0). See shrineSlotChance() in logic.js.

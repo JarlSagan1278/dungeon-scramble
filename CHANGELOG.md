@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.55 (Nov 4, 2026)
+- Forks in the road. At the two Elite rooms of each floor you now choose between two doors, seeing only the room type: the Elite (or Deadly, or Elite Trap) door, or a Standard-slot door (a Standard monster, a Shrine or a Trap). The harder door pays one more loot choice (pick 1 of 3 instead of 1 of 2). The route bar shows forks ahead as two stacked mini doors; the fork screen reuses the room doors, with what each costs and pays. No forks during the guided first fight or at Night Shift II (where every room is Elite). A run saved at a fork resumes on the same two doors. New automated check (check.js: forks); the sim, bug hunt and balance bots know how to pick a door (balance bots: cfg.fork = elite | standard | random, default elite).
 ## 1.42.54 (Nov 4, 2026)
 - Speed pass. The itch demo now ships as the split web build (page plus art files fetched as needed) instead of one 5.6 MB file: on a 4 Mbps connection with a phone-speed CPU the title screen shows in about 3.4 s instead of 12.3 s, and the first fight's art arrives ~0.1 s later. Each full redraw now measures everything before writing (fitFoChips, decorateArch, syncRoomFloor, the VS mark), so it lays the page out once instead of up to six times (redraw time itself is unchanged within noise, about 90 ms at 6x CPU).
 ## 1.42.53 (Nov 4, 2026)

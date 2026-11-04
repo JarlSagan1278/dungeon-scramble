@@ -821,7 +821,7 @@ function loadGame(){
 // survive being written to JSON (see serializeState).
 function maybeAutosave(){
   if(!S || S.transitioning || S.lootChoice || S.shrineChoice || S.relicChoice || S.pendingLootDie) return;
-  if(S.screen!=='game' && S.screen!=='camp' && S.screen!=='shrine') return;
+  if(S.screen!=='game' && S.screen!=='camp' && S.screen!=='shrine' && S.screen!=='fork') return;
   saveGame();
 }
 
@@ -1081,10 +1081,10 @@ function shrineSlotChance(){
 // tier fills in.
 function drawRoomCard(floor){
   const isVeryFirstEncounter = S.floorIdx===0 && S.routeStep===1;
-  let tier = roomTierForStep(S.routeStep);
+  let tier = S._forceTier || roomTierForStep(S.routeStep);
   const unused = c => !S.usedCards.has(c.name);
   // Shrine chances follow the room's normal tier, before Night Shift raises it (Jeremy, Oct 14: keep consistent access to shrines)
-  const baseTier = ROOM_TIER_SLOTS[S.routeStep] || 'standard';
+  const baseTier = S._forceTier || ROOM_TIER_SLOTS[S.routeStep] || 'standard';
   // Oct 30 (Jeremy): no shrine in the first two rooms of a run either -- a shrine as room 2 interrupts the tutorial flow
   const tooEarlyForShrine = S.floorIdx===0 && S.routeStep<=2;
   if(!tooEarlyForShrine && baseTier!=='elite' && !S.segmentShrineUsed && floor.shrines.length && Math.random() < shrineSlotChance()){
@@ -1113,7 +1113,10 @@ function drawEncounter(kind){
   } else {
     // Guided first fight: the very first room of a device's first run is always the gentle Filement Bunny.
     const guideFoe = (S.guide && S.guide.stage==='pending' && S.floorIdx===0) ? FLOOR1_ENEMIES.find(x=>x.name==='Filement Bunny') : null;
-    e = clone(guideFoe || drawRoomCard(floor));
+    const forkCard = (!guideFoe && S.forkPick) ? findRoomCard(S.forkPick.name) : null;
+    e = clone(guideFoe || forkCard || drawRoomCard(floor));
+    if(forkCard && /^(elite|deadly)$/.test(encounterTier(e))) e.forkBonus = FORK_ELITE_BONUS; // chose the harder door: +1 loot choice
+    S.forkPick = null;
     if(e.type==='Trap') S.segmentTrapUsed = true;
     if(e.type==='Shrine') S.segmentShrineUsed = true;
   }
@@ -1140,6 +1143,43 @@ function drawEncounter(kind){
     initEnemyTurnState(e);
   }
   return e;
+}
+
+// ---- Forks in the road (Nov 4) ----
+function findRoomCard(name){
+  const f = FLOORS[S.floorIdx];
+  return [].concat(f.enemies||[], f.traps||[], f.shrines||[]).find(c=>c.name===name) || null;
+}
+function roomKindOf(card){
+  if(card.type==='Shrine') return 'Shrine';
+  const t = encounterTier(card);
+  if(card.type==='Trap') return (t==='elite' || t==='deadly') ? 'Elite Trap' : 'Trap';
+  return t==='deadly' ? 'Deadly' : t==='elite' ? 'Elite' : 'Standard';
+}
+function forkHere(){
+  if(!FORK_SLOTS.includes(S.routeStep) || S.route[S.routeStep]!=='enc') return false;
+  if(S.guide && S.guide.stage && S.guide.stage!=='done') return false;
+  if(depthRank('gauntlet')>=2) return false; // Night Shift II: every room is Elite already, so there's no easier door
+  return true;
+}
+// Both doors are drawn now (nothing is marked used until a door is picked); only their kinds are shown.
+function buildForkChoice(){
+  const floor = FLOORS[S.floorIdx];
+  const hard = drawRoomCard(floor);
+  let easy = null;
+  // one Trap per stretch: if the hard door is a trap, the other door can't be one too
+  const trapWas = S.segmentTrapUsed; if(hard.type==='Trap') S.segmentTrapUsed = true;
+  S._forceTier = 'standard';
+  try{ for(let k=0;k<6 && (!easy || easy.name===hard.name);k++) easy = drawRoomCard(floor); } finally { S._forceTier = null; S.segmentTrapUsed = trapWas; }
+  const doors = [{name:easy.name, kind:roomKindOf(easy)}, {name:hard.name, kind:roomKindOf(hard)}];
+  return {step:S.routeStep, doors};
+}
+function pickForkDoor(i){
+  const fc = S.forkChoice; if(!fc || !fc.doors[i]) return;
+  S.forkPick = fc.doors[i]; S.forkChoice = null;
+  teleLog('fork_pick', {step:fc.step, picked:fc.doors[i].kind, other:fc.doors[1-i] && fc.doors[1-i].kind});
+  advanceRoute();
+  render();
 }
 
 function advanceRoute(){
@@ -1187,6 +1227,13 @@ function advanceRoute(){
     S.segmentShrineUsed = false;
     S.segmentTrapUsed = false;
   } else if(step==='enc'){
+    // a fork: show two doors first; picking one comes back here with S.forkPick set
+    if(!S.forkPick && forkHere()){
+      if(!S.forkChoice || S.forkChoice.step!==S.routeStep) S.forkChoice = buildForkChoice();
+      S.encounter = null; S.screen = 'fork';
+      teleLog('fork', {step:S.routeStep, doors:S.forkChoice.doors.map(d=>d.kind)});
+      return;
+    }
     const drawn = drawEncounter('enc');
     S.encounter = drawn;
     if(drawn.type==='Shrine'){
@@ -2646,6 +2693,7 @@ function onEncounterDefeated(){
   if(nearMiss) S.stats.nearMisses = (S.stats.nearMisses||0) + 1;
   const isBoss = e.type==='Boss' || e.type==='Big Boss';
   let drawCount = isBoss ? 3 : 2;
+  if(e.forkBonus) drawCount += e.forkBonus; // Nov 4: chose the Elite door at a fork
   if(overkill && !depthRank('slim')) drawCount += 1;
   if(depthRank('slim')) drawCount = Math.max(1, drawCount - depthRank('slim')); // Burden of Choice
   if(hasRelic('lucky_coin')){ drawCount += 1; fireRelic('lucky_coin','+1 option'); }
