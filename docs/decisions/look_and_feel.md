@@ -91,3 +91,4 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Nov 4, 2026:** fork doors float over the existing screen (like the loot chest), not a blank screen; the picked door glides to the middle and becomes the room's tap-to-enter door (no opening animation).
 - **Nov 4, 2026:** cut the door-opening swing after tapping the room door (it fades out). The Bonus quest poster stays one size all fight while quests progress or complete.
 - **Nov 4, 2026:** fork markers in the room tracker must match the existing tracker doors: two narrow arched doorways side by side, kind shown by border colour + glyph.
+- **Nov 4, 2026:** side by side fork doors read as sequential, not a choice: the two tracker doorways stack vertically instead.

@@ -3765,3 +3765,7 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .rt-pair .rt-arch.rt-mini.tr{ border-color:#5e8048; color:#cfe6a8; }
 .rt-door.current .rt-pair .rt-arch.rt-mini{ background:radial-gradient(ellipse at 50% 85%, #7a3a10, #1a0e07 75%); box-shadow:0 0 8px rgba(255,150,50,.5), inset 0 0 6px rgba(255,150,50,.3); }
 .rt-door.current .rt-pair .rt-arch.rt-mini:not(.el):not(.dl):not(.sh):not(.tr){ border-color:#e8a33d; }
+/* Nov 4 (Jeremy: side by side read as two rooms in a row, not a choice): the fork's two doorways stack, one above the other,
+   like a branch on a map, in the same 40px slot */
+.rt-pair{ flex-direction:column !important; gap:2px !important; align-items:stretch !important; }
+.rt-pair .rt-arch.rt-mini{ flex:1 1 0; width:100%; height:auto; min-height:0; border-radius:12px 12px 2px 2px; font-size:12px; border-bottom-width:2px; }

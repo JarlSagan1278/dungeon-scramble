@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.62 (Nov 4, 2026)
+- Room tracker: a fork's two doorways now stack one above the other (a branch, like a map) instead of side by side, which read as two rooms in a row.
 ## 1.42.61 (Nov 4, 2026)
 - Room tracker: a fork now shows as two narrow copies of the tracker's own arched doorway, side by side (same stone border, dark inside, paper texture). The kind is the doorway's border colour plus a glyph: "?" unknown, purple "!" Elite, red "!!" Deadly, teal Shrine, green Trap.
 ## 1.42.60 (Nov 4, 2026)
