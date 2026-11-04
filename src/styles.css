@@ -3676,3 +3676,15 @@ body.impact-b #enc-panel .enc-card.fo-arch{ filter:grayscale(1) contrast(3.2) br
 body.impact-b .impact-lines{ display:block; }
 .impact-lines svg{ display:block; overflow:hidden; }
 .impact-lines polygon{ fill:#0c0705; }
+/* Nov 4 (Jeremy): Swap/Reroll faces are used before you path, so until the path starts the whole die gives a little
+   wiggle every couple of seconds (rotate only -- a scale would blur the face). */
+.die.trayact-nudge:not(.shaking):not(.just-rerolled):not(.just-swapped):not(.resolving):not(.guide-nudge):not(.minion){ animation: trayact-nudge 2.2s ease-in-out 0.6s infinite; }
+@keyframes trayact-nudge{ 0%,72%,100%{ rotate:0deg; } 76%{ rotate:-7deg; } 80%{ rotate:6deg; } 84%{ rotate:-4deg; } 88%{ rotate:2deg; } 92%{ rotate:0deg; } }
+body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animation:none !important; }
+/* Nov 4 (Jeremy: check the spacing in the enemy ability notes): long names one size down so they don't wrap into two
+   big lines, a clear gap before the number, a little more air between the header and the rule. */
+.action-note .an-t{ font-size:19px; line-height:1.08; text-wrap:balance; }
+.action-note .an-t.an-long{ font-size:16px; }
+.action-note .an-t b{ margin-left:6px; font-size:23px; }
+.action-note .an-w{ margin-top:3px; }
+.action-note .an-b{ margin-top:8px; font-size:13px; line-height:1.35; hyphens:none; }

@@ -1450,7 +1450,7 @@ function renderDie(cell, idx){
   const taTarget = !!ta && !taSrc && trayActTargetOk(idx);
   const taReady = !ta && !!trayActFaceAt(idx);
   const clickable = ta ? (taSrc || taTarget) : (selectable || isLastMove);
-  const trayActCls = `${taSrc?'trayact-src':''} ${taTarget?'trayact-target':''} ${taReady?'trayact-ready':''} ${cell.spent?'spent':''} ${S.justRerolledIdx===idx?'just-rerolled':''} ${(S.justSwappedIdx||[]).includes(idx)?'just-swapped':''}`;
+  const trayActCls = `${taSrc?'trayact-src':''} ${taTarget?'trayact-target':''} ${taReady?'trayact-ready':''} ${taReady && !S.path.length && !S.needRoll ? 'trayact-nudge':''} ${cell.spent?'spent':''} ${S.justRerolledIdx===idx?'just-rerolled':''} ${(S.justSwappedIdx||[]).includes(idx)?'just-swapped':''}`;
   const num = inPath ? S.path.indexOf(idx)+1 : null;
   const zoneCls = inZone(idx) ? 'zone-cell' : '';
   const shakeCls = S.justScrambled ? 'shaking' : '';
@@ -1650,7 +1650,7 @@ function renderEncounterCard(e, mode){
       const a = a0.type==='dmg' ? {...a0, value:a0.value + (a0.grow ? (e.layers||0) : 0) + zealBonus(false)} : a0; // Zeal (and Extruzeon's layers) show in the warning
       const ik = iconKey[a.type]; if(!ik) return '';
       const num = a.type==='dmgPerMinion' ? perMinNum(a, false) : `<b class="enc-n">${a.value}</b>`;
-      return `<span class="boss-cycle-item next enemy-action-badge ${extraCls}${a.grow?' grows':''}" title="${label?label+': ':''}${actText(a)}${a.grow?` (Layer by Layer: grows by ${a.grow} every turn)`:''}">${iconSpanSolid(ik)}${num}${label?' '+label:''}</span>`;
+      return `<span class="boss-cycle-item next enemy-action-badge ${extraCls}${a.grow?' grows':''}" title="${label ? label+': ' : ((LABEL[ik]||'') ? LABEL[ik]+' '+a.value+': ' : '')}${actText(a)}${a.grow?` (Layer by Layer: grows by ${a.grow} every turn)`:''}">${iconSpanSolid(ik)}${num}${label?' '+label:''}</span>`;
     };
     const kit = bossKitNow(e), sp = nextTurn.special;
     const base = kit.each.map(a=>chip(a,'','')).join('');
@@ -2232,7 +2232,8 @@ document.addEventListener('click', ev=>{
   const name = num ? head.replace(/\s*\d+\s*$/,'') : head;
   const icon = chip.querySelector('.icon-svg');
   const hot = chip.classList.contains('enemy-action-badge') || chip.classList.contains('boss-cycle-item');
-  const n = el(`<div class="action-note${hot?'':' an-status'}" role="dialog"><div class="an-h">${icon?`<span class="an-ic">${icon.outerHTML}</span>`:''}<div><div class="an-t">${name}${num?`<b>${num}</b>`:''}</div>${when?`<div class="an-w">${when}</div>`:''}</div></div><div class="an-b">${body}</div><i class="an-tail"></i></div>`);
+  const bodyTxt = body.replace(/(\w)-(\w)/g, '$1\u2011$2'); // Nov 4: never break a line inside "damage-over-time"
+  const n = el(`<div class="action-note${hot?'':' an-status'}" role="dialog"><div class="an-h">${icon?`<span class="an-ic">${icon.outerHTML}</span>`:''}<div><div class="an-t${name.length>11?' an-long':''}">${name}${num?`<b>${num}</b>`:''}</div>${when?`<div class="an-w">${when}</div>`:''}</div></div><div class="an-b">${bodyTxt}</div><i class="an-tail"></i></div>`);
   document.body.appendChild(n); n._chip = chip; actionNoteEl = n;
   const r = chip.getBoundingClientRect(), w = n.offsetWidth, h = n.offsetHeight;
   const left = Math.max(8, Math.min(window.innerWidth - w - 8, r.left + r.width/2 - w/2));

@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.52 (Nov 4, 2026)
+- Swap and Reroll faces in the tray now wiggle every couple of seconds until you start your path, so they read as "use me first".
+- Enemy ability notes: a boss's plain attack is named ("Hit 5", not just "5"), long move names stay on one line at a smaller size, a little more space before the number and between the header and the rule, and "damage-over-time" no longer breaks across lines.
 ## 1.42.51 (Nov 4, 2026)
 - Impact frames on a kill: during the hit-stop the room flips to an ink negative for one frame, then a stark black-and-cream frame with speed lines bursting from the enemy, then snaps back (bosses get an extra negative frame). Off with Reduce Motion or Low intensity.
 ## 1.42.50 (Nov 1, 2026)

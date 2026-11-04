@@ -85,3 +85,4 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Floor label colour (Jeremy, Oct 31, 1.42.44):** the floor label matches the floor's loot die colour (I Alloy steel, II Gilded gold, III Magic purple), on the tray badge and the Floor card.
 - **Oct 31, 2026:** The shrine's boon explanation sits between the two portraits on the quest-style paper notice (same spot as quests in a fight), not under the shrine.
 - **Nov 4, 2026:** Kills get comic-style impact frames (ink negative, then speed lines), about 110 ms (165 ms on bosses), skipped with Reduce Motion / Low intensity.
+- **Nov 4, 2026:** Swap/Reroll faces wiggle (whole die, rotate only) until the path starts, to say they are used before pathing.
