@@ -5,6 +5,7 @@ study results in `STUDY_FINDINGS.md`. The release checklist (40 items, owner and
 the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 
 ## Now: first players
+0. **Posting plan extended to Nov 20 (Nov 4):** https://claude.ai/artifact/EXsbT3N29MADimSzs15gaN (Newgrounds, r/playtesters, Discord, people we know, Bluesky, Shorts). Make a fresh demo zip before Nov 7/8/15.
 1. **Posting plan, Oct 28 – Nov 9** (page: https://claude.ai/artifact/EXsbT3N29MADimSzs15gaN; texts in
    `release/posts_nov.md`; tracking in `release/outreach.md`). One community a day; log Reddit views and itch
    views/plays the next day.
@@ -32,7 +33,7 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
 - **Forks (shipped 1.42.55-1.42.62):** two doors at slots 3 and 6; the Elite door's extra loot choice is a next-floor die. Bot study: always Elite 50% vs always Standard 39% (STUDY_FINDINGS). Watch real players' picks in the play data (`fork_pick` events) before tuning.
 - **PC release layout (Jeremy, Nov 4):** D (room left, tray right, path panel) + G (hover panel, key letter per die) + H (die cursor, controller glyphs); one landscape frame for monitor and Steam Deck. Refined screens in the same artifact (Part 1).
 - **Room dressing (reopened Oct 29):** inked corner ivy and per-floor room colour shipped in 1.42.5. Still open if Jeremy wants them: his own drawn ivy strands (V3) and one drawn prop per floor (D2).
-- **Performance on slow phones:** load fixed on itch (split build, Nov 4). A full redraw is ~90-110 ms at 6x CPU and a turn does ~7; a playback fast path (like renderPathOnly) for per-die steps and enemy beats is the next lever (see STUDY_FINDINGS, Nov 4).
+- **Performance on slow phones:** load fixed on itch (split build), playback redraws trimmed (1.42.63, STUDY_FINDINGS). What's left in a turn is paint/compositing of running animations; only worth doing if testers report stutter.
 
 ## Later
 - **Optional caps, only if play feels unfair:** damage-per-Minion specials count at most 8 Minions; Extruzeon layers max +12.

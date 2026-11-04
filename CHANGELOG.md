@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.63 (Nov 4, 2026)
+- Speed: while a turn plays back, each redraw swaps only the parts whose markup changed (the two fighters' sides, the route, the vs mark, the quest sign, the button rail and the individual dice) instead of rebuilding the whole screen. Checked against a full redraw after every step (new check: playback, 6 fights incl. two bosses). On a cheap-phone profile (CPU x6, web build) a playback redraw takes ~60 ms instead of ~74 ms and its forced layout ~25 ms instead of ~41 ms.
+- Fix: the HP number roll keeps its real target, so a redraw that keeps the HP bar can't read a half-rolled number back as the new value.
 ## 1.42.62 (Nov 4, 2026)
 - Room tracker: a fork's two doorways now stack one above the other (a branch, like a map) instead of side by side, which read as two rooms in a row.
 ## 1.42.61 (Nov 4, 2026)

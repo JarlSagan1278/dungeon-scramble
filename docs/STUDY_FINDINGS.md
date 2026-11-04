@@ -155,6 +155,16 @@ single-file build ~100 KB of it is the three portraits' data URIs; the web build
 117 KB stylesheet. A turn does ~7 full renders (3 path steps + enemy beats). Next lever if needed: a playback fast path like
 renderPathOnly for the per-die steps and enemy beats.
 
+## Playback fast path, build 1.42.63 (Nov 4, 2026)
+patchGameDOM (render.js): during turn playback, regions marked in the markup (<!--zN-->) are compared as strings and only
+changed ones are parsed and swapped; dice are swapped one by one. Chromium, 395x769, CPU x6, Dwarf Guard, 3 turns.
+Per playback redraw (web build): ~74 -> ~60 ms (forced layout in placeVs 41 -> 25 ms); single file ~93 -> ~70 ms. Two
+traps found on the way: parsing the whole screen into a template to compare was slower than a plain rebuild (239 ms),
+and a `([\w-]+):-...ms` normaliser crawled over base64 image data (85 ms). Whole-turn main-thread time is dominated by
+paint/compositing of the running animations (2 turns: script ~0.9 s, style ~0.7 s, layout ~0.5 s, paint+raster+commit
+~2 s), so the next lever, if slow phones still stutter, is fewer animated layers during playback, not redraws.
+Bug hunt on the change (tools/bugsearch.js, 16 full runs incl. resumes and relics): no findings.
+
 ## Bug hunt, build 1.42.54 (Nov 4, 2026)
 After the week's changes (mid music, quest live count and tip, impact frames, Swap/Reroll wiggle, sound rework, redraw reorder).
 tools/bugsearch.js: 24 full runs, 12 chest-lid runs (FLICK=1), 12 + 16 fresh-device runs (QUICK=1), 10 demo runs: no findings

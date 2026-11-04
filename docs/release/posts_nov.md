@@ -1,4 +1,4 @@
-# Posts and pitch, Oct 28 - Nov 9 (drafted Oct 28; tighter schedule, Jeremy Oct 28)
+# Posts and pitch, Oct 28 - Nov 20 (drafted Oct 28; extended Nov 4: we still need players)
 
 Page version: https://claude.ai/artifact/EXsbT3N29MADimSzs15gaN (copy buttons, checkmarks synced across devices; source docs/release/posting_plan.html).
 
@@ -14,8 +14,24 @@ Page version: https://claude.ai/artifact/EXsbT3N29MADimSzs15gaN (copy buttons, c
 | Wed Nov 4 | r/playmygame redo (a week after the Oct 27 post) |
 | Thu Nov 5 | r/tabletopgamedesign design story |
 | Fri Nov 6 | emails to 3-5 small YouTubers |
+| Sat Nov 7 | r/RoguelikeDev Sharing Saturday #2 (forks, deeper-loot study) |
+| Sun Nov 8 | Newgrounds: upload the demo zip (check their rules on demos and AI art first) |
 | Mon Nov 9 | r/IndieGaming video post |
-| Sun Nov 8 or 15 | devlog #2: what we changed because of your comments |
+| Tue Nov 10 | r/playtesters (unpaid playtest flair) |
+| Wed Nov 11 | Discord: 2-3 playtest / self-promo channels |
+| Fri Nov 13 | People you know, round 2 (board-game friends, Katlynn's friends, ask each to forward to one) |
+| Sat Nov 14 | Bluesky #screenshotsaturday with the clip |
+| Sun Nov 15 | Devlog #2 + new demo zip on itch (refresh in New & Popular) |
+| Mon Nov 16 | r/DestroyMyGame (video) |
+| Tue Nov 17 | TikTok or YouTube Shorts (portrait clip, link in bio) |
+| Wed Nov 18 | r/WebGames second post, only if the sidebar allows a repost after an update |
+| Fri Nov 20 | Numbers, read the play data, keep the two channels that brought plays |
+
+Nov 4 extension: by Nov 3 the demo had 58 itch views and 22 plays in 30 days, nearly all from posts that carried the
+itch link. The new days add places whose readers come to play or test (Newgrounds, r/playtesters, Discord playtest
+channels), people we know (the best converter), and short vertical video. Copy-ready texts for every day are on the
+page (source `posting_plan.html`). Game Jolt was considered and skipped: its rules (as reported) don't allow demos of
+commercial games.
 
 Follows the two-week plan in `first_players.md`. Media: `docs/release/media/clip_turn.mp4` (11.6 s, portrait,
 one Floor 1 turn: flick the lid, draw a path, 18 damage, Overkill, Victory chest) and `clip_turn.gif` (same, for

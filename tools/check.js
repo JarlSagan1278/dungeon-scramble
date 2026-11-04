@@ -14,6 +14,7 @@ const ALL = [
   ['ui',         'tools/tests/test_ui.js'],         // camp flow, shrine screen, quest paper, music, portrait, uploads
   ['pathrender', 'tools/tests/test_pathrender.js'], // fast path redraw == full redraw
   ['trayfast',   'tools/tests/test_trayfast.js'],   // fast tray redraw == full redraw
+  ['playback',   'tools/tests/test_playback.js'],   // turn playback fast path == full redraw, every step (Nov 4)
   ['trayact',    'tools/tests/test_trayact.js'],    // Swap / Reroll
   ['shrines',    'tools/tests/test_shrines.js'],    // every shrine option
   ['scramble',   'tools/tests/test_scramble.js'],   // Scramble flick gate + Depth presets
@@ -21,7 +22,7 @@ const ALL = [
   ['quickstart', 'tools/tests/test_quickstart.js'], // first run: straight into the guided fight
   ['forks',      'tools/tests/test_forks.js'],      // forks in the road: two doors, loot per door, save/resume
 ];
-const QUICK = new Set(['sim', 'pathrender', 'trayfast', 'ui', 'scramble']);
+const QUICK = new Set(['sim', 'pathrender', 'trayfast', 'playback', 'ui', 'scramble']);
 
 (async () => {
   const which = process.argv[2] === 'quick' ? ALL.filter(([k]) => QUICK.has(k)) : ALL;

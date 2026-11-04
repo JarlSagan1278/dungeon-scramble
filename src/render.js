@@ -493,6 +493,7 @@ function syncMascotHop(){
 }
 // Rolling HP numbers: the digits count toward the new value. State lives in S._roll so it
 // survives the DOM being rebuilt mid-count.
+const ROLL_REAL = new WeakMap(); // bar-num element -> its real text
 function rollHpNumbers(){
   try{
     const noAnim = (typeof PREFS!=='undefined' && PREFS.reducedMotion);
@@ -501,7 +502,10 @@ function rollHpNumbers(){
     const now = performance.now();
     for(const side in sides){
       const el = document.querySelector(sides[side]); if(!el) continue;
-      const m = /^(-?\d+)(?:\+(\d+))?\/(\d+)$/.exec(el.textContent.trim()); if(!m) continue;
+      // the real numbers are kept on the element: the roll rewrites its text, and a playback redraw that keeps the
+      // element (patchGameDOM) must not read a half-rolled number back as the new target (Nov 4)
+      let real = ROLL_REAL.get(el); if(real==null){ real = el.textContent.trim(); ROLL_REAL.set(el, real); }
+      const m = /^(-?\d+)(?:\+(\d+))?\/(\d+)$/.exec(real); if(!m) continue;
       const to = +m[1], sh = m[2], max = m[3];
       const st = r[side] || (r[side] = {from:to, to, t:0, shown:to});
       if(st.t > now) st.t = 0; // timestamp from another page session
@@ -1759,16 +1763,16 @@ function renderEncounterCard(e, mode){
       ${hallFxHTML()}
       <svg class="fo-sconce fo-sconce-l" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><path d="M5 9.2 Q4.3 18 5.1 30 Q7.2 31.6 9.2 30 Q9.7 19 9 9.2Z" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/><path d="M1.6 15.4 Q7 13.9 12.4 15.2 Q13 17.6 12.2 19 Q7 20.3 1.8 19 Q1.1 17 1.6 15.4Z" fill="#55555e" stroke="#0c0705" stroke-width="1.5" stroke-linejoin="round"/><path d="M1.2 1.9 Q7 -0.7 12.8 1.7 Q12.2 6.6 9.7 9.7 Q7 10.7 4.4 9.5 Q2 6.6 1.2 1.9Z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-l"></div><svg class="fo-sconce fo-sconce-r" viewBox="0 0 14 32" width="14" height="32" aria-hidden="true"><path d="M5 9.2 Q4.3 18 5.1 30 Q7.2 31.6 9.2 30 Q9.7 19 9 9.2Z" fill="#7a4a22" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/><path d="M1.6 15.4 Q7 13.9 12.4 15.2 Q13 17.6 12.2 19 Q7 20.3 1.8 19 Q1.1 17 1.6 15.4Z" fill="#55555e" stroke="#0c0705" stroke-width="1.5" stroke-linejoin="round"/><path d="M1.2 1.9 Q7 -0.7 12.8 1.7 Q12.2 6.6 9.7 9.7 Q7 10.7 4.4 9.5 Q2 6.6 1.2 1.9Z" fill="#55555e" stroke="#0c0705" stroke-width="1.6" stroke-linejoin="round"/></svg><div class="fo-torch fo-torch-r"></div>
       <div class="fo-hud"></div>
-      ${questLine}
+      <!--z1-->${questLine}<!--/z1-->
       <div class="fo-band">
-        <div class="fo-side fo-player">
+        <!--z2--><div class="fo-side fo-player">
           ${relicStripHTML()}<div class="fo-fig ${p.figCls||''}" title="${S.origin.name} ${S.klass.name}">${p.figHTML||''}</div><div class="fo-floor"></div>
           <div class="fo-hpwrap status-tooltip-target" ${p.tip?`title="${p.tip}"`:''} style="position:relative;"><div class="bar ${p.fxCls||''}">${hpFillHTML('player','hp player',p.hpPct)}${shieldBarHTML(S.playerBlock, S.maxHealth, p.hpPct, 'player')}<span class="bar-num">${S.health}${shieldNumHTML(S.playerBlock)}/${S.maxHealth}</span></div>${p.deltaHTML||''}${tickFloatersHTML('player')}</div>
           <div class="fo-name">${S.charName&&S.charName.trim()?S.charName.trim().replace(/</g,'&lt;')+', '+S.origin.name+' '+S.klass.name:S.origin.name+' '+S.klass.name}</div>
           <div class="fo-chips fo-buffs">${hudChips(p.statusHTML)}</div>
-        </div>
-        <div class="fo-vs"><span class="fo-vs-txt${(performance.now()-UIFX.vsAt)<3400?' vs-intro':''}" style="animation-delay:-${Math.max(0,Math.round(performance.now()-UIFX.vsAt))}ms">vs</span></div>
-        <div class="fo-side fo-enemy${isBoss?' fo-boss-side':''}">
+        </div><!--/z2-->
+        <!--z3--><div class="fo-vs"><span class="fo-vs-txt${(performance.now()-UIFX.vsAt)<3400?' vs-intro':''}" style="animation-delay:-${Math.max(0,Math.round(performance.now()-UIFX.vsAt))}ms">vs</span></div><!--/z3-->
+        <!--z4--><div class="fo-side fo-enemy${isBoss?' fo-boss-side':''}">
           ${doorDustHTML}<div class="fo-fig enc-portrait ${(BOSS_DROP_PENDING&&/Boss/.test(e.type))?'boss-drop-wait ':''}${sz>1.05?'fo-big ':''}${(sz>1.05&&/Boss/.test(e.type))?'fo-bossbig ':''}${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}" style="--sz:${sz}">${monsterFig}</div><div class="fo-floor"></div>
           <div class="fo-hpwrap status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;">${isBoss ? bossArcBarHTML({hpPct, prevLeft:dmgPreviewLeftPct, prevW:dmgPreviewWidthPct, shieldVal:e.curShield, shieldMax:e.maxHealth, cls:`${fx.cls} ${killHint?'bar-'+killHint.state:''}`, numHTML:`<span class="bar-num">${curHealthClamped.toFixed(0)}${shieldNumHTML(e.curShield)}/${e.maxHealth}</span>`}) : `<div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
               ${hpFillHTML('enemy','hp',hpPct)}
@@ -1779,7 +1783,7 @@ function renderEncounterCard(e, mode){
           <div class="fo-chips fo-buffs">${hudChips(statuses)}</div>
           ${chipsOnly?`<div class="fo-turnlabel${nextTurn.heavy?' heavy':''}" title="${isBoss?'Every turn the boss makes its base attack plus the special shown (Freeze cancels the special).':(HEAVY_EVERY[e.tier]?'The enemy does all of these every turn. Every '+HEAVY_EVERY[e.tier]+(HEAVY_EVERY[e.tier]===2?'nd':'rd')+' turn is a heavy turn that doubles one of them (Freeze cancels it).':'The enemy does all of these every turn.')}">${isBoss?(e.phase===2?(nextTurn.heavy?'Phase 2 &middot; Wind-up!':'Phase 2'):(nextTurn.heavy?'Wind-up next!':'Next turn')):(nextTurn.heavy?'Heavy turn next!':(HEAVY_EVERY[e.tier]?'Heavy in '+(HEAVY_EVERY[e.tier]-((e.turnsActed||0)%HEAVY_EVERY[e.tier])):'Every turn'))}</div>`:''}
           <div class="fo-chips">${chipsOnly}</div>
-        </div>
+        </div><!--/z4-->
       </div>
       ${e.flavor?`<div class="fo-flavor">${e.flavor}</div>`:''}
     </div>`;
@@ -1949,10 +1953,10 @@ function renderGame(){
     foPlayer = { statusHTML:`${S.playerDOT?`<span class="status-chip status-tooltip-target" title="D.O.T. ${S.playerDOT}: ${STATUS_DESC.dot}">${iconSpan('dot', S.playerDOT)} DOT</span>`:''}        ${S.playerHOT?`<span class="status-chip status-tooltip-target" title="H.O.T. ${S.playerHOT}: ${STATUS_DESC.hot}">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}        ${S.playerBlock?`<span class="status-chip status-tooltip-target" title="Block ${S.playerBlock}: ${STATUS_DESC.block}">${iconSpan('block', S.playerBlock)} Block</span>`:''}        ${minionCount?`<span class="status-chip status-tooltip-target" title="Minions ${minionCount}: ${STATUS_DESC.minions}"><span class="chip-minion" aria-hidden="true"><i></i><i></i></span><b class="chip-n">${minionCount}</b></span>`:''}${S.pendingFreeBoost?`<span class="status-chip status-tooltip-target" style="background:var(--gold);color:#241c10;" title="Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}">${iconSpan('boost')} Boost x${S.pendingFreeBoost} armed</span>`:''}`, fxCls:playerFx.cls, deltaHTML:playerFx.deltaHTML, hpPct, tip:playerStatusTip,
       figCls: playerFx.cls==='flash-damage'?'dmg-flash':playerFx.cls==='flash-heal'?'heal-flash':'',
       figHTML: portrait.placeholder ? mysteryFigureHTML('width:60px; height:60px;') : `<img class="fo-img" src="${portrait.img}" alt="${S.origin.name}">` }; }
-  app.innerHTML = `
-    <div class="panel route-float" style="margin-bottom:8px;">
+  const html = `
+    <!--z0--><div class="panel route-float" style="margin-bottom:8px;">
       ${renderRoute()}
-    </div>
+    </div><!--/z0-->
     <div class="panel enc-panel-arch" id="enc-panel" style="margin-bottom:8px;">
       <div class="enc-rail-row">
         <div class="enc-card-col">${e?renderEncounterCard(e,'faceoff'):'<p>No active encounter.</p>'}</div>
@@ -1971,18 +1975,26 @@ function renderGame(){
             ${S.transitioning ? `<button class="skip-turn-btn" id="skip-transition-btn">Skip</button>` : pathCounterHTML()}
           </div>
         </div>
-        <div class="util-rail">
+        <!--z5--><div class="util-rail">
           <div class="util-btn primary-accent rail-go ${(resolveDisabled||S.transitioning||S.needRoll)?'disabled':''} ${(resolveDisabled&&!S.transitioning&&!S.needRoll&&!S.path.length)?'go-idle':''} ${(S.needRoll&&!S.transitioning)?'go-flick':''} ${(emphasizeResolve&&!S.needRoll)?'pulse':''}" id="resolve-btn"><span class="go-word">Go</span><span class="go-hint">pick dice</span><span class="go-flick-txt">Flick the lid to open</span></div>
           <div class="util-btn rail-pocket" id="open-backpocket-btn" title="${S.backPocket.length?'Safety net ready: if you fall to 0 Health, your Back Pocket can save you once (it spends every die in it).':'Back Pocket empty: no safety net until a die lands here.'}">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?'<span class="badge pocket-heart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.2 C 5.5 15.6 2 12.4 2 8.2 C 2 5.1 4.4 2.8 7.3 2.8 C 9.2 2.8 10.9 3.8 12 5.4 C 13.1 3.8 14.8 2.8 16.7 2.8 C 19.6 2.8 22 5.1 22 8.2 C 22 12.4 18.5 15.6 12 21.2 Z" fill="currentColor"/></svg></span>':''}</div>
           <div class="util-btn rail-item ${(totalTokens&&!S.needRoll)?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Item</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
           <div class="util-btn danger-accent rail-clear ${(S.transitioning||S.needRoll)?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
           ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning||S.needRoll)?'disabled':''} ${abilityArmed?'armed':''} ${(S.coachRun && !S.classAbilityUsed && !S.transitioning && !S.needRoll && !abilityArmed && !(S.encounter && S.encounter.type==='Shrine'))?'pulse coach-pulse':''}" id="ability-btn" style="--class-color:${S.klass.color||'#d4af52'}"><span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
             : S.klass.debug ? `<div class="util-btn rail-ability ${(!S.encounter||S.transitioning)?'disabled':''}" id="debug-win-btn"><span>Win</span></div>` : ''}
-        </div>
+        </div><!--/z5-->
       </div>
     </div>
   `;
-  document.getElementById('tray').innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join('');
+  const fastDOM = patchGameDOM(html);
+  if(!fastDOM) app.innerHTML = html;
+  { // during a fast playback redraw only the dice whose markup changed are swapped (bindTrayDice skips bound ones)
+    const tray = document.getElementById('tray'), dice = S.tray.map((c,i)=>renderDie(c,i)), keys = dice.map(zoneNorm), prev = renderGame._dice;
+    if(fastDOM && prev && prev.length===keys.length && tray.children.length===keys.length){
+      keys.forEach((k,i)=>{ if(k!==prev[i]){ const t = document.createElement('template'); t.innerHTML = dice[i].trim(); if(t.content.firstElementChild) tray.children[i].replaceWith(t.content.firstElementChild); } });
+    } else tray.innerHTML = dice.join('');
+    renderGame._dice = keys;
+  }
   renderGame._minions = S.tray.filter(c=>c.minion).length; renderGame._tok = `${S.swapTokens||0}|${S.rerollTokens||0}`;
   { const c = document.querySelector('#enc-panel .fo-arch'); if(c && syncRoomFloor._hz) c.style.setProperty('--hz', syncRoomFloor._hz+'px'); }
   // placeVs() runs after the path strip is written (below): reading layout here and writing the strip after it
@@ -2078,9 +2090,49 @@ function renderGame(){
   if(S.pendingLootDie) renderSwapModal();
 }
 
+// Turn playback fast path (Nov 4, speed pass): a turn redraws the screen ~7 times (one per die, then the enemy's
+// beats). While a turn plays back, renderGame builds the same markup as always, but instead of replacing the whole
+// screen it swaps only the regions whose markup changed (the route, the two fighters' sides, the vs mark, the quest
+// sign and the button rail; the tray is always redrawn). Everything outside those regions must match the last
+// redraw exactly, or it falls back to the full redraw. Animation phase offsets (negative delays from the clock)
+// are ignored when comparing. check.js: playback (same screen as the full redraw after every step).
+const GAME_ZONES = ['.route-float', '#enc-panel .fo-quests-float', '#enc-panel .fo-player', '#enc-panel .fo-vs', '#enc-panel .fo-enemy', '.util-rail'];
+// The regions are marked in the markup itself (<!--zN-->...<!--/zN-->, N = index in GAME_ZONES), so a playback redraw
+// compares plain strings and parses only the regions that changed -- never the whole screen.
+const ZONE_RE = /<!--z(\d)-->([\s\S]*?)<!--\/z\1-->/g;
+const zoneNorm = s=>s.replace(/:\s?-[\d.]+ms/g, ':-0ms'); // negative delays are clock-based animation phases (no leading [\w]+: it crawled over image data)
+function patchGameDOM(html){
+  const app = document.getElementById('app');
+  if(!S.transitioning || S.newRoomFx || (typeof window!=='undefined' && window.DS_NO_FASTPLAY) || !app){ renderGame._snap = null; return false; }
+  const strs = GAME_ZONES.map(()=>null), raw = GAME_ZONES.map(()=>null);
+  let dup = false;
+  const skel = zoneNorm(html.replace(ZONE_RE, (m, k, inner)=>{ if(strs[k]!=null) dup = true; raw[k] = inner; strs[k] = zoneNorm(inner); return '§'+k; }));
+  const prev = renderGame._snap;
+  renderGame._snap = dup ? null : {skel, strs};
+  if(dup || !prev || prev.skel!==skel || !document.querySelector('#enc-panel .fo-arch')) return false;
+  const live = GAME_ZONES.map(sel=>{ const l = app.querySelectorAll(sel); return l.length===1 ? l[0] : (l.length ? false : null); });
+  const want = strs.map(z=> !!(z && z.trim()));
+  if(!live.every((n,k)=> n!==false && !!n===want[k])) return false;
+  strs.forEach((z,k)=>{
+    if(!want[k]) return;
+    if(z!==prev.strs[k]){
+      const t = document.createElement('template'); t.innerHTML = raw[k].trim();
+      const n = t.content.firstElementChild; if(n) live[k].replaceWith(n);
+      return;
+    }
+    // a kept region: drop script-driven animations a full redraw would have dropped with the old element
+    // (e.g. the monster's wind-up pose, which holds its last frame); CSS animations carry on
+    try{ live[k].getAnimations({subtree:true}).forEach(a=>{ if(!(typeof CSSAnimation!=='undefined' && a instanceof CSSAnimation) && !(typeof CSSTransition!=='undefined' && a instanceof CSSTransition)) a.cancel(); }); }catch(err){}
+  });
+  // what script added outside the regions, which a full redraw would have rebuilt away: the hit shake on the card
+  { const col = app.querySelector('#enc-panel .enc-card-col'); if(col && col.classList.contains('enc-impact')){ col.classList.remove('enc-impact'); ['--impact-scale','--impact-rot','--impact-dur'].forEach(v=>col.style.removeProperty(v)); if(!col.getAttribute('style')) col.removeAttribute('style'); } }
+  renderGame._fast = (renderGame._fast||0) + 1;
+  return true;
+}
 // Tray dice: long-press shows the face, a tap builds the path. Shared by renderGame() and renderPathOnly().
 function bindTrayDice(){
   [...document.getElementById('tray').children].forEach(node=>{
+    if(node._dsBound) return; node._dsBound = true; // a die kept by a playback redraw already has its handlers
     const idx = parseInt(node.dataset.idx);
     let pressTimer = null;
     let longPressed = false;
@@ -2193,7 +2245,7 @@ function renderTrayFast(){
   hideFaceTooltip();
   tray.classList.toggle('ability-armed', abilityArmed);
   tray.classList.toggle('trayact-armed', !!S.trayAct);
-  tray.innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join('');
+  tray.innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join(''); renderGame._dice = null;
   bindTrayDice();
   renderPathStrip();
   const ab = document.getElementById('ability-btn');
@@ -2215,7 +2267,7 @@ function renderPathOnly(){
   const minions = S.tray.filter(c=>c.minion).length;
   if(minions !== renderGame._minions) return render(); // a step uncovered a Minion: the scene's Minion chip changes too
   hideFaceTooltip();
-  tray.innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join('');
+  tray.innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join(''); renderGame._dice = null;
   bindTrayDice();
   renderPathStrip();
   refreshPathBits();
