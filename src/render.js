@@ -3214,6 +3214,29 @@ function hitStop(ms){
   clearTimeout(hitStop._t);
   hitStop._t = setTimeout(()=>document.body.classList.remove('hit-stop'), ms);
 }
+// Impact frames on a kill (Nov 4, Jeremy): the comic/anime beat at the moment of the blow. During the hit-stop the
+// room flips to a stark ink negative for one frame, then a high-contrast frame with speed lines bursting out of the
+// enemy, then snaps back. Bosses get an extra negative frame. Off with Reduce Motion or Low intensity (it flashes).
+function impactFrames(big){
+  if(PREFS.reducedMotion || juiceLow()) return;
+  const fig = document.querySelector('#enc-panel .fo-enemy .fo-fig'), card = document.querySelector('#enc-panel .enc-card');
+  if(!fig || !card) return;
+  const r = fig.getBoundingClientRect(), c = card.getBoundingClientRect();
+  const cx = r.left + r.width/2, cy = r.top + r.height*0.55, R = Math.hypot(c.width, c.height);
+  let lines = '';
+  for(let i=0;i<28;i++){
+    const a = (i/28)*Math.PI*2 + (i%2 ? 0.06 : -0.04), w = 0.035 + (i%3)*0.018, r0 = R*(0.26 + (i%4)*0.04);
+    const p = (ang, rad)=>`${(Math.cos(ang)*rad).toFixed(1)},${(Math.sin(ang)*rad).toFixed(1)}`;
+    lines += `<polygon points="${p(a-w, R)} ${p(a+w, R)} ${p(a, r0)}"/>`;
+  }
+  const ov = document.createElement('div'); ov.className = 'impact-lines';
+  ov.style.cssText = `left:${c.left}px;top:${c.top}px;width:${c.width}px;height:${c.height}px;`;
+  ov.innerHTML = `<svg viewBox="${-(cx-c.left)} ${-(cy-c.top)} ${c.width} ${c.height}" width="100%" height="100%" aria-hidden="true">${lines}</svg>`;
+  document.body.appendChild(ov);
+  const set = cls=>{ document.body.classList.remove('impact-a','impact-b'); if(cls) document.body.classList.add(cls); };
+  const seq = big ? ['impact-a','impact-b','impact-a',null] : ['impact-a','impact-b',null];
+  seq.forEach((cls,k)=> setTimeout(()=>{ set(cls); if(!cls && ov.parentNode) ov.parentNode.removeChild(ov); }, k*55));
+}
 // Camp upgrade: clones of the dice being combined fly into the new die's tile.
 function flyDiceToFuse(cat, level, run){
   let clones=[];

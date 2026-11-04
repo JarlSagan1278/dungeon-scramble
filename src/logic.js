@@ -2654,6 +2654,7 @@ function onEncounterDefeated(){
   // callout banner, so the moment registers as it happens instead of only
   // as a status chip on the loot screen that follows.
   if(typeof hitStop==='function') hitStop(isBoss ? 180 : 120);
+  if(typeof impactFrames==='function') impactFrames(isBoss);
   if(isBoss){
     if(typeof playTone==='function') playTone('bossKill');
     if(typeof vibrate==='function') vibrate([50,40,90]);

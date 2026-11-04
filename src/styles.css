@@ -3669,3 +3669,10 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 .shrine-boon-float{ width:118px; }
 .shrine-boon-float .fo-quests{ font-size:10px !important; }
 .shrine-boon-float .boon-b, .shrine-boon-float b{ font-weight:800; color:#7a1f14; }
+/* Impact frames on a kill (Nov 4): frame A = ink negative of the room, frame B = stark black-and-cream with speed lines */
+body.impact-a #enc-panel .enc-card.fo-arch{ filter:grayscale(1) invert(1) contrast(2.6) brightness(1.05) !important; }
+body.impact-b #enc-panel .enc-card.fo-arch{ filter:grayscale(1) contrast(3.2) brightness(1.15) sepia(.35) !important; }
+.impact-lines{ position:fixed; z-index:40; pointer-events:none; overflow:hidden; display:none; }
+body.impact-b .impact-lines{ display:block; }
+.impact-lines svg{ display:block; overflow:hidden; }
+.impact-lines polygon{ fill:#0c0705; }

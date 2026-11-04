@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.51 (Nov 4, 2026)
+- Impact frames on a kill: during the hit-stop the room flips to an ink negative for one frame, then a stark black-and-cream frame with speed lines bursting from the enemy, then snaps back (bosses get an extra negative frame). Off with Reduce Motion or Low intensity.
 ## 1.42.50 (Nov 1, 2026)
 - Music: Elite and Deadly fights now play the fast bass with the quiet melody over it (it was the fast bass alone). The title overture gains the same pairing as a step between the quiet half and the action melody (two new sections; the build is now quiet bass, + quiet melody, fast bass + quiet melody, then the full action).
 ## 1.42.49 (Nov 1, 2026)
