@@ -155,3 +155,12 @@ single-file build ~100 KB of it is the three portraits' data URIs; the web build
 117 KB stylesheet. A turn does ~7 full renders (3 path steps + enemy beats). Next lever if needed: a playback fast path like
 renderPathOnly for the per-die steps and enemy beats.
 
+## Bug hunt, build 1.42.54 (Nov 4, 2026)
+After the week's changes (mid music, quest live count and tip, impact frames, Swap/Reroll wiggle, sound rework, redraw reorder).
+tools/bugsearch.js: 24 full runs, 12 chest-lid runs (FLICK=1), 12 + 16 fresh-device runs (QUICK=1), 10 demo runs: no findings
+except the old intermittent Debug-class "resume failed", which was the harness, not the game: it reloaded a file:// page, where
+headless Chromium sometimes drops the session's localStorage writes (same cause as the Oct 31 test_ui flake). The hunt now serves
+the game over http; the 16-run re-check (resume runs included) was clean. Quest rules refactor (questEval): identical to the old
+checkQuests on all 56 quests x 400 random turns (22,400 cases). Live sign vs result: over 61 random turns the sign promised
+"This path!" 6 times and the quest paid all 6; no quest paid without the promise.
+

@@ -31,8 +31,6 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
 ## Next for Claude
 - **Room dressing (reopened Oct 29):** inked corner ivy and per-floor room colour shipped in 1.42.5. Still open if Jeremy wants them: his own drawn ivy strands (V3) and one drawn prop per floor (D2).
 - **Performance on slow phones:** load fixed on itch (split build, Nov 4). A full redraw is ~90-110 ms at 6x CPU and a turn does ~7; a playback fast path (like renderPathOnly) for per-die steps and enemy beats is the next lever (see STUDY_FINDINGS, Nov 4).
-- **Small:** the intermittent "resume failed" on the tester-only Debug class in the bug
-  hunt (save gone after reload; never seen on the four real classes).
 
 ## Later
 - **Optional caps, only if play feels unfair:** damage-per-Minion specials count at most 8 Minions; Extruzeon layers max +12.
