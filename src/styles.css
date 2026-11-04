@@ -3725,3 +3725,12 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 /* Nov 4: the Elite door's deeper-floor loot die */
 .loot-opt-deeper{ position:relative; }
 .deeper-tag{ position:absolute; left:50%; top:-11px; transform:translateX(-50%); z-index:3; white-space:nowrap; font:800 10px/1 var(--font-ui); letter-spacing:.08em; text-transform:uppercase; color:#241c10; background:var(--loot-tier-color, #ffd76a); border:2px solid var(--line); border-radius:999px; padding:3px 8px; box-shadow:0 2px 0 var(--line); }
+
+/* Nov 4 (Jeremy): the fork's doors float on their own, like the loot chest: no panel, no text, a gentle bob */
+.fork-hall{ background:none !important; border:none !important; box-shadow:none !important; padding:0 !important; }
+.fork-doors{ gap:14px; align-items:center; }
+.fork-door .rc-door{ zoom:.7; filter:drop-shadow(0 14px 14px rgba(0,0,0,.6)); }
+.fork-door{ animation:fork-bob 1.8s ease-in-out infinite; animation-delay:var(--bob, 0s); }
+@keyframes fork-bob{ 0%,100%{ translate:0 0; } 50%{ translate:0 -6px; } }
+.fork-door:hover .rc-door, .fork-door:focus-visible .rc-door{ filter:drop-shadow(0 14px 14px rgba(0,0,0,.6)) drop-shadow(0 0 12px rgba(255,215,106,.55)); }
+.fork-door.opening, .reduced-motion .fork-door{ animation:none; }

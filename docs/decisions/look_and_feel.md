@@ -87,3 +87,4 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Nov 4, 2026:** Kills get comic-style impact frames (ink negative, then speed lines), about 110 ms (165 ms on bosses), skipped with Reduce Motion / Low intensity.
 - **Nov 4, 2026:** Swap/Reroll faces wiggle (whole die, rotate only) until the path starts, to say they are used before pathing.
 - **Nov 4, 2026 (quest salience, Jeremy picked 1-3 of the mockups):** quest sign = "Bonus" badge + "In one turn"/"This fight", reward as a red +N chip, live count while pathing with a gold "This path!" state; a one-time tip on the first quest fight. The swing-on-the-nail idea was not taken.
+- **Nov 4, 2026:** the fork screen shows only the two doors, floating like the loot chest: no panel, no descriptions, no text above or below.

@@ -1380,24 +1380,19 @@ const FORK_DOOR_TEXT = {
 };
 function forkDoorHTML(d, i){
   const kindCls = ({Elite:'k-elite', Deadly:'k-deadly', Trap:'k-trap', 'Elite Trap':'k-trap', Shrine:'k-shrine'})[d.kind] || 'k-enemy';
-  return `<div class="fork-door" role="button" tabindex="0" data-fork="${i}" aria-label="${d.kind} door">
+  return `<div class="fork-door" role="button" tabindex="0" data-fork="${i}" aria-label="${d.kind} door" title="${(FORK_DOOR_TEXT[d.kind]||'').replace(/<br>/g,' ').replace(/<[^>]+>/g,'').replace('%DEEP%', FLOORS[S.floorIdx+1] ? ', one from the '+FLOORS[S.floorIdx+1].lootName+' floor' : '')}" style="--bob:${i*-0.8}s">
     <div class="rc-door ${kindCls}">
       <div class="rc-arch"><div class="rc-leaf"><i class="rc-band b1"></i><i class="rc-band b2"></i><svg class="rc-ring" viewBox="0 0 30 46" aria-hidden="true"><rect x="7" y="2" width="16" height="42" rx="5" fill="#5a646d" stroke="#120b07" stroke-width="2.5"/><circle cx="15" cy="7" r="1.4" fill="#120b07"/><circle cx="15" cy="39" r="1.4" fill="#120b07"/><circle cx="15" cy="17" r="8.5" fill="#d6b25a" stroke="#120b07" stroke-width="2.5"/><circle cx="12.5" cy="14.5" r="2.6" fill="#fff1b8"/><path d="M15 26.5a2.6 2.6 0 0 1 1.3 4.9l1 4.6h-4.6l1-4.6a2.6 2.6 0 0 1 1.3-4.9z" fill="#120b07"/></svg></div></div>
       <div class="rc-sign"><div class="rc-plaque"><span>?</span></div><div class="rc-kind">${d.kind}</div></div>
     </div>
-    <span class="fork-note">${(FORK_DOOR_TEXT[d.kind]||'').replace('%DEEP%', FLOORS[S.floorIdx+1] ? `, one from the <b>${FLOORS[S.floorIdx+1].lootName}</b> floor` : '')}</span>
   </div>`;
 }
 function renderFork(){
   const fc = S.forkChoice; if(!fc){ S.screen='game'; return render(); }
   document.querySelectorAll('#room-callout, #room-callout-scrim').forEach(n=>n.remove());
+  // Nov 4 (Jeremy): just the two doors, floating like the loot chest -- no panel, no text around them
   app.innerHTML = `<div class="wrap fork-screen">${renderRoute()}
-    <div class="panel fork-hall">
-      <h2 class="fork-title">Which door?</h2>
-      <p class="fork-sub">You see what kind of room each holds, not what's inside.</p>
-      <div class="fork-doors">${fc.doors.map(forkDoorHTML).join('')}</div>
-      <p class="fork-foot">Health ${S.health} / ${S.maxHealth}${S.backPocket && S.backPocket.length ? ` &middot; ${S.backPocket.length} ${S.backPocket.length===1?'die':'dice'} in the Back Pocket` : ''}</p>
-    </div></div>`;
+    <div class="fork-hall"><div class="fork-doors">${fc.doors.map(forkDoorHTML).join('')}</div></div></div>`;
   app.querySelectorAll('.fork-door').forEach(b=> b.onkeydown = ev=>{ if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); b.click(); } });
   app.querySelectorAll('.fork-door').forEach(b=> b.onclick = ()=>{
     if(b.classList.contains('opening')) return;

@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.57 (Nov 4, 2026)
+- Fork screen: just the two doors, floating on their own like the loot chest (no panel, no title, no notes; each door keeps its kind ribbon), slightly bigger, with a gentle offset bob. What each door pays is still in its hover text.
 ## 1.42.56 (Nov 4, 2026)
 - The Elite door's reward is richer: its third loot choice now comes from the next floor's better loot (a Gilded die on Floor 1, a Magic die on Floor 2; on Floor 3 it stays Magic). The door says so ("one from the Gilded floor") and the loot card wears its own tier colour with a "Deeper loot" tag. A fork no longer shows a leftover door from the room before.
 ## 1.42.55 (Nov 4, 2026)
