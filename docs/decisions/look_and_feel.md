@@ -93,3 +93,4 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Nov 4, 2026:** fork markers in the room tracker must match the existing tracker doors: two narrow arched doorways side by side, kind shown by border colour + glyph.
 - **Nov 4, 2026:** side by side fork doors read as sequential, not a choice: the two tracker doorways stack vertically instead.
 - **Nov 4, 2026:** the kill impact frame looked like a glitch; redone as a held two-tone comic panel (paper + ink silhouette + speed lines) that eases out, no full-room negative flicker.
+- **Nov 4, 2026:** the full comic panel was too intense; middle ground: see-through parchment wash with the room visible, lighter speed lines, solid ink silhouette, no reversed boss frame.

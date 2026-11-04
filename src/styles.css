@@ -3671,14 +3671,15 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 .shrine-boon-float .boon-b, .shrine-boon-float b{ font-weight:800; color:#7a1f14; }
 /* Impact frames on a kill (Nov 4): frame A = ink negative of the room, frame B = stark black-and-cream with speed lines */
 /* Kill impact frame (Nov 4 redo): a held two-tone comic panel over the doorway, then an ease-out (see impactFrames) */
-.impact-frame{ position:fixed; z-index:40; pointer-events:none; overflow:hidden; background:#f3e3bf; opacity:1; }
+.impact-frame{ position:fixed; z-index:40; pointer-events:none; overflow:hidden; opacity:1;
+  background:radial-gradient(ellipse 60% 55% at var(--ifx,50%) var(--ify,40%), rgba(243,227,191,.45), rgba(243,227,191,.74) 70%); } /* Nov 4: see-through wash, the room stays visible */
 .impact-frame svg{ position:absolute; inset:0; display:block; }
-.impact-frame polygon{ fill:#1a0f08; }
-.impact-frame .if-sil{ position:absolute; object-fit:contain; filter:brightness(0); transform:scaleX(var(--flip,1)) scale(1.07); transform-origin:50% 60%; }
+.impact-frame polygon{ fill:#1a0f08; opacity:.72; }
+.impact-frame .if-sil{ position:absolute; object-fit:contain; filter:brightness(0); transform:scaleX(var(--flip,1)) scale(1.04); transform-origin:50% 60%; }
 .impact-frame.if-b{ background:#1a0f08; }
 .impact-frame.if-b polygon{ fill:#f3e3bf; }
 .impact-frame.if-b .if-sil{ filter:brightness(0) invert(.92) sepia(.4); transform:scaleX(var(--flip,1)) scale(1.1); }
-.impact-frame.if-out{ opacity:0; transition:opacity .16s ease-out; }
+.impact-frame.if-out{ opacity:0; transition:opacity .19s ease-out; }
 .impact-frame.if-out .if-sil{ transform:scaleX(var(--flip,1)) scale(1.0); transition:transform .16s ease-out; }
 /* Nov 4 (Jeremy): Swap/Reroll faces are used before you path, so until the path starts the whole die gives a little
    wiggle every couple of seconds (rotate only -- a scale would blur the face). */

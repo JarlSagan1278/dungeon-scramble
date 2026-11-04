@@ -3354,8 +3354,8 @@ function hitStop(ms){
 // room flips to a stark ink negative for one frame, then a high-contrast frame with speed lines bursting out of the
 // enemy, then snaps back. Bosses get an extra negative frame. Off with Reduce Motion or Low intensity (it flashes).
 // Kill impact frame (Nov 4, redone after Jeremy: the flickering negative read as a glitch). A held comic-style panel
-// over the doorway: paper background, the monster as a solid ink silhouette punched slightly forward, ink speed lines
-// aimed at it; on a boss it flips once to ink-on-paper reversed. Then it eases out instead of cutting. Nothing in the
+// over the doorway: a see-through paper wash, the monster as an ink silhouette punched slightly forward, ink speed lines
+// aimed at it (bosses hold it a little longer). Then it eases out instead of cutting. Nothing in the
 // room itself is filtered, so the room never flickers.
 function impactFrames(big){
   if(PREFS.reducedMotion || juiceLow()) return;
@@ -3366,13 +3366,13 @@ function impactFrames(big){
   if(!r.width || !c.width) return;
   const cx = r.left + r.width/2 - c.left, cy = r.top + r.height*0.5 - c.top, R = Math.hypot(c.width, c.height);
   let lines = '';
-  for(let i=0;i<32;i++){
-    const a = (i/32)*Math.PI*2 + ((i*7)%5-2)*0.02, w = 0.022 + (i%3)*0.012, r0 = Math.max(r.width, r.height)*(0.62 + (i%4)*0.07);
+  for(let i=0;i<22;i++){ // Nov 4 middle ground: fewer, thinner lines that stop short of the monster
+    const a = (i/22)*Math.PI*2 + ((i*7)%5-2)*0.03, w = 0.014 + (i%3)*0.008, r0 = Math.max(r.width, r.height)*(0.8 + (i%4)*0.1);
     const p = (ang, rad)=>`${(cx+Math.cos(ang)*rad).toFixed(1)},${(cy+Math.sin(ang)*rad).toFixed(1)}`;
     lines += `<polygon points="${p(a-w, R)} ${p(a+w, R)} ${p(a, r0)}"/>`;
   }
   const ov = document.createElement('div'); ov.className = 'impact-frame';
-  ov.style.cssText = `left:${c.left}px;top:${c.top}px;width:${c.width}px;height:${c.height}px;` + (card.style.clipPath ? `clip-path:${card.style.clipPath};` : '');
+  ov.style.cssText = `left:${c.left}px;top:${c.top}px;width:${c.width}px;height:${c.height}px;--ifx:${(cx/c.width*100).toFixed(1)}%;--ify:${(cy/c.height*100).toFixed(1)}%;` + (card.style.clipPath ? `clip-path:${card.style.clipPath};` : '');
   ov.innerHTML = `<svg viewBox="0 0 ${c.width.toFixed(1)} ${c.height.toFixed(1)}" width="100%" height="100%" aria-hidden="true">${lines}</svg>`;
   let sil = null;
   if(art.tagName === 'IMG'){
@@ -3382,7 +3382,7 @@ function impactFrames(big){
     ov.appendChild(sil);
   }
   document.body.appendChild(ov);
-  const steps = big ? [['if-a',0],['if-b',95],['if-a',170],['if-out',260],[null,430]] : [['if-a',0],['if-out',150],[null,320]];
+  const steps = big ? [['if-a',0],['if-out',190],[null,400]] : [['if-a',0],['if-out',110],[null,300]]; // no reversed frame (too intense, Jeremy Nov 4)
   steps.forEach(([cls,t])=> setTimeout(()=>{
     if(!cls){ if(ov.parentNode) ov.parentNode.removeChild(ov); return; }
     ov.classList.remove('if-a','if-b'); if(cls==='if-out') ov.classList.add(ov.dataset.last||'if-a', 'if-out'); else { ov.classList.add(cls); ov.dataset.last = cls; }

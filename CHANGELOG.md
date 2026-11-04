@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.65 (Nov 4, 2026)
+- Impact frame toned down (1.42.64 was too intense): the room stays visible under a see-through parchment wash (lighter around the monster), 22 thinner speed lines at 72% ink that stop short of the monster, and a solid ink silhouette punched 4% forward. Held ~110 ms (~190 ms on bosses, no reversed frame), then a ~0.2 s fade.
 ## 1.42.64 (Nov 4, 2026)
 - Kill impact frame redone (it read as a glitch): instead of flickering the whole room into a negative, a held comic panel covers the doorway for ~150 ms (paper background, the monster as a solid ink silhouette punched slightly forward, ink speed lines aimed at it), then fades out. Bosses get one reversed frame (ink background, paper silhouette) in between. Skipped with Reduce Motion / Low intensity, as before.
 ## 1.42.63 (Nov 4, 2026)
