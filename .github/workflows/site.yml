@@ -33,10 +33,12 @@ jobs:
       - name: Waiting for the Cloudflare secrets
         if: env.HAS_TOKEN == ''
         run: echo "::notice::Built, not deployed. Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as repository secrets to turn on deploys."
+      # Wrangler runs from the runner's temp folder, not the repo: installing it inside the repo makes npm resolve the
+      # game's package.json (dev tools pinned there), which broke the first deploy (Nov 5).
       - name: Deploy to Cloudflare Pages
         if: env.HAS_TOKEN != ''
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist/site --project-name=dungeonscramble --branch=main --commit-dirty=true
+        working-directory: ${{ runner.temp }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@4 pages deploy "$GITHUB_WORKSPACE/dist/site" --project-name=dungeonscramble --branch=main --commit-dirty=true
