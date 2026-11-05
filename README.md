@@ -1,7 +1,7 @@
 # Dungeon Scramble
 
 A turn-based dice roguelike for phones. Each turn you roll 16 dice into a 4x4 tray and draw one path through them;
-every die you step on fires its face (Hit, Block, Heal, Combo, Boost, Freeze, and Maneuvers that bend the path).
+each die you step on takes effect, in order (Hit, Block, Heal, Combo, Boost, Freeze, and Maneuvers that bend the path).
 Monsters always show their next move. Three floors of rooms, camps, shrines and bosses; loot dice and relics build
 the tray over a run.
 

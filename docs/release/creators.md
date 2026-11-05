@@ -10,7 +10,7 @@ Personalize the first line from the hook below, attach clip_turn (MP4 or GIF), a
 
 Base note (from the plan page): *Hi [name], I enjoyed [video], especially [moment]. My wife and I made Dungeon
 Scramble, a turn-based dice roguelike that started as our board game: roll 16 dice into a 4x4 tray, draw one path,
-and every die you step on fires. The first floor is free in the browser (~15 min, works on PC):
+and each die you step on hits, blocks or heals, in order. The first floor is free in the browser (~15 min, works on PC):
 https://dungeonscramble.itch.io/dungeon-scramble . A 12-second clip is attached. No strings; if it's not your thing,
 no reply needed. Thanks! — Jeremy*
 

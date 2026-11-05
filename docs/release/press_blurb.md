@@ -4,7 +4,7 @@ Drafted Oct 21, 2026 (build 1.41.76). Facts about the game come from `src/data.j
 
 ## Pitch (one paragraph)
 
-Dungeon Scramble is a turn-based roguelike. Roll sixteen dice into a 4x4 tray, then trace a single path through them: each die you step on activates its face, from Hit and Block to Combo, Boost and Freeze. Monsters always show their next move, so you can plan around it. Maneuver faces like Leap, Dodge and Pivot bend the rules of the path. Chain them in the right order and a modest roll becomes a monster-flattening turn. Block the big hit, freeze the wind-up, or burst it down before it lands. Pick from four origins and four classes, collect 50+ 6-sided loot dice and 20+ powerful relics, and descend through three dungeon floors to the Big Bosses.
+Dungeon Scramble is a turn-based roguelike. Roll sixteen dice into a 4x4 tray, then trace a single path through them: each die you step on takes effect in order, from Hit and Block to Combo, Boost and Freeze. Monsters always show their next move, so you can plan around it. Maneuver faces like Leap, Dodge and Pivot bend the rules of the path. Chain them in the right order and a modest roll becomes a monster-flattening turn. Block the big hit, freeze the wind-up, or burst it down before it lands. Pick from four origins and four classes, collect 50+ 6-sided loot dice and 20+ powerful relics, and descend through three dungeon floors to the Big Bosses.
 
 ## Short version (3 sentences)
 

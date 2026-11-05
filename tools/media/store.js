@@ -1,7 +1,7 @@
 const {chromium}=require('playwright');const fs=require('fs');
 const M='/home/user/dungeon-scramble/docs/release/media/';
 const ff=fs.readFileSync('fontface.css','utf8');
-const items=[['02_path.png','Draw a path through the dice','Every die you step on fires its face','appstore_1_path.png'],
+const items=[['02_path.png','Draw a path through the dice','Each die you step on hits, blocks or heals','appstore_1_path.png'],
  ['03_boss.png',"Read the enemy's next move",'Monsters always show what comes next','appstore_2_boss.png'],
  ['07_victory.png','Build your dice, beat the depths','56 loot dice, 27 relics, 3 floors','appstore_3_victory.png']];
 (async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1290,height:2796}});

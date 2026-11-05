@@ -5745,7 +5745,7 @@ function bindScrambleFlick(el){
 
 const GUIDE_TEXT = {
   t1: ['<b>This is your Tray.</b> <b style="color:#e8574f">Red</b> dice are actions (Hit, Combo); <b>white</b> dice are Maneuvers that bend your Path (Leap, Dodge, Pivot). Tap the glowing die to start a Path.',
-       'Now tap the glowing neighbor. Every die you step on fires its face.',
+       'Now tap the glowing neighbor. Each die you step on hits, blocks or heals, in order.',
        'One more! A <b>Combo</b> hits harder when it touches Hits.',
        'That number is your Path\'s damage. Keep going through more dice, or tap <b>Go</b>!'],
   t2roll: 'New turn! <b>Flick the lid</b> open (or double-tap it) to roll your dice. On a phone, you can shake it instead.',

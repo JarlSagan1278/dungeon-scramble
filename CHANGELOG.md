@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.42.66 (Nov 5, 2026)
+- Wording (Jeremy didn't like "every die fires"): the guided first fight now says "Each die you step on hits, blocks or heals, in order." Same change across the README, store/press/itch texts ("takes effect, in order"), post templates, creator note and the QR card (tagline "Draw one path. Every step counts.").
 ## 1.42.65 (Nov 4, 2026)
 - Impact frame toned down (1.42.64 was too intense): the room stays visible under a see-through parchment wash (lighter around the monster), 22 thinner speed lines at 72% ink that stop short of the monster, and a solid ink silhouette punched 4% forward. Held ~110 ms (~190 ms on bosses, no reversed frame), then a ~0.2 s fade.
 ## 1.42.64 (Nov 4, 2026)

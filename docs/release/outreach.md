@@ -21,7 +21,7 @@ Tips:
 
 > Remember Dungeon Scramble, the dice board game? We made it into a phone game, and Floor 1 is free to try in your browser: https://dungeonscramble.itch.io/dungeon-scramble
 >
-> It's the same idea (roll the dice, trace a path, every die you step on fires) with new classes, loot dice and monsters that show their next move. I'm curious how it feels compared with the table version. What's better, what did you miss, and did anything feel unfair?
+> It's the same idea (roll the dice, trace a path, each die you step on hits, blocks or heals) with new classes, loot dice and monsters that show their next move. I'm curious how it feels compared with the table version. What's better, what did you miss, and did anything feel unfair?
 
 ## 3. Reddit: r/WebGames (browser games; title + link post)
 
@@ -30,7 +30,7 @@ Tips:
 **Link:** https://dungeonscramble.itch.io/dungeon-scramble
 
 **First comment (post it yourself):**
-> I made this with my wife Katlynn, starting from a board game we designed together. You roll sixteen dice, then trace one path through the tray. Each die you step on fires its face: hits, blocks, combos, leaps. Monsters always show their next move, so each turn is a small puzzle.
+> I made this with my wife Katlynn, starting from a board game we designed together. You roll sixteen dice, then trace one path through the tray. Each die you step on takes effect, in order: hits, blocks, combos, leaps. Monsters always show their next move, so each turn is a small puzzle.
 >
 > This is the free first floor. I'd really like to hear where you got stuck or what wasn't clear.
 
@@ -40,7 +40,7 @@ Tips:
 
 > My wife Katlynn and I designed Dungeon Scramble as a board game, and I've spent the last while turning it into a phone roguelite.
 >
-> Each turn you roll a 4x4 tray of dice and draw a single path through it. Every die on the path fires its face, so the order matters: Combo hits harder next to Hits, Leap jumps a die, Dodge steps diagonally. Monsters telegraph their next move, bosses have move sets you can learn, and there are four classes, loot dice and relics to build around.
+> Each turn you roll a 4x4 tray of dice and draw a single path through it. Each die on the path takes effect in turn, so the order matters: Combo hits harder next to Hits, Leap jumps a die, Dodge steps diagonally. Monsters telegraph their next move, bosses have move sets you can learn, and there are four classes, loot dice and relics to build around.
 >
 > Floor 1 is free and plays in a phone browser: https://dungeonscramble.itch.io/dungeon-scramble
 >
@@ -53,13 +53,13 @@ Tips:
 
 **Title:** [Browser/Mobile] Dungeon Scramble: a dice-path roguelike, free Floor 1, looking for first-time players
 
-> **What it is:** a turn-based roguelike where you roll a 4x4 tray of dice and draw one path through it. Every die you step on fires its face.
+> **What it is:** a turn-based roguelike where you roll a 4x4 tray of dice and draw one path through it. Each die you step on hits, blocks or heals, in order.
 > **Play:** https://dungeonscramble.itch.io/dungeon-scramble (phone browser works best, ~10-15 minutes)
 > **Feedback I'm after:** was the first turn clear, where your run ended, and whether any death felt unfair.
 
 ## 6. Discord (short, for a #self-promo or #playtesting channel)
 
-> Made a dice-path roguelike with my wife: roll a 4x4 tray, draw a path, every die you step on fires. Free first floor in the browser, works on phones: https://dungeonscramble.itch.io/dungeon-scramble . Looking for first-time players, and blunt feedback is welcome.
+> Made a dice-path roguelike with my wife: roll a 4x4 tray, draw a path, each die you step on hits, blocks or heals, in order. Free first floor in the browser, works on phones: https://dungeonscramble.itch.io/dungeon-scramble . Looking for first-time players, and blunt feedback is welcome.
 
 ## 7. itch.io devlog (post on the game page; it shows up in followers' feeds)
 

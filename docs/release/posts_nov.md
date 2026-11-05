@@ -53,7 +53,7 @@ summaries, not the live pages). Answer every comment the first day. Log the numb
 **Type:** link post to the itch page.
 
 **Title:**
-> Dungeon Scramble: roll a 4x4 tray of dice, draw one path through it, and every die you step on fires. Free, plays on phones.
+> Dungeon Scramble: roll a 4x4 tray of dice, draw one path through it, and each die you step on hits, blocks or heals, in order. Free, plays on phones.
 
 **First comment (from you, right after posting):**
 > My wife and I designed this as a board game, and I've been turning it into a phone game. It's a turn-based roguelike: each turn you get a tray of 16 dice and trace one path through them. Hits, blocks, heals and combos fire in the order you step on them, and the monsters always show what they'll do next turn, so every roll is a little puzzle.
@@ -68,7 +68,7 @@ summaries, not the live pages). Answer every comment the first day. Log the numb
 > Dungeon Scramble — a dice-path roguelike from our kitchen-table board game (free Floor 1, mobile-friendly)
 
 **Body:** (attach the GIF at the top)
-> Hi all! Dungeon Scramble is a turn-based roguelike my wife Katlynn and I started as a board game. Each turn you roll 16 dice into a 4x4 tray and draw one path through them. Every die you step on fires its face: Hit, Block, Heal, Combo, Boost, Freeze. Maneuver faces like Leap, Dodge and Pivot bend the path. Monsters always show their next move, so you can plan around it.
+> Hi all! Dungeon Scramble is a turn-based roguelike my wife Katlynn and I started as a board game. Each turn you roll 16 dice into a 4x4 tray and draw one path through them. Each die you step on takes effect, in order: Hit, Block, Heal, Combo, Boost, Freeze. Maneuver faces like Leap, Dodge and Pivot bend the path. Monsters always show their next move, so you can plan around it.
 >
 > The free demo is the whole first floor: pick up loot dice and relics, visit a shrine and a camp, and fight the Floor 1 boss. It runs in the browser and was built for phones (portrait), but works on a computer too.
 >
@@ -89,10 +89,10 @@ sub wants a written description in the post itself; if the video post has no tex
 as the first comment immediately.
 
 **Title:**
-> [Web/Mobile] Dungeon Scramble — draw a path through a tray of dice, every die fires. Free Floor 1 demo, looking for first-time players
+> [Web/Mobile] Dungeon Scramble — draw a path through a tray of dice, every step counts. Free Floor 1 demo, looking for first-time players
 
 **Description (body or first comment):**
-> **What it is:** a turn-based dice roguelike. Roll 16 dice into a 4x4 tray, trace one path, and each die you step on fires its face in order. Monsters show their next move, so you plan around it.
+> **What it is:** a turn-based dice roguelike. Roll 16 dice into a 4x4 tray, trace one path, and each die you step on hits, blocks or heals, in order. Monsters show their next move, so you plan around it.
 > **Play (free, browser, best on a phone held upright, ~15 min):** https://dungeonscramble.itch.io/dungeon-scramble
 > **Made by:** my wife and me; it started as our board game.
 > **Feedback I'm after:** was your first turn clear? Where did your run end? Did any death feel unfair?
@@ -119,7 +119,7 @@ as the first comment immediately.
 if the live rules allow it.
 
 **Title:**
-> My wife and I turned our dice board game into a phone roguelike: draw one path through the tray and every die fires
+> My wife and I turned our dice board game into a phone roguelike: draw one path through the tray and every step counts
 
 **Comment (only if links are allowed in comments):**
 > It's called Dungeon Scramble. The first floor is free in the browser: https://dungeonscramble.itch.io/dungeon-scramble — happy to answer questions about turning the board game into the digital version.
@@ -138,7 +138,7 @@ No link unless someone asks; then reply with it.
 (Jeremy: the four bullets are my guesses at what changed. Replace them with what really changed from your prototype;
 keep the shape: what was true at the table, what the screen let you do instead.)
 
-> My wife and I designed a dungeon crawler where you roll dice into a 4x4 grid and trace one path through them; each die you step on fires its face (hit, block, heal, combo). At the table it worked, but turning it into a digital game forced a few changes I didn't expect:
+> My wife and I designed a dungeon crawler where you roll dice into a 4x4 grid and trace one path through them; each die you step on takes effect (hit, block, heal, combo). At the table it worked, but turning it into a digital game forced a few changes I didn't expect:
 >
 > - **Minions became "fog."** On the table, minion tokens covered dice and you knew what was under them. Digitally we hide the face until your path reaches it, so you can't plan around what you can't see.
 > - **Upkeep disappeared, so the rules could get fiddlier.** Boost tokens, combos that scale with path length, enemies that act every N turns: all of these were bookkeeping-heavy on paper and are free on a screen.
@@ -173,7 +173,7 @@ in the clip is AI-assisted (see decisions/art_and_names.md).
 >
 > I'm Jeremy Friedman. My wife Katlynn and I make Dungeon Scramble, a turn-based roguelike that started as a board game we designed together.
 >
-> Each turn you roll 16 dice into a 4x4 tray and draw one path through them. Every die you step on fires its face, in order: hits, blocks, heals, combos that grow with the path, and maneuvers like Leap and Pivot that bend it. Monsters always show their next move, so every roll is a small puzzle about whether to block or race.
+> Each turn you roll 16 dice into a 4x4 tray and draw one path through them. Each die you step on takes effect, in order: hits, blocks, heals, combos that grow with the path, and maneuvers like Leap and Pivot that bend it. Monsters always show their next move, so every roll is a small puzzle about whether to block or race.
 >
 > The first floor is a free demo in the browser, about 15 minutes, made for phones held upright but playable on a computer:
 > https://dungeonscramble.itch.io/dungeon-scramble
@@ -194,4 +194,4 @@ a current contact is found, and to 3-5 small dice/roguelike YouTubers on Fri Nov
 
 **Subject:** Free dice roguelike demo for your itch videos? (Dungeon Scramble)
 
-> Hi [name], I enjoyed your video on [specific game/video]. My wife and I made Dungeon Scramble, a turn-based dice roguelike that started as our board game: roll 16 dice into a 4x4 tray, draw one path, every die fires. The first floor is free in the browser (~15 min, works on PC): https://dungeonscramble.itch.io/dungeon-scramble — clip attached. No strings; if it's not your thing, no reply needed. Thanks! — Jeremy
+> Hi [name], I enjoyed your video on [specific game/video]. My wife and I made Dungeon Scramble, a turn-based dice roguelike that started as our board game: roll 16 dice into a 4x4 tray, draw one path, and each die you step on hits, blocks or heals, in order. The first floor is free in the browser (~15 min, works on PC): https://dungeonscramble.itch.io/dungeon-scramble — clip attached. No strings; if it's not your thing, no reply needed. Thanks! — Jeremy

@@ -38,12 +38,12 @@ Promotional text can be changed without a new build: use it later for launch new
 
 ## Full description (max 4000; this draft 1420)
 
-Wording follows Jeremy's Oct 23 press-kit edits: "activates its face", telegraphed fights, class "skill", "three dungeon floors", rounded "50+ / 20+" counts, no "second phase", no story section.
+Wording follows Jeremy's Oct 23 press-kit edits ("activates its face" became "takes effect, in order" on Nov 5), telegraphed fights, class "skill", "three dungeon floors", rounded "50+ / 20+" counts, no "second phase", no story section.
 
 ```
 Kick in the door. Roll your dice. Find the path.
 
-Dungeon Scramble is a turn-based roguelike. Your dice land in a 4x4 tray, and you trace one path through neighboring dice. Each die you step on activates its face: Hit, Block, Heal, Combo, Boost, Freeze and more. Monsters always show their next move, so you can plan around it. Maneuver faces like Leap, Dodge and Pivot bend the rules of the path. Chain them in the right order and a modest roll becomes a monster-flattening turn. Block the big hit, freeze the wind-up, or burst it down before it lands.
+Dungeon Scramble is a turn-based roguelike. Your dice land in a 4x4 tray, and you trace one path through neighboring dice. Each die you step on takes effect, in order: Hit, Block, Heal, Combo, Boost, Freeze and more. Monsters always show their next move, so you can plan around it. Maneuver faces like Leap, Dodge and Pivot bend the rules of the path. Chain them in the right order and a modest roll becomes a monster-flattening turn. Block the big hit, freeze the wind-up, or burst it down before it lands.
 
 WHAT'S INSIDE
 - 4 origins (Dwarf, Gnome, Halfling, Pixie) and 4 classes, each with its own zone of the tray and a once-per-turn skill
