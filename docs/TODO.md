@@ -5,7 +5,7 @@ study results in `STUDY_FINDINGS.md`. The release checklist (40 items, owner and
 the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 
 ## Now: first players
-0. **Publicity plan (Nov 5, replaces the daily posts):** https://claude.ai/artifact/EXsbT3N29MADimSzs15gaN. A: 20 first-time players asked one by one (friends forward, hand-the-phone, playtest swaps). B: 8 small-creator pitches (Claude makes the shortlist). C: Google Play closed test (12 testers x 14 days, the people from A), then open testing ~Dec 1. Claude's parts: creator shortlist, QR card, signed app bundle + listing once the Play account exists.
+0. **Publicity plan (Nov 5, reworked: strangers, not people we know):** https://claude.ai/artifact/EXsbT3N29MADimSzs15gaN. A: strangers who play (Playtester Discord, Newgrounds, r/playtesters swaps, a weekly short video, optional game nights). B: 8 small-creator pitches (docs/release/creators.md). C: Google Play closed test with testers from tester-swap communities (r/AndroidClosedTesting, r/TestersCommunity, Testers Community Google Group), then open testing ~Dec 1. Claude's parts: weekly short clip, signed app bundle + listing + closed-test track once the Play account exists.
 1. **Posting plan, Oct 28 – Nov 9** (page: https://claude.ai/artifact/EXsbT3N29MADimSzs15gaN; texts in
    `release/posts_nov.md`; tracking in `release/outreach.md`). One community a day; log Reddit views and itch
    views/plays the next day.
