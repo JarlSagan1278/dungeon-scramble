@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 // Builds the game's website for Cloudflare Pages (Oct 22): dist/site/ = home page, /privacy, /press (+ press/media).
-// Upload: Cloudflare dashboard -> Workers & Pages -> the "dungeonscramble" Pages project -> new deployment -> drop dist/site.
-// Sources: docs/release/privacy.html, docs/release/presskit.html, docs/release/media/ (git-ignored; tools/media remakes it).
+// Deploy (Nov 5): automatic. .github/workflows/site.yml runs this and `wrangler pages deploy dist/site` to the "dungeonscramble"
+// Pages project on every push to main that touches the site's sources (needs the CLOUDFLARE_API_TOKEN and
+// CLOUDFLARE_ACCOUNT_ID repository secrets). Manual fallback: Cloudflare dashboard -> Workers & Pages -> dungeonscramble ->
+// new deployment -> drop dist/site.
+// Sources: docs/release/privacy.html, docs/release/presskit.html, docs/release/site_media/ (committed: only the files the
+// press kit links; when tools/media remakes them in docs/release/media/, copy the linked ones over).
 const fs = require('fs'), path = require('path');
 const R = path.join(__dirname, '..'), OUT = path.join(R, 'dist', 'site');
 fs.rmSync(OUT, { recursive: true, force: true });
@@ -13,12 +17,15 @@ fs.writeFileSync(path.join(OUT, 'privacy', 'index.html'), fs.readFileSync(path.j
 const scrub = h => h.replace(/<!--[\s\S]*?-->\n?/g, '').replace(/ ?<span class="ph">[^<]*<\/span>/g, '').replace(/<p class="ph">[^<]*<\/p>\n?/g, '')
   .replace(/<tr><th>[^<]*<\/th><td>\s*<\/td><\/tr>\n?/g, '').replace(/<p[^>]*>(\s|&nbsp;)*<\/p>\n?/g, '');
 fs.writeFileSync(path.join(OUT, 'press', 'index.html'), scrub(press));
-const MEDIA = path.join(R, 'docs/release/media');
+const MEDIA = path.join(R, 'docs/release/site_media');
 let n = 0;
 if (fs.existsSync(MEDIA)) {
   fs.mkdirSync(path.join(OUT, 'press', 'media'));
   for (const f of fs.readdirSync(MEDIA)) { fs.copyFileSync(path.join(MEDIA, f), path.join(OUT, 'press', 'media', f)); n++; }
-} else console.warn('docs/release/media is missing: run tools/media first, or the press kit has no pictures');
+} else console.warn('docs/release/site_media is missing: the press kit has no pictures');
+// every picture the press kit links must be there (a missing one would be a broken image on the live site)
+const missing = [...new Set((press.match(/media\/[A-Za-z0-9_.-]+/g) || []).map(m => m.slice(6)))].filter(f => !fs.existsSync(path.join(MEDIA, f)));
+if (missing.length) { console.error('Press kit links missing media: ' + missing.join(', ')); process.exit(1); }
 // Home page: the press kit's look (same <head>, Metamorphous included), a short pitch and the links.
 const head = press.slice(0, press.indexOf('</head>')).replace(/<title>[^<]*<\/title>/, '<title>Dungeon Scramble</title>')
   + '<meta name="description" content="A roguelike dungeon crawler: roll a 4x4 tray of dice and trace one path through it to attack, block and heal. Coming to iPhone and Android.">'

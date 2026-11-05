@@ -1,0 +1,42 @@
+# Website (dungeonscramble.com: home, /press, /privacy) -- Nov 5, 2026.
+# Rebuilds dist/site with tools/site.js and deploys it to the "dungeonscramble" Cloudflare Pages project whenever the
+# site's sources change on main (or by hand: Actions tab > Website > Run workflow).
+# Needs two repository secrets (Settings > Secrets and variables > Actions):
+#   CLOUDFLARE_API_TOKEN  -- a Cloudflare API token with Account > Cloudflare Pages > Edit
+#   CLOUDFLARE_ACCOUNT_ID -- the account ID (Cloudflare dashboard, Workers & Pages, right-hand column)
+name: Website
+on:
+  push:
+    branches: [main]
+    paths:
+      - docs/release/presskit.html
+      - docs/release/privacy.html
+      - docs/release/site_media/**
+      - tools/site.js
+      - .github/workflows/site.yml
+  workflow_dispatch:
+concurrency:
+  group: website
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      HAS_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build the site
+        run: node tools/site.js
+      - name: Waiting for the Cloudflare secrets
+        if: env.HAS_TOKEN == ''
+        run: echo "::notice::Built, not deployed. Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as repository secrets to turn on deploys."
+      - name: Deploy to Cloudflare Pages
+        if: env.HAS_TOKEN != ''
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist/site --project-name=dungeonscramble --branch=main --commit-dirty=true
