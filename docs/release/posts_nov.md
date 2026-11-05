@@ -194,4 +194,4 @@ a current contact is found, and to 3-5 small dice/roguelike YouTubers on Fri Nov
 
 **Subject:** Free dice roguelike demo for your itch videos? (Dungeon Scramble)
 
-> Hi [name], I enjoyed your video on [specific game/video]. My wife and I made Dungeon Scramble, a turn-based dice roguelike that started as our board game: roll 16 dice into a 4x4 tray, draw one path, and each die you step on hits, blocks or heals, in order. The first floor is free in the browser (~15 min, works on PC): https://dungeonscramble.itch.io/dungeon-scramble — clip attached. No strings; if it's not your thing, no reply needed. Thanks! — Jeremy
+> Hi [name], I enjoyed your video on [specific game/video]. My wife and I made Dungeon Scramble, a turn-based dice roguelike that started as our board game: roll 16 dice into a 4x4 tray, draw one path, and each die you step on hits, blocks or heals, in order. The first floor is free in the browser (~15 min, works on PC): https://dungeonscramble.itch.io/dungeon-scramble — clip attached. If you enjoy it and want to keep going, I'm happy to send you the full game (three floors). No strings; if it's not your thing, no reply needed. Thanks! — Jeremy

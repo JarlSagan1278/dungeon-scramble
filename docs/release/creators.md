@@ -11,7 +11,8 @@ Personalize the first line from the hook below, attach clip_turn (MP4 or GIF), a
 Base note (from the plan page): *Hi [name], I enjoyed [video], especially [moment]. My wife and I made Dungeon
 Scramble, a turn-based dice roguelike that started as our board game: roll 16 dice into a 4x4 tray, draw one path,
 and each die you step on hits, blocks or heals, in order. The first floor is free in the browser (~15 min, works on PC):
-https://dungeonscramble.itch.io/dungeon-scramble . A 12-second clip is attached. No strings; if it's not your thing,
+https://dungeonscramble.itch.io/dungeon-scramble . A 12-second clip is attached.
+If you enjoy it and want to keep going, I'm happy to send you the full game (three floors). No strings; if it's not your thing,
 no reply needed. Thanks! — Jeremy*
 
 ## Send these 8 first (small, and already playing exactly this kind of game)
@@ -51,6 +52,15 @@ Roguelikes", 4 months ago), [Wanderbots](https://www.youtube.com/@wanderbots) (5
 Roguelike - Rune Dice [Demo]"). Big channels often pass on browser demos; a Play Store or Steam page helps here later.
 
 Also worth one email: Jupiter Hadley (covers thousands of small itch games; no formal submission route found).
+
+## If a creator wants the full game (Nov 5)
+Never send the playtest site (it changes with every push and has tester tools). Send the frozen **creator build**:
+the release version (all three floors, no Debug class, no tester tools), version 1.42.66, zip
+`dungeon_scramble_full_creator_<ver>.zip` (`node build.js --release`, then zip `dist/release/web` with index.html at the root).
+On itch: create a new project (e.g. "Dungeon Scramble — full game (creator build)"), kind HTML, upload the zip, tick
+"This file will be played in the browser" and the mobile-friendly box, same viewport as the demo, then set
+**Visibility & access: Restricted** and share its secret URL (or a download key) with that creator only. Their viewers
+still go to the public demo link. Rebuild only when a creator needs a fix.
 
 ## Log
 | Channel | Sent | Reply | Video? |
