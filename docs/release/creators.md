@@ -65,3 +65,11 @@ still go to the public demo link. Rebuild only when a creator needs a fix.
 ## Log
 | Channel | Sent | Reply | Video? |
 |---|---|---|---|
+| PunNoFun | Nov 6 | | |
+| Voyix | Nov 6 | | |
+| GothicLordUK | Nov 6 | | |
+| PepperHead | Nov 6 | | |
+| AboboKnows | Nov 6 | | |
+| Keenangraz | Nov 6 | | |
+| Deckbuilders Daily | Nov 6 | | |
+| V4Van | not sent (no listed email; Facebook page message instead) | | |
