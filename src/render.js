@@ -4843,7 +4843,7 @@ function questRewardHTML(rewardText){
   const num = (type==='nullify' || type==='freeze') ? '' : n; // a Freeze is always one skipped turn
   return `<span class="q-reward q-reward-${type}" title="Reward: ${rewardText}">${iconSpan(type)}${num?`<b>${num}</b>`:''}</span>`;
 }
-// The quest sign (Nov 4, Jeremy: quests were hard to read for new players). A "Bonus" badge says it's optional; while a
+// The quest sign (Nov 4, Jeremy: quests were hard to read for new players). A "Wanted" badge (Nov 7; was "Bonus") says it's optional; while a
 // path is being built, each one-turn quest shows its live count ("2/3 Maneuvers"), and when this path would complete
 // one, its row lights gold and the heading reads "This path!". Redrawn on every path tap by refreshPathBits().
 const QSIGN_H = new WeakMap();
@@ -4881,7 +4881,7 @@ function questSignHTML(e){
   const lock = QSIGN_H.get(e), lockH = lock && lock.h;
   const style = questPaperStyle(e), hs = lock ? `--qh:${lock.h}px;--qfit:${lock.fit};` : '';
   const st = !hs ? style : style ? style.replace('style="', 'style="'+hs) : ` style="${hs}"`;
-  return `<div class="fo-quests-float${anyLive?' q-glow':''}${lockH?' q-locked':''}"${st} title="Bonus quests: optional, each pays the reward on its right"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label"><b class="q-bonus-b">Bonus</b> ${label}</div><div class="fo-quests">${rows}</div></div>`;
+  return `<div class="fo-quests-float${anyLive?' q-glow':''}${lockH?' q-locked':''}"${st} title="Wanted: optional quests, each pays the reward on its right"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label"><b class="q-bonus-b">Wanted</b> ${label}</div><div class="fo-quests">${rows}</div></div>`;
 }
 function questRowHTML(q, done, live){
   const {rewardText, cond} = parseQuestSpec(q);
@@ -5848,7 +5848,7 @@ const TIP_TEXT = {
   // Nov 4 (Jeremy): quests were hard to understand. Name this fight's own quest and reward so the lesson is concrete.
   quest: q=>{ const {rewardText, cond} = parseQuestSpec(q); const allFight = QUEST_ALL_FIGHT.test(cond);
     const rw = rewardText ? ` (here: <b>${rewardText.toLowerCase()}</b>)` : '';
-    return `<b>Bonus quest!</b> Do what the sign says ${allFight ? 'during this fight' : 'in a single turn'} (${questCondShort(cond)}) to earn the reward on its right${rw}. It's optional.`; },
+    return `<b>Wanted!</b> Do what the poster says ${allFight ? 'during this fight' : 'in a single turn'} (${questCondShort(cond)}) to earn the reward on its right${rw}. It's optional.`; },
 };
 let _tip = null; // {k, pathLen, at, targetSel}
 function tipTargets(){

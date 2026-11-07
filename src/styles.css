@@ -3785,3 +3785,6 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .fo-quests-float .q-reward b{ font-size:10px !important; }
 .fo-quests-float .q-reward{ padding:0 4px 0 1px !important; }
 .fo-quests-float .fo-quest.q-row{ padding:1px 0; }
+/* Nov 7: "WANTED" is wider than "BONUS": a hair tighter header so "IN ONE TURN" stays inside the paper */
+.fo-quests-float .fo-quests-label{ font-size:8.5px !important; letter-spacing:.3px !important; gap:3px; }
+.fo-quests-label .q-bonus-b{ padding:1px 3px 0; letter-spacing:.6px; }

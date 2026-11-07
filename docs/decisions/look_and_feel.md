@@ -95,3 +95,4 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Nov 4, 2026:** the kill impact frame looked like a glitch; redone as a held two-tone comic panel (paper + ink silhouette + speed lines) that eases out, no full-room negative flicker.
 - **Nov 4, 2026:** the full comic panel was too intense; middle ground: see-through parchment wash with the room visible, lighter speed lines, solid ink silhouette, no reversed boss frame.
 - **Nov 7, 2026:** the quest paper must not pass the wall/floor line: compact sign (one-line header, one line per condition, smaller title) and, as a backstop, scale it down to fit. Trap footing set on the refreshed Monster Footing page (traps added).
+- **Nov 7, 2026:** the quest sign's badge reads "Wanted" (was "Bonus").
