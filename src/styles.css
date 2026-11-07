@@ -3774,3 +3774,14 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
    like a branch on a map, in the same 40px slot */
 .rt-pair{ flex-direction:column !important; gap:2px !important; align-items:stretch !important; }
 .rt-pair .rt-arch.rt-mini{ flex:1 1 0; width:100%; height:auto; min-height:0; border-radius:12px 12px 2px 2px; font-size:12px; border-bottom-width:2px; }
+/* Nov 7 (Jeremy: the quest paper hung past the wall/floor line, with a big title and wrapped rows): a compact sign.
+   "BONUS" and its subtitle share one line, the sign is a little wider so each condition stays on one line, and a sign
+   that would still cross the line is scaled down from its top (--qfit, lockQuestSign). */
+.fo-quests-float{ width:126px; padding:6px 7px 6px !important;
+  transform:translateX(calc(-63% + var(--qdx, 0px))) translateY(var(--qdy, 0px)) rotate(-2.2deg) scale(var(--qfit, 1)) !important; }
+.fo-quests-float .fo-quests-label{ display:flex; align-items:center; justify-content:center; gap:4px; font-size:9px !important; letter-spacing:.6px !important; line-height:1.1; margin-bottom:3px !important; white-space:nowrap; }
+.fo-quests-label .q-bonus-b{ margin-bottom:0; padding:1px 4px 0; font-size:7.5px; letter-spacing:1px; }
+.fo-quests-float .q-cond{ font-size:10px !important; white-space:nowrap; text-wrap:nowrap; line-height:1.15; }
+.fo-quests-float .q-reward b{ font-size:10px !important; }
+.fo-quests-float .q-reward{ padding:0 4px 0 1px !important; }
+.fo-quests-float .fo-quest.q-row{ padding:1px 0; }

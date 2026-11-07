@@ -4853,7 +4853,13 @@ function lockQuestSign(){
     const e = S.encounter, el = document.querySelector('#enc-panel .fo-quests-float:not(.shrine-boon-float)');
     if(!e || !el || QSIGN_H.has(e) || el.classList.contains('q-glow') || el.querySelector('.q-count')) return;
     const h = el.offsetHeight; if(!h) return;
-    QSIGN_H.set(e, h); el.style.setProperty('--qh', h+'px'); el.classList.add('q-locked');
+    // Nov 7 (Jeremy): the paper must not hang past the line where the wall meets the floor. If it would, it is scaled
+    // down (from its top) just enough to clear it; measured once per fight with the size lock, so it never changes mid-fight.
+    let fit = 1;
+    const card = el.closest('.fo-arch'), hz = card ? parseFloat(card.style.getPropertyValue('--hz')) : NaN;
+    if(hz > 0){ const qdy = parseFloat(el.style.getPropertyValue('--qdy')) || 0, top = el.offsetTop + qdy, room = hz - 4 - top;
+      if(room > 0 && h > room) fit = Math.max(0.7, Math.floor(room / h * 100) / 100); }
+    QSIGN_H.set(e, {h, fit}); el.style.setProperty('--qh', h+'px'); el.style.setProperty('--qfit', fit); el.classList.add('q-locked');
   }catch(err){}
 }
 function questSignHTML(e){
@@ -4872,10 +4878,10 @@ function questSignHTML(e){
   // the sign, and the sign keeps the height it had at the start of the fight (QSIGN_H, measured by lockQuestSign).
   const rest = oneTurn ? 'In one turn' : 'This fight';
   const label = `<span class="q-lbl"><span${anyLive?' class="q-off"':''}>${rest}</span><span class="q-yes${anyLive?'':' q-off'}">&#10003; This path!</span></span>`;
-  const lockH = QSIGN_H.get(e);
-  const style = questPaperStyle(e), hs = lockH ? `--qh:${lockH}px;` : '';
+  const lock = QSIGN_H.get(e), lockH = lock && lock.h;
+  const style = questPaperStyle(e), hs = lock ? `--qh:${lock.h}px;--qfit:${lock.fit};` : '';
   const st = !hs ? style : style ? style.replace('style="', 'style="'+hs) : ` style="${hs}"`;
-  return `<div class="fo-quests-float${anyLive?' q-glow':''}${lockH?' q-locked':''}"${st} title="Bonus quests: optional, each pays the reward on its right"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label"><b class="q-bonus-b">Bonus</b><br>${label}</div><div class="fo-quests">${rows}</div></div>`;
+  return `<div class="fo-quests-float${anyLive?' q-glow':''}${lockH?' q-locked':''}"${st} title="Bonus quests: optional, each pays the reward on its right"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label"><b class="q-bonus-b">Bonus</b> ${label}</div><div class="fo-quests">${rows}</div></div>`;
 }
 function questRowHTML(q, done, live){
   const {rewardText, cond} = parseQuestSpec(q);

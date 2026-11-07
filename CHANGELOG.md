@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.67 (Nov 7, 2026)
+- Monster footing for the traps (Monster Footing page, refreshed with the traps added): Transposer Lair (lower, 1.15x), Adhesive Pest Traps (lower, 1.2x), Leper Con-Trap, Ditched Heist (0.85x), The Strike/Break-er (0.9x), Unauthorized Transfusion (0.75x), Unventilated Workshop (0.9x), Bio-Mutant Escape (0.95x), Ergot Eruption.
+- Quest paper never hangs past the line where the wall meets the floor (13 of 34 signs did, by up to 60 px): "BONUS" and its subtitle share one small line, the sign is a little wider (126 px) so every condition stays on one line, smaller text and tighter rows (a 3-quest sign is 94 px tall instead of ~146-171). A sign that would still cross the line is scaled down from its top, measured once per fight (none need it today).
 ## 1.42.66 (Nov 5, 2026)
 - Wording (Jeremy didn't like "every die fires"): the guided first fight now says "Each die you step on hits, blocks or heals, in order." Same change across the README, store/press/itch texts ("takes effect, in order"), post templates, creator note and the QR card (tagline "Draw one path. Every step counts.").
 ## 1.42.65 (Nov 4, 2026)
