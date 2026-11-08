@@ -158,6 +158,7 @@ let res = await page.evaluate((cfg)=>{
       else if((m=cond.match(/(\d+)\s*block/))) done = ef.blockCount>=+m[1];
       else if((m=cond.match(/(\d+)\s*boost/))) done = ef.boostCount>=+m[1];
       else if((m=cond.match(/(\d+)\s*support/))) done = ef.supportCount>=+m[1];
+      else if((m=cond.match(/^route (.+)$/))) done = typeof routeGoalMet==='function' && routeGoalMet(m[1].trim(), {pathIdx:ef.pathIdx||[], pathTypes:ef.pathTypes||[]}); // Nov 8 route goals
       if(done){ const a=flatReward?Math.min(amt,room):amt; bonus+=a; if(flatReward) room-=a; }
     });
     return bonus;
@@ -168,7 +169,15 @@ let res = await page.evaluate((cfg)=>{
   window.finishPlayerPath = function(path, effects){
     const e=S.encounter; const q0=e.questDamageDealt||0;
     window.__man.turns++; window.__man.steps+=effects.totalActions; window.__man.manSteps+=effects.maneuverCount;
+    // Nov 8 route-goal study: per floor, how many Maneuver faces showed on the Tray vs how many the path used
+    const fi=S.floorIdx, pf=(window.__man.pf=window.__man.pf||[0,1,2].map(()=>({turns:0,man:0,manShown:0,manDieUsed:0,manDieShown:0,routeDone:0,routeHad:0,manQDone:0,steps:0})))[fi];
+    pf.turns++; pf.man+=effects.maneuverCount; pf.steps+=effects.totalActions;
+    S.tray.forEach((c,i)=>{ if(c.minion||c.blank||c.spent) return; const t=currentFace(c).type; if(['dodge','leap','pivot'].includes(t)) pf.manShown++;
+      if(c.die.cat==='maneuver' && t!=='blank'){ pf.manDieShown++; if(path.includes(i)) pf.manDieUsed++; } });
+    const qd0=(e.questsDone||[]).slice();
     const r = origFin(path, effects);
+    (e.quests||[]).forEach((q,i)=>{ if(qd0[i]) return; const route=/: route /.test(q); if(route) pf.routeHad++;
+      if(e.questsDone[i]){ if(route) pf.routeDone++; else if(/maneuver|dodge|leap|pivot/.test(q)) pf.manQDone++; } });
     const qd=(e.questDamageDealt||0)-q0; if(qd>0){ window.__man.questDmg+=qd; window.__man.questTurns++; }
     return r;
   };
@@ -195,6 +204,7 @@ let res = await page.evaluate((cfg)=>{
     const pick = pool && pool.filter(b=>forced.includes(b.name));
     if(pick && pick.length){ const saved = pool.splice(0, pool.length, ...pick); e = origDraw(kind); pool.splice(0, pool.length, ...saved); }
     else e = origDraw(kind);
+    if(cfg.noRoute && e.quests){ const keep=e.quests.map((q,i)=>!/: route /.test(q)); e.quests=e.quests.filter((q,i)=>keep[i]); if(e.questsDone) e.questsDone=e.questsDone.filter((q,i)=>keep[i]); } // Nov 8: 1.42.69 quests
     const fi = S.floorIdx;
     const boss = (e.type==='Boss'||e.type==='Big Boss');
     let mul = (cfg.hpMul[fi]||1) * (boss ? (cfg.bossHpMul[fi]||1) : 1);
@@ -411,6 +421,7 @@ const byFloor=[1,2,3].map(f=>{const fs=res.flatMap(r=>r.fights).filter(x=>x.floo
 const reached=[1,2,3].map(f=>res.filter(r=>r.floor>=f).length);
 const td=[1,2,3].map(f=>{const t=turnsData.filter(x=>x.f===f&&!x.boss);const m=a=>a.reduce((x,y)=>x+y,0)/Math.max(1,a.length);const d=t.map(x=>x.dmg).sort((a,b)=>a-b);return {f,avgLen:m(t.map(x=>x.len)).toFixed(1),avgDmg:m(d).toFixed(1),p50:d[d.length>>1],p90:d[Math.floor(d.length*.9)]};});
 const deaths=[1,2,3].map(f=>res.filter(r=>r.result==='GAMEOVER'&&r.floor===f).length);
-const manStats={manPerTurn:(man.manSteps/Math.max(1,man.turns)).toFixed(2),pathLen:(man.steps/Math.max(1,man.turns)).toFixed(2),questDmgPerRun:(man.questDmg/n).toFixed(1),manIIplusAtEnd:(man.manII/n).toFixed(2)};
+const pfStats=(man.pf||[]).map((p,i)=>({f:i+1,manPerTurn:(p.man/Math.max(1,p.turns)).toFixed(2),manDieUseRate:(p.manDieUsed/Math.max(1,p.manDieShown)*100).toFixed(0)+'%',routeDone:p.routeDone,routeTurnsOpen:p.routeHad,manQuestsDone:p.manQDone,pathLen:(p.steps/Math.max(1,p.turns)).toFixed(2)}));
+const manStats={pf:pfStats,manPerTurn:(man.manSteps/Math.max(1,man.turns)).toFixed(2),pathLen:(man.steps/Math.max(1,man.turns)).toFixed(2),questDmgPerRun:(man.questDmg/n).toFixed(1),manIIplusAtEnd:(man.manII/n).toFixed(2)};
 console.log(JSON.stringify({label:cfg.label,manStats,deaths,td,skill:cfg.skill,runs:n,winRate:(wins/n*100).toFixed(0)+'%',reachedF2_F3:reached.slice(1),avgTurns:(res.reduce((a,r)=>a+r.turns,0)/n).toFixed(0),byFloor}));
 await b.close();})();
