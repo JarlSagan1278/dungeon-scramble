@@ -4612,6 +4612,7 @@ function renderSwapModal(){
     suggestItem.onclick(); // pre-compare it
   };
   if(suggestItem) setTimeout(showSuggest, SWAP_SUGGEST_DELAY_MS);
+  if(typeof tipsWanted==='function' && tipsWanted() && !TIPS_SEEN.has('lootswap')) setTimeout(()=>showLootSwapTip(overlay), 350);
   overlay.querySelector('#swap-pocket').onclick = () => closeModal(overlay, ()=> pocketLootDie());
   // Oct 31 (Jeremy): until a die is picked the button says Suggest and shows the suggestion on demand; it then says
   // Replace, so a quick double press equips the suggested die
@@ -4624,6 +4625,22 @@ function renderSwapModal(){
   };
 }
 
+// First loot pick (Nov 8, Jeremy: new players didn't know a loot die replaces one): a one-time bubble above the
+// Equip sheet, pointing down at "Your Tray". It goes away on a tap, or when the sheet closes.
+function showLootSwapTip(overlay){
+  if(!overlay || !overlay.isConnected || document.getElementById('loot-tip')) return;
+  const head = overlay.querySelector('.swap-modal'); if(!head) return;
+  markTipSeen('lootswap');
+  const b = document.createElement('div'); b.id='loot-tip'; b.className='guide-bubble tip-bubble loot-tip';
+  b.innerHTML = `<div class="guide-text"><b>New die!</b> Your Tray always holds 16 dice, so this one <b>replaces</b> one of them. Tap the die to swap out, then <b>Replace</b>. The old die goes to your <b>Back Pocket</b>, which can save you once from 0 Health.</div><span class="guide-skip">Got it</span>`;
+  document.body.appendChild(b);
+  const place = ()=>{ const r = head.getBoundingClientRect(), bw = Math.min(330, innerWidth-24);
+    b.style.width = bw+'px'; b.style.left = Math.round((innerWidth-bw)/2)+'px'; b.style.top = Math.max(8, Math.round(r.top - b.offsetHeight - 14))+'px'; };
+  place();
+  const kill = ()=>{ clearInterval(iv); b.remove(); };
+  const iv = setInterval(()=>{ if(!overlay.isConnected) kill(); else place(); }, 300);
+  b.onclick = kill;
+}
 // ---- Shrine ritual (v1.36.0) ----
 // Press and hold the shrine (its figure or the button) for SHRINE_HOLD_MS: the
 // art lifts and glows, the pathTick ladder climbs, and on completion the

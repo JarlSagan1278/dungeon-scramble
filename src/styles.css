@@ -3804,3 +3804,10 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 @keyframes dot-land{ 0%{ opacity:0; transform:translate(-50%,8px) scale(.85); } 12%{ opacity:1; transform:translate(-50%,0) scale(1.06); } 22%{ transform:translate(-50%,-2px) scale(1); } 75%{ opacity:1; } 100%{ opacity:0; transform:translate(-50%,-26px); } }
 .dot-land.dl-still{ animation:dot-land-still 1.6s linear forwards; }
 @keyframes dot-land-still{ 0%,80%{ opacity:1; } 100%{ opacity:0; } }
+
+/* Nov 8 (Jeremy picked A): a quest the current path would complete gets a green check and green text, no yellow box */
+.fo-quests-float .fo-quest.q-live-done{ background:none; box-shadow:none; }
+.fo-quests-float .fo-quest.q-live-done .q-cond{ color:#2f7a32; font-weight:800; }
+.fo-quests-float .fo-quest.q-live-done .q-cond::before{ content:"\2713\00a0"; color:#2f7a32; }
+/* First loot pick bubble: sits above the Equip sheet, so it must be over the modal overlay (z 50) */
+.loot-tip{ z-index:1000; }
