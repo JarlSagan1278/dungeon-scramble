@@ -1472,6 +1472,13 @@ function renderRoute(){
 // on: it compounds through any leading Boost faces already in the path,
 // then is spent (used or wasted) by the very next non-Boost action --
 // mirrors the boostMult bookkeeping in computePathEffects().
+// Boost reach (Nov 8, Jeremy): while a Boost waits for its next action (the path ends on a Boost face, or an armed
+// Boost token has nothing to land on yet), the dice you can step on next show whether the Boost would multiply them.
+const BOOSTABLE_FACES = new Set(['hit','combo','dot','leech','heal','hot','block','boost']); // same as computePathEffects
+function boostPending(){
+  if(S.path.length) return getFaceForIdx(S.path[S.path.length-1]).type==='boost';
+  return S.pendingFreeBoost>0;
+}
 function boostTargetIdx(){
   if(!(S.pendingFreeBoost>0)) return -1;
   for(const idx of S.path){
@@ -1573,6 +1580,7 @@ function renderDie(cell, idx){
   const nameTag = isNonStarter ? `<div class="name-tag">${nameTagSVG(cell.die.name, idx)}</div>` : '';
   const forcedCls = cell.forcedFace ? 'forced-face' : '';
   const boostTargetCls = boostTargetIdx()===idx ? 'boost-target' : '';
+  const boostReachCls = (!ta && !inPath && selectable && !cell.minion && boostPending()) ? (BOOSTABLE_FACES.has(f.type) ? 'boost-yes' : 'boost-no') : '';
   // A Combo face's damage scales with however many Hit/Combo/Shield/H.O.T./
   // D.O.T. dice currently sit next to it on the board (attackNeighborsCount
   // -- grid-adjacency, not path-adjacency, so this is true any time, path or
@@ -1593,9 +1601,10 @@ function renderDie(cell, idx){
     const rings = ring('cr'+lvl+'a',1.3,1.0) + (lvl>=2 ? ring('cr'+lvl+'b',2.8,1.0) : '');
     return `<svg class="combo-ring combo-ring-${lvl}" viewBox="-8 -8 40 40" aria-hidden="true">${rings}</svg>`;
   })();
-  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${strongGlint?'glint-strong':''} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${resolveCls} ${minionClearCls} ${comboActiveCls} ${trayActCls}"
+  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${strongGlint?'glint-strong':''} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${boostReachCls} ${resolveCls} ${minionClearCls} ${comboActiveCls} ${trayActCls}"
             data-idx="${idx}" title="${isLastMove?'Click to undo this move':(cell.minion?'Minion die':(taReady?`Tap to ${LABEL[trayActFaceAt(idx)]}`:cell.die.name))}" ${shakeDelay}>
             ${num?`<div class="pathnum">${num}</div>`:''}
+            ${boostReachCls==='boost-yes'?`<span class="boost-reach-chip" aria-hidden="true">${iconSpan('boost')}</span>`:''}
             ${cell.minion?`<div class="minion-eyes" aria-hidden="true" style="${minionEyeStyle(idx)}"><i class="minion-eye"></i><i class="minion-eye"></i></div>`:''}
             ${(cell.forcedFace || boostTargetCls) ? `<div class="corner-badges">
               ${cell.forcedFace?`<span class="forced-badge ${justConverted?'badge-pop-in':''}" title="Converted by a class ability">${MARK_STAR}</span>`:''}
@@ -2064,7 +2073,7 @@ function renderGame(){
     if(S.transitioning || S.classAbilityUsed || S.needRoll) return;
     abilityArmed = !abilityArmed; // tap again to back out before picking a die
     playTone(abilityArmed ? 'skillArm' : 'skillDisarm');
-    if(abilityArmed) logMsg('sys', `Click a die in your zone to convert it.`);
+    if(abilityArmed) logMsg('sys', `Tap any die in your zone to convert it, even a blank.`);
     renderTrayFast(); // the zone die tap itself is handled in bindTrayDice (Oct 14: no full redraw per tap)
   };
   const debugWinBtn = document.getElementById('debug-win-btn');
@@ -2196,8 +2205,8 @@ function renderPathStrip(){
 // Class-ability coach (Oct 13, Jeremy): the first fight with each class explains its Skill once, in plain words,
 // placed high so the tray and its zone stay visible below it. Remembered per class in META.coachSeen.
 const ABILITY_COACH = {
-  armsmaster:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the right column) to turn it into a Hit (2). Use it every turn: it is free damage.',
-  guard:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the 2x2 square, middle right) to turn it into a Block (1). Use it every turn: Block stops damage before it lands.',
+  armsmaster:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the right column) to turn it into a Hit (2). <b>Blanks too!</b> A blank in your zone is a free Hit 2 waiting. Use it every turn: it is free damage.',
+  guard:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the 2x2 square, middle right) to turn it into a Block (1). <b>Blanks too!</b> A blank in your zone becomes a Block. Use it every turn: Block stops damage before it lands.',
   dungeoneer:'Always on: your dashed zone is the left and right edges, and your path can wrap from one edge straight to the other on any row. Each wrap adds +1 damage to your next attacking die. Look for long paths that cross the sides.',
   arcanist:'Always on: your dashed zone is both diagonals. Once your path is on the X, it may step diagonally to another square of the X. And every Boost you play is 1 stronger (x2 becomes x3). Look for paths that run along the X.',
 };
@@ -5897,7 +5906,8 @@ const TIP_TEXT = {
   sidestep: ()=>'A <b>Sidestep</b> doesn\'t block anything: it lets your Path\'s next step go <b>diagonally</b>.',
   dot: who=>`<b>D.O.T.</b> (damage over time) is on ${who}: it deals its number in damage at the end of each turn, then drops by 1. <b>Blue</b> chips are on you, <b>red</b> chips on the monster.`,
   skill: k=>{ const c = k && k.convertTo; const zone = ({armsmaster:'the right column', guard:'the 2x2 square, middle right'})[k && k.id] || 'your dashed zone';
-    return `Your <b>Skill</b>: tap it, then tap any die in ${zone} (dashed) to turn that die into a <b>${c ? (LABEL[c.type]||c.type)+' '+c.value : 'better face'}</b>. Once every turn.`; },
+    return `Your <b>Skill</b>: tap it, then tap any die in ${zone} (dashed), <b>even a blank</b>, to turn it into a <b>${c ? (LABEL[c.type]||c.type)+' '+c.value : 'better face'}</b>. Once every turn.`; },
+  skillblank: c=>`That <b>blank</b> is in your Skill zone: tap <b>Skill</b>, then the blank, and it becomes a <b>${c ? (LABEL[c.type]||c.type)+' '+c.value : 'better face'}</b>. Blanks are the best dice to convert.`,
   longpath: ()=>'Longer Paths add up: each die you step on takes effect, in order, and each <b>Combo</b> grows with the attacking dice beside it.',
   // Nov 4 (Jeremy): quests were hard to understand. Name this fight's own quest and reward so the lesson is concrete.
   quest: q=>{ const {rewardText, cond} = parseQuestSpec(q); const allFight = QUEST_ALL_FIGHT.test(cond);
@@ -5912,6 +5922,8 @@ function tipTargets(){
     if(!TIPS_SEEN.has('dot') && (e.curDOT>0 || S.playerDOT>0)){
       const side = e.curDOT>0 ? 'fo-enemy' : 'fo-player', sel = `#enc-panel .${side} .fo-buffs .status-chip[title^="D.O.T."]`;
       if(document.querySelector(sel)) return {k:'dot', el:sel, arg: e.curDOT>0 ? 'the monster' : 'you'}; }
+    if(!TIPS_SEEN.has('skillblank') && S.klass && S.klass.convertTo && !S.classAbilityUsed && document.querySelector('#ability-btn:not(.disabled)')){ // Nov 8 (Jeremy): blanks convert too
+      const i = S.tray.findIndex((c,j)=>inZone(j) && !c.minion && !c.spent && !c.forcedFace && currentFace(c).type==='blank'); if(i>=0) return {k:'skillblank', el:at(i), arg:S.klass.convertTo}; }
     if(!TIPS_SEEN.has('skill') && S.klass && S.klass.convertTo && !S.classAbilityUsed && S.turnNumber>=1 && document.querySelector('#ability-btn:not(.disabled)'))
       return {k:'skill', el:'#ability-btn', arg:S.klass};
     if(!TIPS_SEEN.has('sidestep')){ const i = S.tray.findIndex(c=>!c.minion && !c.blank && !c.spent && currentFace(c).type==='dodge'); if(i>=0) return {k:'sidestep', el:at(i), arg:null}; }

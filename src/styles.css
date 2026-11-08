@@ -3812,3 +3812,10 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .fo-quests-float .fo-quest.q-live-done .q-cond::before{ content:"\2713"; color:#2f7a32; position:absolute; left:-9px; font-weight:900; } /* in the margin, so the text never gets wider */
 /* First loot pick bubble: sits above the Equip sheet, so it must be over the modal overlay (z 50) */
 .loot-tip{ z-index:1000; }
+
+/* Boost reach (Nov 8): the next dice a waiting Boost would multiply get a small gold Boost chip; the ones it would be
+   wasted on fade a little. Opacity only (no filter/box-shadow, which other die states own). */
+.tray > .die.boost-no{ opacity:.55; }
+.tray > .die .boost-reach-chip{ position:absolute; top:3px; right:3px; z-index:3; width:17px; height:17px; border-radius:50%; box-sizing:border-box;
+  background:var(--gold,#d4af52); color:#241c10; border:2px solid var(--line,#0c0705); display:flex; align-items:center; justify-content:center; pointer-events:none; }
+.tray > .die .boost-reach-chip .icon-svg{ width:11px; height:11px; }

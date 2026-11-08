@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.42.70';
+const GAME_VERSION = '1.42.71';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false };
@@ -322,9 +322,9 @@ const ORIGINS = [
 // Dungeoneer=orange, Arcanist=magenta) -- carried over so the digital
 // Class picker identifies each Class the same way the physical game does.
 const CLASSES = [
-  {id:'armsmaster', name:'Armsmaster', color:'#7a45d6', ability:'Once per turn, turn any Action or Blank in your zone (right column) into a Hit (2).',
+  {id:'armsmaster', name:'Armsmaster', color:'#7a45d6', ability:'Once per turn, turn any die in your zone (right column), even a Blank, into a Hit (2).',
     zone:(r,c)=> c===3, convertTo:{type:'hit', value:2}},
-  {id:'guard', name:'Guard', color:'#2fb8b8', ability:'Once per turn, turn any Action or Blank in your zone (a 2x2 square, middle right) into a Block (1).',
+  {id:'guard', name:'Guard', color:'#2fb8b8', ability:'Once per turn, turn any die in your zone (a 2x2 square, middle right), even a Blank, into a Block (1).',
     zone:(r,c)=> (r===1||r===2) && (c===2||c===3), convertTo:{type:'block', value:1}}, // 2x2 square again (Jeremy, Oct 25; was a 3-square L from Oct 12, 63% -> 58% at depth 7) // Block 2 -> 1 (Jeremy, Oct 12 class study: Guard won 89% vs 40-67%)
   {id:'dungeoneer', name:'Dungeoneer', color:'#d4812e', ability:'Your zone (the left and right edges) wraps left-to-right when building a Path, on every row. Each wrap adds +1 damage to your next attacking die.',
     zone:(r,c)=> c===0 || c===3, wrap:true, seamDamage:1}, // seamDamage: Oct 16 study (experts at depth 7: 36% -> 55%) // every row wraps (Jeremy, Oct 12; was the two middle rows)

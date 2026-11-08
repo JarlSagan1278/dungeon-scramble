@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.71 (Nov 8, 2026)
+- Class Skills say plainly that they work on blank faces too (Armsmaster, Guard): the Skill intro ("Blanks too!"), the Skill tip, the class text ("even a Blank"), the armed hint, and a new one-time tip that points at a blank in your zone. Rulebook updated.
+- Boost reach: while a Boost waits for its next action, the dice you can step on next show it: a small gold Boost chip on the ones it would multiply, the others fade a little.
+
 ## 1.42.70 (Nov 8, 2026)
 Route goals (the playtest's "one best path, maneuvers feel forced"; Jeremy picked option C):
 - New Wanted posters ask for a path shape inside one Path, next to each monster's usual quest: Square Root (2×2 square), Running Start (Move, Boost), Leapfrog (Leap to Leap), Diagonal Argument (3 on a diagonal), Pivot Point (Pivot, Combo), Turning Number (Turn 3 times), Antipodal (Far corners), Hollow Proof (Edge path 5+). 13 monsters carry one; reward +5 damage on Floor 1, +8 on Floor 2, +10 on Floor 3. The sign shows only the short condition; long-press names the goal and its rule.

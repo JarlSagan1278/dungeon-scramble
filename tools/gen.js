@@ -80,7 +80,7 @@ C+=ch(2,'Starting a Run',`
 <p>On the character screen pick an <b>Origin</b> and a <b>Class</b>, optionally name your Adventurer (the name is cosmetic) and press ${btn('Enter the Dungeon')}. You start with <b>20 Health</b>, an empty Back Pocket, and a Tray of 16 dice: <b>8 Attack Die I</b>, <b>7 Maneuver Die I</b> and your <b>Origin die</b>.</p>
 <h3>Choose your Origin</h3><p>Your Origin sets your signature die.</p><div class="grid2">${origCards}</div>
 <h3>Choose your Class</h3><p>Your Class gives you a <b>zone</b> on the Tray, highlighted in the Class color, and one ability that works inside it.</p><div class="grid2">${classCards}</div>
-${call('tip','Using a Class skill','For Armsmaster and Guard, press '+btn('Skill')+', then tap a die in your zone (even one under a Minion: the Minion comes off). The conversion lasts for that turn only, and '+btn('Clear')+' undoes it so you can use it again. Dungeoneer and Arcanist skills are always on. Your first fight with each class explains its skill once.')}
+${call('tip','Using a Class skill','For Armsmaster and Guard, press '+btn('Skill')+', then tap a die in your zone. <b>Blanks work too</b>, and they are the best ones to convert (so does a die under a Minion: the Minion comes off). The conversion lasts for that turn only, and '+btn('Clear')+' undoes it so you can use it again. Dungeoneer and Arcanist skills are always on. Your first fight with each class explains its skill once.')}
 <h3>Starting Boon</h3><p>Once unlocked, you can swap one of your Maneuver Die I for a Loot die you have collected <b>3 times</b> (in 3 different runs). A die carried over from a defeat replaces your extra Attack Die I. See Chapter 11.</p>
 `,'c2');
 // 3
