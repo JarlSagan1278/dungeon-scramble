@@ -96,3 +96,6 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Nov 4, 2026:** the full comic panel was too intense; middle ground: see-through parchment wash with the room visible, lighter speed lines, solid ink silhouette, no reversed boss frame.
 - **Nov 7, 2026:** the quest paper must not pass the wall/floor line: compact sign (one-line header, one line per condition, smaller title) and, as a backstop, scale it down to fit. Trap footing set on the refreshed Monster Footing page (traps added).
 - **Nov 7, 2026:** the quest sign's badge reads "Wanted" (was "Bonus").
+
+- **Nov 8 — Quest "this path" highlight (Jeremy picked A):** the yellow box behind a quest row that the current path would complete is gone; the row's text turns green with a ✓ (matching "✓ This path!").
+- **Nov 8 — First loot pick tip (Jeremy):** the first time the Equip sheet opens, a one-time bubble explains that a new die replaces one in the 16-die Tray and the old one goes to the Back Pocket.
