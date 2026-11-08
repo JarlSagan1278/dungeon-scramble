@@ -10,7 +10,7 @@ const path = require('path');
 
 const SRC = path.join(__dirname, 'src');
 // Build flavours (Oct 21, release prep): default = tester build in dist/ (as before);
-// --release = public/store build in dist/release/ (no Debug unlock); --demo = free Floor-1-only build in dist/demo/.
+// --release = public/store build in dist/release/ (no Debug unlock); --demo = free Floors 1-2 build in dist/demo/ (Nov 8: was Floor 1 only).
 const DEMO = process.argv.includes('--demo');
 const APP = process.argv.includes('--app'); // Oct 26: the store app (release + Floor 1 free, one purchase unlocks the rest) in dist/app/
 const RELEASE = DEMO || APP || process.argv.includes('--release');
@@ -29,14 +29,14 @@ let data = read('data.js').replace('var BUILD = { demo:false, release:false, app
 if (RELEASE && !/var BUILD = \{ demo:(true|false), release:true, app:(true|false) \}/.test(data)) throw new Error('build flags line not found in data.js');
 // LOGO_IMG is only used by the rulebook (tools/gen.js reads src/assets.js itself), so the game builds leave it out.
 let assets = read('assets.js').replace(/^const LOGO_IMG = "[^"]*";\n/m, '');
-// Demo build (Oct 21): the free file must not be the whole game. Floors 2-3 (their enemies, traps, shrines, bosses,
+// Demo build (Oct 21; Floors 1-2 since Nov 8): the free file must not be the whole game. Floor 3 (its enemies, traps, shrines,
 // the Big Bosses and their boss kits) are emptied out of the data, and their pictures are dropped from the art.
 let DEMO_STRIPPED = [];
 if (DEMO) {
   const vm = require('vm');
-  const LISTS = ['FLOOR2_ENEMIES', 'FLOOR2_TRAPS', 'FLOOR2_SHRINES', 'FLOOR2_BOSSES', 'FLOOR3_ENEMIES', 'FLOOR3_TRAPS', 'FLOOR3_SHRINES', 'BIG_BOSSES'];
+  const LISTS = ['FLOOR3_ENEMIES', 'FLOOR3_TRAPS', 'FLOOR3_SHRINES', 'BIG_BOSSES'];
   const names = vm.runInNewContext(data + `\n;[${LISTS.map(l => '...' + l).join(',')}].map(e => e.name)`, { console });
-  const keep = new Set(vm.runInNewContext(data + '\n;[...FLOOR1_ENEMIES,...FLOOR1_TRAPS,...FLOOR1_SHRINES,...FLOOR1_BOSSES].map(e => e.name)', { console }));
+  const keep = new Set(vm.runInNewContext(data + '\n;[...FLOOR1_ENEMIES,...FLOOR1_TRAPS,...FLOOR1_SHRINES,...FLOOR1_BOSSES,...FLOOR2_ENEMIES,...FLOOR2_TRAPS,...FLOOR2_SHRINES,...FLOOR2_BOSSES].map(e => e.name)', { console }));
   DEMO_STRIPPED = names.filter(n => !keep.has(n));
   for (const l of LISTS) {
     const re = new RegExp('^const ' + l + ' = \\[\\n[\\s\\S]*?\\n\\];', 'm');
@@ -63,7 +63,7 @@ if (DEMO) {
       assets = assets.slice(0, v) + assets.slice(e); dropped++;
     }
   }
-  console.log(`Demo: removed ${DEMO_STRIPPED.length} Floor 2-3 encounters (${dropped} pictures).`);
+  console.log(`Demo: removed ${DEMO_STRIPPED.length} Floor 3 encounters (${dropped} pictures).`);
 }
 const logic = read('logic.js');
 const depth = read('depth.js');

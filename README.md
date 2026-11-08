@@ -8,7 +8,7 @@ the tray over a run.
 Designed by Jeremy and Katlynn Friedman, from their board game of the same name. Plain HTML, CSS and JavaScript,
 no framework; the build concatenates `src/` into one self-contained HTML file.
 
-- **Free demo (Floor 1):** https://dungeonscramble.itch.io/dungeon-scramble
+- **Free demo (Floors 1-2):** https://dungeonscramble.itch.io/dungeon-scramble
 - **Tester site (full game, rebuilt on every push to `main`):** https://playtest.dungeonscramble.com (also https://dungeon-scramble.dungeonscramblegame.workers.dev)
 
 ## Quick start
@@ -24,7 +24,7 @@ npm run check        # every automated check, ~2 min
 | Command | Output | What it is |
 |---|---|---|
 | `npm run build` | `dist/dungeon_scramble.html`, `dist/web/` | Tester build (default): full game, Debug unlock on |
-| `node build.js --demo` | `dist/demo/` | Free demo: Floor 1 only (`BUILD.demo`) |
+| `node build.js --demo` | `dist/demo/` | Free demo: Floors 1-2 (`BUILD.demo`) |
 | `node build.js --release` | `dist/release/` | Public full build, no Debug unlock (`BUILD.release`) |
 | `node build.js --app` | `dist/app/` | Store app: release + Floor 1 free, then the unlock screen (`BUILD.app`) |
 | `npm run build:all` | all of the above | Needed before `npm run check` (the unlock check uses `dist/app`) |

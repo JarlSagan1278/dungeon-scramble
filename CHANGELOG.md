@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.72 (Nov 8, 2026)
+- The free demo now covers Floors 1 and 2 (was Floor 1 only): Floor 2's monsters, traps, shrines and bosses are in the demo file, and the run ends after the Floor 2 boss ("Floor 2 Cleared!", with a peek at Magic dice from Floor 3). The store app is unchanged (Floor 1 free, then the unlock screen).
+- check.js quickstart: the demo goes on to Floor 2, Floor 3 is stripped, and the demo ends after Floor 2.
+
 ## 1.42.71 (Nov 8, 2026)
 - Class Skills say plainly that they work on blank faces too (Armsmaster, Guard): the Skill intro ("Blanks too!"), the Skill tip, the class text ("even a Blank"), the armed hint, and a new one-time tip that points at a blank in your zone. Rulebook updated.
 - Boost reach: while a Boost waits for its next action, the dice you can step on next show it: a small gold Boost chip on the ones it would multiply, the others fade a little.

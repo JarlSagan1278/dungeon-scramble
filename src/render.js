@@ -5293,7 +5293,7 @@ function runCardData(outcome){
   const killer = st.killedBy || (S.encounter && S.encounter.curHealth>0 ? S.encounter.name : '');
   return {
     name, who: `${S.origin.name} ${S.klass.name}`, depth: depthLabel(currentDepth()), color: S.klass.color || '#d4af52',
-    outcome: outcome==='victory' ? `Conquered the dungeon in ${st.turnsTaken} turns` : outcome==='demo' ? `Cleared Floor 1 in ${st.turnsTaken} turns` : `Fell on Floor ${S.floorIdx+1}${killer?` to ${killer}`:''}`,
+    outcome: outcome==='victory' ? `Conquered the dungeon in ${st.turnsTaken} turns` : outcome==='demo' ? `Cleared Floor ${BUILD.demo?2:1} in ${st.turnsTaken} turns` : `Fell on Floor ${S.floorIdx+1}${killer?` to ${killer}`:''}`,
     stats: [['Damage', Math.round(st.damageDealt)], ['Best turn', st.bestTurn||0], ['Blocked', st.damageBlocked||0], ['Foes beaten', st.encountersDefeated]],
     dice: S.tray.map(c=>{ const f = pickPreviewFace(c.die.faces); return {cat:c.die.cat, type:f.type, value:f.value, name:c.die.name}; }),
     relics: (S.relics||[]).map(relicById).filter(Boolean),
@@ -5553,7 +5553,7 @@ function renderVictory(){
     seal:depthSealHTML(), relic:originRelicEarnedHTML(), again:'Play Again' });
   wireRunCard('victory');
 }
-// Free demo build (BUILD.demo, `node build.js --demo`): the run ends after the Floor 1 boss. It is recorded in Records and
+// Free demo build (BUILD.demo, `node build.js --demo`): the run ends after the Floor 2 boss (Floor 1 until Nov 8). It is recorded in Records and
 // play data as 'demo' (not a win: no depth badge, achievements or origin relic), and the screen points to the full game.
 // Store app, end of Floor 1 without the unlock (Oct 26): the run waits here (it is saved) until the player unlocks the
 // full dungeon (the same run carries on into Floor 2), restores an earlier purchase, or ends the run here like the demo.
@@ -5585,7 +5585,7 @@ function renderDemoEnd(){
     if(typeof musicSting==='function') musicSting('win'); else playTone('grandVictory');
     if(typeof spawnConfettiRain==='function') spawnConfettiRain();
   }
-  app.innerHTML = endScreenHTML({ outcome:'demo', title:'Floor 1 Cleared!', lede: BUILD.app ? 'Your run ends here. Clear Floor 1 again any time to unlock the full dungeon.' : 'That is the end of the free demo.',
+  app.innerHTML = endScreenHTML({ outcome:'demo', title:BUILD.demo ? 'Floor 2 Cleared!' : 'Floor 1 Cleared!', lede: BUILD.app ? 'Your run ends here. Clear Floor 1 again any time to unlock the full dungeon.' : 'That is the end of the free demo.',
     seal:'', relic:'', again:'Play Again', note:demoTeaserHTML() });
   wireRunCard('demo');
 }
@@ -5595,9 +5595,9 @@ const DEMO_TEASER_GILDED = ['Greaterhammer','Drill Shield','Charge-Atlatl','Port
 const DEMO_TEASER_MAGIC = ['Greatesthammer','Dodecahedron of Future Pasts','Warp Crossbow','N-th Dimensional Printer',"Hospitaler's Merciful Guillotine",'Straw of the Last Lamia','Axiom of Choice','273.15 Kelvin Box'];
 function demoTeaserHTML(){
   const pickFrom = (names, pool, n)=>pickN(names.map(nm=>pool.find(d=>d.name===nm)).filter(d=>d && LOOT_ART[d.name]), n);
-  const dice = pickFrom(DEMO_TEASER_GILDED, GILDED, 1).concat(pickFrom(DEMO_TEASER_MAGIC, MAGIC, 2));
+  const dice = BUILD.demo ? pickFrom(DEMO_TEASER_MAGIC, MAGIC, 3) : pickFrom(DEMO_TEASER_GILDED, GILDED, 1).concat(pickFrom(DEMO_TEASER_MAGIC, MAGIC, 2)); // the Floors 1-2 demo already shows Gilded loot
   if(!dice.length) return '';
-  return `<div class="demo-teaser"><div class="demo-teaser-cap">Two more floors wait in the full game, with dice like these:</div>
+  return `<div class="demo-teaser"><div class="demo-teaser-cap">${BUILD.demo ? 'Floor 3 and the Big Bosses wait in the full game, with dice like these:' : 'Two more floors wait in the full game, with dice like these:'}</div>
     <div class="demo-teaser-row">${dice.map((d,i)=>`<div class="demo-teaser-die" title="${d.name}: ${d.faces.map(f=>LABEL[f.type]+(f.value!=null&&f.type!=='blank'?' '+f.value:'')).join(', ')}"><div class="demo-teaser-top"><img class="demo-teaser-art tier-${GILDED.includes(d)?'gilded':'magic'}" src="${LOOT_ART[d.name]}" alt="${d.name}"><div class="demo-teaser-faces">${d.faces.map(f=>`<span class="demo-face${f.type==='blank'?' blank':''}">${f.type==='blank'?'':iconSpan(f.type, f.value)}</span>`).join('')}</div></div><span class="demo-teaser-name tier-${GILDED.includes(d)?'gilded':'magic'}">${d.name}</span></div>`).join('')}</div></div>`;
 }
 function renderGameOver(){

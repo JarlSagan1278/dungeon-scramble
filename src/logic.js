@@ -1196,7 +1196,7 @@ function advanceRoute(){
   S.swapLog = []; S.trayAct = null;
   if(S.routeStep >= S.route.length){
     // move to next floor
-    if(BUILD.demo && S.floorIdx===0){ S.screen='demoEnd'; return; } // free demo build: Floor 1 only
+    if(BUILD.demo && S.floorIdx===1){ S.screen='demoEnd'; return; } // free demo build: Floors 1-2 (Nov 8, Jeremy; was Floor 1 only)
     if(S.floorIdx===0 && !hasFullGame()){ S.screen='unlock'; return; } // store app: Floor 1 is free, one purchase unlocks the rest
     if(S.floorIdx < FLOORS.length-1){
       S.floorIdx++;

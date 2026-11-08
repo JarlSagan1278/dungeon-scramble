@@ -1,6 +1,6 @@
 # itch.io page for the free demo (prepared Oct 23, 2026)
 
-Upload: `dungeon_scramble_demo_itch.zip` (made from `node build.js --demo`: the single-file demo renamed `index.html` and zipped; Floor 1 only, no service worker). Cover: 630x500 PNG. Screenshots: Floor 1 only (the demo has no Floors 2-3).
+Upload: `dungeon_scramble_demo_itch.zip` (made from `node build.js --demo`: the single-file demo renamed `index.html` and zipped; Floors 1-2 since Nov 8, no service worker). Cover: 630x500 PNG. Screenshots: Floors 1-2 only (the demo has no Floor 3).
 
 ## Settings (itch.io > Dashboard > Create new project)
 
@@ -8,7 +8,7 @@ Upload: `dungeon_scramble_demo_itch.zip` (made from `node build.js --demo`: the 
 |---|---|
 | Title | Dungeon Scramble |
 | Project URL | dungeon-scramble (account: dungeonscramble, so the page is dungeonscramble.itch.io/dungeon-scramble) |
-| Short description / tagline | Roll a 4x4 tray of dice. Draw your path. Free Floor 1 demo. |
+| Short description / tagline | Roll a 4x4 tray of dice. Draw your path. Free demo: the first two floors. |
 | Classification | Games |
 | Kind of project | HTML |
 | Release status | In development |
@@ -29,7 +29,7 @@ Upload: `dungeon_scramble_demo_itch.zip` (made from `node build.js --demo`: the 
 
 Dungeon Scramble is a turn-based roguelike for your phone. Roll sixteen dice into a 4x4 tray, then trace one path through them: each die you step on takes effect in order, from Hit and Block to Combo, Boost and Freeze. Monsters always show their next move, so you can plan around it. Maneuver faces like Leap, Dodge and Pivot bend the rules of the path.
 
-This free demo is the whole first floor: pick your origin and class, fight through the rooms, visit shrines and camps, and take on the Floor 1 boss.
+This free demo is the first two floors: pick your origin and class, fight through the rooms, visit shrines and camps, beat the Floor 1 boss, then find Gilded loot on Floor 2 and take on its boss.
 
 The full game has three dungeon floors, 50+ 6-sided loot dice, 20+ powerful relics and the Big Bosses. It is coming to iPhone and Android in 2027.
 

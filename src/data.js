@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.42.71';
+const GAME_VERSION = '1.42.72';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false };
@@ -145,7 +145,7 @@ const ROUTE_STEP_DESC = {
 // Oct 31 (Jeremy, 4A): every page shows what it explains (pic, drawn in render.js tutorialPicHTML), so the text is shorter.
 const TUTORIAL_STEPS = [
   { title: "Welcome, Adventurer", pic:'path',
-    body: "Each turn, draw a path across your dice. Every die on it does its thing, in order. " + (BUILD.demo ? "Beat the Floor 1 boss to clear the demo." : "Clear all three floors to win."),
+    body: "Each turn, draw a path across your dice. Every die on it does its thing, in order. " + (BUILD.demo ? "Beat the Floor 2 boss to clear the demo." : "Clear all three floors to win."),
   },
   { title: "Your Tray", pic:'leap',
     body: "Tap a die, then a neighbor, to grow your path. Some dice hop over a die or turn a corner. Hold any die to read it.",
