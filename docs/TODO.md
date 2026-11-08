@@ -24,7 +24,7 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
 ## Waiting on Jeremy
 - **Title art:** new cover drawn from scratch on the 2048x2434 canvas (`DungeonScramble_TitleArt_canvas.psd`); the chat
   only passes 860 px, so export full size from Sketchbook or upload the PSD to the repo. Keep the logo layer for Steam.
-- **Redraw the remaining AI-assisted art** (pixie portraits, the remaining original loot) to shrink the disclosure. Also unblocks Newgrounds (skipped Nov 8 for its AI-art rules).
+- **Redraw the remaining AI-assisted art** (pixie portraits, the remaining original loot) to shrink the disclosure.
 - **Google Play account** (personal): then real billing behind `STORE` / `window.DSStore` (logic.js), the store
   listing (`release/store_listing.md`), feature graphic and screenshots.
 - **Armsmaster red Skill vs red Clear:** options shown Oct 15.
