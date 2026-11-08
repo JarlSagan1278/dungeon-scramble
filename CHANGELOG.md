@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.42.69 (Nov 8, 2026)
+From the We Playtest Games session (docs/playtests/2026-11-08_weplaytestgames_wndg.md):
+- Status chips take their owner's colour: yours are blue, the monster's deep red (the tester could never tell whose D.O.T. was whose).
+- When a D.O.T. lands, a label floats over whoever got it, in that side's colour: "D.O.T. 2 → Filement Bunny" or "D.O.T. 1 → You" (dice, Fumble, quests, enemy attacks).
+- Dodge is renamed **Sidestep** (the tester thought Dodge defends; it only moves the Path diagonally). Internal face codes are unchanged, so saves are fine.
+- Four new one-time tips: Sidestep (moves diagonally, blocks nothing), D.O.T. (how it ticks, blue vs red chips), the Skill on your second turn if unused (what it turns which dice into), and longer Paths (the first time a Path reaches 4 dice).
 ## 1.42.68 (Nov 7, 2026)
 - The quest poster's badge says "Wanted" instead of "Bonus" (Jeremy). The one-time tip now reads "Wanted! Do what the poster says…".
 ## 1.42.67 (Nov 7, 2026)

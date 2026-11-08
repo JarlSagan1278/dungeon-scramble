@@ -3320,6 +3320,29 @@ function screenShake(intensity){
 // ---- Transient FX registry (cosmetic only -- never saved; timestamps are performance.now()) ----
 const UIFX = {ticks:[], quests:[], flareAt:-1e9, vsAt:-1e9};
 function fxTick(side,type,amt){ if(amt>0) UIFX.ticks.push({side,type,amt,t:performance.now()}); }
+// Nov 8 (playtest: "never sure whether Fumble or Acid Potion was on me or on the enemy"): when a D.O.T. lands, a label
+// floats up over whoever got it, in that side's colour (yours blue, the monster's red): "D.O.T. 2 → Filement Bunny" or
+// "D.O.T. 1 → You". Lives on <body>, so redraws don't cut it short; several in a row stack upward.
+function dotLandFx(side, amt){
+  try{
+    if(!(amt>0) || !S || !S.encounter) return;
+    const fig = document.querySelector(side==='player' ? '#enc-panel .fo-player .fo-fig' : '#enc-panel .fo-enemy .fo-fig');
+    if(!fig) return;
+    const art = fig.querySelector('img,svg,.fo-img') || fig; // the player's fig box is 0 wide: measure the picture
+    let r = art.getBoundingClientRect();
+    if(!r.width){ const sideEl = fig.closest('.fo-side') || fig, sr = sideEl.getBoundingClientRect(); r = {left:sr.left, width:sr.width, top:r.height ? r.top : sr.top, height:r.height || 90}; } // picture not decoded yet
+    if(!r.width) return;
+    const n = document.querySelectorAll('.dot-land.dl-'+side).length;
+    const who = side==='player' ? 'You' : S.encounter.name;
+    const el = document.createElement('div');
+    el.className = 'dot-land dl-'+side + (PREFS.reducedMotion ? ' dl-still' : '');
+    el.innerHTML = `${iconSpanSolid('dot')}<b>D.O.T. ${Math.round(amt*10)/10}</b><span class="dl-arrow">→</span><span class="dl-who">${who}</span>`;
+    el.style.left = (r.left + r.width/2) + 'px';
+    el.style.top = (r.top + r.height*0.35 - n*22) + 'px';
+    document.body.appendChild(el);
+    setTimeout(()=>{ if(el.parentNode) el.parentNode.removeChild(el); }, 1700);
+  }catch(err){}
+}
 function tickFloatersHTML(side){
   const now=performance.now(); UIFX.ticks=UIFX.ticks.filter(x=>now-x.t<1300);
   return UIFX.ticks.filter(x=>x.side===side).map((x,k)=>`<span class="tick-float tf-${x.type}" style="animation-delay:-${Math.round(now-x.t)}ms; --k:${k%3}">${iconSpan(x.type)}${x.type==='block'?`<b>${x.amt}</b>&nbsp;blocked`:`<b>${x.type==='dot'?'-':'+'}${x.amt}</b>`}</span>`).join('');
@@ -4830,7 +4853,7 @@ function questCondShort(cond){
   if((m=c.match(/(\d+)\s*blanks?/))) return `Blanks ${m[1]}+`;
   if((m=c.match(/(\d+)\s*heals?\b/))) return `${m[1]} Heal ${pl(m[1],'die','dice')}`;
   if((m=c.match(/(\d+)\s*block\b/))) return `${m[1]} Block ${pl(m[1],'die','dice')}`;
-  if((m=c.match(/(\d+)\s*(dodge|leap|pivot|boost|combo)s?\b/))) return `${m[1]} ${cap(m[2])}${m[1]==='1'?'':'s'}`;
+  if((m=c.match(/(\d+)\s*(dodge|leap|pivot|boost|combo)s?\b/))) return `${m[1]} ${m[2]==='dodge'?'Sidestep':cap(m[2])}${m[1]==='1'?'':'s'}`; // Dodge was renamed Sidestep (Nov 8)
   if((m=c.match(/(\d+)\s*nullify/))) return `${m[1]} Nullify`;
   return cap(c);
 }
@@ -5750,7 +5773,7 @@ function bindScrambleFlick(el){
 })();
 
 const GUIDE_TEXT = {
-  t1: ['<b>This is your Tray.</b> <b style="color:#e8574f">Red</b> dice are actions (Hit, Combo); <b>white</b> dice are Maneuvers that bend your Path (Leap, Dodge, Pivot). Tap the glowing die to start a Path.',
+  t1: ['<b>This is your Tray.</b> <b style="color:#e8574f">Red</b> dice are actions (Hit, Combo); <b>white</b> dice are Maneuvers that bend your Path (Leap, Sidestep, Pivot). Tap the glowing die to start a Path.',
        'Now tap the glowing neighbor. Each die you step on hits, blocks or heals, in order.',
        'One more! A <b>Combo</b> hits harder when it touches Hits.',
        'That number is your Path\'s damage. Keep going through more dice, or tap <b>Go</b>!'],
@@ -5845,6 +5868,13 @@ const TIP_TEXT = {
   heavy: ()=>'A <b>heavy turn</b> is coming: this monster hits harder next turn. Block faces in this Path will soak it.',
   minion: ()=>'<b>Minion</b> dice clog your Tray. Every point of damage you deal clears one, and a Leap clears any it jumps over.',
   overkill: n=>`This Path wins the fight. Deal ${n} more for an <b>Overkill</b>: an extra loot choice.`,
+  // Nov 8 (We Playtest Games session: the tester thought Dodge defends, never worked out D.O.T. targets or the Skill,
+  // and wondered whether longer paths are worth anything)
+  sidestep: ()=>'A <b>Sidestep</b> doesn\'t block anything: it lets your Path\'s next step go <b>diagonally</b>.',
+  dot: who=>`<b>D.O.T.</b> (damage over time) is on ${who}: it deals its number in damage at the end of each turn, then drops by 1. <b>Blue</b> chips are on you, <b>red</b> chips on the monster.`,
+  skill: k=>{ const c = k && k.convertTo; const zone = ({armsmaster:'the right column', guard:'the 2x2 square, middle right'})[k && k.id] || 'your dashed zone';
+    return `Your <b>Skill</b>: tap it, then tap any die in ${zone} (dashed) to turn that die into a <b>${c ? (LABEL[c.type]||c.type)+' '+c.value : 'better face'}</b>. Once every turn.`; },
+  longpath: ()=>'Longer Paths add up: each die you step on takes effect, in order, and each <b>Combo</b> grows with the attacking dice beside it.',
   // Nov 4 (Jeremy): quests were hard to understand. Name this fight's own quest and reward so the lesson is concrete.
   quest: q=>{ const {rewardText, cond} = parseQuestSpec(q); const allFight = QUEST_ALL_FIGHT.test(cond);
     const rw = rewardText ? ` (here: <b>${rewardText.toLowerCase()}</b>)` : '';
@@ -5855,6 +5885,12 @@ function tipTargets(){
   const e = S.encounter, tray = document.getElementById('tray'); if(!tray || !e) return null;
   const at = i=> `#tray .die[data-idx="${i}"]`;
   if(!S.path.length){
+    if(!TIPS_SEEN.has('dot') && (e.curDOT>0 || S.playerDOT>0)){
+      const side = e.curDOT>0 ? 'fo-enemy' : 'fo-player', sel = `#enc-panel .${side} .fo-buffs .status-chip[title^="D.O.T."]`;
+      if(document.querySelector(sel)) return {k:'dot', el:sel, arg: e.curDOT>0 ? 'the monster' : 'you'}; }
+    if(!TIPS_SEEN.has('skill') && S.klass && S.klass.convertTo && !S.classAbilityUsed && S.turnNumber>=1 && document.querySelector('#ability-btn:not(.disabled)'))
+      return {k:'skill', el:'#ability-btn', arg:S.klass};
+    if(!TIPS_SEEN.has('sidestep')){ const i = S.tray.findIndex(c=>!c.minion && !c.blank && !c.spent && currentFace(c).type==='dodge'); if(i>=0) return {k:'sidestep', el:at(i), arg:null}; }
     if(!TIPS_SEEN.has('quest') && e.quests && e.quests.length && !e.questsDone.some(Boolean) && document.querySelector('#enc-panel .fo-quests-float')){
       const qi = e.quests.findIndex(q=>!QUEST_ALL_FIGHT.test(parseQuestSpec(q).cond)); return {k:'quest', el:'#enc-panel .fo-quests-float', arg:e.quests[qi>=0?qi:0]}; }
     if(!TIPS_SEEN.has('minion')){ const i = S.tray.findIndex(c=>c.minion); if(i>=0) return {k:'minion', el:at(i), arg:null}; }
@@ -5863,6 +5899,8 @@ function tipTargets(){
     if(!TIPS_SEEN.has('leap')){ for(let i=0;i<16;i++){ const c=S.tray[i]; if(c.minion||c.blank) continue; if(currentFace(c).type!=='leap') continue;
       const r=Math.floor(i/4), q=i%4; const blocked=[[0,1],[0,-1],[1,0],[-1,0]].some(([dr,dc])=>{ const rr=r+dr, cc=q+dc, r2=r+2*dr, c2=q+2*dc; if(rr<0||rr>3||cc<0||cc>3||r2<0||r2>3||c2<0||c2>3) return false; const mid=S.tray[rr*4+cc]; return mid.minion || currentFace(mid).type==='blank'; });
       if(blocked) return {k:'leap', el:at(i), arg:null}; } }
+  } else if(!TIPS_SEEN.has('longpath') && S.path.length>=4 && document.querySelector('.tray-float-wrap .path-counter-float')){
+    return {k:'longpath', el:'.tray-float-wrap .path-counter-float', arg:null};
   } else if(!TIPS_SEEN.has('overkill') && !(typeof depthRank==='function' && depthRank('slim'))){
     try{ const pv=computePathEffects(S.path); const d=Math.max(0,pv.totalDamage-(e.curShield||0)), hp=e.curHealth, thr=(typeof hasRelic==='function' && hasRelic('hungry_blade'))?5:9;
       if(hp>0 && d>=hp && d<=hp+thr){ const more=Math.floor(hp+thr)+1-d; if(more<=6) return {k:'overkill', el:'#enc-panel .fo-enemy .fo-hpwrap', arg:more}; } }catch(err){}

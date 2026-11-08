@@ -3788,3 +3788,19 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 /* Nov 7: "WANTED" is wider than "BONUS": a hair tighter header so "IN ONE TURN" stays inside the paper */
 .fo-quests-float .fo-quests-label{ font-size:8.5px !important; letter-spacing:.3px !important; gap:3px; }
 .fo-quests-label .q-bonus-b{ padding:1px 3px 0; letter-spacing:.6px; }
+/* Nov 8 (playtest: "never sure whether the D.O.T. was on me or the enemy"): status chips take their owner's colour.
+   Yours are blue, the monster's are deep red, whatever the status is. 2px toy outline. */
+.fo-player .fo-buffs .status-chip{ background:linear-gradient(160deg,#4f86c6,#2d5a93) !important; color:#eef5ff !important; border:2px solid #0c0705 !important; box-shadow:0 2px 0 #0c0705; }
+.fo-enemy .fo-buffs .status-chip{ background:linear-gradient(160deg,#c0453a,#7e2219) !important; color:#fff0e8 !important; border:2px solid #0c0705 !important; box-shadow:0 2px 0 #0c0705; }
+.fo-player .fo-buffs .status-chip .icon-svg, .fo-enemy .fo-buffs .status-chip .icon-svg{ color:inherit !important; }
+/* Nov 8: the "D.O.T. N -> target" label (dotLandFx), in the target's colour */
+.dot-land{ position:fixed; z-index:45; pointer-events:none; transform:translate(-50%,0); display:inline-flex; align-items:center; gap:4px; white-space:nowrap; max-width:92vw;
+  padding:2px 8px 2px 5px; border:2px solid #0c0705; border-radius:999px; box-shadow:0 2px 0 #0c0705; font:800 12px/1.2 var(--font-ui);
+  animation:dot-land 1.6s ease-out forwards; }
+.dot-land .icon-svg{ width:14px; height:14px; color:inherit; }
+.dot-land .dl-who{ overflow:hidden; text-overflow:ellipsis; max-width:150px; }
+.dot-land.dl-enemy{ background:linear-gradient(160deg,#c0453a,#7e2219); color:#fff0e8; }
+.dot-land.dl-player{ background:linear-gradient(160deg,#4f86c6,#2d5a93); color:#eef5ff; }
+@keyframes dot-land{ 0%{ opacity:0; transform:translate(-50%,8px) scale(.85); } 12%{ opacity:1; transform:translate(-50%,0) scale(1.06); } 22%{ transform:translate(-50%,-2px) scale(1); } 75%{ opacity:1; } 100%{ opacity:0; transform:translate(-50%,-26px); } }
+.dot-land.dl-still{ animation:dot-land-still 1.6s linear forwards; }
+@keyframes dot-land-still{ 0%,80%{ opacity:1; } 100%{ opacity:0; } }

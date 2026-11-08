@@ -1838,11 +1838,11 @@ function applyPathStep(step){
     S.stats.damageDealt += step.dmg;
     S.resolveTotal = (S.resolveTotal||0) + step.dmg;
   }
-  if(step.dotToEncounter){ e.curDOT += step.dotToEncounter; geometryMirror(e, 'dot', step.dotToEncounter); }
+  if(step.dotToEncounter){ e.curDOT += step.dotToEncounter; geometryMirror(e, 'dot', step.dotToEncounter); if(typeof dotLandFx==='function') dotLandFx('enemy', step.dotToEncounter); }
   if(step.hotToPlayer){ addPlayerHOT(step.hotToPlayer); geometryMirror(e, 'hot', step.hotToPlayer); }
   if(step.blockGain) S.playerBlock += step.blockGain;
   if(step.healGain) healPlayer(step.healGain);
-  if(step.selfDot) S.playerDOT += step.selfDot;
+  if(step.selfDot){ S.playerDOT += step.selfDot; if(typeof dotLandFx==='function') dotLandFx('player', step.selfDot); }
   if(step.freeze) S.freezeNext = true;
   if(step.nullify) applyNullify();
   // One minion cleared per point of damage dealt (any damaging die: Hits, Combos, bonuses).
@@ -1960,7 +1960,7 @@ function geometryMirror(e, kind, n){
     const used = e.questMirror[i]||0, amt = Math.min(n, cap-used);
     if(amt<=0) return;
     e.questMirror[i] = used+amt;
-    if(isProfane){ e.curDOT += amt; logMsg('sys', `${e.name}: your H.O.T. mirrors as ${amt} D.O.T. on it.`, 'good'); }
+    if(isProfane){ e.curDOT += amt; if(typeof dotLandFx==='function') dotLandFx('enemy', amt); logMsg('sys', `${e.name}: your H.O.T. mirrors as ${amt} D.O.T. on it.`, 'good'); }
     else { addPlayerHOT(amt); logMsg('sys', `${e.name}: its D.O.T. mirrors as ${amt} H.O.T. for you.`, 'good'); }
     if(e.questMirror[i] >= cap){ e.questsDone[i] = true; logMsg('sys', `Quest complete: ${typeof questCondShort==='function' ? questCondShort(parseQuestSpec(q).cond) : q}`, 'good'); if(typeof fxQuest==='function') fxQuest(e.name, i); }
   });
@@ -1971,7 +1971,7 @@ function applyQuestReward(e, rewardText){
   const m = rewardText.match(/(\d+(\.\d+)?)/);
   const amt = m? parseFloat(m[1]) : 0;
   const low = rewardText.toLowerCase();
-  if(low.includes('dot')) { e.curDOT += amt; geometryMirror(e, 'dot', amt); }
+  if(low.includes('dot')) { e.curDOT += amt; geometryMirror(e, 'dot', amt); if(typeof dotLandFx==='function') dotLandFx('enemy', amt); }
   else if(low.includes('hot')) { addPlayerHOT(amt); }
   else if(low.includes('nullify')) { applyNullify(); }
   else if(low.includes('freeze')) { S.freezeNext = true; logMsg('sys', `Quest reward: ${e.name} will skip its next action.`); }
@@ -2317,7 +2317,7 @@ function applyEnemyAct(e, act){
     case 'shield': enemySound('clank'); e.curShield += v; return `${e.name} gains ${v} shield.`;
     case 'heal': enemySound('enemyBell'); e.curHealth = cap(e.curHealth+v, e.maxHealth); return `${e.name} heals ${v}.`;
     case 'hot': enemySound('enemyBell'); e.curHOT += v; return `${e.name} channels ${v} H.O.T.`;
-    case 'dot': enemySound('pluck'); S.playerDOT += v; return `You gain ${v} D.O.T.`;
+    case 'dot': enemySound('pluck'); S.playerDOT += v; if(typeof dotLandFx==='function') dotLandFx('player', v); return `You gain ${v} D.O.T.`;
     case 'dmgPerMinion': {
       const n = S.tray.filter(c=>c.minion).length;
       return n>0 ? dealEncounterDamage(e, v*n) : `${e.name} finds no Minions on your Tray.`;
@@ -2403,7 +2403,7 @@ function runEncounterAction(){
   if(e.shield>0){ enemySound('clank'); e.curShield += e.shield*x('shield'); parts.push(`${e.name} gains ${e.shield*x('shield')} shield.`); }
   if(e.heal>0){ enemySound('enemyBell'); e.curHealth = cap(e.curHealth+e.heal, e.maxHealth); parts.push(`${e.name} heals ${e.heal}.`); }
   if(e.hot>0){ enemySound('enemyBell'); e.curHOT += e.hot; parts.push(`${e.name} channels ${e.hot} H.O.T.`); }
-  if(e.dot>0){ enemySound('pluck'); S.playerDOT += e.dot*x('dot'); parts.push(`You gain ${e.dot*x('dot')} D.O.T.`); }
+  if(e.dot>0){ enemySound('pluck'); S.playerDOT += e.dot*x('dot'); if(typeof dotLandFx==='function') dotLandFx('player', e.dot*x('dot')); parts.push(`You gain ${e.dot*x('dot')} D.O.T.`); }
   if(e.minion>0){
     enemySound('squeak');
     const t = spawnMinions(e, e.minion*x('minion'));

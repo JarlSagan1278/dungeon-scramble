@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.42.68';
+const GAME_VERSION = '1.42.69';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false };
@@ -46,7 +46,7 @@ function faces(arr){ return arr.map(face); }
 
 
 const LABEL = { hit:'Hit', combo:'Combo', boost:'Boost', dot:'D.O.T.', leech:'Leech', fumble:'Fumble',
-  dodge:'Dodge', leap:'Leap', pivot:'Pivot', freeze:'Freeze', swap:'Swap', reroll:'Reroll', heal:'Heal', hot:'H.O.T.', block:'Block', nullify:'Nullify', blank:'—'};
+  dodge:'Sidestep', leap:'Leap', pivot:'Pivot', freeze:'Freeze', swap:'Swap', reroll:'Reroll', heal:'Heal', hot:'H.O.T.', block:'Block', nullify:'Nullify', blank:'—'};
 
 // One-line, player-facing descriptions of what each face actually does when
 // it resolves -- shown on long-press so new players can learn the icon
@@ -264,7 +264,7 @@ const RELICS = [
   {id:'spite_thorns', name:'Equal and Opposite',      mono:'EO', reflect:'blocked', desc:'Whenever your Block absorbs an enemy hit, the enemy takes that much damage.', tags:['offense','defense']},
   {id:'grave_tally',  name:'Strength in Mooks',       mono:'SM', desc:'Each Minion you clear gives 1 Block.', tags:['defense']},
   // Movement family (lets players try Maneuver payoffs without changing the base dice):
-  {id:'dodger_cloak', name:'Evasion Tank',    mono:'ET', desc:'Each Dodge in your path gives 1 Block.', tags:['path','defense']},
+  {id:'dodger_cloak', name:'Evasion Tank',    mono:'ET', desc:'Each Sidestep in your path gives 1 Block.', tags:['path','defense']},
   {id:'leaper_spurs', name:'Terminal Velocity',    mono:'TV', desc:'Each Leap adds +1 damage to the next damaging die in your path.', tags:['path','offense']},
   {id:'pivot_compass',name:'FTLeporter',     mono:'FT', desc:'Your Pivots can teleport: the next step may go to any die.', tags:['path']},
   // Boss and tempo:
@@ -276,7 +276,7 @@ const RELICS = [
   {id:'forgeplate', name:'Stronger Infill',         mono:'SI', origin:'dwarf',    amt:1, desc:'Start every fight with 1 Block.'}, // was 5 (Oct 12 relic study: +37; 2 Block +21, 1 Block +9 -- Jeremy picked 1)
   {id:'spore_satchel',name:'Mycorrhizal Bond',    mono:'MB', origin:'gnome',    desc:'Leech faces also add +2 D.O.T. and heal +1 more.'},
   {id:'picnic_basket',name:'Coffee Break',    mono:'CB', origin:'halfling', heal:0, hot:1, desc:'H.O.T. faces add +1 H.O.T.'}, // was also Heal +2 (Oct 12 relic study: +46 -> +13)
-  {id:'glimmer_dust',name:'Faerie Fire',      mono:'FF', origin:'pixie',    cap:2, desc:'Each Dodge, Leap or Pivot in your Path adds +1 damage to its last damaging die (at most +2 per path).'}, // cap added (Oct 12 relic study: +29 -> +12)
+  {id:'glimmer_dust',name:'Faerie Fire',      mono:'FF', origin:'pixie',    cap:2, desc:'Each Sidestep, Leap or Pivot in your Path adds +1 damage to its last damaging die (at most +2 per path).'}, // cap added (Oct 12 relic study: +29 -> +12)
 ];
 function relicById(id){ return RELICS.find(r=>r.id===id); }
 // Relic gating (Jeremy, Oct 12; tiers from the Oct 12 relic study): the strongest shrine relics are quietly held
@@ -316,7 +316,7 @@ const CLASSES = [
     zone:(r,c)=> (r===1||r===2) && (c===2||c===3), convertTo:{type:'block', value:1}}, // 2x2 square again (Jeremy, Oct 25; was a 3-square L from Oct 12, 63% -> 58% at depth 7) // Block 2 -> 1 (Jeremy, Oct 12 class study: Guard won 89% vs 40-67%)
   {id:'dungeoneer', name:'Dungeoneer', color:'#d4812e', ability:'Your zone (the left and right edges) wraps left-to-right when building a Path, on every row. Each wrap adds +1 damage to your next attacking die.',
     zone:(r,c)=> c===0 || c===3, wrap:true, seamDamage:1}, // seamDamage: Oct 16 study (experts at depth 7: 36% -> 55%) // every row wraps (Jeremy, Oct 12; was the two middle rows)
-  {id:'arcanist', name:'Arcanist', color:'#b4419a', ability:'Your zone is both diagonals. Once on the X, you may step diagonally along it, as if using Dodge. Your Boosts are 1 stronger (x2 becomes x3).',
+  {id:'arcanist', name:'Arcanist', color:'#b4419a', ability:'Your zone is both diagonals. Once on the X, you may step diagonally along it, as if using Sidestep. Your Boosts are 1 stronger (x2 becomes x3).',
     zone:(r,c)=> r===c || r+c===3, diagonalZone:'both', boostPlus:1}, // both diagonals; diagonal steps only from an X square to an X square (Jeremy, Oct 16; was 'either' from Oct 12, 53% vs 29% at depth 7)
   {id:'debug', name:'Debug', color:'#9aa3ab', ability:'No class ability. Starting tray is a random assortment of every die type in the game, for testing.',
     zone:(r,c)=> false, debug:true},

@@ -11,7 +11,7 @@ const SLOT=new Set(['hit','combo','leech','block','heal','dot','hot']);
 let symbols='';
 for(const [k,v] of Object.entries(O.ICON_SVG)){ if(!v)continue; const inner=v.replace(/^<svg[^>]*>/,'').replace(/<\/svg>$/,''); symbols+=`<symbol id="i-${k}" viewBox="0 0 24 24">${inner}</symbol>`; }
 const ic=(t,cls='')=>`<svg class="ic ${cls}" aria-hidden="true"><use href="#i-${t}"/></svg>`;
-const NAMES={swap:'Swap',reroll:'Reroll',hit:'Hit',combo:'Combo',boost:'Boost',dot:'D.O.T.',leech:'Leech',fumble:'Fumble',dodge:'Dodge',leap:'Leap',pivot:'Pivot',freeze:'Freeze',heal:'Heal',hot:'H.O.T.',block:'Block',nullify:'Nullify'};
+const NAMES={swap:'Swap',reroll:'Reroll',hit:'Hit',combo:'Combo',boost:'Boost',dot:'D.O.T.',leech:'Leech',fumble:'Fumble',dodge:'Sidestep',leap:'Leap',pivot:'Pivot',freeze:'Freeze',heal:'Heal',hot:'H.O.T.',block:'Block',nullify:'Nullify'};
 function face(f,tier='basic'){
   if(!f||f.type==='blank') return `<span class="face blank t-${tier}" title="Blank"></span>`;
   let ov='';
@@ -74,7 +74,7 @@ const portr={dwarf:O.DWARF_PORTRAITS,gnome:O.GNOME_PORTRAITS,halfling:O.HALFLING
 const style={dwarf:'Shield up, then pop it for a big Hit.',gnome:'Damage over time and self-sustain.',halfling:'Healing and buffs.',pixie:'Blink past trouble, leave mischief behind.'};
 const unl={dwarf:'Open from the start',gnome:'Open from the start',halfling:'Unlocks after you win a full run with any Origin',pixie:'Unlocks after you win with two different Origins'};
 const origCards=O.ORIGINS.map(o=>`<div class="card origin"><div class="portrait">${img(portr[o.id][0],'',o.name)}</div><div class="oc"><h4>${o.name}</h4><div class="sub">${o.die}</div>${faces(o.faces,'basic')}<p>${style[o.id]}</p><p class="unl">${unl[o.id]}</p></div></div>`).join('');
-const classText={armsmaster:['The right column','Once per turn, turn any die in the zone into a <b>Hit 2</b>.'],guard:['A 2x2 square on the middle right','Once per turn, turn any die in the zone into a <b>Block 1</b>.'],dungeoneer:['The whole left and right edges','The edges <b>wrap</b>: a Path can cross from one edge to the other on any row. Each face keeps its own move: a plain step crosses on the same row, a <b>Dodge</b> crosses one row up or down, a <b>Pivot</b> either, and a <b>Leap</b> cannot cross. Each wrap also adds <b>+1 damage</b> to your next attacking die.'],arcanist:['Both diagonals','Once on the X, a step from one X square to another may go <b>diagonally</b>, as if from a Dodge. Steps onto or off the X follow the normal rules. Your <b>Boosts</b> are also 1 stronger (×2 becomes ×3).']};
+const classText={armsmaster:['The right column','Once per turn, turn any die in the zone into a <b>Hit 2</b>.'],guard:['A 2x2 square on the middle right','Once per turn, turn any die in the zone into a <b>Block 1</b>.'],dungeoneer:['The whole left and right edges','The edges <b>wrap</b>: a Path can cross from one edge to the other on any row. Each face keeps its own move: a plain step crosses on the same row, a <b>Sidestep</b> crosses one row up or down, a <b>Pivot</b> either, and a <b>Leap</b> cannot cross. Each wrap also adds <b>+1 damage</b> to your next attacking die.'],arcanist:['Both diagonals','Once on the X, a step from one X square to another may go <b>diagonally</b>, as if from a Sidestep. Steps onto or off the X follow the normal rules. Your <b>Boosts</b> are also 1 stronger (×2 becomes ×3).']};
 const classCards=O.CLASSES.filter(c=>!c.debug).map(c=>`<div class="card cls" style="--cc:${c.color}"><h4>${c.name}</h4>${tray(null,{small:true,zone:c.zone,color:c.color})}<div class="sub">${classText[c.id][0]}</div><p>${classText[c.id][1]}</p></div>`).join('');
 C+=ch(2,'Starting a Run',`
 <p>On the character screen pick an <b>Origin</b> and a <b>Class</b>, optionally name your Adventurer (the name is cosmetic) and press ${btn('Enter the Dungeon')}. You start with <b>20 Health</b>, an empty Back Pocket, and a Tray of 16 dice: <b>8 Attack Die I</b>, <b>7 Maneuver Die I</b> and your <b>Origin die</b>.</p>
@@ -106,16 +106,16 @@ C+=ch(4,'Taking a Turn',`
 <li><b>The reply.</b> Enemy takes its D.O.T.; enemy heals from its H.O.T., then acts (unless frozen); then you take your own D.O.T. and receive your H.O.T.</li>
 <li><b>New round.</b> Fresh Scramble. Back to step 2.</li></ol>
 <h3>Example Path</h3>
-<div class="figure">${tray(demo,{path:demoPath})}<div class="figcap"><b>Fig. 1</b> A five-die Path. <b>1</b> Boost ×2 → <b>2</b> Hit 2 (4 damage) → <b>3</b> Dodge → <b>4</b> Combo 1, reached on a diagonal, with 3 neighbors showing Hit, Block and H.O.T. (1×(1+3) = 4 damage) → <b>5</b> Hit 1. <b>Total: 9 damage.</b></div></div>
+<div class="figure">${tray(demo,{path:demoPath})}<div class="figcap"><b>Fig. 1</b> A five-die Path. <b>1</b> Boost ×2 → <b>2</b> Hit 2 (4 damage) → <b>3</b> Sidestep → <b>4</b> Combo 1, reached on a diagonal, with 3 neighbors showing Hit, Block and H.O.T. (1×(1+3) = 4 damage) → <b>5</b> Hit 1. <b>Total: 9 damage.</b></div></div>
 <h3>Path Rules</h3>
 <ul class="rules">
 <li>A Path may start on any die showing an <b>Action</b>. <b>Blanks</b> can never be part of a Path.</li>
 <li>A die can be used only <b>once</b> per Path.</li>
 <li>After most dice the next die must be directly <b>up, down, left or right</b>. Maneuvers change this:
-<div class="mini"><span>${ic('dodge')} <b>Dodge</b> → next die is <b>diagonal</b></span><span>${ic('leap')} <b>Leap</b> → exactly <b>two squares</b> away in a straight line (jumps the square between)</span><span>${ic('pivot')} <b>Pivot</b> → any of the <b>eight</b> neighbors</span></div></li>
+<div class="mini"><span>${ic('dodge')} <b>Sidestep</b> → next die is <b>diagonal</b></span><span>${ic('leap')} <b>Leap</b> → exactly <b>two squares</b> away in a straight line (jumps the square between)</span><span>${ic('pivot')} <b>Pivot</b> → any of the <b>eight</b> neighbors</span></div></li>
 <li>Your Class zone can add moves (Chapter 2).</li>
 <li>You may press ${btn('Go')} with a Path of just one die. If every die is blank, Go lets you pass the turn.</li>
-<li>Dice covered by a <b>Minion</b> count as blanks, but a Dodge, Leap or Pivot may <b>land on</b> one (using its own move). The Path ends there, and when it resolves the die underneath is uncovered and used.</li></ul>
+<li>Dice covered by a <b>Minion</b> count as blanks, but a Sidestep, Leap or Pivot may <b>land on</b> one (using its own move). The Path ends there, and when it resolves the die underneath is uncovered and used.</li></ul>
 <h3>Swap and Reroll</h3>
 <p>Some dice have <b>Swap</b> or <b>Reroll</b> faces. Tap one to arm it (any time, even mid-Path), then tap a target die that isn't in your Path and isn't under a Minion. <b>Swap</b>: the two dice trade places. <b>Reroll</b>: the target lands on a different face that isn't blank. Once used, the Swap or Reroll die becomes a <b>Pivot</b> for the rest of the turn. ${btn('Clear')} undoes Swaps; Rerolls stay.</p>
 <h3>Tokens</h3>
@@ -128,14 +128,14 @@ const fr=[['hit','Hit N','Deal N damage.'],
 ['dot','D.O.T. N','Add N to the enemy\'s D.O.T.'],['leech','Leech N','Add N to the enemy\'s D.O.T. <i>and</i> N to your own H.O.T.'],
 ['heal','Heal N','Heal N Health right now, up to your maximum.'],['hot','H.O.T. N','Add N to your H.O.T.'],['block','Block N','Add N to your Block.'],
 ['boost','Boost ×N','Multiply the next Hit, Combo, D.O.T., Leech, Heal, H.O.T. or Block in your Path by N. Consecutive Boosts multiply (×2 then ×3 is ×6). Any other face in between wastes it.'],
-['dodge','Dodge','Path may continue to a diagonal die. No other effect.'],['leap','Leap','Path may continue exactly two squares away in a straight line. Clears a Minion in the square it jumps over, and may land on one.'],
+['dodge','Sidestep','Path may continue to a diagonal die. No other effect.'],['leap','Leap','Path may continue exactly two squares away in a straight line. Clears a Minion in the square it jumps over, and may land on one.'],
 ['pivot','Pivot','Path may continue to any of the eight neighbors. No other effect.'],['fumble','Fumble N','Add N to your <i>own</i> D.O.T. (never multiplied by Boost). The Path continues normally.'],
 ['freeze','Freeze','Cancels the enemy\'s next move: a regular enemy skips its whole turn, even a heavy one; a boss still makes its every-turn attack but its special is cancelled. It still takes D.O.T. and heals from H.O.T.'],['nullify','Nullify','Clears everything it can reach at once: every Minion, your D.O.T. and the enemy\'s H.O.T.'],
 ['swap','Swap','Tap it, then another die: the two trade places. Afterwards it is a Pivot for the turn.'],['reroll','Reroll','Tap it, then another die: that die rolls a different face that isn\'t blank. Afterwards it is a Pivot for the turn.']];
 C+=ch(5,'Actions &amp; Statuses',`
 <h3>Action Faces</h3>
 <div class="faceTbl">${fr.map(([t,n,d])=>`<div class="fr">${face({type:t,value:['hit','combo','dot','leech','heal','hot','block'].includes(t)?'N':(t==='fumble'?null:(t==='boost'?'N':null))},'basic').replace('×N','×N')}<div><b>${n}</b><span>${d}</span></div></div>`).join('')}</div>
-<p class="small">Dodge, Leap and Pivot are <b>Maneuvers</b>. They do nothing alone but count toward many quests.</p>
+<p class="small">Sidestep, Leap and Pivot are <b>Maneuvers</b>. They do nothing alone but count toward many quests.</p>
 <h3>Statuses</h3>
 ${tbl(['Status','How it works'],[
 ['<b>Block</b>','Absorbs incoming damage point for point and is used up as it does. It lasts for the current fight only.'],
@@ -161,7 +161,7 @@ C+=ch(6,'Encounters',`
 <p><b>Elite</b> and <b>Deadly</b> foes (tagged in the doorway) have <b>heavy turns</b>: an Elite every 3rd turn, a Deadly every 2nd. A heavy turn doubles its attack (or, with no attack, its biggest Minion, D.O.T. or Shield action; healing is never doubled). The chips count down ("Heavy in 2") and turn red the turn before.</p>
 <h3>Quests</h3>
 <p>Every Trap, most Bosses and many Enemies list <b>quests</b> on a paper sign. Completing one pays its reward at once, in full: there is no cap on quest damage. Quest damage hits Shield first, like your Hits. Quests are checked once your Path finishes, so "3 Maneuvers" means three Maneuver faces in one Path. Each quest counts once per fight.</p>
-<p>Quests ask for: a number of Maneuvers, Dodges, Leaps, Pivots, Combos, Boosts, Heals, Blocks, support dice (Heal, H.O.T., Block) or Nullifies in one Path; blank dice left unused ("Blanks 10+"); a long Path ("Path 6+") or a short one ("Path 1-3"); a damage total in one turn ("Damage 10+"); an amount of H.O.T. gained or D.O.T. dealt in one turn; Block banked up ("Block 5+"); or reaching a certain round ("Reach Rd 5"). Most rewards are damage, but some put D.O.T. on the foe, give you H.O.T., or trigger a Nullify or Freeze.</p>
+<p>Quests ask for: a number of Maneuvers, Sidesteps, Leaps, Pivots, Combos, Boosts, Heals, Blocks, support dice (Heal, H.O.T., Block) or Nullifies in one Path; blank dice left unused ("Blanks 10+"); a long Path ("Path 6+") or a short one ("Path 1-3"); a damage total in one turn ("Damage 10+"); an amount of H.O.T. gained or D.O.T. dealt in one turn; Block banked up ("Block 5+"); or reaching a certain round ("Reach Rd 5"). Most rewards are damage, but some put D.O.T. on the foe, give you H.O.T., or trigger a Nullify or Freeze.</p>
 <p>The two <b>Geometry</b> quests are standing rules instead: on Profane Geometry every H.O.T. you gain also lands on it as D.O.T.; on Sacred(?) Geometry every D.O.T. it takes also gives you H.O.T. The reward number caps the total.</p>
 <h3>Shrines</h3><p>A Shrine is a room without a fight: press and hold it to receive its boon. Some offer a choice, and <b>bargain</b> shrines ask a price (maximum Health, or your next Camp rest) or let you walk away. Some shrines also hand you a loot pick (a Scroll Dispenser drops a die along with its scrolls; Madpie Nest and Storied Emporium add one to their relic), and a few let you take two Relics. Themed relic shrines offer relics from one family first.</p>
 ${tbl(['Floor','Shrine','Boon'],shr.map(s=>[s[0],`<b>${s[1]}</b>`,s[2]]))}
