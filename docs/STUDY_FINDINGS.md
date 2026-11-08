@@ -115,6 +115,31 @@ bot undervalues tokens, so token shrines may read better with real players.
 - Quest Health (the cap) removed in 1.41.59: it cut only ~11 damage per run; Displacer (now Transposer) Lair's rewards
   were lowered instead.
 
+## Route goals and Maneuver value (Nov 8, 2026, build 1.42.70)
+
+study_maneuver.js (bot scores route goals; `noRoute` removes them; `swapManeuver` turns every starting Maneuver die into
+an Attack die of the same level), dwarf, Armsmaster and Dungeoneer, regular bot (depth 0) and expert bot (depth 7),
+300 runs per cell. "Maneuver value" = win rate keeping the Maneuver dice minus win rate with them swapped for Attack dice.
+
+| Profile | Class | Route goals ON: keep / swap (value) | OFF: keep / swap (value) |
+|---|---|---|---|
+| regular d0 | Armsmaster | 82 / 82 (0) | 80 / 75 (+5) |
+| regular d0 | Dungeoneer | 93 / 90 (+3) | 92 / 94 (−2) |
+| expert d7 | Armsmaster | 82 / 78 (+4) | 77 / 75 (+2) |
+| expert d7 | Dungeoneer | 77 / 80 (−3) | 69 / 79 (−10) |
+
+- **Maneuver dice gained a little, within noise:** average value +1 with route goals vs −1 without (each cell ±3).
+  Maneuver dice are still worth about the same as Attack dice, no more.
+- **Route goals made runs easier overall:** +4 points on average with Maneuver dice kept (80→82, 92→93, 77→82, 69→77);
+  they are extra rewards. Bots finish ~35% of open route goals on Floor 1, ~25–50% later. Without Maneuver dice, Floor 1
+  completions drop from ~300 to ~200 per 300 runs, so the dice do feed the goals.
+- **Bots didn't change how often they step on Maneuver faces** (F1 1.74 vs 1.73 per turn): the goals are taken when
+  they fall on the best path, not chased.
+- **It is a Floor 1 problem:** of the Maneuver dice showing a face, the share the path uses rises by floor: F1 47–59%,
+  F2 54–64%, F3 71–85%. Maneuver II/III carry Block 2 and Boost faces, and every Maneuver die is level I until the
+  first Train, so the "useless Maneuver" turns are concentrated on Floor 1.
+- Bots don't feel "forced", so this measures value, not how it feels; the playtest note was about feel.
+
 ## Design, art and performance
 
 - **Design audit (Oct 17):** every button its own colour, Settings fits without scrolling, camp rows match their dice,
