@@ -45,6 +45,12 @@ function face(str){
 function faces(arr){ return arr.map(face); }
 
 
+// Route-goal quests (Nov 8, Jeremy: option C, names only in the long-press details and the Bestiary, not on the sign).
+// Quest data: '5 damage: route square root'. The check lives in routeGoalMet (logic.js).
+const ROUTE_GOALS = {
+  'square root':   {name:'Square Root',   short:'2×2 square',      desc:'Four dice of one Path fill a 2×2 square.'},
+  'running start': {name:'Running Start', short:'Move, then Boost', desc:'A Boost right after a Sidestep, Leap or Pivot, in one Path.'},
+};
 const LABEL = { hit:'Hit', combo:'Combo', boost:'Boost', dot:'D.O.T.', leech:'Leech', fumble:'Fumble',
   dodge:'Sidestep', leap:'Leap', pivot:'Pivot', freeze:'Freeze', swap:'Swap', reroll:'Reroll', heal:'Heal', hot:'H.O.T.', block:'Block', nullify:'Nullify', blank:'—'};
 
@@ -397,10 +403,10 @@ function enc(name,type,health,extra){ return Object.assign({name,type,health,max
 
 const FLOOR1_ENEMIES = [
   enc('Filement Bunny','Enemy',7,{dmg:2,flavor:'"Cute, until it gunks up your gears and gnaws off your toes!"'}),
-  enc('Wooden Golem','Enemy',10,{dmg:3,quests:['5 damage: 3 maneuvers'],flavor:'Shoddy construction is evident from the visible weak points.'}),
+  enc('Wooden Golem','Enemy',10,{dmg:3,quests:['5 damage: 3 maneuvers','5 damage: route square root'],flavor:'Shoddy construction is evident from the visible weak points.'}),
   enc('Feral Pet Rock','Enemy',12,{dmg:2,flavor:'Somedwarf took this companion for granite…'}),
   enc('Unbound Automa','Enemy',15,{dmg:3,quests:['5 damage: 3 maneuvers'],flavor:'This replaced the Automaton, mostly to remove the weight.'}),
-  enc('Beaker Breakers','Enemy',15,{dmg:1,heal:1,quests:['5 damage: 2 dodge'],flavor:'"No longer into flasks"'}),
+  enc('Beaker Breakers','Enemy',15,{dmg:1,heal:1,quests:['5 damage: 2 dodge','5 damage: route running start'],flavor:'"No longer into flasks"'}),
   enc('Viscous Orb','Enemy',10,{dmg:2,minion:1,flavor:'"Thankfully it isn\u2019t a gelatinous cube!"'}),
   enc('United Separatists','Enemy',12,{dmg:1,heal:1,flavor:'"Nothing like a shared schism to bring people apart".'}),
   enc('Amanitabomination','Enemy',14,{dmg:2,shield:2,quests:['5 damage: 2 heals'],flavor:'"I was benevolent and good, misery made me a foe"'}),

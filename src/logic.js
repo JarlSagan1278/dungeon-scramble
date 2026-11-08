@@ -1741,7 +1741,8 @@ function computePathEffects(path){
 
   return { totalDamage, dotToEncounter, hotToPlayer, blockGain, healGain, selfDot, freeze, nullifyCount,
     hitCount, comboCount, healCount, blockCount, boostCount, dodgeCount, leapCount, pivotCount,
-    maneuverCount, supportCount, hotCount, dotCount, totalActions: path.length, blankCount };
+    maneuverCount, supportCount, hotCount, dotCount, totalActions: path.length, blankCount,
+    pathIdx: path.slice(), pathTypes: path.map(i=>pathFaceForIdx(i).type) }; // route-goal quests read the path's shape (Nov 8)
 }
 
 // Mirrors computePathEffects()'s own loop (same math, same Boost-carry
@@ -1892,6 +1893,8 @@ function parseQuestSpec(q){
 function questEval(cond, ctx){
   let m; const n = x=>parseInt(x);
   const count = (have, need)=>({done: have >= need, have, need});
+  // Route goals (Nov 8, Jeremy picked option C): "route <key>" asks for a shape inside this one path; see ROUTE_GOALS.
+  if((m=cond.match(/^route (.+)$/))) return {done: routeGoalMet(m[1].trim(), ctx), have:null, need:null};
   // Survive (Oct 17, Jeremy): "survive (to) turn N" is done on the round the bubble shows as Rd N; "survive N" means
   // N enemy turns survived, so it's done on Rd N+1. The paper prints both as "Reach Rd X".
   if((m=cond.match(/survive (?:to )?turn (\d+)/))) return {done: ctx.turnNumber >= n(m[1]) - 1, have:null, need:null};
@@ -1917,6 +1920,21 @@ function questEval(cond, ctx){
   if(cond.includes('nullify')) return count(ctx.nullifyCount, 1);
   return {done:false, have:null, need:null};
 }
+const MANEUVER_TYPES = ['dodge','leap','pivot'];
+function routeGoalMet(key, ctx){
+  const P = ctx.pathIdx||[], T = ctx.pathTypes||[];
+  if(!P.length) return false;
+  if(key==='square root'){ // four dice of the path fill a 2x2 block
+    const has = new Set(P);
+    for(let r=0;r<3;r++) for(let c=0;c<3;c++){ const i=r*4+c; if(has.has(i)&&has.has(i+1)&&has.has(i+4)&&has.has(i+5)) return true; }
+    return false;
+  }
+  if(key==='running start'){ // a Boost right after a maneuver
+    for(let i=1;i<T.length;i++) if(T[i]==='boost' && MANEUVER_TYPES.includes(T[i-1])) return true;
+    return false;
+  }
+  return false;
+}
 function questCtxFromEffects(effects){
   return {
     maneuverCount: effects.maneuverCount, totalActions: effects.totalActions, blankCount: effects.blankCount,
@@ -1924,7 +1942,8 @@ function questCtxFromEffects(effects){
     comboCount:effects.comboCount, healCount:effects.healCount, blockCount:effects.blockCount,
     boostCount:effects.boostCount, dodgeCount:effects.dodgeCount, leapCount:effects.leapCount,
     pivotCount:effects.pivotCount, nullifyCount:effects.nullifyCount, supportCount:effects.supportCount,
-    hotCount:effects.hotCount, dotCount:effects.dotCount, hotGained:effects.hotToPlayer, dotDealt:effects.dotToEncounter
+    hotCount:effects.hotCount, dotCount:effects.dotCount, hotGained:effects.hotToPlayer, dotDealt:effects.dotToEncounter,
+    pathIdx:effects.pathIdx||[], pathTypes:effects.pathTypes||[]
   };
 }
 function checkQuests(e, ctx){

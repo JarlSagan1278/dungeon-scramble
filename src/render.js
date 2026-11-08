@@ -4393,7 +4393,7 @@ const TIER_ORDER = {easy:0, standard:1, elite:2, deadly:3};
 function bestiaryQuestsHTML(e){
   if(!e.quests || !e.quests.length) return '';
   const oneTurn = e.quests.some(q=>!QUEST_ALL_FIGHT.test(parseQuestSpec(q).cond));
-  return `<div class="bst-quests"><div class="bst-quests-head">Quests${oneTurn ? ' <span>in one turn</span>' : ''}</div>${e.quests.map(q=>`<div class="bst-quest q-row" title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, false)}</div>`).join('')}</div>`;
+  return `<div class="bst-quests"><div class="bst-quests-head">Quests${oneTurn ? ' <span>in one turn</span>' : ''}</div>${e.quests.map(q=>`<div class="bst-quest q-row" title="${questTitle(q)}">${questRowHTML(q, false)}</div>`).join('')}</div>`;
 }
 function bestiaryHTML(){
   const B = META.bestiary || {};
@@ -4834,8 +4834,14 @@ function syncCampHeal(){
 // (e.g. "5 damage: 3 maneuvers"); the paper shows the condition first, an arrow, then the reward as a badge. ----
 // Quest paper wording (Oct 17 audit, approved by Jeremy): counts of dice in one path ("3 Maneuvers", "2 Heal dice"),
 // thresholds noun-first ("Damage 10+", "Path 6+", "Block 5+", "Blanks 10+"), rounds as the tray badge shows them ("Reach Round 5").
+// Long-press text for a quest row: route goals show their name and rule (Nov 8); others keep the data string.
+function questTitle(q){
+  const {rewardText, cond} = parseQuestSpec(q); const m = cond.match(/^route (.+)$/); const g = m && ROUTE_GOALS[m[1].trim()];
+  return (g ? `${g.name}: ${g.desc} Reward: ${rewardText}.` : q).replace(/"/g,'&quot;');
+}
 function questCondShort(cond){
   const c = cond.toLowerCase().trim(); let m;
+  if((m=c.match(/^route (.+)$/))){ const g = ROUTE_GOALS[m[1].trim()]; return g ? g.short : 'Route goal'; }
   const cap = t=> t.charAt(0).toUpperCase()+t.slice(1);
   const pl = (n, one, many)=> n==='1' ? one : many;
   if((m=c.match(/(\d+)\s*maneuvers?(?: in a single (?:turn|round))?/))) return `${m[1]} ${pl(m[1],'Maneuver','Maneuvers')}`;
@@ -4895,7 +4901,7 @@ function questSignHTML(e){
     const qs = questStampAttrs(e.name,i), done = e.questsDone[i];
     let live = null;
     if(ctx && !done){ const cond = parseQuestSpec(q).cond; if(!QUEST_ALL_FIGHT.test(cond)){ live = questEval(cond, ctx); if(live.done) anyLive = true; } }
-    return `<span class="fo-quest ${done?'complete':''} ${live&&live.done?'q-live-done':''} ${qs.cls} q-row"${qs.style} title="${q.replace(/"/g,'&quot;')}">${questRowHTML(q, done, live)}</span>`;
+    return `<span class="fo-quest ${done?'complete':''} ${live&&live.done?'q-live-done':''} ${qs.cls} q-row"${qs.style} title="${questTitle(q)}">${questRowHTML(q, done, live)}</span>`;
   }).join('');
   // Nov 4 (Jeremy: the poster grew as quests progressed): both labels share one grid cell, so swapping them never resizes
   // the sign, and the sign keeps the height it had at the start of the fight (QSIGN_H, measured by lockQuestSign).
