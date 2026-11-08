@@ -1637,9 +1637,10 @@ const SHRINE_FLIP = new Set(['Ecclectrical Outlet','Department Spore','Cryothera
 const ENCOUNTER_NO_FLIP = new Set(['Grafted Grifter','Whence Wolf','Roudy Rinotter','Viscous Orb','Unbound Automa','Rogue Golemancer','Heating Elemental','Transposer Kitty','Armored Gear-Pest','Blastogenesis Engine','Half-life Host','Adhesive Pest Traps','The Necrorancher','Bellicose Biomancer','Ceramic Golem','Chimeric Sludge','Toadtaur Warrior','Rabbid Rabbats','Oilephant\'s Foot','The Punished']); // Oct 19 footing page: Gestalt Network faces the default way, The Punished turned // Oct 15 (Jeremy): Toadtaur Warrior and Rabbid Rabbats face the other way
 // Quest paper nudges (Oct 17 design fixes): [px left, px up] for the monsters whose art would otherwise hide the
 // reward badges. Monsters always stand in front of the paper, so the paper moves instead (measured at 395x769).
-const QUEST_PAPER_NUDGE = {'The Strike/Break-er':[-36,-14],'Self-Replicating Forge':[-25,-18],'Bio-Mutant Escape':[-25,-17],'Extractnid Matriarch':[-23,-6],
-  'Anti-Euclidian Space':[-16,-12],'Extruzeon, Co-consul of Waste':[-12,-6],'Myceleus, Co-consul of Rot':[-10,-4],'Ergot Eruption':[-7,0],
-  'Unventilated Workshop':[-6,0],'Leper Con-Trap':[-5,0],'Ditched Heist':[-5,0]};
+// Nov 8: re-swept with the taller route-goal signs (screenshot each reward badge with and without the monster)
+const QUEST_PAPER_NUDGE = {'The Strike/Break-er':[-36,-14],'Self-Replicating Forge':[-25,-18],'Bio-Mutant Escape':[-31,-17],'Extractnid Matriarch':[-23,-6],
+  'Anti-Euclidian Space':[-22,-12],'Extruzeon, Co-consul of Waste':[-12,-6],'Myceleus, Co-consul of Rot':[-10,-4],'Ergot Eruption':[-7,0],
+  'Unventilated Workshop':[-6,0],'Leper Con-Trap':[-5,0],'Ditched Heist':[-5,0],'Grafted Grifter':[-15,-14],'The Warcart':[-9,0],'Roudy Rinotter':[-15,0]};
 function questPaperStyle(e){ const n = QUEST_PAPER_NUDGE[e && e.name]; return n ? ` style="--qdx:${n[0]}px;--qdy:${n[1]}px"` : ''; }
 let foPlayer = null; // the hero's half of the face-off band, set each renderGame()
 function renderEncounterCard(e, mode){

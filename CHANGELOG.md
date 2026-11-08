@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.42.70 (Nov 8, 2026)
+Route goals (the playtest's "one best path, maneuvers feel forced"; Jeremy picked option C):
+- New Wanted posters ask for a path shape inside one Path, next to each monster's usual quest: Square Root (2×2 square), Running Start (Move, Boost), Leapfrog (Leap to Leap), Diagonal Argument (3 on a diagonal), Pivot Point (Pivot, Combo), Turning Number (Turn 3 times), Antipodal (Far corners), Hollow Proof (Edge path 5+). 13 monsters carry one; reward +5 damage on Floor 1, +8 on Floor 2, +10 on Floor 3. The sign shows only the short condition; long-press names the goal and its rule.
+- A quest the current path would complete now turns green with a ✓ (the yellow box is gone).
+- The first loot pick explains that a new die replaces one in your 16-die Tray and the old one goes to the Back Pocket.
+- Quest papers nudged where the taller signs let a monster cover a reward (Grafted Grifter, The Warcart, Roudy Rinotter, Anti-Euclidian Space, Bio-Mutant Escape).
+- check.js: routegoals (every shape check, sign fit, a real turn).
+
 ## 1.42.69 (Nov 8, 2026)
 From the We Playtest Games session (docs/playtests/2026-11-08_weplaytestgames_wndg.md):
 - Status chips take their owner's colour: yours are blue, the monster's deep red (the tester could never tell whose D.O.T. was whose).

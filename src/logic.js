@@ -1924,17 +1924,25 @@ const MANEUVER_TYPES = ['dodge','leap','pivot'];
 function routeGoalMet(key, ctx){
   const P = ctx.pathIdx||[], T = ctx.pathTypes||[];
   if(!P.length) return false;
-  if(key==='square root'){ // four dice of the path fill a 2x2 block
-    const has = new Set(P);
-    for(let r=0;r<3;r++) for(let c=0;c<3;c++){ const i=r*4+c; if(has.has(i)&&has.has(i+1)&&has.has(i+4)&&has.has(i+5)) return true; }
-    return false;
-  }
-  if(key==='running start'){ // a Boost right after a maneuver
-    for(let i=1;i<T.length;i++) if(T[i]==='boost' && MANEUVER_TYPES.includes(T[i-1])) return true;
-    return false;
+  const rc = i=>({r:Math.floor(i/4), c:i%4});
+  // step direction as signs; a Dungeoneer seam step (column 0 <-> 3) counts as one column the other way
+  const dir = (a,b)=>{ const A=rc(a), B=rc(b); let dc=B.c-A.c; if(Math.abs(dc)===3) dc=-Math.sign(dc); return [Math.sign(B.r-A.r), Math.sign(dc)]; };
+  switch(key){
+    case 'square root': { const has = new Set(P); // four dice of the path fill a 2x2 block
+      for(let r=0;r<3;r++) for(let c=0;c<3;c++){ const i=r*4+c; if(has.has(i)&&has.has(i+1)&&has.has(i+4)&&has.has(i+5)) return true; }
+      return false; }
+    case 'running start': for(let i=1;i<T.length;i++) if(T[i]==='boost' && MANEUVER_TYPES.includes(T[i-1])) return true; return false;
+    case 'leapfrog': for(let i=1;i<T.length;i++) if(T[i]==='leap' && T[i-1]==='leap') return true; return false;
+    case 'pivot point': for(let i=1;i<T.length;i++) if(T[i]==='combo' && T[i-1]==='pivot') return true; return false;
+    case 'diagonal argument': for(let i=2;i<P.length;i++){ const d1=dir(P[i-2],P[i-1]), d2=dir(P[i-1],P[i]);
+        if(d1[0]&&d1[1] && d1[0]===d2[0] && d1[1]===d2[1]) return true; } return false;
+    case 'turning number': { let turns=0; for(let i=2;i<P.length;i++){ const d1=dir(P[i-2],P[i-1]), d2=dir(P[i-1],P[i]); if(d1[0]!==d2[0]||d1[1]!==d2[1]) turns++; } return turns>=3; }
+    case 'antipodal': { const a=P[0], z=P[P.length-1]; return P.length>1 && ((a===0&&z===15)||(a===15&&z===0)||(a===3&&z===12)||(a===12&&z===3)); }
+    case 'hollow proof': return P.length>=5 && !P.some(i=>i===5||i===6||i===9||i===10);
   }
   return false;
 }
+
 function questCtxFromEffects(effects){
   return {
     maneuverCount: effects.maneuverCount, totalActions: effects.totalActions, blankCount: effects.blankCount,

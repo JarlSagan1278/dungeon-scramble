@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.42.69';
+const GAME_VERSION = '1.42.70';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false };
@@ -48,8 +48,14 @@ function faces(arr){ return arr.map(face); }
 // Route-goal quests (Nov 8, Jeremy: option C, names only in the long-press details and the Bestiary, not on the sign).
 // Quest data: '5 damage: route square root'. The check lives in routeGoalMet (logic.js).
 const ROUTE_GOALS = {
-  'square root':   {name:'Square Root',   short:'2×2 square',      desc:'Four dice of one Path fill a 2×2 square.'},
-  'running start': {name:'Running Start', short:'Move, then Boost', desc:'A Boost right after a Sidestep, Leap or Pivot, in one Path.'},
+  'square root':       {name:'Square Root',       short:'2×2 square',        desc:'Four dice of one Path fill a 2×2 square.'},
+  'running start':     {name:'Running Start',     short:'Move, Boost',  desc:'A Boost right after a Sidestep, Leap or Pivot, in one Path.'},
+  'leapfrog':          {name:'Leapfrog',          short:'Leap to Leap',  desc:'A Leap that lands on another Leap, in one Path.'},
+  'diagonal argument': {name:'Diagonal Argument', short:'3 on a diagonal',   desc:'Three dice in a row along one diagonal, in one Path (two Sidesteps, one after the other).'},
+  'pivot point':       {name:'Pivot Point',       short:'Pivot, Combo', desc:'A Combo right after a Pivot, in one Path.'},
+  'turning number':    {name:'Turning Number',    short:'Turn 3 times',      desc:'One Path that changes direction at least 3 times.'},
+  'antipodal':         {name:'Antipodal',         short:'Far corners',  desc:'One Path that starts in a corner of the Tray and ends in the opposite corner.'},
+  'hollow proof':      {name:'Hollow Proof',      short:'Edge path 5+',      desc:'One Path of 5 or more dice that never touches the middle four.'},
 };
 const LABEL = { hit:'Hit', combo:'Combo', boost:'Boost', dot:'D.O.T.', leech:'Leech', fumble:'Fumble',
   dodge:'Sidestep', leap:'Leap', pivot:'Pivot', freeze:'Freeze', swap:'Swap', reroll:'Reroll', heal:'Heal', hot:'H.O.T.', block:'Block', nullify:'Nullify', blank:'—'};
@@ -405,15 +411,15 @@ const FLOOR1_ENEMIES = [
   enc('Filement Bunny','Enemy',7,{dmg:2,flavor:'"Cute, until it gunks up your gears and gnaws off your toes!"'}),
   enc('Wooden Golem','Enemy',10,{dmg:3,quests:['5 damage: 3 maneuvers','5 damage: route square root'],flavor:'Shoddy construction is evident from the visible weak points.'}),
   enc('Feral Pet Rock','Enemy',12,{dmg:2,flavor:'Somedwarf took this companion for granite…'}),
-  enc('Unbound Automa','Enemy',15,{dmg:3,quests:['5 damage: 3 maneuvers'],flavor:'This replaced the Automaton, mostly to remove the weight.'}),
+  enc('Unbound Automa','Enemy',15,{dmg:3,quests:['5 damage: 3 maneuvers','5 damage: route turning number'],flavor:'This replaced the Automaton, mostly to remove the weight.'}),
   enc('Beaker Breakers','Enemy',15,{dmg:1,heal:1,quests:['5 damage: 2 dodge','5 damage: route running start'],flavor:'"No longer into flasks"'}),
   enc('Viscous Orb','Enemy',10,{dmg:2,minion:1,flavor:'"Thankfully it isn\u2019t a gelatinous cube!"'}),
   enc('United Separatists','Enemy',12,{dmg:1,heal:1,flavor:'"Nothing like a shared schism to bring people apart".'}),
   enc('Amanitabomination','Enemy',14,{dmg:2,shield:2,quests:['5 damage: 2 heals'],flavor:'"I was benevolent and good, misery made me a foe"'}),
-  enc('Grafted Grifter','Enemy',15,{dmg:2,shield:2,quests:['5 damage: 2 leap'],flavor:'Known to charge an arm and a leg.'}),
+  enc('Grafted Grifter','Enemy',15,{dmg:2,shield:2,quests:['5 damage: 2 leap','5 damage: route leapfrog'],flavor:'Known to charge an arm and a leg.'}),
   enc('Leper Colonizers','Enemy',12,{dmg:2,shield:2,flavor:'"May our crustulant new Chempire outlast its crumbling citizens!"'}),
   // v1.39.0: Jeremy's spare monsters from the Mechanics Document; stats from the evened tiers (2026-10-11 study, docs/STUDY_FINDINGS.md).
-  enc('Untamed Unicrows','Enemy',14,{dmg:2,dot:1,quests:['5 damage: 2 dodge'],flavor:'"A murderous parliament, or a parliamentary murder?"'}),
+  enc('Untamed Unicrows','Enemy',14,{dmg:2,dot:1,quests:['5 damage: 2 dodge','5 damage: route diagonal argument'],flavor:'"A murderous parliament, or a parliamentary murder?"'}),
   enc('Prickly Porcupanther','Enemy',18,{dmg:2,shield:1,dreadOnly:true,quests:['5 damage: 2 block'],flavor:'"Prickly of both texture and temperament."'}),
 ];
 const FLOOR1_TRAPS = [
@@ -453,15 +459,15 @@ const FLOOR2_ENEMIES = [
   enc('Armored Gear-Pest','Enemy',17,{dmg:2,flavor:'A well-documented example of dungeon adaptation.'}),
   enc('Rusty Golem','Enemy',20,{dmg:4,quests:['16 damage: survive turn 4'],flavor:'"Looks like it was falling apart on its own"'}),
   enc('Rogue Technician','Enemy',16,{dmg:4,flavor:'"I\u2019m not here to fix your lockpick, I have an ideology!"'}),
-  enc('The Warcart','Enemy',18,{dmg:2,shield:2,quests:['8 damage: 4 maneuvers'],flavor:'The top contributing reason as to why mining is the most dangerous profession.'}),
+  enc('The Warcart','Enemy',18,{dmg:2,shield:2,quests:['8 damage: 4 maneuvers','8 damage: route turning number'],flavor:'The top contributing reason as to why mining is the most dangerous profession.'}),
   enc('Blastogenesis Engine','Enemy',14,{dmg:3,minion:2,flavor:'A true perpetual devotion machine.'}),
   enc('Half-life Host','Enemy',22,{dmg:3,shield:2,quests:['8 damage: 2 heal'],flavor:'"\u2018Release spores. Multiply.\u2019? - Now I\u2019m always saying that!"'}),
   enc('Lichen-Thrope','Enemy',24,{dmg:3,heal:1,flavor:'Under the luminance of the full bloom, this creature becomes a true hater.'}),
   enc('Fungal Flayer','Enemy',24,{dmg:3,hot:2,quests:['16 damage: accumulate 5 block'],flavor:'It is, in fact, acceptable to hate the flayer.'}),
   enc('Illegal Operation','Enemy',19,{dmg:4,hot:1,flavor:'"Oh no, maybe we try multiplying by zero this time??"'}),
-  enc('Rabbid Rabbats','Enemy',18,{dmg:2,minion:1,quests:['5 damage: 2 leap'],flavor:'"They multiply like rabbits and, as a group, have inverse operations."'}),
-  enc('Roudy Rinotter','Enemy',15,{dmg:2,heal:1,quests:['5 damage: 2 heal'],flavor:'"Is that some cornbread on its tummy?"'}),
-  enc('Whence Wolf','Enemy',32,{dmg:3,dot:1,quests:['10 damage: 3 maneuvers'],flavor:'"Why, Grandma, what uncertain provenance you have."'}),
+  enc('Rabbid Rabbats','Enemy',18,{dmg:2,minion:1,quests:['5 damage: 2 leap','8 damage: route leapfrog'],flavor:'"They multiply like rabbits and, as a group, have inverse operations."'}),
+  enc('Roudy Rinotter','Enemy',15,{dmg:2,heal:1,quests:['5 damage: 2 heal','8 damage: route hollow proof'],flavor:'"Is that some cornbread on its tummy?"'}),
+  enc('Whence Wolf','Enemy',32,{dmg:3,dot:1,quests:['10 damage: 3 maneuvers','8 damage: route antipodal'],flavor:'"Why, Grandma, what uncertain provenance you have."'}),
 ];
 const FLOOR2_TRAPS = [
   enc('Adhesive Pest Traps','Trap',22,{dmg:2,minion:2,quests:['15 damage: 3 maneuvers','15 damage: 4 maneuvers','15 damage: 5 maneuvers'],flavor:'"Environmentally friendly snares for unfriendly environments"'}),
@@ -503,8 +509,8 @@ const FLOOR2_BOSSES = [
 // (heavy turns double it), +1 on the Big Bosses' base attacks.
 const FLOOR3_ENEMIES = [
   enc('Morel Dilemma','Enemy',18,{dmg:6,minion:2,hot:1,flavor:'A fungal species that has stumped, and subsequently eaten, philosophers for generations.'}),
-  enc('Chimeric Sludge','Enemy',25,{dmg:7,hot:2,quests:['12 damage: 4 maneuvers'],flavor:'Biological slag, made up of countless individual chimeras.'}),
-  enc('Gnome Chomper','Enemy',28,{dmg:8,quests:['6 damage: 3 maneuvers'],flavor:'"The Gnomish Chempire is the leading zealot state!"'}),
+  enc('Chimeric Sludge','Enemy',25,{dmg:7,hot:2,quests:['12 damage: 4 maneuvers','10 damage: route antipodal'],flavor:'Biological slag, made up of countless individual chimeras.'}),
+  enc('Gnome Chomper','Enemy',28,{dmg:8,quests:['6 damage: 3 maneuvers','10 damage: route running start'],flavor:'"The Gnomish Chempire is the leading zealot state!"'}),
   // v1.39.0: replaces Parasite Seer (its art was a cropped copy of another gnome); Jeremy's idea, same slot and stats.
   enc('Gnomeowners Association','Enemy',20,{dmg:5,shield:3,flavor:'"Only good and gracious hosts are allowed in this neighborhood."'}),
   enc('Gestalt Network','Enemy',20,{dmg:5,dot:2,flavor:'"You will join us. Our population is mushrooming."'}),
@@ -513,8 +519,8 @@ const FLOOR3_ENEMIES = [
   enc('The Punished','Enemy',36,{dmg:6,minion:1,flavor:'Those foolish enough to try and harness forms they are unable to comprehend.'}),
   enc('Profane Geometry','Enemy',35,{dmg:6,hot:2,quests:['10 damage: adventurer H.O.T. = D.O.T.'],flavor:'A simulacrum of the divine, insatiable as the curiosity by which it was conjured.'}),
   enc('Sacred(?) Geometry','Enemy',38,{dmg:6,dot:2,quests:['10 damage: encounter D.O.T. = H.O.T.'],flavor:'A mere reflection of the divine geometry. The impossible beauty pains your eyes.'}),
-  enc('Eelagator Escapee','Enemy',44,{dmg:5,shield:2,quests:['10 damage: 2 nullify'],flavor:'"Such a successful grafting that it escaped of its own measure!"'}),
-  enc('Toadtaur Warrior','Enemy',30,{dmg:7,quests:['8 damage: 3 maneuvers'],flavor:'"Definitely a \'can we\' vs. a \'should we\' decision, looking back."'}),
+  enc('Eelagator Escapee','Enemy',44,{dmg:5,shield:2,quests:['10 damage: 2 nullify','10 damage: route hollow proof'],flavor:'"Such a successful grafting that it escaped of its own measure!"'}),
+  enc('Toadtaur Warrior','Enemy',30,{dmg:7,quests:['8 damage: 3 maneuvers','10 damage: route pivot point'],flavor:'"Definitely a \'can we\' vs. a \'should we\' decision, looking back."'}),
 ];
 const FLOOR3_TRAPS = [
   enc('Anti-Euclidian Space','Trap',40,{dmg:9,shield:2,quests:['10 damage: any 10 actions','15 damage: any 12 actions','20 damage: any 15 actions'],flavor:'Where forbidden postulates are illogically deduced from perfidious axioms.'}),
