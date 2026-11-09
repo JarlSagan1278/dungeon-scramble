@@ -160,6 +160,28 @@ Harder turn counts didn't help (4 turns: 98/90%, 5 turns: 89/74%): long paths wi
 (a full row or column, in order) came out 53% aiming / 17% blind, so it replaced Turning Number in 1.42.73
 ("Straightedge", 4 in a line). Win rates don't move with the posters (aiming vs blind within 3 points).
 
+## Fairness check, per encounter (Nov 9, 2026, build 1.42.73)
+
+Regular bot, 4 classes x 4 origins x 150 runs (2400 runs): 86% wins; deaths F1 31, F2 104, F3 190.
+Death rate per fight (top of the list) and "healthy deaths" (the player entered the fight with >=60% HP):
+
+| Encounter | Fights | Death rate | Healthy deaths | Median HP at start, deaths |
+|---|---|---|---|---|
+| Myceleus (Big Boss) | 733 | 5.5% | 11 of 40 | 46% |
+| Whence Wolf (F2 deadly) | 328 | 4.0% | 1 of 13 | 25% |
+| Bio-Mutant Escape (F3 elite trap) | 567 | 3.7% | 3 of 21 | 35% |
+| Extruzeon (Big Boss) | 701 | 3.1% | 12 of 22 | 74% |
+| Toadtaur Wizard (Big Boss) | 725 | 3.0% | 6 of 22 | 35% |
+| F2 bosses (Necrorancher, Ceramic Golem, Biomancer) | ~770 each | 2.3-2.7% | 1-4 | 25-35% |
+| Other F3 elites/traps | | 1.0-1.9% | 0-1 | |
+| F1 bosses (Rogue Golemancer, Heating Elemental) | ~800 each | 1.1-1.6% | 0-1 | 30-45% |
+
+- No regular enemy kills healthy players: outside the Big Bosses, deaths are attrition (the player arrives low).
+- Extruzeon is the one that kills from full health, by design (Oct 13: "Layer by Layer", its every-turn hit grows
+  +1 a turn, +2 in phase 2, so long fights end in an enrage). It is telegraphed by the next-turn chips.
+- Outliers to watch, not changed: Myceleus kills about twice as often as the other Big Bosses (5.5% vs 3.0%);
+  Bio-Mutant Escape is about twice as deadly as other Floor 3 elites (3.7% vs 1.5-1.9%), mostly attrition.
+
 ## Design, art and performance
 
 - **Design audit (Oct 17):** every button its own colour, Settings fits without scrolling, camp rows match their dice,
