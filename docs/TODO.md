@@ -1,6 +1,6 @@
 # Dungeon Scramble — TODO
 
-Updated Nov 4, 2026 (build 1.42.62). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
+Updated Nov 9, 2026 (build 1.42.74). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
 study results in `STUDY_FINDINGS.md`. The release checklist (40 items, owner and status) is the Checklist tab of
 the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 
@@ -22,11 +22,13 @@ done in 1.41.97 (Alegreya, toy bevel). Open: the credits' art
 line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jeremy's. Art treatment settled in 1.41.98 (grain kept, cover matched). Second visual review (Oct 28): blank sides, idle Go, Victory chest, equip window and Settings fixed in 1.41.99; title, defeat, Base Camp, boss bar and consent line done in 1.42.0 (loot names in the tray stay). Codex and Records polished in 1.42.1.
 
 ## Waiting on Jeremy
+- **Itch (Nov 9):** upload demo zip 1.42.73+ (Straightedge, phone fixes); in the page description change "Leap, Dodge and Pivot" to "Leap, Sidestep and Pivot" (text in `release/itch_page.md`).
+- **Balance calls from the Nov 9 fairness check (STUDY_FINDINGS):** trim Myceleus (5.5% deaths per fight vs 3.0% for the other Big Bosses)? Bio-Mutant Escape (3.7% vs 1.5-1.9% for Floor 3 elites)? Keep Square Root as the easy poster (75% done)?
+- **Straightedge** (Claude's replacement for Turning Number, 1.42.73): keep the name or rename.
 - **Title art:** new cover drawn from scratch on the 2048x2434 canvas (`DungeonScramble_TitleArt_canvas.psd`); the chat
   only passes 860 px, so export full size from Sketchbook or upload the PSD to the repo. Keep the logo layer for Steam.
 - **Redraw the remaining AI-assisted art** (pixie portraits, the remaining original loot) to shrink the disclosure.
-- **Google Play account** (personal): then real billing behind `STORE` / `window.DSStore` (logic.js), the store
-  listing (`release/store_listing.md`), feature graphic and screenshots.
+- **Google Play account** (personal): then real billing behind `STORE` / `window.DSStore` (logic.js) and the closed-test track. Listing text (`release/store_listing.md`), 1024x500 feature graphic and 1080x1920 screenshots are ready (Nov 9, `tools/media/play.js`).
 - **Armsmaster red Skill vs red Clear:** options shown Oct 15.
 
 ## Next for Claude
