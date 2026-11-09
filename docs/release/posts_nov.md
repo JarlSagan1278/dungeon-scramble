@@ -21,7 +21,7 @@ Page version: https://claude.ai/artifact/EXsbT3N29MADimSzs15gaN (copy buttons, c
 | Wed Nov 11 | Discord: 2-3 playtest / self-promo channels |
 | Fri Nov 13 | People you know, round 2 (board-game friends, Katlynn's friends, ask each to forward to one) |
 | Sat Nov 14 | Bluesky #screenshotsaturday with the clip |
-| Sun Nov 15 | Devlog #2 + new demo zip on itch (refresh in New & Popular) |
+| Sun Nov 15 | ~~Devlog #2 + new demo zip on itch~~ done early Nov 9 (Floors 1-2 demo 1.42.72 + devlog). Nov 15: write down week 2 numbers only |
 | Mon Nov 16 | r/DestroyMyGame (video) |
 | Tue Nov 17 | TikTok or YouTube Shorts (portrait clip, link in bio) |
 | Wed Nov 18 | r/WebGames second post, only if the sidebar allows a repost after an update |
