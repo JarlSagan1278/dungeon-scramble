@@ -182,6 +182,23 @@ Death rate per fight (top of the list) and "healthy deaths" (the player entered 
 - Outliers to watch, not changed: Myceleus kills about twice as often as the other Big Bosses (5.5% vs 3.0%);
   Bio-Mutant Escape is about twice as deadly as other Floor 3 elites (3.7% vs 1.5-1.9%), mostly attrition.
 
+## Maneuver I with a Block or Pivot face (Nov 9, 2026, build 1.42.74)
+
+study_maneuver.js `man1Faces` knob, dwarf, 300 runs per cell; regular bot (4 classes, depth 0) and expert bot
+(Armsmaster + Dungeoneer, depth 7). Today Maneuver I is Sidestep, Sidestep, Leap, Leap, blank, blank.
+
+| Maneuver I | Regular win | Expert d7 win | Deaths F1/F2/F3 (regular) | Maneuver steps/turn F1 | Share of showing Maneuver dice used, F1 |
+|---|---|---|---|---|---|
+| Today | 85% | 74% | 22 / 71 / 86 | 1.83 | 48% |
+| A: one blank -> Block 1 | 90% | 88% | 0 / 35 / 84 | 2.03 | 56% |
+| B: both blanks -> Block 1 | 94% | 97% | 0 / 6 / 68 | 2.70 | 60% |
+| C: one blank -> Pivot | 87% | 77% | 7 / 57 / 90 | 2.48 | 54% |
+
+- Block on the starting Maneuver dice is a huge lever (7 Maneuver I dice in every starting tray): A ends Floor 1 deaths
+  and adds 14 points for experts at depth 7; B flattens the game.
+- C (Pivot) is the "maneuvers matter" option: a third more Maneuver steps per turn on Floor 1, small difficulty change.
+- Not applied: Jeremy's call (Nov 9).
+
 ## Design, art and performance
 
 - **Design audit (Oct 17):** every button its own colour, Settings fits without scrolling, camp rows match their dice,

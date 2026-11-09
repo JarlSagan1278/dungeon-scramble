@@ -26,6 +26,7 @@
 //     so extra loot choices help instead of hurting. false = the old dieScore heuristic.
 //   relicLock (default false): the bot declines every relic shrine offer and walks away from bargain shrines,
 //     so the forced relics are the only ones held (a clean with/without comparison).
+//   man1Faces (Nov 9): replace Maneuver I's faces, e.g. ["Dodge","Dodge","Leap","Leap","Pivot","blank"]; tnTurns: test knob for the old Turning Number poster.
 // usage: node study_maneuver.js '<json config>'
 let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node22/lib/node_modules/playwright')); }
 const cfg = Object.assign({ runs:40, skill:1500, origin:'dwarf', klass:'armsmaster', hpMul:[1,1,1], dmgAdd:[0,0,0], hpAdd:[0,0,0], bossHpMul:[1,1,1], maxTurns:400, dmgMul:1, takenMul:1, label:'', lootMode:'best', questAware:true, swapManeuver:false, payoff:'none', hitAdd:[0,0,0], bigBossHitAdd:0, fxAdd:{}, pivotFace:'pivot', manLevel:1, manRider:null, bossMode:'cycle', intentAware:true, forceBoss:null, forceRelics:[], relicLock:false, tokens:true, lootV2:true, playerLike:true, abilityRate:1, trayActRate:1, tokenRate:1, lootRandomRate:0 }, JSON.parse(process.argv[2]||'{}'));
