@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.74 (Nov 9, 2026)
+- Quest "this path" highlight: darker green (#17501b), so it stays readable with red-green colour blindness (the lighter green read as greyed out in a deuteranopia/protanopia simulation). Boost reach and the blue/red status chips passed the same check.
+- Rulebook: new "Route goals" paragraph listing all eight shapes.
+- Audits (no change needed): first-run tip pacing (at most two tips a turn, none over the dice), per-encounter fairness (STUDY_FINDINGS).
+
 ## 1.42.73 (Nov 9, 2026)
 - Route goals: Turning Number ("Turn 3 times") is replaced by **Straightedge** ("4 in a line": four dice along a full row or column, one after another). Bots met Turning Number by accident in 97% of fights, so it never changed a route; Straightedge is met 17% by accident and 53% when aiming (Unbound Automa +5, The Warcart +8).
 - Short phones: below 736px tall the page margins go, so the 720px card fits a 360x722 phone without scrolling (it scrolled 6px).
