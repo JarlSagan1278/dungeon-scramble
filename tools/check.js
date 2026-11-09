@@ -22,6 +22,7 @@ const ALL = [
   ['quickstart', 'tools/tests/test_quickstart.js'], // first run: straight into the guided fight
   ['forks',      'tools/tests/test_forks.js'],      // forks in the road: two doors, loot per door, save/resume
   ['routegoals', 'tools/tests/test_routegoals.js'], // route-goal Wanted posters: shape checks, sign fit, a real turn (Nov 8)
+  ['shareask',   'tools/tests/test_shareask.js'],   // mid-run play-data ask + live in_progress copies (Nov 9)
 ];
 const QUICK = new Set(['sim', 'pathrender', 'trayfast', 'playback', 'ui', 'scramble']);
 

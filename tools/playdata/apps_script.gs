@@ -12,7 +12,7 @@ const FOLDER_NAME = 'Dungeon Scramble Play Data (runs)';
 const MAX_BODY = 800000;          // bytes; a full 2,500-event run is ~300-500 KB
 const MAX_RUNS_PER_HOUR = 20;     // per device id; real players finish far fewer
 const RETENTION_DAYS = 730;       // 2 years (privacy policy)
-const OUTCOMES = ['victory', 'defeat', 'abandoned', 'demo'];
+const OUTCOMES = ['victory', 'defeat', 'abandoned', 'demo', 'in_progress']; // in_progress (Nov 9): a live copy of a run, replaced by each newer copy
 const HEADERS = ['Received','Player','Run','Version','Origin','Class','Outcome','Floor reached','Depth','Run #','Active minutes','Rooms','Turns','Ended by','Relics','Screen','Full record'];
 
 function doPost(e) {
@@ -29,7 +29,15 @@ function doPost(e) {
     const last = sh.getLastRow();
     if (last > 1) {
       const ids = sh.getRange(2, 3, last - 1, 1).getValues().map(x => x[0]);
-      if (ids.indexOf(r.runId) >= 0) return ContentService.createTextOutput('duplicate');
+      const at = ids.indexOf(r.runId);
+      if (at >= 0) {
+        // Nov 9: a run already filed as in_progress is replaced by any newer copy (a later live copy or the finished run);
+        // a finished run is never overwritten.
+        const row = at + 2, prev = sh.getRange(row, 1, 1, HEADERS.length).getValues()[0];
+        if (prev[6] !== 'in_progress') return ContentService.createTextOutput('duplicate');
+        sh.deleteRow(row);
+        try { const m = String(prev[16] || '').match(/[-\w]{25,}/); if (m) DriveApp.getFileById(m[0]).setTrashed(true); } catch (err) {}
+      }
     }
     const file = folder_().createFile(r.runId + '.json', JSON.stringify(d), 'application/json');
     const ev = r.events || [];

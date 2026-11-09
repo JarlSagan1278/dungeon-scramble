@@ -5443,6 +5443,27 @@ function shareDataAskHTML(){
       <button class="primary" onclick="shareDataAnswer(true)">Yes</button><button onclick="shareDataAnswer(false)">No</button>
     </div>`;
 }
+// Nov 9 (Jeremy): the same question once mid-run, after the first loot pick, so players who quit before a run ends can
+// still be counted (the end-of-run ask only ever reached players who finished a run). Yes covers this run (sent live,
+// see sendLiveRun) and future ones; No is final, as at the end of a run. Asked at most once per run while unanswered.
+function maybeShareAskMidRun(){
+  try{
+    if(!PLAYDATA_URL || shareDataPref() || !S || !S.tele || S.tele.shareAsked) return;
+    if(typeof navigator!=='undefined' && navigator.webdriver && !localStorage.getItem('dungeonScrambleShareAskTest')) return;
+    if(S.screen!=='game' && S.screen!=='camp' && S.screen!=='shrine') return;
+    if(S.pendingLootDie || S.lootChoice || S.forkChoice || S.transitioning || document.querySelector('.modal-overlay, #room-callout, #room-callout-scrim, #floor-card, .coach-overlay, #symbol-intro')){ /* wait for the next room's banner and any other pop-up */ clearTimeout(maybeShareAskMidRun._t); maybeShareAskMidRun._t = setTimeout(maybeShareAskMidRun, 800); return; }
+    S.tele.shareAsked = true;
+    const overlay = el(`<div class="modal-overlay share-ask-modal"><div class="modal" style="text-align:center; max-width:320px;">
+        <h2 style="margin-top:0;">Help balance the game?</h2>
+        <p style="text-align:left;">Share how your runs go (rooms, dice, what beat you) so we can tune the fights. A random id for this device, its screen size and any error messages are sent; no names or personal info. You can turn it off in Settings.</p>
+        <div class="small-btn-row" style="justify-content:center;"><button class="primary" id="share-mid-yes">Yes, share</button><button id="share-mid-no">No thanks</button></div>
+      </div></div>`);
+    openUniqueOverlay('shareask', overlay);
+    const answer = on=>{ teleLog('share_ask', {at:'midrun', on}); setShareData(on, null); closeModal(overlay, ()=>{ if(on) sendLiveRun('consent'); if(typeof saveGame==='function') saveGame(); }); };
+    overlay.querySelector('#share-mid-yes').onclick = ()=>answer(true);
+    overlay.querySelector('#share-mid-no').onclick = ()=>answer(false);
+  }catch(e){}
+}
 function shareDataAnswer(on){
   const last = getTelemetryRuns().slice(-1)[0]; // the run that just ended (the question only shows on its end screen)
   setShareData(on, on && last ? last.runId : null);

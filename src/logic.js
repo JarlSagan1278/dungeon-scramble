@@ -268,6 +268,7 @@ function teleLog(type, data){
     if(!S.tele) S.tele = newTelemetry(); // older saves that predate telemetry
     if(S.tele.events.length >= MAX_TELE_EVENTS) return;
     S.tele.events.push({ t: teleActiveMs(), f: S.floorIdx+1, s: S.routeStep, e: type, ...(data||{}) });
+    if(type==='room_start' && typeof sendLiveRun==='function') sendLiveRun('room'); // Nov 9: live copy for consenting players
   } catch(err){ /* telemetry must never break the game */ }
 }
 
@@ -360,6 +361,30 @@ function flushRunUploads(){
     }, ()=>{ _flushing = false; }); // offline or blocked: try again next launch
   }catch(e){ _flushing = false; }
 }
+
+// Live copy of the run in progress (Nov 9, Jeremy: players who quit mid-run were invisible because only finished runs
+// were sent). With consent, a copy with outcome 'in_progress' is posted when a room starts (at most every 4 minutes) and
+// when the page is hidden or closed; the server replaces it with each newer copy and finally with the finished run.
+// Not queued and not marked sent, so the finished run still goes out as usual.
+let _liveSentAt = 0;
+function sendLiveRun(why){
+  try{
+    if(!PLAYDATA_URL || shareDataPref()!=='yes' || !S || !S.tele || !S.origin || !S.klass) return;
+    if(S.screen==='victory' || S.screen==='gameover' || S.screen==='demoEnd' || S.screen==='unlock') return;
+    if(typeof navigator!=='undefined' && navigator.webdriver && !localStorage.getItem('dungeonScrambleLiveTest')) return;
+    const now = Date.now(), gap = why==='hide' ? 60000 : 240000;
+    if(now - _liveSentAt < gap) return;
+    _liveSentAt = now;
+    const rec = { runId:S.tele.runId, startedAt:S.tele.startedAt, endedAt:now, version:S.tele.version, origin:S.origin.name, klass:S.klass.name,
+      outcome:'in_progress', floorReached:S.floorIdx+1, runNo:((S.tele.events.find(e=>e.e==='run_start')||{}).runNo)||null,
+      depth:(typeof currentDepth==='function') ? currentDepth() : 1, stats:{...S.stats, damageDealt:Math.round(S.stats.damageDealt)},
+      relics:(S.relics||[]).slice(), events:S.tele.events };
+    const body = JSON.stringify({ kind:'run', player:getTelePlayerId(), screen:(typeof window!=='undefined' ? window.innerWidth+'x'+window.innerHeight : ''), rec });
+    if(why==='hide' && navigator.sendBeacon){ navigator.sendBeacon(PLAYDATA_URL, new Blob([body], {type:'text/plain;charset=utf-8'})); return; }
+    fetch(PLAYDATA_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body, keepalive: body.length < 60000 }).catch(()=>{});
+  }catch(e){}
+}
+if(typeof document!=='undefined') document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') sendLiveRun('hide'); });
 
 // Everything a tester needs to hand over: finished runs, the in-progress
 // run (if any), and lifetime totals.
@@ -2826,6 +2851,7 @@ function swapInLootDie(trayIndex){
   S.pendingLootDie = null;
   logMsg('sys', `Equipped ${cell.die.name}.`, 'good');
   S.stats.lootCollected++;
+  if(typeof maybeShareAskMidRun==='function') setTimeout(maybeShareAskMidRun, 700); // Nov 9: ask after the first loot pick
   if(typeof playTone==='function') playTone('equip');
   if(typeof spawnParticleBurstAtEl==='function') spawnParticleBurstAtEl('.panel', ['#ffd76a','#8fd0ff','#fff5d6']);
   finishStep();
@@ -2844,6 +2870,7 @@ function pocketLootDie(){
   S.pendingLootDie = null;
   logMsg('sys', `Kept ${d.name} in your Back Pocket.`, 'good');
   S.stats.lootCollected++;
+  if(typeof maybeShareAskMidRun==='function') setTimeout(maybeShareAskMidRun, 700); // Nov 9
   if(typeof playTone==='function') playTone('equip');
   finishStep();
   render();

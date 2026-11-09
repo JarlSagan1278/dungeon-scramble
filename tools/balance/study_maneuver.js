@@ -53,6 +53,7 @@ let res = await page.evaluate((cfg)=>{
   // shrinePatch (Oct 15 shrine boosts): {shrineName: {effect, loot}} replaces a shrine's effect and/or gives it a loot pick
   if(cfg.shrinePatch) FLOORS.forEach(f=>f.shrines.forEach(x=>{ const p=cfg.shrinePatch[x.name]; if(p){ if(p.effect) x.effect=p.effect; if(p.loot!=null) x.loot=p.loot; } }));
   if(cfg.noQuests) window.checkQuests = function(){ return []; };
+  if(cfg.man1Faces){ const d=BASIC_DICE.find(x=>x.id==='man1'); d.faces=faces(cfg.man1Faces); } // Nov 9 study knob: Maneuver I faces
   if(cfg.tnTurns){ const orig=routeGoalMet; window.routeGoalMet=function(key,ctx){ if(key!=='turning number') return orig(key,ctx); // Nov 9 study knob: turns needed
       const P=ctx.pathIdx||[]; const rc=i=>({r:Math.floor(i/4),c:i%4}); const dir=(a,b)=>{const A=rc(a),B=rc(b);let dc=B.c-A.c;if(Math.abs(dc)===3)dc=-Math.sign(dc);return [Math.sign(B.r-A.r),Math.sign(dc)];};
       if(cfg.tnTurns==='line4'){ let run=1; for(let i=1;i<P.length;i++){ const d=dir(P[i-1],P[i]); const a=rc(P[i-1]),b=rc(P[i]); const adj=Math.abs(a.r-b.r)+Math.abs(a.c-b.c)===1; // orthogonal neighbour steps only

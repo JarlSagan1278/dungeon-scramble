@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.42.75 (Nov 9, 2026)
+- Play data, asked earlier: the "Help balance the game?" question now also comes once mid-run, after your first loot pick (it waits for the next room's banner). Yes shares this run and future ones; No is final. The end-of-run ask stays for anyone not yet asked.
+- Live copies: with sharing on, a copy of the run in progress (outcome `in_progress`) is sent when a room starts (at most every 4 minutes) and when the page is hidden or closed, so runs players walk away from are counted. The receiver (tools/playdata/apps_script.gs) replaces an in_progress row with each newer copy and finally with the finished run. Needs the Apps Script redeployed (New version).
+- Privacy policy updated (effective Nov 9) to say runs in progress are sent once you opt in.
+- check.js: shareask.
+
 ## 1.42.74 (Nov 9, 2026)
 - Quest "this path" highlight: darker green (#17501b), so it stays readable with red-green colour blindness (the lighter green read as greyed out in a deuteranopia/protanopia simulation). Boost reach and the blue/red status chips passed the same check.
 - Rulebook: new "Route goals" paragraph listing all eight shapes.
