@@ -68,7 +68,7 @@ summaries, not the live pages). Answer every comment the first day. Log the numb
 > Dungeon Scramble — a dice-path roguelike from our kitchen-table board game (free Floor 1, mobile-friendly)
 
 **Body:** (attach the GIF at the top)
-> Hi all! Dungeon Scramble is a turn-based roguelike my wife Katlynn and I started as a board game. Each turn you roll 16 dice into a 4x4 tray and draw one path through them. Each die you step on takes effect, in order: Hit, Block, Heal, Combo, Boost, Freeze. Maneuver faces like Leap, Dodge and Pivot bend the path. Monsters always show their next move, so you can plan around it.
+> Hi all! Dungeon Scramble is a turn-based roguelike my wife Katlynn and I started as a board game. Each turn you roll 16 dice into a 4x4 tray and draw one path through them. Each die you step on takes effect, in order: Hit, Block, Heal, Combo, Boost, Freeze. Maneuver faces like Leap, Sidestep and Pivot bend the path. Monsters always show their next move, so you can plan around it.
 >
 > The free demo is the whole first floor: pick up loot dice and relics, visit a shrine and a camp, and fight the Floor 1 boss. It runs in the browser and was built for phones (portrait), but works on a computer too.
 >

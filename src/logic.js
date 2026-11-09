@@ -1936,7 +1936,9 @@ function routeGoalMet(key, ctx){
     case 'pivot point': for(let i=1;i<T.length;i++) if(T[i]==='combo' && T[i-1]==='pivot') return true; return false;
     case 'diagonal argument': for(let i=2;i<P.length;i++){ const d1=dir(P[i-2],P[i-1]), d2=dir(P[i-1],P[i]);
         if(d1[0]&&d1[1] && d1[0]===d2[0] && d1[1]===d2[1]) return true; } return false;
-    case 'turning number': { let turns=0; for(let i=2;i<P.length;i++){ const d1=dir(P[i-2],P[i-1]), d2=dir(P[i-1],P[i]); if(d1[0]!==d2[0]||d1[1]!==d2[1]) turns++; } return turns>=3; }
+    case 'straightedge': for(let i=3;i<P.length;i++){ const a=rc(P[i-3]), s=[P[i-3],P[i-2],P[i-1],P[i]].map(rc); // a full row or column, in order
+      if(s.every(x=>x.r===a.r) && s.every((x,k)=>x.c===a.c+k*(s[1].c-a.c)) && Math.abs(s[1].c-a.c)===1) return true;
+      if(s.every(x=>x.c===a.c) && s.every((x,k)=>x.r===a.r+k*(s[1].r-a.r)) && Math.abs(s[1].r-a.r)===1) return true; } return false;
     case 'antipodal': { const a=P[0], z=P[P.length-1]; return P.length>1 && ((a===0&&z===15)||(a===15&&z===0)||(a===3&&z===12)||(a===12&&z===3)); }
     case 'hollow proof': return P.length>=5 && !P.some(i=>i===5||i===6||i===9||i===10);
   }

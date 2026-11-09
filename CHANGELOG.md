@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.42.73 (Nov 9, 2026)
+- Route goals: Turning Number ("Turn 3 times") is replaced by **Straightedge** ("4 in a line": four dice along a full row or column, one after another). Bots met Turning Number by accident in 97% of fights, so it never changed a route; Straightedge is met 17% by accident and 53% when aiming (Unbound Automa +5, The Warcart +8).
+- Short phones: below 736px tall the page margins go, so the 720px card fits a 360x722 phone without scrolling (it scrolled 6px).
+- 360px-wide phones: the character name field's "New Character" no longer gets cut off.
+- Text: press kit, website and store listing say Sidestep (not Dodge) and "free demo (the first two floors)"; Google Play screenshots (1080x1920) and the 1024x500 feature graphic are made by tools/media/play.js.
+
 ## 1.42.72 (Nov 8, 2026)
 - The free demo now covers Floors 1 and 2 (was Floor 1 only): Floor 2's monsters, traps, shrines and bosses are in the demo file, and the run ends after the Floor 2 boss ("Floor 2 Cleared!", with a peek at Magic dice from Floor 3). The store app is unchanged (Floor 1 free, then the unlock screen).
 - check.js quickstart: the demo goes on to Floor 2, Floor 3 is stripped, and the demo ends after Floor 2.

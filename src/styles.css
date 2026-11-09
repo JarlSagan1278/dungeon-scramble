@@ -3819,3 +3819,13 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .tray > .die .boost-reach-chip{ position:absolute; top:3px; right:3px; z-index:3; width:17px; height:17px; border-radius:50%; box-sizing:border-box;
   background:var(--gold,#d4af52); color:#241c10; border:2px solid var(--line,#0c0705); display:flex; align-items:center; justify-content:center; pointer-events:none; }
 .tray > .die .boost-reach-chip .icon-svg{ width:11px; height:11px; }
+/* Nov 9 (360x722 audit): a phone viewport shorter than the 720px card + its 16px page margin scrolled every screen a
+   little (360x722: 14px). Below 736px tall the page margins go, so the card fits any viewport of 720px or more. */
+@media (max-height: 735.98px){
+  body{ padding-top:0 !important; padding-bottom:0 !important; }
+  .wrap{ padding-top:0 !important; padding-bottom:0 !important; margin-top:0 !important; margin-bottom:0 !important; }
+  :root{ --screen-h: clamp(720px, 100dvh, 769px); }
+  .title-screen-fill{ height:100dvh !important; }
+}
+/* Nov 9 (360px audit): the name field's "New Character" placeholder was cut off on 360px-wide phones */
+@media (max-width: 380px){ .char-name-input{ font-size:16px !important; padding:4px 6px !important; } }

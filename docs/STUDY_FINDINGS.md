@@ -140,6 +140,26 @@ an Attack die of the same level), dwarf, Armsmaster and Dungeoneer, regular bot 
   first Train, so the "useless Maneuver" turns are concentrated on Floor 1.
 - Bots don't feel "forced", so this measures value, not how it feels; the playtest note was about feel.
 
+## Route goals, poster by poster (Nov 9, 2026, build 1.42.72)
+
+Regular bot, dwarf, 4 classes x 300 runs, bot aiming at quests vs ignoring them ("blind" = done by accident).
+Share of fights with that poster where it was completed:
+
+| Poster | Aiming | Blind | Verdict |
+|---|---|---|---|
+| Antipodal (Far corners) | 37% | 6% | good |
+| Diagonal Argument (3 on a diagonal) | 41% | 14% | good |
+| Hollow Proof (Edge path 5+) | 46% | 7% | good |
+| Leapfrog (Leap to Leap) | 37% | 19% | good |
+| Pivot Point (Pivot, Combo) | 40% | 24% | good |
+| Running Start (Move, Boost) | 41% | 24% | good |
+| Square Root (2x2 square) | 75% | 50% | easy (Floor 1 easy monster; kept) |
+| Turning Number (Turn 3 times) | 99% | 97% | broken: almost every path turns 3 times |
+
+Harder turn counts didn't help (4 turns: 98/90%, 5 turns: 89/74%): long paths wiggle. A straight run of 4 dice
+(a full row or column, in order) came out 53% aiming / 17% blind, so it replaced Turning Number in 1.42.73
+("Straightedge", 4 in a line). Win rates don't move with the posters (aiming vs blind within 3 points).
+
 ## Design, art and performance
 
 - **Design audit (Oct 17):** every button its own colour, Settings fits without scrolling, camp rows match their dice,

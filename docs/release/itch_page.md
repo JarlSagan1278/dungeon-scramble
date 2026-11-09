@@ -27,7 +27,7 @@ Upload: `dungeon_scramble_demo_itch.zip` (made from `node build.js --demo`: the 
 
 ## Description (paste into "Description")
 
-Dungeon Scramble is a turn-based roguelike for your phone. Roll sixteen dice into a 4x4 tray, then trace one path through them: each die you step on takes effect in order, from Hit and Block to Combo, Boost and Freeze. Monsters always show their next move, so you can plan around it. Maneuver faces like Leap, Dodge and Pivot bend the rules of the path.
+Dungeon Scramble is a turn-based roguelike for your phone. Roll sixteen dice into a 4x4 tray, then trace one path through them: each die you step on takes effect in order, from Hit and Block to Combo, Boost and Freeze. Monsters always show their next move, so you can plan around it. Maneuver faces like Leap, Sidestep and Pivot bend the rules of the path.
 
 This free demo is the first two floors: pick your origin and class, fight through the rooms, visit shrines and camps, beat the Floor 1 boss, then find Gilded loot on Floor 2 and take on its boss.
 

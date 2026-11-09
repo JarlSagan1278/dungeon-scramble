@@ -53,6 +53,11 @@ let res = await page.evaluate((cfg)=>{
   // shrinePatch (Oct 15 shrine boosts): {shrineName: {effect, loot}} replaces a shrine's effect and/or gives it a loot pick
   if(cfg.shrinePatch) FLOORS.forEach(f=>f.shrines.forEach(x=>{ const p=cfg.shrinePatch[x.name]; if(p){ if(p.effect) x.effect=p.effect; if(p.loot!=null) x.loot=p.loot; } }));
   if(cfg.noQuests) window.checkQuests = function(){ return []; };
+  if(cfg.tnTurns){ const orig=routeGoalMet; window.routeGoalMet=function(key,ctx){ if(key!=='turning number') return orig(key,ctx); // Nov 9 study knob: turns needed
+      const P=ctx.pathIdx||[]; const rc=i=>({r:Math.floor(i/4),c:i%4}); const dir=(a,b)=>{const A=rc(a),B=rc(b);let dc=B.c-A.c;if(Math.abs(dc)===3)dc=-Math.sign(dc);return [Math.sign(B.r-A.r),Math.sign(dc)];};
+      if(cfg.tnTurns==='line4'){ let run=1; for(let i=1;i<P.length;i++){ const d=dir(P[i-1],P[i]); const a=rc(P[i-1]),b=rc(P[i]); const adj=Math.abs(a.r-b.r)+Math.abs(a.c-b.c)===1; // orthogonal neighbour steps only
+          if(adj && i>=2 && (()=>{const p=dir(P[i-2],P[i-1]);const a2=rc(P[i-2]),b2=rc(P[i-1]);return Math.abs(a2.r-b2.r)+Math.abs(a2.c-b2.c)===1 && p[0]===d[0]&&p[1]===d[1];})()) run++; else run = adj?2:1; if(run>=4) return true; } return false; }
+      let t=0; for(let i=2;i<P.length;i++){const d1=dir(P[i-2],P[i-1]),d2=dir(P[i-1],P[i]); if(d1[0]!==d2[0]||d1[1]!==d2[1]) t++;} return t>=cfg.tnTurns; }; }
   if(cfg.noRevive){ const pdx=onPlayerDefeated; window.onPlayerDefeated=function(){ S.backPocket=[]; return pdx(); }; }
   if(cfg.reviveClear) REVIVE_RULE = {spend:'all', hp:5}; if(cfg.reviveRule) REVIVE_RULE = cfg.reviveRule; // Oct 14 test: a Back Pocket save spends the whole Pocket
   window.__rev={saves:0,fails:0,spent:0,downs:0}; { const pd0=onPlayerDefeated; window.onPlayerDefeated=function(){ window.__rev.downs++; return pd0(); }; } { const tl0=teleLog; window.teleLog=function(t,d){ if(t==='pocket_revive'){ if(d.saved) window.__rev.saves++; else window.__rev.fails++; window.__rev.spent+=d.spent; } return tl0(t,d); }; }
@@ -176,6 +181,8 @@ let res = await page.evaluate((cfg)=>{
       if(c.die.cat==='maneuver' && t!=='blank'){ pf.manDieShown++; if(path.includes(i)) pf.manDieUsed++; } });
     const qd0=(e.questsDone||[]).slice();
     const r = origFin(path, effects);
+    const RG=(window.__man.rg=window.__man.rg||{});
+    (e.quests||[]).forEach((q,i)=>{ if(qd0[i]) return; const m=q.match(/: route (.+)$/); if(m){ const k=m[1].trim(); const r=(RG[k]=RG[k]||{open:0,done:0,fights:{}}); r.open++; r.fights[e.name+'#'+(window.__runNo||0)]=r.fights[e.name+'#'+(window.__runNo||0)]||0; if(e.questsDone[i]){ r.done++; r.fights[e.name+'#'+(window.__runNo||0)]=1; } } });
     (e.quests||[]).forEach((q,i)=>{ if(qd0[i]) return; const route=/: route /.test(q); if(route) pf.routeHad++;
       if(e.questsDone[i]){ if(route) pf.routeDone++; else if(/maneuver|dodge|leap|pivot/.test(q)) pf.manQDone++; } });
     const qd=(e.questDamageDealt||0)-q0; if(qd>0){ window.__man.questDmg+=qd; window.__man.questTurns++; }
@@ -381,7 +388,7 @@ let res = await page.evaluate((cfg)=>{
     return null;
   }
   const runs=[];
-  for(let r=0;r<cfg.runs;r++){
+  for(let r=0;r<cfg.runs;r++){ window.__runNo=r;
     newGame(cfg.origin, cfg.klass, null, '', cfg.depthMods||{});
     (cfg.forceRelics||[]).forEach(id=>grantRelic(id,{silent:true, via:'study'}));
     // forceLoot (Oct 13 loot-dice study): that loot die replaces one Attack Die I at the start of every run.
@@ -422,6 +429,7 @@ const reached=[1,2,3].map(f=>res.filter(r=>r.floor>=f).length);
 const td=[1,2,3].map(f=>{const t=turnsData.filter(x=>x.f===f&&!x.boss);const m=a=>a.reduce((x,y)=>x+y,0)/Math.max(1,a.length);const d=t.map(x=>x.dmg).sort((a,b)=>a-b);return {f,avgLen:m(t.map(x=>x.len)).toFixed(1),avgDmg:m(d).toFixed(1),p50:d[d.length>>1],p90:d[Math.floor(d.length*.9)]};});
 const deaths=[1,2,3].map(f=>res.filter(r=>r.result==='GAMEOVER'&&r.floor===f).length);
 const pfStats=(man.pf||[]).map((p,i)=>({f:i+1,manPerTurn:(p.man/Math.max(1,p.turns)).toFixed(2),manDieUseRate:(p.manDieUsed/Math.max(1,p.manDieShown)*100).toFixed(0)+'%',routeDone:p.routeDone,routeTurnsOpen:p.routeHad,manQuestsDone:p.manQDone,pathLen:(p.steps/Math.max(1,p.turns)).toFixed(2)}));
-const manStats={pf:pfStats,manPerTurn:(man.manSteps/Math.max(1,man.turns)).toFixed(2),pathLen:(man.steps/Math.max(1,man.turns)).toFixed(2),questDmgPerRun:(man.questDmg/n).toFixed(1),manIIplusAtEnd:(man.manII/n).toFixed(2)};
+const rgStats=Object.fromEntries(Object.entries(man.rg||{}).map(([k,r])=>{const f=Object.values(r.fights);return [k,{turnsOpen:r.open,done:r.done,fights:f.length,fightDoneRate:(f.filter(x=>x).length/Math.max(1,f.length)*100).toFixed(0)+'%'}];}));
+const manStats={rg:rgStats,pf:pfStats,manPerTurn:(man.manSteps/Math.max(1,man.turns)).toFixed(2),pathLen:(man.steps/Math.max(1,man.turns)).toFixed(2),questDmgPerRun:(man.questDmg/n).toFixed(1),manIIplusAtEnd:(man.manII/n).toFixed(2)};
 console.log(JSON.stringify({label:cfg.label,manStats,deaths,td,skill:cfg.skill,runs:n,winRate:(wins/n*100).toFixed(0)+'%',reachedF2_F3:reached.slice(1),avgTurns:(res.reduce((a,r)=>a+r.turns,0)/n).toFixed(0),byFloor}));
 await b.close();})();

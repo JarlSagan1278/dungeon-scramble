@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.42.72';
+const GAME_VERSION = '1.42.73';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false };
@@ -53,7 +53,7 @@ const ROUTE_GOALS = {
   'leapfrog':          {name:'Leapfrog',          short:'Leap to Leap',  desc:'A Leap that lands on another Leap, in one Path.'},
   'diagonal argument': {name:'Diagonal Argument', short:'3 on a diagonal',   desc:'Three dice in a row along one diagonal, in one Path (two Sidesteps, one after the other).'},
   'pivot point':       {name:'Pivot Point',       short:'Pivot, Combo', desc:'A Combo right after a Pivot, in one Path.'},
-  'turning number':    {name:'Turning Number',    short:'Turn 3 times',      desc:'One Path that changes direction at least 3 times.'},
+  'straightedge':      {name:'Straightedge',      short:'4 in a line',       desc:'Four dice in a row along one full row or column of the Tray, one after another in one Path.'}, // Nov 9: replaced Turning Number (turn 3 times), which 97% of paths did by accident
   'antipodal':         {name:'Antipodal',         short:'Far corners',  desc:'One Path that starts in a corner of the Tray and ends in the opposite corner.'},
   'hollow proof':      {name:'Hollow Proof',      short:'Edge path 5+',      desc:'One Path of 5 or more dice that never touches the middle four.'},
 };
@@ -411,7 +411,7 @@ const FLOOR1_ENEMIES = [
   enc('Filement Bunny','Enemy',7,{dmg:2,flavor:'"Cute, until it gunks up your gears and gnaws off your toes!"'}),
   enc('Wooden Golem','Enemy',10,{dmg:3,quests:['5 damage: 3 maneuvers','5 damage: route square root'],flavor:'Shoddy construction is evident from the visible weak points.'}),
   enc('Feral Pet Rock','Enemy',12,{dmg:2,flavor:'Somedwarf took this companion for granite…'}),
-  enc('Unbound Automa','Enemy',15,{dmg:3,quests:['5 damage: 3 maneuvers','5 damage: route turning number'],flavor:'This replaced the Automaton, mostly to remove the weight.'}),
+  enc('Unbound Automa','Enemy',15,{dmg:3,quests:['5 damage: 3 maneuvers','5 damage: route straightedge'],flavor:'This replaced the Automaton, mostly to remove the weight.'}),
   enc('Beaker Breakers','Enemy',15,{dmg:1,heal:1,quests:['5 damage: 2 dodge','5 damage: route running start'],flavor:'"No longer into flasks"'}),
   enc('Viscous Orb','Enemy',10,{dmg:2,minion:1,flavor:'"Thankfully it isn\u2019t a gelatinous cube!"'}),
   enc('United Separatists','Enemy',12,{dmg:1,heal:1,flavor:'"Nothing like a shared schism to bring people apart".'}),
@@ -459,7 +459,7 @@ const FLOOR2_ENEMIES = [
   enc('Armored Gear-Pest','Enemy',17,{dmg:2,flavor:'A well-documented example of dungeon adaptation.'}),
   enc('Rusty Golem','Enemy',20,{dmg:4,quests:['16 damage: survive turn 4'],flavor:'"Looks like it was falling apart on its own"'}),
   enc('Rogue Technician','Enemy',16,{dmg:4,flavor:'"I\u2019m not here to fix your lockpick, I have an ideology!"'}),
-  enc('The Warcart','Enemy',18,{dmg:2,shield:2,quests:['8 damage: 4 maneuvers','8 damage: route turning number'],flavor:'The top contributing reason as to why mining is the most dangerous profession.'}),
+  enc('The Warcart','Enemy',18,{dmg:2,shield:2,quests:['8 damage: 4 maneuvers','8 damage: route straightedge'],flavor:'The top contributing reason as to why mining is the most dangerous profession.'}),
   enc('Blastogenesis Engine','Enemy',14,{dmg:3,minion:2,flavor:'A true perpetual devotion machine.'}),
   enc('Half-life Host','Enemy',22,{dmg:3,shield:2,quests:['8 damage: 2 heal'],flavor:'"\u2018Release spores. Multiply.\u2019? - Now I\u2019m always saying that!"'}),
   enc('Lichen-Thrope','Enemy',24,{dmg:3,heal:1,flavor:'Under the luminance of the full bloom, this creature becomes a true hater.'}),

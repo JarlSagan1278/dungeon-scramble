@@ -11,7 +11,8 @@ const CASES = [
   ['leapfrog',          [0,2,10],          H('leap leap hit'),            [0,2,3],       H('leap hit hit')],
   ['diagonal argument', [0,5,10,11],       H('dodge dodge hit hit'),      [0,5,4,9],     H('dodge hit dodge hit')],
   ['pivot point',       [4,5,10],          H('hit pivot combo'),          [4,5,6],       H('pivot hit combo')],
-  ['turning number',    [0,1,5,6,10],      H('hit hit hit hit hit'),      [0,1,2,6,10],  H('hit hit hit hit hit')],
+  ['straightedge',      [4,0,1,2,3],       H('hit hit hit hit hit'),      [0,1,2,6,7],   H('hit hit hit hit hit')],
+  ['straightedge',      [15,11,7,3],       H('hit hit hit hit'),          [0,1,5,6,10],  H('hit hit hit hit hit')],
   ['antipodal',         [0,1,2,6,7,11,15], H('hit hit hit hit hit hit hit'), [0,1,2,6,7,11], H('hit hit hit hit hit hit')],
   ['hollow proof',      [0,1,2,3,7],       H('hit hit hit hit hit'),      [0,1,5,6,7],   H('hit hit hit hit hit')],
 ];
