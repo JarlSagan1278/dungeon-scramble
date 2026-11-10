@@ -28,7 +28,7 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
 - **Title art** (Nov 10: revisit when the PC port starts in earnest; 860 px is enough for phone, itch and Play): new cover drawn from scratch on the 2048x2434 canvas (`DungeonScramble_TitleArt_canvas.psd`); the chat
   only passes 860 px, so export full size from Sketchbook or upload the PSD to the repo. Keep the logo layer for Steam.
 - **Redraw the remaining AI-assisted art** (pixie portraits, the remaining original loot) to shrink the disclosure.
-- **Google Play account** (personal; Jeremy creates it Nov 11, closed test while the game keeps changing, public launch later): then real billing behind `STORE` / `window.DSStore` (logic.js) and the closed-test track. Listing text (`release/store_listing.md`), 1024x500 feature graphic and 1080x1920 screenshots are ready (Nov 9, `tools/media/play.js`).
+- **Google Play account** (personal; created Nov 11 on dungeonscramblegame@gmail.com; device verification still to do at home -- create the app on the web first so the Play Console phone app has something to open; trader status: yes, use a PO box/virtual address + Google Voice number; closed test while the game keeps changing, public launch later): then real billing behind `STORE` / `window.DSStore` (logic.js) and the closed-test track. Listing text (`release/store_listing.md`), 1024x500 feature graphic and 1080x1920 screenshots are ready (Nov 9, `tools/media/play.js`).
 - **Armsmaster red Skill vs red Clear:** options shown Oct 15.
 
 ## Next for Claude
