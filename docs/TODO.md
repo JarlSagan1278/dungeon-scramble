@@ -25,10 +25,10 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
 - **Itch (Nov 9):** upload demo zip 1.42.73+ (Straightedge, phone fixes); in the page description change "Leap, Dodge and Pivot" to "Leap, Sidestep and Pivot" (text in `release/itch_page.md`).
 - **Balance calls from the Nov 9 fairness check (STUDY_FINDINGS):** trim Myceleus (5.5% deaths per fight vs 3.0% for the other Big Bosses)? Bio-Mutant Escape (3.7% vs 1.5-1.9% for Floor 3 elites)? Keep Square Root as the easy poster (75% done)?
 - **Straightedge** (Claude's replacement for Turning Number, 1.42.73): keep the name or rename.
-- **Title art:** new cover drawn from scratch on the 2048x2434 canvas (`DungeonScramble_TitleArt_canvas.psd`); the chat
+- **Title art** (Nov 10: revisit when the PC port starts in earnest; 860 px is enough for phone, itch and Play): new cover drawn from scratch on the 2048x2434 canvas (`DungeonScramble_TitleArt_canvas.psd`); the chat
   only passes 860 px, so export full size from Sketchbook or upload the PSD to the repo. Keep the logo layer for Steam.
 - **Redraw the remaining AI-assisted art** (pixie portraits, the remaining original loot) to shrink the disclosure.
-- **Google Play account** (personal): then real billing behind `STORE` / `window.DSStore` (logic.js) and the closed-test track. Listing text (`release/store_listing.md`), 1024x500 feature graphic and 1080x1920 screenshots are ready (Nov 9, `tools/media/play.js`).
+- **Google Play account** (personal; Jeremy creates it Nov 11, closed test while the game keeps changing, public launch later): then real billing behind `STORE` / `window.DSStore` (logic.js) and the closed-test track. Listing text (`release/store_listing.md`), 1024x500 feature graphic and 1080x1920 screenshots are ready (Nov 9, `tools/media/play.js`).
 - **Armsmaster red Skill vs red Clear:** options shown Oct 15.
 
 ## Next for Claude

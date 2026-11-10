@@ -100,3 +100,4 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Nov 8 — Quest "this path" highlight (Jeremy picked A):** the yellow box behind a quest row that the current path would complete is gone; the row's text turns green with a ✓ (matching "✓ This path!").
 - **Nov 8 — First loot pick tip (Jeremy):** the first time the Equip sheet opens, a one-time bubble explains that a new die replaces one in the 16-die Tray and the old one goes to the Back Pocket.
 - **Nov 10 (Jeremy):** Armsmaster's red Skill button next to the red Clear button is fine for now.
+- **Nov 10 — Path counter label (from the playtest's "what does the 11 mean?", Jeremy identified it as the damage counter):** "DAMAGE" under the number; a no-damage path shows only its other effects (1.42.77).

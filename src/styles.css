@@ -3829,3 +3829,10 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 }
 /* Nov 9 (360px audit): the name field's "New Character" placeholder was cut off on 360px-wide phones */
 @media (max-width: 380px){ .char-name-input{ font-size:16px !important; padding:4px 6px !important; } }
+
+/* Nov 10 (playtest: "what does the 11 mean?"): the path counter says what it counts */
+.path-counter-float .pcf-main{ display:flex; flex-direction:column; align-items:center; line-height:1; }
+.path-counter-float .pcf-lbl{ font:800 9px/1 var(--font-ui, sans-serif); letter-spacing:.06em; text-transform:uppercase; margin-top:1px; opacity:.85; }
+.path-counter-float.pcf-nodmg{ padding:6px 12px !important; }
+.path-counter-float.pcf-nodmg .pcf-extra{ font-size:16px; gap:4px; }
+.path-counter-float.pcf-nodmg .pcf-extra .icon-svg{ width:16px; height:16px; }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.77 (Nov 10, 2026)
+- The path counter says what it counts: a small "DAMAGE" under the number (the playtester asked what the "11" meant, at 9:22 in the video).
+- A path with no damage but other effects (Block, Heal, D.O.T., H.O.T.) shows just those, a little larger, instead of a big "0".
+
 ## 1.42.76 (Nov 10, 2026)
 - Myceleus, Co-consul of Rot: 93 -> 84 health (Jeremy: "trim a bit"; deaths per fight 4.0% -> 3.1% in a forced-boss study, level with the other Big Bosses).
 - Square Root (2x2 square) on the Wooden Golem pays +3 instead of +5 (the easiest poster).
