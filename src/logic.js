@@ -2229,7 +2229,8 @@ function runEnemyBeat(i, noWind){
     if(result.stop==='playerDefeated'){ S.transitioning=false; onPlayerDefeated();
       // Nov 11: a Back Pocket save used to stop the turn here: same round, same roll, your D.O.T. never ticked and the
       // path you had just played stayed selected (Go replayed it). Now the turn finishes as usual after a save.
-      if(S.health>0 && S.screen==='game'){ S.transitioning=true; runEnemyBeat(i+1); }
+      if(S.health>0 && S.screen==='game'){ S.transitioning=true; // a beat to read the Saved! card, then the turn goes on
+        if(S._skipAll) runEnemyBeat(i+1); else { S._advance = ()=>{ S._pendingTimeout=null; runEnemyBeat(i+1); }; S._pendingTimeout = setTimeout(S._advance, 1400); } }
       return; }
     if(result.stop==='bothDown'){ S.transitioning=false; onPlayerDefeated(); if(S.health>0 && S.screen!=='gameover') onEncounterDefeated(); return; }
     runEnemyBeat(i+1);
@@ -2897,8 +2898,8 @@ function onPlayerDefeated(){
     // then the whole Pocket ('all') or half of it, rounded up, at least the dice rolled ('half') is spent.
     const n = S.backPocket.length;
     const order = S.backPocket.map((d,i)=>i).sort(()=>Math.random()-0.5);
-    let rolled = 0, saved = false;
-    for(const i of order){ rolled++; const d = S.backPocket[i]; if(d.faces[rand(d.faces.length)].type!=='blank'){ saved = true; break; } }
+    let rolled = 0, saved = false, saver = null;
+    for(const i of order){ rolled++; const d = S.backPocket[i]; const f = d.faces[rand(d.faces.length)]; if(f.type!=='blank'){ saved = true; saver = {name:d.name, cat:d.cat, face:f}; break; } }
     const spendN = !saved ? n : REVIVE_RULE.spend==='all' ? n : Math.max(rolled, Math.ceil(n/2));
     const gone = new Set(order.slice(0, spendN));
     S.backPocket = S.backPocket.filter((d,i)=>!gone.has(i));
@@ -2907,6 +2908,7 @@ function onPlayerDefeated(){
       S.health = Math.min(S.maxHealth, reviveHp());
       logMsg('heal', `Your Back Pocket saves you! (+${S.health} health) ${spendN} spare ${spendN===1?'die is':'dice are'} spent.`, 'good');
       render();
+      if(typeof pocketSaveFx==='function') pocketSaveFx(saver, S.health, spendN); // Nov 11: make the save an event
     } else {
       logMsg('sys', `Every die in your Back Pocket came up blank.`, 'bad');
       onPlayerDefeated();
@@ -2919,6 +2921,7 @@ function onPlayerDefeated(){
       S.health = Math.min(S.maxHealth, reviveHp());
       logMsg('heal', `Desperate roll from the Back Pocket saves you! (+${S.health} health)`, 'good');
       render();
+      if(typeof pocketSaveFx==='function') pocketSaveFx({name:d.name, cat:d.cat, face:f}, S.health, 1);
     } else {
       logMsg('sys', `A die from the Back Pocket comes up blank and is lost.`, 'bad');
       onPlayerDefeated();

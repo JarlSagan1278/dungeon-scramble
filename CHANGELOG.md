@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.79 (Nov 11, 2026)
+- Back Pocket saves are an event: a "Saved!" card over the room names the die that saved you and the face it rolled ("Your Back Pocket's Hidden Estoc rolled Hit 2. Back to 5 HP, 2 spare dice spent"), with a chime and sparks; the turn waits 1.4 s to let it be read (Skip goes straight on). It replaces the small "Saved!" strip.
+- Bug hunt: RELICS=1 runs every game with every relic and spare Back Pocket dice; 32 runs on 1.42.78, no findings.
+
 ## 1.42.78 (Nov 11, 2026)
 Bug fixes from a fresh-eyes code read:
 - A Back Pocket save during the monster's turn left the turn unfinished: same round, same roll, your D.O.T./H.O.T. never ticked, and the path you had just played stayed selected, so Go replayed it for free. The turn now finishes as usual after a save.

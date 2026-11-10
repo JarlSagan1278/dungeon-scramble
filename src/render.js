@@ -2500,6 +2500,7 @@ const RB_NOTICE_RE = /^(Equipped|Relic|Upgraded|Swapped|Rested|— Floor|Mandate
 function showToast(text, kind){
   // Plain damage/heal numbers are already shown by the floating numbers + health bars; skip the redundant message.
   if(/^Path dealt|hits you for|takes \d+ D\.O\.T\. damage|You take \d+ D\.O\.T\. damage|You recover \d+ from H\.O\.T\.|heals \d+\./i.test(text)) return;
+  if(/Back Pocket saves you/i.test(text)) return; // Nov 11: the Saved! card (pocketSaveFx) says it
   // Oct 31 (Jeremy picked A + B after the banner research): the diagonal ribbons were gone before most messages could be
   // read (~238 words a minute) and covered the fighters. Events about something on screen pop as a short chip right there (A);
   // everything else is a short, level headline strip that stays long enough to read and queues (B). Taps pass through
@@ -2556,6 +2557,26 @@ function headlineParts(text){
   return [text.replace(/[.!]$/, ''), ''];
 }
 let HEADLINE_Q = [];
+// Back Pocket save (Nov 11): a gold card over the room naming the die that saved you and the face it rolled. It goes
+// away on its own (taps pass through), so it never stalls the turn that carries on underneath.
+function pocketSaveFx(saver, hp, spent){
+  try{
+    const base = document.querySelector('#enc-panel .fo-arch') || document.getElementById('app'); if(!base) return;
+    const old = document.getElementById('pocket-save'); if(old) old.remove();
+    const r = base.getBoundingClientRect(), f = saver && saver.face;
+    const face = f ? `<span class="ps-die dietype-${saver.cat||'attack'}">${iconSpan(f.type, f.value)}</span>` : '';
+    const card = el(`<div id="pocket-save" class="pocket-save${(typeof PREFS!=='undefined' && PREFS.reducedMotion)?' ps-still':''}" role="status">
+        <div class="ps-title">Saved!</div>
+        <div class="ps-row">${face}<span>Your Back Pocket's <b>${saver ? saver.name : 'die'}</b> rolled ${f ? `<b>${LABEL[f.type]||f.type}${f.value?' '+f.value:''}</b>` : 'true'}.</span></div>
+        <div class="ps-sub">Back to ${hp} HP &middot; ${spent} spare ${spent===1?'die':'dice'} spent</div>
+      </div>`);
+    card.style.left = (r.left + r.width/2) + 'px'; card.style.top = (r.top + r.height*0.42) + 'px';
+    document.body.appendChild(card);
+    if(typeof playTone==='function'){ playTone('bell'); setTimeout(()=>playTone('equip'), 180); }
+    if(typeof spawnParticleBurstAtEl==='function' && !(typeof PREFS!=='undefined' && PREFS.reducedMotion)) spawnParticleBurstAtEl('#pocket-save', ['#ffd76a','#fff5d6','#7fd1a0']);
+    setTimeout(()=>{ card.classList.add('ps-out'); setTimeout(()=>card.remove(), 400); }, 2400);
+  }catch(e){}
+}
 function headlineStrip(text, kind){
   HEADLINE_Q.push({text, kind});
   if(!document.getElementById('headline-strip')) nextHeadline();

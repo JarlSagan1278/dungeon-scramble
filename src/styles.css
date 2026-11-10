@@ -3836,3 +3836,17 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .path-counter-float.pcf-nodmg{ padding:6px 12px !important; }
 .path-counter-float.pcf-nodmg .pcf-extra{ font-size:16px; gap:4px; }
 .path-counter-float.pcf-nodmg .pcf-extra .icon-svg{ width:16px; height:16px; }
+
+/* Back Pocket save card (Nov 11): dark brown pop-up surface, gold title, the saving die's face on a die tile */
+.pocket-save{ position:fixed; z-index:80; transform:translate(-50%,-50%); width:min(300px, 82vw); box-sizing:border-box; pointer-events:none;
+  background:#2b1d14; color:#f3e6cc; border:3px solid var(--line,#0c0705); border-radius:14px; box-shadow:0 0 0 2px #d4af52, 0 6px 0 var(--line,#0c0705);
+  padding:10px 14px 12px; text-align:center; animation:ps-in .35s cubic-bezier(.2,1.4,.4,1) both; }
+.pocket-save .ps-title{ font-family:var(--font-display, Metamorphous, serif); color:#ffd76a; font-size:30px; line-height:1.05; text-shadow:0 3px 0 #120b07; }
+.pocket-save .ps-row{ display:flex; align-items:center; gap:10px; justify-content:center; margin-top:6px; font-size:14px; line-height:1.25; text-align:left; }
+.pocket-save .ps-die{ flex:none; width:40px; height:40px; border:3px solid var(--line,#0c0705); border-radius:9px; display:flex; align-items:center; justify-content:center; background:#f3e3bf; color:#2a1a10; }
+.pocket-save .ps-die .icon-svg{ width:26px; height:26px; }
+.pocket-save .ps-sub{ margin-top:6px; font-size:12px; opacity:.85; }
+.pocket-save.ps-out{ animation:ps-out .4s ease-in both; }
+.pocket-save.ps-still, .pocket-save.ps-still.ps-out{ animation:none; }
+@keyframes ps-in{ from{ opacity:0; transform:translate(-50%,-50%) scale(.6) rotate(-4deg); } to{ opacity:1; transform:translate(-50%,-50%) scale(1); } }
+@keyframes ps-out{ to{ opacity:0; transform:translate(-50%,-56%) scale(.96); } }
