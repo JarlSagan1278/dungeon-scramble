@@ -1883,6 +1883,7 @@ function pathCounterHTML(){
   if(preview.nullifyCount) extras.push(iconSpan('nullify'));
   if(preview.freeze) extras.push(iconSpan('freeze'));
   // Nov 10: a path with no damage but other effects shows just those (a big "0 damage" read as a wasted path)
+  for(let k=0;k<extras.length;k++) extras[k] = `<span class="pcf-x">${extras[k]}</span>`; // Nov 11: one element per effect (layout options)
   if(!val && extras.length) return `<div class="path-counter-float pcf-nodmg"><span class="pcf-extra">${extras.join(' ')}</span></div>`;
   return `<div class="path-counter-float ${big?'pcf-big':''} ${tier>=2?'pcf-t'+tier:''}">
       <span class="pcf-main"><span class="pcf-num" data-from="${fromVal}" data-to="${val}" style="font-size:${size}px;">${val%1?val.toFixed(1):val}</span><span class="pcf-lbl">damage</span></span>
