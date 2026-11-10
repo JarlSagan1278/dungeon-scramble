@@ -1897,7 +1897,7 @@ function applyNullify(){
   if(e.minionsSpawned>0){
     e.minionsSpawned = 0;
     graveTally(S.tray.filter(c=>c.minion).length);
-    S.tray.forEach(cell=>{ if(cell.minion){ cell.minion=false; cell.die=cell.coveredDie; cell.coveredDie=null; cell.blank=true; } });
+    S.tray.forEach(cell=>{ if(cell.minion){ cell.minion=false; cell.die=cell.coveredDie||cell.die; cell.coveredDie=null; cell.blank=true; } }); // ||cell.die like the other Minion clears
     cleared.push('minions');
   }
   if(S.playerDOT>0){ S.playerDOT = 0; cleared.push('your D.O.T.'); }
@@ -2203,6 +2203,9 @@ function runEnemyBeat(i, noWind){
       if(typeof playTone==='function') playTone('enemyDrum');
       const t = runEncounterAction();
       if(t) showToastIfAvailable(t, 'bad');
+      // Nov 11: a hit can take you to 0 while Equal and Opposite's reflect kills the monster. Your death is handled
+      // first (a Back Pocket save gets its chance), then the kill; before, you won at 0 HP and played on.
+      if(e.curHealth<=0 && S.health<=0) return {stop:'bothDown'};
       if(e.curHealth<=0) return {stop:'encounterDefeated'};
       if(S.health<=0) return {stop:'playerDefeated'};
       return null;
@@ -2223,7 +2226,12 @@ function runEnemyBeat(i, noWind){
   const advance = () => {
     S._pendingTimeout = null;
     if(result.stop==='encounterDefeated'){ S.transitioning=false; onEncounterDefeated(); return; }
-    if(result.stop==='playerDefeated'){ S.transitioning=false; onPlayerDefeated(); return; }
+    if(result.stop==='playerDefeated'){ S.transitioning=false; onPlayerDefeated();
+      // Nov 11: a Back Pocket save used to stop the turn here: same round, same roll, your D.O.T. never ticked and the
+      // path you had just played stayed selected (Go replayed it). Now the turn finishes as usual after a save.
+      if(S.health>0 && S.screen==='game'){ S.transitioning=true; runEnemyBeat(i+1); }
+      return; }
+    if(result.stop==='bothDown'){ S.transitioning=false; onPlayerDefeated(); if(S.health>0 && S.screen!=='gameover') onEncounterDefeated(); return; }
     runEnemyBeat(i+1);
   };
   S._advance = advance;

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.42.78 (Nov 11, 2026)
+Bug fixes from a fresh-eyes code read:
+- A Back Pocket save during the monster's turn left the turn unfinished: same round, same roll, your D.O.T./H.O.T. never ticked, and the path you had just played stayed selected, so Go replayed it for free. The turn now finishes as usual after a save.
+- When one enemy hit took you to 0 while Equal and Opposite's reflect killed the monster, you won the fight at 0 HP and played on. Now your defeat is handled first: a Back Pocket save brings you back and you win the fight; an empty Pocket ends the run.
+- Nullify can no longer leave a tray slot without a die (same safety as the other Minion clears).
+- check.js: bothdown.
+
 ## 1.42.77 (Nov 10, 2026)
 - The path counter says what it counts: a small "DAMAGE" under the number (the playtester asked what the "11" meant, at 9:22 in the video).
 - A path with no damage but other effects (Block, Heal, D.O.T., H.O.T.) shows just those, a little larger, instead of a big "0".
