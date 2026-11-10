@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.80 (Nov 11, 2026)
+- Path counter (Jeremy picked A1): one rounded capsule with the number, DAMAGE, and the other effects in two columns underneath, so a path with many effects grows downward instead of covering the Round badge and the dice icons. The number stops growing past a 46 px size (its colour and glow still climb with the total).
+
 ## 1.42.79 (Nov 11, 2026)
 - Back Pocket saves are an event: a "Saved!" card over the room names the die that saved you and the face it rolled ("Your Back Pocket's Hidden Estoc rolled Hit 2. Back to 5 HP, 2 spare dice spent"), with a chime and sparks; the turn waits 1.4 s to let it be read (Skip goes straight on). It replaces the small "Saved!" strip.
 - Bug hunt: RELICS=1 runs every game with every relic and spare Back Pocket dice; 32 runs on 1.42.78, no findings.

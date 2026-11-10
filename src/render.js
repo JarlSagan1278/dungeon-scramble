@@ -1872,7 +1872,7 @@ function pathCounterHTML(){
   // instead of maxing out small and getting visually capped at 44px.
   // Growth tapers (sqrt) past the early numbers so a 30-damage path still
   // reads big without the badge trying to outgrow the whole screen.
-  const size = Math.round(22 + Math.sqrt(Math.max(val,0))*11);
+  const size = Math.min(46, Math.round(22 + Math.sqrt(Math.max(val,0))*11)); // Nov 11: capped (a 33 used to swallow the tray); the colour/glow tiers still escalate
   const big = val>=8;
   const extras = [];
   if(preview.healGain) extras.push(`+${preview.healGain}${iconSpan('heal')}`);

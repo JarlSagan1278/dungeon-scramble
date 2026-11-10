@@ -32,7 +32,6 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
 - **Armsmaster red Skill vs red Clear:** options shown Oct 15.
 
 ## Next for Claude
-- **First thing in the next on-my-own work block (Jeremy, Nov 10):** the path counter badge gets wide with 4-5 extra effects (Heal, Block, D.O.T., H.O.T., Fumble...) and covers the dice-icon row next to "Round 1". Work on a second line for the extras under the number (and any better layout), mock 2-3 options with screenshots at 395 and 360 px, then ask Jeremy to pick. Code: `pathCounterHTML()` in render.js, `.path-counter-float` / `.pcf-extra` in styles.css; must not make the card taller (it floats).
 - **Forks (shipped 1.42.55-1.42.62):** two doors at slots 3 and 6; the Elite door's extra loot choice is a next-floor die. Bot study: always Elite 50% vs always Standard 39% (STUDY_FINDINGS). Watch real players' picks in the play data (`fork_pick` events) before tuning.
 - **PC release layout (Jeremy, Nov 4):** D (room left, tray right, path panel) + G (hover panel, key letter per die) + H (die cursor, controller glyphs); one landscape frame for monitor and Steam Deck. Refined screens in the same artifact (Part 1).
 - **Room dressing (reopened Oct 29):** inked corner ivy and per-floor room colour shipped in 1.42.5. Still open if Jeremy wants them: his own drawn ivy strands (V3) and one drawn prop per floor (D2).

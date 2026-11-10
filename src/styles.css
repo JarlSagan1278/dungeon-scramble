@@ -3850,3 +3850,12 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .pocket-save.ps-still, .pocket-save.ps-still.ps-out{ animation:none; }
 @keyframes ps-in{ from{ opacity:0; transform:translate(-50%,-50%) scale(.6) rotate(-4deg); } to{ opacity:1; transform:translate(-50%,-50%) scale(1); } }
 @keyframes ps-out{ to{ opacity:0; transform:translate(-50%,-56%) scale(.96); } }
+
+/* Nov 11 (Jeremy picked A1): the path counter is one rounded capsule: number, DAMAGE, then the other effects in two
+   columns underneath, so it grows downward instead of sideways over the Round badge and the dice icons. */
+.path-counter-float{ flex-direction:column !important; align-items:center !important; gap:2px !important; border-radius:999px !important;
+  padding:6px 10px 8px !important; min-width:58px; box-sizing:border-box; }
+.path-counter-float .pcf-extra{ display:grid !important; grid-template-columns:auto auto; gap:1px 7px !important; justify-items:start; font-size:11px; }
+.path-counter-float .pcf-extra:has(> .pcf-x:only-child){ grid-template-columns:auto; justify-items:center; }
+.path-counter-float.pcf-nodmg{ padding:8px 12px !important; }
+.path-counter-float.pcf-nodmg .pcf-extra{ font-size:15px; }
