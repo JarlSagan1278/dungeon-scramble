@@ -113,6 +113,7 @@ const CHECK=()=>{
   if(typeof S==='undefined'||!S) return bad;
   if(S.screen==='game'||S.screen==='camp'){
     if(!f(S.health)||S.health>S.maxHealth+1e-9) bad.push('health '+S.health+'/'+S.maxHealth);
+    if(f(S.health)&&S.health<=0&&!S.transitioning) bad.push('alive at '+S.health+' HP (a defeat was skipped)'); // Nov 11: the both-down bug
     if(!f(S.playerBlock)||S.playerBlock<0) bad.push('block '+S.playerBlock);
     if(!f(S.playerDOT)||S.playerDOT<0) bad.push('pDOT '+S.playerDOT);
     if(!f(S.playerHOT)||S.playerHOT<0||S.playerHOT>6) bad.push('pHOT '+S.playerHOT);
