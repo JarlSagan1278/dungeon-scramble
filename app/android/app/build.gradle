@@ -7,8 +7,8 @@ android {
         applicationId "com.dungeonscramble.game"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 14245
-        versionName "1.42.45"
+        versionCode 1042080
+        versionName "1.42.80"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,8 +16,21 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Nov 11: Play upload signing. The GitHub workflow decodes the upload key from repo secrets into a file and passes
+    // its path and password here; without them (local or debug builds) the release build is simply left unsigned.
+    signingConfigs {
+        release {
+            if (System.getenv("DS_UPLOAD_KEYSTORE")) {
+                storeFile file(System.getenv("DS_UPLOAD_KEYSTORE"))
+                storePassword System.getenv("DS_UPLOAD_KEY_PASSWORD")
+                keyAlias "upload"
+                keyPassword System.getenv("DS_UPLOAD_KEY_PASSWORD")
+            }
+        }
+    }
     buildTypes {
         release {
+            if (System.getenv("DS_UPLOAD_KEYSTORE")) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

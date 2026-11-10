@@ -29,3 +29,5 @@ tools/media/cast/
 cast/
 tools/balance/sum_*.json
 tools/balance/*_log.txt
+*.jks
+*.keystore

@@ -1,6 +1,8 @@
 # Builds the Android app (debug APK) on GitHub's servers, which have the Android SDK (Oct 26).
 # Runs on pushes to main that touch the game or the app, or by hand from the Actions tab ("Run workflow").
 # The APK is attached to the run as "dungeon-scramble-apk" (Actions tab > the run > Artifacts).
+# Nov 11: once the repo secrets DS_UPLOAD_KEYSTORE_B64 and DS_UPLOAD_KEY_PASSWORD exist, it also builds the signed app
+# bundle for Google Play, attached as "dungeon-scramble-aab" (upload that .aab in Play Console).
 name: Android APK
 on:
   workflow_dispatch:
@@ -12,6 +14,9 @@ jobs:
   apk:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      DS_UPLOAD_KEYSTORE_B64: ${{ secrets.DS_UPLOAD_KEYSTORE_B64 }}
+      DS_UPLOAD_KEY_PASSWORD: ${{ secrets.DS_UPLOAD_KEY_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -35,4 +40,17 @@ jobs:
         with:
           name: dungeon-scramble-apk
           path: app/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+      - name: Build the signed Play bundle (only when the upload key secrets are set)
+        if: env.DS_UPLOAD_KEYSTORE_B64 != ''
+        working-directory: app/android
+        run: |
+          echo "$DS_UPLOAD_KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          DS_UPLOAD_KEYSTORE="$RUNNER_TEMP/upload.jks" ./gradlew bundleRelease --no-daemon
+          rm -f "$RUNNER_TEMP/upload.jks"
+      - uses: actions/upload-artifact@v4
+        if: env.DS_UPLOAD_KEYSTORE_B64 != ''
+        with:
+          name: dungeon-scramble-aab
+          path: app/android/app/build/outputs/bundle/release/app-release.aab
           retention-days: 30
