@@ -54,9 +54,9 @@ const CASES = [
     const live = !!document.querySelector('#enc-panel .fo-quest.q-live-done');
     const hp0 = S.encounter.curHealth, qi = S.encounter.quests.findIndex(q => /route square root/.test(q));
     document.getElementById('resolve-btn').click(); try { skipTransition(); } catch (e) {}
-    return { live, done: S.encounter.questsDone[qi], dmg: hp0 - S.encounter.curHealth };
+    return { live, done: S.encounter.questsDone[qi], dmg: hp0 - S.encounter.curHealth, want: parseFloat(S.encounter.quests[qi]) };
   });
-  out.push((turn.live && turn.done && turn.dmg >= 5 ? 'ok   ' : 'FAIL ') + `Wooden Golem 2x2 square: sign shows it live (${turn.live}), quest done (${turn.done}), ${turn.dmg} damage from Block-only path`);
+  out.push((turn.live && turn.done && turn.dmg >= turn.want ? 'ok   ' : 'FAIL ') + `Wooden Golem 2x2 square: sign shows it live (${turn.live}), quest done (${turn.done}), ${turn.dmg} damage from Block-only path (reward ${turn.want})`);
   if (errors.length) out.push('FAIL page errors: ' + errors.slice(0, 3).join(' | '));
   console.log(out.join('\n'));
   await browser.close();

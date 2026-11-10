@@ -199,6 +199,12 @@ study_maneuver.js `man1Faces` knob, dwarf, 300 runs per cell; regular bot (4 cla
 - C (Pivot) is the "maneuvers matter" option: a third more Maneuver steps per turn on Floor 1, small difficulty change.
 - Not applied: Jeremy's call (Nov 9).
 
+## Myceleus trim (Nov 10, 2026, build 1.42.75)
+
+Regular bot, 4 classes x 250 runs, every Floor 3 big-boss room forced to Myceleus (~900 fights per version):
+today (93 HP) 4.0% deaths per fight, 13 deaths from >=60% HP, 31% HP taken; 84 HP: 3.1%, 10, 30%; every-turn hit
+6 -> 5: 2.7%, 5, 23%. Jeremy asked for "a bit": 84 HP shipped in 1.42.76 (level with Extruzeon and Toadtaur Wizard, ~3%).
+
 ## Design, art and performance
 
 - **Design audit (Oct 17):** every button its own colour, Settings fits without scrolling, camp rows match their dice,

@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.42.75';
+const GAME_VERSION = '1.42.76';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false };
@@ -409,7 +409,7 @@ function enc(name,type,health,extra){ return Object.assign({name,type,health,max
 
 const FLOOR1_ENEMIES = [
   enc('Filement Bunny','Enemy',7,{dmg:2,flavor:'"Cute, until it gunks up your gears and gnaws off your toes!"'}),
-  enc('Wooden Golem','Enemy',10,{dmg:3,quests:['5 damage: 3 maneuvers','5 damage: route square root'],flavor:'Shoddy construction is evident from the visible weak points.'}),
+  enc('Wooden Golem','Enemy',10,{dmg:3,quests:['5 damage: 3 maneuvers','3 damage: route square root'],flavor:'Shoddy construction is evident from the visible weak points.'}),
   enc('Feral Pet Rock','Enemy',12,{dmg:2,flavor:'Somedwarf took this companion for granite…'}),
   enc('Unbound Automa','Enemy',15,{dmg:3,quests:['5 damage: 3 maneuvers','5 damage: route straightedge'],flavor:'This replaced the Automaton, mostly to remove the weight.'}),
   enc('Beaker Breakers','Enemy',15,{dmg:1,heal:1,quests:['5 damage: 2 dodge','5 damage: route running start'],flavor:'"No longer into flasks"'}),
@@ -550,7 +550,7 @@ const FLOOR3_SHRINES = [
 const BIG_BOSSES = [
   enc('Extruzeon, Co-consul of Waste','Big Boss',99,{dmg:6,shield:2,hot:1,quests:['30 damage: 3 boosts','30 damage: 6 maneuvers in a single turn','freeze: 20+ damage'],flavor:'"And to think\u2026I hesitated."'}),
   enc('Toadtaur Wizard, Assistant to the Co-consul','Big Boss',78,{dmg:4,quests:['30 damage: 3 leaps','30 damage: 6 maneuvers in a single turn','freeze: 15+ damage'],flavor:'"The wizdom of the toads flows through my three-chambered heart!"'}),
-  enc('Myceleus, Co-consul of Rot','Big Boss',93,{dmg:2,minion:2,dot:1,hot:2,quests:['30 damage: 3 combos','30 damage: 6 maneuvers in a single turn','nullify: 15+ damage'],flavor:'"All must rot away to naught!"'}),
+  enc('Myceleus, Co-consul of Rot','Big Boss',84,{dmg:2,minion:2,dot:1,hot:2,quests:['30 damage: 3 combos','30 damage: 6 maneuvers in a single turn','nullify: 15+ damage'],flavor:'"All must rot away to naught!"'}),
 ];
 
 const FLOORS = [

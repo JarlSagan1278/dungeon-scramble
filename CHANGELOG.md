@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.76 (Nov 10, 2026)
+- Myceleus, Co-consul of Rot: 93 -> 84 health (Jeremy: "trim a bit"; deaths per fight 4.0% -> 3.1% in a forced-boss study, level with the other Big Bosses).
+- Square Root (2x2 square) on the Wooden Golem pays +3 instead of +5 (the easiest poster).
+- Straightedge keeps its name.
+
 ## 1.42.75 (Nov 9, 2026)
 - Play data, asked earlier: the "Help balance the game?" question now also comes once mid-run, after your first loot pick (it waits for the next room's banner). Yes shares this run and future ones; No is final. The end-of-run ask stays for anyone not yet asked.
 - Live copies: with sharing on, a copy of the run in progress (outcome `in_progress`) is sent when a room starts (at most every 4 minutes) and when the page is hidden or closed, so runs players walk away from are counted. The receiver (tools/playdata/apps_script.gs) replaces an in_progress row with each newer copy and finally with the finished run. Needs the Apps Script redeployed (New version).
