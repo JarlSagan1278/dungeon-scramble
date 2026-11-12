@@ -28,9 +28,7 @@ done in 1.41.97 (Alegreya, toy bevel). Open: the credits' art
 line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jeremy's. Art treatment settled in 1.41.98 (grain kept, cover matched). Second visual review (Oct 28): blank sides, idle Go, Victory chest, equip window and Settings fixed in 1.41.99; title, defeat, Base Camp, boss bar and consent line done in 1.42.0 (loot names in the tray stay). Codex and Records polished in 1.42.1.
 
 ## Waiting on Jeremy
-- **Itch (Nov 9):** upload demo zip 1.42.73+ (Straightedge, phone fixes); in the page description change "Leap, Dodge and Pivot" to "Leap, Sidestep and Pivot" (text in `release/itch_page.md`).
-- **Balance calls from the Nov 9 fairness check (STUDY_FINDINGS):** trim Myceleus (5.5% deaths per fight vs 3.0% for the other Big Bosses)? Bio-Mutant Escape (3.7% vs 1.5-1.9% for Floor 3 elites)? Keep Square Root as the easy poster (75% done)?
-- **Straightedge** (Claude's replacement for Turning Number, 1.42.73): keep the name or rename.
+- **Itch (Nov 12):** upload the new demo zip (1.42.102: big-turn crescendo, exact damage preview, next goal on defeat, choices resume after closing, one tap cue, camp fixes); in the page description change "Leap, Dodge and Pivot" to "Leap, Sidestep and Pivot" (text in `release/itch_page.md`).
 - **Title art** (Nov 10: revisit when the PC port starts in earnest; 860 px is enough for phone, itch and Play): new cover drawn from scratch on the 2048x2434 canvas (`DungeonScramble_TitleArt_canvas.psd`); the chat
   only passes 860 px, so export full size from Sketchbook or upload the PSD to the repo. Keep the logo layer for Steam.
 - **Redraw the remaining AI-assisted art** (pixie portraits, the remaining original loot) to shrink the disclosure.
