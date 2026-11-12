@@ -43,7 +43,7 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
 
 ## Later
 - **Optional caps, only if play feels unfair:** damage-per-Minion specials count at most 8 Minions; Extruzeon layers max +12.
-- **Free print-and-play edition** (refresh the rulebook then: it lags the game -- minions, Boost tokens, Swap/Reroll, Rest or Train; `npm run rulebook`) (component sheets + current rules) for the BGG solo contest (see `release/first_players.md`).
+- **Free print-and-play edition** (rulebook refreshed Nov 12 to 1.42.102: forks, Scramble flick, lock-in at Go, exact next-hit number, next goal on defeat, earlier play-data ask, Wanted poster / Round wording; `npm run rulebook`) (component sheets + current rules) for the BGG solo contest (see `release/first_players.md`).
 - **Relic look polish:** a bracelet view in the relic list, sockets that grow with depth.
 - **Replay tool** for the tray/path telemetry.
 - **A conversion relic** (e.g. 1 damage per Shield gained).
