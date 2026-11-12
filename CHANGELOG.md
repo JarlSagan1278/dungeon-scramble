@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.86 (Nov 12, 2026)
+- The monster's next-turn damage is exact: Gambeson's -1 and Warding Bell's half now count in the number (it used to show more than landed with them); the tooltip names the relic. New check: preview.
+- Defeat screen: a "Next goal" line in place of the flavor sentence (first win unlocks the Halfling, Depth and new relics; win as this origin to earn its relic; clear the demo), plus "Furthest yet" / "You reached the Floor N boss" when true. Same height as before at 360x722.
+
 ## 1.42.85 (Nov 12, 2026)
 - Codex class badges: a class with no wins reads "No wins yet" instead of "Not cleared".
 
