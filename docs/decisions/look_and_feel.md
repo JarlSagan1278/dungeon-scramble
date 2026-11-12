@@ -103,3 +103,5 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Nov 10 — Path counter label (from the playtest's "what does the 11 mean?", Jeremy identified it as the damage counter):** "DAMAGE" under the number; a no-damage path shows only its other effects (1.42.77).
 - **Nov 11 — Back Pocket save card (Jeremy asked for it):** a gold-edged "Saved!" card naming the die and face that saved you (1.42.79).
 - **Nov 11 — Path counter layout (Jeremy picked A1 of A1/A2/A3 + earlier A/B/C):** rounded capsule, effects in two columns under DAMAGE, number capped at 46 px (1.42.80).
+
+- **Nov 12, 2026:** Approved the polish roadmap batch (https://claude.ai/artifact/RHcVM2LaEFeXyFcX8VR3zm), in order: exact next-turn damage (relics counted), a next goal on the defeat screen, screenshot/height checks for every screen, a big-turn crescendo, then consolidating the quest-poster styles.
