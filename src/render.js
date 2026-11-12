@@ -2502,6 +2502,7 @@ function showToast(text, kind){
   // Plain damage/heal numbers are already shown by the floating numbers + health bars; skip the redundant message.
   if(/^Path dealt|hits you for|takes \d+ D\.O\.T\. damage|You take \d+ D\.O\.T\. damage|You recover \d+ from H\.O\.T\.|heals \d+\./i.test(text)) return;
   if(/Back Pocket saves you/i.test(text)) return; // Nov 11: the Saved! card (pocketSaveFx) says it
+  if(S && S.screen==='camp' && /^Rested/i.test(text)) return; // Nov 12: the Rest button says "Healed +N" and the strip hid the health bar filling
   // Oct 31 (Jeremy picked A + B after the banner research): the diagonal ribbons were gone before most messages could be
   // read (~238 words a minute) and covered the fighters. Events about something on screen pop as a short chip right there (A);
   // everything else is a short, level headline strip that stays long enough to read and queues (B). Taps pass through
@@ -4447,7 +4448,7 @@ function bestiaryHTML(){
       const k = BOSS_KITS[e.name];
       moves = `<div class="bst-moves">${k.specials.map(x=>x.name).join(' &middot; ')}${k.phase2?` <span class="hint">| ${k.phase2.name}: ${k.phase2.specials.map(x=>x.name).join(' &middot; ')}</span>`:''}</div>`;
     } else {
-      const acts = [['dmg','hit'],['minion','minion'],['shield','block'],['heal','heal'],['hot','hot'],['dot','dot']].filter(([k])=>e[k]>0).map(([k,ic])=>`<span>${iconSpan(ic, e[k])}</span>`).join('');
+      const acts = [['dmg','hit'],['minion','minion'],['shield','block'],['heal','heal'],['hot','hot'],['dot','dot']].filter(([k])=>e[k]>0).map(([k,ic])=>`<span class="bst-act" title="${LABEL[ic]||ic} ${e[k]}">${iconSpan(ic)}<b>${e[k]}</b></span>`).join(''); // Nov 12: the number sat unreadably inside the icon
       moves = `<div class="bst-moves compendium-faces">${acts}</div>`;
     }
     const id = 'b'+i;
@@ -4524,7 +4525,9 @@ function renderRelicChoiceModal(){
 function boonNoteHTML(t){ return '<b>' + String(t||'').replace(/(,? )(or|and|plus|then)( )/g, '</b>$1$2$3<b>') + '</b>'; }
 function shrineOptCard(label){
   const l = String(label||''); let m;
-  if((m = l.match(/^Heal (\d+)/i))) return { icon:iconSpanSolid('heal'), bg:'#e8574f', title:`Heal ${m[1]}`, sub:`Get back up to ${m[1]} health now` };
+  if((m = l.match(/^Heal (\d+)/i))){ // Nov 12: it adds up to N (the old "back up to N" read as "set to N"); flags a heal you can't use
+    const room = S ? Math.max(0, S.maxHealth - S.health) : 99;
+    return { icon:iconSpanSolid('heal'), bg:'#e8574f', title:`Heal ${m[1]}`, sub: room<=0 ? "You're already at full health" : (room < +m[1] ? `Heals ${room} (you're ${room} below full)` : `Restores ${m[1]} health now`), wasted: room<=0 }; }
   if((m = l.match(/^\+(\d+) Max Health/i))) return { icon:iconSpanSolid('heal'), bg:'#5f8a3c', plus:true, title:`+${m[1]} max health`, sub:'Your health bar grows for the run' };
   if(/^Forge/i.test(l)) return { icon:iconSpanSolid('combo'), bg:'#d6b25a', plus:true, title:'Forge a die', sub:'One of three Gilded dice' };
   if(/Upgrade 2 Attack/i.test(l)) return { icon:iconSpanSolid('hit'), bg:'#e8574f', plus:true, title:'Upgrade 2 Attack', sub:'Two Attack dice go up a level' };
@@ -4557,7 +4560,7 @@ function renderShrineChoiceModal(){
   const container = overlay.querySelector('#shrine-options');
   options.forEach(opt=>{
     const c = shrineOptCard(opt.label);
-    const card = el(`<div class="loot-opt shrine-opt ${shrineOptClass(opt.label)}" role="button" title="${String(opt.label).replace(/"/g,'&quot;')}"><span class="sp-ic" style="background:${c.bg};color:${c.fg||'#fff6e0'}">${c.icon}${c.plus?'<i>+</i>':''}</span><h4>${c.title}</h4>${c.sub?`<span class="sp-sub">${c.sub}</span>`:''}</div>`);
+    const card = el(`<div class="loot-opt shrine-opt ${shrineOptClass(opt.label)}${c.wasted?' so-wasted':''}" role="button" title="${String(opt.label).replace(/"/g,'&quot;')}"><span class="sp-ic" style="background:${c.bg};color:${c.fg||'#fff6e0'}">${c.icon}${c.plus?'<i>+</i>':''}</span><h4>${c.title}</h4>${c.sub?`<span class="sp-sub">${c.sub}</span>`:''}</div>`);
     card.onclick = ()=> closeModal(overlay, ()=> chooseShrineOption(opt));
     container.appendChild(card);
   });
@@ -5053,9 +5056,9 @@ function campfireChoiceHTML(){
   return `<div class="campfire-choice${ch?' done':''}">
       <div class="cf-label">${ch ? 'Campfire used' : 'Campfire: choose one'} ${infoDot('Each Camp\'s fire gives you ONE of these. Rest: scramble your Tray and heal half the faces that aren\'t blank. Train: combine 3 matching dice into 1 of the next level (up to one Attack and one Maneuver). Organizing is always free.')}</div>
       <div class="cf-row">
-        <button id="rest-btn" class="cf-btn cf-rest${cls('rest')}" ${ch?'disabled':''} title="Scramble your Tray's faces, then heal for half the non-blank faces showing">${ch==='rest'?MARK_CHECK+' ':''}Rest${restSub?`<small>${restSub}</small>`:''}</button>
+        <button id="rest-btn" class="cf-btn cf-rest${cls('rest')}" ${ch?'disabled':''} title="Scramble your Tray's faces, then heal for half the non-blank faces showing"><span class="cf-name">${ch==='rest'?MARK_CHECK+' ':''}Rest</span>${restSub?`<small>${restSub}</small>`:''}</button>
         <span class="cf-or">or</span>
-        <button id="train-btn" class="cf-btn cf-train${cls('train')}" ${(ch||!n)?'disabled':''} title="Combine 3 matching dice in the Upgrade section below">${ch==='train'?MARK_CHECK+' ':''}Train<small>${trainSub}</small></button>
+        <button id="train-btn" class="cf-btn cf-train${cls('train')}" ${(ch||!n)?'disabled':''} title="Combine 3 matching dice in the Upgrade section below"><span class="cf-name">${ch==='train'?MARK_CHECK+' ':''}Train</span><small>${trainSub}</small></button>
       </div>
     </div>`;
 }
@@ -5119,7 +5122,7 @@ function renderCamp(){
       const needsBackfill = count>=3 && !canUpgrade(cat,level);
       const upgradeTitle = needsBackfill ? 'Needs more spare dice to backfill' : `Combine 3 ${label} ${ROMAN[level]} into 1 ${label} ${ROMAN[level+1]}`;
       upgradeRows.push(`<div class="upgrade-row upg-${cat}">
-          <button class="upgrade-btn${(eligible && !baseCamp)?' upgrade-ready':''}${locked?' upgrade-locked':''}" id="upgrade-${cat}-${level}" ${disabled?'disabled':''}${locked?' aria-disabled="true"':''} title="${locked?'Choose Train at the campfire first':upgradeTitle}"><span class="upg-lbl upg-dice">${upgDie(level)}${upgDie(level)}${upgDie(level)}<span class="upg-arrow">&rarr;</span>${upgDie(level+1, true)}<span class="upg-own">${label} &middot; ${count} owned</span></span></button>
+          <button class="upgrade-btn${(eligible && !baseCamp)?' upgrade-ready':''}${locked?' upgrade-locked':''}" id="upgrade-${cat}-${level}" ${disabled?'disabled':''}${locked?' aria-disabled="true"':''} title="${locked?'Choose Train at the campfire first':upgradeTitle}"><span class="upg-lbl upg-dice">${upgDie(level)}${upgDie(level)}${upgDie(level)}<span class="upg-arrow">&rarr;</span>${upgDie(level+1, true)}<span class="upg-own">${S.campUpgrades[cat] ? `${label} &middot; done this camp` : `${label} &middot; ${count} owned`}</span></span></button>
           <button id="preview-${cat}-${level}" class="upgrade-preview-btn" title="Preview the resulting die's faces">?</button>
         </div>`);
     });
@@ -5148,8 +5151,7 @@ function renderCamp(){
 
       <div class="camp-section">
         <h3 class="camp-section-title" id="camp-upgrade-title">${baseCamp?'Upgrade Dice':'Train: Upgrade Dice'} ${infoDot(baseCamp?'Combine 3 matching Basic dice into 1 of the next tier. You can upgrade 1 Attack and 1 Maneuver die per Camp.':'Combine 3 matching Basic dice into 1 of the next tier (1 Attack and 1 Maneuver per Camp). Training uses the campfire, so you can\'t also Rest here.')}</h3>
-        ${(!baseCamp && S.campChoice==='rest') ? '<p class="hint" style="margin:0 0 4px;">You rested at this fire, so no training here.</p>' : (!baseCamp && S.campFireOut) ? '<p class="hint" style="margin:0 0 4px;">The campfire is out.</p>' : ''}
-        <div class="upgrade-rows-col">${upgradeRows.length? upgradeRows.join('') : '<span class="hint">No matching sets of 3 Basic dice to combine right now.</span>'}</div>
+        <div class="upgrade-rows-col">${(!baseCamp && S.campChoice==='rest' && upgradeRows.length) ? '<span class="camp-rows-note">You rested at this fire, so no training here</span>' : (!baseCamp && S.campFireOut && upgradeRows.length) ? '<span class="camp-rows-note">The campfire is out</span>' : ''}${upgradeRows.length? upgradeRows.join('') : '<span class="hint">No matching sets of 3 Basic dice to combine right now.</span>'}</div>
       </div>
 
       <div class="camp-section">

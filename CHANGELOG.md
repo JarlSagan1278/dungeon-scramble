@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.42.81 (Nov 12, 2026)
+Fresh-eyes polish pass (camp, shrines, Codex):
+- Camp: the chosen Rest/Train button no longer grows a line (the check sat on its own row), so nothing below jumps when you choose; "You rested at this fire, so no training here" sits over the dimmed upgrade rows instead of adding a line (Rest made the camp page scroll 16px); the "Rested" strip no longer covers the health bar filling up (the button already says "Healed +N"); a die type already combined at this camp says "done this camp".
+- Shrines: a Heal option says what it will really do ("Restores 20 health now", "Heals 6 (you're 6 below full)", or dimmed "You're already at full health"); it used to say "Get back up to 20 health", which read as setting your health to 20.
+- Codex Bestiary: quest rewards use the wall poster's red badges (they were gold-on-brown blobs) and a monster's actions read as icon + number chips (the number was hidden inside the icon).
+
 ## 1.42.80 (Nov 11, 2026)
 - Path counter (Jeremy picked A1): one rounded capsule with the number, DAMAGE, and the other effects in two columns underneath, so a path with many effects grows downward instead of covering the Round badge and the dice icons. The number stops growing past a 46 px size (its colour and glow still climb with the total).
 

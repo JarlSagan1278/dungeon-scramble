@@ -3859,3 +3859,20 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .path-counter-float .pcf-extra:has(> .pcf-x:only-child){ grid-template-columns:auto; justify-items:center; }
 .path-counter-float.pcf-nodmg{ padding:8px 12px !important; }
 .path-counter-float.pcf-nodmg .pcf-extra{ font-size:15px; }
+
+/* Nov 12 camp polish: the chosen fire button keeps its height (check + name on one line); the "rested here" note sits
+   over the dimmed upgrade rows instead of adding a line (Rest made the camp page scroll 16px) */
+.cf-btn .cf-name{ display:inline-flex; align-items:center; gap:4px; }
+.cf-btn .cf-name svg, .cf-btn .cf-name .mark{ width:14px; height:14px; }
+.upgrade-rows-col{ position:relative; }
+.upgrade-rows-col .camp-rows-note{ position:absolute; inset:0; z-index:2; display:flex; align-items:center; justify-content:center; text-align:center; pointer-events:none;
+  font-size:13px; font-weight:700; color:#f3e6cc; text-shadow:0 1px 0 #120b07, 0 0 6px #120b07; padding:0 10px; }
+.shrine-opt.so-wasted{ opacity:.55; } /* Nov 12: still pickable, just shown as no use right now */
+
+/* Nov 12 Codex polish: Bestiary quest rewards look like the wall poster's red badges (they were gold-on-brown blobs),
+   and a monster's every-turn actions read as icon + number chips */
+.bst-quest .q-reward{ background:#c9473a !important; color:#fff7e6 !important; padding:1px 5px 1px 2px !important; font-size:11px !important; border:2px solid #3a2410; box-shadow:0 1px 0 #3a2410; }
+.bst-quest .q-reward .icon-svg{ color:#fff7e6 !important; width:12px; height:12px; }
+.bst-moves .bst-act{ display:inline-flex; align-items:center; gap:3px; margin:0 3px; padding:1px 7px 1px 4px; border:2px solid #3a2410; border-radius:999px; background:#f3e3bf; color:#3a2410; font-size:12px; }
+.bst-moves .bst-act .icon-svg{ width:14px; height:14px; }
+.bst-moves .bst-act b{ font-family:var(--font-ui); }
