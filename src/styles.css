@@ -3891,3 +3891,23 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 /* Nov 12: fit5, found by the screen check: with the Depth row a 360x722 phone still scrolled 3px after fit4 */
 .setup-panel.fit5 #start-btn{ padding:7px 12px; margin-top:0; }
 .setup-panel.fit5 .depth-toggle{ padding:2px 10px; }
+
+/* Nov 12: big-turn crescendo (polish roadmap E3): the turn total slams onto the monster, holds, then lifts away */
+.turn-total{ position:fixed; z-index:60; pointer-events:none; transform:translate(-50%,-50%) rotate(var(--tt-rot,-5deg)); display:flex; flex-direction:column; align-items:center; line-height:.9;
+  animation:tt-slam 1.3s cubic-bezier(.2,.9,.3,1) both; }
+.turn-total b{ font-family:'Metamorphous', serif; font-weight:400; font-size:58px; color:#ffd76a;
+  -webkit-text-stroke:3px #0c0705; paint-order:stroke fill; text-shadow:0 4px 0 #0c0705, 0 0 18px rgba(255,140,40,.55); letter-spacing:-.02em; }
+.turn-total span{ margin-top:2px; font-family:'Metamorphous', serif; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:#fff1d6;
+  -webkit-text-stroke:3px #0c0705; paint-order:stroke fill; }
+.turn-total.tt-2 b{ font-size:70px; color:#ffb347; }
+.turn-total.tt-3 b{ font-size:84px; color:#ff8a3d; text-shadow:0 5px 0 #0c0705, 0 0 26px rgba(255,90,30,.7); }
+@keyframes tt-slam{
+  0%{ opacity:0; transform:translate(-50%,-50%) rotate(var(--tt-rot)) scale(2.3); }
+  18%{ opacity:1; transform:translate(-50%,-50%) rotate(var(--tt-rot)) scale(.9); }
+  28%{ transform:translate(-50%,-50%) rotate(var(--tt-rot)) scale(1.07); }
+  38%{ transform:translate(-50%,-50%) rotate(var(--tt-rot)) scale(1); }
+  78%{ opacity:1; transform:translate(-50%,-50%) rotate(var(--tt-rot)) scale(1); }
+  100%{ opacity:0; transform:translate(-50%,-62%) rotate(var(--tt-rot)) scale(.96); }
+}
+.turn-total.tt-still{ animation:tt-fade 1.3s linear both; }
+@keyframes tt-fade{ 0%,80%{ opacity:1; } 100%{ opacity:0; } }

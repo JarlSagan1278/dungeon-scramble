@@ -2155,6 +2155,12 @@ function runPlayerPathSteps(steps, i, path, effects){
 // bookkeeping that only makes sense in aggregate -- the damage log line,
 // quest checks (which can themselves land bonus damage), then either the
 // encounter's own reply or, if it's dead, straight to victory.
+// 0 = an ordinary turn, 1-3 = how big a closing beat it gets (absolute total, or its share of the monster's health).
+function crescendoTier(tot, maxHp){
+  let t = tot>=25 ? 3 : tot>=15 ? 2 : tot>=8 ? 1 : 0;
+  if(tot>=4 && maxHp>0){ const f = tot/maxHp; if(f>=0.6) t = Math.max(t, 2); else if(f>=0.35) t = Math.max(t, 1); }
+  return t;
+}
 function finishPlayerPath(path, effects){
   const e = S.encounter;
   if(effects.totalDamage>0) logMsg('dmg', `Path dealt ${effects.totalDamage.toFixed(1)} damage.`);
@@ -2171,14 +2177,22 @@ function finishPlayerPath(path, effects){
     showToastIfAvailable(`Just ${Math.ceil(e.curHealth)} HP left!`, null);
     if(typeof playTone==='function') playTone('closeCall');
   }
-  // Closing 'tally' beat for a strong turn (the kill case has its own, bigger
-  // callouts in onEncounterDefeated): chord + shake scaled to the total.
-  { const tot = S.resolveTotal||0, tier = tot>=25 ? 3 : tot>=15 ? 2 : tot>=8 ? 1 : 0;
-    // A killing blow skips this beat entirely -- onEncounterDefeated() plays its own (bigger) sound, shake and burst.
-    if(tier>0 && !(S.encounter && S.encounter.curHealth<=0)){
+  // Closing beat for a strong turn (polish roadmap E3, Nov 12): the dice each show their own number, so the turn's TOTAL
+  // slams onto the monster with the chord, a shake sized to it and a short hold before the monster answers (Balatro:
+  // the end-of-hand moment is the one players remember). Big is absolute (8/15/25) or a big bite of its health. Small
+  // turns stay quick; a kill skips this (onEncounterDefeated has its own, bigger beat); Skip skips the hold.
+  { const tot = S.resolveTotal||0, tier = crescendoTier(tot, e.maxHealth);
+    if(tier>0 && e.curHealth>0 && !S._skipAll){
+      const calm = typeof PREFS!=='undefined' && (PREFS.reducedMotion||PREFS.lowIntensity);
+      if(typeof turnTotalStamp==='function') turnTotalStamp(tot, tier);
       if(typeof playTone==='function') playTone('tally', tier*2);
-      if(tier>=2 && typeof screenShake==='function') screenShake(tier>=3 ? 'big' : 'small');
+      if(!calm && typeof screenShake==='function') screenShake(tier>=3 ? 'big' : 'small');
       if(tier>=3 && typeof spawnParticleBurstAtPortrait==='function') spawnParticleBurstAtPortrait(['#ff8a3d','#ffd76a','#fff5d6']);
+      teleLog('crescendo', {total:Math.round(tot), tier});
+      const go = () => { S._pendingTimeout=null; runEnemyBeat(0); };
+      S._advance = go;
+      S._pendingTimeout = setTimeout(go, calm ? 450 : [0,650,800,950][tier]);
+      return;
     } }
   runEnemyBeat(0);
 }

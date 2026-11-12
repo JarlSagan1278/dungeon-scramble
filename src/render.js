@@ -3382,6 +3382,24 @@ function dotLandFx(side, amt){
     setTimeout(()=>{ if(el.parentNode) el.parentNode.removeChild(el); }, 1700);
   }catch(err){}
 }
+// Nov 12 (E3 crescendo): the turn's total slams onto the monster. On <body>, like dotLandFx, so playback redraws keep it.
+function turnTotalStamp(tot, tier){
+  try{
+    document.querySelectorAll('.turn-total').forEach(n=>n.remove());
+    const fig = document.querySelector('#enc-panel .fo-enemy .fo-fig'); if(!fig) return;
+    const art = fig.querySelector('img,svg,.fo-img') || fig; let r = art.getBoundingClientRect();
+    if(!r.width){ const sr = (fig.closest('.fo-side')||fig).getBoundingClientRect(); r = {left:sr.left, width:sr.width, top:sr.top, height:sr.height||90}; }
+    if(!r.width) return;
+    const el = document.createElement('div');
+    el.className = `turn-total tt-${tier}` + (PREFS.reducedMotion ? ' tt-still' : '');
+    el.innerHTML = `<b>${Math.round(tot*10)/10}</b><span>damage</span>`;
+    el.style.left = Math.min(window.innerWidth-60, Math.max(60, r.left + r.width/2)) + 'px';
+    el.style.top = (r.top + r.height*0.36) + 'px';
+    el.style.setProperty('--tt-rot', (tier%2 ? -6 : 5) + 'deg');
+    document.body.appendChild(el);
+    setTimeout(()=>{ if(el.parentNode) el.parentNode.removeChild(el); }, 1400);
+  }catch(err){}
+}
 function tickFloatersHTML(side){
   const now=performance.now(); UIFX.ticks=UIFX.ticks.filter(x=>now-x.t<1300);
   return UIFX.ticks.filter(x=>x.side===side).map((x,k)=>`<span class="tick-float tf-${x.type}" style="animation-delay:-${Math.round(now-x.t)}ms; --k:${k%3}">${iconSpan(x.type)}${x.type==='block'?`<b>${x.amt}</b>&nbsp;blocked`:`<b>${x.type==='dot'?'-':'+'}${x.amt}</b>`}</span>`).join('');

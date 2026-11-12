@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.88 (Nov 12, 2026)
+- Big-turn crescendo: after the last die of a big path (8+ damage, or a big share of the monster's health) the turn's total slams onto the monster ("18 DAMAGE", bigger and hotter at 15 and 25), with the closing chord and a shake, and holds for 0.65-0.95 s before the monster answers (the chord and shake used to fire as the monster's turn began). Small turns stay quick, Skip skips it, a kill keeps its own beat, Reduced Motion shows the number without the slam or shake. New check: crescendo.
+
 ## 1.42.87 (Nov 12, 2026)
 - New check, screens: 15 screens (title, setup, fights, boss, camp, shrine, loot, equip, both defeat screens, victory, settings, Codex, Records) at 395x769 and 360x722; fails if one is taller than the phone or looks different from its approved picture (tools/tests/screens/, approve with `node tools/tests/test_screens.js approve`).
 - Fixed (found by it): after a first win, the setup screen scrolled 3px on a 360x722 phone; one more tightening step (smaller Enter button and Depth row padding) only when needed.
