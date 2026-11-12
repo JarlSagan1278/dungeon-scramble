@@ -48,7 +48,7 @@ const SCREENS = [
 ];
 
 module.exports = { SCREENS, INIT, HELP, URL_ }; // tools/css/styledump.js reuses the screen setups
-if (require.main === module) (async () => {
+if (!process.env.DS_STYLEDUMP) (async () => { // styledump.js sets DS_STYLEDUMP to borrow SCREENS without running the check (check.js require()s this file, so require.main can't be used)
   fs.mkdirSync(OUT, { recursive: true });
   const browser = await chromium.launch(); const out = []; let shown = 0;
   const cmp = await browser.newPage(); // a blank page that encodes/decodes/compares pictures

@@ -3,7 +3,7 @@
 // usage: node tools/css/styledump.js out.json '.die, .die *'      then compare two dumps with tools/css/stylediff.js
 const fs = require('fs');
 let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node22/lib/node_modules/playwright')); }
-const { SCREENS, INIT, HELP, URL_ } = require('../tests/test_screens.js');
+process.env.DS_STYLEDUMP = '1'; const { SCREENS, INIT, HELP, URL_ } = require('../tests/test_screens.js');
 const [outFile, SEL] = process.argv.slice(2);
 const EXTRA = [
   ['dice-states', () => { __fight('pixie', 'arcanist'); render(); const t = S.tray;
