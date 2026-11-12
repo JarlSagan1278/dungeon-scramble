@@ -2008,7 +2008,7 @@ function renderGame(){
   { // during a fast playback redraw only the dice whose markup changed are swapped (bindTrayDice skips bound ones)
     const tray = document.getElementById('tray'), dice = S.tray.map((c,i)=>renderDie(c,i)), keys = dice.map(zoneNorm), prev = renderGame._dice;
     if(fastDOM && prev && prev.length===keys.length && tray.children.length===keys.length){
-      keys.forEach((k,i)=>{ if(k!==prev[i]){ const t = document.createElement('template'); t.innerHTML = dice[i].trim(); if(t.content.firstElementChild) tray.children[i].replaceWith(t.content.firstElementChild); } });
+      keys.forEach((k,i)=>{ if(k!==prev[i]) morphElement(tray.children[i], dice[i]); }); // Nov 12: changed dice in place
     } else tray.innerHTML = dice.join('');
     renderGame._dice = keys;
   }
@@ -2109,7 +2109,7 @@ function renderGame(){
 
 // Turn playback fast path (Nov 4, speed pass): a turn redraws the screen ~7 times (one per die, then the enemy's
 // beats). While a turn plays back, renderGame builds the same markup as always, but instead of replacing the whole
-// screen it swaps only the regions whose markup changed (the route, the two fighters' sides, the vs mark, the quest
+// screen it updates (in place with morphElement since Nov 12) only the regions whose markup changed (the route, the two fighters' sides, the vs mark, the quest
 // sign and the button rail; the tray is always redrawn). Everything outside those regions must match the last
 // redraw exactly, or it falls back to the full redraw. Animation phase offsets (negative delays from the clock)
 // are ignored when comparing. check.js: playback (same screen as the full redraw after every step).
@@ -2132,14 +2132,13 @@ function patchGameDOM(html){
   if(!live.every((n,k)=> n!==false && !!n===want[k])) return false;
   strs.forEach((z,k)=>{
     if(!want[k]) return;
-    if(z!==prev.strs[k]){
-      const t = document.createElement('template'); t.innerHTML = raw[k].trim();
-      const n = t.content.firstElementChild; if(n) live[k].replaceWith(n);
-      return;
-    }
-    // a kept region: drop script-driven animations a full redraw would have dropped with the old element
+    // Nov 12 (one redraw path): a changed region is updated in place (morphElement) instead of swapped whole, so the
+    // parts of it that didn't change keep their element and running CSS animations
+    if(z!==prev.strs[k]) morphElement(live[k], raw[k]);
+    // either way, drop script-driven animations a full redraw would have dropped with the old element
     // (e.g. the monster's wind-up pose, which holds its last frame); CSS animations carry on
-    try{ live[k].getAnimations({subtree:true}).forEach(a=>{ if(!(typeof CSSAnimation!=='undefined' && a instanceof CSSAnimation) && !(typeof CSSTransition!=='undefined' && a instanceof CSSTransition)) a.cancel(); }); }catch(err){}
+    const node = z!==prev.strs[k] ? app.querySelector(GAME_ZONES[k]) : live[k];
+    try{ if(node) node.getAnimations({subtree:true}).forEach(a=>{ if(!(typeof CSSAnimation!=='undefined' && a instanceof CSSAnimation) && !(typeof CSSTransition!=='undefined' && a instanceof CSSTransition)) a.cancel(); }); }catch(err){}
   });
   // what script added outside the regions, which a full redraw would have rebuilt away: the hit shake on the card
   { const col = app.querySelector('#enc-panel .enc-card-col'); if(col && col.classList.contains('enc-impact')){ col.classList.remove('enc-impact'); ['--impact-scale','--impact-rot','--impact-dur'].forEach(v=>col.style.removeProperty(v)); if(!col.getAttribute('style')) col.removeAttribute('style'); } }
@@ -5135,11 +5134,17 @@ function confirmEmptyPocket(go){
 // animations, loaded images, focus and scroll, and properties set by script (onclick etc. are reassigned by the
 // screen's own wiring after each redraw, so handlers must be assigned, or added once with a guard, never stacked).
 // The result must equal a fresh innerHTML of the same markup, attribute order included (text comparisons in the
-// redraw checks rely on it): check.js 'morph' compares them screen state by state.
+// redraw checks rely on it), except clock-based animation phases (zoneNorm), which a kept element keeps from when it
+// was made: check.js 'morph' compares them screen state by state.
 // Nodes are matched by position, tag and id. Goal: replace renderPathOnly / patchGameDOM / renderTrayFast with this.
 function morphHTML(el, html){
   const t = document.createElement('template'); t.innerHTML = html;
   morphChildren(el, t.content);
+}
+function morphElement(old, html){ // one element in place (playback regions): same kind -> updated, else replaced
+  const t = document.createElement('template'); t.innerHTML = html.trim();
+  const n = t.content.firstElementChild; if(!n) return;
+  if(morphSameKind(old, n)) morphNode(old, n); else old.replaceWith(n);
 }
 function morphChildren(from, to){
   const a = [...from.childNodes], b = [...to.childNodes];
@@ -5161,7 +5166,9 @@ function morphNode(f, t){
   if(f.isEqualNode(t)) return;
   const ta = [...t.attributes], fa = [...f.attributes];
   if(ta.length===fa.length && ta.every((at,i)=>at.name===fa[i].name)){
-    ta.forEach(at=>{ if(f.getAttribute(at.name)!==at.value) f.setAttribute(at.name, at.value); });
+    // a value that differs only in a clock-based animation phase (e.g. --gd:-919ms) is left alone: rewriting the delay
+    // of a running animation would jump it ahead; kept as is, it stays in step with the clock it was created on
+    ta.forEach(at=>{ const v = f.getAttribute(at.name); if(v!==at.value && zoneNorm(v)!==zoneNorm(at.value)) f.setAttribute(at.name, at.value); });
   } else { // the attribute set changed: rewrite them in the markup's order, so the result serializes exactly like a fresh draw
     fa.forEach(at=>f.removeAttribute(at.name)); ta.forEach(at=>f.setAttribute(at.name, at.value));
   }

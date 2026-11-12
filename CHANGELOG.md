@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.102 (Nov 12, 2026)
+- Turn playback updates the screen in place: a changed region (a fighter's side, the quest sign, the button rail) and each changed die are updated with morphHTML instead of swapped whole, so their unchanged parts keep running (a playback redraw ~3.9 ms instead of ~4.5 ms in the test browser). Every redraw on the fight screen, camp and setup now goes through morphHTML.
+- Fix (from 1.42.100): an in-place redraw rewrote the dice's clock-based animation phase (--gd), which could put a kept die's idle twitch out of step with the others after a tap. morphHTML now leaves a value that differs only in such a phase alone, so a kept die stays in step. check.js morph compares with those phases normalized; playback, pathrender and trayfast unchanged.
+
 ## 1.42.101 (Nov 12, 2026)
 - Swap, Reroll and Skill taps update the tray in place (morphHTML), like path taps: the dice an action doesn't touch keep their element and running animations, and the swapped/rerolled/converted die still plays its flourish (the class lands fresh on the kept element). trayfast (3 classes) and trayact (18 checks) unchanged; check.js morph covers the Skill conversion.
 - morphHTML keeps attributes in the markup's order when an element gains or loses one (a reroll could add one at the end), so an in-place redraw now serializes exactly like a fresh draw; the full suite caught it (trayfast compares the tray as text). check.js morph now compares exact text too.

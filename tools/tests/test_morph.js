@@ -1,6 +1,6 @@
 // One redraw path (Nov 12, polish roadmap A4): camp redraws in place with morphHTML instead of rebuilding #app.
 // Checks, over a run of real camp actions: after every morph the DOM equals a fresh innerHTML of the same markup
-// (exact serialized text, attribute order included); the
+// (exact serialized text, attribute order included, clock-based animation phases normalized); the
 // campfire (and other unchanged parts) are the same elements after a redraw (so animations don't restart); buttons and
 // dice tiles still work after several redraws; the Upgrade hover hint isn't bound twice.
 // usage: node tools/tests/test_morph.js   (prints ok/FAIL lines)
@@ -18,7 +18,7 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
       orig(el, html); res.morphs++;
       const fresh = document.createElement('div'); fresh.innerHTML = html;
       // the browser's own node equality (tags, attributes in any order, text, all descendants)
-      const same = el.innerHTML === fresh.innerHTML; // exact text, attribute order included
+      const same = zoneNorm(el.innerHTML) === zoneNorm(fresh.innerHTML); // exact text, attribute order included; clock phases normalized (kept elements keep theirs)
       if (!same) {
         const a = el.innerHTML, b = fresh.innerHTML; let i = 0; while (i < a.length && a[i] === b[i]) i++;
         res.bad.push(`after ${res.steps[res.steps.length - 1]}: differs at ${i}: …${a.slice(Math.max(0, i - 60), i + 60)}… vs …${b.slice(Math.max(0, i - 60), i + 60)}…`);
@@ -54,7 +54,7 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     const orig = window.__origMorph || window.morphHTML; window.__origMorph = orig;
     window.morphHTML = function (el, html) { orig(el, html); res.morphs++;
       const fresh = document.createElement('div'); fresh.innerHTML = html;
-      if (el.innerHTML !== fresh.innerHTML) res.bad.push(el.id || el.className); };
+      if (zoneNorm(el.innerHTML) !== zoneNorm(fresh.innerHTML)) res.bad.push(el.id || el.className); };
     META.lifetime.victories = 3; META.achievements['origin_duo'] = { date: Date.now() }; preGameScreen = 'setup'; S = null; render();
     const clickAll = sel => [...document.querySelectorAll(sel)].forEach(n => n.click());
     clickAll('#origin-tab-row > *'); clickAll('#class-tab-row > *'); clickAll('#boon-scroll > *');
@@ -70,7 +70,7 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     const orig = window.__origMorph || window.morphHTML; window.__origMorph = orig;
     window.morphHTML = function (el, html) { orig(el, html);
       const fresh = document.createElement('div'); fresh.innerHTML = html;
-      if (el.innerHTML !== fresh.innerHTML) res.bad.push(el.id || el.className); };
+      if (zoneNorm(el.innerHTML) !== zoneNorm(fresh.innerHTML)) res.bad.push(el.id || el.className); };
     META.lifetime.victories = 3; newGame('gnome', 'guard'); S.guide = null;
     for (let g = 0; g < 10 && !(S.screen === 'game' && S.encounter); g++) { if (S.screen === 'camp') campLeave(); else advanceRoute(); }
     S.transitioning = false; S.newRoomFx = false; S.needRoll = false; document.querySelectorAll('#room-callout,#room-callout-scrim').forEach(n => n.remove()); render();
