@@ -3882,3 +3882,9 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .defeat-keep #carryover-list .swap-item{ cursor:pointer; animation:dk-nudge 2.4s ease-in-out 1.2s infinite; }
 @keyframes dk-nudge{ 0%,86%,100%{ transform:translateY(0); } 90%{ transform:translateY(-4px); } 95%{ transform:translateY(0); } }
 .reduced-motion .defeat-keep #carryover-list .swap-item{ animation:none; }
+
+/* Nov 12: defeat screen next goal (polish roadmap E1) */
+.defeat-goal{ display:flex; flex-direction:column; gap:1px; text-align:center; }
+.dg-goal{ display:block; color:var(--parchment); line-height:1.3; }
+.dg-k{ display:block; font-family:'Metamorphous', serif; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--gold, #d4af52); }
+.dg-prog{ display:block; font-size:.82em; color:var(--parchment-dim); }

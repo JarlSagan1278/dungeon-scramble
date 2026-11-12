@@ -1714,6 +1714,8 @@ function renderEncounterCard(e, mode){
   // them are held back for a future turn) -- easier to read at a glance,
   // and visually consistent between boss and regular encounter cards.
   const nextTurn = enemyNextTurnPreview(e);
+  // Nov 12: hit numbers are what you'll take before Block, so relics that cut hits show in them (tooltip says which)
+  const relicHitNote = ward => { const r = [ward?'Warding Bell halves it':'', hasRelic('gambeson')?'Gambeson -1':''].filter(Boolean); return r.length ? ` (${r.join(', ')})` : ''; };
   const regularActionsRow = (!isBoss) ? (()=>{
     // v1.35.0: elite/deadly enemies telegraph a heavy turn (one stat doubled).
     const hs = nextTurn.heavy ? nextTurn.heavyStat : null;
@@ -1726,7 +1728,8 @@ function renderEncounterCard(e, mode){
     if(e.dot) items.push({type:'dot', stat:'dot', label:'D.O.T.', val:e.dot});
     if(!items.length) return '';
     // Oct 14 (Jeremy): icon + a readable number, no word (the number squeezed inside the icon was illegible); names are for boss specials only.
-    const chips = items.map(it=>{ const v = (it.stat===hs ? it.val*2 : it.val) + (it.stat==='dmg' ? zealBonus(!!hs) : 0); return `<span class="boss-cycle-item next enemy-action-badge${it.stat===hs?' heavy':''}" title="${it.label} ${v}${it.stat===hs?' (heavy turn: doubled)':''}: ${enemyActionTooltip(it.type, v)}">${iconSpanSolid(it.type)}<b class="enc-n">${v}</b></span>`; }).join('');
+    const relicNote = relicHitNote(nextTurn.ward);
+    const chips = items.map(it=>{ const v0 = (it.stat===hs ? it.val*2 : it.val) + (it.stat==='dmg' ? zealBonus(!!hs) : 0); const v = it.stat==='dmg' ? enemyHitTaken(v0, nextTurn.ward) : v0; return `<span class="boss-cycle-item next enemy-action-badge${it.stat===hs?' heavy':''}" title="${it.label} ${v}${it.stat===hs?' (heavy turn: doubled)':''}${it.stat==='dmg'&&v!==v0?relicNote:''}: ${enemyActionTooltip(it.type, v)}">${iconSpanSolid(it.type)}<b class="enc-n">${v}</b></span>`; }).join('');
     return `<div class="boss-cycle-row"><span class="hint" style="margin:0;">Each turn:</span>${chips}</div>`;
   })() : '';
   const art = ART_WRONG.has(e.name) ? null : MONSTER_ART[e.name];
@@ -1736,11 +1739,12 @@ function renderEncounterCard(e, mode){
     // Damage-per-Minion moves show the total for the Minions on your Tray now (literature review, Oct 14): the tiny
     // minion mark says it scales; the tooltip has the per-Minion number. Zeal adds once, as in enemyNextTurnPreview.
     const minsNow = S.tray ? S.tray.filter(c=>c.minion).length : 0;
-    const perMinTotal = (a, hv) => { const t = a.value*minsNow; return t>0 ? t + zealBonus(hv) : 0; };
+    const wardSp = !!nextTurn.ward, relicNote = relicHitNote(wardSp);
+    const perMinTotal = (a, hv) => { const t = a.value*minsNow; return t>0 ? enemyHitTaken(t + zealBonus(hv), hv && wardSp) : 0; };
     const perMinNum = (a, hv) => `<b class="enc-n">${perMinTotal(a, hv)}</b><small class="enc-per">${iconSpan('minion')}</small>`;
     const actText = a => a.type==='dmgPerMinion' ? `${a.value} per Minion on your Tray (${minsNow} now: ${perMinTotal(a, !!a._hv)} damage)` : a.type==='dropShield' ? 'drops its Shield' : enemyActionTooltip(iconKey[a.type], a.value);
     const chip = (a0, extraCls, label) => {
-      const a = a0.type==='dmg' ? {...a0, value:a0.value + (a0.grow ? (e.layers||0) : 0) + zealBonus(false)} : a0; // Zeal (and Extruzeon's layers) show in the warning
+      const a = a0.type==='dmg' ? {...a0, value:enemyHitTaken(a0.value + (a0.grow ? (e.layers||0) : 0) + zealBonus(false), false)} : a0; // Zeal (and Extruzeon's layers) show in the warning
       const ik = iconKey[a.type]; if(!ik) return '';
       const num = a.type==='dmgPerMinion' ? perMinNum(a, false) : `<b class="enc-n">${a.value}</b>`;
       return `<span class="boss-cycle-item next enemy-action-badge ${extraCls}${a.grow?' grows':''}" title="${label ? label+': ' : ((LABEL[ik]||'') ? LABEL[ik]+' '+a.value+': ' : '')}${actText(a)}${a.grow?` (Layer by Layer: grows by ${a.grow} every turn)`:''}">${iconSpanSolid(ik)}${num}${label?' '+label:''}</span>`;
@@ -1749,8 +1753,8 @@ function renderEncounterCard(e, mode){
     const base = kit.each.map(a=>chip(a,'','')).join('');
     const frozen = !!S.freezeNext;
     const spMain0 = sp.acts.find(a=>iconKey[a.type]) || sp.acts[0];
-    const spMain = spMain0.type==='dmg' ? {...spMain0, value:spMain0.value + zealBonus(true)} : spMain0;
-    const spTip = `${sp.name}: ${sp.herald?`(brought ${sp.herald.value} Minions with its warning) `:''}${sp.acts.map(a=>actText({...a,_hv:true})).join(', ')}${frozen?' (cancelled by Freeze)':''}`;
+    const spMain = spMain0.type==='dmg' ? {...spMain0, value:enemyHitTaken(spMain0.value + zealBonus(true), wardSp)} : spMain0;
+    const spTip = `${sp.name}: ${sp.herald?`(brought ${sp.herald.value} Minions with its warning) `:''}${sp.acts.map(a=>actText({...a,_hv:true})).join(', ')}${frozen?' (cancelled by Freeze)':''}${relicNote}`;
     const spNum = !spMain.value ? '' : spMain.type==='dmgPerMinion' ? perMinNum(spMain, true) : `<b class="enc-n">${spMain.value}</b>`;
     const special = `<span class="boss-cycle-item next enemy-action-badge boss-special${sp.windup&&!frozen?' heavy':''}${frozen?' frozen':''}" title="${spTip}">${iconKey[spMain.type]?iconSpanSolid(iconKey[spMain.type]):''}${spNum} ${sp.name}</span>`;
     return `<div class="boss-cycle-row${kit.each.length>1?' crowded':''}"><span class="hint" style="margin:0;">Next turn:</span>${base}${special}</div>`;
@@ -5650,6 +5654,28 @@ function demoTeaserHTML(){
   return `<div class="demo-teaser"><div class="demo-teaser-cap">${BUILD.demo ? 'Floor 3 and the Big Bosses wait in the full game, with dice like these:' : 'Two more floors wait in the full game, with dice like these:'}</div>
     <div class="demo-teaser-row">${dice.map((d,i)=>`<div class="demo-teaser-die" title="${d.name}: ${d.faces.map(f=>LABEL[f.type]+(f.value!=null&&f.type!=='blank'?' '+f.value:'')).join(', ')}"><div class="demo-teaser-top"><img class="demo-teaser-art tier-${GILDED.includes(d)?'gilded':'magic'}" src="${LOOT_ART[d.name]}" alt="${d.name}"><div class="demo-teaser-faces">${d.faces.map(f=>`<span class="demo-face${f.type==='blank'?' blank':''}">${f.type==='blank'?'':iconSpan(f.type, f.value)}</span>`).join('')}</div></div><span class="demo-teaser-name tier-${GILDED.includes(d)?'gilded':'magic'}">${d.name}</span></div>`).join('')}</div></div>`;
 }
+// Nov 12 (polish roadmap E1): a loss is when players decide whether to go again, so name the nearest goal and how this
+// run measured up. One line each, plain words; nothing when there's nothing honest to say.
+function defeatGoalHTML(){
+  const L = META.lifetime || {}, hist = getRunHistory(), prev = hist.slice(1); // [0] is this run (recordRunHistory ran first)
+  let goal = '';
+  if(BUILD.demo){
+    if(!prev.some(r=>r.outcome==='demo')) goal = 'Beat the Floor 2 boss to clear the demo.';
+  } else if(!(L.victories>=1)){
+    goal = 'Your first win unlocks the Halfling, Depth and new relics.';
+  } else if(!((L.victoriesByOrigin||{})[S.origin.id]>=1)){
+    const r = typeof originRelicFor==='function' ? originRelicFor(S.origin.id) : null;
+    if(r) goal = `Win as a ${S.origin.name} to earn its relic, ${r.name}.`;
+  }
+  const e = S.encounter, won = S.stats.encountersDefeated||0;
+  const best = prev.reduce((m,r)=>Math.max(m, r.encountersDefeated||0), 0);
+  let prog = '';
+  if(e && (e.type==='Boss' || e.type==='Big Boss')) prog = `You reached the Floor ${S.floorIdx+1} boss${prev.length && won>best ? ': your furthest yet' : ''}.`;
+  else if(prev.length && won>best && won>0) prog = `Furthest yet: ${won} foe${won>1?'s':''} beaten (best was ${best}).`;
+  if(!goal && !prog) return '';
+  // spans: it replaces the flavor lede (a <p>), so the screen never grows (360x722 is already full)
+  return `<span class="defeat-goal">${goal ? `<span class="dg-goal"><span class="dg-k">Next goal</span>${goal}</span>` : ''}${prog ? `<span class="dg-prog">${prog}</span>` : ''}</span>`;
+}
 function renderGameOver(){
   if(!S.gameOverRecorded){
     S.gameOverRecorded = true;
@@ -5688,7 +5714,8 @@ function renderGameOver(){
     return;
   }
   const carryNote = S.carryoverChosenName ? `<p class="hint">${S.carryoverChosenName} will join your tray at the start of your next run.</p>` : '';
-  app.innerHTML = endScreenHTML({ outcome:'defeat', title:'Defeated', lede:'Your adventurer limps back to town. The dungeon will be waiting.',
+  const goalNote = defeatGoalHTML();
+  app.innerHTML = endScreenHTML({ outcome:'defeat', title:'Defeated', lede: goalNote || 'Your adventurer limps back to town. The dungeon will be waiting.',
     note:carryNote, seal:'', relic:'', again:'Try Again' });
   wireRunCard('defeat');
 }

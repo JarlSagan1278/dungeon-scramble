@@ -2503,19 +2503,30 @@ function zealBonus(heavy){ const r = depthRank('fury'); return r ? 1 + ((r>=2 &&
 // Preview of the enemy's coming turn, for the face-off chips and the bot:
 // {heavy, special, dmg} where dmg is the total direct damage it will deal
 // (before your Block), counting Minions currently on your tray.
+// What one enemy hit of `raw` (Zeal already added) takes off you before Block: the same order as dealEncounterDamage.
+function enemyHitTaken(raw, ward){
+  if(!(raw>0)) return 0;
+  let a = raw;
+  if(ward) a = Math.ceil(a/2);
+  if(hasRelic('gambeson')) a = Math.max(0, a-1);
+  return a;
+}
+// Will Warding Bell halve this enemy's coming heavy turn / boss windup? (once per enemy, as in enemyTakeTurn/bossTakeTurn)
+function wardNext(e, heavyish){ return !!(heavyish && hasRelic('warding_bell') && e && !e._wardUsed); }
 function enemyNextTurnPreview(e){
   if(!e) return {dmg:0};
   initEnemyTurnState(e);
   const mins = S.tray ? S.tray.filter(c=>c.minion).length : 0;
-  const hitOf = (v, hv) => v>0 ? v + zealBonus(hv) : 0;
-  const dmgOf = (acts, hv) => acts.reduce((a,x)=>a + (x.type==='dmg' ? hitOf(x.value + (x.grow ? (e.layers||0) : 0), hv) : x.type==='dmgPerMinion' ? hitOf(x.value*mins, hv) : 0), 0);
+  // Nov 12: per hit, exactly as dealEncounterDamage lands it (Zeal, then Warding Bell's half, then Gambeson's -1), before Block
+  const hitOf = (v, hv, ward) => v>0 ? enemyHitTaken(v + zealBonus(hv), ward) : 0;
+  const dmgOf = (acts, hv, ward) => acts.reduce((a,x)=>a + (x.type==='dmg' ? hitOf(x.value + (x.grow ? (e.layers||0) : 0), hv, ward) : x.type==='dmgPerMinion' ? hitOf(x.value*mins, hv, ward) : 0), 0);
   if(e.kit){
     const sp = bossNextSpecial(e), kit = bossKitNow(e);
-    return {special:sp, heavy:!!sp.windup, dmg: dmgOf(kit.each, false) + (S.freezeNext ? 0 : dmgOf(sp.acts, true))};
+    return {special:sp, heavy:!!sp.windup, ward: wardNext(e, sp.windup), dmg: dmgOf(kit.each, false, false) + (S.freezeNext ? 0 : dmgOf(sp.acts, true, wardNext(e, sp.windup)))};
   }
   if(S.freezeNext) return {heavy:false, dmg:0}; // frozen: the whole turn is skipped (Oct 22)
-  const heavy = enemyHeavyNext(e);
-  return {heavy, heavyStat: heavy ? enemyHeavyStat(e) : null, dmg: hitOf((e.dmg||0) * (heavy && enemyHeavyStat(e)==='dmg' ? 2 : 1), heavy)};
+  const heavy = enemyHeavyNext(e), hs = heavy ? enemyHeavyStat(e) : null;
+  return {heavy, heavyStat: hs, ward: wardNext(e, hs), dmg: hitOf((e.dmg||0) * (hs==='dmg' ? 2 : 1), heavy, wardNext(e, hs))};
 }
 
 // Lethal warning (Oct 13, Jeremy): would the enemy's coming turn, then your own D.O.T. tick, finish you? Follows the
@@ -2536,7 +2547,7 @@ function playerLethalRisk(){
   if((e.curDOT||0) > 0 && e.curDOT >= e.curHealth - (ef ? ef.totalDamage : 0)) return null; // its own D.O.T. tick kills it
   const was = S.freezeNext; S.freezeNext = frozen;
   let pv; try{ pv = enemyNextTurnPreview(e); } finally { S.freezeNext = was; }
-  const hit = Math.max(0, (pv.dmg||0) - (hasRelic('gambeson') && pv.dmg>0 ? 1 : 0));
+  const hit = pv.dmg||0; // relics already counted (enemyHitTaken)
   const taken = Math.max(0, hit - block);
   if(hpAfterPath - taken <= 0) return {hit, block, dot:0, hot:0, hp:hpAfterPath};
   if(hpAfterPath - taken - dot + hot <= 0) return {hit, block, dot, hot, hp:hpAfterPath};
