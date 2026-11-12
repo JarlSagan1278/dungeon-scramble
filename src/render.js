@@ -2262,7 +2262,9 @@ function renderTrayFast(){
   hideFaceTooltip();
   tray.classList.toggle('ability-armed', abilityArmed);
   tray.classList.toggle('trayact-armed', !!S.trayAct);
-  tray.innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join(''); renderGame._dice = null;
+  // Nov 12 (one redraw path): in place, like path taps. The one-shot flourish classes (just-swapped/rerolled/converted)
+  // are in the markup for this redraw only, so they're added fresh to the kept die and their animation plays.
+  const dice = S.tray.map((c,i)=>renderDie(c,i)); morphHTML(tray, dice.join('')); renderGame._dice = dice.map(zoneNorm);
   bindTrayDice();
   renderPathStrip();
   const ab = document.getElementById('ability-btn');

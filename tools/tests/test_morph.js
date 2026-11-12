@@ -88,6 +88,24 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
   out.push((ft.taps >= 1 && !ft.bad.length && ft.coins === ft.taps ? 'ok   ' : 'FAIL ') + `fight: ${ft.taps} path taps update the dice and coins in place and match a fresh draw${ft.bad.length ? ': ' + ft.bad.join(', ') : ''}`);
   out.push((ft.kept ? 'ok   ' : 'FAIL ') + 'fight: a die the tap did not change keeps its element (its animations keep running)');
   out.push((ft.turnRan ? 'ok   ' : 'FAIL ') + 'fight: Go plays the turn after in-place path taps');
+  // tray actions (renderTrayFast): the Skill converts a die in place; its flourish class lands on the kept element
+  const sk = await p.evaluate(() => {
+    const res = {};
+    META.lifetime.victories = 3; META.coachSeen = { armsmaster: 1, guard: 1, dungeoneer: 1, arcanist: 1 }; newGame('dwarf', 'armsmaster'); S.guide = null;
+    for (let g = 0; g < 10 && !(S.screen === 'game' && S.encounter); g++) { if (S.screen === 'camp') campLeave(); else advanceRoute(); }
+    S.transitioning = false; S.newRoomFx = false; S.needRoll = false; S.tray.forEach(c => { c.minion = false; c.blank = false; c.coveredDie = null; });
+    render(); document.querySelectorAll('.modal-overlay,#symbol-intro,#room-callout,#room-callout-scrim').forEach(n => n.remove());
+    const z = [...Array(16).keys()].find(i => inZone(i)), other = [...Array(16).keys()].find(i => !inZone(i));
+    const dz = document.querySelectorAll('#tray > .die')[z], dOther = document.querySelectorAll('#tray > .die')[other];
+    document.getElementById('ability-btn').click(); document.querySelectorAll('#tray > .die')[z].click();
+    const nz = document.querySelectorAll('#tray > .die')[z];
+    res.converted = !!(S.tray[z].forcedFace && S.classAbilityUsed);
+    res.keptZone = nz === dz; res.keptOther = document.querySelectorAll('#tray > .die')[other] === dOther;
+    res.flourish = nz.classList.contains('ability-convert') || nz.classList.contains('just-converted') || /convert/.test(nz.className);
+    return res;
+  });
+  out.push((sk.converted && sk.keptOther ? 'ok   ' : 'FAIL ') + `tray actions: the Skill converts a die in place and the other dice keep their elements (${JSON.stringify(sk)})`);
+  out.push((sk.flourish ? 'ok   ' : 'FAIL ') + 'tray actions: the converted die gets its flourish class (its animation plays on the kept element)');
   out.push((r.morphs >= 7 && !r.bad.length ? 'ok   ' : 'FAIL ') + `camp redraws in place and matches a fresh draw after every step (${r.morphs} redraws${r.bad.length ? ': ' + r.bad.slice(0, 2).join(' | ') : ''})`);
   out.push((r.fireKept ? 'ok   ' : 'FAIL ') + 'the campfire and hero stay the same elements across a redraw (animations keep running)');
   out.push((r.restWorks ? 'ok   ' : 'FAIL ') + 'Rest still opens its confirm after many redraws');
