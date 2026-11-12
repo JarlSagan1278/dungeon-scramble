@@ -8,6 +8,14 @@ const [outFile, SEL] = process.argv.slice(2);
 const CAMP = `__fight(); S.screen = 'camp'; S.floorIdx = 0; S.routeStep = 4; S.campChoice = null; S.campRested = false; S.campFireOut = false; S.campUpgrades = {};
   S.backPocket = [clone(basic('attack', 1)), clone(basic('attack', 1)), clone(basic('attack', 1)), clone(basic('maneuver', 1))]; S.health = Math.max(1, S.maxHealth - 5);`;
 const EXTRA = [
+  ['loot-open', () => { __fight(); S.encounter.curHealth = 0; onEncounterDefeated(); S.lootChoice.opened = true; render(); }],
+  ['loot-picked', () => { __fight(); S.encounter.curHealth = 0; onEncounterDefeated(); S.lootChoice.opened = true; render(); const o = document.querySelector('.loot-option, .loot-modal .swap-item, .loot-modal [data-loot]'); if (o) o.click(); }],
+  ['shrine-choice', () => { __fight(); const s = [].concat(...FLOORS.map(f => f.shrines)).find(x => x.effect && x.effect.type === 'choice') || FLOORS[0].shrines[0];
+    const o = window.drawRoomCard; window.drawRoomCard = () => s; S.encounter = drawEncounter('enc'); window.drawRoomCard = o; S.screen = 'shrine'; S.shrineResult = null; render(); applyShrineBoon(S.encounter); render(); }],
+  ['shrine-done', () => { __fight(); const s = FLOORS[0].shrines.find(x => !(x.effect && x.effect.type === 'choice')) || FLOORS[0].shrines[0];
+    const o = window.drawRoomCard; window.drawRoomCard = () => s; S.encounter = drawEncounter('enc'); window.drawRoomCard = o; S.screen = 'shrine'; S.shrineResult = null; render(); applyShrineBoon(S.encounter);
+    for (let g = 0; g < 6; g++) { if (S.relicChoice) chooseRelic(S.relicChoice.options[0]); else if (S.lootChoice || S.pendingLootDie) break; else break; } render(); }],
+  ['setup-fresh', () => { META.lifetime.victories = 0; preGameScreen = 'setup'; S = null; render(); }],
   ['camp-train', `(() => { ${CAMP} S.campChoice = 'train'; render(); })()`],
   ['camp-rested', `(() => { ${CAMP} S.campChoice = 'rest'; S.campRested = true; S.campHealed = 4; render(); })()`],
   ['camp-out', `(() => { ${CAMP} S.campFireOut = true; render(); })()`],

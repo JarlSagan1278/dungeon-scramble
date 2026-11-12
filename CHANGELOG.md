@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.94 (Nov 12, 2026)
+- Code tidy, no visible change: four more components' styles merged into one block each with tools/css: loot window (94 rules -> 81), equip window (53 -> 36), shrine (71 -> 66) and setup screen (38 -> 37); stylesheet 3,800 -> 3,740 lines. Kept in place: the defeat screen's keep-a-die tile (it reuses .swap-item), the shrine's boon sign (it overrides the quest poster) and the tap-cue rules. stylediff: 0 differences on each, at both phone sizes; styledump gained loot-open, shrine-choice, shrine-done and setup-fresh states.
+
 ## 1.42.93 (Nov 12, 2026)
 - Code tidy, no visible change: camp's styles (112 rules: camp-, campfire-, cf-, organize-, upgrade-) merged into one "Camp" block (92 rules, 3 fewer !important, 50 lines shorter). The dice tiles and stack badges in Organize/Pocket stay where they were (they override the dice block), as do the tap-cue rules. stylediff: 0 differences on camp (5 camp states) and dice, both phone sizes. styledump gained camp states (train, rested, fire out, organize pick).
 

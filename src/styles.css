@@ -70,19 +70,10 @@
   button.pocket-btn:hover:not(:disabled){ background:#5a8bb0; }
   .panel{ border:1px solid var(--line); border-radius:var(--r-md); padding:6px 6px; }
 
-  /* Setup screen (character creation) -- a WoW-style icon-row -> contextual
-     detail-panel pattern: tapping an Origin/Class icon fills one shared
-     panel below it rather than showing every option's full card at once
-     (the old 2-up grid of cards this replaced). Sized to fit the whole
-     screen within one phone-height viewport without scrolling. */
-  .setup-name-row{ display:flex; align-items:center; gap:6px; margin:0 0 10px; }
   .char-name-input{ font-size:18px; letter-spacing:0.3px; background:transparent; border:none;
     outline:none; padding:0 0 2px 0; max-width:220px; }
   .char-name-input:hover, .char-name-input:focus{ border-bottom-color:var(--gold); }
   .char-name-pencil{ flex-shrink:0; }
-  .setup-section{ display:flex; flex-direction:column; gap:6px; margin:0 0 10px; }
-  .setup-label{ font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; color:var(--parchment-dim); user-select:none; }
-  .setup-label-sub{ text-transform:none; font-weight:normal; font-size:10.5px; }
 
   /* That character's real portrait art, run through brightness(0) so only
      its silhouette shows -- see lockedOriginPortraitHTML(), render.js. Still
@@ -782,14 +773,7 @@
      than a fixed pixel size so it always reaches past the screen's corners
      regardless of device. screenShake() (render.js) fires alongside it for
      the physical half of the same beat. */
-  .loot-sunray-burst{ position:absolute; inset:0; overflow:hidden; pointer-events:none; display:flex; align-items:center; justify-content:center; }
-  .loot-sunray-wheel{ position:absolute; width:130vmin; height:130vmin; will-change:transform, opacity; /* Oct 13: was 220vmax (and two wheels) -- too much to paint on phones */
-    background:repeating-conic-gradient(var(--sunray-color, var(--gold)) 0deg 9deg, transparent 9deg 27deg);
-    animation: loot-sunray-kf 0.6s ease-out both; }
-  /* Overkill (or a Boss's 3-option draw) gets a denser wheel (narrower
-     wedges) plus this second, slightly delayed layer underneath -- reads as
-     a bigger burst for a bigger haul, not just a recolored one. */
-  .loot-sunray-wheel.loot-sunray-wheel-big{ background:repeating-conic-gradient(var(--sunray-color, var(--gold)) 0deg 7deg, transparent 7deg 21deg); }
+
   @keyframes loot-sunray-kf{
     0%{ opacity:0; transform: scale(0.2) rotate(0deg); }
     18%{ opacity:0.8; }
@@ -901,7 +885,6 @@
   .title-btn-col{ display:flex; flex-direction:column; gap:7px; width:66%; margin:0 auto; }
   .title-btn-col button{ font-size:13px; padding:9px 14px; }
   .title-btn-col .hint{ font-size:11px; }
-  .setup-back-btn{ display:inline-flex; align-items:center; gap:5px; font-size:12px; padding:5px 12px 5px 9px; margin:0 0 10px; border-radius:var(--r-pill); }
 
   .compendium-tier{ margin-bottom:14px; text-align:left; }
   .compendium-list{ display:flex; flex-direction:column; gap:5px; max-height:220px; overflow-y:auto; margin-top:6px; }
@@ -914,94 +897,34 @@
   .compendium-main{ flex:1 1 auto; min-width:0; }
   .compendium-faces{ display:flex; gap:4px; flex-wrap:wrap; opacity:0.85; }
   .compendium-faces .icon-svg{ width:13px; height:13px; }
-  /* Closed chest shown first on the loot screen (renderLootModal(), render.js):
-     bobs and pulses in the loot's tier color, flips edge-on when tapped. */
-  .loot-chest-btn{ display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; padding:18px 0 8px; border-radius:0; cursor:pointer; color:var(--loot-tier-color, var(--gold)); }
-  .loot-chest-btn:hover:not(:disabled), .loot-chest-btn:active:not(:disabled){ background:transparent; box-shadow:none; transform:none; }
-  .loot-chest{ width:120px; height:104px; border-radius:var(--r-lg); background:var(--panel2); border:2.5px solid var(--loot-tier-color, var(--gold));
-    display:flex; align-items:center; justify-content:center;
-    animation: loot-chest-glow 1.6s ease-in-out infinite; } /* + the shared tap knock (end of file) */
-  .loot-chest-btn.opening .loot-chest{ animation: loot-chest-flip 0.48s ease-in-out both; }
+
+   /* + the shared tap knock (end of file) */
+
   @keyframes loot-chest-glow{ 0%,100%{ box-shadow:0 0 0 0 var(--loot-tier-glow, rgba(212,175,82,0.5)); } 50%{ box-shadow:0 0 0 14px transparent; } }
   @keyframes loot-chest-flip{ 0%{ transform:rotateY(0) scale(1); } 45%,55%{ transform:rotateY(90deg) scale(1.08); } 100%{ transform:rotateY(180deg) scale(1); } }
-  .loot-options{ display:flex; gap:10px; margin:12px 0; flex-wrap:wrap; justify-content:center; }
-  .loot-opt{ flex:1 1 calc(50% - 10px); min-width:140px; max-width:220px; background:var(--panel2); border:2px solid var(--line); border-radius:var(--r-md); padding:8px; cursor:pointer; transition: transform .08s; }
+
   @media (hover:hover){ .loot-opt:hover{ border-color:var(--loot-tier-color, var(--gold)); transform: translateY(-2px); } } /* Oct 31: no sticky hover on touch screens (Jeremy: shrine's middle option looked picked) */
-  .loot-opt h4{ margin:4px 0 0; font-size:13px; color:var(--parchment); text-align:center; }
-  /* Reveal pop-in + ambient glow (mirrors dieSettle/glowPulse from the
-     loot-reveal-animation mockup): each card springs in on its own short
-     stagger (animation-delay set inline per card index in renderLootModal())
-     instead of all appearing at once, and its ambient glow pulses in the
-     loot's own tier color (--loot-tier-color/--loot-tier-glow, set inline)
-     for as long as it's on screen. */
-  .loot-opt-reveal{ animation: loot-opt-settle 0.4s cubic-bezier(.34,1.56,.64,1) both; }
-  /* Oct 13: the pulsing glow fades a fixed shadow layer (cheap) instead of repainting box-shadow every frame */
-  .loot-opt-reveal::after{ content:''; position:absolute; inset:-2px; border-radius:inherit; pointer-events:none; box-shadow:0 0 14px 3px var(--loot-tier-glow, rgba(212,175,82,0.4)); opacity:0; animation: loot-opt-glow 1.8s ease-in-out 0.4s infinite; will-change:opacity; }
-  .loot-opt.loot-chosen::after, .loot-opt.loot-faded::after{ animation:none; opacity:0; }
+
   @keyframes loot-opt-settle{
     0%{ transform:scale(0.5) rotate(-6deg); opacity:0; }
     55%{ transform:scale(1.06) rotate(2deg); opacity:1; }
     100%{ transform:scale(1) rotate(0deg); opacity:1; }
   }
   @keyframes loot-opt-glow{ 0%,100%{ opacity:0; } 50%{ opacity:1; } }
-  /* Oct 13 (Jeremy): no scrollbar flash while the picked card grows and its fanfare beam rises */
-  .loot-modal.loot-picking{ overflow:hidden !important; }
-  /* Ball x Pit-style comet streaks whooshing outward from each card's
-     center as it settles in -- the single most-liked effect from the
-     mockup this was prototyped in. See lootStreaksHTML()/render.js. */
-  .loot-opt-streaks{ position:absolute; left:50%; top:42%; width:0; height:0; pointer-events:none; z-index:0; }
-  .loot-streak-wrap{ position:absolute; left:0; top:0; width:0; height:0; }
-  .loot-streak{ position:absolute; left:0; top:-1px; width:46px; height:2px; transform-origin:0 50%;
-    background:linear-gradient(90deg, var(--loot-tier-color, var(--gold)), transparent);
-    opacity:0; animation: loot-streak-kf 0.5s ease-out both; }
+
   @keyframes loot-streak-kf{
     0%{ opacity:0; transform: scaleX(0); }
     22%{ opacity:1; }
     60%{ opacity:0.85; }
     100%{ opacity:0; transform: scaleX(1.3); }
   }
-  /* The moment a card is actually picked (pickLootOption(), render.js): the
-     chosen card scales up with a tier-colored glow and sits still, every
-     other option fades away, and the Zelda-style fanfare below plays over
-     the chosen one. */
-  .loot-opt.loot-chosen{ animation:none; transform:scale(1.08); box-shadow:0 0 22px 6px var(--loot-tier-glow, rgba(212,175,82,0.5)); pointer-events:none; z-index:2; }
-  .loot-opt.loot-faded{ animation:none; opacity:0.18; transform:scale(0.86); pointer-events:none; transition: opacity .2s, transform .2s; }
-  .loot-fanfare{ position:absolute; left:50%; top:50%; width:0; height:0; pointer-events:none; z-index:3; }
-  .loot-fanfare-beam{ position:absolute; left:50%; bottom:0; width:20px; height:170px; margin-left:-10px; transform-origin:bottom;
-    background:linear-gradient(to top, var(--loot-tier-color, var(--gold)), transparent); opacity:0.6; filter:blur(1px);
-    animation: loot-beam-rise 0.9s ease-out both; }
-  .loot-fanfare-ray-wrap{ position:absolute; left:0; top:0; width:0; height:0; }
-  .loot-fanfare-ray{ position:absolute; left:0; top:-1.5px; width:46px; height:3px; transform-origin:0 50%;
-    background:linear-gradient(90deg, var(--loot-tier-color, var(--gold)), transparent);
-    animation: loot-ray-flare 0.7s ease-out 0.05s both; }
-  .loot-fanfare-ring{ position:absolute; left:-34px; top:-34px; width:68px; height:68px; margin-top:-16px; border-radius:50%;
-    border:2px solid var(--loot-tier-color, var(--gold)); animation: loot-chime-ring 0.8s ease-out both; }
+
   @keyframes loot-beam-rise{ 0%{ opacity:0; transform:scaleY(0.15); } 30%{ opacity:0.85; } 100%{ opacity:0; transform:scaleY(1); } }
   @keyframes loot-ray-flare{ 0%{ opacity:0; transform:scaleX(0); } 30%{ opacity:0.9; } 100%{ opacity:0; transform:scaleX(1.3); } }
   @keyframes loot-chime-ring{ 0%{ opacity:0.85; transform:scale(0.3); } 100%{ opacity:0; transform:scale(2.4); } }
-  .reduced-motion .loot-opt-reveal{ animation:none; opacity:1; }
-  .reduced-motion .loot-sunray-burst,
-  .reduced-motion .loot-streak,
-  .reduced-motion .loot-fanfare-beam,
-  .reduced-motion .loot-fanfare-ray,
-  .reduced-motion .loot-fanfare-ring{ display:none; }
-  /* Sized like a real tray die (~72px) rather than the tray's own
-     container-query-relative sizing, since this tile lives outside a
-     .tray-wrap -- a fixed size keeps the icon/name-tag proportions the
-     same as in-tray without depending on a query container that isn't
-     there. */
-  .loot-preview-tile{ width:72px; height:72px; margin:0 auto 8px; cursor:default; }
-  .loot-preview-tile .face-val{ font-size:32px; }
+
   .faces{ display:flex; gap:3px; flex-wrap:wrap; font-size:9px; }
-  /* The loot screen's own face chips used to be forced onto one line
-     (nowrap + horizontal scroll) inside a narrow ~140-220px card, with no
-     visual hint that there was more to scroll to -- in practice the chips
-     just got clipped at the card edge, cutting words like "Hit2" down to
-     "t2". Wrapping onto two rows instead keeps every chip fully visible and
-     readable, so the bump in font size/padding below doesn't need to fight
-     a fixed single line to fit. */
-  .loot-opt .faces{ flex-wrap:wrap; justify-content:center; gap:4px; }
-  .loot-opt .faces span{ font-size:11px; padding:4px 7px; }
+
   /* The icon and its label/value text are built with no space between them
      in the template (e.g. iconSpan() + "Hit" + "2" -> "Hit2" is intentional),
      but that also ran the icon itself flush against the very next letter
@@ -1009,12 +932,7 @@
      A small margin after the icon fixes that without touching the many call
      sites that build these chips. */
   .faces span .icon-svg{ margin-right:3px; }
-  /* Pinned to an explicit pixel size rather than relying on the icon's
-     default 1em sizing -- at this span's bumped-up font-size, the 1em grid
-     box and the SVG inside it stopped agreeing on size (the artwork was
-     rendering noticeably bigger than its own box and bleeding into the
-     label text right after it). */
-  .loot-opt .faces .icon-svg{ width:11px; height:11px; }
+
   /* Same inked-token treatment as .path-chip (above) rather than a flat
      solid-color tag -- these face previews (loot options, upgrade-dice
      results) are "what's printed on this die", so they read better as a
@@ -1025,55 +943,10 @@
     border-radius:var(--r-md); padding:3px 6px; white-space:nowrap; flex:0 0 auto;
     box-shadow:0 1px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); }
 
-  /* padding-top here is deliberately bigger than the count badge's -6px
-     overflow below (see .swap-count-badge) -- otherwise the top row's
-     badges would poke past this list's own edge and get sliced off by its
-     overflow-y:auto (setting overflow-y alone forces overflow-x to clip
-     too, per spec, so this box does clip, not just scroll). */
-  .swap-list{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-height:440px; overflow-y:auto; margin:8px 0; padding:10px 4px 4px; }
-  .swap-item{ position:relative; z-index:0; background:var(--panel2); border:2px solid var(--line); border-radius:var(--r-md); padding:8px; cursor:pointer; transition: transform .08s; width:88px; }
-  .swap-item:hover{ border-color:var(--gold); transform: translateY(-2px); z-index:1; }
-  .swap-item .loot-preview-tile{ margin-bottom:0; }
-  /* Same count-badge design language as Camp's stacked dice (.camp-stack-badge)
-     -- solid gold circle, dark bold number, thin border matching the
-     surrounding background -- instead of the old generic white "x3" pill,
-     so a die count reads the same wherever dice are grouped. */
-  .swap-item .swap-count-badge{ position:absolute; top:-6px; right:-6px; z-index:1;
-    background:var(--gold); color:#241c10; border:1.5px solid var(--line);
-    font-size:10px; font-weight:800; border-radius:9px; padding:1px 6px; min-width:15px; line-height:1.4; }
-  .swap-item-label{ margin-top:6px; font-size:10px; line-height:1.25; text-align:center; color:var(--parchment-dim); word-break:break-word; }
-  /* Used by the Starting Boon picker (Setup screen) -- its "None" option
-     and whichever die is currently picked get a highlighted border/glow so
-     the choice (unlike the carryover list above, which is a one-time pick
-     with no way back) is clearly a toggle you can change your mind on. */
-  .swap-item.selected{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold), 0 0 8px 1px rgba(212,175,82,0.5); }
   .small-btn-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
   .hint{ font-size:12px; color:var(--parchment-dim); margin:6px 0; }
   a{ color: var(--gold); }
 
-/* Compact loot screen: a smaller card so the sunray burst, streaks and
-   fanfare around it actually read, instead of hiding behind a big panel.
-   Backdrop is also lighter so the rays show through. */
-.loot-overlay{ background:rgba(0,0,0,0.55); }
-.loot-modal{ max-width:340px; padding:10px 12px 12px; }
-.loot-modal h2{ font-size:16px; }
-.loot-modal p{ margin:4px 0; text-align:center; }
-.loot-modal .loot-chest-btn{ padding:6px 0 2px; gap:8px; }
-.loot-modal .loot-chest{ width:76px; height:66px; border-radius:12px; }
-.loot-modal .loot-chest svg{ width:36px; height:36px; }
-.loot-modal .loot-preview-tile{ width:52px; height:52px; margin-bottom:4px; }
-.loot-modal .loot-preview-tile .face-val{ font-size:22px; }
-.loot-modal .loot-opt .faces{ gap:3px; }
-.loot-modal .loot-opt .faces span{ font-size:8px; padding:2px 3px; }
-.loot-modal .loot-opt .faces .icon-svg{ width:9px; height:9px; }
-/* Closed-chest phase only: a narrow, centered card -- just the title and the chest. */
-.loot-modal.loot-modal-chest{ max-width:220px; }
-.loot-modal.loot-modal-chest h2{ padding-right:0; text-align:center; }
-.loot-modal.loot-modal-chest .loot-chest-btn{ padding:10px 0 6px; }
-/* Closed chest fills the narrow card and twitches (quick shake, then a
-   pause) until tapped; the .opening flip animation replaces it. */
-.loot-modal.loot-modal-chest .loot-chest svg{ width:84px; height:84px; }
-.loot-modal.loot-modal-chest .loot-chest-btn.opening .loot-chest{ animation: loot-chest-flip 0.48s ease-in-out both; }
 @keyframes loot-chest-twitch{
   0%,52%,100%{ transform:translate(0,0) rotate(0); }
   55%{ transform:translate(-3px,0) rotate(-3deg); }
@@ -1083,10 +956,6 @@
   67%{ transform:translate(-1px,0) rotate(-1deg); }
   70%{ transform:translate(0,0) rotate(0); }
 }
-/* Illustrated chest (lootChestSVG): no frame box, the art is the button. */
-.loot-modal.loot-modal-chest .loot-chest{ width:100%; height:auto; background:none; border:none; border-radius:0; box-shadow:none;
-  animation: loot-chest-twitch 2.2s ease-in-out infinite; }
-.loot-modal.loot-modal-chest .loot-chest .loot-chest-svg{ width:100%; height:auto; display:block; }
 
 /* ---- Relics ---- */
 .relic-badge{ display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%;
@@ -1147,7 +1016,7 @@
   .new-tag{ display:inline-block; background:var(--gold); color:#241c10; font-size:9px; font-weight:900; letter-spacing:.5px; padding:1px 5px; border-radius:999px; vertical-align:middle; animation: new-tag-pop .5s cubic-bezier(.3,1.6,.4,1) both; }
   .new-tag-card{ position:absolute; top:6px; right:6px; z-index:5; font-size:11px; padding:2px 7px; box-shadow:0 0 10px rgba(255,215,106,.8); }
   @keyframes new-tag-pop{ from{ transform:scale(0) rotate(-20deg);} to{ transform:scale(1) rotate(0);} }
-  .loot-opt{ position:relative; }
+
   #floor-card{ position:fixed; inset:0; z-index:9000; display:flex; align-items:center; justify-content:center; pointer-events:none; animation: floor-card-bg 1.7s ease-out both; }
   .floor-card-box{ text-align:center; animation: floor-card-in 1.7s cubic-bezier(.2,.9,.3,1) both; }
   .floor-card-num{ font-size:34px; color:var(--gold); letter-spacing:4px; text-transform:uppercase; -webkit-text-stroke:1px #241c10; }
@@ -1190,11 +1059,6 @@
   /* Dice are bigger now: center the icon + label in the area under the name arc instead of bottom-stacking (which pushed icons up into the name). */
   .die{ padding-top:17px !important; padding-bottom:3px !important; justify-content:center !important; gap:0; }
 
-  /* Loot cards: faces as plain icon dots (no text labels, blanks hidden). */
-  .loot-modal h2{ border-bottom:none; padding-bottom:0; margin-bottom:6px; text-align:center; }
-
-  /* Loot cards: each face as a mini die tile (die color, small icon, name underneath). */
-  .loot-modal .loot-opt .faces-tiles{ display:grid; }
   .mini-face{ display:flex; flex-direction:column; align-items:center; justify-content:center; width:40px; height:40px; border-radius:var(--r-sm);
     border:2px solid var(--line); box-shadow:0 2px 0 var(--line); line-height:1; color:#241c10; }
   .mini-face small{ font-size:8px; font-weight:900; margin-top:2px; white-space:nowrap; }
@@ -1207,8 +1071,6 @@
   .mini-face .icon-svg, .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ box-shadow:none; width:22px; height:22px; margin:1px 0 1px; border-radius:50%; }
   .mini-face .icon-svg svg{ inset:1px; width:calc(100% - 2px); height:calc(100% - 2px); }
 
-  /* Final mini-face icon: plain glyph, no chip styling (the old .faces chip rules added a dark disc). */
-  .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ background:transparent; box-shadow:none; border-radius:0; color:#241c10; }
   .mf-attack .icon-svg, .mf-magic .icon-svg{ color:#fff !important; }
   .mini-face .icon-value-overlay{ font-size:9px; font-weight:900; }
   /* Only two loot options: shrink the modal to hug them. */
@@ -1245,7 +1107,6 @@
   .util-btn.rail-go{ flex:1 1 auto !important; height:auto !important; min-height:60px; font-size:22px !important; }
   .util-btn.rail-clear{ flex:0 0 auto !important; height:38px !important; font-size:12px !important; }
   .util-btn.rail-go span, .util-btn.rail-clear span, .util-btn.rail-ability span{ font-size:10px; }
-  .setup-panel .class-showcase-name{ color:#fff1d6; text-shadow:0 0 0 var(--class-color); border-bottom:3px solid var(--class-color); padding-bottom:1px; }
 
   /* ===== Fonts: Metamorphous for titles/names/banners, MedievalSharp for buttons, numbers, chips and dice labels ===== */
   h1,h2,h3,.enc-name-txt,.origin-showcase-name,.class-showcase-name,.kill-callout-line,.room-callout-line,.floor-card-num,.floor-card-name,.char-name-input,.camp-section-title{ font-family:var(--font-display) !important; font-weight:400; }
@@ -1281,8 +1142,7 @@
   .panel{ background:var(--brown-dark); }
   .enc-card{ background:var(--brown-light) !important; }
   .enc-portrait{ background:transparent !important; }
-  .setup-panel{ background:var(--b2) !important; }
-  .setup-panel .origin-showcase, .setup-panel .class-showcase, .setup-panel .boon-showcase{ background:var(--brown-light) !important; }
+
   /* unique rail button colors */
   .util-btn.rail-ability{ background:#6a45a8 !important; color:#fff1d6; }
   .util-btn.rail-go{ background:var(--gold) !important; color:#241c10; }
@@ -1303,24 +1163,6 @@
   .enc-card-body{ padding-bottom:0; }
 
   /* ===== Loot picker: one wide row per option (big die left, faces in a 3x2 grid right) so 3 options still fit ===== */
-  .loot-modal:not(.loot-modal-chest), .loot-modal.loot-modal-n2:not(.loot-modal-chest){ max-width:350px !important; }
-  .loot-modal .loot-options{ flex-direction:column !important; flex-wrap:nowrap !important; gap:8px !important; margin:8px 0 0 !important; }
-  .loot-modal .loot-opt{ flex:0 0 auto !important; width:100% !important; max-width:none !important; min-width:0 !important; padding:8px 10px !important;
-    display:grid !important; grid-template-columns:92px 1fr; column-gap:12px; align-items:center; background:var(--brown-light) !important; }
-  .loot-modal .loot-opt .loot-preview-tile{ grid-column:1; justify-self:center; margin:0; }
-  .loot-modal .loot-opt .loot-preview-tile .face-val{ font-size:30px; }
-  .loot-modal .loot-opt .faces-tiles{ grid-column:2; grid-row:1 / span 2; grid-template-columns:repeat(3,1fr) !important; gap:5px !important; justify-content:stretch; }
-  .loot-modal .loot-opt .mini-face{ width:100%; height:58px; }
-  .loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ width:30px; height:30px; }
-  .loot-modal .loot-opt .mini-face small{ font-size:9.5px; }
-  .loot-modal .loot-opt .new-tag-card{ top:-8px; right:8px; left:auto; }
-  .loot-modal p{ font-size:13px; }
-
-  /* Loot picker: the item art lives on the big die face itself (the six faces are already shown beside it) */
-  .loot-modal .loot-opt .loot-preview-tile{ grid-row:1 / span 2 !important; width:92px !important; height:92px !important; position:relative; }
-  .loot-modal .loot-opt .loot-tile-art{ position:absolute; left:50%; top:58%; transform:translate(-50%,-50%); width:54px; height:54px; object-fit:contain; filter:drop-shadow(1px 2px 0 rgba(0,0,0,.35)); pointer-events:none; }
-  /* name arc is drawn on a 63x20 box: scale its height with the wider loot tile so the text isn't stretched */
-  .loot-modal .loot-opt .loot-preview-tile .name-tag{ height:27px; }
 
   /* Round badge matches the height of the action coins beside it */
   .tray-head .round-badge{ box-sizing:border-box; height:30px; display:inline-flex; align-items:center; padding:0 11px; font-size:11px; border-radius:15px; }
@@ -1426,9 +1268,6 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 
 .util-btn.rail-ability.armed{ background:var(--class-color,var(--gold)) !important; color:#fff !important; box-shadow:0 0 0 2px #fff6, 0 0 12px var(--class-color,gold); }
 
-/* Loot chest: the art is the button -- no frame lines around it */
-.loot-chest-btn, .loot-chest-btn:hover, .loot-chest-btn:active, .loot-chest-btn:focus{ border:none !important; filter:none !important; box-shadow:none !important; outline:none !important; background:transparent !important; }
-
 #room-callout{ position:fixed; left:50%; margin:0; z-index:97; transform:translate(-50%,-50%); width:max-content; max-width:92vw; }
 #room-callout{ display:flex; justify-content:center; }
 #room-callout .room-callout-box{ margin:0 auto; max-width:100%; box-sizing:border-box; }
@@ -1512,8 +1351,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .path-strip{ min-height:36px; box-sizing:border-box; }
 
 /* ---- v1.32: anticipation pips, near-miss chip, run highlights, origin relic ---- */
-.loot-tap-hint{ font-size:12px; letter-spacing:.06em; opacity:.75; }
-.loot-chest-btn.opening .loot-tap-hint{ visibility:hidden; }
+
 .near-miss-chip{ background:rgba(255,138,61,.16) !important; color:#ffb877 !important; border:1px solid rgba(255,138,61,.5) !important; }
 .run-highlights .hl-row{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:5px 0; border-top:1px solid var(--line); }
 .run-highlights .hl-row:first-of-type{ border-top:none; }
@@ -1597,8 +1435,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
   85%{ transform:translate(3px,-2px) rotate(3deg) scale(1.11); filter:drop-shadow(0 0 20px var(--loot-tier-glow,#ffd76a)) brightness(1.5); }
   100%{ transform:translate(0,0) scale(1.14); filter:drop-shadow(0 0 30px var(--loot-tier-glow,#ffd76a)) brightness(1.9); }
 }
-.loot-chest-btn.opening .loot-chest-svg{ animation: chest-build-kf 1s ease-in .35s both; transform-origin:50% 80%; }
-.reduced-motion .loot-chest-btn.opening .loot-chest-svg{ animation:none; }
+
 /* Tray settles in with each new room */
 @keyframes tray-room-in-kf{ 0%{ opacity:.25; transform:translateY(14px) scale(.97); } 70%{ opacity:1; transform:translateY(-2px) scale(1.005); } 100%{ transform:none; } }
 .tray.tray-room-in{ animation: tray-room-in-kf .45s ease-out both; }
@@ -1967,10 +1804,7 @@ body{ -webkit-tap-highlight-color:transparent; }
 .seal-unlock{ margin-top:6px; font-size:12px; color:var(--gold); }
 
 /* ---- Setup headings: game-style banners, collapsible Depth, thicker seal ---- */
-.setup-panel .setup-label{ display:flex; align-items:center; justify-content:center; gap:10px; font-family:var(--font-display); font-size:13px; font-weight:400; letter-spacing:2.5px; color:var(--gold); text-shadow:0 2px 0 #0c0705, 0 0 10px rgba(255,200,58,.25); padding:0; margin:0 0 1px; }
-.setup-panel .setup-label::before, .setup-panel .setup-label::after{ content:''; flex:1; height:2px; border-radius:2px; background:linear-gradient(90deg, transparent, rgba(255,200,58,.7)); box-shadow:0 1px 0 #0c0705; }
-.setup-panel .setup-label::after{ background:linear-gradient(270deg, transparent, rgba(255,200,58,.7)); }
-.setup-panel .setup-label-sub{ font-family:var(--font-ui); font-size:10px; letter-spacing:.5px; font-style:italic; color:var(--parchment-dim); text-shadow:none; text-transform:none; }
+
 .depth-section{ gap:0 !important; }
 .depth-toggle{ display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:7px 10px; background:var(--b5); border:2px solid var(--line); border-radius:var(--r-lg); color:var(--parchment); cursor:pointer; font:inherit; box-shadow:var(--shadow-1); }
 .depth-toggle .depth-num{ width:38px; height:38px; font-size:20px; flex:none; }
@@ -2023,16 +1857,6 @@ body{ -webkit-tap-highlight-color:transparent; }
 .symbol-intro-text strong{ font-family:var(--font-ui); font-size:14px; color:var(--gold); }
 .symbol-intro-kicker{ font-family:var(--font-ui); font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--parchment-dim); }
 
-/* Swap picker: face comparison */
-.swap-item.selected{ outline:3px solid var(--gold); outline-offset:2px; border-radius:10px; }
-.swap-compare{ display:flex; flex-direction:column; gap:6px; padding:8px; background:var(--b1); border:2px solid var(--line); border-radius:10px; }
-.swap-compare-row{ display:flex; }
-.swap-compare-label{ line-height:1.25; text-transform:uppercase; letter-spacing:1px; color:var(--parchment-dim); }
-.swap-compare-label b{ color:var(--gold); text-transform:none; letter-spacing:0; }
-.swap-compare-hint{ font-size:11px; color:var(--parchment-dim); font-style:italic; width:100%; text-align:center; }
-.swap-compare .faces-tiles{ flex:1 1 auto; min-width:0; }
-.swap-compare .faces-tiles{ display:grid; }
-
 /* ⓘ info dot: explanatory text lives in a hover / tap bubble instead of inline copy */
 .info-dot{ display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; margin-left:4px; vertical-align:middle;
   border:1.5px solid var(--b6); border-radius:50%; color:var(--parchment-dim); font:italic 700 11px/1 Georgia,serif; cursor:help; user-select:none; -webkit-tap-highlight-color:transparent; }
@@ -2057,38 +1881,9 @@ html,body{ overflow-x:clip; }
 /* Kill-hint (Lethal / Almost...) sits just above the enemy health bar, free to overlap the portrait */
 .fo-enemy .fo-hpwrap > .kill-hint{ position:absolute !important; left:0; right:0; bottom:100%; top:auto; margin:0 0 1px !important; height:auto !important; line-height:12px; text-align:center; z-index:6; pointer-events:none; text-shadow:0 1px 0 #0c0705, 0 0 5px rgba(0,0,0,.9); }
 
-/* Swap picker comparison v2: on top, stacked label-over-faces, bigger dark-tile faces */
-.swap-compare{ margin:4px 0 10px; }
-.swap-compare-row{ flex-direction:column; align-items:stretch; gap:3px; }
-.swap-compare-label{ flex:none; display:flex; align-items:baseline; gap:6px; font-size:10px; }
-.swap-compare-label b{ display:inline; font-size:12px; }
-.swap-compare .faces-tiles{ gap:4px; }
-.swap-compare .mini-face{ border-radius:8px; }
-.swap-compare .mini-face .icon-svg{ background:transparent !important; box-shadow:none !important; margin:0 !important; color:#241c10; }
-.swap-compare .mini-face small{ font-size:8.5px; margin-top:1px; }
-.swap-compare-hint{ align-self:center; margin:auto; }
-
 .mini-face{ position:relative; }
 .face-delta{ position:absolute; top:1px; right:2px; font-size:11px; line-height:1; font-weight:900; text-shadow:0 0 2px #0c0705, 0 1px 0 #0c0705; pointer-events:auto; }
 .face-delta.up{ color:#5dff7a; } .face-delta.down{ color:#ff5a4a; }
-/* comparison faces: tiles sized to their contents instead of stretching across the panel */
-.swap-compare .faces-tiles{ justify-content:start; }
-.swap-compare .mini-face .icon-svg{ width:24px !important; height:24px !important; }
-.swap-compare-row{ min-height:68px; }
-
-/* Equip window matches the game column width (not the full screen) */
-.swap-modal{ width:min(390px, calc(100vw - 24px)); max-width:390px !important; margin-left:auto; margin-right:auto; box-sizing:border-box; }
-.swap-compare .faces-tiles{ grid-template-columns:repeat(6,minmax(0,1fr)); }
-.swap-compare .mini-face{ width:100%; height:auto; aspect-ratio:1/1; }
-.swap-modal .swap-list{ justify-content:center; }
-/* Equip window: dice sit directly on the panel (no card behind each) */
-.swap-modal .swap-item{ background:none; box-shadow:none; border-radius:12px; }
-.swap-modal .swap-item:hover{ border-color:transparent; }
-.swap-modal .swap-item.selected{ outline:none; border-color:var(--gold); box-shadow:0 0 10px 2px rgba(255,200,58,.55); background:rgba(255,200,58,.08); }
-/* Equip window: four dice per row at the existing die size */
-.swap-modal .swap-list{ gap:4px 2px; padding-left:0; padding-right:0; }
-.swap-modal .swap-item{ width:76px; padding:2px; border:0; box-sizing:border-box; }
-.swap-modal .swap-item.selected{ border:0; }
 
 /* 'vs' mark: sits between the health bars, plays a short intro at the start of an encounter, then fades out */
 .fo-vs{ position:relative; margin-bottom:0 !important; }
@@ -2106,8 +1901,6 @@ html,body{ overflow-x:clip; }
   100%{ opacity:0; transform:translateX(-50%) scale(.85); }
 }
 .reduced-motion .fo-vs .fo-vs-txt.vs-intro{ animation:none; opacity:.9; }
-/* Equip window: the dice speak for themselves */
-.swap-modal .swap-item-label{ display:none; }
 
 /* Quest paper rows: condition -> reward badge */
 
@@ -2210,40 +2003,26 @@ html,body{ overflow-x:clip; }
 .fo-type.fo-type-deadly{ color:#ff7a5c; }
 .fo-chips .boss-cycle-row.crowded .boss-cycle-item{ font-size:10px; padding:1px 4px; }
 
-/* v1.36.0: shrine ritual */
-#room-callout .room-callout-line.intro.shrine{ color:#cfe9ff !important; font-style:italic; }
-.fo-shrine .shrine-motes{ position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:1; }
-.fo-shrine .shrine-motes i{ position:absolute; left:var(--x); bottom:-6px; width:3px; height:3px; border-radius:50%; background:#ffe9a8; opacity:0;
-  animation:shrineMote var(--t) linear var(--d) infinite; }
 @keyframes shrineMote{ 0%{ transform:translateY(0); opacity:0; } 15%{ opacity:.8; } 100%{ transform:translateY(-240px) translateX(10px); opacity:0; } }
-.fo-shrine.shrine-awaken .fo-torch{ animation:shrineTorchWarm 1.4s ease-out 1; }
+
 @keyframes shrineTorchWarm{ 0%{ opacity:.25; transform:scale(.7); } 60%{ opacity:1; transform:scale(1.25); } 100%{ transform:scale(1); } }
 .fo-shrine .fo-enemy .fo-fig{ touch-action:none; user-select:none; -webkit-user-select:none; cursor:pointer; position:relative; }
 .fo-shrine .fo-enemy .fo-fig::after{ content:''; position:absolute; inset:-10%; border-radius:50%; pointer-events:none; opacity:0;
   background:radial-gradient(circle, rgba(255,233,168,.55), rgba(143,208,255,.15) 55%, transparent 70%); transition:opacity .2s; }
-.fo-shrine .fo-enemy .fo-fig.shrine-charging{ animation:shrineLift .65s ease-in forwards; }
-.fo-shrine .fo-enemy .fo-fig.shrine-charging::after{ opacity:1; transition:opacity .65s; }
+
 @keyframes shrineLift{ 0%{ transform:translateY(0) scale(1); } 100%{ transform:translateY(-8px) scale(1.06); } }
-.fo-shrine .fo-enemy .fo-fig.shrine-burst{ animation:shrineBurst .45s ease-out forwards; }
-.fo-shrine .fo-enemy .fo-fig.shrine-burst::after{ opacity:0; transition:opacity .45s; }
+
 @keyframes shrineBurst{ 0%{ transform:translateY(-8px) scale(1.06); } 40%{ transform:translateY(-10px) scale(1.14); } 100%{ transform:translateY(0) scale(1); } }
-.shrine-hold-btn{ position:relative; overflow:hidden; touch-action:none; user-select:none; -webkit-user-select:none; }
-.shrine-result-banner{ position:absolute; left:14px; right:14px; top:12px; z-index:4; text-align:center; padding:7px 10px;
-  background:rgba(28,17,9,.92); border:2px solid var(--line); border-radius:var(--r-md); box-shadow:0 3px 0 rgba(0,0,0,.5);
-  animation:shrineBanner .35s ease-out both; }
-.shrine-result-banner .srb-title{ font-family:var(--font-display); color:var(--gold); font-size:13px; line-height:1.2; }
-.shrine-result-banner .srb-text{ font-size:11.5px; color:var(--parchment); line-height:1.3; margin-top:2px; }
+
 @keyframes shrineBanner{ from{ transform:translateY(-12px); opacity:0; } to{ transform:none; opacity:1; } }
 .relic-flyer{ position:fixed; z-index:9500; pointer-events:none; transform:translate(-50%,-50%) scale(1.3); transition:transform .7s cubic-bezier(.5,-0.3,.4,1); }
 .relic-badge.relic-arrive{ animation:relicArrive .5s cubic-bezier(.2,1.6,.4,1); }
 @keyframes relicArrive{ 0%{ transform:scale(1.8); } 100%{ transform:scale(1); } }
-.shrine-float{ position:fixed; z-index:9500; pointer-events:none; transform:translate(-50%,0); font-family:var(--font-display); font-size:26px; font-weight:800;
-  text-shadow:0 2px 0 #0c0705, 0 0 6px rgba(0,0,0,.6); animation:shrineFloat 1.4s ease-out forwards; white-space:nowrap; }
-.shrine-float.heal{ color:#7dff9a; } .shrine-float.gold{ color:var(--gold); font-size:20px; }
+
 @keyframes shrineFloat{ 0%{ transform:translate(-50%,6px) scale(.6); opacity:0; } 18%{ transform:translate(-50%,-6px) scale(1.15); opacity:1; } 70%{ opacity:1; } 100%{ transform:translate(-50%,-34px) scale(1); opacity:0; } }
 .bar.hp-stretch{ animation:hpStretch .6s cubic-bezier(.2,1.5,.4,1); transform-origin:left center; }
 @keyframes hpStretch{ 0%{ transform:scaleX(.92); } 100%{ transform:scaleX(1); } }
-.util-btn.shrine-token-pulse{ animation:shrineTokenPulse .7s ease-out 2; }
+
 @keyframes shrineTokenPulse{ 0%,100%{ transform:none; } 40%{ transform:translateY(-3px) rotate(-3deg); } 70%{ transform:translateY(0) rotate(2deg); } }
 /* choice cards fan in */
 .relic-choice-list .relic-choice-card, #shrine-options .loot-opt{ animation:cardFanIn .38s cubic-bezier(.2,1.3,.4,1) both; }
@@ -2274,13 +2053,6 @@ html,body{ overflow-x:clip; }
 .fo-player > .relic-strip{ position:absolute; left:2px; top:-4px; z-index:3; margin:0; padding:0; background:none; border:none; display:flex; flex-direction:column; flex-wrap:wrap; align-content:flex-start;
   max-height:var(--relic-col-h, 118px); gap:2px 3px; justify-content:flex-start; }
 .fo-player > .relic-strip .relic-badge{ width:18px; height:18px; filter:drop-shadow(0 0 1.5px #0c0705) drop-shadow(0 2px 1px rgba(0,0,0,.7)); }
-
-/* Shrine hold / Continue button floats above the tray (Oct 12): out of the page flow so the dice don't move. */
-.shrine-act{ position:fixed; z-index:40; transform:translateX(-50%); pointer-events:none; }
-
-.shrine-act > *{ pointer-events:auto; }
-
-.shrine-float-hint{ text-align:center; margin:0; padding:8px 12px; border-radius:12px; background:rgba(10,7,5,.85); border:2px solid var(--line); }
 
 /* ===== Splash (Oct 13): one tap before the title unlocks audio so the theme can play ===== */
 #splash{ position:fixed; inset:0; z-index:99999; display:flex; align-items:center; justify-content:center; cursor:pointer;
@@ -2392,11 +2164,7 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 .idle-breath.idle-p{ animation-name:idle-sway-p !important; }
 .idle-breath.idle-e{ animation-name:idle-sway-e !important; }
 .idle-breath.idle-e.fo-flip{ animation-name:idle-sway-e-flip !important; }
-/* Oct 13: Suggested die in the Equip picker (mockup A) */
-.swap-item.swap-suggest{ position:relative; }
-.swap-suggest-ribbon{ position:absolute; top:-9px; left:50%; transform:translateX(-50%); z-index:3; background:#ffd76a; color:#241c10;
-  font-size:10px; font-weight:800; padding:0 6px; border-radius:6px; border:2px solid #0c0705; white-space:nowrap; pointer-events:none; }
-.swap-suggest-ribbon{ animation:ribbon-in .3s ease-out; }
+
 @keyframes ribbon-in{ from{ opacity:0; } to{ opacity:1; } }
 /* Oct 14: enemy action chips -- icon + a readable number (no word); boss specials add their name */
 .boss-cycle-item .enc-n{ font-family:var(--font-ui); font-size:13px; font-weight:900; line-height:1; margin-left:1px; }
@@ -2431,19 +2199,8 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 /* Oct 16: the baked floor (see bakedFloorCanvas in render.js) replaces the 3D .rf-plane */
 #room-floor .rf-canvas{ position:absolute; left:0; top:0; width:100%; height:100%; display:block; }
 
-/* Oct 16 (Jeremy): the shrine's Hold / Continue is a round button over the dice tray; it never fades, it pulses to invite a press,
-   and a gold ring fills while you hold (SHRINE_HOLD_MS) */
-.shrine-orb{ position:relative; width:128px; height:128px; border-radius:50% !important; padding:0 !important; display:flex; align-items:center; justify-content:center;
-  background:radial-gradient(circle at 50% 38%, #ffe7a3, #f2b833 58%, #c98a14) !important; color:#2a1a08 !important; border:4px solid var(--line) !important;
-  touch-action:none; user-select:none; -webkit-user-select:none; } /* idle: the shared tap knock (end of file) */
-.shrine-orb .so-label{ position:relative; display:flex; flex-direction:column; align-items:center; line-height:1.05; pointer-events:none; }
-.shrine-orb .so-label b{ font-family:var(--font-display); font-size:22px; }
-.shrine-orb .so-label small{ font-size:10.5px; font-weight:700; max-width:84px; text-align:center; margin-top:3px; opacity:.85; }
-.shrine-orb.so-continue .so-label small{ font-size:18px; margin-top:0; }
-.shrine-orb .so-ring{ position:absolute; inset:-11px; width:calc(100% + 22px); height:calc(100% + 22px); transform:rotate(-90deg); pointer-events:none; overflow:visible; }
-.shrine-orb .so-track{ fill:none; stroke:rgba(12,7,5,.55); stroke-width:6; }
-.shrine-orb .so-fill{ fill:none; stroke:#fff3c4; stroke-width:6; stroke-linecap:round; stroke-dasharray:100; stroke-dashoffset:100; transition:stroke-dashoffset .15s ease-out; filter:drop-shadow(0 0 4px rgba(255,220,120,.9)); }
-.shrine-orb.charging{ animation:so-shake .7s linear forwards; transform:scale(.96); }
+ /* idle: the shared tap knock (end of file) */
+
 /* holding the shrine button: a rattle that builds until the boon bursts (Jeremy, Oct 17) */
 @keyframes so-shake{
   0%{ transform:scale(.96) translate(0,0) rotate(0); }
@@ -2452,17 +2209,9 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
   50%{ transform:scale(.97) translate(-3px,1px) rotate(-2.5deg); } 60%{ transform:scale(.97) translate(3px,-2px) rotate(3deg); }
   70%{ transform:scale(.98) translate(-4px,2px) rotate(-3.5deg); } 80%{ transform:scale(.98) translate(4px,-2px) rotate(4deg); }
   90%{ transform:scale(.99) translate(-5px,2px) rotate(-5deg); } 100%{ transform:scale(1) translate(5px,-3px) rotate(5deg); } }
-.reduced-motion .shrine-orb.charging{ animation:none; }
-.shrine-orb.charging .so-fill{ stroke-dashoffset:0; transition:stroke-dashoffset .7s linear; }
-.reduced-motion .shrine-orb{ animation:none; }
-.shrine-act .shrine-float-hint{ margin-top:46px; }
-/* the round shrine button waits until the "you scramble into a room" banner is tapped away */
-body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
-.shrine-act{ transition:opacity .25s ease-out; }
 
 .round-badge .rb-floor{ color:#f1d58a; font-weight:900; margin-right:3px; }
 .tray-head .round-badge{ gap:0; white-space:nowrap; }
-.shrine-orb.so-continue{ background:radial-gradient(circle at 50% 38%, #b9eea0, #5fb544 58%, #3a7f2a) !important; color:#10260a !important; animation:none; }
 
 /* Relic gem pop (Oct 16): a copy of the gem swells and wobbles over the real one when the relic acts. */
 .relic-fx .relic-badge.relic-gem-pop{ position:absolute; margin:0; transform-origin:50% 55%; animation:relic-gem-pop .62s cubic-bezier(.3,1.4,.5,1) forwards; }
@@ -2534,16 +2283,7 @@ button.end-details-btn:hover:not(:disabled){ background:#5a3e28; }
 .class-tab-btn:not(.selected){ opacity:1; box-shadow:inset 0 -5px 0 var(--tab-rim, transparent) !important; }
 .class-tab-btn.locked:not(.selected){ color:rgba(227,202,163,.7); }
 .class-tab-btn.previewing:not(.selected){ box-shadow:inset 0 -5px 0 var(--tab-rim, transparent), 0 0 0 2px rgba(224,214,188,.45) !important; }
-/* 10: each shrine option its own colour, matching what it gives */
-#shrine-options .loot-opt.shrine-opt{ border:3px solid var(--line); filter:drop-shadow(0 3px 0 var(--line)); }
-#shrine-options .loot-opt.shrine-opt h4{ margin:2px 0; font-size:14px; }
-.shrine-opt.so-heal{ background:#c9506a; } .shrine-opt.so-heal h4{ color:#fff1e8; }
-.shrine-opt.so-maxhp{ background:var(--green); } .shrine-opt.so-maxhp h4{ color:#eafbea; }
-.shrine-opt.so-relic{ background:var(--purple); } .shrine-opt.so-relic h4{ color:#f5eaff; }
-.shrine-opt.so-attack{ background:#e8574f; } .shrine-opt.so-attack h4{ color:#fff3e6; }
-.shrine-opt.so-maneuver{ background:#ffe9a8; } .shrine-opt.so-maneuver h4{ color:#3a2410; }
-.shrine-opt.so-forge{ background:#d4af52; } .shrine-opt.so-forge h4{ color:#241c10; }
-.shrine-opt.so-leave{ background:var(--b1); } .shrine-opt.so-leave h4{ color:var(--parchment-dim); }
+
 /* 11: text boxes are parchment with the chunky outline and the serif; the Log uses the serif too */
 textarea.paper-input{ background:var(--paper); color:var(--ink); border:3px solid var(--line); border-radius:var(--r-sm); font-family:var(--font-ui); padding:6px 8px; outline:none; }
 textarea.paper-input::placeholder{ color:#7d6a52; font-family:var(--font-ui); font-style:italic; }
@@ -2553,7 +2293,7 @@ textarea.paper-input:focus{ box-shadow:0 0 0 2px var(--gold); }
 .pcf-num{ font-family:Georgia,'Iowan Old Style',serif !important; font-weight:900; }
 /* 13: buttons never use the title face (Enter the Dungeon, the shrine's Hold / Continue) */
 #start-btn{ font-family:var(--font-ui) !important; font-weight:800; letter-spacing:.3px; }
-.shrine-orb .so-label b{ font-family:var(--font-ui); font-weight:900; letter-spacing:.3px; }
+
 /* 14: headings in Metamorphous (small caps labels stay serif) */
 .achv-unlock-title, .origin-relic-earned .ore-kicker{ font-family:var(--font-display); font-weight:400; text-transform:none; letter-spacing:.5px; font-size:16px; }
 /* 15-16: every pop-up title centred; the same ✕ in the same corner, red-brown so it never matches the gear (hidden under pop-ups) */
@@ -2601,30 +2341,6 @@ body:has(.modal-overlay) .settings-btn-floating{ visibility:hidden; }
 .bst-quest .q-reward{ display:inline-flex; align-items:center; gap:1px; border-radius:9px; background:#3a2410; color:#ffd76a; font-weight:900; padding:1px 4px 1px 2px; font-size:10px; line-height:1; }
 .bst-quest .q-reward .icon-svg{ width:12px; height:12px; color:#ffd76a; }
 .bst-quest .q-reward b{ font-family:var(--font-ui); }
-/* Setup fits one screen for veterans too (fitSetup, render.js adds fit1..fit3 only while the page would scroll) */
-.setup-panel.fit1 .setup-back-btn{ float:left; margin:0 10px 0 0; }
-.setup-panel.fit1 .setup-name-row{ margin-bottom:8px; min-height:29px; }
-.setup-panel.fit1 .setup-section{ margin-top:0; margin-bottom:6px; }
-.setup-panel.fit1 .boon-showcase{ flex-direction:row; align-items:center; gap:8px; padding:5px 8px; }
-.setup-panel.fit1 .boon-showcase .die-plate{ display:none; }
-.setup-panel.fit1 .boon-showcase .die-art-wrap{ width:30px; height:30px; }
-.setup-panel.fit1 .boon-showcase:has(.boon-showcase-empty){ justify-content:center; }
-.setup-panel.fit1 .boon-showcase-empty{ padding:0 2px; flex:1; }
-.setup-panel.fit1 .boon-scroll{ padding:2px; }
-.setup-panel.fit2 #start-btn{ padding:10px 12px; font-size:19px; margin-top:2px; }
-.setup-panel.fit2 .class-showcase{ min-height:0 !important; padding:7px 10px !important; }
-.setup-panel.fit2 .class-mini-tray{ width:80px; flex-basis:80px; padding:4px; gap:2px; }
-.setup-panel.fit2 .origin-relic-line{ padding:4px 8px; margin-top:5px; }
-.setup-panel.fit2 .depth-toggle{ padding:4px 10px; }
-.setup-panel.fit2 .depth-toggle .depth-num{ width:32px; height:32px; font-size:17px; }
-.setup-panel.fit3 .origin-showcase-portrait{ width:80px !important; height:80px !important; }
-.setup-panel.fit3 .boon-tile-circle{ width:38px; height:38px; }
-.setup-panel.fit3 .setup-section{ gap:4px; }
-.setup-panel.fit4 .origin-showcase{ padding:6px 8px; gap:4px; }
-.setup-panel.fit4 .origin-showcase-portrait{ width:70px !important; height:70px !important; }
-.setup-panel.fit4 .class-showcase-ability{ font-size:11px; line-height:1.25; }
-.setup-panel.fit4 .boon-tile-circle{ width:34px; height:34px; }
-.setup-panel.fit4 .setup-name-row{ margin-bottom:4px; }
 
 @media (min-height:770px){ .camp-status-card::before{ top:146px; } }
 
@@ -2742,7 +2458,7 @@ body{ font-variant-numeric: lining-nums; }
 .util-btn span, .util-btn.rail-pocket span:not(.badge), .util-btn.rail-item span:not(.badge){ font-size:11.5px !important; }
 .hint{ font-size:13px; }
 .mini-face small{ font-size:10px !important; }
-.loot-modal .loot-opt .faces span{ font-size:10px !important; }
+
 .symbol-intro-text{ font-size:13.5px; }
 .symbol-intro-kicker{ font-size:10.5px; }
 .round-badge{ font-size:13px; }
@@ -2752,7 +2468,6 @@ body{ font-variant-numeric: lining-nums; }
 button{ border-radius:12px; box-shadow: inset 0 3px 0 rgba(255,255,255,.30), inset 0 -5px 0 rgba(0,0,0,.28); }
 button:active:not(:disabled){ box-shadow: inset 0 2px 0 rgba(255,255,255,.18), inset 0 -2px 0 rgba(0,0,0,.28); }
 button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(255,255,255,.12); }
-.loot-chest-btn, .loot-chest-btn:active{ box-shadow:none !important; }
 
 /* ---- Oct 28 screen fixes (Jeremy: 1C, 2A, 3A, 7A, 8B) ---- */
 /* Blank sides stay plain (Jeremy, Oct 30: option A; the 1C socket collided with loot dice's curved names). */
@@ -2763,24 +2478,13 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 .util-btn.rail-go.go-idle .go-word{ display:none; }
 .util-btn.rail-go.go-idle .go-hint{ display:block; font-size:12.5px !important; line-height:1.25; color:#e9d7ae; text-align:center; padding:0 3px; font-weight:700 !important; letter-spacing:.04em !important; line-height:1.25; text-transform:uppercase; }
 .util-rail .util-btn.disabled:not(.rail-go){ opacity:1; filter:saturate(.35) brightness(.72); }
-/* 3A: the closed chest takes the stage: no box, big chest in slowly turning gold rays. */
-.loot-overlay:has(.loot-modal-chest){ background:rgba(10,6,3,.78) !important; }
-.loot-modal.loot-modal-chest{ max-width:300px; background:transparent !important; border:none !important; box-shadow:none !important; overflow:visible !important; }
-.loot-modal.loot-modal-chest h2{ font-size:40px !important; color:#ffd75e !important; text-shadow:0 3px 0 #120b07, 0 0 18px rgba(255,200,80,.45); }
-.loot-modal.loot-modal-chest .loot-chest-btn{ position:relative; padding:26px 0 10px; gap:20px; }
-.loot-modal.loot-modal-chest .loot-chest-btn::before{ content:""; position:absolute; left:50%; top:44%; width:330px; height:330px; margin:-165px 0 0 -165px; border-radius:50%; pointer-events:none;
-  background:repeating-conic-gradient(rgba(255,215,94,.22) 0 9deg, transparent 9deg 22deg);
-  -webkit-mask:radial-gradient(circle, #000 18%, transparent 68%); mask:radial-gradient(circle, #000 18%, transparent 68%);
-  animation:loot-rays-turn 24s linear infinite; }
-.loot-modal.loot-modal-chest .loot-chest-btn.opening::before{ opacity:0; transition:opacity .3s; }
+
 @keyframes loot-rays-turn{ to{ transform:rotate(360deg); } }
-.loot-modal.loot-modal-chest .loot-chest{ width:190px; position:relative; }
-.loot-modal.loot-modal-chest .loot-chest svg{ width:170px; height:170px; filter:drop-shadow(0 8px 0 rgba(0,0,0,.45)); }
-.loot-modal.loot-modal-chest .loot-tap-hint{ position:relative; font-family:'Metamorphous',serif !important; font-size:21px !important; color:#ffd75e !important; opacity:1 !important; text-shadow:0 2px 0 #120b07; }
+
 /* 7A: the equip window shows six empty slots until a die is picked, and the button says why it waits. */
 .mini-face.mf-slot{ border:2px dashed rgba(233,215,174,.45) !important; background:rgba(0,0,0,.18) !important; box-shadow:none !important; }
-.swap-out-hint{ opacity:.7; }
-#swap-go.swap-suggest-mode{ background:#4f6aa6 !important; color:#fff3dc !important; } /* Oct 31: Suggest until a die is picked, then gold Replace */
+
+ /* Oct 31: Suggest until a die is picked, then gold Replace */
 /* 8B: Settings links as toy tiles, three across; the danger buttons get their own row under a line. */
 .settings-btn-grid{ display:flex !important; flex-wrap:wrap; gap:8px; }
 .settings-btn-grid .settings-tile{ flex:1 1 28%; display:flex; flex-direction:column; align-items:center; gap:3px; padding:9px 2px 8px; font-size:13px; min-height:62px; }
@@ -2894,7 +2598,7 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 .util-btn.rail-go.disabled{ filter:none !important; }
 .settings-toggle-row{ box-shadow:inset 0 0 0 1px var(--line); }
 .origin-showcase, .class-showcase{ box-shadow:inset 0 0 0 2px var(--line); }
-.loot-modal .loot-opt:not(.loot-chosen){ box-shadow:inset 0 0 0 1px var(--line), 0 3px 0 var(--line); }
+
 /* Oct 29 (Jeremy): parchment is for in-world objects (Quests sign, the Codex book) and How to Play is a parchment page too. */
 .modal.parchment-page{ background:radial-gradient(ellipse at 30% 20%, #f4e6c4, #e6d2a6 70%, #d9c08e) !important; color:#3a2410;
   box-shadow:inset 0 0 0 3px #b8955a, inset 0 0 30px rgba(120,80,30,.35), 0 6px 0 var(--line) !important; }
@@ -3090,7 +2794,7 @@ span > .info-tap, label > .info-tap{ display:none; }
 .origin-showcase .die-blurb{ font-size:12px !important; line-height:1.3 !important; }
 .origin-showcase .die-plate{ font-size:11px !important; }
 .class-showcase-badge .depth-badge-pill{ font-size:10px !important; }
-.setup-name-row{ justify-content:center; }
+
 .char-name-input{ text-align:center; background:#f3e3bf !important; color:#3a2410 !important; border:3px solid var(--line) !important; border-radius:6px !important; box-shadow:0 3px 0 var(--line) !important; padding:4px 12px !important; font-family:var(--font-display) !important; font-size:19px !important; width:230px !important; max-width:70%; }
 .char-name-input::placeholder{ color:#8a5a2b !important; opacity:1; }
 .char-name-pencil{ display:none !important; }
@@ -3101,30 +2805,17 @@ span > .info-tap, label > .info-tap{ display:none; }
 /* 5A: end-screen title and line centred with room above */
 .end-screen > h2{ text-align:center; margin-top:34px !important; font-size:34px !important; }
 .end-lede{ text-align:center; max-width:300px; margin:4px auto 10px !important; }
-/* 6A: while the loot chest is up, the fighters' labels hide so nothing shows around "Victory!" */
-body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-chips, .fo-quests-float, .fo-kind, .relic-strip, .kill-hint){ visibility:hidden !important; }
+
 /* Oct 31 (Jeremy): every die in the How to Play trays is the same size; the step number sits in the die's corner, above the path line. */
 .tut-tray i{ position:relative; }
 .tut-tray svg{ z-index:2; }
 .tut-tray i b{ position:absolute; top:1px; left:3px; z-index:3; font-size:9px !important; line-height:1; }
-/* 1A: Equip shows your tray as a 4x4 grid; the picked die lifts and tilts; the OUT row is one quiet well until then. */
-.swap-tray-head{ font-family:var(--font-display); color:var(--gold); font-size:16px; margin:8px 0 4px; text-align:left; }
-.swap-modal .swap-list.swap-tray{ display:grid !important; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px !important; padding:8px !important; margin:0 0 8px !important; max-height:none !important; overflow:visible !important;
-  background:#6b4220; border:3px solid var(--line); border-radius:12px; box-shadow:0 4px 0 var(--line); }
-.swap-modal .swap-tray .swap-item{ width:auto !important; padding:0 !important; aspect-ratio:1; transition:transform .12s cubic-bezier(.3,1.6,.5,1); }
-.swap-modal .swap-tray .swap-item .loot-preview-tile{ width:100% !important; height:100% !important; margin:0 !important; }
-.swap-modal .swap-tray .swap-item-label{ display:none; }
-.swap-modal .swap-tray .swap-item.selected{ transform:translateY(-5px) rotate(-3deg); z-index:2; }
-.swap-modal .swap-tray .swap-item.selected .loot-preview-tile{ box-shadow:0 0 0 3px var(--gold), 0 6px 0 var(--line) !important; }
-.swap-modal .swap-tray .swap-suggest-ribbon{ font-size:9px !important; top:-8px !important; }
-.swap-modal h2{ font-size:22px !important; }
-.swap-out-empty{ height:44px; border-radius:10px; background:#2a1b10; box-shadow:inset 0 3px 6px rgba(0,0,0,.55); border:2px solid var(--line); }
+
 /* 2A: achievement medals: own icon as a dark silhouette, gold coin once earned */
 .achv-coin .icon-svg{ width:24px; height:24px; }
 .achv-medal:not(.on) .achv-coin{ background:#2a1d13 !important; color:#4b3a2a !important; box-shadow:inset 0 -3px 0 rgba(0,0,0,.4) !important; }
 .achv-medal:not(.on) .achv-mname{ opacity:.7; }
-/* 4A: loot window: bigger Victory, a gold "Pick one" ribbon, blank faces as dark wells */
-.loot-modal h2{ font-size:30px !important; }
+
 .pick-ribbon{ margin:2px auto 10px; width:max-content; padding:5px 26px 6px; background:#ffd75e; color:#241c10; border:3px solid var(--line); font:400 17px var(--font-display); letter-spacing:.04em;
   clip-path:polygon(0 0,100% 0,95% 50%,100% 100%,0 100%,5% 50%); filter:drop-shadow(0 3px 0 var(--line)); }
 .mini-face.mf-blank{ background:#2a1b10 !important; opacity:1 !important; border:2px solid var(--line) !important; border-style:solid !important; box-shadow:inset 0 3px 5px rgba(0,0,0,.6) !important; }
@@ -3273,30 +2964,13 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 /* Oct 31: drawn star instead of the ✦ character (achievement rows, the class-converted die badge) */
 .achv-unlock-icon .mark-svg{ width:18px; height:18px; color:var(--gold); }
 
-/* S1: shrine options are cards (icon, title, one plain line) under a "Pick one" ribbon */
-#shrine-options.shrine-pick{ display:grid !important; grid-template-columns:1fr 1fr; gap:10px; }
-#shrine-options.shrine-pick.sp3{ grid-template-columns:1fr 1fr 1fr; gap:7px; }
-.shrine-pick .shrine-opt{ display:flex !important; flex-direction:column; align-items:center; gap:6px; padding:12px 8px 11px !important; margin:0 !important; width:auto !important; min-height:0 !important;
-  background:#3a2819 !important; border:3px solid var(--line) !important; border-radius:12px !important; box-shadow:0 4px 0 var(--line), inset 0 2px 0 rgba(255,255,255,.08) !important; text-align:center; cursor:pointer; }
-.shrine-pick .shrine-opt:active{ transform:translateY(2px); box-shadow:0 2px 0 var(--line) !important; }
-.shrine-pick .sp-ic{ position:relative; width:56px; height:56px; border-radius:14px; border:3px solid var(--line); display:flex; align-items:center; justify-content:center; box-shadow:inset 0 -4px 0 rgba(0,0,0,.25), inset 0 3px 0 rgba(255,255,255,.25); }
-.shrine-pick .sp-ic .icon-svg, .shrine-pick .sp-ic .mark-svg{ width:32px; height:32px; }
-.shrine-pick .sp-ic i{ position:absolute; right:-7px; bottom:-7px; width:22px; height:22px; border-radius:50%; background:var(--gold); color:#241c10; border:2px solid var(--line); font:900 17px/18px var(--font-ui); font-style:normal; text-align:center; }
-.shrine-pick .shrine-opt h4{ margin:0; font:400 19px/1.1 var(--font-display) !important; color:#fff1d6 !important; text-transform:none !important; letter-spacing:0 !important; }
-.shrine-pick .sp-sub{ font-size:12px; line-height:1.25; color:#c8b08a; }
-.shrine-pick.sp3 .shrine-opt{ padding:10px 4px 9px !important; }
-.shrine-pick.sp3 .sp-ic{ width:46px; height:46px; } .shrine-pick.sp3 .sp-ic .icon-svg, .shrine-pick.sp3 .sp-ic .mark-svg{ width:26px; height:26px; }
-.shrine-pick.sp3 .shrine-opt h4{ font-size:15px !important; } .shrine-pick.sp3 .sp-sub{ font-size:11px; }
 /* S2: the shrine's boon line is a small parchment note pinned under the shrine (same footprint as the old box) */
 .fo-shrine .fo-enemy .fo-quests.boon-note{ display:block !important; position:relative; max-width:170px; margin:4px auto 0 !important; padding:6px 10px 5px !important; border-radius:4px !important;
   background:var(--paper-tile) repeat, #f3e3bf !important; background-size:110px 110px, auto !important; background-blend-mode:soft-light, normal; color:#3a2410 !important;
   border:3px solid var(--line); box-shadow:0 4px 0 var(--line); transform:rotate(1.5deg); font:400 13px/1.3 var(--font-ui) !important; text-align:center; text-shadow:none !important; }
 .fo-shrine .fo-enemy .fo-quests.boon-note::before{ content:''; position:absolute; top:-7px; left:50%; width:12px; height:12px; margin-left:-6px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#ff9a7a,#b02a1c 70%); border:2px solid var(--line); }
 .boon-note b{ font-weight:800; color:#7a1f14; }
-#shrine-options.shrine-pick{ grid-template-columns:repeat(2, minmax(0,1fr)); width:100%; }
-#shrine-options.shrine-pick.sp3{ grid-template-columns:repeat(3, minmax(0,1fr)); }
-.shrine-pick .shrine-opt{ min-width:0 !important; max-width:none !important; flex:none !important; box-sizing:border-box; }
-.shrine-pick .shrine-opt h4, .shrine-pick .sp-sub{ overflow-wrap:anywhere; }
+
 /* Oct 31 (Jeremy): the Floor card text looked blurry: the old banner's dark text-shadow doubled the letters on the
    light stone and parchment, and the tablet's 1-degree tilt softened them. Crisp, flat text now. */
 #floor-card .fc-tablet, #floor-card .fc-name{ text-shadow:none !important; -webkit-text-stroke:0 !important; }
@@ -3372,8 +3046,7 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .fork-door.passed{ opacity:.45; transition:opacity .2s ease; }
 .fork-foot{ margin:12px 0 0; font-size:13px; color:#c9b48e; }
 .reduced-motion .fork-door.opening .rc-leaf{ transition:none; }
-/* Nov 4: the Elite door's deeper-floor loot die */
-.loot-opt-deeper{ position:relative; }
+
 .deeper-tag{ position:absolute; left:50%; top:-11px; transform:translateX(-50%); z-index:3; white-space:nowrap; font:800 10px/1 var(--font-ui); letter-spacing:.08em; text-transform:uppercase; color:#241c10; background:var(--loot-tier-color, #ffd76a); border:2px solid var(--line); border-radius:999px; padding:3px 8px; box-shadow:0 2px 0 var(--line); }
 
 /* Nov 4 (Jeremy): the fork's doors float on their own, like the loot chest: no panel, no text, a gentle bob */
@@ -3492,6 +3165,159 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .fo-quests-float .fo-quest.q-live-done{ border-radius:4px; background:none; box-shadow:none; position:relative; }
 .fo-quests-float .fo-quest.q-live-done .q-cond::before{ content:"\2713"; color:#17501b; position:absolute; left:-9px; font-weight:900; }
  /* in the margin, so the text never gets wider */
+/* ==== Loot window (loot-): every top-level rule for it, merged Nov 12 by tools/css/merge.py (polish roadmap A3).
+   Was 94 rules spread through this file; each value's history is in git. Edit here, not further up. ==== */
+.loot-sunray-burst{ position:absolute; inset:0; overflow:hidden; pointer-events:none; display:flex; align-items:center; justify-content:center; }
+.loot-sunray-wheel{ position:absolute; width:130vmin; height:130vmin; will-change:transform, opacity; background:repeating-conic-gradient(var(--sunray-color, var(--gold)) 0deg 9deg, transparent 9deg 27deg); animation:loot-sunray-kf 0.6s ease-out both; }
+/* Overkill (or a Boss's 3-option draw) gets a denser wheel (narrower wedges) plus this second, slightly delayed layer underneath -- reads as a bigger burst for a bigger haul, not just a recolored one. */
+.loot-sunray-wheel.loot-sunray-wheel-big{ background:repeating-conic-gradient(var(--sunray-color, var(--gold)) 0deg 7deg, transparent 7deg 21deg); }
+/* Closed chest shown first on the loot screen (renderLootModal(), render.js): bobs and pulses in the loot's tier color, flips edge-on when tapped. */
+.loot-chest-btn{ display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; padding:18px 0 8px; border-radius:0; cursor:pointer; color:var(--loot-tier-color, var(--gold)); }
+.loot-chest-btn:hover:not(:disabled), .loot-chest-btn:active:not(:disabled){ background:transparent; box-shadow:none; transform:none; }
+.loot-chest{ width:120px; height:104px; border-radius:var(--r-lg); background:var(--panel2); border:2.5px solid var(--loot-tier-color, var(--gold)); display:flex; align-items:center; justify-content:center; animation:loot-chest-glow 1.6s ease-in-out infinite; }
+.loot-chest-btn.opening .loot-chest{ animation:loot-chest-flip 0.48s ease-in-out both; }
+.loot-options{ display:flex; gap:10px; margin:12px 0; flex-wrap:wrap; justify-content:center; }
+.loot-opt h4{ margin:4px 0 0; font-size:13px; color:var(--parchment); text-align:center; }
+/* Reveal pop-in + ambient glow (mirrors dieSettle/glowPulse from the loot-reveal-animation mockup): each card springs in on its own short stagger (animation-delay set inline per card index in renderLootModal()) instead of all appearing at once, and its ambient glow pulses in the loot's own tier color (--loot-tier-color/--loot-tier-glow, set inline) for as long as it's on screen. */
+.loot-opt-reveal{ animation:loot-opt-settle 0.4s cubic-bezier(.34,1.56,.64,1) both; }
+/* Oct 13: the pulsing glow fades a fixed shadow layer (cheap) instead of repainting box-shadow every frame */
+.loot-opt-reveal::after{ content:''; position:absolute; inset:-2px; border-radius:inherit; pointer-events:none; box-shadow:0 0 14px 3px var(--loot-tier-glow, rgba(212,175,82,0.4)); opacity:0; animation:loot-opt-glow 1.8s ease-in-out 0.4s infinite; will-change:opacity; }
+.loot-opt.loot-chosen::after, .loot-opt.loot-faded::after{ animation:none; opacity:0; }
+/* Oct 13 (Jeremy): no scrollbar flash while the picked card grows and its fanfare beam rises */
+.loot-modal.loot-picking{ overflow:hidden !important; }
+/* Ball x Pit-style comet streaks whooshing outward from each card's center as it settles in -- the single most-liked effect from the mockup this was prototyped in. See lootStreaksHTML()/render.js. */
+.loot-opt-streaks{ position:absolute; left:50%; top:42%; width:0; height:0; pointer-events:none; z-index:0; }
+.loot-streak-wrap{ position:absolute; left:0; top:0; width:0; height:0; }
+.loot-streak{ position:absolute; left:0; top:-1px; width:46px; height:2px; transform-origin:0 50%; background:linear-gradient(90deg, var(--loot-tier-color, var(--gold)), transparent); opacity:0; animation:loot-streak-kf 0.5s ease-out both; }
+/* The moment a card is actually picked (pickLootOption(), render.js): the chosen card scales up with a tier-colored glow and sits still, every other option fades away, and the Zelda-style fanfare below plays over the chosen one. */
+.loot-opt.loot-chosen{ animation:none; transform:scale(1.08); box-shadow:0 0 22px 6px var(--loot-tier-glow, rgba(212,175,82,0.5)); pointer-events:none; z-index:2; }
+.loot-opt.loot-faded{ animation:none; opacity:0.18; transform:scale(0.86); pointer-events:none; transition:opacity .2s, transform .2s; }
+.loot-fanfare{ position:absolute; left:50%; top:50%; width:0; height:0; pointer-events:none; z-index:3; }
+.loot-fanfare-beam{ position:absolute; left:50%; bottom:0; width:20px; height:170px; margin-left:-10px; transform-origin:bottom; background:linear-gradient(to top, var(--loot-tier-color, var(--gold)), transparent); opacity:0.6; filter:blur(1px); animation:loot-beam-rise 0.9s ease-out both; }
+.loot-fanfare-ray-wrap{ position:absolute; left:0; top:0; width:0; height:0; }
+.loot-fanfare-ray{ position:absolute; left:0; top:-1.5px; width:46px; height:3px; transform-origin:0 50%; background:linear-gradient(90deg, var(--loot-tier-color, var(--gold)), transparent); animation:loot-ray-flare 0.7s ease-out 0.05s both; }
+.loot-fanfare-ring{ position:absolute; left:-34px; top:-34px; width:68px; height:68px; margin-top:-16px; border-radius:50%; border:2px solid var(--loot-tier-color, var(--gold)); animation:loot-chime-ring 0.8s ease-out both; }
+.reduced-motion .loot-opt-reveal{ animation:none; opacity:1; }
+.reduced-motion .loot-sunray-burst, .reduced-motion .loot-streak, .reduced-motion .loot-fanfare-beam, .reduced-motion .loot-fanfare-ray, .reduced-motion .loot-fanfare-ring{ display:none; }
+/* Sized like a real tray die (~72px) rather than the tray's own container-query-relative sizing, since this tile lives outside a .tray-wrap -- a fixed size keeps the icon/name-tag proportions the same as in-tray without depending on a query container that isn't there. */
+.loot-preview-tile{ width:72px; height:72px; margin:0 auto 8px; cursor:default; }
+.loot-preview-tile .face-val{ font-size:32px; }
+/* The loot screen's own face chips used to be forced onto one line (nowrap + horizontal scroll) inside a narrow ~140-220px card, with no visual hint that there was more to scroll to -- in practice the chips just got clipped at the card edge, cutting words like "Hit2" down to "t2". Wrapping onto two rows instead keeps every chip fully visible and readable, so the bump in font size/padding below doesn't need to fight a fixed single line to fit. */
+.loot-opt .faces{ flex-wrap:wrap; justify-content:center; gap:4px; }
+.loot-opt .faces span{ font-size:11px; padding:4px 7px; }
+/* Pinned to an explicit pixel size rather than relying on the icon's default 1em sizing -- at this span's bumped-up font-size, the 1em grid box and the SVG inside it stopped agreeing on size (the artwork was rendering noticeably bigger than its own box and bleeding into the label text right after it). */
+.loot-opt .faces .icon-svg{ width:11px; height:11px; }
+
+/* Compact loot screen: a smaller card so the sunray burst, streaks and fanfare around it actually read, instead of hiding behind a big panel. Backdrop is also lighter so the rays show through. */
+.loot-overlay{ background:rgba(0,0,0,0.55); }
+.loot-modal{ max-width:340px; padding:10px 12px 12px; }
+.loot-modal .loot-chest-btn{ padding:6px 0 2px; gap:8px; }
+.loot-modal .loot-chest{ width:76px; height:66px; border-radius:12px; }
+.loot-modal .loot-chest svg{ width:36px; height:36px; }
+.loot-modal .loot-preview-tile{ width:52px; height:52px; margin-bottom:4px; }
+.loot-modal .loot-preview-tile .face-val{ font-size:22px; }
+.loot-modal .loot-opt .faces{ gap:3px; }
+.loot-modal .loot-opt .faces .icon-svg{ width:9px; height:9px; }
+.loot-modal.loot-modal-chest .loot-chest-btn.opening .loot-chest{ animation:loot-chest-flip 0.48s ease-in-out both; }
+.loot-modal.loot-modal-chest .loot-chest .loot-chest-svg{ width:100%; height:auto; display:block; }
+.loot-opt{ flex:1 1 calc(50% - 10px); min-width:140px; max-width:220px; background:var(--panel2); border:2px solid var(--line); border-radius:var(--r-md); padding:8px; cursor:pointer; transition:transform .08s; position:relative; }
+.loot-modal:not(.loot-modal-chest), .loot-modal.loot-modal-n2:not(.loot-modal-chest){ max-width:350px !important; }
+.loot-modal .loot-options{ flex-direction:column !important; flex-wrap:nowrap !important; gap:8px !important; margin:8px 0 0 !important; }
+.loot-modal .loot-opt{ flex:0 0 auto !important; width:100% !important; max-width:none !important; min-width:0 !important; padding:8px 10px !important; display:grid !important; grid-template-columns:92px 1fr; column-gap:12px; align-items:center; background:var(--brown-light) !important; }
+.loot-modal .loot-opt .loot-preview-tile .face-val{ font-size:30px; }
+/* Loot cards: each face as a mini die tile (die color, small icon, name underneath). */
+.loot-modal .loot-opt .faces-tiles{ display:grid; grid-column:2; grid-row:1 / span 2; grid-template-columns:repeat(3,1fr) !important; gap:5px !important; justify-content:stretch; }
+.loot-modal .loot-opt .mini-face{ width:100%; height:58px; }
+/* Final mini-face icon: plain glyph, no chip styling (the old .faces chip rules added a dark disc). */
+.loot-modal .loot-opt .faces-tiles .mini-face .icon-svg{ background:transparent; box-shadow:none; border-radius:0; color:#241c10; width:30px; height:30px; }
+.loot-modal .loot-opt .mini-face small{ font-size:9.5px; }
+.loot-modal .loot-opt .new-tag-card{ top:-8px; right:8px; left:auto; }
+.loot-modal p{ margin:4px 0; text-align:center; font-size:13px; }
+/* Loot picker: the item art lives on the big die face itself (the six faces are already shown beside it) */
+.loot-modal .loot-opt .loot-preview-tile{ grid-column:1; justify-self:center; margin:0; grid-row:1 / span 2 !important; width:92px !important; height:92px !important; position:relative; }
+.loot-modal .loot-opt .loot-tile-art{ position:absolute; left:50%; top:58%; transform:translate(-50%,-50%); width:54px; height:54px; object-fit:contain; filter:drop-shadow(1px 2px 0 rgba(0,0,0,.35)); pointer-events:none; }
+/* name arc is drawn on a 63x20 box: scale its height with the wider loot tile so the text isn't stretched */
+.loot-modal .loot-opt .loot-preview-tile .name-tag{ height:27px; }
+/* Loot chest: the art is the button -- no frame lines around it */
+.loot-chest-btn, .loot-chest-btn:hover, .loot-chest-btn:active, .loot-chest-btn:focus{ border:none !important; filter:none !important; box-shadow:none !important; outline:none !important; background:transparent !important; }
+.loot-tap-hint{ font-size:12px; letter-spacing:.06em; opacity:.75; }
+.loot-chest-btn.opening .loot-tap-hint{ visibility:hidden; }
+.loot-chest-btn.opening .loot-chest-svg{ animation:chest-build-kf 1s ease-in .35s both; transform-origin:50% 80%; }
+.reduced-motion .loot-chest-btn.opening .loot-chest-svg{ animation:none; }
+
+.loot-modal .loot-opt .faces span{ padding:2px 3px; font-size:10px !important; }
+.loot-chest-btn, .loot-chest-btn:active{ box-shadow:none !important; }
+/* 3A: the closed chest takes the stage: no box, big chest in slowly turning gold rays. */
+.loot-overlay:has(.loot-modal-chest){ background:rgba(10,6,3,.78) !important; }
+/* Closed-chest phase only: a narrow, centered card -- just the title and the chest. */
+.loot-modal.loot-modal-chest{ max-width:300px; background:transparent !important; border:none !important; box-shadow:none !important; overflow:visible !important; }
+.loot-modal.loot-modal-chest h2{ padding-right:0; text-align:center; font-size:40px !important; color:#ffd75e !important; text-shadow:0 3px 0 #120b07, 0 0 18px rgba(255,200,80,.45); }
+.loot-modal.loot-modal-chest .loot-chest-btn{ position:relative; padding:26px 0 10px; gap:20px; }
+.loot-modal.loot-modal-chest .loot-chest-btn::before{ content:""; position:absolute; left:50%; top:44%; width:330px; height:330px; margin:-165px 0 0 -165px; border-radius:50%; pointer-events:none; background:repeating-conic-gradient(rgba(255,215,94,.22) 0 9deg, transparent 9deg 22deg); -webkit-mask:radial-gradient(circle, #000 18%, transparent 68%); mask:radial-gradient(circle, #000 18%, transparent 68%); animation:loot-rays-turn 24s linear infinite; }
+.loot-modal.loot-modal-chest .loot-chest-btn.opening::before{ opacity:0; transition:opacity .3s; }
+/* Illustrated chest (lootChestSVG): no frame box, the art is the button. */
+.loot-modal.loot-modal-chest .loot-chest{ height:auto; background:none; border:none; border-radius:0; box-shadow:none; animation:loot-chest-twitch 2.2s ease-in-out infinite; width:190px; position:relative; }
+/* Closed chest fills the narrow card and twitches (quick shake, then a pause) until tapped; the .opening flip animation replaces it. */
+.loot-modal.loot-modal-chest .loot-chest svg{ width:170px; height:170px; filter:drop-shadow(0 8px 0 rgba(0,0,0,.45)); }
+.loot-modal.loot-modal-chest .loot-tap-hint{ position:relative; font-family:'Metamorphous',serif !important; font-size:21px !important; color:#ffd75e !important; opacity:1 !important; text-shadow:0 2px 0 #120b07; }
+.loot-modal .loot-opt:not(.loot-chosen){ box-shadow:inset 0 0 0 1px var(--line), 0 3px 0 var(--line); }
+/* 6A: while the loot chest is up, the fighters' labels hide so nothing shows around "Victory!" */
+body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-chips, .fo-quests-float, .fo-kind, .relic-strip, .kill-hint){ visibility:hidden !important; }
+
+/* ==== Equip window (swap-): every top-level rule for it, merged Nov 12 by tools/css/merge.py (polish roadmap A3).
+   Was 53 rules spread through this file; each value's history is in git. Edit here, not further up. ==== */
+/* padding-top here is deliberately bigger than the count badge's -6px overflow below (see .swap-count-badge) -- otherwise the top row's badges would poke past this list's own edge and get sliced off by its overflow-y:auto (setting overflow-y alone forces overflow-x to clip too, per spec, so this box does clip, not just scroll). */
+.swap-list{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-height:440px; overflow-y:auto; margin:8px 0; padding:10px 4px 4px; }
+.swap-item{ position:relative; z-index:0; background:var(--panel2); border:2px solid var(--line); border-radius:var(--r-md); padding:8px; cursor:pointer; transition:transform .08s; width:88px; }
+.swap-item:hover{ border-color:var(--gold); transform:translateY(-2px); z-index:1; }
+/* Same count-badge design language as Camp's stacked dice (.camp-stack-badge) -- solid gold circle, dark bold number, thin border matching the surrounding background -- instead of the old generic white "x3" pill, so a die count reads the same wherever dice are grouped. */
+.swap-item .swap-count-badge{ position:absolute; top:-6px; right:-6px; z-index:1; background:var(--gold); color:#241c10; border:1.5px solid var(--line); font-size:10px; font-weight:800; border-radius:9px; padding:1px 6px; min-width:15px; line-height:1.4; }
+.swap-item-label{ margin-top:6px; font-size:10px; line-height:1.25; text-align:center; color:var(--parchment-dim); word-break:break-word; }
+/* Used by the Starting Boon picker (Setup screen) -- its "None" option and whichever die is currently picked get a highlighted border/glow so the choice (unlike the carryover list above, which is a one-time pick with no way back) is clearly a toggle you can change your mind on. / Swap picker: face comparison */
+.swap-item.selected{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold), 0 0 8px 1px rgba(212,175,82,0.5); outline:3px solid var(--gold); outline-offset:2px; border-radius:10px; }
+/* Swap picker comparison v2: on top, stacked label-over-faces, bigger dark-tile faces */
+.swap-compare{ display:flex; flex-direction:column; gap:6px; padding:8px; background:var(--b1); border:2px solid var(--line); border-radius:10px; margin:4px 0 10px; }
+.swap-compare-label{ line-height:1.25; text-transform:uppercase; letter-spacing:1px; color:var(--parchment-dim); flex:none; display:flex; align-items:baseline; gap:6px; font-size:10px; }
+.swap-compare-label b{ color:var(--gold); text-transform:none; letter-spacing:0; display:inline; font-size:12px; }
+.swap-compare .mini-face small{ font-size:8.5px; margin-top:1px; }
+.swap-compare-hint{ font-size:11px; color:var(--parchment-dim); font-style:italic; width:100%; text-align:center; align-self:center; margin:auto; }
+.swap-compare .mini-face .icon-svg{ background:transparent !important; box-shadow:none !important; margin:0 !important; color:#241c10; width:24px !important; height:24px !important; }
+.swap-compare-row{ display:flex; flex-direction:column; align-items:stretch; gap:3px; min-height:68px; }
+/* Equip window matches the game column width (not the full screen) */
+.swap-modal{ width:min(390px, calc(100vw - 24px)); max-width:390px !important; margin-left:auto; margin-right:auto; box-sizing:border-box; }
+/* comparison faces: tiles sized to their contents instead of stretching across the panel */
+.swap-compare .faces-tiles{ flex:1 1 auto; min-width:0; display:grid; gap:4px; justify-content:start; grid-template-columns:repeat(6,minmax(0,1fr)); }
+.swap-compare .mini-face{ border-radius:8px; width:100%; height:auto; aspect-ratio:1/1; }
+.swap-modal .swap-item:hover{ border-color:transparent; }
+/* Equip window: four dice per row at the existing die size */
+.swap-modal .swap-list{ justify-content:center; gap:4px 2px; padding-left:0; padding-right:0; }
+/* Equip window: dice sit directly on the panel (no card behind each) */
+.swap-modal .swap-item{ background:none; box-shadow:none; border-radius:12px; width:76px; padding:2px; border:0; box-sizing:border-box; }
+.swap-modal .swap-item.selected{ outline:none; border-color:var(--gold); box-shadow:0 0 10px 2px rgba(255,200,58,.55); background:rgba(255,200,58,.08); border:0; }
+/* Equip window: the dice speak for themselves */
+.swap-modal .swap-item-label{ display:none; }
+/* Oct 13: Suggested die in the Equip picker (mockup A) */
+.swap-item.swap-suggest{ position:relative; }
+.swap-suggest-ribbon{ position:absolute; top:-9px; left:50%; transform:translateX(-50%); z-index:3; background:#ffd76a; color:#241c10; font-size:10px; font-weight:800; padding:0 6px; border-radius:6px; border:2px solid #0c0705; white-space:nowrap; pointer-events:none; animation:ribbon-in .3s ease-out; }
+.swap-out-hint{ opacity:.7; }
+#swap-go.swap-suggest-mode{ background:#4f6aa6 !important; color:#fff3dc !important; }
+/* 1A: Equip shows your tray as a 4x4 grid; the picked die lifts and tilts; the OUT row is one quiet well until then. */
+.swap-tray-head{ font-family:var(--font-display); color:var(--gold); font-size:16px; margin:8px 0 4px; text-align:left; }
+.swap-modal .swap-list.swap-tray{ display:grid !important; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px !important; padding:8px !important; margin:0 0 8px !important; max-height:none !important; overflow:visible !important; background:#6b4220; border:3px solid var(--line); border-radius:12px; box-shadow:0 4px 0 var(--line); }
+.swap-modal .swap-tray .swap-item{ width:auto !important; padding:0 !important; aspect-ratio:1; transition:transform .12s cubic-bezier(.3,1.6,.5,1); }
+.swap-modal .swap-tray .swap-item-label{ display:none; }
+.swap-modal .swap-tray .swap-item.selected{ transform:translateY(-5px) rotate(-3deg); z-index:2; }
+.swap-modal .swap-tray .swap-suggest-ribbon{ font-size:9px !important; top:-8px !important; }
+.swap-modal h2{ font-size:22px !important; }
+.swap-out-empty{ height:44px; border-radius:10px; background:#2a1b10; box-shadow:inset 0 3px 6px rgba(0,0,0,.55); border:2px solid var(--line); }
+.swap-item .loot-preview-tile{ margin-bottom:0; }
+.swap-modal .swap-tray .swap-item .loot-preview-tile{ width:100% !important; height:100% !important; margin:0 !important; }
+.swap-modal .swap-tray .swap-item.selected .loot-preview-tile{ box-shadow:0 0 0 3px var(--gold), 0 6px 0 var(--line) !important; }
+
+/* Loot cards: faces as plain icon dots (no text labels, blanks hidden). / 4A: loot window: bigger Victory, a gold "Pick one" ribbon, blank faces as dark wells */
+.loot-modal h2{ border-bottom:none; padding-bottom:0; margin-bottom:6px; text-align:center; font-size:30px !important; }
+/* Nov 4: the Elite door's deeper-floor loot die */
+.loot-opt-deeper{ position:relative; }
 /* First loot pick bubble: sits above the Equip sheet, so it must be over the modal overlay (z 50) */
 .loot-tip{ z-index:1000; }
 
@@ -3734,7 +3560,81 @@ button.cf-go-train:hover:not(:disabled){ background:#9a6fc2; }
 .upgrade-rows-col{ display:flex; flex-direction:column; gap:5px; margin-top:6px; position:relative; }
 .upgrade-rows-col .camp-rows-note{ position:absolute; inset:0; z-index:2; display:flex; align-items:center; justify-content:center; text-align:center; pointer-events:none; font-size:13px; font-weight:700; color:#f3e6cc; text-shadow:0 1px 0 #120b07, 0 0 6px #120b07; padding:0 10px; }
 
-.shrine-opt.so-wasted{ opacity:.55; } /* Nov 12: still pickable, just shown as no use right now */
+/* ==== Shrine (shrine-, so-): every top-level rule for it, merged Nov 12 by tools/css/merge.py (polish roadmap A3).
+   Was 71 rules spread through this file; each value's history is in git. Edit here, not further up. ==== */
+/* v1.36.0: shrine ritual */
+#room-callout .room-callout-line.intro.shrine{ color:#cfe9ff !important; font-style:italic; }
+.fo-shrine .shrine-motes{ position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:1; }
+.fo-shrine .shrine-motes i{ position:absolute; left:var(--x); bottom:-6px; width:3px; height:3px; border-radius:50%; background:#ffe9a8; opacity:0; animation:shrineMote var(--t) linear var(--d) infinite; }
+.fo-shrine.shrine-awaken .fo-torch{ animation:shrineTorchWarm 1.4s ease-out 1; }
+.fo-shrine .fo-enemy .fo-fig.shrine-charging{ animation:shrineLift .65s ease-in forwards; }
+.fo-shrine .fo-enemy .fo-fig.shrine-charging::after{ opacity:1; transition:opacity .65s; }
+.fo-shrine .fo-enemy .fo-fig.shrine-burst{ animation:shrineBurst .45s ease-out forwards; }
+.fo-shrine .fo-enemy .fo-fig.shrine-burst::after{ opacity:0; transition:opacity .45s; }
+.shrine-hold-btn{ position:relative; overflow:hidden; touch-action:none; user-select:none; -webkit-user-select:none; }
+.shrine-result-banner{ position:absolute; left:14px; right:14px; top:12px; z-index:4; text-align:center; padding:7px 10px; background:rgba(28,17,9,.92); border:2px solid var(--line); border-radius:var(--r-md); box-shadow:0 3px 0 rgba(0,0,0,.5); animation:shrineBanner .35s ease-out both; }
+.shrine-result-banner .srb-title{ font-family:var(--font-display); color:var(--gold); font-size:13px; line-height:1.2; }
+.shrine-result-banner .srb-text{ font-size:11.5px; color:var(--parchment); line-height:1.3; margin-top:2px; }
+.shrine-float{ position:fixed; z-index:9500; pointer-events:none; transform:translate(-50%,0); font-family:var(--font-display); font-size:26px; font-weight:800; text-shadow:0 2px 0 #0c0705, 0 0 6px rgba(0,0,0,.6); animation:shrineFloat 1.4s ease-out forwards; white-space:nowrap; }
+.shrine-float.heal{ color:#7dff9a; }
+.shrine-float.gold{ color:var(--gold); font-size:20px; }
+.util-btn.shrine-token-pulse{ animation:shrineTokenPulse .7s ease-out 2; }
+.shrine-act > *{ pointer-events:auto; }
+.shrine-float-hint{ text-align:center; margin:0; padding:8px 12px; border-radius:12px; background:rgba(10,7,5,.85); border:2px solid var(--line); }
+/* Oct 16 (Jeremy): the shrine's Hold / Continue is a round button over the dice tray; it never fades, it pulses to invite a press, and a gold ring fills while you hold (SHRINE_HOLD_MS) */
+.shrine-orb{ position:relative; width:128px; height:128px; border-radius:50% !important; padding:0 !important; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at 50% 38%, #ffe7a3, #f2b833 58%, #c98a14) !important; color:#2a1a08 !important; border:4px solid var(--line) !important; touch-action:none; user-select:none; -webkit-user-select:none; }
+.shrine-orb .so-label{ position:relative; display:flex; flex-direction:column; align-items:center; line-height:1.05; pointer-events:none; }
+.shrine-orb .so-label small{ font-size:10.5px; font-weight:700; max-width:84px; text-align:center; margin-top:3px; opacity:.85; }
+.shrine-orb.so-continue .so-label small{ font-size:18px; margin-top:0; }
+.shrine-orb .so-ring{ position:absolute; inset:-11px; width:calc(100% + 22px); height:calc(100% + 22px); transform:rotate(-90deg); pointer-events:none; overflow:visible; }
+.shrine-orb .so-track{ fill:none; stroke:rgba(12,7,5,.55); stroke-width:6; }
+.shrine-orb .so-fill{ fill:none; stroke:#fff3c4; stroke-width:6; stroke-linecap:round; stroke-dasharray:100; stroke-dashoffset:100; transition:stroke-dashoffset .15s ease-out; filter:drop-shadow(0 0 4px rgba(255,220,120,.9)); }
+.shrine-orb.charging{ animation:so-shake .7s linear forwards; transform:scale(.96); }
+.reduced-motion .shrine-orb.charging{ animation:none; }
+.shrine-orb.charging .so-fill{ stroke-dashoffset:0; transition:stroke-dashoffset .7s linear; }
+.reduced-motion .shrine-orb{ animation:none; }
+.shrine-act .shrine-float-hint{ margin-top:46px; }
+/* the round shrine button waits until the "you scramble into a room" banner is tapped away */
+body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
+/* Shrine hold / Continue button floats above the tray (Oct 12): out of the page flow so the dice don't move. */
+.shrine-act{ position:fixed; z-index:40; transform:translateX(-50%); pointer-events:none; transition:opacity .25s ease-out; }
+.shrine-orb.so-continue{ background:radial-gradient(circle at 50% 38%, #b9eea0, #5fb544 58%, #3a7f2a) !important; color:#10260a !important; animation:none; }
+.shrine-opt.so-heal{ background:#c9506a; }
+.shrine-opt.so-heal h4{ color:#fff1e8; }
+.shrine-opt.so-maxhp{ background:var(--green); }
+.shrine-opt.so-maxhp h4{ color:#eafbea; }
+.shrine-opt.so-relic{ background:var(--purple); }
+.shrine-opt.so-relic h4{ color:#f5eaff; }
+.shrine-opt.so-attack{ background:#e8574f; }
+.shrine-opt.so-attack h4{ color:#fff3e6; }
+.shrine-opt.so-maneuver{ background:#ffe9a8; }
+.shrine-opt.so-maneuver h4{ color:#3a2410; }
+.shrine-opt.so-forge{ background:#d4af52; }
+.shrine-opt.so-forge h4{ color:#241c10; }
+.shrine-opt.so-leave{ background:var(--b1); }
+.shrine-opt.so-leave h4{ color:var(--parchment-dim); }
+.shrine-orb .so-label b{ font-size:22px; font-family:var(--font-ui); font-weight:900; letter-spacing:.3px; }
+.shrine-pick .shrine-opt:active{ transform:translateY(2px); box-shadow:0 2px 0 var(--line) !important; }
+.shrine-pick .sp-ic{ position:relative; width:56px; height:56px; border-radius:14px; border:3px solid var(--line); display:flex; align-items:center; justify-content:center; box-shadow:inset 0 -4px 0 rgba(0,0,0,.25), inset 0 3px 0 rgba(255,255,255,.25); }
+.shrine-pick .sp-ic .icon-svg, .shrine-pick .sp-ic .mark-svg{ width:32px; height:32px; }
+.shrine-pick .sp-ic i{ position:absolute; right:-7px; bottom:-7px; width:22px; height:22px; border-radius:50%; background:var(--gold); color:#241c10; border:2px solid var(--line); font:900 17px/18px var(--font-ui); font-style:normal; text-align:center; }
+.shrine-pick .shrine-opt h4{ margin:0; font:400 19px/1.1 var(--font-display) !important; color:#fff1d6 !important; text-transform:none !important; letter-spacing:0 !important; }
+.shrine-pick .sp-sub{ font-size:12px; line-height:1.25; color:#c8b08a; }
+.shrine-pick.sp3 .shrine-opt{ padding:10px 4px 9px !important; }
+.shrine-pick.sp3 .sp-ic{ width:46px; height:46px; }
+.shrine-pick.sp3 .sp-ic .icon-svg, .shrine-pick.sp3 .sp-ic .mark-svg{ width:26px; height:26px; }
+.shrine-pick.sp3 .shrine-opt h4{ font-size:15px !important; }
+.shrine-pick.sp3 .sp-sub{ font-size:11px; }
+/* S1: shrine options are cards (icon, title, one plain line) under a "Pick one" ribbon */
+#shrine-options.shrine-pick{ display:grid !important; gap:10px; grid-template-columns:repeat(2, minmax(0,1fr)); width:100%; }
+#shrine-options.shrine-pick.sp3{ gap:7px; grid-template-columns:repeat(3, minmax(0,1fr)); }
+.shrine-pick .shrine-opt{ display:flex !important; flex-direction:column; align-items:center; gap:6px; padding:12px 8px 11px !important; margin:0 !important; width:auto !important; min-height:0 !important; background:#3a2819 !important; border:3px solid var(--line) !important; border-radius:12px !important; box-shadow:0 4px 0 var(--line), inset 0 2px 0 rgba(255,255,255,.08) !important; text-align:center; cursor:pointer; min-width:0 !important; max-width:none !important; flex:none !important; box-sizing:border-box; }
+.shrine-pick .shrine-opt h4, .shrine-pick .sp-sub{ overflow-wrap:anywhere; }
+/* 10: each shrine option its own colour, matching what it gives */
+#shrine-options .loot-opt.shrine-opt{ border:3px solid var(--line); filter:drop-shadow(0 3px 0 var(--line)); }
+#shrine-options .loot-opt.shrine-opt h4{ margin:2px 0; font-size:14px; }
+.shrine-opt.so-wasted{ opacity:.55; }
+ /* Nov 12: still pickable, just shown as no use right now */
 
 /* Nov 12 Codex polish: Bestiary quest rewards look like the wall poster's red badges (they were gold-on-brown blobs),
    and a monster's every-turn actions read as icon + number chips */
@@ -3754,6 +3654,46 @@ button.cf-go-train:hover:not(:disabled){ background:#9a6fc2; }
 .dg-goal{ display:block; color:var(--parchment); line-height:1.3; }
 .dg-k{ display:block; font-family:'Metamorphous', serif; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--gold, #d4af52); }
 .dg-prog{ display:block; font-size:.82em; color:var(--parchment-dim); }
+
+/* ==== Setup screen (setup-): every top-level rule for it, merged Nov 12 by tools/css/merge.py (polish roadmap A3).
+   Was 38 rules spread through this file; each value's history is in git. Edit here, not further up. ==== */
+.setup-section{ display:flex; flex-direction:column; gap:6px; margin:0 0 10px; }
+.setup-label{ font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; color:var(--parchment-dim); user-select:none; }
+.setup-label-sub{ text-transform:none; font-weight:normal; font-size:10.5px; }
+.setup-back-btn{ display:inline-flex; align-items:center; gap:5px; font-size:12px; padding:5px 12px 5px 9px; margin:0 0 10px; border-radius:var(--r-pill); }
+.setup-panel .class-showcase-name{ color:#fff1d6; text-shadow:0 0 0 var(--class-color); border-bottom:3px solid var(--class-color); padding-bottom:1px; }
+.setup-panel{ background:var(--b2) !important; }
+.setup-panel .origin-showcase, .setup-panel .class-showcase, .setup-panel .boon-showcase{ background:var(--brown-light) !important; }
+.setup-panel .setup-label{ display:flex; align-items:center; justify-content:center; gap:10px; font-family:var(--font-display); font-size:13px; font-weight:400; letter-spacing:2.5px; color:var(--gold); text-shadow:0 2px 0 #0c0705, 0 0 10px rgba(255,200,58,.25); padding:0; margin:0 0 1px; }
+.setup-panel .setup-label::before, .setup-panel .setup-label::after{ content:''; flex:1; height:2px; border-radius:2px; background:linear-gradient(90deg, transparent, rgba(255,200,58,.7)); box-shadow:0 1px 0 #0c0705; }
+.setup-panel .setup-label::after{ background:linear-gradient(270deg, transparent, rgba(255,200,58,.7)); }
+.setup-panel .setup-label-sub{ font-family:var(--font-ui); font-size:10px; letter-spacing:.5px; font-style:italic; color:var(--parchment-dim); text-shadow:none; text-transform:none; }
+/* Setup fits one screen for veterans too (fitSetup, render.js adds fit1..fit3 only while the page would scroll) */
+.setup-panel.fit1 .setup-back-btn{ float:left; margin:0 10px 0 0; }
+.setup-panel.fit1 .setup-name-row{ margin-bottom:8px; min-height:29px; }
+.setup-panel.fit1 .setup-section{ margin-top:0; margin-bottom:6px; }
+.setup-panel.fit1 .boon-showcase{ flex-direction:row; align-items:center; gap:8px; padding:5px 8px; }
+.setup-panel.fit1 .boon-showcase .die-plate{ display:none; }
+.setup-panel.fit1 .boon-showcase .die-art-wrap{ width:30px; height:30px; }
+.setup-panel.fit1 .boon-showcase:has(.boon-showcase-empty){ justify-content:center; }
+.setup-panel.fit1 .boon-showcase-empty{ padding:0 2px; flex:1; }
+.setup-panel.fit1 .boon-scroll{ padding:2px; }
+.setup-panel.fit2 #start-btn{ padding:10px 12px; font-size:19px; margin-top:2px; }
+.setup-panel.fit2 .class-showcase{ min-height:0 !important; padding:7px 10px !important; }
+.setup-panel.fit2 .class-mini-tray{ width:80px; flex-basis:80px; padding:4px; gap:2px; }
+.setup-panel.fit2 .origin-relic-line{ padding:4px 8px; margin-top:5px; }
+.setup-panel.fit2 .depth-toggle{ padding:4px 10px; }
+.setup-panel.fit2 .depth-toggle .depth-num{ width:32px; height:32px; font-size:17px; }
+.setup-panel.fit3 .origin-showcase-portrait{ width:80px !important; height:80px !important; }
+.setup-panel.fit3 .boon-tile-circle{ width:38px; height:38px; }
+.setup-panel.fit3 .setup-section{ gap:4px; }
+.setup-panel.fit4 .origin-showcase{ padding:6px 8px; gap:4px; }
+.setup-panel.fit4 .origin-showcase-portrait{ width:70px !important; height:70px !important; }
+.setup-panel.fit4 .class-showcase-ability{ font-size:11px; line-height:1.25; }
+.setup-panel.fit4 .boon-tile-circle{ width:34px; height:34px; }
+.setup-panel.fit4 .setup-name-row{ margin-bottom:4px; }
+/* Setup screen (character creation) -- a WoW-style icon-row -> contextual detail-panel pattern: tapping an Origin/Class icon fills one shared panel below it rather than showing every option's full card at once (the old 2-up grid of cards this replaced). Sized to fit the whole screen within one phone-height viewport without scrolling. */
+.setup-name-row{ display:flex; align-items:center; gap:6px; margin:0 0 10px; justify-content:center; }
 /* Nov 12: fit5, found by the screen check: with the Depth row a 360x722 phone still scrolled 3px after fit4 */
 .setup-panel.fit5 #start-btn{ padding:7px 12px; margin-top:0; }
 .setup-panel.fit5 .depth-toggle{ padding:2px 10px; }
