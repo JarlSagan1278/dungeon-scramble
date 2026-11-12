@@ -5134,7 +5134,8 @@ function confirmEmptyPocket(go){
 // attributes are updated in place, only nodes of a different kind are replaced. Kept nodes keep their running CSS
 // animations, loaded images, focus and scroll, and properties set by script (onclick etc. are reassigned by the
 // screen's own wiring after each redraw, so handlers must be assigned, or added once with a guard, never stacked).
-// The result must equal a fresh innerHTML of the same markup: check.js 'morph' compares them screen state by state.
+// The result must equal a fresh innerHTML of the same markup, attribute order included (text comparisons in the
+// redraw checks rely on it): check.js 'morph' compares them screen state by state.
 // Nodes are matched by position, tag and id. Goal: replace renderPathOnly / patchGameDOM / renderTrayFast with this.
 function morphHTML(el, html){
   const t = document.createElement('template'); t.innerHTML = html;
@@ -5158,8 +5159,12 @@ function morphSameKind(f, t){
 function morphNode(f, t){
   if(f.nodeType!==1){ if(f.nodeValue!==t.nodeValue) f.nodeValue = t.nodeValue; return; }
   if(f.isEqualNode(t)) return;
-  for(const at of [...t.attributes]) if(f.getAttribute(at.name)!==at.value) f.setAttribute(at.name, at.value);
-  for(const at of [...f.attributes]) if(!t.hasAttribute(at.name)) f.removeAttribute(at.name);
+  const ta = [...t.attributes], fa = [...f.attributes];
+  if(ta.length===fa.length && ta.every((at,i)=>at.name===fa[i].name)){
+    ta.forEach(at=>{ if(f.getAttribute(at.name)!==at.value) f.setAttribute(at.name, at.value); });
+  } else { // the attribute set changed: rewrite them in the markup's order, so the result serializes exactly like a fresh draw
+    fa.forEach(at=>f.removeAttribute(at.name)); ta.forEach(at=>f.setAttribute(at.name, at.value));
+  }
   if(f.tagName==='INPUT' && f.value!==t.value) f.value = t.value;
   morphChildren(f, t);
 }

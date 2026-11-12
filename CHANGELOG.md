@@ -2,6 +2,7 @@
 
 ## 1.42.101 (Nov 12, 2026)
 - Swap, Reroll and Skill taps update the tray in place (morphHTML), like path taps: the dice an action doesn't touch keep their element and running animations, and the swapped/rerolled/converted die still plays its flourish (the class lands fresh on the kept element). trayfast (3 classes) and trayact (18 checks) unchanged; check.js morph covers the Skill conversion.
+- morphHTML keeps attributes in the markup's order when an element gains or loses one (a reroll could add one at the end), so an in-place redraw now serializes exactly like a fresh draw; the full suite caught it (trayfast compares the tray as text). check.js morph now compares exact text too.
 
 ## 1.42.100 (Nov 12, 2026)
 - Path taps update the dice and the path coins in place (morphHTML) instead of rebuilding the tray: dice a tap doesn't change keep their element and their running animations (idle twitches, combo rings, the Skill knock), and the next turn's playback keeps its per-die cache instead of rebuilding the whole tray on its first frame. A tap takes ~1.8 ms instead of ~2.8 ms in the test browser. The damage counter is still rebuilt on purpose (its pop-in replays on every tap). check.js morph covers path taps (equal to a fresh draw, untouched dice kept, Go still plays the turn); pathrender: 44 taps, 0 mismatches.
