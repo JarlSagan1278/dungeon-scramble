@@ -39,6 +39,7 @@ Digital prototype of the board game Jeremy designed with his wife Katlynn (Boggl
 - Swap/Reroll and class-Skill taps use `renderTrayFast()` (render.js, Oct 14): it also redraws the tray's armed classes and the Skill button. The armed Skill tap is handled in `bindTrayDice` (no one-shot listeners). (check.js: trayfast).
 - Scramble flick (1.41.83): `scrambleTray(true)` at turn/room start sets `S.needRoll` (tray covered, Scramble replaces Go) until `scrambleRoll()`; faces are already rolled. Off for webdriver unless localStorage `dungeonScrambleRollTest` (check.js: scramble).
 - Tests that reload the page must serve dist over http (see tools/tests/test_ui.js): on a file:// page headless Chromium sometimes drops every localStorage write of the session on location.reload() (the Abandon Run check failed ~1 in 5 that way, Oct 31).
+- Saves (Nov 12): `RUN_FIELDS` / `SCREEN_FIELDS` at the top of logic.js decide what a save keeps. A new `S.field` must go in one of them (check.js: savefields fails otherwise); run data the player would miss after Continue = RUN, anything visual or mid-playback = SCREEN.
 - Pocket/Organize fold in camp: measure positions after applying absolute positioning, cluster rows with ~16px tolerance.
 
 ## Design rules Jeremy has set

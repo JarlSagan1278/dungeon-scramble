@@ -28,6 +28,7 @@ const ALL = [
   ['preview',    'tools/tests/test_preview.js'],    // next-turn damage = what lands, relics included (Nov 12)
   ['screens',    'tools/tests/test_screens.js'],    // 15 screens x 2 phones: never taller than the phone, same as the approved pictures (Nov 12)
   ['crescendo',  'tools/tests/test_crescendo.js'],  // big turns stamp their total and hold a beat; small/Skip/kill don't (Nov 12)
+  ['savefields', 'tools/tests/test_savefields.js'], // every S field is RUN (saved) or SCREEN (not); saves round-trip (Nov 12)
 ];
 const QUICK = new Set(['sim', 'pathrender', 'trayfast', 'playback', 'ui', 'scramble']);
 

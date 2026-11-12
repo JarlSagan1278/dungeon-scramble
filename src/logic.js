@@ -35,14 +35,51 @@ function migrateSave(data){
   return data;
 }
 
+// ---- What a save keeps (Nov 12, polish roadmap A2) ----
+// Every field of S is either RUN data (the run itself: saved, restored on Continue) or SCREEN state (animations, open
+// pop-ups, timers, the turn being played back: never saved, rebuilt by the screen). A save writes RUN fields only, and a
+// load keeps RUN fields only, so a stray animation clock or half-played turn can't come back from a save. The resume
+// bugs of Nov 12 (loot chest, mid-turn) both came from deciding this field by field. check.js 'savefields' fails if S
+// gets a field that is in neither list: put a new field in one of them (when unsure, RUN: that's what used to happen).
+const RUN_FIELDS = [
+  // who and where
+  'screen','charName','origin','klass','portrait','depth','depthMods','floorIdx','routeStep','route','encounter','turnNumber','guide','coachRun',
+  // you
+  'health','maxHealth','playerDOT','playerHOT','playerBlock','tray','backPocket','relics','path','classAbilityUsed','freezeNext',
+  'nullifyTokens','freezeTokens','swapTokens','rerollTokens','boostTokenCharges','boostTokenValue','pendingFreeBoost','swapLog','trayAct',
+  'needRoll','_pendingMinions','_reveals','committedTurn','_lw',
+  // choices waiting on you (a shrine choice holds functions: maybeAutosave never saves while one is open)
+  'lootChoice','pendingLootDie','relicChoice','shrineChoice','shrineResult','forkChoice','forkPick',
+  // camp and route bookkeeping
+  'campOpen','campChoice','campFireOut','campRested','campHealed','campUpgrades','skipNextRest','segmentShrineUsed','segmentTrapUsed',
+  'usedCards','usedLootNames','_stickerSalt',
+  // records of the run
+  'log','stats','tele','_roomStartedAt','saveVersion',
+];
+const SCREEN_FIELDS = [
+  // turn playback
+  'transitioning','resolveTotal','resolvingIdx','resolvingFx','_advance','_pendingTimeout','_skipAll','_resolvingPath','_hitStreak',
+  '_heavyHit','_wardHalf','_downBeat','lastComboRipple','lastMinionClearIdx','_relicQ',
+  // one-shot animations and highlights
+  '_roll','_ghost','_shieldFx','_lastPlayerHealth','_abilityReveal','justConvertedIdx','justRerolledIdx','justScrambled','justSwappedIdx',
+  'newRoomFx','shrineFx','_fuseFx','_forkSeamless','_mascotFloor','_mascotLeft','_enemySoundN','_enemySoundReset','_unlockFx','_forceTier',
+  // open panels
+  'organizeSelection','_pocketOpen',
+  // end-of-run screens (never autosaved: the save is cleared when a run ends)
+  'gameOverRecorded','carryoverOptions','carryoverChosenName','depthResult','newAchievements','newBoonDice','newOriginRelic','personalBests',
+];
+const RUN_FIELD_SET = new Set(RUN_FIELDS), SCREEN_FIELD_SET = new Set(SCREEN_FIELDS);
+function unclassifiedStateFields(st){ return Object.keys(st||{}).filter(k=>!RUN_FIELD_SET.has(k) && !SCREEN_FIELD_SET.has(k)); }
+
 function serializeState(){
-  // _roll/_ghost/_shieldFx hold performance.now() timestamps for animations; they mean nothing after a reload (the clock restarts), so never save them.
-  const { klass, origin, _advance, _pendingTimeout, _roll, _ghost, _shieldFx, ...rest } = S;
+  const rest = {};
+  for(const k of RUN_FIELDS) if(k in S) rest[k] = S[k];
+  delete rest.klass; delete rest.origin; // saved as ids below
   // The portrait picture itself (~265 KB of base64 in the single-file build) is rebuilt on load from origin + idx + tone
   // by refreshSavedPortrait(), so the save keeps only those (Oct 21: saves and backup codes ~40x smaller).
   const p = rest.portrait;
   if(p && !p.placeholder && p.idx!=null && p.origin && originPortraitArray(p.origin) && originPortraitArray(p.origin)[p.idx]) rest.portrait = { ...p, img: null };
-  return { ...rest, saveVersion: SAVE_VERSION, classId: klass.id, originId: origin.id, usedCards: [...S.usedCards], usedLootNames: [...S.usedLootNames] };
+  return { ...rest, saveVersion: SAVE_VERSION, classId: S.klass.id, originId: S.origin.id, usedCards: [...S.usedCards], usedLootNames: [...S.usedLootNames] };
 }
 
 function saveGame(){
@@ -823,7 +860,9 @@ function loadGame(){
   try{
     const raw = localStorage.getItem(SAVE_KEY);
     if(!raw) return false;
-    const data = migrateSave(JSON.parse(raw));
+    const data0 = migrateSave(JSON.parse(raw));
+    // RUN fields only: older saves also carried screen state (animation clocks, playback flags) that must not come back
+    const data = {}; for(const k of Object.keys(data0)) if(RUN_FIELD_SET.has(k) || k==='classId' || k==='originId' || k==='saveVersion') data[k] = data0[k];
     data.klass = CLASSES.find(c=>c.id===data.classId);
     data.origin = ORIGINS.find(o=>o.id===data.originId);
     data.usedCards = new Set(data.usedCards||[]);
@@ -835,7 +874,6 @@ function loadGame(){
     if(Array.isArray(data.backPocket)) data.backPocket = data.backPocket.filter(Boolean);
     if(Array.isArray(data.tray)) data.tray.forEach(c=>{ if(c && !c.die) c.die = clone(basic('attack',1)); });
     data.organizeSelection = null;
-    delete data._roll; delete data._ghost; delete data._shieldFx; // old saves carried stale animation clocks -> absurd HP numbers
     S = data;
     refreshSavedPortrait(S.portrait);
     return true;

@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.90 (Nov 12, 2026)
+- Saves keep the run, not the screen: every field of the game state is now listed as run data (saved) or screen state (animations, playback, open panels: never saved) in logic.js. A save writes run fields only and a load keeps run fields only, so an old save's stray animation clock or playback flag can't come back. New check, savefields: every field the code sets is listed, bot runs add no unlisted field, and save -> load -> save is unchanged at camp, in a fight and at the loot chest.
+
 ## 1.42.89 (Nov 12, 2026)
 - Code tidy, no visible change: the quest poster's styles (72 rules in ~30 places, Oct 13 - Nov 9) are merged into one block in styles.css (36 rules, 6 fewer !important). Checked by comparing every computed style of the poster in six states (plain, done, live, stamp, reduced motion, playback) before and after, plus the screen pictures.
 
