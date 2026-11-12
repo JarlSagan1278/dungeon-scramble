@@ -1,6 +1,6 @@
 # Dungeon Scramble — TODO
 
-Updated Nov 9, 2026 (build 1.42.74). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
+Updated Nov 12, 2026 (build 1.42.89). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
 study results in `STUDY_FINDINGS.md`. The release checklist (40 items, owner and status) is the Checklist tab of
 the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 
@@ -15,6 +15,13 @@ the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
    and phone vs desktop.
 3. **Retune only from real data.** Bot win rates are not human ones (see `STUDY_FINDINGS.md`). Re-calibrate the
    regular/new bot profiles against the first real runs.
+
+## Polish roadmap (Nov 12: https://claude.ai/artifact/RHcVM2LaEFeXyFcX8VR3zm)
+Done in 1.42.86-1.42.89: exact next-turn damage, defeat-screen next goal, screen picture check, big-turn crescendo, quest poster styles merged.
+Next, in order: (A2) split saved run state from screen state (save an allow-list); (V2) one shared "tap me" cue for every screen that waits on a tap;
+(A3 cont.) merge the next component's styles the same way (dice, then camp), verified by computed-style diff + screen pictures;
+(A4) one redraw path (small DOM morph, try on camp first); (A5) art as image files built into base64. V1 floor props when Jeremy has drawings;
+E4 onboarding fixes once ~10 first runs of play data are in.
 
 ## Release gaps (review Oct 28)
 Fixed in 1.41.96: tutorial cards, defeat screen, copy, dev features, credits, desktop backdrop, shrine text. Type and buttons
