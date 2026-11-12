@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.89 (Nov 12, 2026)
+- Code tidy, no visible change: the quest poster's styles (72 rules in ~30 places, Oct 13 - Nov 9) are merged into one block in styles.css (36 rules, 6 fewer !important). Checked by comparing every computed style of the poster in six states (plain, done, live, stamp, reduced motion, playback) before and after, plus the screen pictures.
+
 ## 1.42.88 (Nov 12, 2026)
 - Big-turn crescendo: after the last die of a big path (8+ damage, or a big share of the monster's health) the turn's total slams onto the monster ("18 DAMAGE", bigger and hotter at 15 and 25), with the closing chord and a shake, and holds for 0.65-0.95 s before the monster answers (the chord and shake used to fire as the monster's turn began). Small turns stay quick, Skip skips it, a kill keeps its own beat, Reduced Motion shows the number without the slam or shake. New check: crescendo.
 
