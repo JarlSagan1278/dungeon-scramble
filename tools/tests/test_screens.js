@@ -47,7 +47,8 @@ const SCREENS = [
   ['records', () => { preGameScreen = 'title'; S = null; render(); openRecordsModal(); }],
 ];
 
-(async () => {
+module.exports = { SCREENS, INIT, HELP, URL_ }; // tools/css/styledump.js reuses the screen setups
+if (require.main === module) (async () => {
   fs.mkdirSync(OUT, { recursive: true });
   const browser = await chromium.launch(); const out = []; let shown = 0;
   const cmp = await browser.newPage(); // a blank page that encodes/decodes/compares pictures

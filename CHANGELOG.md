@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.92 (Nov 12, 2026)
+- Code tidy, no visible change: the dice styles (81 rules spread over the whole stylesheet) are merged into one "Dice" block (65 rules, 3 fewer !important); the base `.die` rule stays first because other screens' dice rules override it. New tools: `tools/css/merge.py` (merges one component's rules), `tools/css/styledump.js` + `stylediff.js` (record every computed style on the picture-check screens and prove a refactor changed nothing: 0 differences here, across 18 screens and dice states at both phone sizes).
+
 ## 1.42.91 (Nov 12, 2026)
 - One "tap me" cue everywhere (Jeremy picked "Knock"): anything a screen is waiting on you to tap sits still, then gives a quick wiggle every 2.6 s, starting after 1.2 s: the Skill-ready die, the keep-a-die tile on the defeat screen, the loot chest, the room door, the fork doors, the shrine button, and camp's Rest and Train while neither is chosen. Replaces the chest and door bobbing, the shrine button's pulse and the defeat die's hop. One shared block at the end of styles.css; off under Reduced Motion and during turn playback.
 
