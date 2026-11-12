@@ -28,7 +28,7 @@ done in 1.41.97 (Alegreya, toy bevel). Open: the credits' art
 line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jeremy's. Art treatment settled in 1.41.98 (grain kept, cover matched). Second visual review (Oct 28): blank sides, idle Go, Victory chest, equip window and Settings fixed in 1.41.99; title, defeat, Base Camp, boss bar and consent line done in 1.42.0 (loot names in the tray stay). Codex and Records polished in 1.42.1.
 
 ## Waiting on Jeremy
-- **Itch (Nov 12):** upload the new demo zip (1.42.102: big-turn crescendo, exact damage preview, next goal on defeat, choices resume after closing, one tap cue, camp fixes); in the page description change "Leap, Dodge and Pivot" to "Leap, Sidestep and Pivot" (text in `release/itch_page.md`).
+- **Itch page text:** in the description change "Leap, Dodge and Pivot" to "Leap, Sidestep and Pivot" (text in `release/itch_page.md`). (Demo zip 1.42.102 and the animated cover went up Nov 12.)
 - **Title art** (Nov 10: revisit when the PC port starts in earnest; 860 px is enough for phone, itch and Play): new cover drawn from scratch on the 2048x2434 canvas (`DungeonScramble_TitleArt_canvas.psd`); the chat
   only passes 860 px, so export full size from Sketchbook or upload the PSD to the repo. Keep the logo layer for Steam.
 - **Redraw the remaining AI-assisted art** (pixie portraits, the remaining original loot) to shrink the disclosure.
