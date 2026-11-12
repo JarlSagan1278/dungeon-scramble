@@ -3877,3 +3877,8 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .bst-moves .bst-act .icon-svg{ width:14px; height:14px; }
 .bst-moves .bst-act b{ font-family:var(--font-ui); }
 .rh-card .rh-killer{ font-size:11px; opacity:.85; margin:-2px 0 2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } /* Nov 12 */
+
+/* Nov 12: the keep-a-die tile reads as tappable (the defeat screen has no buttons until you pick) */
+.defeat-keep #carryover-list .swap-item{ cursor:pointer; animation:dk-nudge 2.4s ease-in-out 1.2s infinite; }
+@keyframes dk-nudge{ 0%,86%,100%{ transform:translateY(0); } 90%{ transform:translateY(-4px); } 95%{ transform:translateY(0); } }
+.reduced-motion .defeat-keep #carryover-list .swap-item{ animation:none; }

@@ -5669,7 +5669,7 @@ function renderGameOver(){
     app.innerHTML = `<div class="panel end-screen defeat-keep"><h2>Defeated</h2>
       <div class="dk-hero">${rd.portrait ? `<img class="dk-portrait" src="${rd.portrait}" alt=""/>` : ''}<div class="dk-id"><div class="dk-name">${(rd.name || rd.who).replace(/</g,'&lt;')}</div><div class="dk-fell">${rd.outcome}</div><div class="dk-sub">${rd.stats.map(([k,v])=>`${v} ${k.toLowerCase()}`).join(' &middot; ')}</div></div></div>
       <div class="dk-box"><div class="dk-title">Keep one die for your next run</div>
-        <p class="dk-hint">It joins your tray at the start of the next run.</p>
+        <p class="dk-hint">${S.carryoverOptions.length>1 ? 'Tap one' : 'Tap it'} to keep it: it joins your tray at the start of your next run.</p>
         <div class="swap-list" id="carryover-list"></div></div>
       ${defeatKillerHTML()}
       </div>`;

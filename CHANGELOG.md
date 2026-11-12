@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.84 (Nov 12, 2026)
+- Defeat screen: the keep-a-die step says to tap ("Tap it to keep it: it joins your tray at the start of your next run") and the die gives a small nudge now and then; the screen has no buttons until you pick, and nothing said the die was tappable.
+- Checked, no change needed: title (fresh and returning, Start New Run over a save asks first), setup (locked origins preview and say how to unlock), Settings (keyboard shortcuts are hidden on phones), victory screen.
+
 ## 1.42.83 (Nov 12, 2026)
 - The turn locks in at Go (Jeremy): pressing Go saves the board with the committed path; if the game is closed while the turn plays out, Continue finishes that same path at once. Before, it resumed before Go and let you play the turn again differently.
 - Records: a finished demo run reads "Cleared the demo" (it was listed as "Fell on Floor 2"); a lost run names what beat you ("to Beaker Breakers"); Clear History needs a second tap within 3 seconds (one tap used to wipe every run).
