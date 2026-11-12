@@ -28,6 +28,15 @@ const DIR = path.resolve(__dirname, '../../dist');
   const b = await scen('equip', () => { S.encounter.curHealth = 0; onEncounterDefeated(); chooseLoot(S.lootChoice.options[0]); return S.routeStep; },
     () => { const back = !!S.pendingLootDie && !!document.querySelector('.swap-modal'); pocketLootDie(); return { back, step: S.routeStep, pocket: S.backPocket.length }; });
   out.push((b.back && b.step === b.step0 + 1 ? 'ok   ' : 'FAIL ') + `closed on the equip sheet: resumes on it, Keep in Pocket goes on (${JSON.stringify(b)})`);
+  // Nov 12 (Jeremy: lock the turn in at Go): close the game while the turn plays out; Continue finishes the same path
+  const c = await scen('midturn', () => { S.encounter.curHealth = 40; S.encounter.maxHealth = 40; S.encounter.curShield = 0;
+      const h = [...Array(16).keys()].filter(i => canSelect(i)); toggleSelect(h[0]); for (let k = 0; k < 3; k++) { const n = [...Array(16).keys()].find(i => canSelect(i) && !S.path.includes(i)); if (n == null) break; toggleSelect(n); }
+      window.__want = { path: S.path.slice(), dmg: computePathEffects(S.path).totalDamage, turn: S.turnNumber };
+      localStorage.setItem('__want', JSON.stringify(window.__want));
+      document.getElementById('resolve-btn').click(); return S.routeStep; },
+    () => { const w = JSON.parse(localStorage.getItem('__want')); return { want: w, turn: S.turnNumber, enemy: S.encounter && S.encounter.curHealth, trans: S.transitioning, committed: !!S.committedTurn }; });
+  const dealt = 40 - c.enemy;
+  out.push((c.turn === c.want.turn + 1 && dealt >= c.want.dmg && !c.trans ? 'ok   ' : 'FAIL ') + `closed mid-turn: Continue finishes the same path (want ${c.want.dmg} damage, dealt ${dealt}; turn ${c.want.turn} -> ${c.turn})`);
   if (errors.length) out.push('FAIL page errors: ' + errors.slice(0, 3).join(' | '));
   console.log(out.join('\n')); await browser.close(); srv.close();
 })();

@@ -458,8 +458,9 @@ function recordRunHistory(outcome){
       charName: S.charName || '',
       origin: S.origin.name,
       klass: S.klass.name,
-      outcome, // 'victory' | 'defeat'
+      outcome, // 'victory' | 'defeat' | 'demo' (the free demo's last boss beaten)
       floorReached: S.floorIdx+1,
+      killedBy: outcome==='defeat' ? (S.stats.killedBy || null) : null, // Nov 12: shown on the Records card
       turnsTaken: S.stats.turnsTaken,
       damageDealt: Math.round(S.stats.damageDealt),
       encountersDefeated: S.stats.encountersDefeated,
@@ -2049,7 +2050,23 @@ function endTurnButton(){
   try{ const p = S.path; S.path = []; const a = playerLethalRisk(); S.path = p; const b = playerLethalRisk();
     S._lw = {start: a ? 1 : 0, go: b ? 1 : 0}; }catch(err){ S._lw = null; }
   S.trayAct = null; S.swapLog = []; // swaps lock in once the turn resolves
+  // Nov 12 (Jeremy: lock the turn in at Go): save the board with the committed path before it plays out. Nothing is
+  // saved while a turn plays, so closing the game mid-turn used to resume before Go and let you play the turn again
+  // differently; now Continue finishes this same path (resumeCommittedTurn).
+  S.committedTurn = { path: S.path.slice(), lw: S._lw || null };
+  saveGame();
+  delete S.committedTurn;
   startTurnTransition();
+}
+// Continue after the game was closed during a turn: play the committed path out at once (Skip), as if it had finished.
+function resumeCommittedTurn(){
+  if(!S || !S.committedTurn) return false;
+  const c = S.committedTurn; delete S.committedTurn;
+  if(S.screen!=='game' || !S.encounter || S.encounter.curHealth<=0 || S.lootChoice || S.pendingLootDie) return false;
+  S.path = (c.path||[]).slice(); S._lw = c.lw || null; S.trayAct = null; S.swapLog = []; S.needRoll = false;
+  teleLog('turn_resumed', {len:S.path.length});
+  startTurnTransition(); skipTransition();
+  return true;
 }
 
 // ---- Turn transition: plays the path back one die at a time -- each die

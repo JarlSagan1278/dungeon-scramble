@@ -950,7 +950,7 @@ function renderTitle(){
       </div>
     </div>
   `;
-  if(saved) document.getElementById('title-continue-btn').onclick = ()=>{ if(loadGame()) render(); };
+  if(saved) document.getElementById('title-continue-btn').onclick = ()=>{ if(loadGame()){ render(); if(typeof resumeCommittedTurn==='function') resumeCommittedTurn(); } };
   document.getElementById('title-newrun-btn').onclick = ()=>{
     if(!saved && guideWanted()){ resetSetupPortraitPreviews(); newGame('dwarf', 'armsmaster'); return; } // quick start: first run picks Dwarf Armsmaster
     if(!saved){ resetSetupPortraitPreviews(); preGameScreen='setup'; render(); return; }
@@ -3759,9 +3759,9 @@ function runHistoryHTML(){
   const cards = history.map(r=>{
     const dateStr = new Date(r.date).toLocaleDateString(undefined, {month:'short', day:'numeric'});
     const won = r.outcome==='victory';
-    return `<div class="rh-card ${won?'won':'lost'}" style="--c:${color(r.klass)}" title="${r.damageDealt} damage &middot; ${r.overkills} overkill${r.overkills===1?'':'s'}">
+    return `<div class="rh-card ${won||r.outcome==='demo'?'won':'lost'}" style="--c:${color(r.klass)}" title="${r.damageDealt} damage &middot; ${r.overkills} overkill${r.overkills===1?'':'s'}">
         <span class="rh-date">${dateStr}</span>
-        <div class="rh-result">${won ? '&#10004; Conquered' : `&#10005; Fell on Floor ${r.floorReached}`}</div>
+        <div class="rh-result">${won ? '&#10004; Conquered' : r.outcome==='demo' ? `&#10004; Cleared the demo` : `&#10005; Fell on Floor ${r.floorReached}`}</div>${(!won && r.killedBy) ? `<div class="rh-killer">to ${r.killedBy}</div>` : ''}
         <div class="rh-who">${r.charName?`${r.charName}<br>`:''}${r.origin}<br>${r.klass}</div>
         <div class="rh-meta">Depth ${r.depth!=null ? depthLabel(r.depth) : 0} &middot; ${r.turnsTaken} turns</div>
       </div>`;
@@ -3810,7 +3810,10 @@ function openRecordsModal(tab){
       if(d) d.innerHTML = `<b>${m.dataset.name}</b> ${m.dataset.desc}${m.dataset.date?` <span class="hint">Earned ${m.dataset.date}.</span>`:''}`;
     });
     const clr = body.querySelector('#run-history-clear-btn');
-    if(clr) clr.onclick = ()=>{ clearRunHistory(); show('history'); };
+    // Nov 12: one tap used to wipe every run; now the first tap arms it ("Tap again to clear") for 3 seconds
+    if(clr) clr.onclick = ()=>{ if(clr.dataset.armed){ clearRunHistory(); show('history'); return; }
+      clr.dataset.armed = '1'; clr.textContent = 'Tap again to clear'; clearTimeout(clr._t);
+      clr._t = setTimeout(()=>{ if(clr.isConnected){ delete clr.dataset.armed; clr.textContent = 'Clear History'; } }, 3000); };
   };
   overlay.querySelectorAll('.codex-tab').forEach(b=> b.onclick = ()=> show(b.dataset.tab));
   show(tab || 'history');

@@ -3876,3 +3876,4 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .bst-moves .bst-act{ display:inline-flex; align-items:center; gap:3px; margin:0 3px; padding:1px 7px 1px 4px; border:2px solid #3a2410; border-radius:999px; background:#f3e3bf; color:#3a2410; font-size:12px; }
 .bst-moves .bst-act .icon-svg{ width:14px; height:14px; }
 .bst-moves .bst-act b{ font-family:var(--font-ui); }
+.rh-card .rh-killer{ font-size:11px; opacity:.85; margin:-2px 0 2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } /* Nov 12 */

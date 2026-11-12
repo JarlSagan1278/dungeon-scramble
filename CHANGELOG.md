@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.42.83 (Nov 12, 2026)
+- The turn locks in at Go (Jeremy): pressing Go saves the board with the committed path; if the game is closed while the turn plays out, Continue finishes that same path at once. Before, it resumed before Go and let you play the turn again differently.
+- Records: a finished demo run reads "Cleared the demo" (it was listed as "Fell on Floor 2"); a lost run names what beat you ("to Beaker Breakers"); Clear History needs a second tap within 3 seconds (one tap used to wipe every run).
+- Checked, no change needed: forks (both doors, picking, and resuming with the doors up).
+- check.js resume: closed mid-turn.
+
 ## 1.42.82 (Nov 12, 2026)
 - Closing the game on the loot chest, the equip sheet or a relic pick now resumes on that same choice. Before, nothing was saved while a choice was open, so you came back to the fight before the killing turn (the monster alive again) and could replay it for a fresh set of loot. Shrine choices still aren't saved (they hold code, not data).
 - check.js: resume.
