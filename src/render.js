@@ -2199,11 +2199,11 @@ function renderPathStrip(){
     // (measuring here forced an extra layout on every redraw).
     const ta = S.trayAct;
     if(ta){ document.getElementById('path-strip').innerHTML = `<span class="trayact-hint">${iconSpan(ta.kind)} ${ta.kind==='swap' ? (ta.token ? (ta.first==null ? 'Tap the first die to swap' : 'Tap the second die') : 'Tap a die to trade places') : 'Tap a die to reroll'}</span>`; }
-    else document.getElementById('path-strip').innerHTML = S.path.map((idx,k)=>{
+    else morphHTML(document.getElementById('path-strip'), S.path.map((idx,k)=>{ // coins already laid stay put (Nov 12)
       const f = classFace(getFaceForIdx(idx));
       const tip = `${k+1}. ${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?(' '+f.value):''}`;
       return `<span class="path-slot" style="z-index:${k+1}"><span class="path-coin" title="${tip}">${iconSpan(f.type, f.value)}</span></span>`;
-    }).join('');
+    }).join(''));
   }
 }
 // Fast update for a plain path tap (Oct 12, performance): only what a path step changes is redrawn -- the dice,
@@ -2284,10 +2284,12 @@ function renderPathOnly(){
   const minions = S.tray.filter(c=>c.minion).length;
   if(minions !== renderGame._minions) return render(); // a step uncovered a Minion: the scene's Minion chip changes too
   hideFaceTooltip();
-  tray.innerHTML = S.tray.map((c,i)=>renderDie(c,i)).join(''); renderGame._dice = null;
+  // Nov 12 (one redraw path): the dice update in place, so a die the tap didn't change keeps its element, handlers and
+  // running animations; the playback redraw's per-die cache stays valid (it used to be dropped, forcing a full tray rebuild)
+  const dice = S.tray.map((c,i)=>renderDie(c,i)); morphHTML(tray, dice.join('')); renderGame._dice = dice.map(zoneNorm);
   bindTrayDice();
   renderPathStrip();
-  refreshPathBits();
+  refreshPathBits(); // the counter is still rebuilt on purpose: its pop-in replays on every tap
 }
 // What a path change redraws besides the dice and coins: counter, Go, chest lock, enemy hp-bar preview, lethal tag.
 function refreshPathBits(){

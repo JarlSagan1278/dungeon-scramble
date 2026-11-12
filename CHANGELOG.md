@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.100 (Nov 12, 2026)
+- Path taps update the dice and the path coins in place (morphHTML) instead of rebuilding the tray: dice a tap doesn't change keep their element and their running animations (idle twitches, combo rings, the Skill knock), and the next turn's playback keeps its per-die cache instead of rebuilding the whole tray on its first frame. A tap takes ~1.8 ms instead of ~2.8 ms in the test browser. The damage counter is still rebuilt on purpose (its pop-in replays on every tap). check.js morph covers path taps (equal to a fresh draw, untouched dice kept, Go still plays the turn); pathrender: 44 taps, 0 mismatches.
+
 ## 1.42.99 (Nov 12, 2026)
 - Setup: picking an origin, class or boon updates its showcase card in place (morphHTML) instead of rebuilding it, so the portrait and dice faces aren't recreated when only the text changes. Setup already redrew only the card you picked; the whole screen is still drawn once on entry. check.js morph now also covers setup (12 picks, each equal to a fresh draw).
 

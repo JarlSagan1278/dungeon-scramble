@@ -64,6 +64,30 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
   });
   out.push((st.morphs >= 6 && !st.bad.length ? 'ok   ' : 'FAIL ') + `setup: origin/class/boon picks redraw their showcase in place and match a fresh draw (${st.morphs} redraws${st.bad.length ? ': ' + st.bad.slice(0, 3).join(', ') : ''})`);
   out.push((st.imgKept ? 'ok   ' : 'FAIL ') + 'setup: re-picking the same origin keeps its portrait element');
+  // fight: path taps update the dice and coins in place (renderPathOnly); untouched dice keep their element
+  const ft = await p.evaluate(() => {
+    const res = { bad: [] };
+    const orig = window.__origMorph || window.morphHTML; window.__origMorph = orig;
+    window.morphHTML = function (el, html) { orig(el, html);
+      const fresh = document.createElement('div'); fresh.innerHTML = html;
+      if (!(el.childNodes.length === fresh.childNodes.length && [...el.childNodes].every((n, i) => n.isEqualNode(fresh.childNodes[i])))) res.bad.push(el.id || el.className); };
+    META.lifetime.victories = 3; newGame('gnome', 'guard'); S.guide = null;
+    for (let g = 0; g < 10 && !(S.screen === 'game' && S.encounter); g++) { if (S.screen === 'camp') campLeave(); else advanceRoute(); }
+    S.transitioning = false; S.newRoomFx = false; S.needRoll = false; document.querySelectorAll('#room-callout,#room-callout-scrim').forEach(n => n.remove()); render();
+    const first = [...Array(16).keys()].find(i => canSelect(i)); const keepIdx = [...Array(16).keys()].reverse().find(i => i !== first);
+    const before = document.querySelectorAll('#tray > .die')[keepIdx];
+    document.querySelectorAll('#tray > .die')[first].click();
+    const n2 = [...Array(16).keys()].find(i => canSelect(i) && !S.path.includes(i)); if (n2 != null) document.querySelectorAll('#tray > .die')[n2].click();
+    res.taps = S.path.length;
+    const after = document.querySelectorAll('#tray > .die')[keepIdx];
+    res.kept = before === after || S.path.includes(keepIdx);
+    res.coins = document.querySelectorAll('#path-strip .path-coin').length;
+    document.getElementById('resolve-btn').click(); skipTransition(); res.turnRan = S.turnNumber >= 1 || !S.encounter || S.screen !== 'game';
+    return res;
+  });
+  out.push((ft.taps >= 1 && !ft.bad.length && ft.coins === ft.taps ? 'ok   ' : 'FAIL ') + `fight: ${ft.taps} path taps update the dice and coins in place and match a fresh draw${ft.bad.length ? ': ' + ft.bad.join(', ') : ''}`);
+  out.push((ft.kept ? 'ok   ' : 'FAIL ') + 'fight: a die the tap did not change keeps its element (its animations keep running)');
+  out.push((ft.turnRan ? 'ok   ' : 'FAIL ') + 'fight: Go plays the turn after in-place path taps');
   out.push((r.morphs >= 7 && !r.bad.length ? 'ok   ' : 'FAIL ') + `camp redraws in place and matches a fresh draw after every step (${r.morphs} redraws${r.bad.length ? ': ' + r.bad.slice(0, 2).join(' | ') : ''})`);
   out.push((r.fireKept ? 'ok   ' : 'FAIL ') + 'the campfire and hero stay the same elements across a redraw (animations keep running)');
   out.push((r.restWorks ? 'ok   ' : 'FAIL ') + 'Rest still opens its confirm after many redraws');
