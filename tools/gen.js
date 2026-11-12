@@ -2,7 +2,7 @@ const fs=require('fs'),vm=require('vm');
 const R=require('path').resolve(__dirname,'../src')+'/';
 const ctx={};vm.createContext(ctx);
 const depthSrc=fs.readFileSync(R+'depth.js','utf8'); const dpart=(a,b)=>depthSrc.slice(depthSrc.indexOf(a), depthSrc.indexOf(b));
-vm.runInContext(fs.readFileSync(R+'data.js','utf8')+fs.readFileSync(R+'assets.js','utf8')+
+vm.runInContext(fs.readFileSync(R+'data.js','utf8')+require('./art/inline.js').readAssets()+
 dpart('const BASE_HP_MUL','const DEPTH_MOD_BY_ID')+'const DREAD_HP=0.2;'+
 ';globalThis.O={GAME_VERSION,BOSS_KITS,HEAVY_EVERY,ENCOUNTER_TIER,BASE_HP_MUL,DEPTH_MODS,ICON_SVG,ORIGINS,CLASSES,FLOORS,BIG_BOSSES,RELICS,BASIC_DICE,LOGO_IMG,COVER_ART,MONSTER_ART,LOOT_ART,DWARF_PORTRAITS,GNOME_PORTRAITS,HALFLING_PORTRAITS,PIXIE_PORTRAITS};',ctx);
 const O=ctx.O;

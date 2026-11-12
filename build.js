@@ -28,7 +28,9 @@ const body = read('_body.html');
 let data = read('data.js').replace('var BUILD = { demo:false, release:false, app:false };', `var BUILD = { demo:${DEMO}, release:${RELEASE}, app:${APP} };`);
 if (RELEASE && !/var BUILD = \{ demo:(true|false), release:true, app:(true|false) \}/.test(data)) throw new Error('build flags line not found in data.js');
 // LOGO_IMG is only used by the rulebook (tools/gen.js reads src/assets.js itself), so the game builds leave it out.
-let assets = read('assets.js').replace(/^const LOGO_IMG = "[^"]*";\n/m, '');
+// Nov 12: the pictures are files in src/art/; assets.js holds "art:<path>" references that inlineArt() turns back into data: URLs.
+const { inlineArt } = require('./tools/art/inline.js');
+let assets = inlineArt(read('assets.js')).replace(/^const LOGO_IMG = "[^"]*";\n/m, '');
 // Demo build (Oct 21; Floors 1-2 since Nov 8): the free file must not be the whole game. Floor 3 (its enemies, traps, shrines,
 // the Big Bosses and their boss kits) are emptied out of the data, and their pictures are dropped from the art.
 let DEMO_STRIPPED = [];

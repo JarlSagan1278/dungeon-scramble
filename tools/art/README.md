@@ -1,9 +1,15 @@
 # Art export / import workflow
 
-All of Dungeon Scramble's art (portraits, monster art, loot icons, the
-cover) is embedded as base64 PNGs inside `src/assets.js`. Editing that by
-hand is painful, so these two scripts let you work with plain PNG files
-instead.
+All of Dungeon Scramble's art (portraits, monster art, loot icons, the cover, the paper tile, the rulebook logo) lives as
+image files in `src/art/` (Nov 12; it used to be 7 MB of base64 inside `src/assets.js`). `src/assets.js` keeps the
+structure (`DWARF_PORTRAITS`, `MONSTER_ART`, ...) with `"art:<path>"` references, and `tools/art/inline.js` turns them
+back into the same data: URLs at build time (build.js, tools/gen.js), so the built game is byte-for-byte what it was.
+
+**Quick change:** replace a file in `src/art/` with the new picture (same name and format), then
+`node build.js && node tools/check.js quick`. **New picture:** add the file and a `"art:<path>"` entry in assets.js.
+
+The export/import scripts below still work as before for batch work (repaint canvases, black edges, hi-res reimport):
+they read and write `src/art/` instead of the base64.
 
 ## Exporting art to edit
 

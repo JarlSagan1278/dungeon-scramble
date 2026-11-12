@@ -25,7 +25,7 @@ Digital prototype of the board game Jeremy designed with his wife Katlynn (Boggl
 - GitHub origin (`main`) is the source of truth. Commit regularly and push after each release commit.
 
 ## Layout
-`src/{data,assets,logic,depth,render,music,main}.js` + `styles.css` concatenated by build.js. `assets.js` is base64 art (3.5 MB, WebP with a paper texture since 1.41.26; new art goes through `tools/art/paper.py`). Global state `S`; `render()` rebuilds `#app`. Telemetry: `teleLog(...)`; export via the gear menu (Export Play Data).
+`src/{data,assets,logic,depth,render,music,main}.js` + `styles.css` concatenated by build.js. Art (Nov 12): the pictures are files in `src/art/` (WebP with a paper texture since 1.41.26; new art goes through `tools/art/paper.py`); `assets.js` keeps the structure with `"art:<path>"` references that `tools/art/inline.js` turns into data: URLs at build time (build.js, tools/gen.js). To change a picture, replace its file (same name/format); see tools/art/README.md. Global state `S`; `render()` rebuilds `#app`. Telemetry: `teleLog(...)`; export via the gear menu (Export Play Data).
 
 ## Gotchas (learned the hard way)
 - Never replace a code slice by index without checking neighbors: a slice replace once deleted `applyBossCycleAction` (boss turns threw intermittently). Run sim several times after big logic edits.

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Re-splice edited PNG files back into src/assets.js, using the manifest.json
+Put edited PNG files back into src/art/ (Nov 12: the pictures are files there; src/assets.js only\nreferences them), using the manifest.json
 produced by export_art.py to find each image's exact location.
 
 Usage:
@@ -23,33 +23,25 @@ from PIL import Image
 ASSETS_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'src', 'assets.js')
 ASSETS_PATH = os.path.abspath(ASSETS_PATH)
 
-def find_value_span(src, const_name, key, open_ch):
-    """Return (start, end) byte offsets of the base64 payload for this
-    const/key, so it can be sliced out and replaced."""
+REF = re.compile(r'([\'"])art:([^"\']+)\1')  # Nov 12: assets.js holds "art:<path>" references; the pictures are files in src/art/
+ART_DIR = os.path.join(os.path.dirname(ASSETS_PATH), 'art')
+
+def find_ref(src, const_name, key, open_ch):
+    """Return (start, end, path) of the art:<path> reference for this const/key (start/end span the path text)."""
     const_m = re.search(r'\nconst ' + re.escape(const_name) + r'\s*=\s*.', src)
     if not const_m:
         raise ValueError(f'const {const_name} not found')
     search_from = const_m.start()
-
     if open_ch == '[':
-        # Nth data:image match after this const's start
-        idx = int(key)
-        it = re.finditer(r'data:image/(\w+);base64,([A-Za-z0-9+/=]{200,})', src[search_from:])
-        for i, m in enumerate(it):
-            if i == idx:
-                return search_from + m.start(2), search_from + m.end(2), m.group(1)
-        raise ValueError(f'index {idx} not found in {const_name}')
-    elif open_ch == '{':
-        # find `'key':` or "key": then the following data:image match
-        key_pat = re.compile(r'[\'"]' + re.escape(key).replace("'", r"\\?'") + r'[\'"]\s*:\s*[\'"]')  # 'Oilephant\'s Foot' is stored escaped
+        for i, m in enumerate(REF.finditer(src, search_from)):
+            if i == int(key): return m.start(2), m.end(2), m.group(2)
+        raise ValueError(f'index {key} not found in {const_name}')
+    if open_ch == '{':
+        key_pat = re.compile(r'[\'"]' + re.escape(key).replace("'", r"\\?'") + r'[\'"]\s*:\s*(?=[\'"]art:)')  # 'Oilephant\'s Foot' is stored escaped
         km = key_pat.search(src, search_from)
-        if not km:
-            raise ValueError(f'key {key!r} not found in {const_name}')
-        m = re.compile(r'data:image/(\w+);base64,([A-Za-z0-9+/=]{200,})').search(src, km.end()-1)
-        return m.start(2), m.end(2), m.group(1)
-    else:
-        m = re.compile(r'data:image/(\w+);base64,([A-Za-z0-9+/=]{200,})').search(src, search_from)
-        return m.start(2), m.end(2), m.group(1)
+        if not km: raise ValueError(f'key {key!r} not found in {const_name}')
+        m = REF.search(src, km.end()); return m.start(2), m.end(2), m.group(2)
+    m = REF.search(src, search_from); return m.start(2), m.end(2), m.group(2)
 
 WEBP = '--png' not in sys.argv  # Oct 15: art is stored as WebP by default (pass --png to keep PNG)
 
@@ -117,14 +109,12 @@ def main():
             im.save(buf, format='JPEG', quality=90)
         else:
             buf.write(raw)
-        new_b64 = base64.b64encode(buf.getvalue()).decode('ascii')
-
-        start, end, _ = find_value_span(src, const_name, key, open_ch)
-        if to_webp:
-            mstart = src.rfind('data:image/', 0, start)
-            src = src[:mstart] + 'data:image/webp;base64,' + new_b64 + src[end:]
-        else:
-            src = src[:start] + new_b64 + src[end:]
+        start, end, art_path = find_ref(src, const_name, key, open_ch)
+        new_path = (os.path.splitext(art_path)[0] + '.webp') if to_webp else art_path
+        with open(os.path.join(ART_DIR, new_path), 'wb') as af: af.write(buf.getvalue())
+        if new_path != art_path:  # the format changed: drop the old file and point the reference at the new one
+            os.remove(os.path.join(ART_DIR, art_path))
+            src = src[:start] + new_path + src[end:]
         print(f'updated {const_name}[{key}]  <-  {fname}  ({len(raw)} -> {buf.tell()} bytes)')
         changed += 1
 

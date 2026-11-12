@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.97 (Nov 12, 2026)
+- Code tidy, no visible change: the 202 pictures moved out of src/assets.js (7.2 MB of base64 -> 12 KB) into image files in src/art/ (5.6 MB). assets.js keeps the same constants with "art:<path>" references; tools/art/inline.js turns them back into data: URLs in build.js and tools/gen.js, so the tester, demo and app builds came out byte-for-byte identical to before. tools/art/export_art.py and import_art.py work on the files now (same folder format, so the repaint and black-edge tools are unchanged).
+
 ## 1.42.96 (Nov 12, 2026)
 - Code tidy, no visible change: the fight screen's tray, path and damage counter (93 rules -> 73, 7 fewer !important) and face-off (205 rules -> 166) merged into one block each with tools/css. The quest poster and shrine boon sign keep their own blocks. stylediff: 0 differences on every component across all recorded screens and states (styledump gained the covered tray and an armed Swap); stylediff now skips the damage floaters' random tilt and the chest lock's clock variable, which differ between any two runs.
 

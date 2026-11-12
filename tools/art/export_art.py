@@ -63,9 +63,12 @@ def main():
     manifest = []
     seen_names = set()
 
-    for m in re.finditer(r'data:image/(\w+);base64,([A-Za-z0-9+/=]{200,})', src):
-        ext, b64 = m.group(1), m.group(2)
-        pos = m.start()
+    # Nov 12: the pictures are files in src/art/; assets.js holds "art:<path>" references in their place
+    ART_DIR = os.path.join(os.path.dirname(ASSETS_PATH), 'art')
+    for m in re.finditer(r'([\'"])art:([^"\']+)\1', src):
+        art_path = m.group(2)
+        ext = os.path.splitext(art_path)[1][1:]
+        pos = m.start() + 1
         const_name, open_ch = which_const(pos)
         if const_name is None:
             key = 'unkeyed'
@@ -80,12 +83,12 @@ def main():
             # object literal -- look backwards for the nearest 'Name': or "Name":
             # the window ends right at the opening quote of the "data:image..."
             # string value itself, so allow (and strip) one trailing quote.
-            window = src[max(0, pos-200):pos]
+            window = src[max(0, pos-200):pos]  # ends at the reference's opening quote
             # the key may hold an escaped quote ('Oilephant\'s Foot', Oct 17)
             km = re.search(r'([\'"])((?:\\.|(?!\1).)+)\1\s*:\s*[\'"]?$', window.rstrip())
             key = re.sub(r'\\(.)', r'\1', km.group(2)) if km else f'pos{pos}'
 
-        raw = base64.b64decode(b64)
+        with open(os.path.join(ART_DIR, art_path), 'rb') as af: raw = af.read()
         fname_base = f'{const_name or "UNKNOWN"}__{safe_key(key)}'
         fname = f'{fname_base}.{ext}'
         n = 2
@@ -102,6 +105,7 @@ def main():
             'const': const_name,
             'key': key,
             'ext': ext,
+            'art': art_path,  # its file under src/art/
             'sha256': hashlib.sha256(raw).hexdigest(),
             'bytes': len(raw),
         })
