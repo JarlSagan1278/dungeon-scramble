@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.87 (Nov 12, 2026)
+- New check, screens: 15 screens (title, setup, fights, boss, camp, shrine, loot, equip, both defeat screens, victory, settings, Codex, Records) at 395x769 and 360x722; fails if one is taller than the phone or looks different from its approved picture (tools/tests/screens/, approve with `node tools/tests/test_screens.js approve`).
+- Fixed (found by it): after a first win, the setup screen scrolled 3px on a 360x722 phone; one more tightening step (smaller Enter button and Depth row padding) only when needed.
+
 ## 1.42.86 (Nov 12, 2026)
 - The monster's next-turn damage is exact: Gambeson's -1 and Warding Bell's half now count in the number (it used to show more than landed with them); the tooltip names the relic. New check: preview.
 - Defeat screen: a "Next goal" line in place of the flavor sentence (first win unlocks the Halfling, Depth and new relics; win as this origin to earn its relic; clear the demo), plus "Furthest yet" / "You reached the Floor N boss" when true. Same height as before at 360x722.

@@ -31,3 +31,4 @@ tools/balance/sum_*.json
 tools/balance/*_log.txt
 *.jks
 *.keystore
+tools/tests/screens/_out/

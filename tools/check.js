@@ -26,6 +26,7 @@ const ALL = [
   ['bothdown',   'tools/tests/test_bothdown.js'],   // you and the monster both at 0 in one hit (Nov 11)
   ['resume',     'tools/tests/test_resume.js'],     // closing the app on the loot chest / equip sheet resumes there (Nov 12)
   ['preview',    'tools/tests/test_preview.js'],    // next-turn damage = what lands, relics included (Nov 12)
+  ['screens',    'tools/tests/test_screens.js'],    // 15 screens x 2 phones: never taller than the phone, same as the approved pictures (Nov 12)
 ];
 const QUICK = new Set(['sim', 'pathrender', 'trayfast', 'playback', 'ui', 'scramble']);
 

@@ -1372,9 +1372,9 @@ function fitSetup(opts){
       box.innerHTML = keep; box.style.setProperty('min-height', max + 'px', 'important');
     });
   };
-  p.classList.remove('fit1','fit2','fit3','fit4');
+  p.classList.remove('fit1','fit2','fit3','fit4','fit5');
   lockHeights();
-  for(const c of ['fit1','fit2','fit3','fit4']){ if(se.scrollHeight <= window.innerHeight + 1) break; p.classList.add(c); lockHeights(); }
+  for(const c of ['fit1','fit2','fit3','fit4','fit5']){ if(se.scrollHeight <= window.innerHeight + 1) break; p.classList.add(c); lockHeights(); }
 }
 
 // Forks (Nov 4, Jeremy picked two doors): after the room before an Elite slot, two of the game's doors stand side by
