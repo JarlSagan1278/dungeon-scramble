@@ -1218,7 +1218,7 @@ function renderSetup(){
   }
   function renderOriginShowcaseNow(){
     const o = ORIGINS.find(x=>x.id===previewedOriginId);
-    originShowcase.innerHTML = originShowcaseHTML(o, isOriginUnlocked(o.id));
+    morphHTML(originShowcase, originShowcaseHTML(o, isOriginUnlocked(o.id))); // Nov 12: in place (one redraw path)
     attachLongPressTooltips('#origin-showcase .die-face-chip');
   }
   renderOriginTabs();
@@ -1252,7 +1252,7 @@ function renderSetup(){
     });
   }
   function renderClassShowcaseNow(){
-    classShowcase.innerHTML = classShowcaseHTML(realClasses.find(k=>k.id===previewedClassId));
+    morphHTML(classShowcase, classShowcaseHTML(realClasses.find(k=>k.id===previewedClassId)));
   }
   renderClassTabs();
   renderClassShowcaseNow();
@@ -1294,7 +1294,7 @@ function renderSetup(){
       });
     }
     function renderBoonShowcaseNow(){
-      boonShowcase.innerHTML = boonShowcaseHTML(chosenBoonName ? boonDice.find(d=>d.name===chosenBoonName) : null);
+      morphHTML(boonShowcase, boonShowcaseHTML(chosenBoonName ? boonDice.find(d=>d.name===chosenBoonName) : null));
       attachLongPressTooltips('#boon-showcase .die-face-chip');
     }
     renderBoonScroll();

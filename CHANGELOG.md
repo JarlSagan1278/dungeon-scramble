@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.99 (Nov 12, 2026)
+- Setup: picking an origin, class or boon updates its showcase card in place (morphHTML) instead of rebuilding it, so the portrait and dice faces aren't recreated when only the text changes. Setup already redrew only the card you picked; the whole screen is still drawn once on entry. check.js morph now also covers setup (12 picks, each equal to a fresh draw).
+
 ## 1.42.98 (Nov 12, 2026)
 - Camp redraws in place: after the first draw, each change at camp (picking a die, Train, Rest, upgrades) updates only what changed instead of rebuilding the page, so the campfire's flicker, the hero, the dice and the buttons stay put and keep their animations. New shared `morphHTML` (render.js), the first step to one redraw path for every screen (polish roadmap A4); the Upgrade buttons' hover hints are bound once. New check, morph: over 10 real camp redraws the result always equals a fresh draw of the same markup, the fire stays the same element, Rest still works.
 

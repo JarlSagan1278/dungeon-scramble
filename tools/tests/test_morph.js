@@ -48,6 +48,22 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     const b = document.getElementById('upgrade-attack-1'); res.litOnce = !b || b._litBound === true;
     return res;
   });
+  // setup: origin, class and boon picks redraw their showcase in place (same isEqualNode check via the wrapper)
+  const st = await p.evaluate(() => {
+    const res = window.__setupRes = { morphs: 0, bad: [] };
+    const orig = window.__origMorph || window.morphHTML; window.__origMorph = orig;
+    window.morphHTML = function (el, html) { orig(el, html); res.morphs++;
+      const fresh = document.createElement('div'); fresh.innerHTML = html;
+      if (!(el.childNodes.length === fresh.childNodes.length && [...el.childNodes].every((n, i) => n.isEqualNode(fresh.childNodes[i])))) res.bad.push(el.id || el.className); };
+    META.lifetime.victories = 3; META.achievements['origin_duo'] = { date: Date.now() }; preGameScreen = 'setup'; S = null; render();
+    const clickAll = sel => [...document.querySelectorAll(sel)].forEach(n => n.click());
+    clickAll('#origin-tab-row > *'); clickAll('#class-tab-row > *'); clickAll('#boon-scroll > *');
+    const img0 = document.querySelector('#origin-showcase img'); document.querySelector('#origin-tab-row > *').click(); document.querySelector('#origin-tab-row > *').click();
+    res.imgKept = document.querySelector('#origin-showcase img') === img0;
+    return res;
+  });
+  out.push((st.morphs >= 6 && !st.bad.length ? 'ok   ' : 'FAIL ') + `setup: origin/class/boon picks redraw their showcase in place and match a fresh draw (${st.morphs} redraws${st.bad.length ? ': ' + st.bad.slice(0, 3).join(', ') : ''})`);
+  out.push((st.imgKept ? 'ok   ' : 'FAIL ') + 'setup: re-picking the same origin keeps its portrait element');
   out.push((r.morphs >= 7 && !r.bad.length ? 'ok   ' : 'FAIL ') + `camp redraws in place and matches a fresh draw after every step (${r.morphs} redraws${r.bad.length ? ': ' + r.bad.slice(0, 2).join(' | ') : ''})`);
   out.push((r.fireKept ? 'ok   ' : 'FAIL ') + 'the campfire and hero stay the same elements across a redraw (animations keep running)');
   out.push((r.restWorks ? 'ok   ' : 'FAIL ') + 'Rest still opens its confirm after many redraws');
