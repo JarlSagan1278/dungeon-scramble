@@ -19,6 +19,8 @@ const EXTRA = [
   ['codex-dice', () => { META.lifetime.victories = 1; preGameScreen = 'title'; S = null; render(); openCodexModal('dice'); }],
   ['codex-relics', () => { META.lifetime.victories = 1; preGameScreen = 'title'; S = null; render(); openCodexModal('relics'); }],
   ['codex-key', () => { META.lifetime.victories = 1; preGameScreen = 'title'; S = null; render(); openCodexModal('key'); }],
+  ['trayact-armed', () => { __fight(); S.swapTokens = 1; render(); armTrayAct('swap', null, true); render(); }],
+  ['need-roll', () => { __fight(); S.needRoll = true; render(); }],
   ['camp-train', `(() => { ${CAMP} S.campChoice = 'train'; render(); })()`],
   ['camp-rested', `(() => { ${CAMP} S.campChoice = 'rest'; S.campRested = true; S.campHealed = 4; render(); })()`],
   ['camp-out', `(() => { ${CAMP} S.campFireOut = true; render(); })()`],

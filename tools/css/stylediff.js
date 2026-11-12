@@ -2,7 +2,9 @@
 // and transforms of running animations are frozen by styledump, so anything left is a real difference).
 // usage: node tools/css/stylediff.js before.json after.json
 const fs = require('fs'); const [a, b] = process.argv.slice(2).map(f => Object.fromEntries(fs.readFileSync(f, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l))));
-const CLOCK = new Set(['--gd', '--qd', '--fl']); // animation offsets taken from the page clock
+const CLOCK = new Set(['--gd', '--qd', '--fl', '--lk-delay']);
+// damage-number floaters get a random tilt and a clock-based start, so their transform/opacity differ run to run
+const FLOATER = /span\.[^>]*damage/, FLOATER_PROPS = new Set(['transform', 'opacity']); // animation offsets taken from the page clock
 let n = 0; const byProp = {};
 for (const scr of new Set([...Object.keys(a), ...Object.keys(b)])) {
   const A0 = a[scr], B0 = b[scr];
@@ -11,7 +13,7 @@ for (const scr of new Set([...Object.keys(a), ...Object.keys(b)])) {
   const A = exp(A0), B = exp(B0);
   for (const el of new Set([...Object.keys(A), ...Object.keys(B)])) {
     if (!A[el] || !B[el]) { console.log(scr, el, A[el] ? 'gone' : 'new'); n++; continue; }
-    for (const k of new Set([...Object.keys(A[el]), ...Object.keys(B[el])])) if (A[el][k] !== B[el][k] && !CLOCK.has(k)) {
+    for (const k of new Set([...Object.keys(A[el]), ...Object.keys(B[el])])) if (A[el][k] !== B[el][k] && !CLOCK.has(k) && !(FLOATER_PROPS.has(k) && FLOATER.test(el))) {
       n++; byProp[k] = (byProp[k] || 0) + 1; if (n <= 60) console.log(scr, el.slice(0, 90), k, JSON.stringify(A[el][k]).slice(0, 70), '->', JSON.stringify(B[el][k]).slice(0, 70));
     }
   }

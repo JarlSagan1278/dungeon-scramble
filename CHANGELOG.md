@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.96 (Nov 12, 2026)
+- Code tidy, no visible change: the fight screen's tray, path and damage counter (93 rules -> 73, 7 fewer !important) and face-off (205 rules -> 166) merged into one block each with tools/css. The quest poster and shrine boon sign keep their own blocks. stylediff: 0 differences on every component across all recorded screens and states (styledump gained the covered tray and an armed Swap); stylediff now skips the damage floaters' random tilt and the chest lock's clock variable, which differ between any two runs.
+
 ## 1.42.95 (Nov 12, 2026)
 - Code tidy, no visible change: the title screen (32 rules -> 18, 2 fewer !important), Codex (40 -> 37) and end screens (27) each merged into one block with tools/css. Kept in place: the selected Codex tab's gold base (the per-tab colours override it) and the end screens' heading margin (the defeat screen overrides it). stylediff: 0 differences on the title, Records, all four Codex tabs, both defeat screens and victory, and on every component merged before; styledump gained the Codex tabs.
 
