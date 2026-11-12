@@ -16,6 +16,9 @@ const EXTRA = [
     const o = window.drawRoomCard; window.drawRoomCard = () => s; S.encounter = drawEncounter('enc'); window.drawRoomCard = o; S.screen = 'shrine'; S.shrineResult = null; render(); applyShrineBoon(S.encounter);
     for (let g = 0; g < 6; g++) { if (S.relicChoice) chooseRelic(S.relicChoice.options[0]); else if (S.lootChoice || S.pendingLootDie) break; else break; } render(); }],
   ['setup-fresh', () => { META.lifetime.victories = 0; preGameScreen = 'setup'; S = null; render(); }],
+  ['codex-dice', () => { META.lifetime.victories = 1; preGameScreen = 'title'; S = null; render(); openCodexModal('dice'); }],
+  ['codex-relics', () => { META.lifetime.victories = 1; preGameScreen = 'title'; S = null; render(); openCodexModal('relics'); }],
+  ['codex-key', () => { META.lifetime.victories = 1; preGameScreen = 'title'; S = null; render(); openCodexModal('key'); }],
   ['camp-train', `(() => { ${CAMP} S.campChoice = 'train'; render(); })()`],
   ['camp-rested', `(() => { ${CAMP} S.campChoice = 'rest'; S.campRested = true; S.campHealed = 4; render(); })()`],
   ['camp-out', `(() => { ${CAMP} S.campFireOut = true; render(); })()`],

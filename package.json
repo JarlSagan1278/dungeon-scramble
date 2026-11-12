@@ -1,6 +1,6 @@
 {
   "name": "dungeon-scramble",
-  "version": "1.42.94",
+  "version": "1.42.95",
   "private": true,
   "description": "Dungeon Scramble: a turn-based dice-path roguelike for phones",
   "scripts": {

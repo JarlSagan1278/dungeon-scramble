@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.95 (Nov 12, 2026)
+- Code tidy, no visible change: the title screen (32 rules -> 18, 2 fewer !important), Codex (40 -> 37) and end screens (27) each merged into one block with tools/css. Kept in place: the selected Codex tab's gold base (the per-tab colours override it) and the end screens' heading margin (the defeat screen overrides it). stylediff: 0 differences on the title, Records, all four Codex tabs, both defeat screens and victory, and on every component merged before; styledump gained the Codex tabs.
+
 ## 1.42.94 (Nov 12, 2026)
 - Code tidy, no visible change: four more components' styles merged into one block each with tools/css: loot window (94 rules -> 81), equip window (53 -> 36), shrine (71 -> 66) and setup screen (38 -> 37); stylesheet 3,800 -> 3,740 lines. Kept in place: the defeat screen's keep-a-die tile (it reuses .swap-item), the shrine's boon sign (it overrides the quest poster) and the tap-cue rules. stylediff: 0 differences on each, at both phone sizes; styledump gained loot-open, shrine-choice, shrine-done and setup-fresh states.
 

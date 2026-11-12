@@ -12,7 +12,9 @@ Prove it changed nothing before committing:
   python3 tools/css/merge.py '<regex>' 'Title' [--keep 'exact selector' ...]
   node build.js && node tools/css/styledump.js after.json '<selector>' && node tools/css/stylediff.js before.json after.json
 If stylediff reports differences, re-run from the old styles.css with --keep for the selectors involved (their order
-against other components mattered), until it reports 0. Then the screen pictures (check.js) must still pass.
+against other components mattered), until it reports 0. --who PROP lists the picked rules that set PROP. Two common causes:
+a base rule that other screens override (keep it), and one selector written twice with an equal-specificity rule between
+the two (joining them moves the first one's values after that rule: keep the selector, e.g. `.codex-tabs .codex-tab.on`). Then the screen pictures (check.js) must still pass.
 
 usage: python3 tools/css/merge.py REGEX TITLE [--keep SELECTOR]... [--keep-re REGEX]... [--dry] [--who PROP,PROP]
 """

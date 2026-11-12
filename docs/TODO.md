@@ -1,6 +1,6 @@
 # Dungeon Scramble — TODO
 
-Updated Nov 12, 2026 (build 1.42.94). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
+Updated Nov 12, 2026 (build 1.42.95). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
 study results in `STUDY_FINDINGS.md`. The release checklist (40 items, owner and status) is the Checklist tab of
 the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 
@@ -18,7 +18,7 @@ the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 
 ## Polish roadmap (Nov 12: https://claude.ai/artifact/RHcVM2LaEFeXyFcX8VR3zm)
 Done in 1.42.86-1.42.90: exact next-turn damage, defeat-screen next goal, screen picture check, big-turn crescendo, quest poster styles merged, saves keep run data only (RUN_FIELDS/SCREEN_FIELDS), one shared tap cue (Knock, 1.42.91).
-Next, in order: (A3 cont.) merge the next component's styles with tools/css (dice 1.42.92, camp 1.42.93, loot/equip/shrine/setup 1.42.94; left: the fight screen's face-off and tray, title, Codex/Records, end screens), verified by stylediff + screen pictures;
+Next, in order: (A3 cont.) merge the next component's styles with tools/css (dice 1.42.92, camp 1.42.93, loot/equip/shrine/setup 1.42.94, title/Codex/end screens 1.42.95; left: the fight screen's face-off (256 rules) and tray (96)), verified by stylediff + screen pictures;
 (A4) one redraw path (small DOM morph, try on camp first); (A5) art as image files built into base64. V1 floor props when Jeremy has drawings;
 E4 onboarding fixes once ~10 first runs of play data are in.
 
