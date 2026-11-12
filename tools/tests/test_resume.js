@@ -34,8 +34,10 @@ const DIR = path.resolve(__dirname, '../../dist');
       window.__want = { path: S.path.slice(), dmg: computePathEffects(S.path).totalDamage, turn: S.turnNumber };
       localStorage.setItem('__want', JSON.stringify(window.__want));
       document.getElementById('resolve-btn').click(); return S.routeStep; },
-    () => { const w = JSON.parse(localStorage.getItem('__want')); return { want: w, turn: S.turnNumber, enemy: S.encounter && S.encounter.curHealth, trans: S.transitioning, committed: !!S.committedTurn }; });
-  const dealt = 40 - c.enemy;
+    () => { const w = JSON.parse(localStorage.getItem('__want')); return { want: w, turn: S.turnNumber, enemy: S.encounter && S.encounter.curHealth, trans: S.transitioning, committed: !!S.committedTurn,
+      pathLog: (S.log||[]).map(x => /Path dealt ([\d.]+)/.exec(x && x.text || '')).filter(Boolean).map(m => +m[1]).pop() }; });
+  // read the path's own log line: an enemy that heals on its turn (United Separatists) would undercount 40 - hp
+  const dealt = c.pathLog != null ? c.pathLog : 40 - c.enemy;
   out.push((c.turn === c.want.turn + 1 && dealt >= c.want.dmg && !c.trans ? 'ok   ' : 'FAIL ') + `closed mid-turn: Continue finishes the same path (want ${c.want.dmg} damage, dealt ${dealt}; turn ${c.want.turn} -> ${c.turn})`);
   if (errors.length) out.push('FAIL page errors: ' + errors.slice(0, 3).join(' | '));
   console.log(out.join('\n')); await browser.close(); srv.close();

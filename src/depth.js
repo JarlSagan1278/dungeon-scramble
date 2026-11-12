@@ -180,7 +180,7 @@ function depthBadgeEmptySVG(size){
 }
 function classBadgeHTML(klass, size, withScore){
   const b = DEPTH_BEST.byClass[klass.id];
-  if(!b || !b.depth) return `<div class="depth-badge-wrap">${depthBadgeEmptySVG(size)}<div class="depth-badge-pill">Not cleared</div></div>`;
+  if(!b || !b.depth) return `<div class="depth-badge-wrap">${depthBadgeEmptySVG(size)}<div class="depth-badge-pill">No wins yet</div></div>`;
   return `<div class="depth-badge-wrap">${depthBadgeSVG(klass.color, b.depth, size, klass.id)}${withScore?`<div class="depth-badge-pill">${b.score.toLocaleString()}</div>`:''}</div>`;
 }
 

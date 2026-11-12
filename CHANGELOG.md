@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.85 (Nov 12, 2026)
+- Codex class badges: a class with no wins reads "No wins yet" instead of "Not cleared".
+
 ## 1.42.84 (Nov 12, 2026)
 - Defeat screen: the keep-a-die step says to tap ("Tap it to keep it: it joins your tray at the start of your next run") and the die gives a small nudge now and then; the screen has no buttons until you pick, and nothing said the die was tappable.
 - Checked, no change needed: title (fresh and returning, Start New Run over a save asks first), setup (locked origins preview and say how to unlock), Settings (keyboard shortcuts are hidden on phones), victory screen.
