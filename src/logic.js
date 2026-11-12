@@ -845,7 +845,10 @@ function loadGame(){
 // mid-transition or mid-modal, since a Shrine choice's callback can't
 // survive being written to JSON (see serializeState).
 function maybeAutosave(){
-  if(!S || S.transitioning || S.lootChoice || S.shrineChoice || S.relicChoice || S.pendingLootDie) return;
+  // Nov 12: the loot chest, the equip sheet and relic picks are plain data and are saved too (closing the app on the
+  // chest used to resume in the fight before the kill: replay the turn, re-roll the loot). A shrine choice holds
+  // functions, so it still isn't saved.
+  if(!S || S.transitioning || S.shrineChoice) return;
   if(S.screen!=='game' && S.screen!=='camp' && S.screen!=='shrine') return;
   saveGame();
 }

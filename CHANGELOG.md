@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.82 (Nov 12, 2026)
+- Closing the game on the loot chest, the equip sheet or a relic pick now resumes on that same choice. Before, nothing was saved while a choice was open, so you came back to the fight before the killing turn (the monster alive again) and could replay it for a fresh set of loot. Shrine choices still aren't saved (they hold code, not data).
+- check.js: resume.
+
 ## 1.42.81 (Nov 12, 2026)
 Fresh-eyes polish pass (camp, shrines, Codex):
 - Camp: the chosen Rest/Train button no longer grows a line (the check sat on its own row), so nothing below jumps when you choose; "You rested at this fire, so no training here" sits over the dimmed upgrade rows instead of adding a line (Rest made the camp page scroll 16px); the "Rested" strip no longer covers the health bar filling up (the button already says "Healed +N"); a die type already combined at this camp says "done this camp".

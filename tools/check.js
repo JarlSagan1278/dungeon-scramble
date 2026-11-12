@@ -24,6 +24,7 @@ const ALL = [
   ['routegoals', 'tools/tests/test_routegoals.js'], // route-goal Wanted posters: shape checks, sign fit, a real turn (Nov 8)
   ['shareask',   'tools/tests/test_shareask.js'],   // mid-run play-data ask + live in_progress copies (Nov 9)
   ['bothdown',   'tools/tests/test_bothdown.js'],   // you and the monster both at 0 in one hit (Nov 11)
+  ['resume',     'tools/tests/test_resume.js'],     // closing the app on the loot chest / equip sheet resumes there (Nov 12)
 ];
 const QUICK = new Set(['sim', 'pathrender', 'trayfast', 'playback', 'ui', 'scramble']);
 
