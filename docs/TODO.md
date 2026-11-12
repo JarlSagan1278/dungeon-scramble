@@ -9,7 +9,7 @@ the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 1. **Posting plan, Oct 28 – Nov 9** (page: https://claude.ai/artifact/EXsbT3N29MADimSzs15gaN; texts in
    `release/posts_nov.md`; tracking in `release/outreach.md`). One community a day; log Reddit views and itch
    views/plays the next day.
-2. **Read the play data** (sheet `1W1TyynfdWTlxMqzr7TJOTZKMY6sOPBVPfXVd41kcGSM`). Check-in scheduled Oct 29.
+2. **Read the play data** (sheet `1W1TyynfdWTlxMqzr7TJOTZKMY6sOPBVPfXVd41kcGSM`). Nov 12 check: only 1 stranger's run so far (it went well; STUDY_FINDINGS); Jeremy to compare itch plays with shares.
    Once ~10 new players have shared runs: `python3 tools/playdata/funnel.py <run JSONs> --out report.md`. Watch
    deaths in fights 2–4 of a first run (soften those rooms at depth 0 if over ~15%), whether players use the Skill,
    and phone vs desktop.

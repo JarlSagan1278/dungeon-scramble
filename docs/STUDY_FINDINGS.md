@@ -275,3 +275,6 @@ Re-run with the deeper-floor extra choice (1.42.56+, 80 runs each, same setup): 
 for the Elite path, so the deeper die pays for the harder rooms over a run. The Elite door is now the stronger pick for this bot;
 that is a player-power edge (fine by the balance philosophy), and the Standard door stays the safer short-term choice.
 
+
+## Play data check (Nov 12, 2026)
+Sheet `1W1TyynfdWTlxMqzr7TJOTZKMY6sOPBVPfXVd41kcGSM`, 40 run records. **One** stranger so far (desktop, Nov 6, demo 1.42.66, first run): guided fight done, picked the Elite door at the first fork, cleared the (Floor 1) demo in 9.3 min, never below 10 HP, used the Armsmaster Skill on 11 of 15 turns, paths grew from 3 to 8 dice; no second run (the demo was Floor 1 only then). Everything else is 5 tester devices: 32 finished runs, 27 wins / 5 losses (84%), full runs 20-43 min, deaths at depth 1-2 to Floor 2 bosses/elites and on Floor 3. Live in_progress copies arrive (1.42.94 run today). **Too little for the funnel report (needs ~10 first runs); the bottleneck is new players, not analysis.** Next: compare itch views/plays with shares (Jeremy's dashboard) to tell "few players" from "players saying no to the ask".
