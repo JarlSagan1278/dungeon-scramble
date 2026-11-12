@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.91 (Nov 12, 2026)
+- One "tap me" cue everywhere (Jeremy picked "Knock"): anything a screen is waiting on you to tap sits still, then gives a quick wiggle every 2.6 s, starting after 1.2 s: the Skill-ready die, the keep-a-die tile on the defeat screen, the loot chest, the room door, the fork doors, the shrine button, and camp's Rest and Train while neither is chosen. Replaces the chest and door bobbing, the shrine button's pulse and the defeat die's hop. One shared block at the end of styles.css; off under Reduced Motion and during turn playback.
+
 ## 1.42.90 (Nov 12, 2026)
 - Saves keep the run, not the screen: every field of the game state is now listed as run data (saved) or screen state (animations, playback, open panels: never saved) in logic.js. A save writes run fields only and a load keeps run fields only, so an old save's stray animation clock or playback flag can't come back. New check, savefields: every field the code sets is listed, bot runs add no unlisted field, and save -> load -> save is unchanged at camp, in a fight and at the loot chest.
 

@@ -1038,10 +1038,9 @@
   .loot-chest-btn:hover:not(:disabled), .loot-chest-btn:active:not(:disabled){ background:transparent; box-shadow:none; transform:none; }
   .loot-chest{ width:120px; height:104px; border-radius:var(--r-lg); background:var(--panel2); border:2.5px solid var(--loot-tier-color, var(--gold));
     display:flex; align-items:center; justify-content:center;
-    animation: loot-chest-glow 1.6s ease-in-out infinite, loot-chest-bob 1.6s ease-in-out infinite; }
+    animation: loot-chest-glow 1.6s ease-in-out infinite; } /* + the shared tap knock (end of file) */
   .loot-chest-btn.opening .loot-chest{ animation: loot-chest-flip 0.48s ease-in-out both; }
   @keyframes loot-chest-glow{ 0%,100%{ box-shadow:0 0 0 0 var(--loot-tier-glow, rgba(212,175,82,0.5)); } 50%{ box-shadow:0 0 0 14px transparent; } }
-  @keyframes loot-chest-bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
   @keyframes loot-chest-flip{ 0%{ transform:rotateY(0) scale(1); } 45%,55%{ transform:rotateY(90deg) scale(1.08); } 100%{ transform:rotateY(180deg) scale(1); } }
   .loot-options{ display:flex; gap:10px; margin:12px 0; flex-wrap:wrap; justify-content:center; }
   .loot-opt{ flex:1 1 calc(50% - 10px); min-width:140px; max-width:220px; background:var(--panel2); border:2px solid var(--line); border-radius:var(--r-md); padding:8px; cursor:pointer; transition: transform .08s; }
@@ -2664,7 +2663,7 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
    and a gold ring fills while you hold (SHRINE_HOLD_MS) */
 .shrine-orb{ position:relative; width:128px; height:128px; border-radius:50% !important; padding:0 !important; display:flex; align-items:center; justify-content:center;
   background:radial-gradient(circle at 50% 38%, #ffe7a3, #f2b833 58%, #c98a14) !important; color:#2a1a08 !important; border:4px solid var(--line) !important;
-  touch-action:none; user-select:none; -webkit-user-select:none; animation:so-pulse 1.8s ease-in-out infinite; }
+  touch-action:none; user-select:none; -webkit-user-select:none; } /* idle: the shared tap knock (end of file) */
 .shrine-orb .so-label{ position:relative; display:flex; flex-direction:column; align-items:center; line-height:1.05; pointer-events:none; }
 .shrine-orb .so-label b{ font-family:var(--font-display); font-size:22px; }
 .shrine-orb .so-label small{ font-size:10.5px; font-weight:700; max-width:84px; text-align:center; margin-top:3px; opacity:.85; }
@@ -2683,7 +2682,6 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
   90%{ transform:scale(.99) translate(-5px,2px) rotate(-5deg); } 100%{ transform:scale(1) translate(5px,-3px) rotate(5deg); } }
 .reduced-motion .shrine-orb.charging{ animation:none; }
 .shrine-orb.charging .so-fill{ stroke-dashoffset:0; transition:stroke-dashoffset .7s linear; }
-@keyframes so-pulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.06); } }
 .reduced-motion .shrine-orb{ animation:none; }
 .shrine-act .shrine-float-hint{ margin-top:46px; }
 /* the round shrine button waits until the "you scramble into a room" banner is tapped away */
@@ -3606,8 +3604,6 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 .impact-frame.if-out .if-sil{ transform:scaleX(var(--flip,1)) scale(1.0); transition:transform .16s ease-out; }
 /* Nov 4 (Jeremy): Swap/Reroll faces are used before you path, so until the path starts the whole die gives a little
    wiggle every couple of seconds (rotate only -- a scale would blur the face). */
-.die.trayact-nudge:not(.shaking):not(.just-rerolled):not(.just-swapped):not(.resolving):not(.guide-nudge):not(.minion){ animation: trayact-nudge 2.2s ease-in-out 0.6s infinite; }
-@keyframes trayact-nudge{ 0%,72%,100%{ rotate:0deg; } 76%{ rotate:-7deg; } 80%{ rotate:6deg; } 84%{ rotate:-4deg; } 88%{ rotate:2deg; } 92%{ rotate:0deg; } }
 body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animation:none !important; }
 /* Nov 4 (Jeremy: check the spacing in the enemy ability notes): long names one size down so they don't wrap into two
    big lines, a clear gap before the number, a little more air between the header and the rule. */
@@ -3652,8 +3648,6 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .fork-hall{ background:none !important; border:none !important; box-shadow:none !important; padding:0 !important; }
 .fork-doors{ gap:14px; align-items:center; }
 .fork-door .rc-door{ zoom:.7; filter:drop-shadow(0 14px 14px rgba(0,0,0,.6)); }
-.fork-door{ animation:fork-bob 1.8s ease-in-out infinite; animation-delay:var(--bob, 0s); }
-@keyframes fork-bob{ 0%,100%{ translate:0 0; } 50%{ translate:0 -6px; } }
 .fork-door:hover .rc-door, .fork-door:focus-visible .rc-door{ filter:drop-shadow(0 14px 14px rgba(0,0,0,.6)) drop-shadow(0 0 12px rgba(255,215,106,.55)); }
 .fork-door.opening, .reduced-motion .fork-door{ animation:none; }
 /* Nov 4 (Jeremy): the fork's doors float over the finished room, behind the room door's own scrim; the chosen one
@@ -3662,7 +3656,7 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 #fork-callout{ position:fixed; left:50%; z-index:97; transform:translate(-50%,-50%); width:min(100vw, 395px); }
 #fork-ghost{ position:fixed; left:50%; z-index:-1; transform:translate(-50%,-50%); visibility:hidden; pointer-events:none; display:flex; justify-content:center; }
 #fork-callout .fork-doors{ display:flex; justify-content:center; gap:14px; align-items:center; width:100%; }
-#fork-callout .fork-door{ cursor:pointer; flex:0 0 auto; width:auto; -webkit-tap-highlight-color:transparent; outline:none; animation:fork-bob 1.8s ease-in-out infinite; animation-delay:var(--bob, 0s); }
+#fork-callout .fork-door{ cursor:pointer; flex:0 0 auto; width:auto; -webkit-tap-highlight-color:transparent; outline:none; }
 #fork-callout .fork-door .rc-door{ zoom:.7; margin:0; transform:none; animation:none; filter:drop-shadow(0 14px 14px rgba(0,0,0,.6)); }
 #fork-callout .fork-door .rc-tap{ display:none; }
 #fork-callout .fork-door:hover .rc-door, #fork-callout .fork-door:focus-visible .rc-door{ filter:drop-shadow(0 14px 14px rgba(0,0,0,.6)) drop-shadow(0 0 12px rgba(255,215,106,.55)); }
@@ -3835,8 +3829,7 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .rh-card .rh-killer{ font-size:11px; opacity:.85; margin:-2px 0 2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } /* Nov 12 */
 
 /* Nov 12: the keep-a-die tile reads as tappable (the defeat screen has no buttons until you pick) */
-.defeat-keep #carryover-list .swap-item{ cursor:pointer; animation:dk-nudge 2.4s ease-in-out 1.2s infinite; }
-@keyframes dk-nudge{ 0%,86%,100%{ transform:translateY(0); } 90%{ transform:translateY(-4px); } 95%{ transform:translateY(0); } }
+.defeat-keep #carryover-list .swap-item{ cursor:pointer; } /* + the shared tap knock (end of file) */
 .reduced-motion .defeat-keep #carryover-list .swap-item{ animation:none; }
 
 /* Nov 12: defeat screen next goal (polish roadmap E1) */
@@ -3867,3 +3860,24 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 }
 .turn-total.tt-still{ animation:tt-fade 1.3s linear both; }
 @keyframes tt-fade{ 0%,80%{ opacity:1; } 100%{ opacity:0; } }
+
+/* ==== Shared tap cue (Nov 12, Jeremy picked "A, Knock": https://claude.ai/artifact/KocsE5wmjCXUCXMwjh8J3Q) ====
+   Anything the screen is waiting on you to tap sits still, then gives a quick wiggle every 2.6 s (first one after 1.2 s).
+   It animates the separate `rotate` property, so it stacks with an element's own transform animations (entrances,
+   presses) and never touches filter or box-shadow (see the CLAUDE.md gotchas). Stops under Reduced Motion and playback.
+   Used by: the Skill-ready die, the keep-a-die tile, the loot chest, the room door, the fork doors, the shrine button,
+   and camp's Rest/Train while neither is chosen. A new "tap to go on" thing should use it too. */
+@keyframes tap-knock{ 0%,70%,100%{ rotate:0deg; } 74%{ rotate:-6deg; } 78%{ rotate:5deg; } 82%{ rotate:-3.5deg; } 86%{ rotate:2deg; } 90%{ rotate:0deg; } }
+:root{ --tap-knock: tap-knock 2.6s ease-in-out 1.2s infinite; }
+.die.trayact-nudge:not(.shaking):not(.just-rerolled):not(.just-swapped):not(.resolving):not(.guide-nudge):not(.minion){ animation:tap-knock 2.6s ease-in-out .6s infinite; }
+.defeat-keep #carryover-list .swap-item{ animation:var(--tap-knock); transform-origin:50% 85%; }
+.loot-chest-btn:not(.opening) .loot-chest{ animation:loot-chest-glow 1.6s ease-in-out infinite, var(--tap-knock); transform-origin:50% 80%; }
+.loot-modal.loot-modal-chest .loot-chest-btn:not(.opening) .loot-chest{ animation:var(--tap-knock); }
+#room-callout:not(.rc-seamless) .rc-door{ animation:rc-in .28s cubic-bezier(.3,1.5,.5,1) both, var(--tap-knock); transform-origin:50% 90%; }
+#fork-callout .fork-door:not(.opening){ animation:var(--tap-knock); animation-delay:calc(1.2s + var(--bob, 0s)); transform-origin:50% 90%; }
+.shrine-orb:not(.charging){ animation:var(--tap-knock); }
+.campfire-choice:not(.done):not(.out) .cf-btn:not(:disabled){ animation:var(--tap-knock); transform-origin:50% 80%; }
+.campfire-choice:not(.done):not(.out) #train-btn{ animation-delay:1.5s; } /* Train knocks just after Rest */
+.reduced-motion :is(.die.trayact-nudge, .defeat-keep #carryover-list .swap-item, .loot-chest-btn .loot-chest, #fork-callout .fork-door, .shrine-orb:not(.charging), .campfire-choice .cf-btn),
+body.is-resolving :is(.die.trayact-nudge, .shrine-orb:not(.charging)){ animation:none !important; }
+.reduced-motion #room-callout .rc-door{ animation:none !important; }

@@ -105,3 +105,4 @@ Visual direction, textures, layout rules, monster footing, onboarding (splash, g
 - **Nov 11 — Path counter layout (Jeremy picked A1 of A1/A2/A3 + earlier A/B/C):** rounded capsule, effects in two columns under DAMAGE, number capped at 46 px (1.42.80).
 
 - **Nov 12, 2026:** Approved the polish roadmap batch (https://claude.ai/artifact/RHcVM2LaEFeXyFcX8VR3zm), in order: exact next-turn damage (relics counted), a next goal on the defeat screen, screenshot/height checks for every screen, a big-turn crescendo, then consolidating the quest-poster styles.
+- **Nov 12, 2026:** One shared "tap me" cue for every screen that waits on a tap: **A, Knock** (sits still, then a quick wiggle every few seconds; the Skill-ready die's move, used everywhere). Options page: https://claude.ai/artifact/KocsE5wmjCXUCXMwjh8J3Q
