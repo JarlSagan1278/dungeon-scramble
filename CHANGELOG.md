@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.98 (Nov 12, 2026)
+- Camp redraws in place: after the first draw, each change at camp (picking a die, Train, Rest, upgrades) updates only what changed instead of rebuilding the page, so the campfire's flicker, the hero, the dice and the buttons stay put and keep their animations. New shared `morphHTML` (render.js), the first step to one redraw path for every screen (polish roadmap A4); the Upgrade buttons' hover hints are bound once. New check, morph: over 10 real camp redraws the result always equals a fresh draw of the same markup, the fire stays the same element, Rest still works.
+
 ## 1.42.97 (Nov 12, 2026)
 - Code tidy, no visible change: the 202 pictures moved out of src/assets.js (7.2 MB of base64 -> 12 KB) into image files in src/art/ (5.6 MB). assets.js keeps the same constants with "art:<path>" references; tools/art/inline.js turns them back into data: URLs in build.js and tools/gen.js, so the tester, demo and app builds came out byte-for-byte identical to before. tools/art/export_art.py and import_art.py work on the files now (same folder format, so the repaint and black-edge tools are unchanged).
 

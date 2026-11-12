@@ -5125,6 +5125,41 @@ function confirmEmptyPocket(go){
   overlay.onclick = (ev)=>{ if(ev.target===overlay) closeModal(overlay); };
 }
 
+// ---- One redraw path (Nov 12, polish roadmap A4; camp first) ----
+// morphHTML(el, html) makes el's contents match html while keeping every node that is already right: changed text and
+// attributes are updated in place, only nodes of a different kind are replaced. Kept nodes keep their running CSS
+// animations, loaded images, focus and scroll, and properties set by script (onclick etc. are reassigned by the
+// screen's own wiring after each redraw, so handlers must be assigned, or added once with a guard, never stacked).
+// The result must equal a fresh innerHTML of the same markup: check.js 'morph' compares them screen state by state.
+// Nodes are matched by position, tag and id. Goal: replace renderPathOnly / patchGameDOM / renderTrayFast with this.
+function morphHTML(el, html){
+  const t = document.createElement('template'); t.innerHTML = html;
+  morphChildren(el, t.content);
+}
+function morphChildren(from, to){
+  const a = [...from.childNodes], b = [...to.childNodes];
+  b.forEach((tn, i)=>{
+    const fn = a[i];
+    if(!fn) from.appendChild(tn);
+    else if(morphSameKind(fn, tn)) morphNode(fn, tn);
+    else from.replaceChild(tn, fn);
+  });
+  for(let i=b.length;i<a.length;i++) a[i].remove();
+}
+function morphSameKind(f, t){
+  if(f.nodeType!==t.nodeType) return false;
+  if(f.nodeType!==1) return true;
+  return f.namespaceURI===t.namespaceURI && f.tagName===t.tagName && (f.id||'')===(t.id||'');
+}
+function morphNode(f, t){
+  if(f.nodeType!==1){ if(f.nodeValue!==t.nodeValue) f.nodeValue = t.nodeValue; return; }
+  if(f.isEqualNode(t)) return;
+  for(const at of [...t.attributes]) if(f.getAttribute(at.name)!==at.value) f.setAttribute(at.name, at.value);
+  for(const at of [...f.attributes]) if(!t.hasAttribute(at.name)) f.removeAttribute(at.name);
+  if(f.tagName==='INPUT' && f.value!==t.value) f.value = t.value;
+  morphChildren(f, t);
+}
+
 function renderCamp(){
   try{ ensureRoomTextures(); }catch(e){} // the camp scene reuses the dungeon's (paper) wall and floor (Oct 15)
   const baseCamp = S.floorIdx===0 && S.routeStep===0;
@@ -5152,7 +5187,7 @@ function renderCamp(){
         </div>`);
     });
   });
-  app.innerHTML = `
+  const campHTML = `
     <div class="panel ${baseCamp?'base-camp':''}">
       ${renderRoute()}
       <h2 style="margin-bottom:6px;">${baseCamp?'Base Camp':'Camp'} ${infoDot(baseCamp?'Your adventure begins here. Upgrade or organize your dice if you like.':'Prepare before pressing onward. The campfire gives you one choice: Rest or Train.')}</h2>
@@ -5182,14 +5217,16 @@ function renderCamp(){
       <div class="camp-section">
         <h3 class="camp-section-title">Organize Dice ${infoDot('Tap a die in your Tray, then one in your Back Pocket, to swap them.')}</h3>
         <div class="organize-wrap"><div class="organize-body">
-        <div class="camp-dice-grid ${organizeSel && organizeSel.type==='bp' ? 'organize-target':''} ${organizeSel && organizeSel.type==='tray' ? 'organize-source':''}" id="organize-tray"></div>
+        <div class="camp-dice-grid ${organizeSel && organizeSel.type==='bp' ? 'organize-target':''} ${organizeSel && organizeSel.type==='tray' ? 'organize-source':''}" id="organize-tray">${campDiceGridHTML(S.tray.map((c,i)=>({die:c.die, idx:i})), 'tray')}</div>
         ${organizeSwapArrowHTML()}
         <div class="camp-pocket ${organizeSel && organizeSel.type==='tray' ? 'organize-target':''} ${organizeSel && organizeSel.type==='bp' ? 'organize-source':''}">
-          ${S.backPocket.length ? `<span class="camp-pocket-count" title="Back Pocket">${S.backPocket.length}</span><div class="camp-dice-grid" id="organize-bp"></div>` : `<p class="hint camp-empty-hint" style="margin:0;">Back Pocket empty ${infoDot('Dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one.')}</p>`}
+          ${S.backPocket.length ? `<span class="camp-pocket-count" title="Back Pocket">${S.backPocket.length}</span><div class="camp-dice-grid" id="organize-bp">${campDiceGridHTML(S.backPocket.map((d,i)=>({die:d, idx:i})), 'bp')}</div>` : `<p class="hint camp-empty-hint" style="margin:0;">Back Pocket empty ${infoDot('Dice land here when a Loot Die replaces them in your Tray, or a Shrine upgrades one.')}</p>`}
         </div>
         </div></div>
       </div>
     </div>`;
+  // Nov 12: camp redraws in place (morphHTML) when camp is already on screen, so the fire, dice and buttons aren't rebuilt
+  if(app.querySelector('.camp-status-card')) morphHTML(app, campHTML); else app.innerHTML = campHTML;
   const restBtn = document.getElementById('rest-btn');
   if(restBtn) restBtn.onclick = ()=>{ if(!S.campRested) confirmCampfire('rest', campRest); };
   const trainBtn = document.getElementById('train-btn');
@@ -5234,8 +5271,9 @@ function renderCamp(){
         // Hovering (or focusing / touching) an upgrade lights up the dice stacks it would consume.
         const nm = basic(cat,level).name;
         const lit = on => document.querySelectorAll('.camp-die-tile').forEach(t=>{ if((t.title||'').startsWith(nm)) t.classList.toggle('fuse-hint', on); });
-        ['mouseenter','focus','touchstart'].forEach(ev=> btn.addEventListener(ev, ()=>lit(true), {passive:true}));
-        ['mouseleave','blur','touchend','touchcancel'].forEach(ev=> btn.addEventListener(ev, ()=>lit(false), {passive:true}));
+        if(!btn._litBound){ btn._litBound = true; // the redraw keeps this button: add its hover hints once
+          ['mouseenter','focus','touchstart'].forEach(ev=> btn.addEventListener(ev, ()=>lit(true), {passive:true}));
+          ['mouseleave','blur','touchend','touchcancel'].forEach(ev=> btn.addEventListener(ev, ()=>lit(false), {passive:true})); }
       }
       const previewBtn = document.getElementById(`preview-${cat}-${level}`);
       if(previewBtn) previewBtn.onclick = ()=>{
@@ -5254,8 +5292,7 @@ function renderCamp(){
       };
     });
   });
-  document.getElementById('organize-tray').innerHTML = campDiceGridHTML(S.tray.map((c,i)=>({die:c.die, idx:i})), 'tray');
-  if(S.backPocket.length) document.getElementById('organize-bp').innerHTML = campDiceGridHTML(S.backPocket.map((d,i)=>({die:d, idx:i})), 'bp');
+  // (the dice grids are part of the markup since Nov 12, so the redraw can keep their tiles)
   applyPocketCollapse();
   [...document.querySelectorAll('.camp-die-tile')].forEach(tile=>{
     tile.onclick = ()=> selectOrganize(tile.dataset.campType, parseInt(tile.dataset.campIdx));
