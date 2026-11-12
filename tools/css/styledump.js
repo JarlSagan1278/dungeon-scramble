@@ -5,7 +5,14 @@ const fs = require('fs');
 let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node22/lib/node_modules/playwright')); }
 process.env.DS_STYLEDUMP = '1'; const { SCREENS, INIT, HELP, URL_ } = require('../tests/test_screens.js');
 const [outFile, SEL] = process.argv.slice(2);
+const CAMP = `__fight(); S.screen = 'camp'; S.floorIdx = 0; S.routeStep = 4; S.campChoice = null; S.campRested = false; S.campFireOut = false; S.campUpgrades = {};
+  S.backPocket = [clone(basic('attack', 1)), clone(basic('attack', 1)), clone(basic('attack', 1)), clone(basic('maneuver', 1))]; S.health = Math.max(1, S.maxHealth - 5);`;
 const EXTRA = [
+  ['camp-train', `(() => { ${CAMP} S.campChoice = 'train'; render(); })()`],
+  ['camp-rested', `(() => { ${CAMP} S.campChoice = 'rest'; S.campRested = true; S.campHealed = 4; render(); })()`],
+  ['camp-out', `(() => { ${CAMP} S.campFireOut = true; render(); })()`],
+  ['camp-organize', `(() => { ${CAMP} render(); const t = document.querySelector('#organize-tray .camp-die-tile'); if (t) t.click(); })()`],
+
   ['dice-states', () => { __fight('pixie', 'arcanist'); render(); const t = S.tray;
     t[1].minion = true; t[2].spent = true; t[3].blank = true; render();
     const h = [...Array(16).keys()].filter(i => canSelect(i)); if (h.length) toggleSelect(h[0]); render(); }],
@@ -29,7 +36,7 @@ const EXTRA = [
         const path = []; for (let n = el; n && n !== document.body; n = n.parentElement) path.unshift(n.tagName.toLowerCase() + (n.id ? '#' + n.id : '') + ([...n.classList].filter(c => !/^(shaking|resolving)$/.test(c)).sort().map(c => '.' + c).join('')));
         for (const pseudo of [null, '::before', '::after']) {
           const cs = getComputedStyle(el, pseudo); if (pseudo && cs.content === 'none') continue;
-          const parts = []; for (let i = 0; i < cs.length; i++) { const n = cs[i]; let v = cs.getPropertyValue(n); if (v.length > 300) { let h = 2166136261; for (let j = 0; j < v.length; j++) h = Math.imul(h ^ v.charCodeAt(j), 16777619); v = v.slice(0, 60) + `…[${v.length} chars #${(h >>> 0).toString(16)}]`; } parts.push(n + ':' + v); } // art data: URLs -> fingerprint
+          const parts = []; for (let i = 0; i < cs.length; i++) { const n = cs[i]; let v = cs.getPropertyValue(n).replace(/\s*\n\s*/g, ' '); if (v.length > 300) { let h = 2166136261; for (let j = 0; j < v.length; j++) h = Math.imul(h ^ v.charCodeAt(j), 16777619); v = v.slice(0, 60) + `…[${v.length} chars #${(h >>> 0).toString(16)}]`; } parts.push(n + ':' + v); } // art data: URLs -> fingerprint
           const str = parts.join('\n'); let id = seen.get(str); if (id == null) { id = table.length; table.push(str); seen.set(str, id); }
           rec[k + ' ' + path.slice(-4).join('>') + (pseudo || '')] = id;
         }

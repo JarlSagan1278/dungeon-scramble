@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.93 (Nov 12, 2026)
+- Code tidy, no visible change: camp's styles (112 rules: camp-, campfire-, cf-, organize-, upgrade-) merged into one "Camp" block (92 rules, 3 fewer !important, 50 lines shorter). The dice tiles and stack badges in Organize/Pocket stay where they were (they override the dice block), as do the tap-cue rules. stylediff: 0 differences on camp (5 camp states) and dice, both phone sizes. styledump gained camp states (train, rested, fire out, organize pick).
+
 ## 1.42.92 (Nov 12, 2026)
 - Code tidy, no visible change: the dice styles (81 rules spread over the whole stylesheet) are merged into one "Dice" block (65 rules, 3 fewer !important); the base `.die` rule stays first because other screens' dice rules override it. New tools: `tools/css/merge.py` (merges one component's rules), `tools/css/styledump.js` + `stylediff.js` (record every computed style on the picture-check screens and prove a refactor changed nothing: 0 differences here, across 18 screens and dice states at both phone sizes).
 

@@ -557,22 +557,7 @@
   .key-item.blk-maneuver .key-icon, .key-item.blk-maneuver .key-label,
   .key-item.blk-attack .key-icon, .key-item.blk-attack .key-label,
   .key-item.blk-support .key-icon, .key-item.blk-support .key-label{ color:#141414; }
-  /* Camp screen section cards -- Status/Upgrade/Organize each get their own
-     bordered panel2 card instead of floating directly on the page
-     background, so Camp reads as a real game screen with distinct areas
-     rather than a flat stack of controls. */
-  .camp-section{ background:var(--panel2); border-radius:var(--r-md); padding:8px 10px 9px; margin:7px 0; }
-  .camp-status-card .bar-row{ margin-bottom:0; }
-  .camp-status-card .small-btn-row{ margin-top:6px; }
-  .camp-status-card .small-btn-row button{ flex:1 1 0; }
-  /* Square tiles again, in a responsive grid -- but each one now stands for
-     every identical copy of that die (buildDieStacks(), render.js), so a
-     tray of sixteen Basic dice collapses to a handful of tiles instead of
-     sixteen individually. That's what makes the square affordable this
-     time: a square can't fit "Dwarven Doohickie" (the earlier reason Camp
-     moved to text pills), but it has no trouble with one piece of art or a
-     short "Atk/Man + tier" label, and there are far fewer of them to fit. */
-  .camp-dice-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap:7px; margin:3px 0; }
+
   .camp-die-tile{ position:relative; z-index:0; aspect-ratio:1/1; width:auto; height:auto; min-width:0; min-height:0;
     padding:0; border-radius:var(--r-md); cursor:pointer;
     /* .die (above) sets overflow:hidden to clip its own art/label to the
@@ -585,7 +570,7 @@
     overflow:visible;
     display:flex; align-items:center; justify-content:center; text-align:center; }
   .camp-die-tile img{ display:block; border-radius:var(--r-md); }
-  .camp-die-basic-label{ font-size:11px; line-height:1.3; font-weight:800; }
+
   .camp-die-tile.organize-selected{ box-shadow:0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
   /* Card-stack look for more than one copy: three faux layers fan out
      bottom-right via box-shadow (it follows the tile's own border-radius,
@@ -618,8 +603,7 @@
     calc(2*var(--st)) calc(-2*var(--st)) 0 0 var(--sk2), calc(2*var(--st)) calc(-2*var(--st)) 0 1.5px var(--line),
     calc(3*var(--st)) calc(-3*var(--st)) 0 0 var(--sk3), calc(3*var(--st)) calc(-3*var(--st)) 0 1.5px var(--line);
     margin: calc(3*var(--st) + 2px) calc(3*var(--st) + 2px) 7px 0; }
-  /* every tile in a grid that has a stack shares the same top/right room, so singles and stacks stay one size */
-  .camp-pocket .camp-dice-grid{ padding-top:2px; }
+
   .camp-pocket .camp-die-tile.stacked{ margin:0; }
   .camp-die-tile.stacked{ box-shadow: var(--stk); }
   .camp-die-tile.stacked.organize-selected{ z-index:2; box-shadow: var(--stk), 0 0 0 3px #fff, 0 0 10px 2px var(--gold); }
@@ -631,66 +615,19 @@
   .camp-stack-badge{ position:absolute; bottom:-7px; right:-7px; background:var(--gold); color:#241c10;
     font-size:9px; font-weight:800; border-radius:var(--r-md); padding:1px 5px; min-width:13px; text-align:center;
     border:1.5px solid var(--line); line-height:1.3; z-index:1; }
-  /* Back Pocket as a visibly different, darker storage area rather than a
-     second list that only a text heading told apart from Tray -- a sunken
-     pouch shape (inset shadow, darker fill, bottom corners rounder than the
-     top like a drawn drawstring bag) reads as "this is where things are
-     kept" on its own. Deliberately smaller than the Tray above it (tighter
-     padding, smaller tiles via its own grid rule below) -- it's a side
-     pocket for spares, not a second equal-weight tray. */
-  .camp-pocket{ position:relative;
-    border-radius:8px 8px 16px 16px; padding:11px 7px 7px; margin-top:4px;
-    box-shadow:inset 0 3px 10px rgba(0,0,0,0.6); }
-  .camp-pocket .camp-dice-grid{ grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap:6px; }
-  .camp-pocket-count{ position:absolute; top:-8px; left:50%; transform:translateX(-50%);
-    background:var(--stone); border:1.5px solid var(--line); color:var(--parchment-dim);
-    font-size:9px; font-weight:800; border-radius:var(--r-md); padding:1px 7px; }
-  /* Connected swap cue: once a die is picked, the area it came FROM dims
-     (everything but the selection itself) and the area it's going INTO
-     gets a pulsing gold outline -- so the two taps a swap takes read as one
-     continuous gesture aimed at a clear target, not two disconnected clicks
-     into generically-labeled lists. */
-  .camp-dice-grid.organize-source{ opacity:0.45; }
+
   .camp-dice-grid.organize-source .camp-die-tile.organize-selected{ opacity:1; }
-  .camp-dice-grid.organize-target{ outline:2px solid var(--gold); outline-offset:4px; border-radius:var(--r-md);
-    animation: organize-target-pulse 1.1s ease-in-out infinite; }
-  .camp-pocket.organize-source{ opacity:0.5; }
+
   .camp-pocket.organize-source .camp-die-tile.organize-selected{ opacity:1; }
-  .camp-pocket.organize-target{ outline:2px solid var(--gold); outline-offset:4px;
-    animation: organize-target-pulse 1.1s ease-in-out infinite; }
+
   @keyframes organize-target-pulse{
     0%,100%{ box-shadow:0 0 0 0 rgba(212,175,82,0); }
     50%{ box-shadow:0 0 0 5px rgba(212,175,82,0.3); }
   }
-  .reduced-motion .camp-dice-grid.organize-target, .reduced-motion .camp-pocket.organize-target{ animation:none; box-shadow:0 0 0 3px rgba(212,175,82,0.4); }
-  .organize-swap-arrow{ display:flex; justify-content:center; color:var(--gold); margin:1px 0; }
-  .organize-swap-arrow.down{ animation: organize-arrow-bounce-down 0.9s ease-in-out infinite; }
-  .organize-swap-arrow.up{ animation: organize-arrow-bounce-up 0.9s ease-in-out infinite; }
+
   @keyframes organize-arrow-bounce-down{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(4px); } }
   @keyframes organize-arrow-bounce-up{ 0%,100%{ transform:translateY(0) rotate(180deg); } 50%{ transform:translateY(-4px) rotate(180deg); } }
-  .reduced-motion .organize-swap-arrow{ animation:none !important; }
-  .reduced-motion .organize-swap-arrow.up{ transform:rotate(180deg); }
-  .camp-section-title{ font-size:13px; margin:7px 0 3px; }
-  .camp-section .camp-section-title:first-child{ margin-top:0; }
-  .camp-empty-hint{ margin:0 0 2px; }
-  /* A small CSS-only campfire (logs + two flickering flame blobs + a pulsing
-     warm glow) as Camp's focal point -- no art asset needed, and it doubles
-     as a bit of ambient motion/juice consistent with the rest of the game's
-     feedback (screen shake, particle bursts, etc.). Respects the global
-     reduced-motion rule at the top of this file like every other animation. */
-  .camp-fire-wrap{ position:relative; width:106px; margin:10px auto 18px; display:flex; align-items:flex-end; justify-content:center; }
-  .campfire-glow{ position:absolute; bottom:4px; left:50%; transform:translateX(-50%); width:81px; height:81px; border-radius:50%;
-    background:radial-gradient(circle, rgba(255,170,60,0.55) 0%, rgba(255,170,60,0) 70%);
-    animation: campfire-glow-pulse 2.4s ease-in-out infinite; }
-  .campfire-logs{ position:relative; width:48px; border-radius:var(--r-sm); z-index:1; }
-  .campfire-logs::before, .campfire-logs::after{ content:''; position:absolute; width:48px; border-radius:var(--r-sm); }
-  .campfire-logs::before{ transform: rotate(22deg); }
-  .campfire-logs::after{ transform: rotate(-22deg); }
-  .campfire-flame{ position:absolute; bottom:13px; left:50%; border-radius:50% 50% 50% 50% / 62% 62% 38% 38%; z-index:2; }
-  .campfire-flame.flame-back{ width:27px; height:41px; margin-left:-13.5px; background:linear-gradient(to top, #ff7a1a, #ffce54);
-    animation: campfire-flicker-a 1.1s ease-in-out infinite; }
-  .campfire-flame.flame-front{ width:15px; height:24px; margin-left:-7.5px; background:linear-gradient(to top, #ffb23d, #fff2b0);
-    animation: campfire-flicker-b 0.9s ease-in-out infinite; }
+
   @keyframes campfire-glow-pulse{ 0%,100%{ opacity:0.75; transform:translateX(-50%) scale(1); } 50%{ opacity:1; transform:translateX(-50%) scale(1.08); } }
   @keyframes campfire-flicker-a{ 0%,100%{ transform:scaleY(1) scaleX(1); } 50%{ transform:scaleY(1.12) scaleX(0.92); } }
   @keyframes campfire-flicker-b{ 0%,100%{ transform:scaleY(1) rotate(-2deg); } 50%{ transform:scaleY(0.88) rotate(3deg); } }
@@ -1087,18 +1024,7 @@
     border:1px solid rgba(0,0,0,0.65); color: var(--parchment);
     border-radius:var(--r-md); padding:3px 6px; white-space:nowrap; flex:0 0 auto;
     box-shadow:0 1px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); }
-  /* Upgrade Dice rows (renderCamp(), render.js) -- kept deliberately compact
-     (small font/padding, short "Attack I -> II" wording instead of a full
-     "Combine 3 ... into 1 ..." sentence) so this section doesn't blow out
-     the Camp screen's height; the old full-sentence buttons wrapped onto 2
-     lines and pushed the ineligible-row note onto its own separate pill
-     below, roughly doubling this section's height for no real benefit. */
-  .upgrade-rows-col{ display:flex; flex-direction:column; gap:5px; margin-top:6px; }
-  .upgrade-row{ display:flex; align-items:stretch; gap:6px; }
-  .upgrade-row button:first-child{ flex:1; }
-  .upgrade-btn{ font-size:12px; padding:10px 8px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    display:flex; align-items:center; justify-content:center; gap:5px; }
-  .upgrade-preview-btn{ flex:0 0 auto; width:28px; font-weight:bold; font-size:12px; padding:6px 4px; }
+
   /* padding-top here is deliberately bigger than the count badge's -6px
      overflow below (see .swap-count-badge) -- otherwise the top row's
      badges would poke past this list's own edge and get sliced off by its
@@ -1260,9 +1186,6 @@
   .class-tab-btn.selected{ background:var(--class-color, var(--gold)) !important; color:#fff !important; text-shadow:0 1px 0 rgba(0,0,0,.45);
     border-color:var(--line) !important; box-shadow:0 0 0 3px var(--gold) !important; transform:translateY(-3px); }
   .class-tab-btn:not(.selected){ opacity:.82; }
-
-  /* Camp status card (health, campfire, Rest / Break Camp): near-black so the fire glows. */
-  .camp-status-card{ background:var(--b0) !important; border:3px solid var(--line) !important; box-shadow:inset 0 0 24px rgba(0,0,0,.7), 0 4px 0 var(--line); }
 
   /* Dice are bigger now: center the icon + label in the area under the name arc instead of bottom-stacking (which pushed icons up into the name). */
   .die{ padding-top:17px !important; padding-bottom:3px !important; justify-content:center !important; gap:0; }
@@ -1488,13 +1411,6 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 #start-btn:not(:disabled){ animation: pulse-glow 1.8s ease-in-out infinite; }
 .reduced-motion #start-btn{ animation:none !important; }
 
-/* Camp: your hero sits beside the fire, facing it */
-.camp-fire-wrap{ height:78px !important; }
-.camp-hero{ position:absolute; right:calc(50% + 24px); bottom:0; z-index:3; }
-.camp-hero img{ display:block; height:74px; filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)) drop-shadow(6px 0 8px rgba(255,150,40,.45)); }
-.camp-hero{ width:max-content; }
-.camp-hero img{ max-width:none !important; width:auto !important; object-fit:contain; }
-
 .fo-floor{ display:none !important; }
 .fo-enemy .fo-quests{ align-items:center !important; text-align:center !important; justify-content:center !important; }
 /* Top map panel: even frame (the mascot hangs into the bottom padding instead of extra margin) */
@@ -1614,16 +1530,11 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 .near-miss-chip{ white-space:nowrap; font-size:12px !important; padding:3px 10px !important; width:auto !important; max-width:none; }
 
 /* ---- v1.32.3: campfire logs get the same thick black outline as the portraits ---- */
-.campfire-logs{ height:13px !important; border:2.5px solid #000 !important; background:var(--b4) !important; }
-.campfire-logs::before, .campfire-logs::after{ height:11px !important; border:2.5px solid #000 !important; top:-2.5px !important; left:-2.5px !important; background:var(--b4) !important; }
 
 /* v1.32.8 contrast pass: flat colors, lighter edges so brown layers separate */
 .wrap > .panel{ background:var(--b2) !important; border:2px solid var(--b4) !important; box-shadow:0 0 0 2px var(--b0); }
-.camp-section{ border:2px solid var(--b4) !important; box-shadow:inset 0 0 0 1px rgba(255,220,160,.12); }
-.camp-pocket{ background:var(--b0) !important; border:1px solid var(--b4) !important; }
+
 .tray-wrap{ border-color:var(--b5) !important; }
-.upgrade-btn:disabled, .upgrade-preview-btn:disabled{ opacity:1 !important; background:var(--b3) !important; color:#e3caa3 !important; border-color:var(--b0) !important; }
-.upgrade-btn:disabled .icon-svg, .upgrade-btn:disabled svg{ opacity:.85; }
 
 /* v1.32.10 shield on health bars */
 .bar-fill.shield-seg{ position:absolute; top:0; bottom:0; height:auto; background:#5fa8d8 !important; border-left:2px solid #1c3a52; z-index:1; }
@@ -1764,10 +1675,6 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 /* Bosses: large-enemy size, standing in the pocket of their health-bar arc (feet resting on the curve) */
 .enc-card.fo-arch .fo-boss-side .fo-fig .fo-img.enc-art{ margin-bottom:-12px !important; max-width:125%; }
 
-/* One ink colour everywhere. Camp props get a slimmer outline than the characters: logs 2px, flames 2.5px */
-.campfire-logs, .campfire-logs::before, .campfire-logs::after{ border:2px solid var(--line); box-sizing:border-box; }
-.campfire-flame{ box-sizing:border-box; }
-
 /* v1.32.19 dark hallway: two torch-lit foci, a faint warm centre, near-black edges */
 .enc-card.fo-arch{ background:radial-gradient(circle at 19px 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
     radial-gradient(circle at calc(100% - 19px) 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
@@ -1878,7 +1785,7 @@ body.hit-stop .fo-enemy .fo-fig{ filter:brightness(2.4) saturate(.35); }
 /* Camp: dice fly together; the fused tile waits for them, then pops */
 .camp-die-tile.fuse-flash{ animation-delay:.34s; animation-fill-mode:both; }
 .fuse-fly{ filter:drop-shadow(0 0 6px rgba(255,215,106,.8)); }
-.camp-fire-wrap.flare .campfire-glow{ animation:fire-flare .9s ease-out both; animation-delay:var(--fl,0ms); }
+
 @keyframes fire-flare{ 0%{ transform:translateX(-50%) scale(1); filter:brightness(1); } 25%{ transform:translateX(-50%) scale(1.9); filter:brightness(1.8); } 100%{ transform:translateX(-50%) scale(1); filter:brightness(1); } }
 
 /* ---- Passive atmosphere: torch light breathing, dust motes, chest interior glow ---- */
@@ -1910,9 +1817,6 @@ body.is-resolving .fo-torch, body.is-resolving .hall-fx .hf-glow, body.is-resolv
 body.is-resolving .die-sheen::before, body.is-resolving .die-sheen::after, body.is-resolving .minion-eye, body.is-resolving .minion-eye::after,
 body.is-resolving .die.minion, body.is-resolving .chest-lock:not(.unlock), body.is-resolving .path-counter-float, body.is-resolving .util-btn.pulse,
 body.is-resolving .lethal-tag, body.is-resolving .die .face-val .icon-svg, body.is-resolving .die.trayact-ready .face-val{ animation:none !important; }
-
-/* Campfire flames: no dark outline (logs keep theirs) */
-.campfire-flame{ border:0 !important; box-shadow:none !important; filter:none; }
 
 /* Hallway floor: the bottom of the doorway warms toward the dice-box brown instead of dropping to black; the base edge is solid ink, not the torch gradient bleeding through the transparent border */
 .enc-card.fo-arch{ border-bottom-color:var(--line) !important; }
@@ -2096,8 +2000,6 @@ body{ -webkit-tap-highlight-color:transparent; }
 .depth-toggle .depth-chevron{ transform:rotate(180deg); }
 .depth-toggle.open .depth-chevron{ transform:rotate(0deg); }
 
-/* Available basic-die upgrades gently pulse so players notice them */
-.upgrade-btn.upgrade-ready:not(:disabled){ animation: upgradeReady 1.8s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce){ .upgrade-btn.upgrade-ready:not(:disabled){ animation:none; box-shadow:0 0 8px 2px rgba(255,215,106,.45); } }
 
 /* Quest paper: one-time glow when a room with bonus quests begins */
@@ -2244,8 +2146,6 @@ html,body{ overflow-x:clip; }
 .kill-callout-line{ paint-order:stroke fill; -webkit-text-stroke:6px #120a04 !important; stroke-linejoin:round;
   text-shadow:0 3px 0 #120a04, 0 0 12px rgba(0,0,0,.9), 0 0 26px rgba(0,0,0,.7) !important; }
 .kill-callout-line.boss{ -webkit-text-stroke:7px #120a04 !important; }
-
-.camp-hero{ cursor:pointer; }
 
 /* armed zone: ~1s twitch burst, ~4s rest (5s cycle) */
 @keyframes zoneTwitch{
@@ -2505,20 +2405,7 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 .fo-chips .boss-cycle-item .icon-svg{ width:14px; height:14px; }
 
 /* ---- Campfire choice (Oct 14): Rest OR Train ---- */
-.campfire-choice{ margin:4px 0 8px; text-align:center; }
-.campfire-choice .cf-label{ font-family:var(--font-display); font-size:14px; color:var(--gold); margin-bottom:5px; }
-.campfire-choice .cf-row{ display:flex; align-items:stretch; justify-content:center; gap:8px; }
-.campfire-choice .cf-or{ align-self:center; font-family:var(--font-display); font-size:13px; color:var(--parchment-dim); }
-.cf-btn{ flex:1 1 0; max-width:150px; display:flex; flex-direction:column; align-items:center; gap:2px; font-weight:bold; font-size:15px; padding:7px 8px; }
-.cf-btn small{ font-weight:normal; font-size:11.5px; opacity:.9; text-wrap:balance; }
-.cf-btn.cf-rest{ background:var(--green); color:var(--parchment); }
-.cf-btn.cf-rest:hover:not(:disabled){ background:#57a06b; }
-.cf-btn.cf-train{ background:var(--purple); color:var(--parchment); }
-.cf-btn.cf-train:hover:not(:disabled){ background:#9a6fc2; }
-.cf-btn.chosen:disabled{ opacity:1; box-shadow:0 0 0 2px var(--gold); }
-.cf-btn.skipped:disabled{ opacity:.35; }
-.campfire-choice.out .cf-label{ color:var(--parchment-dim); }
-.camp-section.cf-point{ animation: cf-point 1.1s ease-out 1; }
+
 @keyframes cf-point{ 0%{ box-shadow:0 0 0 0 var(--purple); } 30%{ box-shadow:0 0 0 4px var(--purple); } 100%{ box-shadow:0 0 0 0 transparent; } }
 .util-btn .badge.pocket-heart{ background:#c0392b; color:#fff5d6; width:18px; height:18px; min-width:18px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:50%; }
 .util-btn .badge.pocket-heart svg{ width:12px; height:12px; display:block; }
@@ -2534,21 +2421,12 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 /* Oct 15 (Jeremy: "do all 5"): textures beyond the art and scenery. Dice, buttons, bars, numbers and chips stay clean. */
 /* 1. the Quests sign is paper (a softer grain: Jeremy, Oct 15 -- it has to stay readable) */
 
-/* 2. the camp scene stands in the dungeon: paper wall behind, paper floor under the fire */
-.camp-section.camp-status-card{ position:relative; overflow:hidden; background:linear-gradient(rgba(10,6,4,.25), rgba(10,6,4,.05) 55%, rgba(10,6,4,.3)), var(--tex-wall) 0 0/200px 100px repeat, #0c0705 !important; }
-.camp-status-card::before{ content:""; position:absolute; left:0; right:0; bottom:0; height:42%; border-top:3px solid #120b07; background:linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.55)), var(--tex-floor) 50% 0/320px 320px; pointer-events:none; z-index:0; }
-.camp-status-card > *{ position:relative; z-index:1; }
-/* Oct 15 (Jeremy): a campfire in a dark room -- the light falls off toward the edges (above the floor, under the hero, fire and buttons) */
-.camp-status-card::after{ content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
-  background:radial-gradient(ellipse 62% 70% at 50% 52%, rgba(8,4,2,0) 30%, rgba(8,4,2,.55) 70%, rgba(8,4,2,.9) 100%); }
 /* (pop-up panels stay plain: UI, not in-world -- Jeremy, Oct 15) */
 /* 4. a little wear on the chest's iron (the shine animation does the rest) */
 /* Oct 15 (Jeremy): texture is for in-world things; UI panels stay plain so they read easily (camp sections back to their light brown). */
 .tray-wrap .cc svg, .tray-wrap .chest-lock svg{ filter:url(#fx-worn); }
 /* 5. the route bar's doorways are paper too */
 .route .node.rt-door > svg, .route .node.rt-door > .rt-arch{ filter:url(#fx-paper); }
-/* Oct 15 (Jeremy): the campfire logs are in-world, so they get the paper grain too */
-.campfire-logs, .campfire-logs::before, .campfire-logs::after{ filter:url(#fx-paper); }
 
 /* Oct 16: the baked floor (see bakedFloorCanvas in render.js) replaces the 3D .rf-plane */
 #room-floor .rf-canvas{ position:absolute; left:0; top:0; width:100%; height:100%; display:block; }
@@ -2605,15 +2483,7 @@ body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
 .portrait-reroll.spin svg{ animation:portrait-reroll-spin .45s ease-out; }
 @keyframes portrait-reroll-spin{ from{ transform:rotate(-360deg); } to{ transform:rotate(0); } }
 
-/* Camp (Oct 16, Jeremy): combine buttons stay covered (stripes + lock) until Train is chosen at the campfire. */
-.upgrade-btn.upgrade-locked{ position:relative; cursor:not-allowed; }
-.upgrade-btn.upgrade-locked::after{ content:''; position:absolute; inset:0; pointer-events:none;
-  background:repeating-linear-gradient(135deg, rgba(12,7,5,.30) 0 6px, rgba(12,7,5,.06) 6px 12px); }
-/* tapping a locked combine nudges the Train button */
-.cf-btn.cf-nudge{ animation:cf-nudge .5s ease-in-out; }
 @keyframes cf-nudge{ 0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-5px) rotate(-2deg); } 45%{ transform:translateX(5px) rotate(2deg); } 70%{ transform:translateX(-3px); } }
-.upgrade-btn.upgrade-locked::before{ content:''; position:absolute; left:50%; top:50%; width:16px; height:18px; transform:translate(-50%,-50%); z-index:1; pointer-events:none;
-  background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 18'%3E%3Crect x='1.5' y='7.5' width='13' height='9.5' rx='2' fill='%23f2e4c8' stroke='%230c0705' stroke-width='1.6'/%3E%3Cpath d='M4.5 7.5V5a3.5 3.5 0 0 1 7 0v2.5' fill='none' stroke='%230c0705' stroke-width='3.2'/%3E%3Cpath d='M4.5 7.5V5a3.5 3.5 0 0 1 7 0v2.5' fill='none' stroke='%23f2e4c8' stroke-width='1.4'/%3E%3C/svg%3E"); }
 
 /* Quest paper (Jeremy, Oct 16): chunky black outline + two little nicks cut out of the paper (real holes: the wall shows
    through, and the outline and drop shadow follow the cut). .fq-body is the black outline shape; its ::after is the paper,
@@ -2641,18 +2511,7 @@ button.btn-backup:hover:not(:disabled){ background:#ad8c36; }
 /* Reset Progress: darker, outline-only danger, so it never sits beside Abandon Run in the same red */
 button.danger-outline{ background:#1c130c; color:#ff9a8a; box-shadow:inset 0 0 0 2px #b33b3b; }
 button.danger-outline:hover:not(:disabled){ background:#2c1a12; box-shadow:inset 0 0 0 2px #d24a3e; }
-/* Camp upgrade rows take their die's colour (Attack red, Maneuver cream, like the tray); the "?" matches its row */
-.upg-attack .upgrade-btn, .upg-attack .upgrade-preview-btn{ background:#e8574f; color:#fff; }
-.upg-maneuver .upgrade-btn, .upg-maneuver .upgrade-preview-btn{ background:#ffe9a8; color:#3a2410; }
-.upg-attack .upgrade-btn:hover:not(:disabled), .upg-attack .upgrade-preview-btn:hover:not(:disabled){ background:#f06a62; }
-.upg-maneuver .upgrade-btn:hover:not(:disabled), .upg-maneuver .upgrade-preview-btn:hover:not(:disabled){ background:#fff2c8; }
-.upg-attack .upgrade-btn:disabled{ background:#6a2f2a !important; color:#f4c9c2 !important; }
-.upg-maneuver .upgrade-btn:disabled{ background:#6a5a34 !important; color:#f3e3b8 !important; }
-/* The one-time campfire confirm uses the colour of the button that opened it */
-button.cf-go-rest{ background:var(--green); color:var(--parchment); }
-button.cf-go-rest:hover:not(:disabled){ background:#57a06b; }
-button.cf-go-train{ background:var(--purple); color:var(--parchment); }
-button.cf-go-train:hover:not(:disabled){ background:#9a6fc2; }
+
 .upg-maneuver .token-count{ background:rgba(58,36,16,.16); }
 /* End screens (items 6-7): run card + [Save Card][Try Again] on one 769px screen; the rest behind Details */
 .end-screen h2{ margin-bottom:4px; }
@@ -2668,9 +2527,7 @@ button.end-details-btn:hover:not(:disabled){ background:#5a3e28; }
 .end-details-btn small{ font-weight:normal; font-size:11px; color:var(--parchment); opacity:.85; white-space:normal; }
 .end-screen .share-ask{ margin-top:10px; }
 /* ---- Oct 17 design fixes, part 2 (audit Part 2, items 8-22, 25-26, plus Jeremy's 1.41.60 review) ---- */
-/* 8: the Health number sits inside the bar everywhere (camp and shrine like the fight) */
-.camp-hp-row .camp-hpwrap{ flex:1 1 auto; width:auto; }
-.camp-hp-row .camp-hpwrap .bar{ height:20px !important; }
+
 /* 9: every Origin and Class pill carries its own colour as a rim, so no two neighbours look alike */
 #class-tab-row .class-tab-btn{ --tab-rim:var(--class-color); }
 .origin-tab-dwarf{ --tab-rim:#c8873a; } .origin-tab-gnome{ --tab-rim:#d9534f; } .origin-tab-halfling{ --tab-rim:#e8c25a; } .origin-tab-pixie{ --tab-rim:#c77ddb; }
@@ -2712,9 +2569,7 @@ body:has(.modal-overlay) .settings-btn-floating{ visibility:hidden; }
 .key-item.blk-maneuver .key-icon, .key-item.blk-maneuver .key-label, .key-item.blk-support .key-icon, .key-item.blk-support .key-label{ color:#241c10; }
 .key-item .key-label{ font-weight:900; }
 .key-item.on{ outline:3px solid #fff1d6; outline-offset:1px; }
-/* 18: camp cards and the Back Pocket get the near-black outline */
-.camp-section{ border:3px solid var(--line) !important; }
-.camp-pocket{ border:3px solid var(--line) !important; }
+
 /* 19: achievement box and run-card stat tiles outlined in the line colour (gold stays for the heading) */
 .achv-unlock-box{ border:3px solid var(--line); }
 .rc-stat{ border:2px solid var(--line); }
@@ -2727,22 +2582,12 @@ body:has(.modal-overlay) .settings-btn-floating{ visibility:hidden; }
 .util-rail.rail-shrine > *{ visibility:visible; } /* Oct 31 (Jeremy): the rail stays at shrines, all greyed out */
 .util-btn.disabled:not(.rail-go){ opacity:1 !important; position:relative; }
 .util-btn.disabled:not(.rail-go)::before{ content:''; position:absolute; inset:0; border-radius:inherit; background:rgba(28,17,9,.6); pointer-events:none; z-index:3; }
-.cf-btn:disabled:not(.chosen){ opacity:1 !important; }
-.cf-btn.cf-rest:disabled:not(.chosen){ background:#2f4a37 !important; color:#c9d6c4 !important; }
-.cf-btn.cf-train:disabled:not(.chosen){ background:#463656 !important; color:#d6c9e3 !important; }
+
 /* 22: round bubble in dark brown with light-brown text; the floor number stays gold */
 .tray-head .round-badge{ background:var(--b2) !important; color:var(--parchment-dim) !important; }
 /* 25: one scroll area per Codex / Records tab (no scrolling list inside the scrolling window) */
 .codex-body .compendium-list, .codex-body .run-history-list{ max-height:none; overflow:visible; }
-/* Locked combine rows (Jeremy, 1.41.60 review): lighter stripes, the label on its own backing, the lock beside it */
-.upgrade-btn .upg-lbl{ position:relative; z-index:2; display:inline-flex; align-items:center; gap:5px; min-width:0; }
-.upgrade-btn.upgrade-locked::after{ z-index:0; background:repeating-linear-gradient(135deg, rgba(12,7,5,.17) 0 6px, rgba(12,7,5,0) 6px 12px); }
-.upgrade-btn.upgrade-locked .upg-lbl{ padding:1px 9px 1px 26px; border-radius:var(--r-pill); box-shadow:0 0 0 2px var(--line); }
-.upg-attack .upgrade-btn.upgrade-locked .upg-lbl{ background:#e8574f; }
-.upg-maneuver .upgrade-btn.upgrade-locked .upg-lbl{ background:#ffe9a8; }
-.upgrade-btn.upgrade-locked::before{ display:none; }
-.upgrade-btn.upgrade-locked .upg-lbl::before{ content:''; position:absolute; left:6px; top:50%; width:15px; height:17px; transform:translateY(-50%); pointer-events:none;
-  background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 18'%3E%3Crect x='1.5' y='7.5' width='13' height='9.5' rx='2' fill='%23f2e4c8' stroke='%230c0705' stroke-width='1.6'/%3E%3Cpath d='M4.5 7.5V5a3.5 3.5 0 0 1 7 0v2.5' fill='none' stroke='%230c0705' stroke-width='3.2'/%3E%3Cpath d='M4.5 7.5V5a3.5 3.5 0 0 1 7 0v2.5' fill='none' stroke='%23f2e4c8' stroke-width='1.4'/%3E%3C/svg%3E"); }
+
 /* Hanging vines (Floors 2-3) sit behind the quest paper and the monsters: their own layer under the arch */
 .fo-frame.fo-vines{ z-index:0; }
 /* Bestiary: each monster's quests in the fight's own wording and reward icons */
@@ -2780,13 +2625,9 @@ body:has(.modal-overlay) .settings-btn-floating{ visibility:hidden; }
 .setup-panel.fit4 .class-showcase-ability{ font-size:11px; line-height:1.25; }
 .setup-panel.fit4 .boon-tile-circle{ width:34px; height:34px; }
 .setup-panel.fit4 .setup-name-row{ margin-bottom:4px; }
-/* Camp scene (Jeremy, Oct 17: "the wall is too high up compared to the campfire"): the floor starts just behind the hero
-   and fire (their feet sit ~30px below the horizon, like a fight room), so they stand on it with the wall behind them */
-.camp-status-card::before{ top:90px; height:auto; }
+
 @media (min-height:770px){ .camp-status-card::before{ top:146px; } }
-/* Campfire buttons: the label is centred vertically whether or not it has a sub-line, and Rest and Train line up */
-.campfire-choice .cf-btn{ justify-content:center; min-height:52px; }
-.campfire-choice .cf-btn small{ line-height:1.15; }
+
 /* ---- Guided first fight (Oct 22): bubble above the tray + a glowing ring on the next die / Go (fixed overlays) ---- */
 .guide-bubble{ position:fixed; z-index:70; box-sizing:border-box; background:var(--parchment); color:#2b1d14; border:3px solid var(--line); border-radius:14px;
   padding:8px 10px 6px; font-size:14px; line-height:1.28; box-shadow:0 4px 0 var(--line); text-align:center; pointer-events:auto; }
@@ -2965,9 +2806,7 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 .dk-k-kicker{ font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--parchment-dim,#bfa983); }
 .dk-k-name{ font-family:'Metamorphous',serif; color:#ff8a7a; font-size:18px; line-height:1.15; margin:2px 0 4px; }
 .dk-k-tip{ font-size:13.5px; color:#e9d7ae; line-height:1.35; }
-/* C2: upgrade rows as little dice */
-.upgrade-btn .upg-dice{ display:flex; align-items:center; gap:5px; width:100%; }
-.upgrade-btn{ padding:7px 10px !important; }
+
 .upg-die{ width:24px; height:24px; border-radius:6px; border:2px solid var(--line); display:inline-flex; align-items:center; justify-content:center; flex:none;
   font-size:11px; font-weight:800; box-shadow:inset 0 2px 0 rgba(255,255,255,.3); }
 .upg-die.upg-die-big{ width:34px; height:34px; font-size:14px; }
@@ -3092,7 +2931,7 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 .room-tint{ position:absolute; inset:0; pointer-events:none; border-radius:inherit; z-index:0; }
 /* Jeremy's feedback (Oct 30): the camp must fit his phone with a full Back Pocket -- a smaller campfire scene and slimmer upgrade rows. */
 @media (min-height:770px){ .camp-fire-wrap{ zoom:1.2; margin:6px auto 12px !important; } }
-.upgrade-btn{ padding:5px 10px !important; }
+
 .upg-die{ width:20px; height:20px; font-size:10px; }
 .upg-die.upg-die-big{ width:28px; height:28px; font-size:13px; }
 /* Title fits with every class's depth badge (Jeremy's feedback, Oct 30) */
@@ -3777,13 +3616,124 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .path-counter-float.pcf-nodmg{ padding:8px 12px !important; }
 .path-counter-float.pcf-nodmg .pcf-extra{ font-size:15px; }
 
-/* Nov 12 camp polish: the chosen fire button keeps its height (check + name on one line); the "rested here" note sits
-   over the dimmed upgrade rows instead of adding a line (Rest made the camp page scroll 16px) */
+/* ==== Camp (camp-, campfire-, cf-, organize-, upgrade-): every top-level rule for it, merged Nov 12 by tools/css/merge.py (polish roadmap A3).
+   Was 112 rules spread through this file; each value's history is in git. Edit here, not further up. ==== */
+.camp-status-card .bar-row{ margin-bottom:0; }
+.camp-status-card .small-btn-row{ margin-top:6px; }
+.camp-status-card .small-btn-row button{ flex:1 1 0; }
+/* Square tiles again, in a responsive grid -- but each one now stands for every identical copy of that die (buildDieStacks(), render.js), so a tray of sixteen Basic dice collapses to a handful of tiles instead of sixteen individually. That's what makes the square affordable this time: a square can't fit "Dwarven Doohickie" (the earlier reason Camp moved to text pills), but it has no trouble with one piece of art or a short "Atk/Man + tier" label, and there are far fewer of them to fit. */
+.camp-dice-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(52px, 1fr)); gap:7px; margin:3px 0; }
+.camp-die-basic-label{ font-size:11px; line-height:1.3; font-weight:800; }
+/* every tile in a grid that has a stack shares the same top/right room, so singles and stacks stay one size */
+.camp-pocket .camp-dice-grid{ padding-top:2px; grid-template-columns:repeat(auto-fill, minmax(38px, 1fr)); gap:6px; }
+.camp-pocket-count{ position:absolute; top:-8px; left:50%; transform:translateX(-50%); background:var(--stone); border:1.5px solid var(--line); color:var(--parchment-dim); font-size:9px; font-weight:800; border-radius:var(--r-md); padding:1px 7px; }
+/* Connected swap cue: once a die is picked, the area it came FROM dims (everything but the selection itself) and the area it's going INTO gets a pulsing gold outline -- so the two taps a swap takes read as one continuous gesture aimed at a clear target, not two disconnected clicks into generically-labeled lists. */
+.camp-dice-grid.organize-source{ opacity:0.45; }
+.camp-dice-grid.organize-target{ outline:2px solid var(--gold); outline-offset:4px; border-radius:var(--r-md); animation:organize-target-pulse 1.1s ease-in-out infinite; }
+.camp-pocket.organize-source{ opacity:0.5; }
+.camp-pocket.organize-target{ outline:2px solid var(--gold); outline-offset:4px; animation:organize-target-pulse 1.1s ease-in-out infinite; }
+.reduced-motion .camp-dice-grid.organize-target, .reduced-motion .camp-pocket.organize-target{ animation:none; box-shadow:0 0 0 3px rgba(212,175,82,0.4); }
+.organize-swap-arrow{ display:flex; justify-content:center; color:var(--gold); margin:1px 0; }
+.organize-swap-arrow.down{ animation:organize-arrow-bounce-down 0.9s ease-in-out infinite; }
+.organize-swap-arrow.up{ animation:organize-arrow-bounce-up 0.9s ease-in-out infinite; }
+.reduced-motion .organize-swap-arrow{ animation:none !important; }
+.reduced-motion .organize-swap-arrow.up{ transform:rotate(180deg); }
+.camp-section-title{ font-size:13px; margin:7px 0 3px; }
+.camp-section .camp-section-title:first-child{ margin-top:0; }
+.camp-empty-hint{ margin:0 0 2px; }
+.campfire-glow{ position:absolute; bottom:4px; left:50%; transform:translateX(-50%); width:81px; height:81px; border-radius:50%; background:radial-gradient(circle, rgba(255,170,60,0.55) 0%, rgba(255,170,60,0) 70%); animation:campfire-glow-pulse 2.4s ease-in-out infinite; }
+.campfire-logs::before{ transform:rotate(22deg); }
+.campfire-logs::after{ transform:rotate(-22deg); }
+.campfire-flame.flame-back{ width:27px; height:41px; margin-left:-13.5px; background:linear-gradient(to top, #ff7a1a, #ffce54); animation:campfire-flicker-a 1.1s ease-in-out infinite; }
+.campfire-flame.flame-front{ width:15px; height:24px; margin-left:-7.5px; background:linear-gradient(to top, #ffb23d, #fff2b0); animation:campfire-flicker-b 0.9s ease-in-out infinite; }
+.upgrade-row{ display:flex; align-items:stretch; gap:6px; }
+.upgrade-row button:first-child{ flex:1; }
+.upgrade-preview-btn{ flex:0 0 auto; width:28px; font-weight:bold; font-size:12px; padding:6px 4px; }
+/* Camp status card (health, campfire, Rest / Break Camp): near-black so the fire glows. */
+.camp-status-card{ background:var(--b0) !important; border:3px solid var(--line) !important; box-shadow:inset 0 0 24px rgba(0,0,0,.7), 0 4px 0 var(--line); }
+/* A small CSS-only campfire (logs + two flickering flame blobs + a pulsing warm glow) as Camp's focal point -- no art asset needed, and it doubles as a bit of ambient motion/juice consistent with the rest of the game's feedback (screen shake, particle bursts, etc.). Respects the global reduced-motion rule at the top of this file like every other animation. / Camp: your hero sits beside the fire, facing it */
+.camp-fire-wrap{ position:relative; width:106px; margin:10px auto 18px; display:flex; align-items:flex-end; justify-content:center; height:78px !important; }
+.camp-hero img{ display:block; height:74px; filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)) drop-shadow(6px 0 8px rgba(255,150,40,.45)); max-width:none !important; width:auto !important; object-fit:contain; }
+.campfire-logs{ position:relative; width:48px; border-radius:var(--r-sm); z-index:1; height:13px !important; border:2.5px solid #000 !important; background:var(--b4) !important; }
+.campfire-logs::before, .campfire-logs::after{ content:''; position:absolute; width:48px; border-radius:var(--r-sm); height:11px !important; border:2.5px solid #000 !important; top:-2.5px !important; left:-2.5px !important; background:var(--b4) !important; }
+.upgrade-btn:disabled, .upgrade-preview-btn:disabled{ opacity:1 !important; background:var(--b3) !important; color:#e3caa3 !important; border-color:var(--b0) !important; }
+.upgrade-btn:disabled .icon-svg, .upgrade-btn:disabled svg{ opacity:.85; }
+.camp-fire-wrap.flare .campfire-glow{ animation:fire-flare .9s ease-out both; animation-delay:var(--fl,0ms); }
+/* Campfire flames: no dark outline (logs keep theirs) */
+.campfire-flame{ position:absolute; bottom:13px; left:50%; border-radius:50% 50% 50% 50% / 62% 62% 38% 38%; z-index:2; box-sizing:border-box; border:0 !important; box-shadow:none !important; filter:none; }
+/* Available basic-die upgrades gently pulse so players notice them */
+.upgrade-btn.upgrade-ready:not(:disabled){ animation:upgradeReady 1.8s ease-in-out infinite; }
+.camp-hero{ position:absolute; right:calc(50% + 24px); bottom:0; z-index:3; width:max-content; cursor:pointer; }
+.campfire-choice{ margin:4px 0 8px; text-align:center; }
+.campfire-choice .cf-label{ font-family:var(--font-display); font-size:14px; color:var(--gold); margin-bottom:5px; }
+.campfire-choice .cf-row{ display:flex; align-items:stretch; justify-content:center; gap:8px; }
+.campfire-choice .cf-or{ align-self:center; font-family:var(--font-display); font-size:13px; color:var(--parchment-dim); }
+.cf-btn{ flex:1 1 0; max-width:150px; display:flex; flex-direction:column; align-items:center; gap:2px; font-weight:bold; font-size:15px; padding:7px 8px; }
+.cf-btn small{ font-weight:normal; font-size:11.5px; opacity:.9; text-wrap:balance; }
+.cf-btn.cf-rest{ background:var(--green); color:var(--parchment); }
+.cf-btn.cf-rest:hover:not(:disabled){ background:#57a06b; }
+.cf-btn.cf-train{ background:var(--purple); color:var(--parchment); }
+.cf-btn.cf-train:hover:not(:disabled){ background:#9a6fc2; }
+.cf-btn.chosen:disabled{ opacity:1; box-shadow:0 0 0 2px var(--gold); }
+.cf-btn.skipped:disabled{ opacity:.35; }
+.campfire-choice.out .cf-label{ color:var(--parchment-dim); }
+.camp-section.cf-point{ animation:cf-point 1.1s ease-out 1; }
+/* 2. the camp scene stands in the dungeon: paper wall behind, paper floor under the fire */
+.camp-section.camp-status-card{ position:relative; overflow:hidden; background:linear-gradient(rgba(10,6,4,.25), rgba(10,6,4,.05) 55%, rgba(10,6,4,.3)), var(--tex-wall) 0 0/200px 100px repeat, #0c0705 !important; }
+.camp-status-card > *{ position:relative; z-index:1; }
+/* Oct 15 (Jeremy): a campfire in a dark room -- the light falls off toward the edges (above the floor, under the hero, fire and buttons) */
+.camp-status-card::after{ content:""; position:absolute; inset:0; pointer-events:none; z-index:0; background:radial-gradient(ellipse 62% 70% at 50% 52%, rgba(8,4,2,0) 30%, rgba(8,4,2,.55) 70%, rgba(8,4,2,.9) 100%); }
+/* One ink colour everywhere. Camp props get a slimmer outline than the characters: logs 2px, flames 2.5px / Oct 15 (Jeremy): the campfire logs are in-world, so they get the paper grain too */
+.campfire-logs, .campfire-logs::before, .campfire-logs::after{ border:2px solid var(--line); box-sizing:border-box; filter:url(#fx-paper); }
+/* Camp (Oct 16, Jeremy): combine buttons stay covered (stripes + lock) until Train is chosen at the campfire. */
+.upgrade-btn.upgrade-locked{ position:relative; cursor:not-allowed; }
+/* tapping a locked combine nudges the Train button */
+.cf-btn.cf-nudge{ animation:cf-nudge .5s ease-in-out; }
+/* Camp upgrade rows take their die's colour (Attack red, Maneuver cream, like the tray); the "?" matches its row */
+.upg-attack .upgrade-btn, .upg-attack .upgrade-preview-btn{ background:#e8574f; color:#fff; }
+.upg-maneuver .upgrade-btn, .upg-maneuver .upgrade-preview-btn{ background:#ffe9a8; color:#3a2410; }
+.upg-attack .upgrade-btn:hover:not(:disabled), .upg-attack .upgrade-preview-btn:hover:not(:disabled){ background:#f06a62; }
+.upg-maneuver .upgrade-btn:hover:not(:disabled), .upg-maneuver .upgrade-preview-btn:hover:not(:disabled){ background:#fff2c8; }
+.upg-attack .upgrade-btn:disabled{ background:#6a2f2a !important; color:#f4c9c2 !important; }
+.upg-maneuver .upgrade-btn:disabled{ background:#6a5a34 !important; color:#f3e3b8 !important; }
+/* The one-time campfire confirm uses the colour of the button that opened it */
+button.cf-go-rest{ background:var(--green); color:var(--parchment); }
+button.cf-go-rest:hover:not(:disabled){ background:#57a06b; }
+button.cf-go-train{ background:var(--purple); color:var(--parchment); }
+button.cf-go-train:hover:not(:disabled){ background:#9a6fc2; }
+/* 8: the Health number sits inside the bar everywhere (camp and shrine like the fight) */
+.camp-hp-row .camp-hpwrap{ flex:1 1 auto; width:auto; }
+.camp-hp-row .camp-hpwrap .bar{ height:20px !important; }
+/* Camp screen section cards -- Status/Upgrade/Organize each get their own bordered panel2 card instead of floating directly on the page background, so Camp reads as a real game screen with distinct areas rather than a flat stack of controls. / 18: camp cards and the Back Pocket get the near-black outline */
+.camp-section{ background:var(--panel2); border-radius:var(--r-md); padding:8px 10px 9px; margin:7px 0; box-shadow:inset 0 0 0 1px rgba(255,220,160,.12); border:3px solid var(--line) !important; }
+/* Back Pocket as a visibly different, darker storage area rather than a second list that only a text heading told apart from Tray -- a sunken pouch shape (inset shadow, darker fill, bottom corners rounder than the top like a drawn drawstring bag) reads as "this is where things are kept" on its own. Deliberately smaller than the Tray above it (tighter padding, smaller tiles via its own grid rule below) -- it's a side pocket for spares, not a second equal-weight tray. */
+.camp-pocket{ position:relative; border-radius:8px 8px 16px 16px; padding:11px 7px 7px; margin-top:4px; box-shadow:inset 0 3px 10px rgba(0,0,0,0.6); background:var(--b0) !important; border:3px solid var(--line) !important; }
+.cf-btn:disabled:not(.chosen){ opacity:1 !important; }
+.cf-btn.cf-rest:disabled:not(.chosen){ background:#2f4a37 !important; color:#c9d6c4 !important; }
+.cf-btn.cf-train:disabled:not(.chosen){ background:#463656 !important; color:#d6c9e3 !important; }
+/* Locked combine rows (Jeremy, 1.41.60 review): lighter stripes, the label on its own backing, the lock beside it */
+.upgrade-btn .upg-lbl{ position:relative; z-index:2; display:inline-flex; align-items:center; gap:5px; min-width:0; }
+.upgrade-btn.upgrade-locked::after{ content:''; position:absolute; inset:0; pointer-events:none; z-index:0; background:repeating-linear-gradient(135deg, rgba(12,7,5,.17) 0 6px, rgba(12,7,5,0) 6px 12px); }
+.upgrade-btn.upgrade-locked .upg-lbl{ padding:1px 9px 1px 26px; border-radius:var(--r-pill); box-shadow:0 0 0 2px var(--line); }
+.upg-attack .upgrade-btn.upgrade-locked .upg-lbl{ background:#e8574f; }
+.upg-maneuver .upgrade-btn.upgrade-locked .upg-lbl{ background:#ffe9a8; }
+.upgrade-btn.upgrade-locked::before{ content:''; position:absolute; left:50%; top:50%; width:16px; height:18px; transform:translate(-50%,-50%); z-index:1; pointer-events:none; background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 18'%3E%3Crect x='1.5' y='7.5' width='13' height='9.5' rx='2' fill='%23f2e4c8' stroke='%230c0705' stroke-width='1.6'/%3E%3Cpath d='M4.5 7.5V5a3.5 3.5 0 0 1 7 0v2.5' fill='none' stroke='%230c0705' stroke-width='3.2'/%3E%3Cpath d='M4.5 7.5V5a3.5 3.5 0 0 1 7 0v2.5' fill='none' stroke='%23f2e4c8' stroke-width='1.4'/%3E%3C/svg%3E"); display:none; }
+.upgrade-btn.upgrade-locked .upg-lbl::before{ content:''; position:absolute; left:6px; top:50%; width:15px; height:17px; transform:translateY(-50%); pointer-events:none; background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 18'%3E%3Crect x='1.5' y='7.5' width='13' height='9.5' rx='2' fill='%23f2e4c8' stroke='%230c0705' stroke-width='1.6'/%3E%3Cpath d='M4.5 7.5V5a3.5 3.5 0 0 1 7 0v2.5' fill='none' stroke='%230c0705' stroke-width='3.2'/%3E%3Cpath d='M4.5 7.5V5a3.5 3.5 0 0 1 7 0v2.5' fill='none' stroke='%23f2e4c8' stroke-width='1.4'/%3E%3C/svg%3E"); }
+/* Camp scene (Jeremy, Oct 17: "the wall is too high up compared to the campfire"): the floor starts just behind the hero and fire (their feet sit ~30px below the horizon, like a fight room), so they stand on it with the wall behind them */
+.camp-status-card::before{ content:""; position:absolute; left:0; right:0; bottom:0; border-top:3px solid #120b07; background:linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.55)), var(--tex-floor) 50% 0/320px 320px; pointer-events:none; z-index:0; top:90px; height:auto; }
+/* Campfire buttons: the label is centred vertically whether or not it has a sub-line, and Rest and Train line up */
+.campfire-choice .cf-btn{ justify-content:center; min-height:52px; }
+.campfire-choice .cf-btn small{ line-height:1.15; }
+/* C2: upgrade rows as little dice */
+.upgrade-btn .upg-dice{ display:flex; align-items:center; gap:5px; width:100%; }
+.upgrade-btn{ font-size:12px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; justify-content:center; gap:5px; padding:5px 10px !important; }
+/* Nov 12 camp polish: the chosen fire button keeps its height (check + name on one line); the "rested here" note sits over the dimmed upgrade rows instead of adding a line (Rest made the camp page scroll 16px) */
 .cf-btn .cf-name{ display:inline-flex; align-items:center; gap:4px; }
 .cf-btn .cf-name svg, .cf-btn .cf-name .mark{ width:14px; height:14px; }
-.upgrade-rows-col{ position:relative; }
-.upgrade-rows-col .camp-rows-note{ position:absolute; inset:0; z-index:2; display:flex; align-items:center; justify-content:center; text-align:center; pointer-events:none;
-  font-size:13px; font-weight:700; color:#f3e6cc; text-shadow:0 1px 0 #120b07, 0 0 6px #120b07; padding:0 10px; }
+/* Upgrade Dice rows (renderCamp(), render.js) -- kept deliberately compact (small font/padding, short "Attack I -> II" wording instead of a full "Combine 3 ... into 1 ..." sentence) so this section doesn't blow out the Camp screen's height; the old full-sentence buttons wrapped onto 2 lines and pushed the ineligible-row note onto its own separate pill below, roughly doubling this section's height for no real benefit. */
+.upgrade-rows-col{ display:flex; flex-direction:column; gap:5px; margin-top:6px; position:relative; }
+.upgrade-rows-col .camp-rows-note{ position:absolute; inset:0; z-index:2; display:flex; align-items:center; justify-content:center; text-align:center; pointer-events:none; font-size:13px; font-weight:700; color:#f3e6cc; text-shadow:0 1px 0 #120b07, 0 0 6px #120b07; padding:0 10px; }
+
 .shrine-opt.so-wasted{ opacity:.55; } /* Nov 12: still pickable, just shown as no use right now */
 
 /* Nov 12 Codex polish: Bestiary quest rewards look like the wall poster's red badges (they were gold-on-brown blobs),

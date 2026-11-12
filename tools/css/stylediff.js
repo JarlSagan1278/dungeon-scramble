@@ -2,7 +2,7 @@
 // and transforms of running animations are frozen by styledump, so anything left is a real difference).
 // usage: node tools/css/stylediff.js before.json after.json
 const fs = require('fs'); const [a, b] = process.argv.slice(2).map(f => Object.fromEntries(fs.readFileSync(f, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l))));
-const CLOCK = new Set(['--gd', '--qd']); // animation offsets taken from the page clock
+const CLOCK = new Set(['--gd', '--qd', '--fl']); // animation offsets taken from the page clock
 let n = 0; const byProp = {};
 for (const scr of new Set([...Object.keys(a), ...Object.keys(b)])) {
   const A0 = a[scr], B0 = b[scr];
