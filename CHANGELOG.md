@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.103 (Nov 13, 2026)
+- PC layout, first slice (opt-in: add ?pc=1 to the address on a wide landscape window; phones and the normal desktop view are unchanged). The fight screen is Jeremy's Nov 4 pick D: route across the top, the room on the left, the tray and its buttons on the right, each enlarged to fill the window (sizes computed for any window; checked at 1920x1080 and 1280x800 Steam Deck). Built from the phone's own components with CSS zoom, so it stays one game. The path line and the room's stone floor follow the enlarged panels; pop-up windows, the room door, fork doors and the big-turn stamp are enlarged; other screens show the phone card scaled to the window's height. tools/pc_shots.js takes the pictures. Still to come: hover panel and key letters (G), controller cursor (H), a real landscape camp/setup/title.
+
 ## 1.42.102 (Nov 12, 2026)
 - Turn playback updates the screen in place: a changed region (a fighter's side, the quest sign, the button rail) and each changed die are updated with morphHTML instead of swapped whole, so their unchanged parts keep running (a playback redraw ~3.9 ms instead of ~4.5 ms in the test browser). Every redraw on the fight screen, camp and setup now goes through morphHTML.
 - Fix (from 1.42.100): an in-place redraw rewrote the dice's clock-based animation phase (--gd), which could put a kept die's idle twitch out of step with the others after a tap. morphHTML now leaves a value that differs only in such a phase alone, so a kept die stays in step. check.js morph compares with those phases normalized; playback, pathrender and trayfast unchanged.

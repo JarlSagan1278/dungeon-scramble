@@ -148,8 +148,9 @@ function pathTrailCenterOf(trayEl, idx){
   // stays on the dice instead of jumping against them.
   const svg = document.getElementById('path-trail-svg'), host = svg && svg.parentNode;
   let ox = 0, oy = 0;
-  if(host && host !== document.body){ const h = host.getBoundingClientRect(); ox = h.left + host.clientLeft; oy = h.top + host.clientTop; }
-  return {x: r.left+r.width/2-ox, y: r.top+r.height/2-oy};
+  const z = (host && host !== document.body && host.currentCSSZoom) || 1; // PC layout: the tray panel is zoomed, the line is drawn in its own px
+  if(host && host !== document.body){ const h = host.getBoundingClientRect(); ox = h.left + host.clientLeft*z; oy = h.top + host.clientTop*z; }
+  return {x: (r.left+r.width/2-ox)/z, y: (r.top+r.height/2-oy)/z};
 }
 function pathTrailAppendSegment(svg, a, b, animate, curved){
   // A Leap segment connects two tiles that are 2 apart in a straight line,
@@ -675,9 +676,12 @@ function ensureRoomTextures(){
 }
 function syncRoomFloor(card){
   try{
-    const app = document.getElementById('app'); if(!app || !card) return;
+    const appEl = document.getElementById('app'); if(!appEl || !card) return;
     ensureRoomTextures();
-    if(!app.classList.contains('has-room-floor')) app.classList.add('has-room-floor');
+    if(!appEl.classList.contains('has-room-floor')) appEl.classList.add('has-room-floor');
+    // PC layout (Nov 13): the room panel is zoomed on its own, so the floor lives inside it (same maths, measured from the
+    // panel instead of the app) and runs down to the bottom of the window
+    const pc = pcMode(), app = (pc && card.closest('#enc-panel')) || appEl, zf = (pc && app.currentCSSZoom) || 1;
     const off = el=>{ let t=0,l=0,n=el; while(n && n!==app){ t+=n.offsetTop; l+=n.offsetLeft; n=n.offsetParent; } return {t,l}; };
     const c = off(card), cw = card.offsetWidth, ch = card.offsetHeight;
     const appL = 0, vw = app.offsetWidth; // hard cutoff at the app's own width
@@ -690,7 +694,7 @@ function syncRoomFloor(card){
     const xl = Math.round(appL + c.l + edge), xr = Math.round(appL + c.l + cw - edge);
     // Oct 16 (Jeremy: the fight screen scrolled a little on his phone): the floor used to hang a fixed 30px below the
     // app, past the bottom of the screen; now it reaches exactly the screen's bottom edge and no further.
-    const floorBelow = -Math.min(30, Math.max(0, Math.round(window.innerHeight - app.getBoundingClientRect().bottom)));
+    const floorBelow = -Math.min(pc ? 4000 : 30, Math.max(0, Math.round((window.innerHeight - app.getBoundingClientRect().bottom)/zf)));
     const fl = document.createElement('div'); fl.id = 'room-floor';
     fl.style.cssText = `left:${-appL}px;width:${vw}px;top:${hy}px;bottom:${floorBelow}px;clip-path:polygon(${xl}px 0,${xr}px 0,${xr}px ${yb}px,100% ${yb}px,100% 100%,0 100%,0 ${yb}px,${xl}px ${yb}px);`;
     fl.style.setProperty('--ld', '-'+Math.round(performance.now()%3100)+'ms');
@@ -5127,6 +5131,32 @@ function confirmEmptyPocket(go){
   overlay.querySelector('#ep-go').onclick = ()=> closeModal(overlay, go);
   overlay.onclick = (ev)=>{ if(ev.target===overlay) closeModal(overlay); };
 }
+
+// ---- PC layout (Nov 13, Jeremy's Nov 4 pick: D room left / tray right, G hover panel + key letters, H cursor) ----
+// One landscape frame for monitors and the Steam Deck, built from the phone's own components: the fight screen's three
+// blocks (route, room, tray) are laid out side by side and enlarged with CSS zoom (sizes computed from the window, vars
+// --pc-zroute/--pc-zr/--pc-zt); every other screen is the phone card scaled to the window's height (--pc-zc).
+// While it is being built it is opt-in: add ?pc=1 to the address, or localStorage dungeonScramblePC = '1'.
+function pcWanted(){ try{ return /[?&]pc=1/.test(location.search) || localStorage.getItem('dungeonScramblePC')==='1'; }catch(e){ return false; } }
+function pcMode(){ return document.body.classList.contains('pc'); }
+function applyPcMode(){
+  const W = window.innerWidth, H = window.innerHeight;
+  const on = pcWanted() && W>=960 && W/H>=1.25;
+  const was = pcMode();
+  document.body.classList.toggle('pc', on);
+  if(on){
+    const st = document.body.style;
+    const zRoute = Math.max(1.15, Math.min(1.8, H/620));
+    const availH = H - (52*zRoute + 22) - 22, availW = W - 48 - 32;
+    st.setProperty('--pc-zroute', zRoute.toFixed(3));
+    st.setProperty('--pc-zr', Math.min(availH/286, availW*0.565/379).toFixed(3));
+    st.setProperty('--pc-zt', Math.min(availH/418, availW*0.435/379).toFixed(3));
+    st.setProperty('--pc-zc', Math.max(1, (H - 16)/785).toFixed(3));
+    st.setProperty('--pc-zm', Math.max(1, Math.min(2, H/600)).toFixed(3)); // pop-up windows, doors and other things floating over the screen
+  }
+  return on !== was;
+}
+window.addEventListener('resize', ()=>{ const changed = applyPcMode(); if(changed || pcMode()){ try{ render(); }catch(e){} } });
 
 // ---- One redraw path (Nov 12, polish roadmap A4; camp first) ----
 // morphHTML(el, html) makes el's contents match html while keeping every node that is already right: changed text and

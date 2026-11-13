@@ -1,6 +1,6 @@
 # Dungeon Scramble — TODO
 
-Updated Nov 12, 2026 (build 1.42.102). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
+Updated Nov 13, 2026 (build 1.42.103). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
 study results in `STUDY_FINDINGS.md`. The release checklist (40 items, owner and status) is the Checklist tab of
 the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 
@@ -37,7 +37,7 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
 
 ## Next for Claude
 - **Forks (shipped 1.42.55-1.42.62):** two doors at slots 3 and 6; the Elite door's extra loot choice is a next-floor die. Bot study: always Elite 50% vs always Standard 39% (STUDY_FINDINGS). Watch real players' picks in the play data (`fork_pick` events) before tuning.
-- **PC release layout (Jeremy, Nov 4):** D (room left, tray right, path panel) + G (hover panel, key letter per die) + H (die cursor, controller glyphs); one landscape frame for monitor and Steam Deck. Refined screens in the same artifact (Part 1).
+- **PC release layout (Jeremy, Nov 4; started Nov 13, 1.42.103: D's split fight screen works behind ?pc=1; next G hover panel + key letters, H cursor, landscape camp/setup/title, then make it the default on wide windows):** D (room left, tray right, path panel) + G (hover panel, key letter per die) + H (die cursor, controller glyphs); one landscape frame for monitor and Steam Deck. Refined screens in the same artifact (Part 1).
 - **Room dressing (reopened Oct 29):** inked corner ivy and per-floor room colour shipped in 1.42.5. Still open if Jeremy wants them: his own drawn ivy strands (V3) and one drawn prop per floor (D2).
 - **Performance on slow phones:** load fixed on itch (split build), playback redraws trimmed (1.42.63, STUDY_FINDINGS). What's left in a turn is paint/compositing of running animations; only worth doing if testers report stutter.
 

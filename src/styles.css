@@ -3628,3 +3628,31 @@ body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
 .reduced-motion :is(.die.trayact-nudge, .defeat-keep #carryover-list .swap-item, .loot-chest-btn .loot-chest, #fork-callout .fork-door, .shrine-orb:not(.charging), .campfire-choice .cf-btn),
 body.is-resolving :is(.die.trayact-nudge, .shrine-orb:not(.charging)){ animation:none !important; }
 .reduced-motion #room-callout .rc-door{ animation:none !important; }
+
+/* ==== PC layout (Nov 13; opt-in with ?pc=1 while it is built; see applyPcMode in render.js) ====
+   body.pc = a wide landscape window. The fight screen is the phone's own blocks side by side, enlarged with zoom:
+   route across the top, room on the left, tray and its button rail on the right. Other screens: the phone card scaled up. */
+body.pc{ overflow:hidden; }
+body.pc .wrap{ max-width:none !important; width:100vw; margin:0 !important; padding:0 !important; }
+body.pc #app:not(:has(> #enc-panel)){ zoom:var(--pc-zc, 1); width:395px; margin:0 auto; padding:8px; box-sizing:border-box; }
+body.pc #app:has(> #enc-panel){ display:grid !important; grid-template-columns:auto auto; grid-template-rows:auto 1fr; justify-content:center; align-items:center;
+  column-gap:32px; row-gap:8px; height:100vh; padding:10px 24px 12px; box-sizing:border-box; }
+body.pc #app:has(> #enc-panel) > .route-float{ grid-column:1 / 3; justify-self:center; width:379px; zoom:var(--pc-zroute, 1.6); }
+body.pc #app:has(> #enc-panel) > #enc-panel{ grid-column:1; grid-row:2; width:379px; zoom:var(--pc-zr, 2.4); background:transparent !important; border-color:transparent !important; box-shadow:none !important; }
+body.pc #app:has(> #enc-panel) > .tray-panel{ grid-column:2; grid-row:2; width:379px; zoom:var(--pc-zt, 2); }
+body.pc .settings-btn-floating{ right:14px !important; top:12px !important; zoom:1.5; }
+body.pc{ margin:0 !important; padding:0 !important; }
+body.pc .wrap{ min-height:0 !important; height:100vh; }
+/* pop-up windows keep the phone's design, enlarged; the scrim still covers the window (it is zoomed with them) */
+body.pc .modal-overlay{ zoom:var(--pc-zm, 1.6); }
+/* things placed by script in screen px grow through their own sizes, not zoom (zoom would move them) */
+body.pc .turn-total b{ font-size:calc(58px * var(--pc-zr, 2)); -webkit-text-stroke-width:6px; }
+body.pc .turn-total.tt-2 b{ font-size:calc(70px * var(--pc-zr, 2)); }
+body.pc .turn-total.tt-3 b{ font-size:calc(84px * var(--pc-zr, 2)); }
+body.pc .turn-total span{ font-size:calc(13px * var(--pc-zr, 2)); -webkit-text-stroke-width:5px; }
+body.pc #room-callout .rc-door{ zoom:var(--pc-zm, 1.6); }
+body.pc #fork-callout{ width:auto; } /* its top is set in screen px, so the doors are enlarged inside it */
+body.pc #fork-callout > *{ zoom:var(--pc-zm, 1.6); }
+/* a window may use the whole screen height, measured in its own (zoomed) px */
+body.pc .modal-overlay{ padding:calc(12px / var(--pc-zm, 1.6)); }
+body.pc .modal-overlay .modal{ max-height:calc((100vh - 24px) / var(--pc-zm, 1.6)) !important; }
