@@ -43,9 +43,9 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
 
 ## Later
 - **Optional caps, only if play feels unfair:** damage-per-Minion specials count at most 8 Minions; Extruzeon layers max +12.
-- **Free print-and-play edition** (rulebook refreshed Nov 12 to 1.42.102: forks, Scramble flick, lock-in at Go, exact next-hit number, next goal on defeat, earlier play-data ask, Wanted poster / Round wording; `npm run rulebook`) (component sheets + current rules) for the BGG solo contest (see `release/first_players.md`).
 - **Relic look polish:** a bracelet view in the relic list, sockets that grow with depth.
 - **Replay tool** for the tray/path telemetry.
 - **A conversion relic** (e.g. 1 damage per Shield gained).
 - **Co-op multiplayer** (lowest priority): feasibility doc https://claude.ai/code/artifact/1a2e8cb1-5527-400c-b4a2-defff09d6323
   ("Shared Foe, Two Chests"; six questions for Jeremy; first step a tabletop test).
+- **Free print-and-play edition (Jeremy, Nov 13: below the PC version; hand-made dice and big numbers make it heavy)** (rulebook refreshed Nov 12 to 1.42.102: forks, Scramble flick, lock-in at Go, exact next-hit number, next goal on defeat, earlier play-data ask, Wanted poster / Round wording; `npm run rulebook`) (component sheets + current rules) for the BGG solo contest (see `release/first_players.md`).
