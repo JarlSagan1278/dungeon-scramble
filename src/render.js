@@ -1410,8 +1410,10 @@ function forkDoorHTML(d, i){
 // Picking one glides it to the middle and grows it into the room's own "tap to enter" door (showRoomCallout), which
 // then appears in exactly that spot with no entrance animation, so the chosen door simply becomes the room's door.
 const FORK_ZOOM = 0.7;
-function forkMid(){ const a = document.getElementById('app'); const r = a ? a.getBoundingClientRect() : {top:0,height:window.innerHeight};
+function forkMid(){ const a = (pcMode() && document.querySelector('#app > #enc-panel')) || document.getElementById('app'); const r = a ? a.getBoundingClientRect() : {top:0,height:window.innerHeight};
   return Math.max(110, Math.min(window.innerHeight-110, r.top + r.height/2)); }
+// PC layout: doors (the room door, the fork's two) stand in the room, not in the middle of the window over the tray
+function pcRoomCenterX(){ const r = pcMode() && document.querySelector('#app > #enc-panel'); if(!r) return null; const b = r.getBoundingClientRect(); return b.left + b.width/2; }
 function removeForkCallout(){ ['fork-callout','fork-scrim','fork-ghost'].forEach(id=>{ const n=document.getElementById(id); if(n) n.remove(); }); }
 function syncForkCallout(){
   if(!S || !S.forkChoice){ removeForkCallout(); return; }
@@ -1424,6 +1426,7 @@ function syncForkCallout(){
   const ghost = el(`<div id="fork-ghost" aria-hidden="true"><div class="rc-door"><div class="rc-arch"><div class="rc-leaf"></div></div><div class="rc-sign"><div class="rc-plaque"><span>?</span></div><div class="rc-kind">Enemy</div></div><div class="rc-tap">tap to enter</div></div></div>`);
   document.body.appendChild(scrim); document.body.appendChild(ghost); document.body.appendChild(node);
   node.style.top = mid+'px'; ghost.style.top = mid+'px';
+  { const cx = pcRoomCenterX(); if(cx!=null){ node.style.left = cx+'px'; ghost.style.left = cx+'px'; } }
   node.querySelectorAll('.fork-door').forEach(b=>{
     b.onkeydown = ev=>{ if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); b.click(); } };
     b.onclick = ()=>{
@@ -2838,9 +2841,8 @@ function showRoomCallout(fx, onDismiss){
   document.body.appendChild(scrim);
   // Own slot (not the shared #fx-stack toasts/equip notices use): fixed at the vertical middle of the game UI.
   document.body.appendChild(node);
-  { const a = document.getElementById('app'); const r = a ? a.getBoundingClientRect() : {top:0,height:window.innerHeight};
-    const mid = Math.max(110, Math.min(window.innerHeight-110, r.top + r.height/2));
-    node.style.top = mid+'px'; }
+  node.style.top = forkMid()+'px'; // the door's vertical middle matches the fork's, so a picked fork door glides into its place
+  { const cx = pcRoomCenterX(); if(cx!=null) node.style.left = cx+'px'; }
   const dismiss = ()=>{
     if(scrim.parentNode) scrim.parentNode.removeChild(scrim);
     if(BOSS_DROP_PENDING) setTimeout(bossDropIn, 120);

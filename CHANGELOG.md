@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.110 (Nov 13, 2026)
+- PC layout: the room door and the fork's two doors now stand inside the room (centered on it, at its middle height) instead of in the middle of the window, where the second fork door sat on the dice box. A picked fork door still glides into the room door's place.
+
 ## 1.42.109 (Nov 13, 2026)
 - PC fight screen tidied (Jeremy: the route looked small and silly, the room was taller and lower than the dice box, the hint box was too big and empty): the route now heads the room column at the room's own width and scale; route + room and the dice box are exactly as tall and start at the same height (sizes are measured, so a taller tray still lines up); the room's floor stops at the bottom of the room with a short fade instead of running to the window's edge; the hint box is now a quiet caption strip under both columns, only as tall as what it says.
 
