@@ -267,6 +267,7 @@ function maybeScreenTransition(key){
 let preGameScreen = 'title';
 
 function render(){
+  { const a = document.getElementById('app'); if(a && a.style.zoom) a.style.removeProperty('zoom'); } // pcFitCard's zoom is per screen
   if(pcMode() || document.getElementById('pc-hover')) requestAnimationFrame(pcHoverSync); // PC hover panel follows the room
   hideFaceTooltip(); closeActionNote();
   if(typeof musicUpdate==='function') musicUpdate(); // start/stop the music for this screen
@@ -283,11 +284,11 @@ function render(){
     else { renderSetup(); maybeScreenTransition('setup'); }
     return;
   }
-  if(S.screen==='victory'){ clearPathTrail(); renderVictory(); maybeScreenTransition('victory'); return; }
-  if(S.screen==='demoEnd'){ clearPathTrail(); renderDemoEnd(); maybeScreenTransition('victory'); return; }
-  if(S.screen==='unlock'){ clearPathTrail(); renderUnlock(); maybeAutosave(); maybeScreenTransition('victory'); return; }
-  if(S.screen==='gameover'){ clearPathTrail(); renderGameOver(); maybeScreenTransition('gameover'); return; }
-  if(S.screen==='camp'){ clearPathTrail(); renderCamp(); tuckCampCog(); maybeAutosave(); maybeScreenTransition('camp'); return; }
+  if(S.screen==='victory'){ clearPathTrail(); renderVictory(); pcFitCard(); maybeScreenTransition('victory'); return; }
+  if(S.screen==='demoEnd'){ clearPathTrail(); renderDemoEnd(); pcFitCard(); maybeScreenTransition('victory'); return; }
+  if(S.screen==='unlock'){ clearPathTrail(); renderUnlock(); pcFitCard(); maybeAutosave(); maybeScreenTransition('victory'); return; }
+  if(S.screen==='gameover'){ clearPathTrail(); renderGameOver(); pcFitCard(); maybeScreenTransition('gameover'); return; }
+  if(S.screen==='camp'){ clearPathTrail(); renderCamp(); pcFitCamp(); tuckCampCog(); maybeAutosave(); maybeScreenTransition('camp'); return; }
   if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); decorateArch(); maybeAutosave(); maybeScreenTransition('shrine'); syncForkCallout(); return; }
   placeVs._inRender = true;
   try{ renderGame(); } finally { placeVs._inRender = false; }
@@ -3669,6 +3670,7 @@ function openSettingsModal(){
         ${settingsToggleRowHTML('pref-low-intensity', 'Gentler effects (fewer sparks)', PREFS.lowIntensity)}
         ${settingsToggleRowHTML('pref-vibration', 'Vibration (phones)', PREFS.vibration!==false)}
         ${settingsToggleRowHTML('pref-flick-roll', 'Flick or shake to roll each turn', PREFS.flickRoll!==false)}
+        ${pcFits() ? settingsToggleRowHTML('pref-pc-layout', 'Wide-screen layout', pcWanted()) : ''}
         ${PLAYDATA_URL ? settingsToggleRowHTML('pref-share-data', 'Share play data automatically', shareDataPref()==='yes') : ''}
       </div>
       ${hasKeyboardPointer() ? `<p class="hint" style="text-align:left;">Keyboard shortcuts ${infoDot('Enter = Go · Backspace = Clear · 1234/qwer/asdf/zxcv tap a tray die (matches its grid position)')}</p>` : ''}
@@ -3705,6 +3707,7 @@ function openSettingsModal(){
   overlay.querySelector('#pref-reduced-motion').onchange = (ev)=> setPref('reducedMotion', ev.target.checked);
   overlay.querySelector('#pref-large-text').onchange = (ev)=> setPref('largeText', ev.target.checked);
   overlay.querySelector('#pref-low-intensity').onchange = (ev)=> setPref('lowIntensity', ev.target.checked);
+  { const t = overlay.querySelector('#pref-pc-layout'); if(t) t.onchange = (ev)=>{ try{ localStorage.setItem('dungeonScramblePC', ev.target.checked ? '1' : '0'); }catch(e){} closeModal(overlay, ()=>{ applyPcMode(); render(); }); }; }
   overlay.querySelector('#pref-flick-roll').onchange = (ev)=>{ setPref('flickRoll', ev.target.checked); if(!ev.target.checked && S && S.needRoll && rollNow()) render(); };
   overlay.querySelector('#pref-vibration').onchange = (ev)=>{ setPref('vibration', ev.target.checked); if(ev.target.checked) vibrate(30); };
   const restartBtn = overlay.querySelector('#settings-restart-btn');
@@ -5045,15 +5048,15 @@ function applyPocketCollapse(){
   if(!body || !wrap) return;
   const sec = wrap.closest('.camp-section'); sec.style.position='relative';
   const tiles = [...body.querySelectorAll('.camp-die-tile')];
-  const bTop = body.getBoundingClientRect().top;
+  const bTop = body.getBoundingClientRect().top, z = body.currentCSSZoom || 1; // PC layout: camp is zoomed, so screen px / z = its own px
   // cluster tile tops into rows (stacked tiles are tilted, so their tops differ by a few px)
-  const raw = tiles.map(x=>x.getBoundingClientRect().top - bTop).sort((a,b)=>a-b);
+  const raw = tiles.map(x=>(x.getBoundingClientRect().top - bTop)/z).sort((a,b)=>a-b);
   const tops = []; raw.forEach(v=>{ if(!tops.length || v - tops[tops.length-1] > 16) tops.push(v); });
-  const rowOf = x => { const v = x.getBoundingClientRect().top - bTop; let k=0; tops.forEach((tp,i)=>{ if(v >= tp-16) k=i; }); return k; };
+  const rowOf = x => { const v = (x.getBoundingClientRect().top - bTop)/z; let k=0; tops.forEach((tp,i)=>{ if(v >= tp-16) k=i; }); return k; };
   if(tops.length<3) return;
   if(!S._pocketOpen && !campOverflows(wrap)) return;
   const row2Tiles = tiles.filter(x=>rowOf(x)<=1);
-  const h = Math.max(...row2Tiles.map(x=>x.getBoundingClientRect().bottom - bTop)) + 8;
+  const h = Math.max(...row2Tiles.map(x=>(x.getBoundingClientRect().bottom - bTop)/z)) + 8;
   const hidden = tiles.filter(x=>rowOf(x)>1).length;
   const more = document.createElement('button');
   more.className='pocket-more'; more.type='button';
@@ -5157,12 +5160,42 @@ function confirmEmptyPocket(go){
 // One landscape frame for monitors and the Steam Deck, built from the phone's own components: the fight screen's three
 // blocks (route, room, tray) are laid out side by side and enlarged with CSS zoom (sizes computed from the window, vars
 // --pc-zroute/--pc-zr/--pc-zt); every other screen is the phone card scaled to the window's height (--pc-zc).
-// While it is being built it is opt-in: add ?pc=1 to the address, or localStorage dungeonScramblePC = '1'.
-function pcWanted(){ try{ return /[?&]pc=1/.test(location.search) || localStorage.getItem('dungeonScramblePC')==='1'; }catch(e){ return false; } }
+// On by default on a wide landscape window (Nov 13); Settings > Wide-screen layout (localStorage dungeonScramblePC
+// '1'/'0') or ?pc=1 / ?pc=0 override it. Bots and checks keep the phone layout unless they ask for it.
+function pcWanted(){
+  try{
+    const q = location.search.match(/[?&]pc=([01])/); if(q) return q[1]==='1';
+    const v = localStorage.getItem('dungeonScramblePC'); if(v==='1' || v==='0') return v==='1';
+    return !navigator.webdriver;
+  }catch(e){ return false; }
+}
+function pcFits(){ const W = window.innerWidth, H = window.innerHeight; return W>=960 && W/H>=1.25; }
 function pcMode(){ return document.body.classList.contains('pc'); }
+// PC layout: a camp that is taller than the window (a big Back Pocket) is scaled down to fit instead of folding the
+// pocket like the phone does. The zoom is set on the panel after each draw (a redraw resets it first).
+function pcFitCamp(){
+  if(!pcMode()) return;
+  const p = document.querySelector('#app > .panel:has(> .camp-status-card)'); if(!p) return;
+  p.style.removeProperty('zoom');
+  const h = p.getBoundingClientRect().height, room = window.innerHeight - 16;
+  if(h > room) p.style.zoom = ((p.currentCSSZoom || 1) * room / h).toFixed(3);
+}
+// PC layout: the end screens (victory, defeat, demo end, unlock) keep the phone card, scaled to the window height.
+function pcFitCard(again){
+  if(!pcMode()) return;
+  if(!again){ const scr = S && S.screen; setTimeout(()=>{ if(S && S.screen===scr) pcFitCard(true); }, 300); } // images (portrait, dice) can grow the card after the draw
+  const a = document.getElementById('app'), c = a && a.firstElementChild; if(!c) return;
+  // measure what the card holds (the card itself stretches to the window height)
+  const z = a.currentCSSZoom || 1, top = c.getBoundingClientRect().top, kids = [...c.querySelectorAll(':scope > *, :scope > * > *')].filter(k=>!k.hidden && k.offsetParent);
+  const h = (kids.length ? Math.max(...kids.map(k=>k.getBoundingClientRect().bottom)) - top : c.getBoundingClientRect().height) / z + 28;
+  a.style.zoom = Math.max(1, Math.min(2.2, (window.innerHeight - 8) / h, (window.innerWidth - 48) / 395)).toFixed(3);
+  // the card sits a little below the top: everything scales from the window's top, so shrink by the overshoot
+  const bottom = Math.max(...kids.map(k=>k.getBoundingClientRect().bottom)), room = window.innerHeight - 10;
+  if(kids.length && bottom > room) a.style.zoom = Math.max(1, parseFloat(a.style.zoom) * room / bottom).toFixed(3);
+}
 function applyPcMode(){
   const W = window.innerWidth, H = window.innerHeight;
-  const on = pcWanted() && W>=960 && W/H>=1.25;
+  const on = pcWanted() && pcFits();
   const was = pcMode();
   document.body.classList.toggle('pc', on);
   if(on){
@@ -5175,6 +5208,10 @@ function applyPcMode(){
     st.setProperty('--pc-zh', (hoverH/96).toFixed(3));
     st.setProperty('--pc-zt', Math.min(availH/418, availW*0.435/379).toFixed(3));
     st.setProperty('--pc-zc', Math.max(1, (H - 16)/785).toFixed(3));
+    // landscape title, setup and camp (Nov 13): each laid out in two columns, scaled to fill the window
+    st.setProperty('--pc-zti', Math.max(1, Math.min(2, H/520, (W - H*0.843 - 80)/380)).toFixed(3)); // title buttons beside the full-height art
+    st.setProperty('--pc-zsu', Math.max(1, Math.min(2.2, (H - 24)/450, (W - 48)/790)).toFixed(3));
+    st.setProperty('--pc-zca', Math.max(1, Math.min(2.2, (H - 24)/415, (W - 48)/790)).toFixed(3));
     st.setProperty('--pc-zm', Math.max(1, Math.min(2, H/640)).toFixed(3)); // pop-up windows, doors and other things floating over the screen
   }
   return on !== was;
@@ -5615,7 +5652,8 @@ function wireEndDetails(countUp){ // countUp: the Run Summary numbers count up (
     const open = det.hidden;
     // the details take the card's place and may use whatever room is left on screen, never growing the page
     if(open){ const kids = [...b.parentNode.children], bottom = Math.max(...kids.map(k=>k.getBoundingClientRect().bottom));
-      det.style.maxHeight = Math.max(main.offsetHeight, Math.floor(window.innerHeight - bottom - 22 + main.offsetHeight)) + 'px'; }
+      const z = det.currentCSSZoom || 1; // PC layout: the card is zoomed, screen px / z = its own px
+      det.style.maxHeight = Math.max(main.offsetHeight, Math.floor((window.innerHeight - bottom - 22)/z + main.offsetHeight)) + 'px'; }
     det.hidden = !open; main.hidden = open;
     b.classList.toggle('open', open);
     b.querySelector('.end-details-word').textContent = open ? 'Back to run card' : 'Details';

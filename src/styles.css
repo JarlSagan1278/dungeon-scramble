@@ -3709,6 +3709,34 @@ body.pc.pad #resolve-btn::before{ content:'Y'; border-radius:50%; background:#d9
 body.pc.pad #ability-btn:not(.disabled)::before{ content:'X'; border-radius:50%; background:#3f7fd0; color:#fff; }
 body.pc.pad #clear-path-btn:not(.disabled)::before{ content:none; }
 
+/* landscape title, setup and camp (Nov 13): the phone panel in two columns, scaled by --pc-zti/--pc-zsu/--pc-zca (applyPcMode) */
+body.pc #app:not(:has(> #enc-panel)):has(> .title-screen-fill), body.pc #app:not(:has(> #enc-panel)):has(> .setup-panel), body.pc #app:not(:has(> #enc-panel)):has(> .panel > .camp-status-card){ width:100vw; height:100vh; margin:0; padding:0; zoom:1;
+  display:flex !important; align-items:center; justify-content:center; box-sizing:border-box; }
+/* title: the whole cover at window height on the left (the phone crops its sides), the buttons on the right */
+body.pc .title-screen-fill{ height:100vh !important; max-height:none; width:100%; }
+body.pc .title-panel{ max-width:none !important; width:100%; height:100%; flex-direction:row; align-items:center; justify-content:center; gap:4vw; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
+body.pc .title-art-wrap{ flex:0 0 auto !important; height:100%; width:auto; aspect-ratio:483 / 573; }
+body.pc .title-cover-art{ width:100% !important; height:100%; object-fit:cover; margin-left:0; }
+body.pc .title-art-fade{ top:0; bottom:0; left:auto; right:0; width:22%; height:auto; background:linear-gradient(to right, rgba(24,13,5,0) 0%, var(--b1) 100%); }
+body.pc .title-content{ margin-top:0 !important; width:377px; flex:0 0 auto !important; zoom:var(--pc-zti, 1.5); }
+/* setup: Origin on the left; Class, Boon, Depth and Enter on the right */
+body.pc .setup-panel{ zoom:var(--pc-zsu, 1.5); width:auto !important; height:auto !important; min-height:0 !important; flex:0 0 auto !important; align-self:center !important; max-width:none !important; display:grid !important; grid-template-columns:365px 365px; column-gap:18px; align-content:start; }
+body.pc .setup-panel > .setup-back-btn{ grid-column:1; grid-row:1; justify-self:start; align-self:center; }
+body.pc .setup-panel > .setup-name-row{ grid-column:1 / 3; grid-row:1; justify-self:center; width:365px; }
+body.pc .setup-panel > .setup-section:has(.origin-layout){ grid-column:1; grid-row:2 / 7; align-self:start; }
+body.pc .setup-panel > .setup-section:not(:has(.origin-layout)), body.pc .setup-panel > #start-btn{ grid-column:2; }
+body.pc .setup-panel > #start-btn{ align-self:end; }
+/* camp: the route across the top, the campfire on the left, Train and Organize on the right */
+body.pc .panel:has(> .camp-status-card){ zoom:var(--pc-zca, 1.5); width:auto !important; height:auto !important; min-height:0 !important; flex:0 0 auto !important; align-self:center !important; max-width:none !important; display:grid !important; grid-template-columns:365px 365px; column-gap:18px; align-content:start;
+  grid-template-areas:"route route" "head head" "status up" "status org"; }
+body.pc .panel:has(> .camp-status-card) > .route-wrap{ grid-area:route; justify-self:center; width:365px; }
+body.pc .panel:has(> .camp-status-card) > h2{ grid-area:head; }
+body.pc .panel:has(> .camp-status-card) > .camp-status-card{ grid-area:status; align-self:stretch; }
+body.pc .panel:has(> .camp-status-card) > .camp-section:has(.upgrade-rows-col){ grid-area:up; }
+body.pc .panel:has(> .camp-status-card) > .camp-section:has(.organize-wrap){ grid-area:org; }
+/* end screens: the card is as tall as what it holds (pcFitCard scales it to the window height) */
+body.pc #app .panel.end-screen{ min-height:0 !important; height:auto !important; flex:0 0 auto !important; }
+body.pc #app > :has(> .panel.end-screen){ min-height:0 !important; height:auto !important; }
 /* ==== Dice roll (Nov 13, option G): 3D cubes made by startCubeRoll (render.js), one per die, in a layer inside #tray */
 .tray-wrap .tray{ position:relative; }
 #tray > .roll-layer{ position:absolute; inset:0; pointer-events:none; z-index:2; }

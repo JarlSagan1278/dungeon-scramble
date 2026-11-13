@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.42.108 (Nov 13, 2026)
+- PC layout is now on by default on a wide landscape window (at least 960 px wide and 1.25 times wider than tall); phones and narrow windows are unchanged. Settings has a new **Wide-screen layout** switch (shown on wide windows) to turn it off or back on.
+- Landscape title: the whole cover art at window height on the left (the phone crops its sides), the buttons on the right.
+- Landscape setup: Origin on the left; Class, Starting Boon, Depth and Enter the Dungeon on the right.
+- Landscape camp: the route across the top, the campfire (Rest/Train, Break Camp) on the left, Train and Organize Dice on the right; a big Back Pocket shrinks the camp to fit instead of folding.
+- Victory, defeat, demo-end and unlock screens: the card is scaled up to the window height (it was phone-sized in the middle of the screen); Details on the end screens measures correctly when scaled.
+- check.js pc: title, setup, camp (full Back Pocket) and victory at 1920x1080 and 1280x800 sit side by side inside the window; the Settings switch turns it off and is remembered.
+
 ## 1.42.107 (Nov 13, 2026)
 - Dice landing clicks now follow the 3D roll: each click plays the moment a die settles, in that die's material (magic = glass chime, gilded = bright ring, alloy = dull metal tick, the rest wood). Every loot die gets its own click; wood clicks are thinned to 4 (2 on Low Intensity), at least 70 ms apart. A Minion-covered die lands as wood, so the sound never gives away what's under it. Reduced Motion keeps the old timed clacks.
 - check.js scramble: the clicks match the landings and materials.

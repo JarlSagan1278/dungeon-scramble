@@ -90,6 +90,32 @@ const FIGHT = () => { META.lifetime.victories = 3; META.coachSeen = { armsmaster
   const boon = await p.evaluate(() => !!(S.shrineResult || S.shrineChoice || S.relicChoice || S.lootChoice || S.pendingLootDie));
   out.push((onHold && boon ? 'ok   ' : 'FAIL ') + `controller: the cursor starts on the shrine's Hold button and holding A grants the boon (${JSON.stringify({ onHold, boon })})`);
   await p.close();
+  // landscape title, setup, camp and end screens (Nov 13): two columns side by side, all inside the window, no scrolling
+  for (const [w, h] of [[1920, 1080], [1280, 800]]) {
+    p = await open(w, h, true);
+    const SCR = {
+      title: [() => { preGameScreen = 'title'; S = null; render(); }, '.title-art-wrap', '.title-content'],
+      setup: [() => { META.lifetime.victories = 3; preGameScreen = 'setup'; S = null; render(); }, '.setup-section:has(.origin-layout)', '#start-btn'],
+      camp: [() => { S.screen = 'camp'; S.floorIdx = 1; S.routeStep = 4; S.campChoice = null; S.backPocket = [...ALLOY.slice(0, 5), ...GILDED.slice(0, 5), ...MAGIC.slice(0, 5)].map(d => clone(d)); render(); }, '.camp-status-card', '.camp-section:has(.organize-wrap)'],
+      victory: [() => { S.screen = 'victory'; render(); }, null, null],
+    };
+    for (const [k, [setup, left, right]] of Object.entries(SCR)) {
+      if (k === 'camp' || k === 'victory') await p.evaluate(FIGHT);
+      await p.evaluate(setup); await p.waitForTimeout(600);
+      const g = await p.evaluate(([left, right]) => { const W = innerWidth, H = innerHeight, all = [...document.querySelectorAll('#app *')].filter(n => n.offsetParent && !n.closest('.modal-overlay'));
+        const low = Math.max(...all.map(n => n.getBoundingClientRect().bottom)), r = s => s && document.querySelector(s) && document.querySelector(s).getBoundingClientRect();
+        const a = r(left), b = r(right); return { pc: document.body.classList.contains('pc'), sh: document.documentElement.scrollHeight, H, low: Math.round(low), side: !a || (a.right <= b.left + 1), zoom: document.getElementById('app').style.zoom || '' }; }, [left, right]);
+      out.push((g.pc && g.sh <= g.H && g.low <= g.H + 1 && g.side ? 'ok   ' : 'FAIL ') + `${w}x${h} ${k}: laid out side by side and inside the window (${JSON.stringify(g)})`);
+    }
+    await p.close();
+  }
+  // the Settings switch turns it off (and is remembered); without any setting a real browser gets it on a wide window
+  p = await open(1280, 800, true); await p.evaluate(() => { preGameScreen = 'title'; S = null; render(); openSettingsModal(); }); await p.waitForTimeout(400);
+  await p.click('#pref-pc-layout', { force: true }); await p.waitForTimeout(700);
+  const sw = await p.evaluate(() => ({ pc: document.body.classList.contains('pc'), kept: localStorage.getItem('dungeonScramblePC') }));
+  const def = await p.evaluate(() => { localStorage.removeItem('dungeonScramblePC'); Object.defineProperty(navigator, 'webdriver', { get: () => false }); return pcWanted(); });
+  out.push((!sw.pc && sw.kept === '0' && def ? 'ok   ' : 'FAIL ') + `Settings > Wide-screen layout turns it off and remembers; with no setting a player's browser gets it (${JSON.stringify({ ...sw, def })})`);
+  await p.close();
   out.forEach(l => console.log(l));
   if (errors.length) console.log('FAIL page errors: ' + errors.slice(0, 3).join(' | '));
   await browser.close();

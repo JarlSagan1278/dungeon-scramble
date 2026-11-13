@@ -61,3 +61,4 @@ Distribution, hosting, play data, privacy, release plan, monetization, store, it
 - **Nov 12 — itch demo 1.42.102 uploaded and the animated cover set (Jeremy):** cover = 630x500 GIF of the big-turn crescendo (17 DAMAGE on the Viscous Orb, 2.4 MB), made from tools/media/clip_crescendo.js. Itch pictures must be 3 MB or less.
 - **Nov 12 — itch description fixed (Jeremy):** "Leap, Sidestep and Pivot" (was Dodge).
 - **Nov 13, 2026 (Jeremy): print-and-play is deprioritized, below the PC version.** Building the tabletop by hand was an insane amount of manual labor (stickering every die), and the video game's numbers (enemy Health in the dozens to 160+, stacking statuses) are unwieldy to track by hand. The BGG solo contest idea waits.
+- **Nov 13, 2026 (Jeremy approved "finish the PC layout"):** the PC layout turns on by itself on wide landscape windows (Settings > Wide-screen layout turns it off); title, setup and camp get landscape versions (1.42.108).

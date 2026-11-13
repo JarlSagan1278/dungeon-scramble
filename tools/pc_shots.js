@@ -14,6 +14,9 @@ const SET={ fight:FIGHT+`const h=[...Array(16).keys()].filter(i=>canSelect(i)); 
   door:`META.lifetime.victories=3; META.coachSeen={armsmaster:1,guard:1,dungeoneer:1,arcanist:1}; newGame('dwarf','armsmaster'); S.guide=null; for(let g=0;g<10&&!(S.screen==='game'&&S.encounter);g++){ if(S.screen==='camp') campLeave(); else advanceRoute(); } render();`,
   fork:FIGHT+`for (let g = 0; g < 12 && !S.forkChoice; g++) { if (S.screen === 'camp') campLeave(); else { if (S.routeStep > 0) S.routeStep++; advanceRoute(); } } S.transitioning=false; S.newRoomFx=false; render();`,
   stamp:FIGHT+`S.encounter.maxHealth=S.encounter.curHealth=60; render(); turnTotalStamp(18,2);`,
+  shrine:FIGHT+`const s=FLOORS[0].shrines[0]; const o=window.drawRoomCard; window.drawRoomCard=()=>s; S.encounter=drawEncounter('enc'); window.drawRoomCard=o; S.screen='shrine'; S.shrineResult=null; render(); try{ placeShrineFloat(); }catch(e){} document.querySelectorAll('#room-callout,#room-callout-scrim').forEach(n=>n.remove());`,
+  victory:FIGHT+`S.screen='victory'; render();`,
+  defeat:FIGHT+`S.stats.killedBy=S.encounter.name; S.health=0; S.screen='gameover'; S.carryoverOptions=highestTierTrayGroups(); S.carryoverChosenName=null; render();`,
   codex:`META.lifetime.victories=1; preGameScreen='title'; S=null; render(); openCodexModal();` };
 (async()=>{ const b=await chromium.launch();
  for(const [w,h] of sizes) for(const k of want){ const p=await b.newPage({viewport:{width:w,height:h}}); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
