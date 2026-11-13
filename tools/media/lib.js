@@ -55,5 +55,6 @@ async function findPath(p,maxLen=5){
     const out=best.map(i=>[i,currentFace(S.tray[i]).type]); out.total=0; return {path:out,dmg:computePathEffects(best).totalDamage};
   },maxLen);
 }
-async function tapDie(p,i){ await p.click(`#tray > [data-idx="${i}"]`); }
+// force: the dice idle-twitch and the tap cue wiggles (1.42.91), so they are never "stable" for Playwright's default click (Nov 12)
+async function tapDie(p,i){ await p.click(`#tray > [data-idx="${i}"]`, {force:true}); }
 module.exports={chromium,openPage,seedMeta,startRun,midRun,findPath,tapDie,sleep,OUT};

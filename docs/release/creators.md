@@ -6,14 +6,29 @@ each channel's subscriber count (272 channels seen, 70 checked). Counts and vide
 
 **How to reach them:** the business email sits on each channel's About page ("View email address", behind a
 captcha, so I couldn't read it). If there's none, use the Twitter/X, Bluesky or Discord link on the same page.
-Personalize the first line from the hook below, attach clip_turn (MP4 or GIF), and send no more than one short follow-up after 7 days.
+Personalize the first line from the hook below, attach the clip (since Nov 12: clip_crescendo.mp4, or the 2.8 MB devlog GIF), and send no more than one short follow-up after 7 days (template below).
 
 Base note (from the plan page): *Hi [name], I enjoyed [video], especially [moment]. My wife and I made Dungeon
 Scramble, a turn-based dice roguelike that started as our board game: roll 16 dice into a 4x4 tray, draw one path,
 and each die you step on hits, blocks or heals, in order. The first two floors are free in the browser (~30 min, works on PC):
-https://dungeonscramble.itch.io/dungeon-scramble . A 12-second clip is attached.
+https://dungeonscramble.itch.io/dungeon-scramble . A 13-second clip of one big turn is attached.
 If you enjoy it and want to keep going, I'm happy to send you the full game (three floors). No strings; if it's not your thing,
 no reply needed. Thanks! — Jeremy*
+
+## Follow-up for round 1 (once, Nov 13 or later, only to those who haven't replied)
+
+*Hi [name], a quick follow-up on Dungeon Scramble, the dice roguelike my wife and I made from our board game. Since
+my note last week the free demo got a new moment I think your viewers would enjoy: string together a long path and
+the turn's total slams onto the monster before it answers (13-second clip attached). The first two floors are free in
+the browser: https://dungeonscramble.itch.io/dungeon-scramble . If it's not a fit, no need to reply. Thanks! — Jeremy*
+
+Attach clip_crescendo.mp4 (or devlog_crescendo_2.8MB.gif where only small files go). No second follow-up.
+
+## Round 2 (Nov 13): the "Next 7" below
+
+Use the base note above with the new clip. The hooks were checked on Nov 5, so before sending, glance at each channel's
+newest upload and use that for the first line if there's something more recent. For The Dungeon Dive, lead with the
+board-game origin (the refreshed rulebook PDF can go along if they ask how it plays on the table).
 
 ## Send these 8 first (small, and already playing exactly this kind of game)
 
@@ -55,7 +70,7 @@ Also worth one email: Jupiter Hadley (covers thousands of small itch games; no f
 
 ## If a creator wants the full game (Nov 5)
 Never send the playtest site (it changes with every push and has tester tools). Send the frozen **creator build**:
-the release version (all three floors, no Debug class, no tester tools), version 1.42.66, zip
+the release version (all three floors, no Debug class, no tester tools), version 1.42.102 (rebuilt Nov 12; was 1.42.66), zip
 `dungeon_scramble_full_creator_<ver>.zip` (`node build.js --release`, then zip `dist/release/web` with index.html at the root).
 On itch: create a new project (e.g. "Dungeon Scramble — full game (creator build)"), kind HTML, upload the zip, tick
 "This file will be played in the browser" and the mobile-friendly box, same viewport as the demo, then set
@@ -73,3 +88,10 @@ still go to the public demo link. Rebuild only when a creator needs a fix.
 | Keenangraz | Nov 6 | | |
 | Deckbuilders Daily | Nov 6 | | |
 | V4Van | not sent (no listed email; Facebook page message instead) | | |
+| Chrisp44s | | | |
+| apqLIVE | | | |
+| Oridont | | | |
+| The Dungeon Dive | | | |
+| Adin Walls | | | |
+| 2 Headed Hero | | | |
+| I Dream of Indie Games | | | |

@@ -4,7 +4,7 @@ const L=require('./lib');const which=process.argv[2]||'all';
  const want=k=>which==='all'||which.split(',').includes(k);
  if(want('title')){ const {ctx,p}=await L.openPage(b); await p.evaluate(()=>{document.querySelectorAll('#app *').forEach(n=>{if(/^Playtesting\?/.test(n.textContent.trim())&&n.children.length===0)n.style.visibility='hidden';});}); await L.sleep(500); await p.screenshot({path:L.OUT+'01_title.png'}); await ctx.close(); }
  if(want('path')){ const {ctx,p}=await L.openPage(b); await L.seedMeta(p); await L.startRun(p,'Dwarf','Armsmaster');
-   let path; for(let k=0;k<8;k++){ await L.midRun(p,{floorIdx:1,routeStep:2,loot:[4,3,2],upg:4}); const r=await L.findPath(p,6); path=r.path; console.log('try',k,r.dmg); if(r.dmg>=14&&path.length>=5) break; } console.log('path',JSON.stringify(path), await p.evaluate(()=>S.encounter.name));
+   let path; for(let k=0;k<16;k++){ await L.midRun(p,{floorIdx:1,routeStep:2,loot:[4,3,2],upg:4}); if(!(await p.evaluate(()=>S.screen==='game'&&S.encounter&&/^(Enemy|Trap)$/.test(S.encounter.type)))) continue; /* Nov 12: a shrine room has no path to draw */ const r=await L.findPath(p,6); path=r.path; console.log('try',k,r.dmg); if(r.dmg>=14&&path.length>=5) break; } console.log('path',JSON.stringify(path), await p.evaluate(()=>S.encounter.name));
    for(const [i] of path){ await L.tapDie(p,i); await L.sleep(450);} await L.sleep(800);
    await p.screenshot({path:L.OUT+'02_path.png'}); await ctx.close(); }
  if(want('boss')){ const {ctx,p}=await L.openPage(b); await L.seedMeta(p); await L.startRun(p,'Gnome','Guard');
