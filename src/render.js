@@ -1379,7 +1379,9 @@ function fitSetup(opts){
   };
   p.classList.remove('fit1','fit2','fit3','fit4','fit5');
   lockHeights();
-  for(const c of ['fit1','fit2','fit3','fit4','fit5']){ if(se.scrollHeight <= window.innerHeight + 1) break; p.classList.add(c); lockHeights(); }
+  // PC layout: the page never scrolls there (the card is scaled into the window), so measure the card itself
+  const fits = ()=> pcMode() ? p.getBoundingClientRect().bottom <= window.innerHeight - 6 : se.scrollHeight <= window.innerHeight + 1;
+  for(const c of ['fit1','fit2','fit3','fit4','fit5']){ if(fits()) break; p.classList.add(c); lockHeights(); }
 }
 
 // Forks (Nov 4, Jeremy picked two doors): after the room before an Elite slot, two of the game's doors stand side by
@@ -5155,7 +5157,7 @@ function applyPcMode(){
     st.setProperty('--pc-zh', (hoverH/96).toFixed(3));
     st.setProperty('--pc-zt', Math.min(availH/418, availW*0.435/379).toFixed(3));
     st.setProperty('--pc-zc', Math.max(1, (H - 16)/785).toFixed(3));
-    st.setProperty('--pc-zm', Math.max(1, Math.min(2, H/600)).toFixed(3)); // pop-up windows, doors and other things floating over the screen
+    st.setProperty('--pc-zm', Math.max(1, Math.min(2, H/640)).toFixed(3)); // pop-up windows, doors and other things floating over the screen
   }
   return on !== was;
 }
@@ -5178,7 +5180,7 @@ function pcHoverDieHTML(idx){
   const die = cell.die, f = classFace(cell.forcedFace || currentFace(cell));
   const faces = die.faces.map((x,i)=> x.type==='blank'
     ? `<div class="mini-face mf-blank${(!cell.forcedFace && i===cell.faceIdx)?' pch-cur':''}"></div>`
-    : `<div class="mini-face mf-${die.cat||'loot'}${(!cell.forcedFace && i===cell.faceIdx)?' pch-cur':''}">${iconSpan(x.type, x.value, true)}<small>${LABEL[x.type]}${(x.value && !ICON_VALUE_SLOT.has(x.type))?' '+x.value:''}</small></div>`).join('');
+    : `<div class="mini-face mf-${die.cat||'loot'}${(!cell.forcedFace && i===cell.faceIdx)?' pch-cur':''}">${iconSpan(x.type, x.value)}<small>${LABEL[x.type]}${(x.value && !ICON_VALUE_SLOT.has(x.type))?' '+x.value:''}</small></div>`).join('');
   const nm = f.type==='blank' ? 'Blank' : LABEL[f.type] + ((f.value && !ICON_VALUE_SLOT.has(f.type)) ? ' '+f.value : '');
   const notes = [];
   if(cell.forcedFace) notes.push('Changed for this turn.');
@@ -5194,7 +5196,9 @@ function pcHoverRender(){
   else if(pcHoverTip){ // "Label: what it does" -> the label as a heading
     const t = String(pcHoverTip).replace(/</g,'&lt;'), m = /^([^:.]{2,40}): (.+)$/s.exec(t);
     html = m ? `<div class="pch-main"><div class="pch-head"><b>${m[1]}</b></div><div class="pch-text">${m[2]}</div></div>` : `<div class="pch-main"><div class="pch-text">${t}</div></div>`; }
-  if(!html) html = `<div class="pch-main pch-idle"><div class="pch-text">Point at a die, a monster's move or a relic to read it. Keys: <b>1 2 3 4 / Q W E R / A S D F / Z X C V</b> pick dice, <b>Enter</b> is Go, <b>Backspace</b> is Clear.</div></div>`;
+  if(!html) html = `<div class="pch-main pch-idle"><div class="pch-text">Point at a die, a monster's move or a relic to read it. ${document.body.classList.contains('pad')
+    ? 'Controller: <b>D-pad</b> or stick moves the cursor, <b>A</b> picks (hold it on a Hold button), <b>B</b> steps back, <b>X</b> is Skill, <b>Y</b> is Go.'
+    : 'Keys: <b>1 2 3 4 / Q W E R / A S D F / Z X C V</b> pick dice, <b>Enter</b> is Go, <b>Backspace</b> is Clear. Or use the <b>arrow keys</b> and <b>Space</b>; <b>Esc</b> steps back.'}</div></div>`;
   if(inn.innerHTML !== html) inn.innerHTML = html;
 }
 // Sits under the room, as wide as it; hidden when PC mode is off or the screen has no room.

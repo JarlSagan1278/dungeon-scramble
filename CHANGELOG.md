@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.105 (Nov 13, 2026)
+- PC layout (still opt-in, ?pc=1): keyboard and controller play (mockup H). A gold cursor moves between everything clickable on the current screen (dice, buttons, loot, doors, menus): arrow keys / D-pad / left stick move it to the nearest thing that way, Space / A presses it like a finger (so holding it works for the shrine's Hold button), Esc / B goes back (closes the top window; in a fight steps the Path back one die or disarms the Skill), X is Skill, Y or Start is Go, Select opens Settings. Sliders move with left/right. The cursor starts on each screen's main thing, follows redraws, and hides when the mouse moves. The hover panel explains what the cursor is on. Go, Clear and Skill show their key or controller button. Standard-mapping gamepads (Steam Deck included) are read with the Gamepad API.
+- Fixed in PC mode: at Steam Deck height the setup screen's Enter the Dungeon button sat below the window (setup's shrink-to-fit measured page scrolling, which PC mode doesn't have); pop-up windows are a little smaller on short screens.
+- check.js pc (12 checks): a keyboard-only run from the title into a fight, and a simulated controller through a turn, Settings and a shrine.
+
 ## 1.42.104 (Nov 13, 2026)
 - PC layout (still opt-in, ?pc=1): hover panel and key letters (mockup G). A strip under the room explains whatever the mouse is over: a die (its name, all six faces with the one showing marked, what that face does, and "Step N of your Path" / "Changed for this turn"), or anything with a description (a monster's move, a relic, a quest row, a button), with the label as a heading. A die under a Minion only says Minion, so hovering can't scout. Each die shows its key (1234 / QWER / ASDF / ZXCV) on its right edge; the keys already worked. The browser's own tooltip is parked while the panel shows the same text.
 - New check, pc: off without the flag and on phones; at 1920x1080 and 1280x800 the room is left of the tray, nothing scrolls, the path line joins its dice, hover explains a die and hides a Minion's, the key cap picks its die and Enter plays the turn.
