@@ -30,6 +30,7 @@ const ALL = [
   ['crescendo',  'tools/tests/test_crescendo.js'],  // big turns stamp their total and hold a beat; small/Skip/kill don't (Nov 12)
   ['savefields', 'tools/tests/test_savefields.js'], // every S field is RUN (saved) or SCREEN (not); saves round-trip (Nov 12)
   ['morph',      'tools/tests/test_morph.js'],      // camp redraws in place (morphHTML) and always equals a fresh draw (Nov 12)
+  ['pc',         'tools/tests/test_pc.js'],         // PC layout (?pc=1): split fight, hover panel, key letters, off on phones (Nov 13)
 ];
 const QUICK = new Set(['sim', 'pathrender', 'trayfast', 'playback', 'ui', 'scramble']);
 

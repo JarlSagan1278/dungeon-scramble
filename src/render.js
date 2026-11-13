@@ -267,6 +267,7 @@ function maybeScreenTransition(key){
 let preGameScreen = 'title';
 
 function render(){
+  if(pcMode() || document.getElementById('pc-hover')) requestAnimationFrame(pcHoverSync); // PC hover panel follows the room
   hideFaceTooltip(); closeActionNote();
   if(typeof musicUpdate==='function') musicUpdate(); // start/stop the music for this screen
   if(typeof applyDiceFinish==='function') applyDiceFinish();
@@ -5148,8 +5149,10 @@ function applyPcMode(){
     const st = document.body.style;
     const zRoute = Math.max(1.15, Math.min(1.8, H/620));
     const availH = H - (52*zRoute + 22) - 22, availW = W - 48 - 32;
+    const hoverH = Math.round(Math.max(118, Math.min(176, H*0.16))); // the hover panel's strip under the room
     st.setProperty('--pc-zroute', zRoute.toFixed(3));
-    st.setProperty('--pc-zr', Math.min(availH/286, availW*0.565/379).toFixed(3));
+    st.setProperty('--pc-zr', Math.min((availH - hoverH - 10)/286, availW*0.565/379).toFixed(3));
+    st.setProperty('--pc-zh', (hoverH/96).toFixed(3));
     st.setProperty('--pc-zt', Math.min(availH/418, availW*0.435/379).toFixed(3));
     st.setProperty('--pc-zc', Math.max(1, (H - 16)/785).toFixed(3));
     st.setProperty('--pc-zm', Math.max(1, Math.min(2, H/600)).toFixed(3)); // pop-up windows, doors and other things floating over the screen
@@ -5157,6 +5160,67 @@ function applyPcMode(){
   return on !== was;
 }
 window.addEventListener('resize', ()=>{ const changed = applyPcMode(); if(changed || pcMode()){ try{ render(); }catch(e){} } });
+
+// Hover panel (mockup G): on a PC nothing can be long-pressed, so whatever the mouse is over is explained in a strip
+// under the room: a die (name, its six faces with the one showing marked, what that face does), or anything that
+// carries a description (a monster's move, a relic, a quest row, a button). A die under a Minion only says Minion.
+const PC_KEYS = ['1','2','3','4','Q','W','E','R','A','S','D','F','Z','X','C','V'];
+let pcHoverIdx = null, pcHoverTip = null;
+function pcHoverEl(){
+  let n = document.getElementById('pc-hover');
+  if(!n){ n = document.createElement('div'); n.id = 'pc-hover'; n.hidden = true; n.innerHTML = '<div class="pch-in"></div>'; document.body.appendChild(n); }
+  return n;
+}
+function pcHoverDieHTML(idx){
+  const cell = S && S.tray && S.tray[idx]; if(!cell) return '';
+  const key = `<span class="pch-key">${PC_KEYS[idx]}</span>`;
+  if(cell.minion) return `<div class="pch-main"><div class="pch-head"><b>Minion</b>${key}</div><div class="pch-text">It clogs this space. Every point of damage you deal clears one, or Leap clean over it.</div></div>`;
+  const die = cell.die, f = classFace(cell.forcedFace || currentFace(cell));
+  const faces = die.faces.map((x,i)=> x.type==='blank'
+    ? `<div class="mini-face mf-blank${(!cell.forcedFace && i===cell.faceIdx)?' pch-cur':''}"></div>`
+    : `<div class="mini-face mf-${die.cat||'loot'}${(!cell.forcedFace && i===cell.faceIdx)?' pch-cur':''}">${iconSpan(x.type, x.value, true)}<small>${LABEL[x.type]}${(x.value && !ICON_VALUE_SLOT.has(x.type))?' '+x.value:''}</small></div>`).join('');
+  const nm = f.type==='blank' ? 'Blank' : LABEL[f.type] + ((f.value && !ICON_VALUE_SLOT.has(f.type)) ? ' '+f.value : '');
+  const notes = [];
+  if(cell.forcedFace) notes.push('Changed for this turn.');
+  if(cell.spent) notes.push('Used this turn.');
+  const k = S.path ? S.path.indexOf(idx) : -1; if(k>=0) notes.push(`Step ${k+1} of your Path.`);
+  return `<div class="pch-dice"><div class="pch-head"><b>${die.name}</b>${key}</div><div class="faces-tiles">${faces}</div></div>
+    <div class="pch-main"><div class="pch-head"><b>${nm}</b></div><div class="pch-text">${FACE_DESC[f.type]||'No effect this turn.'}${notes.length?` <i>${notes.join(' ')}</i>`:''}</div></div>`;
+}
+function pcHoverRender(){
+  const n = pcHoverEl(), inn = n.firstChild;
+  let html = '';
+  if(pcHoverIdx!=null && S && S.screen==='game') html = pcHoverDieHTML(pcHoverIdx);
+  else if(pcHoverTip){ // "Label: what it does" -> the label as a heading
+    const t = String(pcHoverTip).replace(/</g,'&lt;'), m = /^([^:.]{2,40}): (.+)$/s.exec(t);
+    html = m ? `<div class="pch-main"><div class="pch-head"><b>${m[1]}</b></div><div class="pch-text">${m[2]}</div></div>` : `<div class="pch-main"><div class="pch-text">${t}</div></div>`; }
+  if(!html) html = `<div class="pch-main pch-idle"><div class="pch-text">Point at a die, a monster's move or a relic to read it. Keys: <b>1 2 3 4 / Q W E R / A S D F / Z X C V</b> pick dice, <b>Enter</b> is Go, <b>Backspace</b> is Clear.</div></div>`;
+  if(inn.innerHTML !== html) inn.innerHTML = html;
+}
+// Sits under the room, as wide as it; hidden when PC mode is off or the screen has no room.
+function pcHoverSync(){
+  const n = document.getElementById('pc-hover'); if(!n && !pcMode()) return;
+  const el = pcHoverEl(), room = pcMode() ? document.querySelector('#app > #enc-panel') : null;
+  if(!room){ el.hidden = true; return; }
+  const r = room.getBoundingClientRect();
+  el.hidden = false; el.style.left = Math.round(r.left)+'px'; el.style.width = Math.round(r.width)+'px'; el.style.top = Math.round(r.bottom + 8)+'px';
+  pcHoverRender();
+}
+document.addEventListener('mouseover', ev=>{
+  if(!pcMode() || !ev.target || !ev.target.closest) return;
+  const die = ev.target.closest('#tray > .die');
+  let idx = null, tip = null;
+  if(die) idx = parseInt(die.dataset.idx);
+  else { const t = ev.target.closest('[title], [data-pc-tip]'); if(t && !t.closest('#pc-hover')) tip = t.getAttribute('data-pc-tip') || t.getAttribute('title'); }
+  // the browser's own little tooltip would repeat the panel: park the title while the mouse is over it
+  const holder = ev.target.closest('[title]');
+  if(holder && holder.getAttribute('title')){ holder.setAttribute('data-pc-tip', holder.getAttribute('title')); holder.removeAttribute('title'); }
+  if(idx!==pcHoverIdx || tip!==pcHoverTip){ pcHoverIdx = idx; pcHoverTip = tip; pcHoverRender(); }
+}, {passive:true});
+document.addEventListener('mouseout', ev=>{
+  const t = ev.target && ev.target.closest ? ev.target.closest('[data-pc-tip]') : null;
+  if(t && !t.contains(ev.relatedTarget)){ if(!t.getAttribute('title')) t.setAttribute('title', t.getAttribute('data-pc-tip')); t.removeAttribute('data-pc-tip'); }
+}, {passive:true});
 
 // ---- One redraw path (Nov 12, polish roadmap A4; camp first) ----
 // morphHTML(el, html) makes el's contents match html while keeping every node that is already right: changed text and

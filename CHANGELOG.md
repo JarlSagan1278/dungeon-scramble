@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.104 (Nov 13, 2026)
+- PC layout (still opt-in, ?pc=1): hover panel and key letters (mockup G). A strip under the room explains whatever the mouse is over: a die (its name, all six faces with the one showing marked, what that face does, and "Step N of your Path" / "Changed for this turn"), or anything with a description (a monster's move, a relic, a quest row, a button), with the label as a heading. A die under a Minion only says Minion, so hovering can't scout. Each die shows its key (1234 / QWER / ASDF / ZXCV) on its right edge; the keys already worked. The browser's own tooltip is parked while the panel shows the same text.
+- New check, pc: off without the flag and on phones; at 1920x1080 and 1280x800 the room is left of the tray, nothing scrolls, the path line joins its dice, hover explains a die and hides a Minion's, the key cap picks its die and Enter plays the turn.
+
 ## 1.42.103 (Nov 13, 2026)
 - PC layout, first slice (opt-in: add ?pc=1 to the address on a wide landscape window; phones and the normal desktop view are unchanged). The fight screen is Jeremy's Nov 4 pick D: route across the top, the room on the left, the tray and its buttons on the right, each enlarged to fill the window (sizes computed for any window; checked at 1920x1080 and 1280x800 Steam Deck). Built from the phone's own components with CSS zoom, so it stays one game. The path line and the room's stone floor follow the enlarged panels; pop-up windows, the room door, fork doors and the big-turn stamp are enlarged; other screens show the phone card scaled to the window's height. tools/pc_shots.js takes the pictures. Still to come: hover panel and key letters (G), controller cursor (H), a real landscape camp/setup/title.
 
