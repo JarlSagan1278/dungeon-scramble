@@ -26,12 +26,21 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     ok(S.needRoll && S.path.length === 0 && !S.transitioning, 'taps on dice and on Go do not roll or start a path');
     const ab = document.getElementById('ability-btn'); if (ab) { ab.click(); ok(!abilityArmed, 'Skill waits for the roll'); }
     const sv = serializeState(); ok(sv.needRoll === true, 'the save keeps the dice covered');
+    // landing clicks (Nov 13): recorded instead of played; one per loot die in its material, wood thinned, Minions as wood
+    const clickLog = [], realClack = playMaterialClack, realCtx = getAudioCtx, realSound = PREFS.sound, realRollSnd = playDiceRollSound, realTone = playTone; playDiceRollSound = () => {}; playTone = () => {};
+    playMaterialClack = (c, t, mat) => clickLog.push([mat, performance.now()]); getAudioCtx = () => ({ currentTime: 0 }); PREFS.sound = true;
+    S.tray[5].die = Object.assign({}, S.tray[5].die, { cat: 'magic' }); S.tray[9].die = Object.assign({}, S.tray[9].die, { cat: 'gilded' });
+    S.tray[9].minion = true;
+    const rollAt = performance.now();
     scrambleRoll(); await new Promise(r => setTimeout(r, 200)); // the redraw follows the lid's take-off by a frame
     ok(!S.needRoll && S.tray.map(c => c.faceIdx).join() === faces && !document.querySelector('#tray .die.unrolled') && !document.getElementById('chest-lid'), 'the flick reveals the faces rolled at turn start');
     // 3D roll (Nov 13): a cube per die rolls in the layer, the real dice hide under them, then all is clean again
     const midCubes = document.querySelectorAll('#tray > .roll-layer .roll-cube').length;
     await new Promise(r => setTimeout(r, 1400));
-    ok(midCubes > 0 && !document.querySelector('#tray .roll-layer') && [...document.querySelectorAll('#tray > .die')].every(d => d.getAnimations().every(a => a.playState !== 'running')), `the dice roll as 3D cubes and settle with nothing left over (${midCubes} cubes mid-roll)`);
+    playMaterialClack = realClack; getAudioCtx = realCtx; playDiceRollSound = realRollSnd; playTone = realTone; PREFS.sound = realSound; S.tray[9].minion = false;
+    const mats = clickLog.map(c => c[0]), woods = mats.filter(m => m === 'wood').length, firstAt = clickLog.length ? clickLog[0][1] - rollAt : 0;
+    ok(mats.filter(m => m === 'magic').length === 1 && !mats.includes('gilded') && woods >= 1 && woods <= 4 && firstAt > 150, `a click per landing in its own material, wood thinned, a Minion's die not given away (${mats.join(',')}; first at ${Math.round(firstAt)} ms)`);
+    ok(midCubes > 0 && !document.querySelector('#tray .roll-layer') && [...document.querySelectorAll('#tray > .die')].every(d => d.getAnimations().every(a => a.constructor !== Animation || a.playState !== 'running')), `the dice roll as 3D cubes and settle with nothing left over (${midCubes} cubes mid-roll)`);
     endTurn();
     ok(S.needRoll === true, 'the next turn waits again');
     PREFS.flickRoll = false; endTurn(); ok(!S.needRoll, 'with the setting off the dice roll by themselves'); PREFS.flickRoll = true;

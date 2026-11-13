@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.107 (Nov 13, 2026)
+- Dice landing clicks now follow the 3D roll: each click plays the moment a die settles, in that die's material (magic = glass chime, gilded = bright ring, alloy = dull metal tick, the rest wood). Every loot die gets its own click; wood clicks are thinned to 4 (2 on Low Intensity), at least 70 ms apart. A Minion-covered die lands as wood, so the sound never gives away what's under it. Reduced Motion keeps the old timed clacks.
+- check.js scramble: the clicks match the landings and materials.
+
 ## 1.42.106 (Nov 13, 2026)
 - New dice roll (Jeremy picked option G): when the lid comes off, each die tumbles as a little 3D cube through two or three of its own real faces, rolling the way you flicked (some roll sideways to it), in a wave starting from the side you flicked from, then lands a touch past its slot, rocks on the edge it rolled over and settles. Minion-covered dice tumble as their Minion, so nothing is revealed. The landing clicks are spread out to match. Reduced Motion keeps the old flip. Made from the dice already on screen (no new pictures, nothing new to download).
 - check.js scramble: the roll's cubes appear and clean up after themselves.

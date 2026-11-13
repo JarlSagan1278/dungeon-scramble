@@ -3255,14 +3255,30 @@ function playDiceRollSound(){
     const ring = 1300 + Math.random()*1400;
     for(let b=0;b<4;b++){ tap(at, g, ring*(1+(Math.random()-0.5)*0.05)); at += gap; gap *= 0.62; g *= 0.55; }
   }
-  // Landing click-clacks in the tray's dice materials (v1.39.3), after the bounces
+  // Landing click-clacks in the tray's dice materials (v1.39.3), after the bounces. The 3D roll (Nov 13) plays its own,
+  // one per landing as each die settles (cubeLandClick), so the magic chime is the magic die touching down.
+  if(typeof cubeRollOn==='function' && cubeRollOn()) return;
   const mats = diceMaterials();
   const clacks = juiceLow() ? 2 : 4;
   for(let i=0;i<clacks;i++){
-    const roll3d = typeof cubeRollOn==='function' && cubeRollOn(); // the 3D roll lands its dice over ~0.4-0.9 s
-    const at = (roll3d ? 0.4 : 0.3) + i*((roll3d ? 0.5 : 0.2)/clacks) + Math.random()*0.02;
+    const at = 0.3 + i*(0.2/clacks) + Math.random()*0.02;
     playMaterialClack(ctx, now+at, mats[i % mats.length], i);
   }
+}
+// One die of the 3D roll landing, in its own material. Every loot die (magic, gilded, alloy) gets its click; wood
+// dice are thinned to a few (4, or 2 on Low Intensity) at least 70 ms apart, so 16 landings never turn into a rattle.
+// A Minion-covered die lands as wood: its click must not give away the die underneath.
+function cubeLandClick(cell, st){
+  if(!PREFS.sound) return;
+  const ctx = getAudioCtx(); if(!ctx) return;
+  const cat = cell && !cell.minion && cell.die ? cell.die.cat : '';
+  const mat = (cat==='magic' || cat==='gilded' || cat==='alloy') ? cat : 'wood';
+  const t = performance.now();
+  if(mat==='wood'){
+    if(st.wood >= (juiceLow() ? 2 : 4) || t - st.lastWood < 70) return;
+    st.wood++; st.lastWood = t;
+  }
+  playMaterialClack(ctx, ctx.currentTime, mat, st.n++ % 4);
 }
 // Loot tier of each die in the tray, best first, so the most special dice are heard first.
 function diceMaterials(){
@@ -6022,7 +6038,7 @@ function startCubeRoll(){
   const layer = document.createElement('div'); layer.className = 'roll-layer'; layer.setAttribute('data-morph-keep', ''); layer.setAttribute('aria-hidden', 'true');
   tray.appendChild(layer);
   const z = tray.currentCSSZoom || 1, tr = tray.getBoundingClientRect(), low = juiceLow();
-  let settled = 0, live = 0;
+  let settled = 0, live = 0; const clicks = { wood:0, lastWood:-1e9, n:0 }; // landing clicks (cubeLandClick)
   dice.forEach(el=>{
     const idx = parseInt(el.dataset.idx), cell = S.tray[idx]; if(!cell) return;
     const row = Math.floor(idx/4), col = idx%4;
@@ -6059,6 +6075,7 @@ function startCubeRoll(){
           if(k < seq.length-1){ step(); return; }
           cube.remove(); if(!--live) layer.remove();
           if(gen!==startCubeRoll.gen || !el.isConnected) return;
+          cubeLandClick(cell, clicks);
           // lands a little past its slot (the way you flicked), rocks on the edge it rolled over, then nestles flat
           const sg = turn > 0 ? 1 : -1, tilt = Math.random()*4 - 2, P = 'perspective(400px)';
           el.animate([
