@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.111 (Nov 13, 2026)
+- Defeat, keep-a-die screen: the content sits in the middle of the phone (the bottom half was empty) and the dice to choose from are 40% bigger.
+- Equip window: before you pick the die to replace, the Out row shows six empty, dashed face slots in the same grid as the New row (it was a plain empty bar).
+
 ## 1.42.110 (Nov 13, 2026)
 - PC layout: the room door and the fork's two doors now stand inside the room (centered on it, at its middle height) instead of in the middle of the window, where the second fork door sat on the dice box. A picked fork door still glides into the room door's place.
 

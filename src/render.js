@@ -4669,7 +4669,7 @@ function renderSwapModal(){
       <h2>Equip ${incoming.name}</h2>
       <div class="swap-compare" id="swap-compare">
         <div class="swap-compare-row swap-compare-in"><div class="swap-compare-label"><span>New</span> <b>${incoming.name}</b></div>${diceFacesRowHTML(incoming)}</div>
-        <div class="swap-compare-row swap-compare-out" id="swap-compare-out"><div class="swap-compare-label"><span>Out</span> <b class="swap-out-hint">pick a die in your tray</b>${infoDot('Tap the die you want to replace. It goes to your Back Pocket. Or keep the new die in your Back Pocket and leave your Tray as it is.')}</div><div class="swap-out-empty"></div></div>
+        <div class="swap-compare-row swap-compare-out" id="swap-compare-out"><div class="swap-compare-label"><span>Out</span> <b class="swap-out-hint">pick a die in your tray</b>${infoDot('Tap the die you want to replace. It goes to your Back Pocket. Or keep the new die in your Back Pocket and leave your Tray as it is.')}</div><div class="faces-tiles swap-out-slots" aria-hidden="true"><div class="mini-face mf-slot"></div><div class="mini-face mf-slot"></div><div class="mini-face mf-slot"></div><div class="mini-face mf-slot"></div><div class="mini-face mf-slot"></div><div class="mini-face mf-slot"></div></div></div>
       </div>
       <div class="swap-tray-head">Your Tray</div>
       <div class="swap-list swap-tray" id="swap-list"></div>

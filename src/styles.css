@@ -2025,11 +2025,15 @@ body.large-text .face-tooltip{ max-width:260px !important; }
 .unlock-msg{ margin:0; min-height:1.2em; text-align:center; font-size:12px; }
 
 /* Defeat: keep-a-die screen (Oct 28, release review) */
-.defeat-keep{ display:flex; flex-direction:column; gap:12px; }
+/* Nov 13 (visual pass): the screen's one job sits in the middle of the phone, with a bigger die to tap (the bottom half was empty) */
+.defeat-keep{ display:flex; flex-direction:column; gap:12px; justify-content:center; }
 .defeat-keep h2{ margin:0; }
 
-.defeat-keep .swap-list{ margin:4px 0 0; max-height:none; }
-.defeat-keep .swap-item{ width:96px; box-shadow:0 4px 0 var(--line); }
+.defeat-keep .swap-list{ margin:4px 0 0; max-height:none; gap:14px; }
+.defeat-keep .swap-item{ width:124px; box-shadow:0 4px 0 var(--line); }
+.defeat-keep .swap-item-label{ font-size:12.5px; }
+.defeat-keep .swap-item .loot-preview-tile{ zoom:1.4; margin:0 auto; }
+.defeat-keep .dk-box{ padding-bottom:16px; }
 .defeat-keep .swap-item:active{ transform:translateY(2px); }
 
 /* Credits (Oct 28) */
@@ -2881,7 +2885,8 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 .swap-modal .swap-tray .swap-item.selected{ transform:translateY(-5px) rotate(-3deg); z-index:2; }
 .swap-modal .swap-tray .swap-suggest-ribbon{ font-size:9px !important; top:-8px !important; }
 .swap-modal h2{ font-size:22px !important; }
-.swap-out-empty{ height:44px; border-radius:10px; background:#2a1b10; box-shadow:inset 0 3px 6px rgba(0,0,0,.55); border:2px solid var(--line); }
+/* the Out row before a die is picked (Nov 13 visual pass): six empty, sunken face slots in the same grid as the New row */
+.swap-compare .mini-face.mf-slot{ background:#2a1b10; border:2px dashed rgba(242,228,200,.22); box-shadow:inset 0 3px 6px rgba(0,0,0,.55); box-sizing:border-box; }
 .swap-item .loot-preview-tile{ margin-bottom:0; }
 .swap-modal .swap-tray .swap-item .loot-preview-tile{ width:100% !important; height:100% !important; margin:0 !important; }
 .swap-modal .swap-tray .swap-item.selected .loot-preview-tile{ box-shadow:0 0 0 3px var(--gold), 0 6px 0 var(--line) !important; }
