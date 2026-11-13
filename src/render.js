@@ -292,6 +292,7 @@ function render(){
   if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); decorateArch(); maybeAutosave(); maybeScreenTransition('shrine'); syncForkCallout(); return; }
   placeVs._inRender = true;
   try{ renderGame(); } finally { placeVs._inRender = false; }
+  pcFitFight();
   // Nov 4 (speed pass): measure everything first, write after -- the chips are fitted while the layout placeVs already
   // forced is still clean, the arch decoration measures before it writes, and the VS mark's position is applied last.
   fitFoChips();
@@ -682,7 +683,7 @@ function syncRoomFloor(card){
     ensureRoomTextures();
     if(!appEl.classList.contains('has-room-floor')) appEl.classList.add('has-room-floor');
     // PC layout (Nov 13): the room panel is zoomed on its own, so the floor lives inside it (same maths, measured from the
-    // panel instead of the app) and runs down to the bottom of the window
+    // panel instead of the app)
     const pc = pcMode(), app = (pc && card.closest('#enc-panel')) || appEl, zf = (pc && app.currentCSSZoom) || 1;
     const off = el=>{ let t=0,l=0,n=el; while(n && n!==app){ t+=n.offsetTop; l+=n.offsetLeft; n=n.offsetParent; } return {t,l}; };
     const c = off(card), cw = card.offsetWidth, ch = card.offsetHeight;
@@ -696,7 +697,8 @@ function syncRoomFloor(card){
     const xl = Math.round(appL + c.l + edge), xr = Math.round(appL + c.l + cw - edge);
     // Oct 16 (Jeremy: the fight screen scrolled a little on his phone): the floor used to hang a fixed 30px below the
     // app, past the bottom of the screen; now it reaches exactly the screen's bottom edge and no further.
-    const floorBelow = -Math.min(pc ? 4000 : 30, Math.max(0, Math.round((window.innerHeight - app.getBoundingClientRect().bottom)/zf)));
+    // PC layout (Nov 13, second pass): the floor stops at the bottom of the room column, level with the tray
+    const floorBelow = pc && app !== appEl ? 0 : -Math.min(30, Math.max(0, Math.round((window.innerHeight - app.getBoundingClientRect().bottom)/zf)));
     const fl = document.createElement('div'); fl.id = 'room-floor';
     fl.style.cssText = `left:${-appL}px;width:${vw}px;top:${hy}px;bottom:${floorBelow}px;clip-path:polygon(${xl}px 0,${xr}px 0,${xr}px ${yb}px,100% ${yb}px,100% 100%,0 100%,0 ${yb}px,${xl}px ${yb}px);`;
     fl.style.setProperty('--ld', '-'+Math.round(performance.now()%3100)+'ms');
@@ -5193,6 +5195,23 @@ function pcFitCard(again){
   const bottom = Math.max(...kids.map(k=>k.getBoundingClientRect().bottom)), room = window.innerHeight - 10;
   if(kids.length && bottom > room) a.style.zoom = Math.max(1, parseFloat(a.style.zoom) * room / bottom).toFixed(3);
 }
+// PC fight layout (Nov 13): route + room in the left column, the tray in the right, both exactly as tall, and the hover
+// caption under both. Heights are measured (offsetHeight is the unzoomed size), so a taller tray (quest rows) or room still
+// lines up. Called after each fight draw; only writes when a value changes.
+function pcFitFight(){
+  if(!pcMode()) return;
+  const W = window.innerWidth, H = window.innerHeight, q = s=> document.querySelector('#app > '+s);
+  const ro = q('.route-float'), rm = q('#enc-panel'), tr = q('.tray-panel');
+  const hRoute = ro ? ro.offsetHeight : 51, hRoom = rm ? rm.offsetHeight : 285, hTray = tr ? tr.offsetHeight : 381;
+  const pad = Math.round(Math.max(12, H*0.018)), gap = Math.round(Math.max(24, W*0.018)), foot = Math.round(Math.max(48, Math.min(78, H*0.07)));
+  // left column = (route + room) * zr, right column = tray * zt, equal heights; widths 379 * (zr + zt) + gap fit the window
+  const k = hTray / (hRoute + hRoom); // zr = zt * k
+  const zt = Math.min((H - 2*pad - foot) / hTray, (W - 48 - gap) / (379 * (1 + k)));
+  const zr = zt * k;
+  const st = document.body.style, set = (n, v)=>{ if(st.getPropertyValue(n) !== v) st.setProperty(n, v); };
+  set('--pc-zt', zt.toFixed(3)); set('--pc-zr', zr.toFixed(3)); set('--pc-zroute', zr.toFixed(3));
+  set('--pc-pad', pad+'px'); set('--pc-gap', gap+'px'); set('--pc-foot', foot+'px'); set('--pc-zh', Math.max(1, Math.min(1.8, foot/46)).toFixed(3));
+}
 function applyPcMode(){
   const W = window.innerWidth, H = window.innerHeight;
   const on = pcWanted() && pcFits();
@@ -5200,13 +5219,7 @@ function applyPcMode(){
   document.body.classList.toggle('pc', on);
   if(on){
     const st = document.body.style;
-    const zRoute = Math.max(1.15, Math.min(1.8, H/620));
-    const availH = H - (52*zRoute + 22) - 22, availW = W - 48 - 32;
-    const hoverH = Math.round(Math.max(118, Math.min(176, H*0.16))); // the hover panel's strip under the room
-    st.setProperty('--pc-zroute', zRoute.toFixed(3));
-    st.setProperty('--pc-zr', Math.min((availH - hoverH - 10)/286, availW*0.565/379).toFixed(3));
-    st.setProperty('--pc-zh', (hoverH/96).toFixed(3));
-    st.setProperty('--pc-zt', Math.min(availH/418, availW*0.435/379).toFixed(3));
+    pcFitFight(); // the fight's zooms come from its blocks' measured heights (first guess here, exact after each draw)
     st.setProperty('--pc-zc', Math.max(1, (H - 16)/785).toFixed(3));
     // landscape title, setup and camp (Nov 13): each laid out in two columns, scaled to fill the window
     st.setProperty('--pc-zti', Math.max(1, Math.min(2, H/520, (W - H*0.843 - 80)/380)).toFixed(3)); // title buttons beside the full-height art
@@ -5259,10 +5272,11 @@ function pcHoverRender(){
 // Sits under the room, as wide as it; hidden when PC mode is off or the screen has no room.
 function pcHoverSync(){
   const n = document.getElementById('pc-hover'); if(!n && !pcMode()) return;
-  const el = pcHoverEl(), room = pcMode() ? document.querySelector('#app > #enc-panel') : null;
-  if(!room){ el.hidden = true; return; }
-  const r = room.getBoundingClientRect();
-  el.hidden = false; el.style.left = Math.round(r.left)+'px'; el.style.width = Math.round(r.width)+'px'; el.style.top = Math.round(r.bottom + 8)+'px';
+  const el = pcHoverEl(), room = pcMode() ? document.querySelector('#app > #enc-panel') : null, tray = room && document.querySelector('#app > .tray-panel');
+  if(!room || !tray){ el.hidden = true; return; }
+  const r = room.getBoundingClientRect(), t = tray.getBoundingClientRect(), top = Math.max(r.bottom, t.bottom) + 8;
+  el.hidden = false; el.style.left = Math.round(r.left)+'px'; el.style.width = Math.round(t.right - r.left)+'px'; el.style.top = Math.round(top)+'px';
+  el.style.maxHeight = Math.max(30, Math.round(window.innerHeight - top - 6))+'px';
   pcHoverRender();
 }
 document.addEventListener('mouseover', ev=>{

@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.109 (Nov 13, 2026)
+- PC fight screen tidied (Jeremy: the route looked small and silly, the room was taller and lower than the dice box, the hint box was too big and empty): the route now heads the room column at the room's own width and scale; route + room and the dice box are exactly as tall and start at the same height (sizes are measured, so a taller tray still lines up); the room's floor stops at the bottom of the room with a short fade instead of running to the window's edge; the hint box is now a quiet caption strip under both columns, only as tall as what it says.
+
 ## 1.42.108 (Nov 13, 2026)
 - PC layout is now on by default on a wide landscape window (at least 960 px wide and 1.25 times wider than tall); phones and narrow windows are unchanged. Settings has a new **Wide-screen layout** switch (shown on wide windows) to turn it off or back on.
 - Landscape title: the whole cover art at window height on the left (the phone crops its sides), the buttons on the right.
