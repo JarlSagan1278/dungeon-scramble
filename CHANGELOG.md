@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.106 (Nov 13, 2026)
+- New dice roll (Jeremy picked option G): when the lid comes off, each die tumbles as a little 3D cube through two or three of its own real faces, rolling the way you flicked (some roll sideways to it), in a wave starting from the side you flicked from, then lands a touch past its slot, rocks on the edge it rolled over and settles. Minion-covered dice tumble as their Minion, so nothing is revealed. The landing clicks are spread out to match. Reduced Motion keeps the old flip. Made from the dice already on screen (no new pictures, nothing new to download).
+- check.js scramble: the roll's cubes appear and clean up after themselves.
+
 ## 1.42.105 (Nov 13, 2026)
 - PC layout (still opt-in, ?pc=1): keyboard and controller play (mockup H). A gold cursor moves between everything clickable on the current screen (dice, buttons, loot, doors, menus): arrow keys / D-pad / left stick move it to the nearest thing that way, Space / A presses it like a finger (so holding it works for the shrine's Hold button), Esc / B goes back (closes the top window; in a fight steps the Path back one die or disarms the Skill), X is Skill, Y or Start is Go, Select opens Settings. Sliders move with left/right. The cursor starts on each screen's main thing, follows redraws, and hides when the mouse moves. The hover panel explains what the cursor is on. Go, Clear and Skill show their key or controller button. Standard-mapping gamepads (Steam Deck included) are read with the Gamepad API.
 - Fixed in PC mode: at Steam Deck height the setup screen's Enter the Dungeon button sat below the window (setup's shrink-to-fit measured page scrolling, which PC mode doesn't have); pop-up windows are a little smaller on short screens.

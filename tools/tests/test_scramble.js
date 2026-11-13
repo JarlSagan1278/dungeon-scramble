@@ -28,6 +28,10 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     const sv = serializeState(); ok(sv.needRoll === true, 'the save keeps the dice covered');
     scrambleRoll(); await new Promise(r => setTimeout(r, 200)); // the redraw follows the lid's take-off by a frame
     ok(!S.needRoll && S.tray.map(c => c.faceIdx).join() === faces && !document.querySelector('#tray .die.unrolled') && !document.getElementById('chest-lid'), 'the flick reveals the faces rolled at turn start');
+    // 3D roll (Nov 13): a cube per die rolls in the layer, the real dice hide under them, then all is clean again
+    const midCubes = document.querySelectorAll('#tray > .roll-layer .roll-cube').length;
+    await new Promise(r => setTimeout(r, 1400));
+    ok(midCubes > 0 && !document.querySelector('#tray .roll-layer') && [...document.querySelectorAll('#tray > .die')].every(d => d.getAnimations().every(a => a.playState !== 'running')), `the dice roll as 3D cubes and settle with nothing left over (${midCubes} cubes mid-roll)`);
     endTurn();
     ok(S.needRoll === true, 'the next turn waits again');
     PREFS.flickRoll = false; endTurn(); ok(!S.needRoll, 'with the setting off the dice roll by themselves'); PREFS.flickRoll = true;

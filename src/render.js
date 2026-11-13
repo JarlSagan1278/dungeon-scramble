@@ -1550,7 +1550,7 @@ function renderDie(cell, idx){
   const trayActCls = `${taSrc?'trayact-src':''} ${taTarget?'trayact-target':''} ${taReady?'trayact-ready':''} ${taReady && !S.path.length && !S.needRoll ? 'trayact-nudge':''} ${cell.spent?'spent':''} ${S.justRerolledIdx===idx?'just-rerolled':''} ${(S.justSwappedIdx||[]).includes(idx)?'just-swapped':''}`;
   const num = inPath ? S.path.indexOf(idx)+1 : null;
   const zoneCls = inZone(idx) ? 'zone-cell' : '';
-  const shakeCls = S.justScrambled ? 'shaking' : '';
+  const shakeCls = S.justScrambled && !cubeRollOn() ? 'shaking' : ''; // the 3D roll (startCubeRoll) replaces the flip when it's on
   const strongGlint = S.justScrambled && !cell.minion && !isBlank && f.value>=3 && (f.type==='hit'||f.type==='combo'||f.type==='heal'||f.type==='block'||f.type==='shield');
   const rippleEntry = S.lastComboRipple && S.lastComboRipple.find(r=>r.idx===idx);
   const rippleCls = rippleEntry ? 'combo-ripple' : '';
@@ -1569,7 +1569,7 @@ function renderDie(cell, idx){
   const resolveCls = isResolving ? 'resolving' : '';
   const resolveFx = isResolving ? S.resolvingFx : null;
   const styleParts = [];
-  if(S.justScrambled) styleParts.push(`animation-delay:${idx*18}ms`);
+  if(shakeCls) styleParts.push(`animation-delay:${idx*18}ms`);
   if(strongGlint) styleParts.push(`--glint-delay:${idx*18+400}ms`);
   else if(rippleEntry) styleParts.push(`animation-delay:${rippleEntry.order*90}ms`);
   if(resolveFx) styleParts.push(`--resolve-color:${RESOLVE_PULSE_COLORS[resolveFx.pulse]||RESOLVE_PULSE_COLORS.move}`);
@@ -1991,7 +1991,7 @@ function renderGame(){
         <div class="enc-card-col">
           <div class="tray-float-wrap">
             <div class="tray-head"><span class="round-badge" title="Floor ${S.floorIdx+1}, round ${S.turnNumber+1}"><b class="rb-floor rb-${(FLOORS[S.floorIdx]&&FLOORS[S.floorIdx].lootName||'Alloy').toLowerCase()}">Floor ${ROMAN[S.floorIdx+1]||S.floorIdx+1}</b><span class="rb-round">Round ${S.turnNumber+1}</span></span><div class="path-strip" id="path-strip"></div></div>
-            <div class="tray-wrap tray-wrap-full ${S.justScrambled?'tray-shake':''}">
+            <div class="tray-wrap tray-wrap-full ${S.justScrambled && !cubeRollOn()?'tray-shake':''}">
               <div class="tray ${S.newRoomFx?'tray-room-in':''} ${abilityArmed?'ability-armed':''} ${S.trayAct?'trayact-armed':''}" id="tray" style="--class-color:${S.klass.color||'#ffffff'}; --gd:-${Math.round(performance.now()%4600)}ms"></div>
               ${S.needRoll ? chestLidHTML() : ''}
               ${chestTrimHTML()}
@@ -2040,10 +2040,11 @@ function renderGame(){
     S.newRoomFx = null; // consumed -- plays once, on the render right after advanceRoute() set it
   } else maybeShowSymbolIntro();
   if(S.justScrambled){
-    const strong = document.querySelectorAll('#tray .glint-strong').length;
-    if(strong && !PREFS.reducedMotion) setTimeout(()=> playTone('glint', Math.min(4, strong-1)), 520);
+    const settled = cubeRollOn() ? startCubeRoll() : 0; // ms until the last die has settled (3D roll), 0 for the flip
+    const strong = document.querySelectorAll('#tray > .glint-strong').length;
+    if(strong && !PREFS.reducedMotion) setTimeout(()=> playTone('glint', Math.min(4, strong-1)), settled ? settled - 150 : 520);
     // each loot-die metal that landed on the tray gets its own soft shimmer cue (once per scramble)
-    ['gilded','alloy','magic'].forEach((cat,k)=>{ if(document.querySelector('#tray .sheen-'+cat) && !PREFS.reducedMotion) setTimeout(()=> playTone(cat+'Shine'), 700 + k*140); });
+    ['gilded','alloy','magic'].forEach((cat,k)=>{ if(document.querySelector('#tray > .die .sheen-'+cat) && !PREFS.reducedMotion) setTimeout(()=> playTone(cat+'Shine'), (settled || 700) + k*140); });
   }
   S.justScrambled = false;
   S.lastComboRipple = null; // consumed -- plays once, on the render right after runPlayerPathSteps() set it
@@ -3258,7 +3259,8 @@ function playDiceRollSound(){
   const mats = diceMaterials();
   const clacks = juiceLow() ? 2 : 4;
   for(let i=0;i<clacks;i++){
-    const at = 0.3 + i*(0.2/clacks) + Math.random()*0.02;
+    const roll3d = typeof cubeRollOn==='function' && cubeRollOn(); // the 3D roll lands its dice over ~0.4-0.9 s
+    const at = (roll3d ? 0.4 : 0.3) + i*((roll3d ? 0.5 : 0.2)/clacks) + Math.random()*0.02;
     playMaterialClack(ctx, now+at, mats[i % mats.length], i);
   }
 }
@@ -5245,7 +5247,7 @@ function morphElement(old, html){ // one element in place (playback regions): sa
   if(morphSameKind(old, n)) morphNode(old, n); else old.replaceWith(n);
 }
 function morphChildren(from, to){
-  const a = [...from.childNodes], b = [...to.childNodes];
+  const a = [...from.childNodes].filter(n=> !(n.nodeType===1 && n.hasAttribute('data-morph-keep'))), b = [...to.childNodes]; // kept: script-made layers (the dice roll)
   b.forEach((tn, i)=>{
     const fn = a[i];
     if(!fn) from.appendChild(tn);
@@ -5976,6 +5978,7 @@ function scrambleRoll(dx, dy){
   // phone, which held the lid still after the flick). The flight is transform/opacity only, so it keeps moving during the redraw.
   if(r && !PREFS.reducedMotion){
     let vx = dx||0, vy = dy==null ? -1 : dy; const n = Math.hypot(vx, vy) || 1; vx /= n; vy /= n;
+    cubeRollDir = Math.abs(vx) > Math.abs(vy) ? [vx<0 ? -1 : 1, 0] : [0, vy>0 ? 1 : -1]; // the dice roll the way the lid flew
     const fly = document.createElement('div');
     fly.className = 'chest-lid lid-fly'; fly.innerHTML = lid.innerHTML;
     Object.assign(fly.style, { left:r.left+'px', top:r.top+'px', width:r.width+'px', height:r.height+'px' });
@@ -5989,6 +5992,87 @@ function scrambleRoll(dx, dy){
     ], { duration:480, easing:'cubic-bezier(.3,.6,.4,1)', fill:'forwards' }).onfinish = ()=> fly.remove();
     requestAnimationFrame(()=> setTimeout(()=>{ if(S && S.screen==='game') render(); }, 0));
   } else render();
+}
+// Dice roll (Nov 13, Jeremy picked option G of the roll mockups): each die tumbles as a small 3D cube, two or three
+// quarter turns through its own real faces, rolling the way the lid was flicked (2 in 5 roll sideways to it), in a wave
+// from the edge the flick came from, then lands a touch past its slot, rocks on the edge it rolled over and settles.
+// The cube is two faces at a time (the one leaving and the one arriving), drawn with renderDie, so nothing new is
+// stored; a Minion-covered die tumbles as its Minion. The cubes live in a layer inside #tray that morphHTML leaves alone
+// (data-morph-keep); the real die is hidden while its cube rolls and does the settle itself. Reduced Motion and bots
+// (unless localStorage dungeonScrambleRollTest) keep the old flip.
+let cubeRollDir = null; // set by scrambleRoll from the flick; null = up
+function cubeRollOn(){
+  if(PREFS.reducedMotion) return false;
+  try{ if(navigator.webdriver && !localStorage.getItem('dungeonScrambleRollTest')) return false; }catch(e){ return false; }
+  return true;
+}
+function cubeRollFace(cell, idx, faceIdx){
+  const keep = cell.faceIdx, js = S.justScrambled; cell.faceIdx = faceIdx; S.justScrambled = false;
+  let html; try{ html = renderDie(cell, idx); } finally { cell.faceIdx = keep; S.justScrambled = js; }
+  const t = document.createElement('template');
+  t.innerHTML = html.replace(/\sdata-idx="\d+"/, '').replace(/\stitle="[^"]*"/, '').replace(/\sid="[^"]*"/g, '');
+  return t.content.firstElementChild;
+}
+function startCubeRoll(){
+  const tray = document.getElementById('tray'); if(!tray || !S || !S.tray) return 0;
+  const gen = startCubeRoll.gen = (startCubeRoll.gen||0) + 1;
+  const v = cubeRollDir || [0,-1]; cubeRollDir = null;
+  tray.querySelectorAll(':scope > .roll-layer').forEach(n=> n.remove());
+  const dice = [...tray.querySelectorAll(':scope > .die[data-idx]')]; if(!dice.length) return 0;
+  const layer = document.createElement('div'); layer.className = 'roll-layer'; layer.setAttribute('data-morph-keep', ''); layer.setAttribute('aria-hidden', 'true');
+  tray.appendChild(layer);
+  const z = tray.currentCSSZoom || 1, tr = tray.getBoundingClientRect(), low = juiceLow();
+  let settled = 0, live = 0;
+  dice.forEach(el=>{
+    const idx = parseInt(el.dataset.idx), cell = S.tray[idx]; if(!cell) return;
+    const row = Math.floor(idx/4), col = idx%4;
+    const fromEdge = v[1]<0 ? (3-row) : v[1]>0 ? row : v[0]<0 ? (3-col) : col;
+    const delay = fromEdge*70 + Math.random()*35, T = 120 + Math.random()*60;
+    const r = Math.random() < 0.4 ? (Math.random()<0.5 ? [v[1], v[0]] : [-v[1], -v[0]]) : v; // the way it turns
+    const ax = r[0] ? 'rotateY' : 'rotateX', turn = r[0] ? (r[0]<0 ? -90 : 90) : (r[1]<0 ? 90 : -90);
+    const turns = low ? 2 : (Math.random() < 0.5 ? 2 : 3);
+    const seq = (turns===3 ? [1,3,5,0] : [2,4,0]).map(k=> cubeRollFace(cell, idx, (cell.faceIdx + k) % 6)); // lands on its own face
+    const dr = el.getBoundingClientRect(), w = dr.width/z, h = dr.height/z, hz = h/2;
+    const cube = document.createElement('div'); cube.className = 'roll-cube';
+    Object.assign(cube.style, { left:((dr.left - tr.left)/z - tray.clientLeft)+'px', top:((dr.top - tr.top)/z - tray.clientTop)+'px', width:w+'px', height:h+'px' });
+    const sideT = `${ax}(${-turn}deg) translateZ(${hz}px)`;
+    cube.innerHTML = `<div class="roll-box"><div class="roll-face" style="transform:translateZ(${hz}px)"><i></i><div class="roll-shade"></div></div><div class="roll-face" style="transform:${sideT}"><i></i><div class="roll-shade"></div></div></div>`;
+    const box = cube.firstChild, [f0, f1] = box.children, s0 = f0.lastChild, s1 = f1.lastChild;
+    el.animate([{opacity:0},{opacity:0}], { delay, duration:turns*T + 40 }); // hidden while its cube rolls (expires on its own)
+    settled = Math.max(settled, delay + turns*T + 300); live++;
+    setTimeout(()=>{
+      if(gen!==startCubeRoll.gen || !layer.isConnected) return;
+      layer.appendChild(cube);
+      let k = 0;
+      const step = ()=>{
+        if(gen!==startCubeRoll.gen || !el.isConnected){ cube.remove(); return; }
+        f0.replaceChild(seq[k].cloneNode(true), f0.firstChild); f1.replaceChild(seq[k+1].cloneNode(true), f1.firstChild);
+        const travel = (turns-k) * 6;
+        const a = box.animate([
+          { transform:`translate(${v[0]*travel}px, ${v[1]*travel}px) translateZ(${-hz}px) ${ax}(0deg)` },
+          { transform:`translate(${v[0]*(travel-3)}px, ${v[1]*(travel-3) - 5}px) translateZ(${-hz}px) ${ax}(${turn/2}deg)`, offset:.5 },
+          { transform:`translate(${v[0]*(travel-6)}px, ${v[1]*(travel-6)}px) translateZ(${-hz}px) ${ax}(${turn}deg)` }], { duration:T, easing:'ease-in-out', fill:'forwards' });
+        s0.animate([{opacity:0},{opacity:.6}], { duration:T, easing:'ease-in', fill:'forwards' });
+        s1.animate([{opacity:.6},{opacity:0}], { duration:T, easing:'ease-out', fill:'forwards' });
+        a.onfinish = ()=>{
+          k++;
+          if(k < seq.length-1){ step(); return; }
+          cube.remove(); if(!--live) layer.remove();
+          if(gen!==startCubeRoll.gen || !el.isConnected) return;
+          // lands a little past its slot (the way you flicked), rocks on the edge it rolled over, then nestles flat
+          const sg = turn > 0 ? 1 : -1, tilt = Math.random()*4 - 2, P = 'perspective(400px)';
+          el.animate([
+            { transform:`${P} translate(${v[0]*-2}px, ${v[1]*-2}px) ${ax}(${8*sg}deg) rotate(${tilt}deg)` },
+            { transform:`${P} translate(${v[0]*3}px, ${v[1]*3}px) ${ax}(${-3*sg}deg) rotate(${-tilt*.5}deg)`, offset:.4 },
+            { transform:`${P} translate(${-v[0]}px, ${-v[1]}px) ${ax}(${sg}deg) rotate(${tilt*.2}deg)`, offset:.72 },
+            { transform:`${P} translate(0,0) ${ax}(0deg) rotate(0deg)` }], { duration:300, easing:'ease-out' });
+        };
+      };
+      step();
+    }, delay);
+    if(el.classList.contains('glint-strong')) el.style.setProperty('--glint-delay', Math.round(delay + turns*T + 200)+'ms');
+  });
+  return Math.round(settled);
 }
 function scrambleHint(){
   const w = document.querySelector('.tray-wrap'); if(!w) return;

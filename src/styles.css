@@ -3708,3 +3708,13 @@ body.pc #clear-path-btn:not(.disabled)::before{ content:'Bksp'; }
 body.pc.pad #resolve-btn::before{ content:'Y'; border-radius:50%; background:#d9a520; color:#241c10; }
 body.pc.pad #ability-btn:not(.disabled)::before{ content:'X'; border-radius:50%; background:#3f7fd0; color:#fff; }
 body.pc.pad #clear-path-btn:not(.disabled)::before{ content:none; }
+
+/* ==== Dice roll (Nov 13, option G): 3D cubes made by startCubeRoll (render.js), one per die, in a layer inside #tray */
+.tray-wrap .tray{ position:relative; }
+#tray > .roll-layer{ position:absolute; inset:0; pointer-events:none; z-index:2; }
+#tray .roll-cube{ position:absolute; perspective:400px; }
+#tray .roll-box{ position:absolute; inset:0; transform-style:preserve-3d; }
+#tray .roll-face{ position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+#tray .roll-face > .die{ position:absolute !important; inset:0 !important; width:100% !important; height:100% !important; margin:0 !important; animation:none !important; transition:none !important; }
+#tray .roll-face > .die *{ animation:none !important; }
+#tray .roll-shade{ position:absolute; inset:0; background:#0c0705; opacity:0; border-radius:9px; }
