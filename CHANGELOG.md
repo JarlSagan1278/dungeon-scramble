@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.42.115 (Nov 14, 2026)
+PC layout fixes from Jeremy's review (phones unchanged):
+- The route and the room now share one framed panel, the same brown frame as the dice box, and both panels are exactly the same height at every window size (checked at 1280x800 to 2560x1440). The route sits a little above the doorway arch instead of under its stones.
+- Kill impact frame: in the enlarged room it was drawn at phone size in the top-left corner; it now covers the whole room like on the phone.
+- Hover caption: the die's six faces are bigger and full strength (they were faded, with small icons); the face showing has a thicker gold ring, and the strip always has room for a die's full caption.
+- Door choices (the room door and the fork's two doors) are centered on the combat panel, and stay centered after the layout settles or the window is resized.
+
 ## 1.42.114 (Nov 14, 2026)
 - PC layout fix: the Equip window was taller than the screen, so Keep in Pocket and Suggest sat below the fold (the window scrolled). On PC it is now side by side (the New/Out rows and the buttons on the left, Your Tray on the right) and sits in the middle of the screen like the other windows. Phones unchanged.
 - check.js pc: the Equip window fits with its buttons on screen at 1920x1080 and 1280x800.

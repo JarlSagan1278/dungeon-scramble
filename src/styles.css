@@ -3688,9 +3688,17 @@ body.pc #tray > .die.blank::before{ display:none; }
 /* the room sits at the top of its column; the hover panel takes the strip under it */
 body.pc #app:has(> #enc-panel) > #enc-panel{ align-self:start; }
 body.pc #enc-panel > #room-floor{ -webkit-mask-image:linear-gradient(to bottom, #000 82%, transparent); mask-image:linear-gradient(to bottom, #000 82%, transparent); }
+/* Nov 14 (Jeremy: the route and the room need one background, like the tray has; the arch covered the route): the left
+   column gets the tray panel's own frame (a grid item behind route + room), the route and room sit a little inside it,
+   and the route keeps clear of the arch above the doorway */
+body.pc #app:has(> #enc-panel)::before{ content:''; grid-column:1; grid-row:1 / 3; align-self:stretch; justify-self:stretch; z-index:0; background:rgb(51,32,15); border:2px solid #0c0705; border-radius:calc(12px * var(--pc-zt, 2)); box-sizing:border-box; }
+body.pc #app:has(> #enc-panel) > .route-float, body.pc #app:has(> #enc-panel) > #enc-panel, body.pc #app:has(> #enc-panel) > .tray-panel{ position:relative; z-index:1; }
+body.pc #app:has(> #enc-panel) > .route-float{ box-sizing:border-box; padding:6px 8px 9px !important; }
+body.pc #app:has(> #enc-panel) > #enc-panel{ box-sizing:border-box; padding:0 6px 6px !important; margin:0 !important; }
+body.pc #app:has(> #enc-panel) > .tray-panel{ align-self:stretch; }
 /* the hover caption (Nov 13, Jeremy: too present, too much blank space): a quiet strip as tall as what it says */
 #pc-hover{ position:fixed; z-index:20; box-sizing:border-box; display:flex; align-items:center; background:rgba(12,7,5,.5); border-radius:12px; overflow:hidden; }
-#pc-hover .pch-in{ zoom:var(--pc-zh, 1.4); display:flex; align-items:center; gap:12px; width:100%; padding:3px 10px; box-sizing:border-box; color:var(--parchment); }
+#pc-hover .pch-in{ zoom:var(--pc-zh, 1.4); display:flex; align-items:center; gap:12px; width:100%; padding:6px 12px; box-sizing:border-box; color:var(--parchment); }
 #pc-hover .pch-idle{ align-items:center; }
 #pc-hover .pch-idle .pch-text{ text-align:center; font-size:11.5px; }
 #pc-hover[hidden]{ display:none; }
@@ -3703,8 +3711,12 @@ body.pc #enc-panel > #room-floor{ -webkit-mask-image:linear-gradient(to bottom, 
 #pc-hover .pch-text i{ color:var(--parchment-dim); }
 #pc-hover .pch-idle .pch-text{ color:var(--parchment-dim); }
 #pc-hover .faces-tiles{ display:flex; gap:3px; }
-#pc-hover .mini-face{ width:34px; height:34px; opacity:.62; }
-#pc-hover .mini-face.pch-cur{ opacity:1; outline:2px solid var(--gold); outline-offset:1px; }
+/* Nov 14 (Jeremy: hard-to-read icons): the faces drawn like the Equip window's face row (dark icon on the face's own colour,
+   full strength); the face showing gets the gold ring */
+#pc-hover .mini-face{ width:48px; height:48px; opacity:1; border-radius:9px; }
+#pc-hover .mini-face .icon-svg{ background:transparent !important; box-shadow:none !important; margin:0 !important; width:30px !important; height:30px !important; }
+#pc-hover .mini-face small{ font-size:10px !important; margin-top:0; }
+#pc-hover .mini-face.pch-cur{ opacity:1; outline:3px solid var(--gold); outline-offset:2px; }
 /* the cursor (keyboard arrows / controller): a gold ring around what A or Space will press */
 #pc-cursor{ position:fixed; z-index:400; pointer-events:none; box-sizing:border-box; border:4px solid var(--gold); border-radius:14px;
   box-shadow:0 0 0 3px var(--line), inset 0 0 0 2px var(--line); animation:pc-cursor-breathe 1.2s ease-in-out infinite; transition:left .07s ease-out, top .07s ease-out, width .07s ease-out, height .07s ease-out; }

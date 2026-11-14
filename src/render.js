@@ -1414,6 +1414,18 @@ function forkMid(){ const a = (pcMode() && document.querySelector('#app > #enc-p
   return Math.max(110, Math.min(window.innerHeight-110, r.top + r.height/2)); }
 // PC layout: doors (the room door, the fork's two) stand in the room, not in the middle of the window over the tray
 function pcRoomCenterX(){ const r = pcMode() && document.querySelector('#app > #enc-panel'); if(!r) return null; const b = r.getBoundingClientRect(); return b.left + b.width/2; }
+// Nov 14 (Jeremy: the doors should be centered on the combat panel): the doors are re-centered on the route + room panel
+// after every draw and resize (they were placed once, before the layout settled)
+function pcCombatCenter(){
+  if(!pcMode()) return null;
+  const ro = document.querySelector('#app > .route-float'), rm = document.querySelector('#app > #enc-panel'); if(!rm) return null;
+  const a = rm.getBoundingClientRect(), t = ro ? ro.getBoundingClientRect().top : a.top;
+  return { x: a.left + a.width/2, y: (t + a.bottom)/2 };
+}
+function pcPlaceDoors(){
+  const c = pcCombatCenter(); if(!c) return;
+  ['room-callout','fork-callout','fork-ghost'].forEach(id=>{ const n = document.getElementById(id); if(n && !n.classList.contains('picking')){ n.style.left = c.x+'px'; n.style.top = c.y+'px'; } });
+}
 function removeForkCallout(){ ['fork-callout','fork-scrim','fork-ghost'].forEach(id=>{ const n=document.getElementById(id); if(n) n.remove(); }); }
 function syncForkCallout(){
   if(!S || !S.forkChoice){ removeForkCallout(); return; }
@@ -1426,7 +1438,7 @@ function syncForkCallout(){
   const ghost = el(`<div id="fork-ghost" aria-hidden="true"><div class="rc-door"><div class="rc-arch"><div class="rc-leaf"></div></div><div class="rc-sign"><div class="rc-plaque"><span>?</span></div><div class="rc-kind">Enemy</div></div><div class="rc-tap">tap to enter</div></div></div>`);
   document.body.appendChild(scrim); document.body.appendChild(ghost); document.body.appendChild(node);
   node.style.top = mid+'px'; ghost.style.top = mid+'px';
-  { const cx = pcRoomCenterX(); if(cx!=null){ node.style.left = cx+'px'; ghost.style.left = cx+'px'; } }
+  pcPlaceDoors();
   node.querySelectorAll('.fork-door').forEach(b=>{
     b.onkeydown = ev=>{ if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); b.click(); } };
     b.onclick = ()=>{
@@ -2842,7 +2854,7 @@ function showRoomCallout(fx, onDismiss){
   // Own slot (not the shared #fx-stack toasts/equip notices use): fixed at the vertical middle of the game UI.
   document.body.appendChild(node);
   node.style.top = forkMid()+'px'; // the door's vertical middle matches the fork's, so a picked fork door glides into its place
-  { const cx = pcRoomCenterX(); if(cx!=null) node.style.left = cx+'px'; }
+  pcPlaceDoors();
   const dismiss = ()=>{
     if(scrim.parentNode) scrim.parentNode.removeChild(scrim);
     if(BOSS_DROP_PENDING) setTimeout(bossDropIn, 120);
@@ -3475,7 +3487,9 @@ function impactFrames(big){
   const fig = document.querySelector('#enc-panel .fo-enemy .fo-fig'), card = document.querySelector('#enc-panel .enc-card');
   if(!fig || !card) return;
   const art = fig.querySelector('img') || fig.querySelector('.fo-img') || fig;
-  const r = art.getBoundingClientRect(), c = card.getBoundingClientRect();
+  // everything is measured in the card's own px (the PC layout zooms the room, Nov 14): screen px / zoom
+  const z = card.currentCSSZoom || 1, R0 = art.getBoundingClientRect(), C0 = card.getBoundingClientRect();
+  const c = { left:0, top:0, width:C0.width/z, height:C0.height/z }, r = { left:(R0.left - C0.left)/z, top:(R0.top - C0.top)/z, width:R0.width/z, height:R0.height/z };
   if(!r.width || !c.width) return;
   const cx = r.left + r.width/2 - c.left, cy = r.top + r.height*0.5 - c.top, R = Math.hypot(c.width, c.height);
   let lines = '';
@@ -3485,7 +3499,11 @@ function impactFrames(big){
     lines += `<polygon points="${p(a-w, R)} ${p(a+w, R)} ${p(a, r0)}"/>`;
   }
   const ov = document.createElement('div'); ov.className = 'impact-frame';
-  ov.style.cssText = `left:${c.left}px;top:${c.top}px;width:${c.width}px;height:${c.height}px;--ifx:${(cx/c.width*100).toFixed(1)}%;--ify:${(cy/c.height*100).toFixed(1)}%;` + (card.style.clipPath ? `clip-path:${card.style.clipPath};` : '');
+  // on the phone the frame is fixed over the card; in a zoomed room it lives inside the room panel, so it zooms with it
+  const host = z !== 1 && card.offsetParent ? card.offsetParent : null;
+  let ox = C0.left, oy = C0.top;
+  if(host){ ox = 0; oy = 0; let n = card; while(n && n !== host){ ox += n.offsetLeft; oy += n.offsetTop; n = n.offsetParent; } }
+  ov.style.cssText = `${host?'position:absolute;':''}left:${ox}px;top:${oy}px;width:${c.width}px;height:${c.height}px;--ifx:${(cx/c.width*100).toFixed(1)}%;--ify:${(cy/c.height*100).toFixed(1)}%;` + (card.style.clipPath ? `clip-path:${card.style.clipPath};` : '');
   ov.innerHTML = `<svg viewBox="0 0 ${c.width.toFixed(1)} ${c.height.toFixed(1)}" width="100%" height="100%" aria-hidden="true">${lines}</svg>`;
   let sil = null;
   if(art.tagName === 'IMG'){
@@ -3494,7 +3512,7 @@ function impactFrames(big){
     sil.style.cssText = `left:${r.left-c.left}px;top:${r.top-c.top}px;width:${r.width}px;height:${r.height}px;--flip:${flip?-1:1};`;
     ov.appendChild(sil);
   }
-  document.body.appendChild(ov);
+  (host || document.body).appendChild(ov);
   const steps = big ? [['if-a',0],['if-out',190],[null,400]] : [['if-a',0],['if-out',110],[null,300]]; // no reversed frame (too intense, Jeremy Nov 4)
   steps.forEach(([cls,t])=> setTimeout(()=>{
     if(!cls){ if(ov.parentNode) ov.parentNode.removeChild(ov); return; }
@@ -5212,15 +5230,17 @@ function pcFitFight(){
   if(!pcMode()) return;
   const W = window.innerWidth, H = window.innerHeight, q = s=> document.querySelector('#app > '+s);
   const ro = q('.route-float'), rm = q('#enc-panel'), tr = q('.tray-panel');
-  const hRoute = ro ? ro.offsetHeight : 51, hRoom = rm ? rm.offsetHeight : 285, hTray = tr ? tr.offsetHeight : 381;
-  const pad = Math.round(Math.max(12, H*0.018)), gap = Math.round(Math.max(24, W*0.018)), foot = Math.round(Math.max(48, Math.min(78, H*0.07)));
+  // the tray stretches to the column's height (CSS), so its own height is read with the stretch off for a moment
+  let hTray = 381; if(tr){ tr.style.alignSelf = 'start'; hTray = tr.offsetHeight; tr.style.removeProperty('align-self'); }
+  const hRoute = ro ? ro.offsetHeight : 51, hRoom = rm ? rm.offsetHeight : 285;
+  const pad = Math.round(Math.max(12, H*0.018)), gap = Math.round(Math.max(24, W*0.018)), foot = Math.round(Math.max(80, Math.min(104, H*0.09))); // room for the hover caption at its tallest (a die: name + six faces)
   // left column = (route + room) * zr, right column = tray * zt, equal heights; widths 379 * (zr + zt) + gap fit the window
   const k = hTray / (hRoute + hRoom); // zr = zt * k
   const zt = Math.min((H - 2*pad - foot) / hTray, (W - 48 - gap) / (379 * (1 + k)));
   const zr = zt * k;
   const st = document.body.style, set = (n, v)=>{ if(st.getPropertyValue(n) !== v) st.setProperty(n, v); };
   set('--pc-zt', zt.toFixed(3)); set('--pc-zr', zr.toFixed(3)); set('--pc-zroute', zr.toFixed(3));
-  set('--pc-pad', pad+'px'); set('--pc-gap', gap+'px'); set('--pc-foot', foot+'px'); set('--pc-zh', Math.max(1, Math.min(1.8, foot/46)).toFixed(3));
+  set('--pc-pad', pad+'px'); set('--pc-gap', gap+'px'); set('--pc-foot', foot+'px'); set('--pc-zh', Math.max(0.95, Math.min(1.5, (foot - 8)/80)).toFixed(3)); // a die's caption is ~80 px tall at zoom 1
 }
 function applyPcMode(){
   const W = window.innerWidth, H = window.innerHeight;
@@ -5285,6 +5305,7 @@ function pcHoverSync(){
   const el = pcHoverEl(), room = pcMode() ? document.querySelector('#app > #enc-panel') : null, tray = room && document.querySelector('#app > .tray-panel');
   if(!room || !tray){ el.hidden = true; return; }
   const r = room.getBoundingClientRect(), t = tray.getBoundingClientRect(), top = Math.max(r.bottom, t.bottom) + 8;
+  pcPlaceDoors();
   el.hidden = false; el.style.left = Math.round(r.left)+'px'; el.style.width = Math.round(t.right - r.left)+'px'; el.style.top = Math.round(top)+'px';
   el.style.maxHeight = Math.max(30, Math.round(window.innerHeight - top - 6))+'px';
   pcHoverRender();
