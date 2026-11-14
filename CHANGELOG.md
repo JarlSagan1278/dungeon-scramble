@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.136 (Nov 14, 2026)
+- Loot on the hero (Jeremy picked B + C of the proposals): every loot die has a slot: back (weapons and shields, behind the hero over a shoulder), ground (potions, food, boxes, gear at the feet) or float (charms, cards, gadgets bobbing by the head). The rarest item you own per slot shows on the hero in fights and on the victory stage (ground shows two); not at camp, where the hero rests unencumbered. Placed in the hero's own box, so it fits all 48 portraits with no per-portrait work. The victory trophies show the rest of your loot (nothing twice). The 60 slot tags are Claude's first draft (LOOT_SLOT in assets.js) for Jeremy to correct.
+- When a loot die's face plays in a turn, its item flashes up beside the hero with a gold burst.
+
 ## 1.42.135 (Nov 14, 2026)
 - Chips audit (Jeremy: the Run Summary pills looked web-app-like). A script listed every visible thin-outlined or flat pill-shaped element on 13 screens. The Run Summary is now a grid of stat tiles like the run card's (gold number over a small label, chunky outline and drop shadow), with your relics as gems underneath; setup's depth rows, the "No wins yet" depth badge, the Origin Relic Earned card and the class Skill icon get the toy outline and drop shadow instead of thin 1 px lines.
 
