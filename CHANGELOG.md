@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.132 (Nov 14, 2026)
+- PC layout: each pop-up window is enlarged as far as it fits the screen (up to 1.9x), measured from its own content, and refitted when its content changes and on resize. At Steam Deck size the loot pick-one window, relic choice, tutorial, Records, credits and Back Pocket were drawn at their smallest; they now fill the screen. Long scrolling windows (Codex, Settings, relic list) stay at the base size.
+
 ## 1.42.131 (Nov 14, 2026)
 - Momentary scrollbars removed (Jeremy: the loot choices twitched and the window flashed a scrollbar when moving between them). Cause: the PC cursor's highlight set its own animation and shadow, which replaced the element's own, so a loot card's settle animation replayed when the cursor left it, poking past the window. The cursor is now a plain outline that leaves an element's own look alone.
 - Audit of every scrolling box (a script opened every window and screen at phone and Steam Deck sizes with animations running and sampled every 25 ms): boxes that scroll up and down no longer scroll sideways (browsers allow it by default, so a bounce or wiggle flashed a horizontal bar: windows, Codex, Records, lists, log, depth panel, end-screen details); the keep-a-die list after a defeat no longer scrolls (its dice's wiggle flashed a bar); the loot window keeps scrolling on very small screens but never shows a bar.

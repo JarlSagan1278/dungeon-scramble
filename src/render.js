@@ -5381,6 +5381,26 @@ window.addEventListener('gamepadconnected', ev=>{
   try{ if(pcMode() && typeof showToast==='function') showToast('Controller connected: ' + String(ev.gamepad && ev.gamepad.id || '').slice(0,40)); }catch(e){}
   const st = document.getElementById('pc-pad-status'); if(st) st.innerHTML = pcPadStatusText();
 });
+// Nov 14 (Steam Deck, 1024x640: the loot and pick-one windows were tiny): in PC mode each pop-up window is enlarged as far
+// as it fits the screen (up to 1.9x), from its own content size; long scrolling windows (Codex, Records) stay at the base
+// size. Recomputed when a window opens, when its content changes (the loot chest opening into choices) and on resize.
+function pcFitModal(ov){
+  if(!pcMode() || !ov || !ov.isConnected) return;
+  const m = ov.querySelector(':scope > .modal'); if(!m) return;
+  const base = parseFloat(document.body.style.getPropertyValue('--pc-zm')) || 1.6;
+  const w = m.offsetWidth, h = m.scrollHeight; if(!w || !h) return;
+  const z = Math.max(base, Math.min(1.9, (window.innerHeight - 28) / h * 0.95, (window.innerWidth - 48) / w * 0.95)); // 5% spare: content reflows a little at a new size
+  const v = z.toFixed(3); if(ov.style.getPropertyValue('--pc-zm') !== v) ov.style.setProperty('--pc-zm', v);
+}
+function pcFitModals(){ document.querySelectorAll('body > .modal-overlay').forEach(pcFitModal); }
+(function watchModals(){
+  const seen = new WeakSet();
+  const attach = ov=>{ if(seen.has(ov)) return; seen.add(ov); let q = 0;
+    new MutationObserver(()=>{ if(!q) q = requestAnimationFrame(()=>{ q = 0; pcFitModal(ov); }); }).observe(ov, {childList:true, subtree:true});
+    requestAnimationFrame(()=> pcFitModal(ov)); };
+  new MutationObserver(muts=>{ muts.forEach(mu=> mu.addedNodes.forEach(n=>{ if(n.nodeType===1 && n.classList.contains('modal-overlay')) attach(n); })); }).observe(document.body, {childList:true});
+  window.addEventListener('resize', ()=> requestAnimationFrame(pcFitModals));
+})();
 function applyPcMode(){
   const W = window.innerWidth, H = window.innerHeight;
   const on = pcWanted() && pcFits();
