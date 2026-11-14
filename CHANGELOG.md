@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.120 (Nov 14, 2026)
+- The dice box is now a strapped chest seen slightly from above (Jeremy's design, mockup https://claude.ai/artifact/AJBD5RJxY15cD9vV4e8z3T): the tops of the walls, the inside of the back and side walls, and the front of the box passing just in front of the bottom row of dice; a riveted iron band across the front with strips down the corners; the lid's straps carried on down the front and clipped over the back wall; the padlock in front. The lid is a barrel lid (its boards curve round the dome) and overhangs the box slightly. Dimmed dice are solid instead of see-through. Drawn at the box's own size on every screen (phones, PC).
+- check.js morph: leaves out the layers that fast redraws keep on purpose (chest art, dice roll) when comparing with a fresh draw.
+
 ## 1.42.119 (Nov 14, 2026)
 - Gag stickers on the dice box lid are much more common (Jeremy): 4 rooms in 10 now get one (was 1 in 10).
 

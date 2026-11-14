@@ -289,10 +289,11 @@ function render(){
   if(S.screen==='unlock'){ clearPathTrail(); renderUnlock(); pcFitCard(); maybeAutosave(); maybeScreenTransition('victory'); return; }
   if(S.screen==='gameover'){ clearPathTrail(); renderGameOver(); pcFitCard(); maybeScreenTransition('gameover'); return; }
   if(S.screen==='camp'){ clearPathTrail(); renderCamp(); pcFitCamp(); tuckCampCog(); maybeAutosave(); maybeScreenTransition('camp'); return; }
-  if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); decorateArch(); maybeAutosave(); maybeScreenTransition('shrine'); syncForkCallout(); return; }
+  if(S.screen==='shrine'){ clearPathTrail(); renderShrineEncounter(); syncChestArt(); decorateArch(); maybeAutosave(); maybeScreenTransition('shrine'); syncForkCallout(); return; }
   placeVs._inRender = true;
   try{ renderGame(); } finally { placeVs._inRender = false; }
   pcFitFight();
+  syncChestArt();
   // Nov 4 (speed pass): measure everything first, write after -- the chips are fitted while the layout placeVs already
   // forced is still clean, the arch decoration measures before it writes, and the VS mark's position is applied last.
   fitFoChips();
@@ -895,6 +896,68 @@ const CHEST_TRIM_STATIC = (()=>{
   const lock='<svg viewBox="0 0 64 58" width="58" height="52">'+g+'<path class="ch-shackle" d="M14 6 Q32 -2 50 6 L50 18 L14 18Z" fill="url(#chMg)" stroke="#0c0705" stroke-width="2.4" stroke-linejoin="round"/><path d="M6 16 H58 Q60 16 60 19 V40 Q60 54 32 55 Q4 54 4 40 V19 Q4 16 6 16Z" fill="url(#chLg)" stroke="#0c0705" stroke-width="2.6" stroke-linejoin="round"/><path d="M9 21 H55 V30" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="2" stroke-linecap="round"/><circle cx="32" cy="28" r="5" fill="#0c0705"/><path d="M32 31 L29 43 H35Z" fill="#0c0705"/><clipPath id="chLockClip"><path d="M6 16 H58 Q60 16 60 19 V40 Q60 54 32 55 Q4 54 4 40 V19 Q4 16 6 16Z"/></clipPath><g clip-path="url(#chLockClip)"><g class="ch-shine"><rect x="-26" y="0" width="12" height="60" fill="#fff" opacity=".7" transform="skewX(-20)"/></g></g><path d="M6 16 H58 Q60 16 60 19 V40 Q60 54 32 55 Q4 54 4 40 V19 Q4 16 6 16Z" fill="none" stroke="#0c0705" stroke-width="2.6" stroke-linejoin="round"/></svg>';
   return {corners:'<div class="cc tl">'+corner+'</div><div class="cc tr">'+corner+'</div><div class="cc bl">'+corner+'</div><div class="cc br">'+corner+'</div>', lock};
 })();
+// Dice box as a strapped chest seen slightly from above (Nov 14, Jeremy; mockup https://claude.ai/artifact/AJBD5RJxY15cD9vV4e8z3T):
+// the wall tops, the inner faces of the back and side walls, the front wall's outer face (passing just in front of the
+// bottom row of dice), an iron band across the front's top edge with strips down the corners, the lid's straps carried on
+// down the front and clipped over the back wall's top edge, and the game's padlock in front. Drawn as SVG at the box's
+// measured size (the tray changes size with the screen), 3 px below the box frame, in layers: behind the dice (inside
+// #tray), the back rim above them, and the front over them. The layers are data-morph-keep, so fast redraws keep them;
+// syncChestArt() rebuilds them only when the box's size changes or a full redraw removed them.
+function chestArtSVGs(W, H, F0x, F1x, F0y, F1y){
+  const O = 'stroke="#0c0705" stroke-width="2" stroke-linejoin="round"';
+  const defs = `<defs>
+ <linearGradient id="caBack" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5c3519"/><stop offset="1" stop-color="#8a5629"/></linearGradient>
+ <linearGradient id="caSideL" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5a3317"/><stop offset="1" stop-color="#7f4c22"/></linearGradient>
+ <linearGradient id="caSideR" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#5a3317"/><stop offset="1" stop-color="#7f4c22"/></linearGradient>
+ <linearGradient id="caFront" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8f5f33"/><stop offset="1" stop-color="#6c4322"/></linearGradient>
+ <linearGradient id="caUnder" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0c0705" stop-opacity=".85"/><stop offset="1" stop-color="#0c0705" stop-opacity="0"/></linearGradient>
+ <linearGradient id="caRim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e0a463"/><stop offset="1" stop-color="#b97b42"/></linearGradient>
+ <linearGradient id="caSt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a9b3bc"/><stop offset="1" stop-color="#4a5560"/></linearGradient></defs>`;
+  const rivet = (x,y,r=1.8)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#20262b"/><circle cx="${x-0.5}" cy="${y-0.6}" r="${r*0.45}" fill="#d5dce2"/>`;
+  const R = 4, yT = -2, FWB = F0y+7, FB = F1y-8, FT = F1y-4;
+  const sx = x=> F0x + (x-R)*(F1x-F0x)/(W-2*R);
+  const strapX = [1 + 0.18*(W-2), W-1 - 0.18*(W-2) - 15]; // under the lid's own straps (left/right 18%)
+  // behind the dice: back wall, side walls, wall tops, the back corner caps and the straps clipped over the back edge
+  let u = `<path d="M${R} ${yT+R} H${W-R} L${F1x} ${FWB} H${F0x} Z" fill="url(#caBack)" ${O}/>`;
+  for(let x=40;x<W;x+=46) u += `<path d="M${x} ${yT+R+1} L${sx(x)} ${FWB-1}" stroke="#2a170a" stroke-width="1"/>`;
+  u += `<path d="M${R} ${yT+R} L${F0x} ${FWB} V${FB} L${R} ${FB} Z" fill="url(#caSideL)" ${O}/>`;
+  u += `<path d="M${W-R} ${yT+R} L${F1x} ${FWB} V${FB} L${W-R} ${FB} Z" fill="url(#caSideR)" ${O}/>`;
+  u += `<path d="M0 ${yT} H${W} V${FT} H0 Z M${R} ${yT+R} V${FB} H${W-R} V${yT+R} Z" fill="url(#caRim)" fill-rule="evenodd" ${O}/>`;
+  u += `<path d="M${F0x} ${FB} V${FWB} H${F1x} V${FB}" fill="none" stroke="#0c0705" stroke-width="1.6" opacity=".7"/><path d="M${R} ${FB} H${W-R}" stroke="#0c0705" stroke-width="2"/>`;
+  strapX.forEach(x=>{ u += `<path d="M${x} ${yT-2} H${x+15} V${yT+R+3} Q${x+7.5} ${yT+R+5} ${x} ${yT+R+3} Z" fill="url(#caSt)" ${O}/>${rivet(x+7.5,yT+1.5)}`; });
+  [[0,1],[W,-1]].forEach(([x,d])=>{ u += `<path d="M${x} ${yT} H${x+d*15} V${yT+R+1} L${x+d*9} ${yT+R+5} V${yT+16} H${x} Z" fill="url(#caSt)" ${O}/>${rivet(x+d*4.5, yT+9)}`; });
+  // in front of the dice: the front wall's outer face, the lid's shadow on it, the straps, the corner strips, the iron band
+  let o = `<ellipse cx="${W/2}" cy="${H+7}" rx="${W/2+6}" ry="7" fill="rgba(0,0,0,.35)"/><rect x="0" y="${FT}" width="${W}" height="${H+3-FT}" fill="url(#caFront)" ${O}/>`;
+  for(let x=31;x<W;x+=32) o += `<rect x="${x}" y="${FT+1}" width="2" height="${H+2-FT}" fill="rgba(0,0,0,.32)"/>`;
+  o += `<rect x="1" y="${FT+1}" width="${W-2}" height="15" fill="url(#caUnder)"/>`;
+  strapX.forEach(x=>{ o += `<rect x="${x}" y="${FT-4}" width="15" height="${H+6-FT}" fill="url(#caSt)" ${O}/>${rivet(x+7.5,FT+5)}${rivet(x+7.5,H-3)}`; });
+  [[0,1],[W,-1]].forEach(([x,d])=>{ o += `<rect x="${Math.min(x,x+d*9)}" y="${FT}" width="9" height="${H+3-FT}" fill="url(#caSt)" ${O}/>${rivet(x+d*4.5, FT+11)}${rivet(x+d*4.5, H-4)}`; });
+  o += `<rect x="0" y="${FT-2}" width="${W}" height="8" fill="url(#caSt)" ${O}/>`; for(let x=8;x<W;x+=26) o += rivet(x, FT+2, 1.5);
+  o += `<rect x="${W/2-12}" y="${FT+3}" width="24" height="16" rx="3" fill="url(#caSt)" ${O}/>${rivet(W/2-7,FT+7.5)}${rivet(W/2+7,FT+7.5)}`;
+  return { defs, under:u, over:o, FT };
+}
+function syncChestArt(){
+  document.querySelectorAll('.tray-wrap.tray-wrap-full').forEach(w=>{
+    const tr = w.querySelector(':scope > .tray'); if(!tr) return;
+    const W = w.offsetWidth, H = w.offsetHeight, bl = w.clientLeft, bt = w.clientTop - 3; // 3 px below the frame (Jeremy)
+    if(!W || !H) return;
+    const F0x = bl + tr.offsetLeft, F1x = F0x + tr.offsetWidth, F0y = w.clientTop + tr.offsetTop, F1y = F0y + tr.offsetHeight;
+    const key = [W,H,F0x,F1x,F0y,F1y].join(',');
+    if(w.dataset.chestKey === key && w.querySelector(':scope > .ca-over') && tr.querySelector(':scope > .ca-under')) return;
+    w.querySelectorAll('.chest-art').forEach(n=> n.remove());
+    const a = chestArtSVGs(W, H, F0x, F1x, F0y, F1y);
+    // each layer gets its own gradient ids: a hidden layer's (display:none, under the lid) would otherwise be the one url(#id) finds, and paint nothing
+    const svg = (cls, z, inner, left, top, extra)=> `<svg class="chest-art ${cls}" data-morph-keep aria-hidden="true" viewBox="-6 -6 ${W+12} ${H+50}" style="left:${left}px;top:${top}px;width:${W+12}px;height:${H+50}px;z-index:${z};${extra||''}">${(a.defs+inner).replace(/id="ca/g, `id="${cls}`).replace(/url\(#ca/g, `url(#${cls}`)}</svg>`;
+    const tx = -tr.offsetLeft - tr.clientLeft, ty = -tr.offsetTop - tr.clientTop;
+    // at the END of #tray: the dice must stay its first children (PC key caps use :nth-child, fast redraws compare them)
+    tr.insertAdjacentHTML('beforeend', svg('ca-under', 0, a.under, -6-bl+tx, -6-bt+ty)
+      + `<div class="chest-art ca-grain-in" data-morph-keep style="left:${tx-bl}px;top:${ty-bt-2}px;width:${W}px;height:${a.FT+2}px"></div>`);
+    w.insertAdjacentHTML('beforeend', `<div class="chest-art ca-grain" data-morph-keep style="left:${-bl}px;right:${-bl}px;top:${a.FT-bt}px;height:${H+3-a.FT}px"></div>`
+      + svg('ca-back', 2, a.under, -6-bl, -6-bt, `clip-path:inset(0 0 ${H+50-17}px 0)`)
+      + svg('ca-over', 3, a.over, -6-bl, -6-bt));
+    w.dataset.chestKey = key;
+  });
+}
 function chestTrimHTML(){
   const age = performance.now() - chestLockFxAt;
   const open = age < 900;
@@ -902,7 +965,7 @@ function chestTrimHTML(){
   try{ if(S.path && S.path.length && !S.transitioning){ ready = pcfTierFor(computePathEffects(S.path).totalDamage) >= 2; } }catch(e){}
   const st = open ? ` style="animation-delay:-${Math.round(age)}ms"` : '';
   // The shackle needs its own delay too, so it is set on the wrapper via a CSS variable
-  return CHEST_TRIM_STATIC.corners + `<div class="chest-lock ${open?'unlock':''} ${ready?'ready':''}" style="--lk-delay:-${open?Math.round(age):0}ms">` + CHEST_TRIM_STATIC.lock + '</div>';
+  return `<div class="chest-lock ${open?'unlock':''} ${ready?'ready':''}" style="--lk-delay:-${open?Math.round(age):0}ms">` + CHEST_TRIM_STATIC.lock + '</div>';
 }
 function campDiceGridHTML(items, type){
   return buildDieStacks(items).map(stack=>campStackTileHTML(stack, type)).join('');
@@ -6081,7 +6144,9 @@ function newAchievementsHTML(newAchievements){
 // Closed chest (Jeremy, Oct 24): until the roll a wooden lid covers the tray; the flick throws it off in the flick's
 // direction, the lock pops and the dice tumble out.
 // Domed lid (Jeremy picked A1, Oct 25): as wide as the chest, rising 26px above it so it covers the top corner brackets.
-const CHEST_LID_HTML = `<div class="chest-lid" id="chest-lid" title="Flick or double-tap to open (or shake your phone)"><i class="strap s1"></i><i class="strap s2"></i><i class="rim"></i></div>`;
+// Barrel lid (Nov 14, Jeremy): boards run left to right round the dome, each seam arching up (strongly near the top,
+// flat at the front) and crowding toward the top; a soft highlight on the upper curve (lid-sheen).
+const CHEST_LID_HTML = `<div class="chest-lid" id="chest-lid" title="Flick or double-tap to open (or shake your phone)"><svg class="lid-seams" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="#0c0705" stroke-opacity=".55" stroke-width="2"><path vector-effect="non-scaling-stroke" d="M0 15.01 Q50 -1.01 100 15.01"/><path vector-effect="non-scaling-stroke" d="M0 20.20 Q50 5.80 100 20.20"/><path vector-effect="non-scaling-stroke" d="M0 26.30 Q50 13.70 100 26.30"/><path vector-effect="non-scaling-stroke" d="M0 33.32 Q50 22.68 100 33.32"/><path vector-effect="non-scaling-stroke" d="M0 41.30 Q50 32.70 100 41.30"/><path vector-effect="non-scaling-stroke" d="M0 50.26 Q50 43.74 100 50.26"/><path vector-effect="non-scaling-stroke" d="M0 60.25 Q50 55.75 100 60.25"/><path vector-effect="non-scaling-stroke" d="M0 71.31 Q50 68.69 100 71.31"/><path vector-effect="non-scaling-stroke" d="M0 84.48 Q50 83.52 100 84.48"/></g></svg><i class="lid-sheen"></i><i class="strap s1"></i><i class="strap s2"></i><i class="rim"></i></div>`;
 // Oct 31 (Jeremy): no class crest; instead a gag sticker on the lid, like a well-travelled crate. 4 rooms in 10 get one
 // (Nov 14, Jeremy: much more common; was 1 in 10), picked per room (same sticker every turn of that room), never in the guided first fight.
 const stkT = (x,y,size,fill,txt,len,font)=>`<text x="${x}" y="${y}" text-anchor="middle" style="font-family:${font==='d'?'var(--font-display)':'var(--font-ui)'};font-weight:${font==='d'?400:800}" font-size="${size}" fill="${fill}"${len?` textLength="${len}" lengthAdjust="spacingAndGlyphs"`:''}>${txt}</text>`;

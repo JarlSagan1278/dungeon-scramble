@@ -3813,3 +3813,26 @@ body.pc .swap-modal > .small-btn-row > button{ width:100%; }
 #tray .roll-face > .die{ position:absolute !important; inset:0 !important; width:100% !important; height:100% !important; margin:0 !important; animation:none !important; transition:none !important; }
 #tray .roll-face > .die *{ animation:none !important; }
 #tray .roll-shade{ position:absolute; inset:0; background:#0c0705; opacity:0; border-radius:9px; }
+
+/* ==== Dice box: strapped chest (Nov 14, Jeremy). The drawing is syncChestArt() (render.js); these place its layers,
+   give it the game's paper grain and worn iron, fit the barrel lid to it, and keep dimmed dice solid (the back wall
+   would show through see-through ones). */
+.tray-wrap.tray-wrap-full{ border-color:transparent !important; }
+.tray-wrap .tray{ overflow:visible; }
+.tray-wrap .tray > .die{ z-index:3; }
+.chest-art{ position:absolute; pointer-events:none; }
+svg.chest-art{ overflow:visible; filter:url(#fx-worn); }
+.tray-wrap:has(.chest-lid) .ca-under, .tray-wrap:has(.chest-lid) .ca-back, .tray-wrap:has(.chest-lid) .ca-grain-in{ display:none; } /* the lid covers the inside */
+.ca-grain-in{ z-index:1; }
+.ca-grain{ z-index:4; }
+.ca-grain-in, .ca-grain{ background:var(--paper-tile) repeat; background-size:110px 110px; mix-blend-mode:soft-light; opacity:.9; }
+.tray-wrap .tray > .die.used{ opacity:1; filter:brightness(.42) saturate(.7) drop-shadow(0 3px 0 #0c0705); }
+#tray:has(.in-path) .die.minion.used{ opacity:1; }
+.tray-wrap .chest-lock{ bottom:-16px; z-index:6; }
+.tray-wrap .chest-lid{ left:-5px; right:-5px; top:-23px; bottom:20px; z-index:5; border-bottom-width:2px; box-shadow:inset 0 3px 0 rgba(255,225,170,.18), 0 3px 4px rgba(0,0,0,.4); }
+.chest-lid .rim{ left:-3px; right:-3px; }
+/* barrel lid */
+.chest-lid{ background:linear-gradient(180deg,#4e2f16 0%,#8a5a2e 10%,#c38d52 24%,#b27c45 36%,#94622f 60%,#6c4322 100%); }
+.chest-lid .lid-seams{ position:absolute; left:0; top:0; width:100%; height:calc(100% - 10px); z-index:0; pointer-events:none; }
+.chest-lid .lid-sheen{ position:absolute; left:0; right:0; top:0; bottom:10px; z-index:2; pointer-events:none; mix-blend-mode:soft-light;
+  background:radial-gradient(ellipse 75% 16% at 50% 21%, rgba(255,240,210,.85), rgba(255,240,210,0) 100%), linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 12%, rgba(0,0,0,0) 60%, rgba(0,0,0,.35) 100%); }

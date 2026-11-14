@@ -54,7 +54,8 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     const orig = window.__origMorph || window.morphHTML; window.__origMorph = orig;
     window.morphHTML = function (el, html) { orig(el, html); res.morphs++;
       const fresh = document.createElement('div'); fresh.innerHTML = html;
-      if (zoneNorm(el.innerHTML) !== zoneNorm(fresh.innerHTML)) res.bad.push(el.id || el.className); };
+      const mine = el.cloneNode(true); mine.querySelectorAll('[data-morph-keep]').forEach(n => n.remove()); // script layers kept on purpose (chest art, dice roll)
+      if (zoneNorm(mine.innerHTML) !== zoneNorm(fresh.innerHTML)) res.bad.push(el.id || el.className); };
     META.lifetime.victories = 3; META.achievements['origin_duo'] = { date: Date.now() }; preGameScreen = 'setup'; S = null; render();
     const clickAll = sel => [...document.querySelectorAll(sel)].forEach(n => n.click());
     clickAll('#origin-tab-row > *'); clickAll('#class-tab-row > *'); clickAll('#boon-scroll > *');
@@ -70,7 +71,8 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     const orig = window.__origMorph || window.morphHTML; window.__origMorph = orig;
     window.morphHTML = function (el, html) { orig(el, html);
       const fresh = document.createElement('div'); fresh.innerHTML = html;
-      if (zoneNorm(el.innerHTML) !== zoneNorm(fresh.innerHTML)) res.bad.push(el.id || el.className); };
+      const mine = el.cloneNode(true); mine.querySelectorAll('[data-morph-keep]').forEach(n => n.remove()); // script layers kept on purpose (chest art, dice roll)
+      if (zoneNorm(mine.innerHTML) !== zoneNorm(fresh.innerHTML)) res.bad.push(el.id || el.className); };
     META.lifetime.victories = 3; newGame('gnome', 'guard'); S.guide = null;
     for (let g = 0; g < 10 && !(S.screen === 'game' && S.encounter); g++) { if (S.screen === 'camp') campLeave(); else advanceRoute(); }
     S.transitioning = false; S.newRoomFx = false; S.needRoll = false; document.querySelectorAll('#room-callout,#room-callout-scrim').forEach(n => n.remove()); render();
