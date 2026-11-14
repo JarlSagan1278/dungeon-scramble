@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.121 (Nov 14, 2026)
+- PC layout on Steam Deck (Jeremy's photos): Chrome at 125% gives a 1024x640 window, and the phone card's 720 px minimum height still applied, so every screen sat 40 px low with its bottom cut off (camp's hint, the hover caption over the room). PC mode drops that minimum; title, setup and camp fill exactly the window.
+- Settings (PC mode) shows which controller the browser reports, or that it sees none; a "Controller connected" note appears when one is found. The game already reads any controller the browser reports; on the Deck, Chrome only gets it with the right Steam and Flatpak settings.
+- check.js pc: title, setup, camp and victory also checked at 1024x640.
+
 ## 1.42.120 (Nov 14, 2026)
 - The dice box is now a strapped chest seen slightly from above (Jeremy's design, mockup https://claude.ai/artifact/AJBD5RJxY15cD9vV4e8z3T): the tops of the walls, the inside of the back and side walls, and the front of the box passing just in front of the bottom row of dice; a riveted iron band across the front with strips down the corners; the lid's straps carried on down the front and clipped over the back wall; the padlock in front. The lid is a barrel lid (its boards curve round the dome) and overhangs the box slightly. Dimmed dice are solid instead of see-through. Drawn at the box's own size on every screen (phones, PC).
 - check.js morph: leaves out the layers that fast redraws keep on purpose (chest art, dice roll) when comparing with a fresh draw.

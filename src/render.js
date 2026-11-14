@@ -3801,6 +3801,7 @@ function openSettingsModal(){
         ${settingsToggleRowHTML('pref-vibration', 'Vibration (phones)', PREFS.vibration!==false)}
         ${settingsToggleRowHTML('pref-flick-roll', 'Flick or shake to roll each turn', PREFS.flickRoll!==false)}
         ${pcFits() ? settingsToggleRowHTML('pref-pc-layout', 'Wide-screen layout', pcWanted()) : ''}
+        ${pcMode() ? `<p class="hint" id="pc-pad-status" style="text-align:left;margin:2px 0 0;">${pcPadStatusText()}</p>` : ''}
         ${PLAYDATA_URL ? settingsToggleRowHTML('pref-share-data', 'Share play data automatically', shareDataPref()==='yes') : ''}
       </div>
       ${hasKeyboardPointer() ? `<p class="hint" style="text-align:left;">Keyboard shortcuts ${infoDot('Enter = Go · Backspace = Clear · 1234/qwer/asdf/zxcv tap a tray die (matches its grid position)')}</p>` : ''}
@@ -5350,6 +5351,17 @@ function pcFitFight(){
   set('--pc-zt', zt.toFixed(3)); set('--pc-zr', zr.toFixed(3)); set('--pc-zroute', zr.toFixed(3));
   set('--pc-pad', pad+'px'); set('--pc-gap', gap+'px'); set('--pc-foot', foot+'px'); set('--pc-zh', Math.max(0.95, Math.min(1.5, (foot - 8)/80)).toFixed(3)); // a die's caption is ~80 px tall at zoom 1
 }
+// Nov 14 (Steam Deck: only the touchscreen worked): say what controller, if any, the browser reports, so a player can
+// tell a game problem from a browser/Steam setting. The browser only lists a pad after one of its buttons is pressed.
+function pcPadStatusText(){
+  let pads = []; try{ pads = [...(navigator.getGamepads ? navigator.getGamepads() : [])].filter(Boolean); }catch(e){}
+  if(!pads.length) return 'Controller: none seen yet. Press a button on it; if this still says none, the browser is not receiving it.';
+  const g = pads[0]; return `Controller: ${String(g.id||'connected').replace(/</g,'&lt;').slice(0,60)} (${g.mapping==='standard'?'standard layout':'non-standard layout'}).`;
+}
+window.addEventListener('gamepadconnected', ev=>{
+  try{ if(pcMode() && typeof showToast==='function') showToast('Controller connected: ' + String(ev.gamepad && ev.gamepad.id || '').slice(0,40)); }catch(e){}
+  const st = document.getElementById('pc-pad-status'); if(st) st.innerHTML = pcPadStatusText();
+});
 function applyPcMode(){
   const W = window.innerWidth, H = window.innerHeight;
   const on = pcWanted() && pcFits();

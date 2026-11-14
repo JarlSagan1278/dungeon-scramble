@@ -91,7 +91,7 @@ const FIGHT = () => { META.lifetime.victories = 3; META.coachSeen = { armsmaster
   out.push((onHold && boon ? 'ok   ' : 'FAIL ') + `controller: the cursor starts on the shrine's Hold button and holding A grants the boon (${JSON.stringify({ onHold, boon })})`);
   await p.close();
   // landscape title, setup, camp and end screens (Nov 13): two columns side by side, all inside the window, no scrolling
-  for (const [w, h] of [[1920, 1080], [1280, 800]]) {
+  for (const [w, h] of [[1920, 1080], [1280, 800], [1024, 640]]) { // 1024x640 = Steam Deck Chrome at 125% (Nov 14)
     p = await open(w, h, true);
     const SCR = {
       title: [() => { preGameScreen = 'title'; S = null; render(); }, '.title-art-wrap', '.title-content'],

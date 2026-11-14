@@ -3804,6 +3804,10 @@ body.pc .swap-modal > .swap-tray-head{ grid-area:h; margin-top:0; }
 body.pc .swap-modal > #swap-list{ grid-area:l; margin:0; }
 body.pc .swap-modal > .small-btn-row{ grid-area:b; align-self:end; flex-direction:column; gap:10px; }
 body.pc .swap-modal > .small-btn-row > button{ width:100%; }
+/* Nov 14 (Steam Deck: Chrome at 125% is 1024x640): the phone card's 720 px minimum height must not apply in PC mode, or a
+   shorter window centres everything 40 px low and cuts off the bottom */
+body.pc .wrap, body.pc #app{ min-height:0 !important; }
+body.pc #app:not(:has(> #enc-panel)):has(> .title-screen-fill), body.pc #app:not(:has(> #enc-panel)):has(> .setup-panel), body.pc #app:not(:has(> #enc-panel)):has(> .panel > .camp-status-card){ height:100vh !important; max-height:100vh; }
 /* ==== Dice roll (Nov 13, option G): 3D cubes made by startCubeRoll (render.js), one per die, in a layer inside #tray */
 .tray-wrap .tray{ position:relative; }
 #tray > .roll-layer{ position:absolute; inset:0; pointer-events:none; z-index:2; }
