@@ -3936,12 +3936,14 @@ body.pc .vic-stage{ height:200px; } body.pc .vic-hero{ height:120px; }
 .fo-player .fo-fig > .fo-img, .vic-hero-wrap > .vic-hero{ position:relative; } /* after the behind layer in page order, so it covers it */
 .hero-gear{ position:absolute; inset:0; pointer-events:none; }
 .hero-gear .hg{ position:absolute; width:auto; max-width:none; filter:drop-shadow(0 2px 0 rgba(12,7,5,.55)); }
-.hero-gear .hg-back{ left:6%; top:-12%; /* behind the left shoulder (Jeremy, Nov 14); the body hides part of it */ transform:rotate(28deg); transform-origin:50% 80%; }
+.hero-gear .hg-back{ left:-6%; top:2%; /* slung diagonally across the back, heavy end beside the shoulder, a little shaded (Jeremy picked A, Nov 14) */ transform:rotate(-42deg); transform-origin:50% 50%; filter:brightness(.78) drop-shadow(0 2px 0 rgba(12,7,5,.55)); }
 .hero-gear .hg-ground{ bottom:-4%; } /* close in, overlapping the feet, not mirror images (Jeremy) */
 .hero-gear .hg-gl{ left:-3%; bottom:-3%; transform:rotate(-9deg); transform-origin:50% 100%; } .hero-gear .hg-gr{ right:1%; bottom:-7%; transform:rotate(7deg); transform-origin:50% 100%; }
 .hero-gear .hg-float{ right:-26%; top:-2%; animation:hg-bob 3.4s ease-in-out infinite; }
 @keyframes hg-bob{ 0%,100%{ transform:translateY(0) rotate(-4deg); } 50%{ transform:translateY(-6%) rotate(4deg); } }
-.reduced-motion .hero-gear .hg-float{ animation:none; }
+.hero-gear .hg-head{ left:50%; top:-30%; transform:translateX(-50%); animation:hg-head-bob 3s ease-in-out infinite; } /* held up above the head (Hataxe, Jeremy) */
+@keyframes hg-head-bob{ 0%,100%{ transform:translateX(-50%) translateY(0); } 50%{ transform:translateX(-50%) translateY(-5%); } }
+.reduced-motion .hero-gear .hg-float, .reduced-motion .hero-gear .hg-head{ animation:none; }
 /* C: the item flashes up beside the hero when its die plays */
 .hero-brandish{ position:absolute; z-index:5; right:-30%; top:2%; width:58%; aspect-ratio:1; pointer-events:none; display:flex; align-items:center; justify-content:center; }
 .hero-brandish img{ position:relative; max-width:80%; max-height:80%; filter:drop-shadow(0 3px 0 rgba(12,7,5,.6)); animation:hb-pop .85s cubic-bezier(.3,1.5,.5,1) both; }

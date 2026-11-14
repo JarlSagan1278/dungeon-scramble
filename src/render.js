@@ -5845,15 +5845,16 @@ function heroGear(){
   const own = [...(S && S.tray || []).map(c=> c && !c.minion && c.die), ...(S && S.backPocket || [])].filter(d=> d && LOOT_ART[d.name] && LOOT_SLOT[d.name]);
   own.sort((a,b)=> (LOOT_RANK[a.cat]??9) - (LOOT_RANK[b.cat]??9));
   const pick = (slot, n)=>{ const out = [], seen = new Set(); own.forEach(d=>{ if(LOOT_SLOT[d.name]===slot && !seen.has(d.name) && out.length<n){ seen.add(d.name); out.push(d); } }); return out; };
-  return { back: pick('back',1)[0], ground: pick('ground',2), float: pick('float',1)[0] };
+  return { back: pick('back',1)[0], ground: pick('ground',2), float: pick('float',1)[0], head: pick('head',1)[0] };
 }
 // Two layers by page order: the back item before the portrait (drawn behind it), the rest after (in front).
 function heroGearHTML(part){
   if(!S) return '';
-  const g = heroGear(), img = (d, cls)=> `<img class="hg ${cls}" src="${LOOT_ART[d.name]}" alt="" title="${d.name}" style="height:${Math.round((LOOT_GEAR_SIZE[d.name]||.3)*100)}%">`;
+  const CAP = {back:.75, ground:.5, float:.45, head:.5};
+  const g = heroGear(), img = (d, cls)=> `<img class="hg ${cls}" src="${LOOT_ART[d.name]}" alt="" title="${d.name}" style="height:${Math.round(Math.min(LOOT_GEAR_SIZE[d.name]||.3, CAP[LOOT_SLOT[d.name]]||.5)*100)}%">`;
   if(part==='back') return g.back ? `<span class="hero-gear hg-behind" aria-hidden="true">${img(g.back,'hg-back').replace(/height:(\d+)%/, (m,h)=>`height:${Math.min(98, Math.round(h*1.35))}%`)}</span>` : ''; // bigger and more central, so it still peeks out (Jeremy)
-  if(!g.ground.length && !g.float) return '';
-  return `<span class="hero-gear" aria-hidden="true">${g.ground[0]?img(g.ground[0],'hg-ground hg-gl'):''}${g.ground[1]?img(g.ground[1],'hg-ground hg-gr'):''}${g.float?img(g.float,'hg-float'):''}</span>`;
+  if(!g.ground.length && !g.float && !g.head) return '';
+  return `<span class="hero-gear" aria-hidden="true">${g.ground[0]?img(g.ground[0],'hg-ground hg-gl'):''}${g.ground[1]?img(g.ground[1],'hg-ground hg-gr'):''}${g.float?img(g.float,'hg-float'):''}${g.head?img(g.head,'hg-head'):''}</span>`;
 }
 function heroBrandish(die){
   if(!die || !LOOT_ART[die.name] || PREFS.reducedMotion) return;

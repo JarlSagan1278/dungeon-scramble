@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.140 (Nov 14, 2026)
+- Hero gear (Jeremy's review): back items are slung diagonally across the back, heavy end beside the left shoulder and a little shaded (they read as hitting the hero's head); the floating item moved to the right.
+- Slots corrected by Jeremy: Hospitaler's Merciful Guillotine, Trained Transposer, Humor-inverter, Maximum Capacitor, Portable RNGenerator to the ground; Aloo'Minium Armor, Axiom of Choice, Glacial Gorget, Phlebotomizer to the back; Winged Boots and the shields (Spiked Shield, Buckler, Thorned Bulwark, Drill Shield) floating; the Hataxe gets its own slot, worn on top of the head. Item sizes are capped by their current slot.
+
 ## 1.42.139 (Nov 14, 2026)
 - Hero gear (Jeremy): the back item is behind the left shoulder (the floating item moves to the right to make room), and both ground items stand a little closer in to the hero.
 
