@@ -3771,6 +3771,17 @@ body.pc .codex-book .codex-spread.one-page{ grid-template-columns:1fr; }
 body.pc .codex-book .codex-spread.one-page .codex-body{ border-right:0; padding-right:0; }
 body.pc .codex-book .codex-spread.one-page .codex-page-pane{ display:none; }
 body.pc .codex-book .cx-card.cx-on{ outline:3px solid #b8752a; outline-offset:1px; }
+/* Equip window (Nov 14): side by side on PC (the compare rows and buttons left, Your Tray right) so it fits without
+   scrolling; bottom sheets sit in the middle of the screen like every other PC window */
+body.pc .modal-overlay.modal-bottom{ align-items:center; }
+body.pc .modal.swap-modal{ max-width:none !important; width:790px; display:grid; grid-template-columns:350px 1fr; column-gap:22px; align-content:start;
+  grid-template-areas:"t t" "c h" "c l" "b l"; grid-template-rows:auto auto 1fr auto; }
+body.pc .swap-modal > h2{ grid-area:t; }
+body.pc .swap-modal > .swap-compare{ grid-area:c; align-self:start; }
+body.pc .swap-modal > .swap-tray-head{ grid-area:h; margin-top:0; }
+body.pc .swap-modal > #swap-list{ grid-area:l; margin:0; }
+body.pc .swap-modal > .small-btn-row{ grid-area:b; align-self:end; flex-direction:column; gap:10px; }
+body.pc .swap-modal > .small-btn-row > button{ width:100%; }
 /* ==== Dice roll (Nov 13, option G): 3D cubes made by startCubeRoll (render.js), one per die, in a layer inside #tray */
 .tray-wrap .tray{ position:relative; }
 #tray > .roll-layer{ position:absolute; inset:0; pointer-events:none; z-index:2; }

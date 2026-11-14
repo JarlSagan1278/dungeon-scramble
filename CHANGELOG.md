@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.114 (Nov 14, 2026)
+- PC layout fix: the Equip window was taller than the screen, so Keep in Pocket and Suggest sat below the fold (the window scrolled). On PC it is now side by side (the New/Out rows and the buttons on the left, Your Tray on the right) and sits in the middle of the screen like the other windows. Phones unchanged.
+- check.js pc: the Equip window fits with its buttons on screen at 1920x1080 and 1280x800.
+
 ## 1.42.113 (Nov 14, 2026)
 - PC layout: the Codex opens as a two-page book. The list stays on the left page and the entry you pick reads on the right page (the chosen card is outlined), so you can flip through entries without going back and forth. Tabs with nothing to open (Key, or before anything is discovered) use the whole book. Phones unchanged.
 - check.js pc: the Codex book check.

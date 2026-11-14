@@ -109,6 +109,14 @@ const FIGHT = () => { META.lifetime.victories = 3; META.coachSeen = { armsmaster
     }
     await p.close();
   }
+  // Equip window (Nov 14): side by side and whole on screen (its buttons used to sit below the fold), at both sizes
+  for (const [w, h] of [[1920, 1080], [1280, 800]]) {
+    p = await open(w, h, true); await p.evaluate(FIGHT); await p.evaluate(() => { S.encounter.curHealth = 0; onEncounterDefeated(); chooseLoot(S.lootChoice.options[0]); }); await p.waitForTimeout(700);
+    const eq = await p.evaluate(() => { const m = document.querySelector('.swap-modal').getBoundingClientRect(), b = document.getElementById('swap-go').getBoundingClientRect(), c = document.querySelector('.swap-compare').getBoundingClientRect(), l = document.getElementById('swap-list').getBoundingClientRect();
+      return { fits: m.top >= 0 && m.bottom <= innerHeight, btn: b.bottom <= innerHeight && b.top >= 0, side: c.right <= l.left, scroll: document.querySelector('.swap-modal').scrollHeight <= document.querySelector('.swap-modal').clientHeight + 1 }; });
+    out.push((eq.fits && eq.btn && eq.side && eq.scroll ? 'ok   ' : 'FAIL ') + `${w}x${h} Equip window: compare left, tray right, buttons on screen, no scrolling (${JSON.stringify(eq)})`);
+    await p.close();
+  }
   // Codex as an open book (Nov 14): opening an entry keeps the list on the left page and shows the entry on the right
   p = await open(1920, 1080, true); await p.evaluate(() => { preGameScreen = 'title'; S = null; render(); openCodexModal('dice'); }); await p.waitForTimeout(400);
   await p.locator('.cx-card[data-page]').first().click(); await p.waitForTimeout(300);
