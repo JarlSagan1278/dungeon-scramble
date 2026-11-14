@@ -3252,6 +3252,28 @@ function playNoiseBurst(ctx, startTime, dur, gainPeak, filterType, filterFreq, f
 // varied pitch -- irregular gaps and per-knock randomness read as several
 // loose objects colliding, where evenly-spaced identical clicks read as a
 // machine. Knocks taper off in both volume and spacing as they "settle".
+// Kill impact (Nov 14, Jeremy: no sound played at the impact frame of a plain kill): the blow itself, landing with the ink
+// panel: a fast downward noise slash, a deep thump and a sharp crack; heavier for bosses and overkills. Plays even when
+// Reduce Motion skips the frame (the sound is not motion).
+function playKillImpact(big){
+  if(!PREFS.sound) return;
+  const ctx = getAudioCtx(); if(!ctx) return;
+  const now = ctx.currentTime + 0.005, out = sfxOut(ctx), k = big ? 1.3 : 1;
+  // slash: band-passed noise sweeping down
+  const len = Math.floor(ctx.sampleRate*0.16), buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i] = (Math.random()*2-1) * (1 - i/len);
+  const src = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), sg = ctx.createGain(); src.buffer = buf;
+  bp.type = 'bandpass'; bp.Q.value = 1.4; bp.frequency.setValueAtTime(4200, now); bp.frequency.exponentialRampToValueAtTime(700, now+0.14);
+  sg.gain.setValueAtTime(0.0001, now); sg.gain.exponentialRampToValueAtTime(0.42*k, now+0.012); sg.gain.exponentialRampToValueAtTime(0.0001, now+0.16);
+  src.connect(bp).connect(sg).connect(out); src.start(now); src.stop(now+0.17);
+  // thump
+  const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine';
+  o.frequency.setValueAtTime(big ? 120 : 140, now+0.02); o.frequency.exponentialRampToValueAtTime(big ? 38 : 48, now+0.24);
+  g.gain.setValueAtTime(0.0001, now+0.02); g.gain.exponentialRampToValueAtTime(0.6*k, now+0.03); g.gain.exponentialRampToValueAtTime(0.0001, now+(big ? 0.38 : 0.28));
+  o.connect(g).connect(out); o.start(now+0.02); o.stop(now+0.4);
+  // crack
+  if(typeof playNoiseBurst==='function') playNoiseBurst(ctx, now+0.018, 0.02, 0.32*k, 'highpass', 2600, 0.8);
+}
 // Nov 14 (Jeremy: a sound for the boss bending its health bar): an iron bar groaning under the weight, timed to the
 // bar's sag (bossDropIn's 0.75 s SMIL: dips past rest by ~0.28 s, springs back by ~0.54 s, settles): a low sawtooth
 // falling through a narrow band-pass with a fast flutter (the strain), a short rising twang as it springs back, two

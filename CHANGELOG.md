@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.117 (Nov 14, 2026)
+- New sound: every kill now lands with an impact hit at the moment of the ink impact frame (a fast slash, a deep thump and a crack; heavier for bosses and overkills). A plain kill used to play nothing until its victory chime on the next bar of the music. It plays even with Reduce Motion, which skips the frame itself.
+
 ## 1.42.116 (Nov 14, 2026)
 - Dice roll calmed down and quicker (Jeremy): a tighter wave, quicker quarter-turns, a third tumble on 1 in 4 dice (was 1 in 2), less travel and hop, a shorter, gentler settle. The slowest die lands in about 0.8 s (was about 1.1 s).
 - New sound: a boss bending its health bar when it lands on it: an iron groan as the bar sags, a twang as it springs back, two rivet ticks as it settles.

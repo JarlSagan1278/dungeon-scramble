@@ -2860,6 +2860,7 @@ function onEncounterDefeated(){
   // callout banner, so the moment registers as it happens instead of only
   // as a status chip on the loot screen that follows.
   if(typeof hitStop==='function') hitStop(isBoss ? 180 : 120);
+  if(typeof playKillImpact==='function') playKillImpact(isBoss || overkill); // the blow itself, under the impact frame (Nov 14)
   if(typeof impactFrames==='function') impactFrames(isBoss);
   if(isBoss){
     if(typeof playTone==='function') playTone('bossKill');
