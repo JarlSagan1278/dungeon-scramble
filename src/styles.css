@@ -3860,3 +3860,15 @@ html body #tray > .die.pc-cur{ outline:none !important; }
 .pc-die-ring{ position:absolute; z-index:8; pointer-events:none; box-sizing:border-box; border:4px solid var(--gold); border-radius:14px; box-shadow:0 0 0 2px #0c0705, inset 0 0 0 2px #0c0705; animation:pc-ring-pulse 1.2s ease-in-out infinite; }
 @keyframes pc-ring-pulse{ 0%,100%{ border-color:var(--gold); } 50%{ border-color:#fff3c4; } }
 .reduced-motion .pc-die-ring{ animation:none; }
+
+/* ==== Dice rings, one meaning each (Nov 14, Jeremy: too many outlines). At rest only the class zone has a ring; picked
+   dice share one plain white ring and stay bright; dimming alone marks dice you can't pick; the Skill and Boost badges
+   (not rings) mark converted and Boost-target dice; no hover ring (it stuck on touchscreens). Choosing states
+   (Swap/Reroll, Skill armed), the tutorial link and the PC cursor keep their own looks. */
+html body #tray > .die.selectable, html body #tray > .die.selectable:hover,
+html body #tray > .die.forced-face:not(.in-path), html body #tray > .die.boost-target:not(.in-path){ box-shadow:inset 0 3px 0 rgba(255,255,255,.3) !important; }
+html body #tray > .die.in-path, html body #tray > .die.undoable, html body #tray > .die.in-path.forced-face, html body #tray > .die.in-path.boost-target{ box-shadow:0 0 0 3px #fff, inset 0 3px 0 rgba(255,255,255,.3) !important; }
+html body #tray > .die.in-path.used{ filter:drop-shadow(0 3px 0 #0c0705) !important; opacity:1 !important; }
+html body #tray > .die.zone-cell:not(.in-path){ box-shadow:0 0 0 3px color-mix(in srgb, var(--class-color,#fff) 60%, transparent), inset 0 3px 0 rgba(255,255,255,.3) !important; }
+/* the dice sit above the box's back rim (and behind its front wall): the tray is no longer its own layer group */
+.tray-wrap .tray{ perspective:none; }

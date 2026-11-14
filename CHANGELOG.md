@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.130 (Nov 14, 2026)
+- Dice rings cleaned up (Jeremy: too many outlines): one meaning per ring. At rest only your class's zone dice have a ring (a little thinner); the thin gold "you can pick this" ring is gone (dice you can't pick are already dimmed), as is the hover ring (it stuck on touchscreens: Jeremy saw a yellow ring on a die for no reason). Picked dice share one plain white ring and stay bright instead of dimming like unpickable dice; the last pick keeps its number and still undoes on tap (no red ring). Converted and Boost-target dice keep their badges, without extra rings. Choosing states (Swap/Reroll, Skill armed), the tutorial link and the PC cursor are unchanged.
+- The dice now sit above the box's back rim (and behind its front wall), so a top-row die's ring is never cut off.
+
 ## 1.42.129 (Nov 14, 2026)
 - PC cursor (Jeremy, Steam Deck): on a tray die the highlight is now its own gold ring drawn on top of the box (the dice sit in a layer under the box's walls, which cut the die's own outline off), placed from the dice grid's layout, not screen measurements. The numpad moves the cursor by key position, NumLock on or off: 4/6/8/2 move, 5 or 0 presses. Numpad digits no longer tap dice (with NumLock on, numpad 4 used to tap the 4th die instead of moving right).
 
