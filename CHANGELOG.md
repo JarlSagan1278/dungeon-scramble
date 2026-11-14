@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.134 (Nov 14, 2026)
+- Victory screen (Jeremy: needs more juice and a bigger adventurer): a stage under the title with the hero large on a stone plinth (name and depth) in front of a turning gold sunburst, dropping in with a squash and a gentle bob; the run's loot dice stand either side as trophy portraits (best first), popping in one by one with a chime; the outcome line sits under the plinth. The run card drops its small portrait row (the stage says it). Fits the phone (395x769 and 360x722) and spans both columns on PC. Reduced Motion: still.
+
 ## 1.42.133 (Nov 14, 2026)
 - PC victory screen: the Save Card / Play Again buttons and the play-data question sit under the run card in the left column, so both columns are about even and the screen scales up (at Steam Deck size it was shrunk to 75% to fit the tall details column).
 

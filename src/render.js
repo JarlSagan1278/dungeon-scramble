@@ -5832,6 +5832,27 @@ function wireRunCard(outcome){ const b = document.getElementById('save-run-card-
 
 // End screens (Oct 17 design fixes, items 6-7): the run card and [Save Card][Try Again] fit one 769px screen; the
 // depth seal, relic, achievements, boons and Run Summary sit behind a Details toggle that swaps places with the card.
+// Victory stage (Nov 14, Jeremy: the victory screen needs more juice and a bigger picture of the adventurer): the hero
+// large on a stone plinth in front of a turning gold sunburst, and the run's loot dice as a row of trophy portraits that
+// pop in one by one. Replaces the one-line lede; the phone card does not grow.
+function victoryTrophies(){
+  const order = {magic:0, gilded:1, alloy:2, origin:3};
+  const all = [...(S.tray||[]).map(c=>c && c.die), ...(S.backPocket||[])].filter(d=> d && LOOT_ART[d.name] && d.cat!=='attack' && d.cat!=='maneuver');
+  const seen = new Set(), out = [];
+  all.sort((a,b)=>(order[a.cat]??9) - (order[b.cat]??9)).forEach(d=>{ if(!seen.has(d.name)){ seen.add(d.name); out.push(d); } });
+  return out.slice(0, 6);
+}
+function victoryStageHTML(){
+  const d = runCardData('victory'), tr = victoryTrophies();
+  return `<div class="vic-stage" style="--rc-class:${d.color}">
+    <div class="vic-rays" aria-hidden="true"></div>
+    ${d.portrait ? `<img class="vic-hero" src="${d.portrait}" alt="">` : ''}
+    <div class="vic-plinth"><span>${(d.name || d.who).replace(/</g,'&lt;')} &middot; Depth ${d.depth}</span></div>
+    <div class="vic-outcome">${d.outcome}</div>
+    ${tr.length ? (()=>{ const t = (x,i)=>`<img class="vic-trophy t-${x.cat}" style="--i:${i}" src="${LOOT_ART[x.name]}" alt="${x.name}" title="${x.name}">`;
+      return `<div class="vic-trophies vt-left">${tr.map((x,i)=> i%2 ? '' : t(x,i)).join('')}</div><div class="vic-trophies vt-right">${tr.map((x,i)=> i%2 ? t(x,i) : '').join('')}</div>`; })() : ''}
+  </div>`;
+}
 function endScreenHTML(o){
   const news = [];
   if(o.seal) news.push(S.depthResult && S.depthResult.newClassBest ? 'New best depth' : 'Depth seal');
@@ -5839,7 +5860,7 @@ function endScreenHTML(o){
   const na = (S.newAchievements||[]).length; if(na) news.push(`${na} achievement${na>1?'s':''}`);
   const nb = (S.newBoonDice||[]).filter((n,i,a)=>a.indexOf(n)===i).length; if(nb) news.push(`${nb} Starting Boon${nb>1?'s':''}`);
   news.push('Run Summary');
-  return `<div class="panel end-screen"><h2>${o.title}</h2><p class="end-lede">${o.lede}</p>
+  return `<div class="panel end-screen${o.stage?' has-stage':''}"><h2>${o.title}</h2>${o.stage || `<p class="end-lede">${o.lede}</p>`}
     <div class="end-swap">
       <div class="end-main">${runCardHTML(o.outcome)}${o.note||''}</div>
       <div class="end-details" hidden>${o.seal}${o.relic}${newAchievementsHTML(S.newAchievements)}${newBoonsHTML()}${summaryStatsHTML()}
@@ -6037,7 +6058,9 @@ function renderVictory(){
     if(S.newOriginRelic) setTimeout(()=>{ if(typeof playTone==='function') playTone('relicProc'); }, 700);
   }
   app.innerHTML = endScreenHTML({ outcome:'victory', title:'Dungeon Conquered!', lede:'You defeated the Big Boss and cleared all three floors. Well fought, Adventurer.',
-    seal:depthSealHTML(), relic:originRelicEarnedHTML(), again:'Play Again' });
+    stage:victoryStageHTML(), seal:depthSealHTML(), relic:originRelicEarnedHTML(), again:'Play Again' });
+  // the trophies land one by one, each with a chime
+  if(!PREFS.reducedMotion && typeof playTone==='function') document.querySelectorAll('.vic-trophy').forEach((t,i)=> setTimeout(()=>{ try{ playTone('glint', Math.min(4,i)); }catch(e){} }, 900 + i*160));
   wireRunCard('victory');
 }
 // Free demo build (BUILD.demo, `node build.js --demo`): the run ends after the Floor 2 boss (Floor 1 until Nov 8). It is recorded in Records and

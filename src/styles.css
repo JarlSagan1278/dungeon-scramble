@@ -3889,3 +3889,31 @@ html body #tray > .die.zone-cell:not(.in-path){ box-shadow:0 0 0 3px color-mix(i
    the loot window still scrolls on a very small screen, without showing a bar */
 .defeat-keep .swap-list{ overflow:visible !important; }
 .modal.loot-modal{ scrollbar-width:none; } .modal.loot-modal::-webkit-scrollbar{ display:none; }
+
+/* ==== Victory stage (Nov 14): hero on a plinth before a turning sunburst, loot trophies popping in */
+.vic-stage{ position:relative; height:calc(140px + (var(--screen-h, 769px) - 720px) * 0.6); margin:-4px 0 6px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; overflow:hidden; border-radius:14px; }
+.vic-rays{ position:absolute; left:50%; top:46%; width:420px; height:420px; margin:-210px 0 0 -210px; border-radius:50%; pointer-events:none;
+  background:repeating-conic-gradient(from 0deg, rgba(255,215,106,.34) 0deg 9deg, rgba(255,215,106,0) 9deg 22.5deg);
+  -webkit-mask:radial-gradient(circle, #000 18%, transparent 62%); mask:radial-gradient(circle, #000 18%, transparent 62%);
+  animation:vic-rays-in .7s cubic-bezier(.2,.9,.3,1.2) both, vic-rays-spin 26s linear .7s infinite; }
+.vic-hero{ position:relative; z-index:2; height:calc(78px + (var(--screen-h, 769px) - 720px) * 0.5); width:auto; margin-bottom:-6px; filter:drop-shadow(0 6px 0 rgba(12,7,5,.55)); transform-origin:50% 100%;
+  animation:vic-hero-drop .75s cubic-bezier(.3,1.4,.5,1) .15s both, vic-hero-bob 3.2s ease-in-out 1.2s infinite; }
+.vic-plinth{ position:relative; z-index:1; width:250px; height:24px; border:3px solid var(--line); border-radius:8px 8px 4px 4px;
+  background:linear-gradient(180deg,#cfc3ad,#9a8d78); box-shadow:inset 0 3px 0 rgba(255,255,255,.35), 0 4px 0 var(--line); display:flex; align-items:center; justify-content:center; }
+.vic-plinth span{ font:400 12px/1 var(--font-display); color:#2b2117; letter-spacing:.04em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:92%; }
+.vic-trophies{ position:absolute; z-index:3; bottom:46px; display:flex; flex-wrap:wrap; gap:5px; width:78px; pointer-events:none; }
+.vt-left{ right:calc(50% + 54px); justify-content:flex-end; } .vt-right{ left:calc(50% + 54px); justify-content:flex-start; }
+.vic-trophy{ width:36px; height:36px; object-fit:cover; border-radius:9px; border:3px solid var(--line); background:#3a2716; box-shadow:0 3px 0 var(--line); box-sizing:border-box;
+  animation:vic-trophy-pop .45s cubic-bezier(.3,1.6,.5,1) calc(.9s + var(--i) * .16s) both; }
+.vic-trophy.t-gilded{ border-color:#8a6a1f; } .vic-trophy.t-magic{ border-color:#5b3a7a; } .vic-trophy.t-alloy{ border-color:#5c656d; }
+@keyframes vic-rays-in{ from{ transform:scale(.2) rotate(-40deg); opacity:0; } to{ transform:scale(1) rotate(0); opacity:1; } }
+@keyframes vic-rays-spin{ to{ transform:rotate(360deg); } }
+@keyframes vic-hero-drop{ 0%{ transform:translateY(-140px) scale(.9); opacity:0; } 55%{ transform:translateY(0) scale(1.12,.86); opacity:1; } 75%{ transform:translateY(-8px) scale(.96,1.05); } 100%{ transform:none; } }
+@keyframes vic-hero-bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
+@keyframes vic-trophy-pop{ 0%{ transform:scale(0) rotate(-20deg); opacity:0; } 100%{ transform:none; opacity:1; } }
+.reduced-motion .vic-rays, .reduced-motion .vic-hero, .reduced-motion .vic-trophy{ animation:none !important; }
+/* the hero stands on the stage, so the run card's own small portrait goes */
+.end-screen.has-stage .rc-top{ display:none; } /* the stage says who and how (name, depth, outcome) */
+.vic-outcome{ position:relative; z-index:1; margin-top:5px; font-size:12.5px; font-style:italic; color:#9fe08a; }
+body.pc .end-screen.has-stage:has(.end-details) > .vic-stage{ grid-area:l; }
+body.pc .vic-stage{ height:200px; } body.pc .vic-hero{ height:120px; }
