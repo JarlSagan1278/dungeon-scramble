@@ -3777,7 +3777,16 @@ body.pc #app > :has(> .panel.end-screen){ min-height:0 !important; height:auto !
 /* end screens (Nov 14): the run card and its Details side by side (the phone swaps them behind a Details button) */
 body.pc #app .panel.end-screen:has(.end-details){ width:auto !important; max-width:none !important; }
 body.pc #app:not(:has(> #enc-panel)):has(.end-screen .end-details){ width:max-content; max-width:100vw; }
-body.pc .end-screen .end-swap{ display:grid; grid-auto-flow:column; grid-auto-columns:365px; gap:18px; align-items:start; justify-content:center; }
+/* Nov 14: two even columns (run card, buttons and the share question left; the details right), so the card can scale up */
+body.pc #app .panel.end-screen:has(.end-details){ display:grid !important; grid-template-columns:365px 365px; column-gap:18px; row-gap:10px; align-content:start; justify-content:center;
+  grid-template-areas:"h h" "l l" "main det" "act det" "share det" "pad det"; grid-template-rows:auto auto auto auto auto 1fr; }
+body.pc .end-screen:has(.end-details) > h2{ grid-area:h; }
+body.pc .end-screen:has(.end-details) > .end-lede{ grid-area:l; }
+body.pc .end-screen .end-swap{ display:contents; }
+body.pc .end-screen:has(.end-details) .end-main{ grid-area:main; }
+body.pc .end-screen:has(.end-details) .end-details{ grid-area:det; }
+body.pc .end-screen:has(.end-details) > .end-actions{ grid-area:act; margin-top:0; }
+body.pc .end-screen:has(.end-details) > .share-ask{ grid-area:share; max-width:none; margin:0; }
 body.pc .end-screen .end-details{ max-height:none !important; overflow:visible; }
 body.pc .end-screen .end-details > :first-child{ margin-top:0; }
 body.pc .end-screen #end-details-btn{ display:none !important; }

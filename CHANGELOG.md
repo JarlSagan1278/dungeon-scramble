@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.133 (Nov 14, 2026)
+- PC victory screen: the Save Card / Play Again buttons and the play-data question sit under the run card in the left column, so both columns are about even and the screen scales up (at Steam Deck size it was shrunk to 75% to fit the tall details column).
+
 ## 1.42.132 (Nov 14, 2026)
 - PC layout: each pop-up window is enlarged as far as it fits the screen (up to 1.9x), measured from its own content, and refitted when its content changes and on resize. At Steam Deck size the loot pick-one window, relic choice, tutorial, Records, credits and Back Pocket were drawn at their smallest; they now fill the screen. Long scrolling windows (Codex, Settings, relic list) stay at the base size.
 
