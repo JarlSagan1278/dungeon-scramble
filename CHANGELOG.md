@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.129 (Nov 14, 2026)
+- PC cursor (Jeremy, Steam Deck): on a tray die the highlight is now its own gold ring drawn on top of the box (the dice sit in a layer under the box's walls, which cut the die's own outline off), placed from the dice grid's layout, not screen measurements. The numpad moves the cursor by key position, NumLock on or off: 4/6/8/2 move, 5 or 0 presses. Numpad digits no longer tap dice (with NumLock on, numpad 4 used to tap the 4th die instead of moving right).
+
 ## 1.42.128 (Nov 14, 2026)
 - PC cursor (Jeremy, Steam Deck: How to Play unreachable on the title, like the 4th dice column before): the cursor no longer skips things it measures as past the window's side, and when nothing is found in a direction it steps to the next/previous thing in page order, so every button stays reachable however the browser measures. The old-Chrome position correction now also requires that the browser lacks currentCSSZoom (both changed in Chrome 128), so it cannot switch on for a browser that does not need it.
 

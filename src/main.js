@@ -53,6 +53,7 @@ document.addEventListener('keydown', (ev)=>{
   if(!S || S.screen!=='game') return;
   if(document.querySelector('.modal-overlay')) return;
   if(document.activeElement && document.activeElement.tagName==='INPUT') return;
+  if(/^Numpad/.test(ev.code||'') && ev.code!=='NumpadEnter') return; // the numpad moves the PC cursor (below), never taps dice by digit
   const key = ev.key.toLowerCase();
   if(key==='enter'){
     if(S.needRoll){ scrambleRoll(0, -1); ev.preventDefault(); return; } // keyboard: Enter rolls
@@ -209,7 +210,7 @@ function pcCursorSet(n){
 }
 function pcCursorDraw(){
   const ring = pcCursorRing();
-  if(!pcCurOn || !pcMode()){ ring.hidden = true; if(pcCurMarked){ pcCurMarked.classList.remove('pc-cur'); pcCurMarked = null; } return; }
+  if(!pcCurOn || !pcMode()){ ring.hidden = true; if(pcCurMarked){ pcCurMarked.classList.remove('pc-cur'); pcCurMarked = null; } pcDieRing(null); return; }
   const where = pcWhere();
   if(!pcCur || !pcCur.isConnected || !pcTargetOk(pcCur) || where!==pcCurWhere){
     const ts = pcTargets(); if(!ts.length){ ring.hidden = true; pcCur = null; return; }
@@ -228,6 +229,18 @@ function pcCursorDraw(){
   if(pcCurMarked && pcCurMarked !== pcCur) pcCurMarked.classList.remove('pc-cur');
   if(!pcCur.classList.contains('pc-cur')) pcCur.classList.add('pc-cur'); // re-added after a redraw rewrote its classes
   pcCurMarked = pcCur;
+  pcDieRing(pcCur.matches('#tray > .die') ? pcCur : null);
+}
+// A tray die's highlight is its own ring in the box (Nov 14, Deck photo: the dice grid is a layer under the box's walls,
+// so a die's own outline was cut off by them). Placed from layout offsets (unaffected by zoom), never screen measurements.
+function pcDieRing(die){
+  document.querySelectorAll('.pc-die-ring').forEach(r=>{ if(!die || r.parentNode !== die.closest('.tray-wrap')) r.remove(); });
+  if(!die) return;
+  const tray = die.parentNode, wrap = tray.closest('.tray-wrap'); if(!wrap) return;
+  let r = wrap.querySelector(':scope > .pc-die-ring');
+  if(!r){ r = document.createElement('div'); r.className = 'pc-die-ring'; r.setAttribute('data-morph-keep', ''); r.setAttribute('aria-hidden', 'true'); wrap.appendChild(r); }
+  const x = tray.offsetLeft + tray.clientLeft + die.offsetLeft, y = tray.offsetTop + tray.clientTop + die.offsetTop;
+  r.style.left = (x - 6)+'px'; r.style.top = (y - 6)+'px'; r.style.width = (die.offsetWidth + 12)+'px'; r.style.height = (die.offsetHeight + 12)+'px';
 }
 let pcCurMarked = null;
 // Which screen or window the cursor is on (a change sends it to that screen's starting point).
@@ -327,6 +340,10 @@ document.addEventListener('keydown', ev=>{
   const inText = document.activeElement && document.activeElement.matches && document.activeElement.matches('input[type="text"], input:not([type]), textarea');
   const k = ev.key;
   if(inText){ if(k==='Escape' || k==='Enter') document.activeElement.blur(); return; }
+  // Nov 14 (Jeremy, Deck numpad): numpad 4/6/8/2 move and 5/0 press, NumLock on or off (by key position, ev.code)
+  const np = {Numpad4:[-1,0], Numpad6:[1,0], Numpad8:[0,-1], Numpad2:[0,1]}[ev.code];
+  if(np){ pcMove(np[0], np[1]); ev.preventDefault(); return; }
+  if(ev.code==='Numpad5' || ev.code==='Numpad0'){ if(!ev.repeat){ pcDown(); pcUp(); } ev.preventDefault(); return; }
   const dir = {ArrowLeft:[-1,0], ArrowRight:[1,0], ArrowUp:[0,-1], ArrowDown:[0,1]}[k];
   if(dir){ pcMove(dir[0], dir[1]); ev.preventDefault(); return; }
   if(k===' ' || k==='Spacebar'){ if(!ev.repeat) pcDown(); ev.preventDefault(); return; }
