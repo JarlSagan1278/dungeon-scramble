@@ -5441,13 +5441,13 @@ function pcHoverRender(){
 function pcHoverSync(){
   const n = document.getElementById('pc-hover'); if(!n && !pcMode()) return;
   const el = pcHoverEl(), room = pcMode() ? document.querySelector('#app > #enc-panel') : null, tray = room && document.querySelector('#app > .tray-panel');
-  if(!room || !tray){ el.hidden = true; return; }
-  const r = room.getBoundingClientRect(), t = tray.getBoundingClientRect(), top = Math.max(r.bottom, t.bottom) + 8;
+  if(!room || !tray){ el.hidden = true; if(el.parentNode !== document.body) document.body.appendChild(el); return; }
   pcPlaceDoors();
-  el.hidden = false; el.style.left = Math.round(r.left)+'px'; el.style.width = Math.round(t.right - r.left)+'px'; el.style.top = Math.round(top)+'px';
-  // a fixed-height footer under both panels (Nov 14): the group (panels + footer) is one centred block, never a floating line
-  const foot = parseFloat(document.body.style.getPropertyValue('--pc-foot')) || 80;
-  el.style.height = Math.round(foot - 8)+'px'; el.style.maxHeight = '';
+  // Nov 14 (Jeremy, Steam Deck: it overlapped the panels): the footer is the fight grid's third row, placed by the browser
+  // under both panels (it was positioned from measured screen coordinates, which the Deck's Chrome reported differently)
+  const app = room.parentNode;
+  if(el.parentNode !== app){ el.setAttribute('data-morph-keep', ''); app.appendChild(el); }
+  el.hidden = false; ['left','top','width','height','maxHeight'].forEach(k=> el.style[k] = '');
   pcHoverRender();
 }
 document.addEventListener('mouseover', ev=>{

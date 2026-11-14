@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.124 (Nov 14, 2026)
+- PC layout (Jeremy, Steam Deck: the hint footer overlapped the panels): the hover/hint footer is now the fight layout's own third row, placed by the browser under both panels, instead of being positioned from measured screen coordinates (the Deck's Chrome measured them differently).
+
 ## 1.42.123 (Nov 14, 2026)
 - PC layout (Jeremy, Steam Deck): the gold keyboard/controller cursor is now an outline drawn on the thing it points at, so it always sits exactly on it (on the Deck it was drawn from measured positions and landed off to the side). The fork's two doors are much bigger, filling the room. "Tap to enter" is a small dark tag on the door's lower panel instead of a line under the door that could sit on the hero's name (phone too).
 
