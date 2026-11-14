@@ -239,6 +239,28 @@ function pcStartTarget(ts){
   return ts.find(n=> n.matches('#tray > .die.selectable')) || ts.find(n=> n.matches('#tray > .die:not(.blank)'))
       || ts.find(n=> n.classList.contains('primary')) || ts.slice().sort((a,b)=>{ const A = pcCentre(a), B = pcCentre(b); return (A.y-B.y) || (A.x-B.x); })[0];
 }
+// Nov 14 (Steam Deck: the cursor could not reach the 4th column or the buttons): inside the fight's tray the cursor moves
+// by the dice grid's structure (4x4 by data-idx) and the rail's button order, not by measured positions, so it works
+// whatever a browser reports. Right from the 4th column goes to the rail, left from the rail back to that row.
+function pcGridMove(ts, dx, dy){
+  const die = n=> n && n.matches && n.matches('#tray > .die');
+  const dieAt = i=> ts.find(n=> die(n) && +n.dataset.idx === i);
+  const rail = ts.filter(n=> !die(n) && n.closest('.tray-panel') && !n.closest('#tray') && !n.closest('.tray-head'));
+  const RAIL_ORDER = ['skip-transition-btn','resolve-btn','ability-btn','open-backpocket-btn','open-tokens-btn','clear-path-btn']; // top to bottom on screen
+  rail.sort((a,b)=>{ const ia = RAIL_ORDER.indexOf(a.id), ib = RAIL_ORDER.indexOf(b.id); return (ia<0?99:ia) - (ib<0?99:ib); });
+  if(die(pcCur)){
+    const i = +pcCur.dataset.idx, r = Math.floor(i/4), c = i%4;
+    if(dx){ for(let k=c+dx; k>=0 && k<4; k+=dx){ const n = dieAt(r*4+k); if(n) return n; }
+      if(dx>0 && rail.length) return rail[Math.min(rail.length-1, Math.round(r/3*(rail.length-1)))];
+      return null; }
+    for(let k=r+dy; k>=0 && k<4; k+=dy){ const n = dieAt(k*4+c); if(n) return n; }
+    return null; // off the top or bottom of the tray: the usual search (route, room, footer)
+  }
+  const ri = rail.indexOf(pcCur); if(ri < 0) return null;
+  if(dy){ const n = rail[ri+dy]; return n || null; }
+  if(dx<0){ const row = rail.length>1 ? Math.round(ri/(rail.length-1)*3) : 0; for(let k=3;k>=0;k--){ const n = dieAt(row*4+k); if(n) return n; } }
+  return null;
+}
 function pcMove(dx, dy){
   if(!pcMode()) return;
   const ts = pcTargets(); if(!ts.length) return;
@@ -246,6 +268,7 @@ function pcMove(dx, dy){
   if(pcCur.matches('input[type="range"]') && dx){ // a slider: left/right change it
     const st = parseFloat(pcCur.step)||1; pcCur.value = Math.max(+pcCur.min||0, Math.min(+pcCur.max||100, (+pcCur.value) + dx*st*5));
     pcCur.dispatchEvent(new Event('input', {bubbles:true})); pcCur.dispatchEvent(new Event('change', {bubbles:true})); return; }
+  { const g = pcGridMove(ts, dx, dy); if(g){ pcCursorSet(g); return; } } // the tray and its button rail by structure, no measuring
   const c = pcCentre(pcCur); let best = null, bs = 1e9;
   for(const n of ts){ if(n===pcCur) continue;
     const r = n.getBoundingClientRect(), o = c.r;

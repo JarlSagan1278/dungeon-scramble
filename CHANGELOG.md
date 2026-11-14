@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.127 (Nov 14, 2026)
+- PC cursor (Jeremy, Steam Deck): in the fight's tray the cursor now moves by the dice grid and the button rail's order instead of by measured positions: left/right/up/down step through the 4x4 dice, right from the 4th column goes to the rail (Go, Skill, Pocket, Item, Clear, top to bottom), left from the rail comes back to that row. On the Deck it could not get past the 3rd column. The pointed-at die is raised above its neighbours so they never cover its gold outline.
+
 ## 1.42.126 (Nov 14, 2026)
 - PC cursor (Jeremy): the gold outline now shows on dice inside your class's highlighted zone too (their glow ring's rule removed any outline).
 
