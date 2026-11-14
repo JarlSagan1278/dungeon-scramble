@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.119 (Nov 14, 2026)
+- Gag stickers on the dice box lid are much more common (Jeremy): 4 rooms in 10 now get one (was 1 in 10).
+
 ## 1.42.118 (Nov 14, 2026)
 - Route: the character on the route is a fixed square, so it can no longer be squeezed narrower by its fit-to-content holder (Jeremy saw it squashed sideways; WebKit can size that holder before the picture has loaded).
 

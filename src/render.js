@@ -6082,8 +6082,8 @@ function newAchievementsHTML(newAchievements){
 // direction, the lock pops and the dice tumble out.
 // Domed lid (Jeremy picked A1, Oct 25): as wide as the chest, rising 26px above it so it covers the top corner brackets.
 const CHEST_LID_HTML = `<div class="chest-lid" id="chest-lid" title="Flick or double-tap to open (or shake your phone)"><i class="strap s1"></i><i class="strap s2"></i><i class="rim"></i></div>`;
-// Oct 31 (Jeremy): no class crest; instead a rare gag sticker on the lid, like a well-travelled crate. About 1 room in
-// 10 gets one, picked per room (same sticker every turn of that room), never in the guided first fight.
+// Oct 31 (Jeremy): no class crest; instead a gag sticker on the lid, like a well-travelled crate. 4 rooms in 10 get one
+// (Nov 14, Jeremy: much more common; was 1 in 10), picked per room (same sticker every turn of that room), never in the guided first fight.
 const stkT = (x,y,size,fill,txt,len,font)=>`<text x="${x}" y="${y}" text-anchor="middle" style="font-family:${font==='d'?'var(--font-display)':'var(--font-ui)'};font-weight:${font==='d'?400:800}" font-size="${size}" fill="${fill}"${len?` textLength="${len}" lengthAdjust="spacingAndGlyphs"`:''}>${txt}</text>`;
 const LID_STICKERS = [
   // FRAGILE, contents may bite
@@ -6104,7 +6104,7 @@ function lidStickerFor(){
   if(!S._stickerSalt) S._stickerSalt = 1 + Math.floor(Math.random()*1e9);
   let h = (S._stickerSalt ^ ((S.floorIdx+1)*2654435761) ^ ((S.routeStep+1)*40503)) >>> 0;
   h = Math.imul(h ^ (h >>> 15), 2246822519) >>> 0; h = (h ^ (h >>> 13)) >>> 0;
-  if(h % 100 >= 10) return '';
+  if(h % 100 >= 40) return '';
   const tilt = ((h >> 8) % 13) - 6;
   return `<div class="lid-sticker" style="--tilt:${tilt}deg" aria-hidden="true">${LID_STICKERS[(h >> 4) % LID_STICKERS.length]}</div>`;
 }
