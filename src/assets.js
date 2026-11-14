@@ -267,7 +267,7 @@ const LOOT_SLOT = {
   'Portable RNGenerator': 'ground',
   'Poison Sword': 'back',
   'Sporific Staff': 'back',
-  'Genetic Drifter': 'float',
+  'Genetic Drifter': 'ground', // ridden like a skateboard (Jeremy, Nov 14)
   'Leeching Lance': 'back',
   'Pleasant Parasite?': 'float',
   'Greatesthammer': 'back',
@@ -298,8 +298,12 @@ const LOOT_HILT_UP = { 'Dagger': 140, 'Hidden Estoc': 20 };
 // Per-item touches on the hero (Jeremy, Nov 14): size = multiplier, out = extra distance away from the hero (fraction of
 // its width), flat = stands level on the floor instead of tilted.
 const LOOT_GEAR_TWEAK = {
-  'Tarot Deck': { size:.7, out:.3 },
-  'Winged Boots': { out:.3 },
+  'Tarot Deck': { size:.7, out:.15 },
+  'Winged Boots': { out:.15 },
+  'Dagger': { size:1.45, out:.2 }, 'Charge-Atlatl': { size:1.35, out:.14 }, 'Leeching Lance': { size:1.4, out:.14 }, 'Axiom of Choice': { size:1.5, out:.22 }, // thin back items that hid behind hair and hoods
+  'Drill Shield': { size:.8 }, // overlapped the head
+  'Grappling Set': { out:.12 }, // its rope crossed the hero's hand
+  'Genetic Drifter': { board:true }, // lies under the hero's feet like a skateboard (Jeremy)
   'N-th Dimensional Printer': { flat:true },
   '273.15 Kelvin Box': { flat:true },
   "Hospitaler's Merciful Guillotine": { flat:true },

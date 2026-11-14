@@ -3941,12 +3941,14 @@ body.pc .vic-stage{ height:200px; } body.pc .vic-hero{ height:120px; }
 .hero-gear .hg-gl{ left:-3%; bottom:-3%; transform:rotate(-9deg); transform-origin:50% 100%; } .hero-gear .hg-gr{ right:1%; bottom:-7%; transform:rotate(7deg); transform-origin:50% 100%; }
 .hero-gear .hg-float{ right:-26%; top:14%; /* below the Wanted poster (Jeremy) */ animation:hg-bob 3.4s ease-in-out infinite; }
 @keyframes hg-bob{ 0%,100%{ transform:translateY(0) rotate(-4deg); } 50%{ transform:translateY(-6%) rotate(4deg); } }
-.hero-gear .hg-head{ left:50%; top:-30%; transform:translateX(-50%); animation:hg-head-bob 3s ease-in-out infinite; } /* held up above the head (Hataxe, Jeremy) */
+.hero-gear .hg-head{ left:50%; top:-22%; transform:translateX(-50%); animation:hg-head-bob 3s ease-in-out infinite; } /* held up above the head (Hataxe, Jeremy) */
 @keyframes hg-head-bob{ 0%,100%{ transform:translateX(-50%) translateY(0); } 50%{ transform:translateX(-50%) translateY(-5%); } }
 .reduced-motion .hero-gear .hg-float, .reduced-motion .hero-gear .hg-head{ animation:none; }
 .hero-gear .hg-back.hg-hilt{ top:6%; left:10%; } /* hilt above the shoulder, blade down behind the hero */
 .hero-gear .hg-flat{ transform:none !important; bottom:-5% !important; } /* stands level on the floor */
 .hero-gear .hg-float{ right:calc(-26% - var(--hg-out, 0) * 100%); } .hero-gear .hg-gl{ left:calc(-3% - var(--hg-out, 0) * 100%); } .hero-gear .hg-gr{ right:calc(1% - var(--hg-out, 0) * 100%); } /* --hg-out: a fraction of the hero's width further away */
+.hero-gear .hg-back{ left:calc(-6% - var(--hg-out, 0) * 100%); } .hero-gear .hg-back.hg-hilt{ left:calc(10% - var(--hg-out, 0) * 100%); } /* thin back items peek out past the shoulder */
+.hero-gear .hg-board{ bottom:-13% !important; height:48% !important; transform:rotate(-76deg) !important; transform-origin:50% 50% !important; } .hero-gear .hg-gl.hg-board{ left:-10% !important; } .hero-gear .hg-gr.hg-board{ right:-6% !important; } /* the Genetic Drifter: a skateboard lying flat on the floor beside the hero (Jeremy) */
 .hero-gear .hg-flip{ scale:-1 1; } /* mirrored, on top of each slot's own rotation and bob */
 /* C: the item flashes up beside the hero when its die plays */
 .hero-brandish{ position:absolute; z-index:5; right:-30%; top:2%; width:58%; aspect-ratio:1; pointer-events:none; display:flex; align-items:center; justify-content:center; }
