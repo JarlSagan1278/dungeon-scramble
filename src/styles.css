@@ -3936,7 +3936,7 @@ body.pc .vic-stage{ height:200px; } body.pc .vic-hero{ height:120px; }
 .fo-player .fo-fig > .fo-img, .vic-hero-wrap > .vic-hero{ position:relative; } /* after the behind layer in page order, so it covers it */
 .hero-gear{ position:absolute; inset:0; pointer-events:none; }
 .hero-gear .hg{ position:absolute; width:auto; max-width:none; filter:drop-shadow(0 2px 0 rgba(12,7,5,.55)); }
-.hero-gear .hg-back{ right:-18%; top:-6%; transform:rotate(-28deg); transform-origin:50% 80%; }
+.hero-gear .hg-back{ right:-9%; top:0%; /* tucked behind the shoulder: the body hides its lower half (Jeremy: read as floating) */ transform:rotate(-28deg); transform-origin:50% 80%; }
 .hero-gear .hg-ground{ bottom:-4%; } /* close in, overlapping the feet, not mirror images (Jeremy) */
 .hero-gear .hg-gl{ left:-10%; bottom:-3%; transform:rotate(-9deg); transform-origin:50% 100%; } .hero-gear .hg-gr{ right:-6%; bottom:-7%; transform:rotate(7deg); transform-origin:50% 100%; }
 .hero-gear .hg-float{ left:-26%; top:-2%; animation:hg-bob 3.4s ease-in-out infinite; }

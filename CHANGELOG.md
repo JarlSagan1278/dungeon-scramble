@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.138 (Nov 14, 2026)
+- Hero gear (Jeremy: back items read as a second floating item): the back-slot weapon or shield is tucked behind the hero's shoulder, so the body covers part of it and it reads as carried on the back.
+
 ## 1.42.137 (Nov 14, 2026)
 - Loot on the hero (Jeremy's notes): each item is sized from its own outline thickness so it matches the hero's line weight (measured per picture; LOOT_GEAR_SIZE in assets.js), which makes most items bigger, ground items most of all. The two ground items stand close in, overlapping the hero's feet, at different heights and tilts instead of a mirrored pair.
 
