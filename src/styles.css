@@ -3726,11 +3726,13 @@ body.pc #app:not(:has(> #enc-panel)):has(> .title-screen-fill), body.pc #app:not
   display:flex !important; align-items:center; justify-content:center; box-sizing:border-box; }
 /* title: the whole cover at window height on the left (the phone crops its sides), the buttons on the right */
 body.pc .title-screen-fill{ height:100vh !important; max-height:none; width:100%; }
-body.pc .title-panel{ max-width:none !important; width:100%; height:100%; flex-direction:row; align-items:center; justify-content:center; gap:4vw; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
-body.pc .title-art-wrap{ flex:0 0 auto !important; height:100%; width:auto; aspect-ratio:483 / 573; }
+body.pc .title-panel{ max-width:none !important; width:100%; height:100%; flex-direction:row; align-items:center; justify-content:center; gap:56px; border:0 !important; border-radius:0 !important; box-shadow:none !important; background:transparent !important; }
+/* Nov 14 (consistency pass): like every other PC screen, the title sits on the blurred backdrop: the cover in a framed card, the buttons in a dark-brown card */
+body.pc .title-screen-fill{ background:transparent !important; }
+body.pc .title-art-wrap{ flex:0 0 auto !important; height:calc(100vh - 64px); width:auto; aspect-ratio:483 / 573; border:3px solid var(--line); border-radius:18px; box-shadow:0 6px 0 var(--line), 0 24px 60px rgba(0,0,0,.6); }
 body.pc .title-cover-art{ width:100% !important; height:100%; object-fit:cover; margin-left:0; }
-body.pc .title-art-fade{ top:0; bottom:0; left:auto; right:0; width:22%; height:auto; background:linear-gradient(to right, rgba(24,13,5,0) 0%, var(--b1) 100%); }
-body.pc .title-content{ margin-top:0 !important; width:377px; flex:0 0 auto !important; zoom:var(--pc-zti, 1.5); }
+body.pc .title-art-fade{ display:none; }
+body.pc .title-content{ margin-top:0 !important; width:377px; flex:0 0 auto !important; zoom:var(--pc-zti, 1.5); background:var(--panel); border:3px solid var(--line); border-radius:16px; box-shadow:0 4px 0 var(--line); padding:16px 14px !important; box-sizing:border-box; }
 /* setup: Origin on the left; Class, Boon, Depth and Enter on the right */
 body.pc .setup-panel{ zoom:var(--pc-zsu, 1.5); width:auto !important; height:auto !important; min-height:0 !important; flex:0 0 auto !important; align-self:center !important; max-width:none !important; display:grid !important; grid-template-columns:365px 365px; column-gap:18px; align-content:start; }
 body.pc .setup-panel > .setup-back-btn{ grid-column:1; grid-row:1; justify-self:start; align-self:center; }
@@ -3741,7 +3743,7 @@ body.pc .setup-panel > #start-btn{ align-self:end; }
 /* camp: the route across the top, the campfire on the left, Train and Organize on the right */
 body.pc .panel:has(> .camp-status-card){ zoom:var(--pc-zca, 1.5); width:auto !important; height:auto !important; min-height:0 !important; flex:0 0 auto !important; align-self:center !important; max-width:none !important; display:grid !important; grid-template-columns:365px 365px; column-gap:18px; align-content:start;
   grid-template-areas:"route route" "head head" "status up" "status org"; }
-body.pc .panel:has(> .camp-status-card) > .route-wrap{ grid-area:route; justify-self:center; width:365px; }
+body.pc .panel:has(> .camp-status-card) > .route-wrap{ grid-area:route; justify-self:center; width:365px; zoom:1.45; margin-bottom:2px; } /* about the fight route's size (Nov 14 consistency pass) */
 body.pc .panel:has(> .camp-status-card) > h2{ grid-area:head; }
 body.pc .panel:has(> .camp-status-card) > .camp-status-card{ grid-area:status; align-self:stretch; }
 body.pc .panel:has(> .camp-status-card) > .camp-section:has(.upgrade-rows-col){ grid-area:up; }
@@ -3749,6 +3751,14 @@ body.pc .panel:has(> .camp-status-card) > .camp-section:has(.organize-wrap){ gri
 /* end screens: the card is as tall as what it holds (pcFitCard scales it to the window height) */
 body.pc #app .panel.end-screen{ min-height:0 !important; height:auto !important; flex:0 0 auto !important; }
 body.pc #app > :has(> .panel.end-screen){ min-height:0 !important; height:auto !important; }
+/* end screens (Nov 14): the run card and its Details side by side (the phone swaps them behind a Details button) */
+body.pc #app .panel.end-screen:has(.end-details){ width:auto !important; max-width:none !important; }
+body.pc #app:not(:has(> #enc-panel)):has(.end-screen .end-details){ width:max-content; max-width:100vw; }
+body.pc .end-screen .end-swap{ display:grid; grid-auto-flow:column; grid-auto-columns:365px; gap:18px; align-items:start; justify-content:center; }
+body.pc .end-screen .end-details{ max-height:none !important; overflow:visible; }
+body.pc .end-screen .end-details > :first-child{ margin-top:0; }
+body.pc .end-screen #end-details-btn{ display:none !important; }
+body.pc .end-screen .share-ask{ max-width:560px; margin-left:auto; margin-right:auto; }
 /* ==== Dice roll (Nov 13, option G): 3D cubes made by startCubeRoll (render.js), one per die, in a layer inside #tray */
 .tray-wrap .tray{ position:relative; }
 #tray > .roll-layer{ position:absolute; inset:0; pointer-events:none; z-index:2; }

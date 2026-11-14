@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.42.112 (Nov 14, 2026)
+PC layout consistency pass (phones unchanged):
+- Title: sits on the same blurred backdrop as every other screen, with the cover in a framed card and the buttons in a dark-brown card (it was a flat dark screen with loose buttons).
+- Victory and defeat: the run card and its Details (depth seal, relic, achievements, Starting Boons, Run Summary) sit side by side; the Details button is gone on PC. The card scales to the window by its real width and height, and can shrink when needed so nothing is cut off.
+- Camp: the route is about the same size as the fight's.
+
 ## 1.42.111 (Nov 13, 2026)
 - Defeat, keep-a-die screen: the content sits in the middle of the phone (the bottom half was empty) and the dice to choose from are 40% bigger.
 - Equip window: before you pick the die to replace, the Out row shows six empty, dashed face slots in the same grid as the New row (it was a plain empty bar).

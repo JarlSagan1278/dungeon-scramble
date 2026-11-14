@@ -5192,10 +5192,11 @@ function pcFitCard(again){
   // measure what the card holds (the card itself stretches to the window height)
   const z = a.currentCSSZoom || 1, top = c.getBoundingClientRect().top, kids = [...c.querySelectorAll(':scope > *, :scope > * > *')].filter(k=>!k.hidden && k.offsetParent);
   const h = (kids.length ? Math.max(...kids.map(k=>k.getBoundingClientRect().bottom)) - top : c.getBoundingClientRect().height) / z + 28;
-  a.style.zoom = Math.max(1, Math.min(2.2, (window.innerHeight - 8) / h, (window.innerWidth - 48) / 395)).toFixed(3);
+  const w = Math.max(395, c.getBoundingClientRect().width / z + 16); // two columns on the end screens are wider than the phone card
+  a.style.zoom = Math.max(0.7, Math.min(2.2, (window.innerHeight - 8) / h, (window.innerWidth - 48) / w)).toFixed(3);
   // the card sits a little below the top: everything scales from the window's top, so shrink by the overshoot
   const bottom = Math.max(...kids.map(k=>k.getBoundingClientRect().bottom)), room = window.innerHeight - 10;
-  if(kids.length && bottom > room) a.style.zoom = Math.max(1, parseFloat(a.style.zoom) * room / bottom).toFixed(3);
+  if(kids.length && bottom > room) a.style.zoom = Math.max(0.7, parseFloat(a.style.zoom) * room / bottom).toFixed(3);
 }
 // PC fight layout (Nov 13): route + room in the left column, the tray in the right, both exactly as tall, and the hover
 // caption under both. Heights are measured (offsetHeight is the unzoomed size), so a taller tray (quest rows) or room still
@@ -5224,7 +5225,7 @@ function applyPcMode(){
     pcFitFight(); // the fight's zooms come from its blocks' measured heights (first guess here, exact after each draw)
     st.setProperty('--pc-zc', Math.max(1, (H - 16)/785).toFixed(3));
     // landscape title, setup and camp (Nov 13): each laid out in two columns, scaled to fill the window
-    st.setProperty('--pc-zti', Math.max(1, Math.min(2, H/520, (W - H*0.843 - 80)/380)).toFixed(3)); // title buttons beside the full-height art
+    st.setProperty('--pc-zti', Math.max(1, Math.min(1.9, H/520, (W - (H-64)*0.843 - 56 - 64)/380)).toFixed(3)); // title buttons beside the full-height art
     st.setProperty('--pc-zsu', Math.max(1, Math.min(2.2, (H - 24)/450, (W - 48)/790)).toFixed(3));
     st.setProperty('--pc-zca', Math.max(1, Math.min(2.2, (H - 24)/415, (W - 48)/790)).toFixed(3));
     st.setProperty('--pc-zm', Math.max(1, Math.min(2, H/640)).toFixed(3)); // pop-up windows, doors and other things floating over the screen
@@ -5664,6 +5665,8 @@ function wireEndDetails(countUp){ // countUp: the Run Summary numbers count up (
   const b = document.getElementById('end-details-btn'); if(!b) return;
   const main = document.querySelector('.end-main'), det = document.querySelector('.end-details');
   let animated = false;
+  // PC layout (Nov 14): there is room for both, so the Details sit beside the run card and the button goes away
+  if(pcMode()){ det.hidden = false; b.hidden = true; if(countUp && !animated){ animated = true; setTimeout(animateSummary, 500); } return; }
   b.onclick = ()=>{
     const open = det.hidden;
     // the details take the card's place and may use whatever room is left on screen, never growing the page
