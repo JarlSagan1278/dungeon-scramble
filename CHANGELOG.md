@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.131 (Nov 14, 2026)
+- Momentary scrollbars removed (Jeremy: the loot choices twitched and the window flashed a scrollbar when moving between them). Cause: the PC cursor's highlight set its own animation and shadow, which replaced the element's own, so a loot card's settle animation replayed when the cursor left it, poking past the window. The cursor is now a plain outline that leaves an element's own look alone.
+- Audit of every scrolling box (a script opened every window and screen at phone and Steam Deck sizes with animations running and sampled every 25 ms): boxes that scroll up and down no longer scroll sideways (browsers allow it by default, so a bounce or wiggle flashed a horizontal bar: windows, Codex, Records, lists, log, depth panel, end-screen details); the keep-a-die list after a defeat no longer scrolls (its dice's wiggle flashed a bar); the loot window keeps scrolling on very small screens but never shows a bar.
+
 ## 1.42.130 (Nov 14, 2026)
 - Dice rings cleaned up (Jeremy: too many outlines): one meaning per ring. At rest only your class's zone dice have a ring (a little thinner); the thin gold "you can pick this" ring is gone (dice you can't pick are already dimmed), as is the hover ring (it stuck on touchscreens: Jeremy saw a yellow ring on a die for no reason). Picked dice share one plain white ring and stay bright instead of dimming like unpickable dice; the last pick keeps its number and still undoes on tap (no red ring). Converted and Boost-target dice keep their badges, without extra rings. Choosing states (Swap/Reroll, Skill armed), the tutorial link and the PC cursor are unchanged.
 - The dice now sit above the box's back rim (and behind its front wall), so a top-row die's ring is never cut off.
