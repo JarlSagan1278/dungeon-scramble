@@ -2826,7 +2826,7 @@ function bossDropIn(){
     const bar = document.querySelector('.fo-enemy .bar-arc');
     if(bar){ bar.classList.remove('ba-waiting'); bar.classList.add('ba-landed');
       bar.querySelectorAll('animate.ba-drop').forEach(a=>{ try{ a.beginElement(); }catch(err){} }); }
-    playTone('bossLand'); vibrate([40]);
+    playTone('bossLand'); playBarBend(); vibrate([40]);
     if(typeof screenShake==='function') screenShake('small');
   }, 330);
 }
@@ -3252,6 +3252,29 @@ function playNoiseBurst(ctx, startTime, dur, gainPeak, filterType, filterFreq, f
 // varied pitch -- irregular gaps and per-knock randomness read as several
 // loose objects colliding, where evenly-spaced identical clicks read as a
 // machine. Knocks taper off in both volume and spacing as they "settle".
+// Nov 14 (Jeremy: a sound for the boss bending its health bar): an iron bar groaning under the weight, timed to the
+// bar's sag (bossDropIn's 0.75 s SMIL: dips past rest by ~0.28 s, springs back by ~0.54 s, settles): a low sawtooth
+// falling through a narrow band-pass with a fast flutter (the strain), a short rising twang as it springs back, two
+// rivet ticks as it settles.
+function playBarBend(){
+  if(!PREFS.sound) return;
+  const ctx = getAudioCtx(); if(!ctx) return;
+  const now = ctx.currentTime + 0.02, out = sfxOut(ctx);
+  // the groan
+  const o = ctx.createOscillator(), bp = ctx.createBiquadFilter(), g = ctx.createGain(), am = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
+  o.type = 'sawtooth'; o.frequency.setValueAtTime(150, now); o.frequency.exponentialRampToValueAtTime(92, now+0.3); o.frequency.exponentialRampToValueAtTime(104, now+0.5);
+  bp.type = 'bandpass'; bp.frequency.setValueAtTime(950, now); bp.frequency.exponentialRampToValueAtTime(620, now+0.3); bp.Q.value = 7;
+  lfo.type = 'square'; lfo.frequency.value = 34; lg.gain.value = 0.5; am.gain.value = 0.5; lfo.connect(lg).connect(am.gain);
+  g.gain.setValueAtTime(0.0001, now); g.gain.exponentialRampToValueAtTime(0.32, now+0.05); g.gain.setValueAtTime(0.32, now+0.22); g.gain.exponentialRampToValueAtTime(0.0001, now+0.5);
+  o.connect(bp).connect(am).connect(g).connect(out); o.start(now); lfo.start(now); o.stop(now+0.52); lfo.stop(now+0.52);
+  // the spring back
+  const t = ctx.createOscillator(), tg = ctx.createGain(), t1 = now + 0.3;
+  t.type = 'triangle'; t.frequency.setValueAtTime(196, t1); t.frequency.exponentialRampToValueAtTime(262, t1+0.1);
+  tg.gain.setValueAtTime(0.0001, t1); tg.gain.exponentialRampToValueAtTime(0.16, t1+0.01); tg.gain.exponentialRampToValueAtTime(0.0001, t1+0.26);
+  t.connect(tg).connect(out); t.start(t1); t.stop(t1+0.3);
+  // rivets settling
+  if(typeof playNoiseBurst==='function'){ playNoiseBurst(ctx, now+0.56, 0.012, 0.16, 'highpass', 3200, 0.7); playNoiseBurst(ctx, now+0.66, 0.01, 0.1, 'highpass', 3800, 0.7); }
+}
 function playDiceRollSound(){
   // Nov 1 (Jeremy, Sound Board: "sounds more like a deck of cards"): the old soft rumble bed and dense noise bursts
   // read as shuffling. Dice are a few hard, separate objects: each one bounces 3-4 times, its clicks getting closer
@@ -5045,7 +5068,7 @@ function questSignHTML(e){
   // Nov 4 (Jeremy: the poster grew as quests progressed): both labels share one grid cell, so swapping them never resizes
   // the sign, and the sign keeps the height it had at the start of the fight (QSIGN_H, measured by lockQuestSign).
   const rest = oneTurn ? 'In one turn' : 'This fight';
-  const label = `<span class="q-lbl"><span${anyLive?' class="q-off"':''}>${rest}</span><span class="q-yes${anyLive?'':' q-off'}">&#10003; This path!</span></span>`;
+  const label = `<span class="q-lbl"><span${anyLive?' class="q-off"':''}>${rest}</span><span class="q-yes${anyLive?'':' q-off'}"><i class="q-seal" aria-hidden="true"></i>This path!</span></span>`;
   const lock = QSIGN_H.get(e), lockH = lock && lock.h;
   const style = questPaperStyle(e), hs = lock ? `--qh:${lock.h}px;--qfit:${lock.fit};` : '';
   const st = !hs ? style : style ? style.replace('style="', 'style="'+hs) : ` style="${hs}"`;
@@ -6128,10 +6151,10 @@ function startCubeRoll(){
     const idx = parseInt(el.dataset.idx), cell = S.tray[idx]; if(!cell) return;
     const row = Math.floor(idx/4), col = idx%4;
     const fromEdge = v[1]<0 ? (3-row) : v[1]>0 ? row : v[0]<0 ? (3-col) : col;
-    const delay = fromEdge*70 + Math.random()*35, T = 120 + Math.random()*60;
+    const delay = fromEdge*45 + Math.random()*25, T = 105 + Math.random()*35; // Nov 14 (Jeremy: chill out, end a little faster): tighter wave, quicker turns
     const r = Math.random() < 0.4 ? (Math.random()<0.5 ? [v[1], v[0]] : [-v[1], -v[0]]) : v; // the way it turns
     const ax = r[0] ? 'rotateY' : 'rotateX', turn = r[0] ? (r[0]<0 ? -90 : 90) : (r[1]<0 ? 90 : -90);
-    const turns = low ? 2 : (Math.random() < 0.5 ? 2 : 3);
+    const turns = low ? 2 : (Math.random() < 0.25 ? 3 : 2);
     const seq = (turns===3 ? [1,3,5,0] : [2,4,0]).map(k=> cubeRollFace(cell, idx, (cell.faceIdx + k) % 6)); // lands on its own face
     const dr = el.getBoundingClientRect(), w = dr.width/z, h = dr.height/z, hz = h/2;
     const cube = document.createElement('div'); cube.className = 'roll-cube';
@@ -6140,7 +6163,7 @@ function startCubeRoll(){
     cube.innerHTML = `<div class="roll-box"><div class="roll-face" style="transform:translateZ(${hz}px)"><i></i><div class="roll-shade"></div></div><div class="roll-face" style="transform:${sideT}"><i></i><div class="roll-shade"></div></div></div>`;
     const box = cube.firstChild, [f0, f1] = box.children, s0 = f0.lastChild, s1 = f1.lastChild;
     el.animate([{opacity:0},{opacity:0}], { delay, duration:turns*T + 40 }); // hidden while its cube rolls (expires on its own)
-    settled = Math.max(settled, delay + turns*T + 300); live++;
+    settled = Math.max(settled, delay + turns*T + 220); live++;
     setTimeout(()=>{
       if(gen!==startCubeRoll.gen || !layer.isConnected) return;
       layer.appendChild(cube);
@@ -6148,11 +6171,11 @@ function startCubeRoll(){
       const step = ()=>{
         if(gen!==startCubeRoll.gen || !el.isConnected){ cube.remove(); return; }
         f0.replaceChild(seq[k].cloneNode(true), f0.firstChild); f1.replaceChild(seq[k+1].cloneNode(true), f1.firstChild);
-        const travel = (turns-k) * 6;
+        const travel = (turns-k) * 4;
         const a = box.animate([
           { transform:`translate(${v[0]*travel}px, ${v[1]*travel}px) translateZ(${-hz}px) ${ax}(0deg)` },
-          { transform:`translate(${v[0]*(travel-3)}px, ${v[1]*(travel-3) - 5}px) translateZ(${-hz}px) ${ax}(${turn/2}deg)`, offset:.5 },
-          { transform:`translate(${v[0]*(travel-6)}px, ${v[1]*(travel-6)}px) translateZ(${-hz}px) ${ax}(${turn}deg)` }], { duration:T, easing:'ease-in-out', fill:'forwards' });
+          { transform:`translate(${v[0]*(travel-2)}px, ${v[1]*(travel-2) - 3}px) translateZ(${-hz}px) ${ax}(${turn/2}deg)`, offset:.5 },
+          { transform:`translate(${v[0]*(travel-4)}px, ${v[1]*(travel-4)}px) translateZ(${-hz}px) ${ax}(${turn}deg)` }], { duration:T, easing:'ease-in-out', fill:'forwards' });
         s0.animate([{opacity:0},{opacity:.6}], { duration:T, easing:'ease-in', fill:'forwards' });
         s1.animate([{opacity:.6},{opacity:0}], { duration:T, easing:'ease-out', fill:'forwards' });
         a.onfinish = ()=>{
@@ -6162,12 +6185,12 @@ function startCubeRoll(){
           if(gen!==startCubeRoll.gen || !el.isConnected) return;
           cubeLandClick(cell, clicks);
           // lands a little past its slot (the way you flicked), rocks on the edge it rolled over, then nestles flat
-          const sg = turn > 0 ? 1 : -1, tilt = Math.random()*4 - 2, P = 'perspective(400px)';
+          const sg = turn > 0 ? 1 : -1, tilt = Math.random()*2.4 - 1.2, P = 'perspective(400px)';
           el.animate([
-            { transform:`${P} translate(${v[0]*-2}px, ${v[1]*-2}px) ${ax}(${8*sg}deg) rotate(${tilt}deg)` },
-            { transform:`${P} translate(${v[0]*3}px, ${v[1]*3}px) ${ax}(${-3*sg}deg) rotate(${-tilt*.5}deg)`, offset:.4 },
+            { transform:`${P} translate(${v[0]*-1.5}px, ${v[1]*-1.5}px) ${ax}(${5*sg}deg) rotate(${tilt}deg)` },
+            { transform:`${P} translate(${v[0]*2}px, ${v[1]*2}px) ${ax}(${-2*sg}deg) rotate(${-tilt*.5}deg)`, offset:.4 },
             { transform:`${P} translate(${-v[0]}px, ${-v[1]}px) ${ax}(${sg}deg) rotate(${tilt*.2}deg)`, offset:.72 },
-            { transform:`${P} translate(0,0) ${ax}(0deg) rotate(0deg)` }], { duration:300, easing:'ease-out' });
+            { transform:`${P} translate(0,0) ${ax}(0deg) rotate(0deg)` }], { duration:220, easing:'ease-out' });
         };
       };
       step();

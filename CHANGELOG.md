@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.42.116 (Nov 14, 2026)
+- Dice roll calmed down and quicker (Jeremy): a tighter wave, quicker quarter-turns, a third tumble on 1 in 4 dice (was 1 in 2), less travel and hop, a shorter, gentler settle. The slowest die lands in about 0.8 s (was about 1.1 s).
+- New sound: a boss bending its health bar when it lands on it: an iron groan as the bar sags, a twang as it springs back, two rivet ticks as it settles.
+- Quest poster: the done ticks are now a small green toy seal with a drawn check (they were plain typed check marks), on "This path!" and in front of a quest the path completes.
+- The "tap me" wiggle (loot chest, doors, shrine, campfire, Skill-ready die, keep-a-die) comes every 5.2 s instead of every 2.6 s, first one about 2 s in.
+
 ## 1.42.115 (Nov 14, 2026)
 PC layout fixes from Jeremy's review (phones unchanged):
 - The route and the room now share one framed panel, the same brown frame as the dice box, and both panels are exactly the same height at every window size (checked at 1280x800 to 2560x1440). The route sits a little above the doorway arch instead of under its stones.

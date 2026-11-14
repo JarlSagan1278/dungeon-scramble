@@ -2739,7 +2739,16 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .fo-quests-float .fo-quests-label{ display:flex; align-items:center; justify-content:center; line-height:1.1; margin-bottom:3px !important; white-space:nowrap; font-size:8.5px !important; letter-spacing:.3px !important; gap:3px; }
 .fo-quests-float .fo-quest.q-live-done .q-cond{ color:#17501b; font-weight:800; }
 .fo-quests-float .fo-quest.q-live-done{ border-radius:4px; background:none; box-shadow:none; position:relative; }
-.fo-quests-float .fo-quest.q-live-done .q-cond::before{ content:"\2713"; color:#17501b; position:absolute; left:-9px; font-weight:900; }
+/* Nov 14 (Jeremy: the done ticks looked like typed text, not a game piece): a small toy seal, green with a chunky dark
+   outline, a top bevel and a drawn check, used for "This path!" and in front of a quest the path completes */
+.q-seal, .fo-quests-float .fo-quest.q-live-done .q-cond::before{ content:''; display:inline-block; box-sizing:border-box; width:11px; height:11px; border-radius:50%; flex:0 0 auto;
+  background:#3f9a3c radial-gradient(circle at 50% 30%, rgba(255,255,255,.35), transparent 60%); border:2px solid #0c0705; box-shadow:0 1px 0 #0c0705; vertical-align:-1px; margin-right:3px;
+  -webkit-mask:none; position:relative; }
+.q-seal::after, .fo-quests-float .fo-quest.q-live-done .q-cond::after{ content:''; position:absolute; box-sizing:border-box; width:3.5px; height:6px; border:solid #fff6dc; border-width:0 1.6px 1.6px 0; transform:rotate(45deg); }
+.q-seal::after{ left:2px; top:0; }
+.fo-quests-float .fo-quest.q-live-done .q-cond::before{ position:absolute; left:-12px; top:50%; margin-top:-5.5px; }
+.fo-quests-float .fo-quest.q-live-done .q-cond::after{ left:-8.4px; top:50%; margin-top:-4.6px; }
+.fo-quests-float .fo-quest.q-live-done .q-cond{ position:relative; }
  /* in the margin, so the text never gets wider */
 /* ==== Loot window (loot-): every top-level rule for it, merged Nov 12 by tools/css/merge.py (polish roadmap A3).
    Was 94 rules spread through this file; each value's history is in git. Edit here, not further up. ==== */
@@ -3619,14 +3628,15 @@ body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
    presses) and never touches filter or box-shadow (see the CLAUDE.md gotchas). Stops under Reduced Motion and playback.
    Used by: the Skill-ready die, the keep-a-die tile, the loot chest, the room door, the fork doors, the shrine button,
    and camp's Rest/Train while neither is chosen. A new "tap to go on" thing should use it too. */
-@keyframes tap-knock{ 0%,70%,100%{ rotate:0deg; } 74%{ rotate:-6deg; } 78%{ rotate:5deg; } 82%{ rotate:-3.5deg; } 86%{ rotate:2deg; } 90%{ rotate:0deg; } }
-:root{ --tap-knock: tap-knock 2.6s ease-in-out 1.2s infinite; }
-.die.trayact-nudge:not(.shaking):not(.just-rerolled):not(.just-swapped):not(.resolving):not(.guide-nudge):not(.minion){ animation:tap-knock 2.6s ease-in-out .6s infinite; }
+/* Nov 14 (Jeremy: wiggle less often): every 5.2 s (was 2.6 s), the wiggle itself as quick as before; the negative delay puts the first one ~2 s in */
+@keyframes tap-knock{ 0%,86%,100%{ rotate:0deg; } 88%{ rotate:-6deg; } 90%{ rotate:5deg; } 92%{ rotate:-3.5deg; } 94%{ rotate:2deg; } 96%{ rotate:0deg; } }
+:root{ --tap-knock: tap-knock 5.2s ease-in-out -2.4s infinite; }
+.die.trayact-nudge:not(.shaking):not(.just-rerolled):not(.just-swapped):not(.resolving):not(.guide-nudge):not(.minion){ animation:tap-knock 5.2s ease-in-out -2.4s infinite; }
 .defeat-keep #carryover-list .swap-item{ animation:var(--tap-knock); transform-origin:50% 85%; }
 .loot-chest-btn:not(.opening) .loot-chest{ animation:loot-chest-glow 1.6s ease-in-out infinite, var(--tap-knock); transform-origin:50% 80%; }
 .loot-modal.loot-modal-chest .loot-chest-btn:not(.opening) .loot-chest{ animation:var(--tap-knock); }
 #room-callout:not(.rc-seamless) .rc-door{ animation:rc-in .28s cubic-bezier(.3,1.5,.5,1) both, var(--tap-knock); transform-origin:50% 90%; }
-#fork-callout .fork-door:not(.opening){ animation:var(--tap-knock); animation-delay:calc(1.2s + var(--bob, 0s)); transform-origin:50% 90%; }
+#fork-callout .fork-door:not(.opening){ animation:var(--tap-knock); animation-delay:calc(-2.4s + var(--bob, 0s)); transform-origin:50% 90%; }
 .shrine-orb:not(.charging){ animation:var(--tap-knock); }
 .campfire-choice:not(.done):not(.out) .cf-btn:not(:disabled){ animation:var(--tap-knock); transform-origin:50% 80%; }
 .campfire-choice:not(.done):not(.out) #train-btn{ animation-delay:1.5s; } /* Train knocks just after Rest */
