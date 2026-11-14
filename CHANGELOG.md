@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.139 (Nov 14, 2026)
+- Hero gear (Jeremy): the back item is behind the left shoulder (the floating item moves to the right to make room), and both ground items stand a little closer in to the hero.
+
 ## 1.42.138 (Nov 14, 2026)
 - Hero gear (Jeremy: back items read as a second floating item): the back-slot weapon or shield is tucked behind the hero's shoulder, so the body covers part of it and it reads as carried on the back.
 
