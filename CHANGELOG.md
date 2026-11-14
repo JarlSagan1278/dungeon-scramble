@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.141 (Nov 14, 2026)
+- Hero gear touches (Jeremy's review of every item): floating items 30% bigger and sit lower (clear of the Wanted poster); the Dagger and Hidden Estoc are worn hilt-up, the blade hidden behind the hero (point-up they read as back stabs); Winged Boots, Trained Transposer, Eye-Frame, Pleasant Parasite? and Phlebotomizer are mirrored; the Tarot Deck is smaller, and it and the Winged Boots float well away from the hero; the N-th Dimensional Printer, 273.15 Kelvin Box, Hospitaler's Merciful Guillotine and Portable RNGenerator stand level on the floor. Per-item settings live in LOOT_FLIP, LOOT_HILT_UP and LOOT_GEAR_TWEAK (assets.js).
+
 ## 1.42.140 (Nov 14, 2026)
 - Hero gear (Jeremy's review): back items are slung diagonally across the back, heavy end beside the left shoulder and a little shaded (they read as hitting the hero's head); the floating item moved to the right.
 - Slots corrected by Jeremy: Hospitaler's Merciful Guillotine, Trained Transposer, Humor-inverter, Maximum Capacitor, Portable RNGenerator to the ground; Aloo'Minium Armor, Axiom of Choice, Glacial Gorget, Phlebotomizer to the back; Winged Boots and the shields (Spiked Shield, Buckler, Thorned Bulwark, Drill Shield) floating; the Hataxe gets its own slot, worn on top of the head. Item sizes are capped by their current slot.
