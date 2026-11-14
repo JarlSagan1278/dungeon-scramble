@@ -290,6 +290,8 @@ const LOOT_SLOT = {
 // Size of each loot item on the hero, as a fraction of the hero's height (Nov 14, Jeremy: size items by line thickness):
 // 70% of the size at which the item's outline would be as thick as the hero's (measured: hero art 400 px with ~12 px
 // lines; each loot picture's own line width), so relative sizes follow the art; capped per slot (back .75, ground .5, float .45).
+// Items drawn mirrored on the hero so they face the right way (Jeremy, Nov 14).
+const LOOT_FLIP = new Set(['Winged Boots', 'Trained Transposer', 'Eye-Frame', 'Pleasant Parasite?', 'Phlebotomizer']);
 const LOOT_GEAR_SIZE = {
   'Axiom of Choice': 0.45,
   'Trained Transposer': 0.36,
