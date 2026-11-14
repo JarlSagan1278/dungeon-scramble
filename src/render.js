@@ -5907,17 +5907,12 @@ function summaryStatsHTML(){
     ${runHighlightsHTML()}
     <div class="key-card" style="text-align:left;">
       <div class="camp-section-title" style="font-weight:800; text-align:center; margin-bottom:8px;">Run Summary</div>
-      <div class="statuses" style="justify-content:center;">
-        <span class="status-chip sum-chip">Floor reached: <b class="sum-count" data-to="${S.floorIdx+1}">${S.floorIdx+1}</b>/3</span>
-        <span class="status-chip sum-chip">Turns taken: <b class="sum-count" data-to="${st.turnsTaken}">${st.turnsTaken}</b></span>
-        <span class="status-chip sum-chip">Damage dealt: <b class="sum-count" data-to="${Math.round(st.damageDealt)}">${Math.round(st.damageDealt)}</b></span>
-        <span class="status-chip sum-chip">Encounters defeated: <b class="sum-count" data-to="${st.encountersDefeated}">${st.encountersDefeated}</b></span>
-        <span class="status-chip sum-chip">Shrines visited: <b class="sum-count" data-to="${st.shrinesVisited}">${st.shrinesVisited}</b></span>
-        <span class="status-chip sum-chip">Damage blocked: <b class="sum-count" data-to="${st.damageBlocked||0}">${st.damageBlocked||0}</b></span>
-        <span class="status-chip sum-chip">Overkills: <b class="sum-count" data-to="${st.overkills}">${st.overkills}</b></span>
-        <span class="status-chip sum-chip">Loot Dice collected: <b class="sum-count" data-to="${st.lootCollected}">${st.lootCollected}</b></span>
-        ${(S.relics||[]).map(id=>`<span class="status-chip">Relic: ${relicById(id).name}</span>`).join('')}
+      <div class="sum-grid">
+        ${[['Floor reached', S.floorIdx+1, '/3'], ['Turns taken', st.turnsTaken], ['Damage dealt', Math.round(st.damageDealt)], ['Foes defeated', st.encountersDefeated],
+           ['Shrines visited', st.shrinesVisited], ['Damage blocked', st.damageBlocked||0], ['Overkills', st.overkills], ['Loot dice', st.lootCollected]]
+          .map(([k,v,suf])=>`<div class="sum-chip sum-tile"><b><span class="sum-count" data-to="${v}">${v}</span>${suf||''}</b><small>${k}</small></div>`).join('')}
       </div>
+      ${(S.relics||[]).length ? `<div class="sum-relics">${S.relics.map(id=>relicBadgeHTML(relicById(id),'rc-gem')).join('')}</div>` : ''}
     </div>`;
 }
 

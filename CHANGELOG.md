@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.135 (Nov 14, 2026)
+- Chips audit (Jeremy: the Run Summary pills looked web-app-like). A script listed every visible thin-outlined or flat pill-shaped element on 13 screens. The Run Summary is now a grid of stat tiles like the run card's (gold number over a small label, chunky outline and drop shadow), with your relics as gems underneath; setup's depth rows, the "No wins yet" depth badge, the Origin Relic Earned card and the class Skill icon get the toy outline and drop shadow instead of thin 1 px lines.
+
 ## 1.42.134 (Nov 14, 2026)
 - Victory screen (Jeremy: needs more juice and a bigger adventurer): a stage under the title with the hero large on a stone plinth (name and depth) in front of a turning gold sunburst, dropping in with a squash and a gentle bob; the run's loot dice stand either side as trophy portraits (best first), popping in one by one with a chime; the outcome line sits under the plinth. The run card drops its small portrait row (the stage says it). Fits the phone (395x769 and 360x722) and spans both columns on PC. Reduced Motion: still.
 

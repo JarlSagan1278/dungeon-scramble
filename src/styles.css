@@ -3917,3 +3917,16 @@ html body #tray > .die.zone-cell:not(.in-path){ box-shadow:0 0 0 3px color-mix(i
 .vic-outcome{ position:relative; z-index:1; margin-top:5px; font-size:12.5px; font-style:italic; color:#9fe08a; }
 body.pc .end-screen.has-stage:has(.end-details) > .vic-stage{ grid-area:l; }
 body.pc .vic-stage{ height:200px; } body.pc .vic-hero{ height:120px; }
+
+/* ==== Chips audit (Nov 14, Jeremy: the Run Summary pills looked web-app-like): toy pieces instead of thin flat pills.
+   Run Summary = stat tiles like the run card's; depth rows, the depth badge, the relic-earned card and the class Skill
+   icon get the chunky outline + drop shadow. */
+.sum-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:5px; }
+.sum-tile{ background:#2a1c10; border:2px solid var(--line); border-radius:8px; box-shadow:0 2px 0 var(--line), inset 0 2px 0 rgba(255,255,255,.06); text-align:center; padding:4px 2px 3px; display:flex; flex-direction:column; align-items:center; }
+.sum-tile b{ color:var(--gold); font:800 16px/1.1 var(--font-ui); }
+.sum-tile small{ font-size:9.5px; line-height:1.15; color:var(--parchment-dim); }
+.sum-relics{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:8px; }
+.depth-row{ border:2px solid var(--line) !important; box-shadow:0 2px 0 var(--line); }
+.depth-badge-pill{ border:2px solid var(--line) !important; border-radius:6px !important; box-shadow:0 2px 0 var(--line); }
+.key-card.origin-relic-earned{ border:3px solid var(--gold) !important; box-shadow:0 3px 0 var(--line), 0 0 18px rgba(255,215,106,.3) !important; }
+.class-action-icon{ border:2px solid var(--line) !important; box-shadow:0 2px 0 var(--line); }
