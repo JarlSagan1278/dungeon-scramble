@@ -291,7 +291,7 @@ const LOOT_SLOT = {
 // 70% of the size at which the item's outline would be as thick as the hero's (measured: hero art 400 px with ~12 px
 // lines; each loot picture's own line width), so relative sizes follow the art; capped per slot (back .75, ground .5, float .45).
 // Items drawn mirrored on the hero so they face the right way (Jeremy, Nov 14).
-const LOOT_FLIP = new Set(['Winged Boots', 'Trained Transposer', 'Eye-Frame', 'Pleasant Parasite?', 'Phlebotomizer']);
+const LOOT_FLIP = new Set(['Winged Boots', 'Trained Transposer', 'Eye-Frame', 'Pleasant Parasite?', 'Phlebotomizer','Axiom of Choice']);
 // Short blades carried hilt-up on the back, the blade hidden behind the hero (Jeremy: point-up they read as back stabs).
 // The value is the turn that puts each one's blade straight down (the art faces different ways).
 const LOOT_HILT_UP = { 'Dagger': 140, 'Hidden Estoc': 20 };
@@ -300,7 +300,7 @@ const LOOT_HILT_UP = { 'Dagger': 140, 'Hidden Estoc': 20 };
 const LOOT_GEAR_TWEAK = {
   'Tarot Deck': { size:.7, out:.15 },
   'Winged Boots': { out:.15 },
-  'Dagger': { size:1.45, out:.2 }, 'Charge-Atlatl': { size:1.35, out:.14 }, 'Leeching Lance': { size:1.4, out:.14 }, 'Axiom of Choice': { size:1.5, out:.22 }, // thin back items that hid behind hair and hoods
+  'Dagger': { size:1.45, out:.2 }, 'Charge-Atlatl': { size:1.35, out:.14 }, 'Leeching Lance': { size:1.4, out:.14 }, 'Axiom of Choice': { size:1.3, out:.04, rot:0 }, // thin back items that hid behind hair and hoods
   'Drill Shield': { size:.8 }, // overlapped the head
   'Grappling Set': { out:.12 }, // its rope crossed the hero's hand
   'Genetic Drifter': { board:true }, // lies under the hero's feet like a skateboard (Jeremy)
