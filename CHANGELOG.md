@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.137 (Nov 14, 2026)
+- Loot on the hero (Jeremy's notes): each item is sized from its own outline thickness so it matches the hero's line weight (measured per picture; LOOT_GEAR_SIZE in assets.js), which makes most items bigger, ground items most of all. The two ground items stand close in, overlapping the hero's feet, at different heights and tilts instead of a mirrored pair.
+
 ## 1.42.136 (Nov 14, 2026)
 - Loot on the hero (Jeremy picked B + C of the proposals): every loot die has a slot: back (weapons and shields, behind the hero over a shoulder), ground (potions, food, boxes, gear at the feet) or float (charms, cards, gadgets bobbing by the head). The rarest item you own per slot shows on the hero in fights and on the victory stage (ground shows two); not at camp, where the hero rests unencumbered. Placed in the hero's own box, so it fits all 48 portraits with no per-portrait work. The victory trophies show the rest of your loot (nothing twice). The 60 slot tags are Claude's first draft (LOOT_SLOT in assets.js) for Jeremy to correct.
 - When a loot die's face plays in a turn, its item flashes up beside the hero with a gold burst.
