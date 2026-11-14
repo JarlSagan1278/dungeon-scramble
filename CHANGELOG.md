@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.118 (Nov 14, 2026)
+- Route: the character on the route is a fixed square, so it can no longer be squeezed narrower by its fit-to-content holder (Jeremy saw it squashed sideways; WebKit can size that holder before the picture has loaded).
+
 ## 1.42.117 (Nov 14, 2026)
 - New sound: every kill now lands with an impact hit at the moment of the ink impact frame (a fast slash, a deep thump and a crack; heavier for bosses and overkills). A plain kill used to play nothing until its victory chime on the next bar of the music. It plays even with Reduce Motion, which skips the frame itself.
 

@@ -1445,7 +1445,7 @@ body.is-resolving .lethal-tag, body.is-resolving .die .face-val .icon-svg, body.
 .rt-tick{ font-size:16px; }
 .mascot-wrap{ bottom:3px !important; }
 .rt-door.current .rt-q{ opacity:0; }
-.mascot-marker{ height:36px !important; }
+.mascot-marker{ height:36px !important; width:36px !important; max-width:none !important; flex:0 0 auto; object-fit:contain; } /* Nov 14 (Jeremy: looked squashed sideways): a fixed square, never narrowed by its fit-to-content wrapper (WebKit sizes the wrapper before the image loads) */
 
 /* ======== 1.32.57: Pocket is moss green (no longer teal like Guard's Skill); armed Skill lights the class zone ======== */
 .util-btn.rail-pocket{ background:#5f6f2e !important; color:#f4f1d2 !important; }
