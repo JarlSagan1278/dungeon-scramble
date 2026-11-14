@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.126 (Nov 14, 2026)
+- PC cursor (Jeremy): the gold outline now shows on dice inside your class's highlighted zone too (their glow ring's rule removed any outline).
+
 ## 1.42.125 (Nov 14, 2026)
 - Older Chrome (the Steam Deck's): two compatibility fixes found from Jeremy's Deck photos.
   - Positions: Chrome before 128 reports where things are inside a CSS-zoomed block divided by that zoom. The PC layout zooms its blocks, so everything placed by measuring (the cursor, the hint footer, the tutorial bubble and ring, tooltips, doors, kill and relic callouts, flying chips, the path line, the room floor) landed off target. On such a browser the game now corrects those measurements at startup, so all of them line up without changing each one. Checked by making a modern browser act like the old one: all PC checks pass.

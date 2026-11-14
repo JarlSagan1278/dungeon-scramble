@@ -3843,9 +3843,9 @@ svg.chest-art{ overflow:visible; filter:url(#fx-worn); }
   background:radial-gradient(ellipse 75% 16% at 50% 21%, rgba(255,240,210,.85), rgba(255,240,210,0) 100%), linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 12%, rgba(0,0,0,0) 60%, rgba(0,0,0,.35) 100%); }
 
 /* Nov 14 (Steam Deck): the PC cursor is an outline on its target (pcCursorDraw), drawn by the browser in the right place */
-.pc-cur{ outline:4px solid var(--gold) !important; outline-offset:4px; box-shadow:0 0 0 10px rgba(12,7,5,.0); animation:pc-cur-pulse 1.2s ease-in-out infinite; }
+html body .pc-cur, html body #tray > .die.pc-cur{ outline:4px solid var(--gold) !important; outline-offset:4px !important; /* beats the class-zone dice's outline:none !important (Nov 14) */ box-shadow:0 0 0 10px rgba(12,7,5,.0); animation:pc-cur-pulse 1.2s ease-in-out infinite; }
 @keyframes pc-cur-pulse{ 0%,100%{ outline-color:var(--gold); } 50%{ outline-color:#fff3c4; } }
-.reduced-motion .pc-cur{ animation:none; }
+html body.reduced-motion .pc-cur{ animation:none; }
 /* Nov 14 (Jeremy): "tap to enter" sits on the door's lower panel as a small dark tag, not below the door over the hero */
 .rc-door > .rc-tap{ grid-area:1/1; align-self:end; margin:0 0 22px; z-index:3; padding:2px 9px; border-radius:6px; background:rgba(12,7,5,.72); color:#f3e6cc; opacity:1; font-size:11px; }
 
