@@ -295,6 +295,16 @@ const LOOT_FLIP = new Set(['Winged Boots', 'Trained Transposer', 'Eye-Frame', 'P
 // Short blades carried hilt-up on the back, the blade hidden behind the hero (Jeremy: point-up they read as back stabs).
 // The value is the turn that puts each one's blade straight down (the art faces different ways).
 const LOOT_HILT_UP = { 'Dagger': 140, 'Hidden Estoc': 20 };
+// Per-item touches on the hero (Jeremy, Nov 14): size = multiplier, out = extra distance away from the hero (fraction of
+// its width), flat = stands level on the floor instead of tilted.
+const LOOT_GEAR_TWEAK = {
+  'Tarot Deck': { size:.7, out:.3 },
+  'Winged Boots': { out:.3 },
+  'N-th Dimensional Printer': { flat:true },
+  '273.15 Kelvin Box': { flat:true },
+  "Hospitaler's Merciful Guillotine": { flat:true },
+  'Portable RNGenerator': { flat:true },
+};
 const LOOT_GEAR_SIZE = {
   'Axiom of Choice': 0.45,
   'Trained Transposer': 0.36,
