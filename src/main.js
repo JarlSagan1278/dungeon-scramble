@@ -17,7 +17,7 @@ const LEGACY_ZOOM = (()=>{ try{
   const a = document.createElement('div'); a.style.cssText = 'position:absolute;left:-9999px;top:0;zoom:2;width:10px;height:10px';
   const b = document.createElement('div'); b.style.cssText = 'width:10px;height:10px'; a.appendChild(b); document.body.appendChild(a);
   const w = b.getBoundingClientRect().width; a.remove();
-  return w > 0 && w < 15; // today's Chrome says 20 (screen px); the old one 10
+  return w > 0 && w < 15 && !('currentCSSZoom' in Element.prototype); // today's Chrome says 20 (screen px) and has currentCSSZoom; the old one 10 and none (both changed in Chrome 128)
 }catch(e){ return false; } })();
 // Chrome before 123 ignores paint-order on page text, so a thick -webkit-text-stroke covers the letters (health bar
 // numbers read as black blobs on the Steam Deck, Nov 14): those browsers get a shadow outline instead (body.old-text).
@@ -182,7 +182,7 @@ function pcTargets(){
     const r = n.getBoundingClientRect();
     if(r.width<8 || r.height<8) continue;
     // off the screen: only reachable inside a pop-up window, whose content scrolls (the cursor scrolls it into view)
-    if((r.bottom<2 || r.top>H-2 || r.right<2 || r.left>W-2) && !(layer && layer.classList.contains('modal-overlay'))) continue;
+    if((r.bottom<2 || r.top>H-2) && !(layer && layer.classList.contains('modal-overlay'))) continue; // sideways never skipped (Nov 14: on the Deck the rightmost buttons measured past the edge)
     if(r.width>W*0.7 && r.height>H*0.7) continue; // a scrim or a whole-screen catcher, not a thing to point at
     const cs = getComputedStyle(n);
     if(cs.visibility==='hidden' || cs.display==='none' || cs.pointerEvents==='none' || +cs.opacity===0) continue;
@@ -282,6 +282,9 @@ function pcMove(dx, dy){
     const score = Math.max(0, along) + side*3 + offc*0.35 + fwd*0.05;
     if(score < bs){ bs = score; best = n; }
   }
+  // nothing found that way (a browser that measures oddly): right/down step to the next thing in page order, left/up to
+  // the previous, so every button stays reachable
+  if(!best){ const i = ts.indexOf(pcCur), j = i + ((dx||dy) > 0 ? 1 : -1); if(i >= 0 && ts[j] && ts[j].id !== 'settings-btn') best = ts[j]; }
   if(best) pcCursorSet(best);
 }
 function pcDown(){

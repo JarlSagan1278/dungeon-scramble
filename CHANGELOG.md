@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.128 (Nov 14, 2026)
+- PC cursor (Jeremy, Steam Deck: How to Play unreachable on the title, like the 4th dice column before): the cursor no longer skips things it measures as past the window's side, and when nothing is found in a direction it steps to the next/previous thing in page order, so every button stays reachable however the browser measures. The old-Chrome position correction now also requires that the browser lacks currentCSSZoom (both changed in Chrome 128), so it cannot switch on for a browser that does not need it.
+
 ## 1.42.127 (Nov 14, 2026)
 - PC cursor (Jeremy, Steam Deck): in the fight's tray the cursor now moves by the dice grid and the button rail's order instead of by measured positions: left/right/up/down step through the 4x4 dice, right from the 4th column goes to the rail (Go, Skill, Pocket, Item, Clear, top to bottom), left from the rail comes back to that row. On the Deck it could not get past the 3rd column. The pointed-at die is raised above its neighbours so they never cover its gold outline.
 
