@@ -1486,8 +1486,23 @@ function pcCombatCenter(){
   return { x: a.left + a.width/2, y: (t + a.bottom)/2 };
 }
 function pcPlaceDoors(){
-  const c = pcCombatCenter(); if(!c) return;
-  ['room-callout','fork-callout','fork-ghost'].forEach(id=>{ const n = document.getElementById(id); if(n && !n.classList.contains('picking')){ n.style.left = c.x+'px'; n.style.top = c.y+'px'; } });
+  if(!pcMode()) return;
+  // Nov 14 (Jeremy, Deck screenshot): the door stands in the room's own archway, centred on the room picture and sized to fit
+  // inside it (it used to centre on route + room and could cover the hero and the route)
+  const rm = document.querySelector('#app > #enc-panel'); if(!rm) return;
+  const card = rm.querySelector('.enc-card') || rm, a = card.getBoundingClientRect();
+  const cx = a.left + a.width/2, cy = a.top + a.height/2;
+  const zm = parseFloat(getComputedStyle(document.body).getPropertyValue('--pc-zm')) || 1.6;
+  const fit = (node, parts)=>{
+    if(!node || !parts.length || node.classList.contains('picking')) return;
+    const z0 = parts[0].currentCSSZoom || zm, h = node.getBoundingClientRect().height; if(!h) return;
+    const z = Math.min(zm, z0 * a.height * 0.88 / h); // node's height scales with its parts' zoom
+    parts.forEach(p=>{ if(Math.abs((parseFloat(p.style.zoom)||0) - z) > 0.01) p.style.zoom = z.toFixed(3); });
+    node.style.left = cx+'px'; node.style.top = cy+'px';
+  };
+  const rc = document.getElementById('room-callout'); if(rc) fit(rc, [...rc.querySelectorAll(':scope > *')]);
+  const fc = document.getElementById('fork-callout'); if(fc) fit(fc, [...fc.children]);
+  const gh = document.getElementById('fork-ghost'); if(gh){ const d = gh.querySelector('.rc-door'); if(d) fit(gh, [d]); }
 }
 function removeForkCallout(){ ['fork-callout','fork-scrim','fork-ghost'].forEach(id=>{ const n=document.getElementById(id); if(n) n.remove(); }); }
 function syncForkCallout(){
@@ -1516,7 +1531,8 @@ function syncForkCallout(){
       const sc = t.width / a.width, dx = (t.left + t.width/2) - (a.left + a.width/2), dy = (t.top + t.height/2) - (a.top + a.height/2);
       door.style.transformOrigin = '50% 50%';
       // translate is in the door's own (zoomed) pixels, so divide by its zoom
-      const anim = door.animate([{transform:'none'}, {transform:`translate(${dx/FORK_ZOOM}px, ${dy/FORK_ZOOM}px) scale(${sc})`}], {duration:340, easing:'cubic-bezier(.3,.9,.35,1)', fill:'forwards'});
+      const zf = door.currentCSSZoom || FORK_ZOOM; // the door's whole zoom (PC mode enlarges the fork too)
+      const anim = door.animate([{transform:'none'}, {transform:`translate(${dx/zf}px, ${dy/zf}px) scale(${sc})`}], {duration:340, easing:'cubic-bezier(.3,.9,.35,1)', fill:'forwards'});
       try{ playTone('uiTick'); }catch(e){}
       anim.onfinish = go;
     };
@@ -5349,7 +5365,7 @@ function pcFitFight(){
   const zr = zt * k;
   const st = document.body.style, set = (n, v)=>{ if(st.getPropertyValue(n) !== v) st.setProperty(n, v); };
   set('--pc-zt', zt.toFixed(3)); set('--pc-zr', zr.toFixed(3)); set('--pc-zroute', zr.toFixed(3));
-  set('--pc-pad', pad+'px'); set('--pc-gap', gap+'px'); set('--pc-foot', foot+'px'); set('--pc-zh', Math.max(0.95, Math.min(1.5, (foot - 8)/80)).toFixed(3)); // a die's caption is ~80 px tall at zoom 1
+  set('--pc-pad', pad+'px'); set('--pc-gap', gap+'px'); set('--pc-foot', foot+'px'); set('--pc-zh', Math.max(0.8, Math.min(1.5, (foot - 12)/80)).toFixed(3)); // the footer strip is foot - 8 tall, a die's caption ~80 px at zoom 1 // a die's caption is ~80 px tall at zoom 1
 }
 // Nov 14 (Steam Deck: only the touchscreen worked): say what controller, if any, the browser reports, so a player can
 // tell a game problem from a browser/Steam setting. The browser only lists a pad after one of its buttons is pressed.
@@ -5427,7 +5443,9 @@ function pcHoverSync(){
   const r = room.getBoundingClientRect(), t = tray.getBoundingClientRect(), top = Math.max(r.bottom, t.bottom) + 8;
   pcPlaceDoors();
   el.hidden = false; el.style.left = Math.round(r.left)+'px'; el.style.width = Math.round(t.right - r.left)+'px'; el.style.top = Math.round(top)+'px';
-  el.style.maxHeight = Math.max(30, Math.round(window.innerHeight - top - 6))+'px';
+  // a fixed-height footer under both panels (Nov 14): the group (panels + footer) is one centred block, never a floating line
+  const foot = parseFloat(document.body.style.getPropertyValue('--pc-foot')) || 80;
+  el.style.height = Math.round(foot - 8)+'px'; el.style.maxHeight = '';
   pcHoverRender();
 }
 document.addEventListener('mouseover', ev=>{

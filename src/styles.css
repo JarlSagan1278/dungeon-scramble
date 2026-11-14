@@ -3707,7 +3707,7 @@ body.pc #app:has(> #enc-panel) > .route-float{ box-sizing:border-box; padding:6p
 body.pc #app:has(> #enc-panel) > #enc-panel{ box-sizing:border-box; padding:0 6px 6px !important; margin:0 !important; }
 body.pc #app:has(> #enc-panel) > .tray-panel{ align-self:stretch; }
 /* the hover caption (Nov 13, Jeremy: too present, too much blank space): a quiet strip as tall as what it says */
-#pc-hover{ position:fixed; z-index:20; box-sizing:border-box; display:flex; align-items:center; background:rgba(12,7,5,.5); border-radius:12px; overflow:hidden; }
+#pc-hover{ position:fixed; z-index:20; box-sizing:border-box; display:flex; align-items:center; background:rgb(51,32,15); border:2px solid #0c0705; border-radius:14px; overflow:hidden; } /* framed like the panels above it (Nov 14) */
 #pc-hover .pch-in{ zoom:var(--pc-zh, 1.4); display:flex; align-items:center; gap:12px; width:100%; padding:6px 12px; box-sizing:border-box; color:var(--parchment); }
 #pc-hover .pch-idle{ align-items:center; }
 #pc-hover .pch-idle .pch-text{ text-align:center; font-size:11.5px; }

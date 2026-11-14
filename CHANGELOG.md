@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.122 (Nov 14, 2026)
+- PC layout (Jeremy, Deck screenshot): the room door and the fork's doors stand in the room's own archway, centred on the room and sized to fit inside it (they were centred on route + room and covered the hero and the route); a picked fork door still glides into place. The hover caption is a framed footer of fixed height under both panels, so panels and caption are one centred group (it floated as a loose line).
+
 ## 1.42.121 (Nov 14, 2026)
 - PC layout on Steam Deck (Jeremy's photos): Chrome at 125% gives a 1024x640 window, and the phone card's 720 px minimum height still applied, so every screen sat 40 px low with its bottom cut off (camp's hint, the hover caption over the room). PC mode drops that minimum; title, setup and camp fill exactly the window.
 - Settings (PC mode) shows which controller the browser reports, or that it sees none; a "Controller connected" note appears when one is found. The game already reads any controller the browser reports; on the Deck, Chrome only gets it with the right Steam and Flatpak settings.
