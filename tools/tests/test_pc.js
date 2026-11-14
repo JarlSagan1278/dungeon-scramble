@@ -109,6 +109,13 @@ const FIGHT = () => { META.lifetime.victories = 3; META.coachSeen = { armsmaster
     }
     await p.close();
   }
+  // Codex as an open book (Nov 14): opening an entry keeps the list on the left page and shows the entry on the right
+  p = await open(1920, 1080, true); await p.evaluate(() => { preGameScreen = 'title'; S = null; render(); openCodexModal('dice'); }); await p.waitForTimeout(400);
+  await p.locator('.cx-card[data-page]').first().click(); await p.waitForTimeout(300);
+  const bk = await p.evaluate(() => { const b = document.getElementById('codex-body').getBoundingClientRect(), g = document.getElementById('codex-page').getBoundingClientRect();
+    return { list: document.querySelectorAll('#codex-body .cx-card').length, page: !!document.querySelector('#codex-page .cx-page'), side: b.right <= g.left + 1, on: !!document.querySelector('.cx-card.cx-on') }; });
+  out.push((bk.list > 3 && bk.page && bk.side && bk.on ? 'ok   ' : 'FAIL ') + `Codex: an opened entry reads on the right page while the list stays on the left (${JSON.stringify(bk)})`);
+  await p.close();
   // the Settings switch turns it off (and is remembered); without any setting a real browser gets it on a wide window
   p = await open(1280, 800, true); await p.evaluate(() => { preGameScreen = 'title'; S = null; render(); openSettingsModal(); }); await p.waitForTimeout(400);
   await p.click('#pref-pc-layout', { force: true }); await p.waitForTimeout(700);

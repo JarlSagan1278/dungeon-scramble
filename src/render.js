@@ -4530,18 +4530,25 @@ function openCodexModal(tab){
       <button class="modal-x-btn" id="codex-x-btn" title="Close">✕</button>
       <h2 style="margin-top:0;">Codex</h2>
       <div class="codex-tabs">${CODEX_TABS.map(([id,l])=>`<button class="codex-tab" data-tab="${id}">${l}</button>`).join('')}</div>
-      <div class="codex-body" id="codex-body"></div>
+      <div class="codex-spread"><div class="codex-body" id="codex-body"></div><div class="codex-page-pane" id="codex-page" aria-live="polite"></div></div>
     </div></div>`);
   openModal(overlay);
-  const body = overlay.querySelector('#codex-body');
+  const body = overlay.querySelector('#codex-body'), pane = overlay.querySelector('#codex-page');
+  // PC layout (Nov 14): an open book: the list stays on the left page, the chosen entry reads on the right page (the phone
+  // swaps the list for the entry and back)
+  const paneIdle = ()=>{ pane.innerHTML = `<div class="codex-pane-idle">Pick an entry on the left to read its page.</div>`; };
+  paneIdle();
   const show = t=>{
     overlay.querySelectorAll('.codex-tab').forEach(b=>b.classList.toggle('on', b.dataset.tab===t));
     body.innerHTML = t==='dice' ? diceCompendiumHTML() : t==='relics' ? relicCodexHTML() : t==='key' ? keyCardHTML() : bestiaryHTML();
-    body.scrollTop = 0; cur = t;
+    body.scrollTop = 0; cur = t; paneIdle();
+    overlay.querySelector('.codex-spread').classList.toggle('one-page', !body.querySelector('.cx-card[data-page]')); // nothing to open: the list takes the whole book
     if(t==='dice') markDiceSeen(); if(t==='relics') markRelicsSeen();
   };
   let cur = tab, listScroll = 0;
-  const openPage = c=>{ const html = CODEX_PAGES[c.dataset.page]; if(!html) return; listScroll = body.scrollTop; body.innerHTML = html; body.scrollTop = 0; };
+  const openPage = c=>{ const html = CODEX_PAGES[c.dataset.page]; if(!html) return;
+    if(pcMode()){ pane.innerHTML = html; pane.scrollTop = 0; body.querySelectorAll('.cx-card.cx-on').forEach(x=>x.classList.remove('cx-on')); c.classList.add('cx-on'); return; }
+    listScroll = body.scrollTop; body.innerHTML = html; body.scrollTop = 0; };
   body.onclick = ev=>{
     const c = ev.target.closest('.cx-card[data-page]'); if(c){ openPage(c); return; }
     if(ev.target.closest('.cx-back')){ const y = listScroll; show(cur); body.scrollTop = y; }

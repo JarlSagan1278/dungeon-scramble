@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.113 (Nov 14, 2026)
+- PC layout: the Codex opens as a two-page book. The list stays on the left page and the entry you pick reads on the right page (the chosen card is outlined), so you can flip through entries without going back and forth. Tabs with nothing to open (Key, or before anything is discovered) use the whole book. Phones unchanged.
+- check.js pc: the Codex book check.
+
 ## 1.42.112 (Nov 14, 2026)
 PC layout consistency pass (phones unchanged):
 - Title: sits on the same blurred backdrop as every other screen, with the cover in a framed card and the buttons in a dark-brown card (it was a flat dark screen with loose buttons).
