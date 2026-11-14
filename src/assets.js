@@ -292,6 +292,9 @@ const LOOT_SLOT = {
 // lines; each loot picture's own line width), so relative sizes follow the art; capped per slot (back .75, ground .5, float .45).
 // Items drawn mirrored on the hero so they face the right way (Jeremy, Nov 14).
 const LOOT_FLIP = new Set(['Winged Boots', 'Trained Transposer', 'Eye-Frame', 'Pleasant Parasite?', 'Phlebotomizer']);
+// Short blades carried hilt-up on the back, the blade hidden behind the hero (Jeremy: point-up they read as back stabs).
+// The value is the turn that puts each one's blade straight down (the art faces different ways).
+const LOOT_HILT_UP = { 'Dagger': 140, 'Hidden Estoc': 20 };
 const LOOT_GEAR_SIZE = {
   'Axiom of Choice': 0.45,
   'Trained Transposer': 0.36,

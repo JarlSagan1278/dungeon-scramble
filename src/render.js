@@ -5850,9 +5850,9 @@ function heroGear(){
 // Two layers by page order: the back item before the portrait (drawn behind it), the rest after (in front).
 function heroGearHTML(part){
   if(!S) return '';
-  const CAP = {back:.75, ground:.5, float:.45, head:.5};
-  const g = heroGear(), img = (d, cls)=> `<img class="hg ${cls}${LOOT_FLIP.has(d.name)?' hg-flip':''}" src="${LOOT_ART[d.name]}" alt="" title="${d.name}" style="height:${Math.round(Math.min(LOOT_GEAR_SIZE[d.name]||.3, CAP[LOOT_SLOT[d.name]]||.5)*100)}%">`;
-  if(part==='back') return g.back ? `<span class="hero-gear hg-behind" aria-hidden="true">${img(g.back,'hg-back').replace(/height:(\d+)%/, (m,h)=>`height:${Math.min(98, Math.round(h*1.35))}%`)}</span>` : ''; // bigger and more central, so it still peeks out (Jeremy)
+  const CAP = {back:.75, ground:.5, float:.6, head:.5};
+  const g = heroGear(), img = (d, cls)=> `<img class="hg ${cls}${LOOT_FLIP.has(d.name)?' hg-flip':''}" src="${LOOT_ART[d.name]}" alt="" title="${d.name}" style="height:${Math.round(Math.min((LOOT_GEAR_SIZE[d.name]||.3) * (LOOT_SLOT[d.name]==='float' ? 1.3 : 1), CAP[LOOT_SLOT[d.name]]||.5)*100)}%">`;
+  if(part==='back') return g.back ? `<span class="hero-gear hg-behind" aria-hidden="true">${(LOOT_HILT_UP[g.back.name]!=null ? img(g.back,'hg-back hg-hilt').replace('style="', `style="transform:rotate(${LOOT_HILT_UP[g.back.name]}deg);`) : img(g.back,'hg-back')).replace(/height:(\d+)%/, (m,h)=>`height:${Math.min(98, Math.round(h*1.35))}%`)}</span>` : ''; // bigger and more central, so it still peeks out (Jeremy)
   if(!g.ground.length && !g.float && !g.head) return '';
   return `<span class="hero-gear" aria-hidden="true">${g.ground[0]?img(g.ground[0],'hg-ground hg-gl'):''}${g.ground[1]?img(g.ground[1],'hg-ground hg-gr'):''}${g.float?img(g.float,'hg-float'):''}${g.head?img(g.head,'hg-head'):''}</span>`;
 }
