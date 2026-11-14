@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.42.125 (Nov 14, 2026)
+- Older Chrome (the Steam Deck's): two compatibility fixes found from Jeremy's Deck photos.
+  - Positions: Chrome before 128 reports where things are inside a CSS-zoomed block divided by that zoom. The PC layout zooms its blocks, so everything placed by measuring (the cursor, the hint footer, the tutorial bubble and ring, tooltips, doors, kill and relic callouts, flying chips, the path line, the room floor) landed off target. On such a browser the game now corrects those measurements at startup, so all of them line up without changing each one. Checked by making a modern browser act like the old one: all PC checks pass.
+  - Outlined text: Chrome before 123 draws the thick outline over the letters, so health bar numbers (and the damage pops, turn total and kill callouts) read as black blobs. Those browsers get a shadow outline instead.
+- Settings (PC mode) also shows the Chrome version and whether positions are being corrected.
+- check.js pc: DS_LEGACY_ZOOM=1 runs the PC checks as old Chrome.
+
 ## 1.42.124 (Nov 14, 2026)
 - PC layout (Jeremy, Steam Deck: the hint footer overlapped the panels): the hover/hint footer is now the fight layout's own third row, placed by the browser under both panels, instead of being positioned from measured screen coordinates (the Deck's Chrome measured them differently).
 

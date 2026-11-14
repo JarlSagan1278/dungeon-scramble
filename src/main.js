@@ -8,6 +8,26 @@ window.addEventListener('unhandledrejection', (ev)=>{
   try{ teleLog('error', {msg:'unhandledrejection: '+String(ev.reason&&ev.reason.message||ev.reason).slice(0,200), screen:S&&S.screen}); }catch(e){}
 });
 
+// Nov 14 (Steam Deck: the cursor ring, hint footer and tutorial bubble landed in the wrong places): Chrome before 128
+// reported an element's position inside a CSS-zoomed block divided by that zoom, and had no element.currentCSSZoom.
+// The PC layout zooms its blocks, and everything the game places by measuring (tooltips, doors, callouts, the path
+// line, the tutorial) assumes today's numbers. On such a browser, correct getBoundingClientRect to screen pixels and
+// supply currentCSSZoom, so every placement works the same on old and new Chrome.
+const LEGACY_ZOOM = (()=>{ try{
+  const a = document.createElement('div'); a.style.cssText = 'position:absolute;left:-9999px;top:0;zoom:2;width:10px;height:10px';
+  const b = document.createElement('div'); b.style.cssText = 'width:10px;height:10px'; a.appendChild(b); document.body.appendChild(a);
+  const w = b.getBoundingClientRect().width; a.remove();
+  return w > 0 && w < 15; // today's Chrome says 20 (screen px); the old one 10
+}catch(e){ return false; } })();
+// Chrome before 123 ignores paint-order on page text, so a thick -webkit-text-stroke covers the letters (health bar
+// numbers read as black blobs on the Steam Deck, Nov 14): those browsers get a shadow outline instead (body.old-text).
+try{ const m = navigator.userAgent.match(/Chrome\/(\d+)/); if(m && +m[1] < 123) document.body.classList.add('old-text'); }catch(e){}
+if(LEGACY_ZOOM){
+  const effZoom = el=>{ let z = 1; for(let n = el; n && n.nodeType === 1; n = n.parentElement){ const v = parseFloat(getComputedStyle(n).zoom); if(v && v !== 1) z *= v; } return z; };
+  const orig = Element.prototype.getBoundingClientRect;
+  Element.prototype.getBoundingClientRect = function(){ const r = orig.call(this), z = effZoom(this); return z === 1 ? r : new DOMRect(r.x*z, r.y*z, r.width*z, r.height*z); };
+  if(!('currentCSSZoom' in Element.prototype)) Object.defineProperty(Element.prototype, 'currentCSSZoom', { get(){ return effZoom(this); }, configurable:true });
+}
 document.getElementById('settings-btn').onclick = openSettingsModal;
 // Wide screens (a computer): the cover scene, dimmed, fills the space around the game card instead of a black void (Oct 28).
 try{ if(typeof COVER_ART!=='undefined' && COVER_ART) document.documentElement.style.setProperty('--backdrop', `url("${COVER_ART}")`); }catch(e){}

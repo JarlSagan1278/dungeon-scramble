@@ -5371,10 +5371,11 @@ function pcFitFight(){
 }
 // Nov 14 (Steam Deck: only the touchscreen worked): say what controller, if any, the browser reports, so a player can
 // tell a game problem from a browser/Steam setting. The browser only lists a pad after one of its buttons is pressed.
+function pcBrowserNote(){ const m = navigator.userAgent.match(/Chrome\/(\d+)/); return ` Browser: ${m ? 'Chrome '+m[1] : 'not Chrome'}${typeof LEGACY_ZOOM!=='undefined' && LEGACY_ZOOM ? ' (older positions, corrected)' : ''}.`; }
 function pcPadStatusText(){
   let pads = []; try{ pads = [...(navigator.getGamepads ? navigator.getGamepads() : [])].filter(Boolean); }catch(e){}
-  if(!pads.length) return 'Controller: none seen yet. Press a button on it; if this still says none, the browser is not receiving it.';
-  const g = pads[0]; return `Controller: ${String(g.id||'connected').replace(/</g,'&lt;').slice(0,60)} (${g.mapping==='standard'?'standard layout':'non-standard layout'}).`;
+  if(!pads.length) return 'Controller: none seen yet. Press a button on it; if this still says none, the browser is not receiving it.' + pcBrowserNote();
+  const g = pads[0]; return `Controller: ${String(g.id||'connected').replace(/</g,'&lt;').slice(0,60)} (${g.mapping==='standard'?'standard layout':'non-standard layout'}).` + pcBrowserNote();
 }
 window.addEventListener('gamepadconnected', ev=>{
   try{ if(pcMode() && typeof showToast==='function') showToast('Controller connected: ' + String(ev.gamepad && ev.gamepad.id || '').slice(0,40)); }catch(e){}

@@ -3848,3 +3848,8 @@ svg.chest-art{ overflow:visible; filter:url(#fx-worn); }
 .reduced-motion .pc-cur{ animation:none; }
 /* Nov 14 (Jeremy): "tap to enter" sits on the door's lower panel as a small dark tag, not below the door over the hero */
 .rc-door > .rc-tap{ grid-area:1/1; align-self:end; margin:0 0 22px; z-index:3; padding:2px 9px; border-radius:6px; background:rgba(12,7,5,.72); color:#f3e6cc; opacity:1; font-size:11px; }
+
+/* Chrome before 123 (body.old-text, main.js): no paint-order on page text, so outlined text uses a shadow ring instead of a stroke */
+body.old-text .fo-hpwrap .bar-num, body.old-text .fo-hpwrap .delta-float, body.old-text .turn-total span{ -webkit-text-stroke:0 !important; text-shadow:-1.5px 0px 0 #1b0f06, 1.5px 0px 0 #1b0f06, 0px -1.5px 0 #1b0f06, 0px 1.5px 0 #1b0f06, -1.0499999999999998px -1.0499999999999998px 0 #1b0f06, 1.0499999999999998px -1.0499999999999998px 0 #1b0f06, -1.0499999999999998px 1.0499999999999998px 0 #1b0f06, 1.0499999999999998px 1.0499999999999998px 0 #1b0f06 !important; }
+body.old-text .turn-total b{ -webkit-text-stroke:0 !important; text-shadow:-2.5px 0px 0 #0c0705, 2.5px 0px 0 #0c0705, 0px -2.5px 0 #0c0705, 0px 2.5px 0 #0c0705, -1.75px -1.75px 0 #0c0705, 1.75px -1.75px 0 #0c0705, -1.75px 1.75px 0 #0c0705, 1.75px 1.75px 0 #0c0705, 0 4px 0 #0c0705, 0 0 18px rgba(255,140,40,.55) !important; }
+body.old-text .kill-callout-line{ -webkit-text-stroke:0 !important; text-shadow:-3px 0px 0 #120a04, 3px 0px 0 #120a04, 0px -3px 0 #120a04, 0px 3px 0 #120a04, -2.0999999999999996px -2.0999999999999996px 0 #120a04, 2.0999999999999996px -2.0999999999999996px 0 #120a04, -2.0999999999999996px 2.0999999999999996px 0 #120a04, 2.0999999999999996px 2.0999999999999996px 0 #120a04, 0 3px 0 #120a04, 0 0 12px rgba(0,0,0,.9) !important; }

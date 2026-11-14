@@ -16,6 +16,10 @@ const FIGHT = () => { META.lifetime.victories = 3; META.coachSeen = { armsmaster
   const browser = await chromium.launch(); const out = [], errors = [];
   const open = async (w, h, pc) => { const p = await browser.newPage({ viewport: { width: w, height: h } }); p.on('pageerror', e => errors.push(`${w}x${h}: ` + e.message));
     await p.addInitScript((pc) => { try { localStorage.setItem('dungeonScrambleTutorialSeen_v1', '1'); if (pc) localStorage.setItem('dungeonScramblePC', '1'); } catch (e) {} }, pc);
+    // DS_LEGACY_ZOOM=1: act like Chrome before 128 (positions inside CSS zoom divided by it, no currentCSSZoom), to check the game's correction
+    if (process.env.DS_LEGACY_ZOOM) await p.addInitScript(() => { const o = Element.prototype.getBoundingClientRect; delete Element.prototype.currentCSSZoom;
+      const ez = el => { let z = 1; for (let n = el; n && n.nodeType === 1; n = n.parentElement) { const v = parseFloat(getComputedStyle(n).zoom); if (v && v !== 1) z *= v; } return z; };
+      Element.prototype.getBoundingClientRect = function () { const r = o.call(this), z = ez(this); return z === 1 ? r : new DOMRect(r.x / z, r.y / z, r.width / z, r.height / z); }; });
     await p.goto(URL_); await p.waitForTimeout(400); return p; };
   // off unless asked for; off on a phone even when asked for
   let p = await open(1920, 1080, false); const offWide = await p.evaluate(() => document.body.classList.contains('pc')); await p.close();
