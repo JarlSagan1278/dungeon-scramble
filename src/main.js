@@ -189,7 +189,7 @@ function pcCursorSet(n){
 }
 function pcCursorDraw(){
   const ring = pcCursorRing();
-  if(!pcCurOn || !pcMode()){ ring.hidden = true; return; }
+  if(!pcCurOn || !pcMode()){ ring.hidden = true; if(pcCurMarked){ pcCurMarked.classList.remove('pc-cur'); pcCurMarked = null; } return; }
   const where = pcWhere();
   if(!pcCur || !pcCur.isConnected || !pcTargetOk(pcCur) || where!==pcCurWhere){
     const ts = pcTargets(); if(!ts.length){ ring.hidden = true; pcCur = null; return; }
@@ -202,11 +202,14 @@ function pcCursorDraw(){
     pcCurWhere = where; pcCurPt = pcCentre(pcCur);
     try{ const die = pcCur.matches('#tray > .die') ? parseInt(pcCur.dataset.idx) : null; pcHoverIdx = die; pcHoverTip = null; pcHoverRender(); }catch(e){}
   }
-  const r = pcCur.getBoundingClientRect();
-  ring.hidden = false;
-  ring.style.left = (r.left-5)+'px'; ring.style.top = (r.top-5)+'px'; ring.style.width = (r.width+10)+'px'; ring.style.height = (r.height+10)+'px';
-  ring.style.borderRadius = (parseFloat(getComputedStyle(pcCur).borderTopLeftRadius)||10)*(pcCur.currentCSSZoom||1) + 6 + 'px';
+  // Nov 14 (Steam Deck: the ring sat off its target): the highlight is an outline on the target itself, so the browser
+  // places it (measured screen positions inside zoomed blocks differ between Chrome versions)
+  ring.hidden = true;
+  if(pcCurMarked && pcCurMarked !== pcCur) pcCurMarked.classList.remove('pc-cur');
+  if(!pcCur.classList.contains('pc-cur')) pcCur.classList.add('pc-cur'); // re-added after a redraw rewrote its classes
+  pcCurMarked = pcCur;
 }
+let pcCurMarked = null;
 // Which screen or window the cursor is on (a change sends it to that screen's starting point).
 let pcCurWhere = null;
 function pcWhere(){ const l = pcLayer(); return (S ? S.screen : 'pre:'+preGameScreen) + '|' + (l ? (l.id || l.className) : '') + '|' + (S && S.screen==='game' ? (S.routeStep+':'+S.floorIdx) : ''); }

@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.123 (Nov 14, 2026)
+- PC layout (Jeremy, Steam Deck): the gold keyboard/controller cursor is now an outline drawn on the thing it points at, so it always sits exactly on it (on the Deck it was drawn from measured positions and landed off to the side). The fork's two doors are much bigger, filling the room. "Tap to enter" is a small dark tag on the door's lower panel instead of a line under the door that could sit on the hero's name (phone too).
+
 ## 1.42.122 (Nov 14, 2026)
 - PC layout (Jeremy, Deck screenshot): the room door and the fork's doors stand in the room's own archway, centred on the room and sized to fit inside it (they were centred on route + room and covered the hero and the route); a picked fork door still glides into place. The hover caption is a framed footer of fixed height under both panels, so panels and caption are one centred group (it floated as a loose line).
 

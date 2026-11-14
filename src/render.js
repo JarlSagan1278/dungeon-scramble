@@ -1496,7 +1496,9 @@ function pcPlaceDoors(){
   const fit = (node, parts)=>{
     if(!node || !parts.length || node.classList.contains('picking')) return;
     const z0 = parts[0].currentCSSZoom || zm, h = node.getBoundingClientRect().height; if(!h) return;
-    const z = Math.min(zm, z0 * a.height * 0.88 / h); // node's height scales with its parts' zoom
+    const w = node.getBoundingClientRect().width || 1;
+    const cap = node.id==='room-callout' ? zm : 9; // the fork's doors fill the room (Jeremy: bigger)
+    const z = Math.min(cap, z0 * a.height * 0.9 / h, z0 * a.width * 0.94 / w); // node's size scales with its parts' zoom
     parts.forEach(p=>{ if(Math.abs((parseFloat(p.style.zoom)||0) - z) > 0.01) p.style.zoom = z.toFixed(3); });
     node.style.left = cx+'px'; node.style.top = cy+'px';
   };
