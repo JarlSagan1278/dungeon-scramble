@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.145 (Nov 15, 2026)
+- Route map (Jeremy picked C): the route bar is a torn parchment map with an inked path, cleared rooms crossed off, forks as a split path to two doors, a gold coin token for the hero; finished floors' maps pile up underneath and a red tab names the floor.
+- The Floor/Round label above the chest is gone; an open round quest on the Wanted poster counts the rounds itself ("Reach Round 3/5").
+
 ## 1.42.144 (Nov 15, 2026)
 - Foes carry their drop: an Elite-door foe or a floor boss visibly carries one loot die (worn like the hero's gear, mirrored), and that die is always one of your loot choices. Placement follows each monster's visible body (MONSTER_ART_BOX, tools/art/monster_boxes.py).
 - Defeat scene: the room you fell in, the hero down with their gear scattered, the winner wearing your best piece. Under the title on the defeat screen (the run card's dice now sit in two rows of eight), in place of the portrait on the keep-a-die screen, atop the details column on PC.

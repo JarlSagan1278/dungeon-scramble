@@ -4002,4 +4002,3 @@ body.pc .defeat-scene.ds-pc{ height:230px; margin:0 0 12px; }
 .route-map .mascot-wrap.rm-token{ bottom:auto !important; transform:translate(-50%, -50%); transition:none; z-index:3; }
 .route-map .rm-coin{ display:flex; align-items:center; justify-content:center; width:30px; height:30px; box-sizing:border-box; border-radius:50%; border:3px solid #e6c25a; background:#f3e3c3; box-shadow:0 0 0 2.5px #0c0705, 0 3px 0 2px #0c0705; overflow:hidden; }
 .route-map .rm-coin .mascot-marker{ width:30px !important; height:30px !important; object-fit:cover; object-position:50% 20%; filter:none; }
-

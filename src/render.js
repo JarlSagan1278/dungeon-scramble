@@ -5211,6 +5211,9 @@ function questRowHTML(q, done, live){
   let short = questCondShort(cond);
   // live count while building a path: the target number becomes "have/need" (only the first number, e.g. "2/3 Maneuvers")
   if(live && live.have!=null && live.need!=null){ const h = Math.min(live.have, live.need); short = short.replace(String(live.need), `<b class="q-count${live.done?' q-full':''}">${h}/${live.need}</b>`).replace(/(\/\d+<\/b>)\+/, '$1'); }
+  // Nov 15 (Jeremy): the round shows nowhere else now, so a round quest still open says which round it is
+  // written like the live counts above: "Reach Round 3/5"
+  if(!done && S && S.turnNumber!=null) short = short.replace(/^Reach Round (\d+)/, (m,n)=> `Reach Round <b class="q-count">${Math.min(S.turnNumber+1, +n)}/${n}</b>`);
   return `<span class="q-cond">${short}</span><span class="q-arrow">→</span>${questRewardHTML(rt)}`;
 }
 // Oct 31 (Jeremy): in headings and paragraphs the note sits behind a small toy "?" coin (same family as the Train rows'
