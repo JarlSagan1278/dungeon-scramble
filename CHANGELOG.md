@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.142 (Nov 15, 2026)
+- Hero gear touch-ups: the Dagger, Charge-Atlatl and Leeching Lance are bigger and set out past the shoulder so they show behind hair and hoods; the Axiom of Choice is slung with its head over the shoulder; the Hataxe sits lower on the head (less over the Wanted poster); the Drill Shield is smaller; the Winged Boots and Tarot Deck come halfway back in; the Grappling Set's rope no longer crosses the hand. The Genetic Drifter is now a ground item, lying on the floor like a skateboard, wheels down.
+
 ## 1.42.141 (Nov 14, 2026)
 - Hero gear touches (Jeremy's review of every item): floating items 30% bigger and sit lower (clear of the Wanted poster); the Dagger and Hidden Estoc are worn hilt-up, the blade hidden behind the hero (point-up they read as back stabs); Winged Boots, Trained Transposer, Eye-Frame, Pleasant Parasite? and Phlebotomizer are mirrored; the Tarot Deck is smaller, and it and the Winged Boots float well away from the hero; the N-th Dimensional Printer, 273.15 Kelvin Box, Hospitaler's Merciful Guillotine and Portable RNGenerator stand level on the floor. Per-item settings live in LOOT_FLIP, LOOT_HILT_UP and LOOT_GEAR_TWEAK (assets.js).
 
