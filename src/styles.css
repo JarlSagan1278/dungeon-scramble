@@ -3949,6 +3949,7 @@ body.pc .vic-stage{ height:200px; } body.pc .vic-hero{ height:120px; }
 .hero-gear .hg-float{ right:calc(-26% - var(--hg-out, 0) * 100%); } .hero-gear .hg-gl{ left:calc(-3% - var(--hg-out, 0) * 100%); } .hero-gear .hg-gr{ right:calc(1% - var(--hg-out, 0) * 100%); } /* --hg-out: a fraction of the hero's width further away */
 .hero-gear .hg-back{ left:calc(-6% - var(--hg-out, 0) * 100%); } .hero-gear .hg-back.hg-hilt{ left:calc(10% - var(--hg-out, 0) * 100%); } /* thin back items peek out past the shoulder */
 .hero-gear .hg-board{ bottom:-13% !important; height:48% !important; transform:scale(1,-1) rotate(-76deg) !important; transform-origin:50% 50% !important; } .hero-gear .hg-gl.hg-board{ left:-10% !important; } .hero-gear .hg-gr.hg-board{ right:-6% !important; } /* the Genetic Drifter: a skateboard lying flat on the floor beside the hero (Jeremy) */
+.vic-hero-wrap .hero-gear .hg-ground{ translate:0 -20%; } /* the victory hero stands right on its name banner: keep floor items above it */
 .hero-gear .hg-flip{ scale:-1 1; } /* mirrored, on top of each slot's own rotation and bob */
 /* C: the item flashes up beside the hero when its die plays */
 .hero-brandish{ position:absolute; z-index:5; right:-30%; top:2%; width:58%; aspect-ratio:1; pointer-events:none; display:flex; align-items:center; justify-content:center; }
