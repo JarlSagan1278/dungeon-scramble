@@ -94,4 +94,4 @@ still go to the public demo link. Rebuild only when a creator needs a fix.
 | The Dungeon Dive | Nov 16 (round 2, clip_crescendo.mp4) | | |
 | Adin Walls | Nov 16 (round 2, clip_crescendo.mp4) | | |
 | 2 Headed Hero | Nov 16 (round 2, clip_crescendo.mp4) | | |
-| I Dream of Indie Games | Nov 16 (round 2, clip_crescendo.mp4) | | |
+| I Dream of Indie Games | Nov 16 (round 2, clip_crescendo.mp4) | Nov 16: organic spots full; offered paid integrations/shorts (rates sent) | no (paid only) |
