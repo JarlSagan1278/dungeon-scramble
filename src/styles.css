@@ -3952,12 +3952,5 @@ body.pc .vic-stage{ height:200px; } body.pc .vic-hero{ height:120px; }
 .vic-hero-wrap .hero-gear .hg-ground{ translate:0 -20%; } /* the victory hero stands right on its name banner: keep floor items above it */
 .hero-gear .hg-flip{ scale:-1 1; } /* mirrored, on top of each slot's own rotation and bob */
 /* C: the item flashes up beside the hero when its die plays */
-.hero-brandish{ position:absolute; z-index:5; left:-4%; top:-42%; width:58%; /* above the head, clear of the floating item (Nov 15) */ aspect-ratio:1; pointer-events:none; display:flex; align-items:center; justify-content:center; }
-.hero-brandish img{ position:relative; max-width:80%; max-height:80%; filter:drop-shadow(0 3px 0 rgba(12,7,5,.6)); animation:hb-pop .85s cubic-bezier(.3,1.5,.5,1) both; }
-.hero-gear .hg.hb-hide{ visibility:hidden; } /* the worn copy hides while the same item pops */
-.hero-brandish .hb-burst{ position:absolute; inset:-10%; border-radius:50%; background:repeating-conic-gradient(rgba(255,215,106,.85) 0 8deg, transparent 8deg 30deg);
-  -webkit-mask:radial-gradient(circle, transparent 30%, #000 32%, #000 48%, transparent 66%); mask:radial-gradient(circle, transparent 30%, #000 32%, #000 48%, transparent 66%); animation:hb-burst .85s ease-out both; }
-@keyframes hb-pop{ 0%{ transform:translateY(30%) scale(.2) rotate(-30deg); opacity:0; } 30%{ transform:translateY(-6%) scale(1.15) rotate(8deg); opacity:1; } 55%{ transform:none; } 85%{ opacity:1; } 100%{ transform:translateY(-14%) scale(.95); opacity:0; } }
-@keyframes hb-burst{ 0%{ transform:scale(.3) rotate(0); opacity:0; } 30%{ opacity:1; } 100%{ transform:scale(1.25) rotate(60deg); opacity:0; } }
 .vic-hero-wrap{ display:inline-block; margin-bottom:-6px; z-index:2; }
 .vic-hero-wrap > .vic-hero{ margin-bottom:0; }

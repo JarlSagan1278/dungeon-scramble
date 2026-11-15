@@ -5839,7 +5839,6 @@ function wireRunCard(outcome){ const b = document.getElementById('save-run-card-
 // drawn behind the hero, peeking over a shoulder), 'ground' (potions, food, boxes: at the feet, one each side) or
 // 'float' (charms, cards, gadgets: hovering by the head). The rarest owned item per slot is shown (tray + Back Pocket;
 // ground shows up to two). Placed in the figure's own box, so it fits all 48 portraits with no per-portrait work.
-// C: heroBrandish() flashes a loot die's item beside the hero when its face plays in a turn.
 const LOOT_RANK = {magic:0, gilded:1, alloy:2, origin:3};
 function heroGear(){
   const own = [...(S && S.tray || []).map(c=> c && !c.minion && c.die), ...(S && S.backPocket || [])].filter(d=> d && LOOT_ART[d.name] && LOOT_SLOT[d.name]);
@@ -5855,14 +5854,6 @@ function heroGearHTML(part){
   if(part==='back') return g.back ? `<span class="hero-gear hg-behind" aria-hidden="true">${(LOOT_HILT_UP[g.back.name]!=null ? img(g.back,'hg-back hg-hilt').replace('style="', `style="transform:rotate(${LOOT_HILT_UP[g.back.name]}deg);`) : img(g.back,'hg-back')).replace(/height:(\d+)%/, (m,h)=>`height:${Math.min(98, Math.round(h*1.35))}%`)}</span>` : ''; // bigger and more central, so it still peeks out (Jeremy)
   if(!g.ground.length && !g.float && !g.head) return '';
   return `<span class="hero-gear" aria-hidden="true">${g.ground[0]?img(g.ground[0],'hg-ground hg-gl'):''}${g.ground[1]?img(g.ground[1],'hg-ground hg-gr'):''}${g.float?img(g.float,'hg-float'):''}${g.head?img(g.head,'hg-head'):''}</span>`;
-}
-function heroBrandish(die){
-  if(!die || !LOOT_ART[die.name] || PREFS.reducedMotion) return;
-  const fig = document.querySelector('#enc-panel .fo-player .fo-fig'); if(!fig) return;
-  const n = document.createElement('span'); n.className = 'hero-brandish'; n.setAttribute('data-morph-keep',''); n.setAttribute('aria-hidden','true');
-  n.innerHTML = `<i class="hb-burst"></i><img src="${LOOT_ART[die.name]}" alt="">`;
-  const worn = [...fig.querySelectorAll('.hero-gear .hg')].filter(g=> g.title===die.name); worn.forEach(g=> g.classList.add('hb-hide'));
-  fig.appendChild(n); setTimeout(()=>{ n.remove(); worn.forEach(g=> g.classList.remove('hb-hide')); }, 900);
 }
 function victoryTrophies(){
   const order = {magic:0, gilded:1, alloy:2, origin:3};

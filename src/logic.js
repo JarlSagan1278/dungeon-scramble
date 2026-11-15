@@ -2163,7 +2163,6 @@ function runPlayerPathSteps(steps, i, path, effects){
   applyPathStep(step);
   S.resolvingIdx = step.idx;
   S.resolvingFx = typeof describeStepFx==='function' ? describeStepFx(step) : null;
-  { const c = S.tray[step.idx]; if(c && !c.minion && c.die && typeof heroBrandish==='function') setTimeout(()=> heroBrandish(c.die), 0); } // loot item flashes beside the hero (Nov 14)
   S.lastComboRipple = step.type==='combo' ? buildComboRipple([step.idx]) : null;
   // One-shot flag so renderGame()/renderDie() can flash the specific cell a
   // Leap just cleared (a different tile than the one resolving above --
