@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.146 (Nov 15, 2026)
+- Route map: forks split the inked path to their two doors and rejoin after; the fork you stand at is one line (its doors are on screen). The Floor tab's text is centred in a slightly wider box.
+
 ## 1.42.145 (Nov 15, 2026)
 - Route map (Jeremy picked C): the route bar is a torn parchment map with an inked path, cleared rooms crossed off, forks as a split path to two doors, a gold coin token for the hero; finished floors' maps pile up underneath and a red tab names the floor.
 - The Floor/Round label above the chest is gone; an open round quest on the Wanted poster counts the rounds itself ("Reach Round 3/5").
