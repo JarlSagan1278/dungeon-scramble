@@ -509,7 +509,10 @@ function rollHpNumbers(){
       const el = document.querySelector(sides[side]); if(!el) continue;
       // the real numbers are kept on the element: the roll rewrites its text, and a playback redraw that keeps the
       // element (patchGameDOM) must not read a half-rolled number back as the new target (Nov 4)
-      let real = ROLL_REAL.get(el); if(real==null){ real = el.textContent.trim(); ROLL_REAL.set(el, real); }
+      // (Nov 15) ...but a redraw that keeps the element and changes its number (e.g. Block gained) must be read again:
+      // the cached text is only trusted while the element still shows what the roll itself last wrote
+      let rc = ROLL_REAL.get(el); if(!rc || el.innerHTML!==rc.wrote){ rc = {real:el.textContent.trim(), wrote:el.innerHTML}; ROLL_REAL.set(el, rc); }
+      const real = rc.real;
       const m = /^(-?\d+)(?:\+(\d+))?\/(\d+)$/.exec(real); if(!m) continue;
       const to = +m[1], sh = m[2], max = m[3];
       const st = r[side] || (r[side] = {from:to, to, t:0, shown:to});
@@ -522,6 +525,7 @@ function rollHpNumbers(){
         const up = st.to>st.from; const c1=1.7, c3=c1+1; const ease = up ? 1 + c3*Math.pow(k-1,3) + c1*Math.pow(k-1,2) : 1-Math.pow(1-k,3);
         st.shown = Math.min(+max, Math.round(st.from + (st.to-st.from)*ease));
         e.innerHTML = `${st.shown}${shieldNumHTML(+sh||0)}/${max}`;
+        const ec = ROLL_REAL.get(e); if(ec) ec.wrote = e.innerHTML; else ROLL_REAL.set(e, {real:`${st.to}${sh?'+'+sh:''}/${max}`, wrote:e.innerHTML});
         if(k<1) requestAnimationFrame(tick);
       };
       if(now - st.t < 450) tick();
@@ -1875,7 +1879,10 @@ function renderEncounterCard(e, mode){
     const questLine = questSignHTML(e);
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
     const sz = encounterSize(e);
-    const monsterFig = art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz};--drop:${encounterDrop(e)}%"/>`
+    // Nov 15: a foe carrying its loot die wraps its picture (ec-wrap takes the footing drop) so the item sits on the body
+    const carryOn = !!(art && e.carry && LOOT_ART[e.carry] && !(e.curHealth<=0 && S.resolvingIdx==null));
+    const monsterFig = carryOn ? `<span class="ec-wrap" style="--sz:${sz};--drop:${encounterDrop(e)}%;${enemyCarryBoxVars(e, !!flipCls)}">${enemyCarryHTML(e,'back')}<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz};--drop:0%"/>${enemyCarryHTML(e)}</span>`
+      : art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz};--drop:${encounterDrop(e)}%"/>`
       : `<div class="fo-img ${flipCls} fo-mystery">${mysteryFigureHTML('width:70%; aspect-ratio:1/1;')}</div>`;
     const p = foPlayer || {};
     return `
@@ -1893,7 +1900,7 @@ function renderEncounterCard(e, mode){
         </div><!--/z2-->
         <!--z3--><div class="fo-vs"><span class="fo-vs-txt${(performance.now()-UIFX.vsAt)<3400?' vs-intro':''}" style="animation-delay:-${Math.max(0,Math.round(performance.now()-UIFX.vsAt))}ms">vs</span></div><!--/z3-->
         <!--z4--><div class="fo-side fo-enemy${isBoss?' fo-boss-side':''}">
-          ${doorDustHTML}<div class="fo-fig enc-portrait ${(BOSS_DROP_PENDING&&/Boss/.test(e.type))?'boss-drop-wait ':''}${sz>1.05?'fo-big ':''}${(sz>1.05&&/Boss/.test(e.type))?'fo-bossbig ':''}${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}" style="--sz:${sz}">${monsterFig}</div><div class="fo-floor"></div>
+          ${doorDustHTML}<div class="fo-fig enc-portrait ${(BOSS_DROP_PENDING&&/Boss/.test(e.type))?'boss-drop-wait ':''}${sz>1.05?'fo-big ':''}${(sz>1.05&&/Boss/.test(e.type))?'fo-bossbig ':''}${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}" style="--sz:${sz}"${carryOn?` title="${e.name} carries ${e.carry}: beat it and it's one of your loot choices"`:''}>${monsterFig}</div><div class="fo-floor"></div>
           <div class="fo-hpwrap status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;">${isBoss ? bossArcBarHTML({hpPct, prevLeft:dmgPreviewLeftPct, prevW:dmgPreviewWidthPct, shieldVal:e.curShield, shieldMax:e.maxHealth, cls:`${fx.cls} ${killHint?'bar-'+killHint.state:''}`, numHTML:`<span class="bar-num">${curHealthClamped.toFixed(0)}${shieldNumHTML(e.curShield)}/${e.maxHealth}</span>`}) : `<div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
               ${hpFillHTML('enemy','hp',hpPct)}
               ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
@@ -5854,6 +5861,26 @@ function heroGearHTML(part){
   if(part==='back') return g.back ? `<span class="hero-gear hg-behind" aria-hidden="true">${(LOOT_HILT_UP[g.back.name]!=null ? img(g.back,'hg-back hg-hilt').replace('style="', `style="transform:rotate(${LOOT_HILT_UP[g.back.name]}deg);`) : img(g.back,'hg-back')).replace(/height:(\d+)%/, (m,h)=>`height:${Math.min(98, Math.round(h*1.35))}%`)}</span>` : ''; // bigger and more central, so it still peeks out (Jeremy)
   if(!g.ground.length && !g.float && !g.head) return '';
   return `<span class="hero-gear" aria-hidden="true">${g.ground[0]?img(g.ground[0],'hg-ground hg-gl'):''}${g.ground[1]?img(g.ground[1],'hg-ground hg-gr'):''}${g.float?img(g.float,'hg-float'):''}${g.head?img(g.head,'hg-head'):''}</span>`;
+}
+// Nov 15 (Jeremy): an Elite-door foe or a floor boss carries the loot die it will drop (e.carry, logic.js drawEncounter),
+// drawn like the hero's gear but mirrored, since foes face left: back items over its right shoulder, the floating item
+// and ground items on the side toward the hero.
+function enemyCarryBoxVars(e, flipped){
+  const b = MONSTER_ART_BOX[e.name] || [.1,.1,.9,1];
+  const x0 = flipped ? 1-b[2] : b[0], x1 = flipped ? 1-b[0] : b[2];
+  return `--bx0:${x0.toFixed(3)};--bx1:${x1.toFixed(3)};--by0:${b[1].toFixed(3)};--by1:${b[3].toFixed(3)};`;
+}
+function enemyCarryHTML(e, part){
+  const name = e && e.carry; if(!name || !LOOT_ART[name]) return '';
+  const slot = LOOT_SLOT[name] || 'float', t = LOOT_GEAR_TWEAK[name] || {};
+  if((part==='back') !== (slot==='back')) return '';
+  const CAP = {back:.75, ground:.5, float:.6, head:.5};
+  let h = Math.min((LOOT_GEAR_SIZE[name]||.3) * (slot==='float' ? 1.3 : 1), CAP[slot]||.5) * (t.size||1) * 100;
+  if(slot==='back') h = Math.min(98, h*1.35);
+  const flip = !LOOT_FLIP.has(name); // mirrored relative to the hero (foes face left)
+  const cls = slot==='back' ? 'ec-back' : slot==='ground' ? (t.board ? 'ec-ground ec-board' : t.flat ? 'ec-ground ec-flat' : 'ec-ground') : slot==='head' ? 'ec-head' : 'ec-float';
+  // sized like the hero's gear (the hero picture's height), so a big boss doesn't get a giant sword: divide by --sz
+  return `<span class="hero-gear enemy-carry" aria-hidden="true"><img class="hg ${cls}${flip?' hg-flip':''}" src="${LOOT_ART[name]}" alt="" style="height:calc(${Math.round(h)}% / var(--sz,1));"></span>`;
 }
 function victoryTrophies(){
   const order = {magic:0, gilded:1, alloy:2, origin:3};

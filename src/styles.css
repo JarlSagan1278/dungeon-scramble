@@ -3950,7 +3950,22 @@ body.pc .vic-stage{ height:200px; } body.pc .vic-hero{ height:120px; }
 .hero-gear .hg-back{ left:calc(-6% - var(--hg-out, 0) * 100%); } .hero-gear .hg-back.hg-hilt{ left:calc(10% - var(--hg-out, 0) * 100%); } /* thin back items peek out past the shoulder */
 .hero-gear .hg-board{ bottom:-13% !important; height:48% !important; transform:scale(1,-1) rotate(-76deg) !important; transform-origin:50% 50% !important; } .hero-gear .hg-gl.hg-board{ left:-10% !important; } .hero-gear .hg-gr.hg-board{ right:-6% !important; } /* the Genetic Drifter: a skateboard lying flat on the floor beside the hero (Jeremy) */
 .vic-hero-wrap .hero-gear .hg-ground{ translate:0 -20%; } /* the victory hero stands right on its name banner: keep floor items above it */
-.hero-gear .hg-flip{ scale:-1 1; } /* mirrored, on top of each slot's own rotation and bob */
+.hero-gear .hg-flip{ scale:-1 1; }
+/* Nov 15 (Jeremy): the loot die an Elite or boss will drop, carried on the foe (mirrored hero gear). .ec-wrap is exactly
+   the picture's box and takes its footing drop; --bx0/--bx1/--by0/--by1 = the body inside it (MONSTER_ART_BOX). */
+.fo-fig .ec-wrap{ position:relative; display:flex; isolation:isolate; transform:translateY(var(--drop,0%)); transform-origin:50% 100%; }
+.fo-fig .ec-wrap > .fo-img{ position:relative; }
+.enc-card.fo-arch .fo-enemy .fo-fig.fo-big .ec-wrap{ margin-bottom:calc(-1 * var(--down)); }
+.enc-card.fo-arch .fo-enemy .fo-fig.fo-big:not(.fo-bossbig) .ec-wrap{ margin-bottom:calc(-1 * var(--down) + 6px); }
+.enc-card.fo-arch .fo-enemy .fo-fig.fo-big .ec-wrap > .fo-img.enc-art{ margin-bottom:0 !important; }
+.enemy-carry .hg{ translate:-50% -50%; }
+.enemy-carry .ec-back{ z-index:-1; left:calc((var(--bx0) + (var(--bx1) - var(--bx0)) * .92) * 100%); top:calc((var(--by0) + (var(--by1) - var(--by0)) * .14) * 100%); transform:rotate(34deg); filter:brightness(.78) drop-shadow(0 2px 0 rgba(12,7,5,.55)); }
+.enemy-carry .ec-head{ left:calc((var(--bx0) + var(--bx1)) * 50%); top:calc(var(--by0) * 100%); translate:-50% -80%; }
+.enemy-carry .ec-float{ left:calc(var(--bx0) * 100%); top:calc((var(--by0) + (var(--by1) - var(--by0)) * .3) * 100%); translate:-85% -50%; animation:hg-bob 3.4s ease-in-out infinite; }
+.enemy-carry .ec-ground{ left:calc(var(--bx0) * 100%); top:calc(var(--by1) * 100%); translate:-55% -88%; transform:rotate(8deg); transform-origin:50% 100%; }
+.enemy-carry .ec-flat{ transform:none; }
+.enemy-carry .ec-board{ translate:-50% -70%; transform:scale(1,-1) rotate(76deg); transform-origin:50% 50%; }
+.reduced-motion .enemy-carry .ec-float{ animation:none; } /* mirrored, on top of each slot's own rotation and bob */
 /* C: the item flashes up beside the hero when its die plays */
 .vic-hero-wrap{ display:inline-block; margin-bottom:-6px; z-index:2; }
 .vic-hero-wrap > .vic-hero{ margin-bottom:0; }
