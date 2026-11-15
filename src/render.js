@@ -5861,7 +5861,8 @@ function heroBrandish(die){
   const fig = document.querySelector('#enc-panel .fo-player .fo-fig'); if(!fig) return;
   const n = document.createElement('span'); n.className = 'hero-brandish'; n.setAttribute('data-morph-keep',''); n.setAttribute('aria-hidden','true');
   n.innerHTML = `<i class="hb-burst"></i><img src="${LOOT_ART[die.name]}" alt="">`;
-  fig.appendChild(n); setTimeout(()=> n.remove(), 900);
+  const worn = [...fig.querySelectorAll('.hero-gear .hg')].filter(g=> g.title===die.name); worn.forEach(g=> g.classList.add('hb-hide'));
+  fig.appendChild(n); setTimeout(()=>{ n.remove(); worn.forEach(g=> g.classList.remove('hb-hide')); }, 900);
 }
 function victoryTrophies(){
   const order = {magic:0, gilded:1, alloy:2, origin:3};

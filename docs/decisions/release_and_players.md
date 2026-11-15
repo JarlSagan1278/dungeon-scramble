@@ -62,3 +62,4 @@ Distribution, hosting, play data, privacy, release plan, monetization, store, it
 - **Nov 12 — itch description fixed (Jeremy):** "Leap, Sidestep and Pivot" (was Dodge).
 - **Nov 13, 2026 (Jeremy): print-and-play is deprioritized, below the PC version.** Building the tabletop by hand was an insane amount of manual labor (stickering every die), and the video game's numbers (enemy Health in the dozens to 160+, stacking statuses) are unwieldy to track by hand. The BGG solo contest idea waits.
 - **Nov 13, 2026 (Jeremy approved "finish the PC layout"):** the PC layout turns on by itself on wide landscape windows (Settings > Wide-screen layout turns it off); title, setup and camp get landscape versions (1.42.108).
+- **Nov 15, 2026 (Jeremy):** The Steam Deck controller works in Chrome once each Deck button is bound individually in Steam's controller settings (the default Gamepad layout didn't reach the game). Note for Deck players until a native/Steam build exists.

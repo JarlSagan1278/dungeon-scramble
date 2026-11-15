@@ -1,6 +1,6 @@
 # Dungeon Scramble — TODO
 
-Updated Nov 13, 2026 (build 1.42.108; 3D dice roll G + landing clicks in 1.42.106-107; PC layout on by default 1.42.108). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
+Updated Nov 15, 2026 (build 1.42.142; since Nov 13: PC layout default and Steam Deck fixes 1.42.108-1.42.133, strapped chest with barrel lid 1.42.119-120, dice rings cleanup 1.42.130, victory stage 1.42.134, stat tiles 1.42.135, loot worn on the hero 1.42.136-142). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
 study results in `STUDY_FINDINGS.md`. The release checklist (40 items, owner and status) is the Checklist tab of
 the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 
@@ -37,7 +37,8 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
 
 ## Next for Claude
 - **Forks (shipped 1.42.55-1.42.62):** two doors at slots 3 and 6; the Elite door's extra loot choice is a next-floor die. Bot study: always Elite 50% vs always Standard 39% (STUDY_FINDINGS). Watch real players' picks in the play data (`fork_pick` events) before tuning.
-- **PC release layout (Jeremy, Nov 4; 1.42.103-1.42.108: split fight screen, hover panel + key letters, keyboard/controller cursor, landscape title/setup/camp, end screens scaled; on by default on wide windows since 1.42.108):** Deck tried by Jeremy Nov 14 (layout fixed in 1.42.121; controller not reaching Chrome, setup steps sent); still to do: confirm the controller after the Chrome/Steam settings; then Steam-only pieces (fullscreen toggle, controller glyph set, store build).
+- **PC release layout (Jeremy, Nov 4; 1.42.103-1.42.133):** split fight screen, hover footer, keyboard/controller/numpad cursor, landscape title/setup/camp, end screens and pop-ups fitted; on by default on wide windows. Steam Deck (Chrome, 1024x640): layout and old-Chrome fixes in 1.42.121-1.42.129; **controller confirmed working Nov 15** once Jeremy bound the Deck's buttons individually in Steam's controller settings (the default Gamepad template didn't reach Chrome). Still to do: Steam-only pieces (fullscreen toggle, controller glyph set, store build); a native build would drive the controller directly.
+- **Hero gear (1.42.136-1.42.142):** the rarest owned loot per slot (back 1, ground 2, float 1, head = Hataxe) is drawn on the hero in fights and on the victory stage, not in camp; item pops above the head when its die plays. Per-item settings in assets.js (LOOT_SLOT, LOOT_GEAR_SIZE, LOOT_FLIP, LOOT_HILT_UP, LOOT_GEAR_TWEAK). New loot art needs a slot and, if it looks off, a tweak; re-check with a sheet of every item on a hero.
 - **Room dressing (reopened Oct 29):** inked corner ivy and per-floor room colour shipped in 1.42.5. Still open if Jeremy wants them: his own drawn ivy strands (V3) and one drawn prop per floor (D2).
 - **Performance on slow phones:** load fixed on itch (split build), playback redraws trimmed (1.42.63, STUDY_FINDINGS). What's left in a turn is paint/compositing of running animations; only worth doing if testers report stutter.
 
