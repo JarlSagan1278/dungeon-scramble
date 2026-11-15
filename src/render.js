@@ -1544,37 +1544,56 @@ function syncForkCallout(){
     };
   });
 }
+// Route map (Nov 15, Jeremy picked C): a torn parchment map of the floor with an inked path; the maps of the floors
+// already cleared pile up underneath (one more sheet per floor), the paper darkens and cracks floor by floor, and a red
+// tab names the floor. Cleared rooms are crossed off in red, the way ahead is dotted, the hero is a gold coin token.
+// The rooms stay one element each (titles for the long-press tooltips) and the token is .mascot-wrap (syncMascotHop).
+const RM_PAL = [['#ecd9ab','#c9a96b','#3a2414'], ['#d6b985','#9a7642','#2a190d'], ['#b39465','#6a4d2a','#160c05']];
+function rmRag(seed, dy){ // a torn sheet across the 1000x40 box (stretched to the bar's width)
+  const top = [], bot = [];
+  for(let x=0; x<=1000; x+=18){ top.push(`${x},${(2+dy+3*Math.abs(Math.sin(x*.15+seed)*Math.cos(x*.045+seed*2))).toFixed(1)}`); bot.push(`${x},${(38+dy-3*Math.abs(Math.sin(x*.15+seed+3)*Math.cos(x*.045+seed*2+6))).toFixed(1)}`); }
+  return top.concat(bot.reverse()).join(' ');
+}
+function rmGlyph(kind, ink, extra){
+  const T = (t,y,c,sz)=>`<text x="0" y="${y}" font-size="${sz||10}" text-anchor="middle" fill="${c||ink}" font-family="Metamorphous, serif">${t}</text>`;
+  if(kind==='boss') return `<circle r="10.5" fill="#9b2c1f" stroke="${ink}" stroke-width="2.5"/><path d="M-5 -2a5 5 0 0 1 10 0v3h-3v2h-4v-2h-3z" fill="#f3e3c3" stroke="${ink}" stroke-width="1.2"/><circle cx="-2" cy="-1.5" r="1.3" fill="${ink}"/><circle cx="2" cy="-1.5" r="1.3" fill="${ink}"/>`;
+  if(kind==='camp') return `<path d="M-9 7 L0 -8 L9 7 Z" fill="#7b8f4a" stroke="${ink}" stroke-width="2.2" stroke-linejoin="round"/><path d="M0 -8 L0 7 M-3 7 L0 1 L3 7" stroke="${ink}" stroke-width="1.6" fill="none"/>`;
+  if(kind==='done') return `<path d="M-6 -6 L6 6 M6 -6 L-6 6" stroke="#9b2c1f" stroke-width="3" stroke-linecap="round"/>`;
+  if(kind==='fork'){ const [a,b] = extra; const door = (k,y)=>{ const f = k==='Elite'||k==='Elite Trap' ? ['#e6c25a','!'] : k==='Deadly' ? ['#d0533c','!!'] : k==='Shrine' ? ['#7cc4bd','?'] : k==='Trap' ? ['#a9c27a','?'] : [extra[2],'?'];
+      return `<circle cx="2" cy="${y}" r="6" fill="${f[0]}" stroke="${ink}" stroke-width="2"/><text x="2" y="${y+3.5}" font-size="${f[1].length>1?7:9}" text-anchor="middle" fill="${ink}" font-family="Metamorphous, serif">${f[1]}</text>`; };
+    return `<path d="M-14 0 Q-6 -9 0 -8 M-14 0 Q-6 9 0 8" stroke="${ink}" stroke-width="2" fill="none" stroke-dasharray="3 3"/>${door(a,-8)}${door(b,8)}`; }
+  return `<circle r="7" fill="${extra}" stroke="${ink}" stroke-width="2"/>${T('?',3.5)}`;
+}
 function renderRoute(){
-  const floorCls = `floor${S.floorIdx+1}`;
-  const n = S.route.length;
-  let html = `<div class="route-wrap">`;
-  html += '<div class="route">';
+  const fl = Math.min(2, S.floorIdx||0), pal = RM_PAL[fl], ink = pal[2];
+  const n = S.route.length, cur = Math.min(S.routeStep, n-1);
+  const amp = [2,3,4][fl], dyOf = i=> +(amp*Math.sin(i*1.7 + fl + 1)).toFixed(2);
+  const X = i=> (i+0.5)/n*1000;
+  let path = `M${X(0)} ${20+dyOf(0)}`; for(let i=1;i<n;i++) path += ` Q${((X(i-1)+X(i))/2).toFixed(1)} ${(20+dyOf(i-1)+(i%2?-5:5)).toFixed(1)} ${X(i).toFixed(1)} ${20+dyOf(i)}`;
+  const trail = path.split(' Q').slice(0, cur+1).join(' Q');
+  const sheets = []; for(let k=0;k<fl;k++){ const back = fl-k; sheets.push(`<polygon points="${rmRag(k+7, 0)}" transform="translate(${back*4} ${back*4}) rotate(${-back*.6} 500 20)" fill="${RM_PAL[k][0]}" stroke="#0c0705" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`); }
+  const cracks = fl>=1 ? `<path d="M300 2 l7 16 l-6 12 l8 10" ${fl>=2?'':''}stroke="${pal[1]}" stroke-width="1.5" fill="none" vector-effect="non-scaling-stroke"/>` + (fl>=2 ? `<path d="M720 38 l-5 -14 l7 -12 l-4 -10" stroke="${pal[1]}" stroke-width="1.5" fill="none" vector-effect="non-scaling-stroke"/>` : '') : '';
+  const paper = `<svg class="rm-paper" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true"><defs><radialGradient id="rm-pv" cx="50%" cy="50%" r="70%"><stop offset="55%" stop-color="${pal[0]}"/><stop offset="100%" stop-color="${pal[1]}"/></radialGradient></defs>${sheets.join('')}<polygon points="${rmRag(fl+1, 0)}" fill="url(#rm-pv)" stroke="#0c0705" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>${cracks}</svg>`;
+  let html = `<div class="route-wrap route-map rm-f${fl+1}">${paper}<div class="rm-tab" title="Floor ${S.floorIdx+1} of ${FLOORS.length}"><small>Floor</small><b>${S.floorIdx+1}</b></div><div class="route rm-route">`;
+  html += `<svg class="rm-ink" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true"><path d="${path}" stroke="${ink}" stroke-width="2.2" fill="none" stroke-dasharray="1 6" stroke-linecap="round" vector-effect="non-scaling-stroke"/><path d="${trail}" stroke="#9b2c1f" stroke-width="2.6" fill="none" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`;
   S.route.forEach((step,i)=>{
     const cls = i<S.routeStep?'done':(i===S.routeStep?'current':'');
-    const icon = step==='camp'?iconSpan('camp'):(step==='boss'?iconSpan('boss'):(i<S.routeStep?'<span class="rt-tick">\u2713</span>':'<span class="rt-q">?</span>'));
     const statusSuffix = cls==='done' ? ' (cleared)' : (cls==='current' ? ' (current)' : ' (ahead)');
-    const tip = (ROUTE_STEP_DESC[step]||'') + statusSuffix;
-    // Nov 4: a fork still ahead (or being chosen) shows as two stacked mini doors
+    let tip = (ROUTE_STEP_DESC[step]||'') + statusSuffix, g;
     const fork = step==='enc' && i>=S.routeStep && typeof FORK_SLOTS!=='undefined' && FORK_SLOTS.includes(i) && !(i===S.routeStep && !S.forkChoice) && !(S.guide && S.guide.stage && S.guide.stage!=='done') && !(typeof depthRank==='function' && depthRank('gauntlet')>=2);
-    if(fork){
-      const kinds = (i===S.routeStep && S.forkChoice) ? S.forkChoice.doors.map(d=>d.kind) : ['?','Elite'];
-      // Nov 4 (Jeremy): two narrow copies of the tracker's own arched doorway, side by side; the kind shows as the
-      // doorway's border colour plus a glyph ("!" = Elite or Deadly), not as a text label
-      const kc = k=> k==='Elite'||k==='Elite Trap' ? 'el' : k==='Deadly' ? 'dl' : k==='Shrine' ? 'sh' : k==='Trap' ? 'tr' : '';
-      const kg = k=> k==='Elite'||k==='Elite Trap' ? '!' : k==='Deadly' ? '!!' : '?';
-      html += `<div class="node rt-door rt-room rt-fork ${floorCls} ${cls} route-tooltip-target" title="A fork: choose one of two doors (${kinds.map(k=>k==='?'?'unknown':k).join(' or ')})${statusSuffix}"><span class="rt-pair">${kinds.map(k=>`<i class="rt-arch rt-mini ${kc(k)}"><span class="rt-q">${kg(k)}</span></i>`).join('')}</span></div>`;
-      return;
-    }
-    html += `<div class="node rt-door rt-${step==='camp'?'camp':(step==='boss'?'boss':'room')} ${floorCls} ${cls} route-tooltip-target" title="${tip}"><i class="rt-arch">${icon}</i></div>`;
+    if(fork){ const kinds = (i===S.routeStep && S.forkChoice) ? S.forkChoice.doors.map(d=>d.kind) : ['?','Elite'];
+      tip = `A fork: choose one of two doors (${kinds.map(k=>k==='?'?'unknown':k).join(' or ')})${statusSuffix}`; g = rmGlyph('fork', ink, [kinds[0], kinds[1], pal[0]]); }
+    else if(step==='boss') g = rmGlyph('boss', ink);
+    else if(step==='camp') g = rmGlyph('camp', ink);
+    else if(i<S.routeStep) g = rmGlyph('done', ink);
+    else g = rmGlyph('room', ink, pal[0]);
+    html += `<div class="rm-node rt-${step==='camp'?'camp':(step==='boss'?'boss':'room')}${fork?' rt-fork':''} ${cls} route-tooltip-target" title="${tip}"><svg viewBox="-15 -15 30 30" style="translate:0 ${dyOf(i)}px" aria-hidden="true">${g}</svg></div>`;
   });
-  html += '</div>';
-  const leftPct = ((Math.min(S.routeStep, n-1) + 0.5) / n * 100).toFixed(2);
+  const leftPct = ((cur + 0.5) / n * 100).toFixed(2);
   const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
-  const mascotHTML = portrait.placeholder
-    ? mysteryFigureHTML('width:26px; height:26px;')
-    : `<img class="mascot-marker" src="${portrait.img}" alt="">`;
-  html += `<span class="mascot-wrap" style="left:${leftPct}%;">${mascotHTML}</span>`;
-  html += '</div>';
+  const face = portrait.placeholder ? mysteryFigureHTML('width:22px; height:22px;') : `<img class="mascot-marker" src="${portrait.img}" alt="">`;
+  html += `<span class="mascot-wrap rm-token" style="left:${leftPct}%; top:calc(50% + ${dyOf(cur)}px);"><span class="rm-coin">${face}</span></span>`;
+  html += '</div></div>';
   return html;
 }
 

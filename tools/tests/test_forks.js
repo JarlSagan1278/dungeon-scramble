@@ -49,8 +49,8 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     for (let g = 0; g < 12 && !S.forkChoice; g++) { if (S.screen === 'camp') campLeave(); else { if (S.routeStep > 0) S.routeStep++; advanceRoute(); } }
     render();
     ok(!!S.forkChoice && document.querySelectorAll('#fork-callout .fork-door').length === 2 && !!document.getElementById('fork-scrim') && !!document.querySelector('#app .tray-panel, #app .fo-shrine'), 'the two doors float over the finished room, behind a scrim');
-    const pairs = document.querySelectorAll('.route .rt-fork .rt-pair').length;
-    ok(pairs === 2, 'the route bar shows both forks of the floor as door pairs (' + pairs + ')');
+    const pairs = document.querySelectorAll('.route .rt-fork').length; // route map (Nov 15): a fork is one room drawn as a split path to two doors
+    ok(pairs === 2, 'the route map shows both forks of the floor as two-door splits (' + pairs + ')');
     const before = JSON.stringify(S.forkChoice); saveGame(); S = null; loadGame(); render();
     ok(!!S.forkChoice && JSON.stringify(S.forkChoice) === before && document.querySelectorAll('#fork-callout .fork-door').length === 2, 'a save at the fork resumes on the same two doors');
     const want = S.forkChoice.doors[1].name;

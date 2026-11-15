@@ -3986,3 +3986,20 @@ body.pc .vic-stage{ height:200px; } body.pc .vic-hero{ height:120px; }
 .end-screen.has-scene .run-card .rc-dice{ grid-template-columns:repeat(8,30px); } /* two rows of eight: room for the scene */
 body:not(.pc) .defeat-scene.ds-pc, body.pc .defeat-scene.ds-phone{ display:none; }
 body.pc .defeat-scene.ds-pc{ height:230px; margin:0 0 12px; }
+
+/* ==== Route map (Nov 15, Jeremy picked C): torn parchment, older floors' maps stacked underneath, a red floor tab */
+.route-wrap.route-map{ position:relative; height:40px; display:flex; align-items:stretch; padding:0 6px 0 46px; margin:2px 0 6px !important; }
+.route-map .rm-paper{ position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; pointer-events:none; filter:url(#fx-paper) drop-shadow(0 3px 0 rgba(12,7,5,.5)); }
+.route-map .rm-tab{ position:absolute; left:7px; top:50%; translate:0 -50%; z-index:2; width:34px; height:24px; box-sizing:border-box; border:2.5px solid var(--line, #0c0705); border-radius:5px; background:#7a1f14; box-shadow:0 2px 0 #0c0705; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1; cursor:help; }
+.route-map .rm-tab small{ font:7px 'Metamorphous', serif; color:#f3e3c3; letter-spacing:.4px; text-transform:uppercase; }
+.route-map .rm-tab b{ font:11px 'Metamorphous', serif; color:#ffd76a; font-weight:normal; }
+.route-map .rm-route{ position:relative; flex:1; display:flex; gap:0 !important; padding:0 !important; }
+.route-map .rm-ink{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
+.route-map .rm-node{ flex:1; position:relative; display:flex; align-items:center; justify-content:center; min-width:0; }
+.route-map .rm-node svg{ width:30px; height:30px; overflow:visible; filter:url(#fx-paper); }
+.route-map .rm-node.current svg{ visibility:hidden; } /* the token stands there */
+.route-map .rm-node.route-tooltip-target{ cursor:help; }
+.route-map .mascot-wrap.rm-token{ bottom:auto !important; transform:translate(-50%, -50%); transition:none; z-index:3; }
+.route-map .rm-coin{ display:flex; align-items:center; justify-content:center; width:30px; height:30px; box-sizing:border-box; border-radius:50%; border:3px solid #e6c25a; background:#f3e3c3; box-shadow:0 0 0 2.5px #0c0705, 0 3px 0 2px #0c0705; overflow:hidden; }
+.route-map .rm-coin .mascot-marker{ width:30px !important; height:30px !important; object-fit:cover; object-position:50% 20%; filter:none; }
+
