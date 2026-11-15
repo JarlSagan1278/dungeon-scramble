@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.143 (Nov 15, 2026)
+- The item pop-up beside the hero when a loot die plays is gone (too crowded; the dice, path and damage numbers already show it). On the victory stage, floor gear sits above the name banner.
+
 ## 1.42.142 (Nov 15, 2026)
 - Hero gear touch-ups: the Dagger, Charge-Atlatl and Leeching Lance are bigger and set out past the shoulder so they show behind hair and hoods; the Axiom of Choice is slung with its head over the shoulder; the Hataxe sits lower on the head (less over the Wanted poster); the Drill Shield is smaller; the Winged Boots and Tarot Deck come halfway back in; the Grappling Set's rope no longer crosses the hand. The Genetic Drifter is now a ground item, lying on the floor like a skateboard, wheels down.
 
