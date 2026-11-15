@@ -24,7 +24,7 @@ the browser: https://dungeonscramble.itch.io/dungeon-scramble . If it's not a fi
 
 Attach clip_crescendo.mp4 (or devlog_crescendo_2.8MB.gif where only small files go). No second follow-up.
 
-## Round 2 (Nov 13): the "Next 7" below
+## Round 2 (sent Nov 16): the "Next 7" below
 
 Use the base note above with the new clip. The hooks were checked on Nov 5, so before sending, glance at each channel's
 newest upload and use that for the first line if there's something more recent. For The Dungeon Dive, lead with the
@@ -80,18 +80,18 @@ still go to the public demo link. Rebuild only when a creator needs a fix.
 ## Log
 | Channel | Sent | Reply | Video? |
 |---|---|---|---|
-| PunNoFun | Nov 6 | | |
-| Voyix | Nov 6 | | |
-| GothicLordUK | Nov 6 | | |
-| PepperHead | Nov 6 | | |
-| AboboKnows | Nov 6 | | |
-| Keenangraz | Nov 6 | | |
-| Deckbuilders Daily | Nov 6 | | |
+| PunNoFun | Nov 6; follow-up Nov 16 | none by Nov 16 | |
+| Voyix | Nov 6; follow-up Nov 16 | none by Nov 16 | |
+| GothicLordUK | Nov 6; follow-up Nov 16 | none by Nov 16 | |
+| PepperHead | Nov 6; follow-up Nov 16 | none by Nov 16 | |
+| AboboKnows | Nov 6; follow-up Nov 16 | none by Nov 16 | |
+| Keenangraz | Nov 6; follow-up Nov 16 | none by Nov 16 | |
+| Deckbuilders Daily | Nov 6; follow-up Nov 16 | none by Nov 16 | |
 | V4Van | not sent (no listed email; Facebook page message instead) | | |
-| Chrisp44s | | | |
-| apqLIVE | | | |
-| Oridont | | | |
-| The Dungeon Dive | | | |
-| Adin Walls | | | |
-| 2 Headed Hero | | | |
-| I Dream of Indie Games | | | |
+| Chrisp44s | Nov 16 (round 2, clip_crescendo.mp4) | | |
+| apqLIVE | Nov 16 (round 2, clip_crescendo.mp4) | | |
+| Oridont | Nov 16 (round 2, clip_crescendo.mp4) | | |
+| The Dungeon Dive | Nov 16 (round 2, clip_crescendo.mp4) | | |
+| Adin Walls | Nov 16 (round 2, clip_crescendo.mp4) | | |
+| 2 Headed Hero | Nov 16 (round 2, clip_crescendo.mp4) | | |
+| I Dream of Indie Games | Nov 16 (round 2, clip_crescendo.mp4) | | |
