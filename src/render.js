@@ -2115,7 +2115,7 @@ function renderGame(){
       <div class="enc-rail-row">
         <div class="enc-card-col">
           <div class="tray-float-wrap">
-            <div class="tray-head"><span class="round-badge" title="Floor ${S.floorIdx+1}, round ${S.turnNumber+1}"><b class="rb-floor rb-${(FLOORS[S.floorIdx]&&FLOORS[S.floorIdx].lootName||'Alloy').toLowerCase()}">Floor ${ROMAN[S.floorIdx+1]||S.floorIdx+1}</b><span class="rb-round">Round ${S.turnNumber+1}</span></span><div class="path-strip" id="path-strip"></div></div>
+            <div class="tray-head"><div class="path-strip" id="path-strip"></div></div>
             <div class="tray-wrap tray-wrap-full ${S.justScrambled && !cubeRollOn()?'tray-shake':''}">
               <div class="tray ${S.newRoomFx?'tray-room-in':''} ${abilityArmed?'ability-armed':''} ${S.trayAct?'trayact-armed':''}" id="tray" style="--class-color:${S.klass.color||'#ffffff'}; --gd:-${Math.round(performance.now()%4600)}ms"></div>
               ${S.needRoll ? chestLidHTML() : ''}
@@ -5048,7 +5048,7 @@ function renderShrineEncounter(){
       <div class="enc-rail-row">
         <div class="enc-card-col">
           <div class="tray-float-wrap">
-            <div class="tray-head"><span class="round-badge"><b class="rb-floor rb-${(FLOORS[S.floorIdx]&&FLOORS[S.floorIdx].lootName||'Alloy').toLowerCase()}">Floor ${ROMAN[S.floorIdx+1]||S.floorIdx+1}</b><span class="rb-round">Shrine</span></span><div class="path-strip"></div></div>
+            <div class="tray-head"><div class="path-strip"></div></div>
             <div class="tray-wrap tray-wrap-full">
               <div class="tray" id="tray" style="--class-color:${S.klass.color||'#ffffff'}"></div>
               ${chestLidHTML().replace('id="chest-lid"', 'id="shrine-lid"').replace(/title="[^"]*"/, '')}

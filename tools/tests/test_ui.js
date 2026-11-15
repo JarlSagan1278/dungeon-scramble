@@ -67,8 +67,9 @@ const SHOTS = process.env.SHOTS || ''; // set SHOTS=<dir> to save screenshots
   // ---- floor badge in a fight; quest paper for 0/1/3 quests
   await page.evaluate(() => { newGame('dwarf', 'guard'); for (let g = 0; g < 12 && !(S.screen === 'game' && S.encounter && S.encounter.type !== 'Shrine'); g++) { if (S.screen === 'camp') campLeave(); else advanceRoute(); } S.transitioning = false; try { skipTransition(); } catch (e) {} S.newRoomFx = false; render(); });
   await clean();
-  const badge = await page.evaluate(() => (document.querySelector('.round-badge') || {}).textContent);
-  ok(/^Floor I\s*Round 1$/.test((badge || '').trim()), `fight floor badge text: "${badge}"`);
+  // Nov 15 (Jeremy): the floor shows on the route map's tab; the label above the chest is gone
+  const badge = await page.evaluate(() => ({ tab: (document.querySelector('.route-map .rm-tab') || {}).textContent, old: !!document.querySelector('.round-badge') }));
+  ok(/^Floor\s*1$/.test((badge.tab || '').trim()) && !badge.old, `fight: floor on the map tab, no chest label (${JSON.stringify(badge)})`);
   for (const nq of [0, 1, 3]) {
     const q = await page.evaluate((nq) => {
       const e = S.encounter; e.quests = ['10 damage: 3 maneuvers', '2 dot: 2 heal', 'nullify: 5 block'].slice(0, nq); e.questsDone = e.quests.map(() => false); render();
@@ -167,10 +168,10 @@ const SHOTS = process.env.SHOTS || ''; // set SHOTS=<dir> to save screenshots
   // ---- shrine screen: orb centred, Continue green, wiggle, badge
   await page.evaluate(() => { newGame('dwarf', 'guard'); S.floorIdx = 1; const s = FLOORS[1].shrines.find(x => /Fountain/.test(x.name)) || FLOORS[1].shrines[0]; const o = window.drawRoomCard; window.drawRoomCard = () => s; S.encounter = drawEncounter('enc'); window.drawRoomCard = o; S.screen = 'shrine'; S.shrineResult = null; S.newRoomFx = false; render(); try { placeShrineFloat(); } catch (e) {} });
   await clean(); await page.waitForTimeout(1500); // let the entrance animation settle
-  const sh = await page.evaluate(() => { const b = document.getElementById('shrine-hold-btn'); if (!b) return null; const r = b.getBoundingClientRect(); return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, vw: document.documentElement.clientWidth, vh: innerHeight, badge: (document.querySelector('.round-badge') || {}).textContent }; });
+  const sh = await page.evaluate(() => { const b = document.getElementById('shrine-hold-btn'); if (!b) return null; const r = b.getBoundingClientRect(); return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, vw: document.documentElement.clientWidth, vh: innerHeight, badge: (document.querySelector('.route-map .rm-tab') || {}).textContent }; });
   await shot('shrine_hold');
   ok(sh && Math.abs(sh.cx - sh.vw / 2) < 2 && Math.abs(sh.cy - sh.vh / 2) < 4, `shrine Hold orb centred (${JSON.stringify(sh)})`);
-  ok(sh && /^Floor II\s*Shrine$/.test(sh.badge.trim()), `shrine floor badge: "${sh && sh.badge}"`);
+  ok(sh && /^Floor\s*2$/.test(sh.badge.trim()), `shrine: floor on the map tab: "${sh && sh.badge}"`);
   const fb = await page.evaluate(() => { const f = document.querySelector('.fo-shrine .fo-enemy .fo-fig'); const r = f.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
   await page.mouse.click(fb.x, fb.y); await page.waitForTimeout(60);
   const wig = await page.evaluate(() => { const f = document.querySelector('.fo-shrine .fo-enemy .fo-fig'); return f.getAnimations().map(a => a.effect && a.effect.getKeyframes().length).join(',') + ' charging:' + document.getElementById('shrine-hold-btn').classList.contains('charging'); });
