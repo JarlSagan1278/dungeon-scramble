@@ -1560,8 +1560,8 @@ function rmGlyph(kind, ink, extra){
   if(kind==='camp') return `<path d="M-9 7 L0 -8 L9 7 Z" fill="#7b8f4a" stroke="${ink}" stroke-width="2.2" stroke-linejoin="round"/><path d="M0 -8 L0 7 M-3 7 L0 1 L3 7" stroke="${ink}" stroke-width="1.6" fill="none"/>`;
   if(kind==='done') return `<path d="M-6 -6 L6 6 M6 -6 L-6 6" stroke="#9b2c1f" stroke-width="3" stroke-linecap="round"/>`;
   if(kind==='fork'){ const [a,b] = extra; const door = (k,y)=>{ const f = k==='Elite'||k==='Elite Trap' ? ['#e6c25a','!'] : k==='Deadly' ? ['#d0533c','!!'] : k==='Shrine' ? ['#7cc4bd','?'] : k==='Trap' ? ['#a9c27a','?'] : [extra[2],'?'];
-      return `<circle cx="2" cy="${y}" r="6" fill="${f[0]}" stroke="${ink}" stroke-width="2"/><text x="2" y="${y+3.5}" font-size="${f[1].length>1?7:9}" text-anchor="middle" fill="${ink}" font-family="Metamorphous, serif">${f[1]}</text>`; };
-    return `<path d="M-14 0 Q-6 -9 0 -8 M-14 0 Q-6 9 0 8" stroke="${ink}" stroke-width="2" fill="none" stroke-dasharray="3 3"/>${door(a,-8)}${door(b,8)}`; }
+      return `<circle cx="0" cy="${y}" r="6" fill="${f[0]}" stroke="${ink}" stroke-width="2"/><text x="0" y="${y+3.5}" font-size="${f[1].length>1?7:9}" text-anchor="middle" fill="${ink}" font-family="Metamorphous, serif">${f[1]}</text>`; };
+    return `${door(a,-8)}${door(b,8)}`; } // the path itself splits to the two doors (renderRoute)
   return `<circle r="7" fill="${extra}" stroke="${ink}" stroke-width="2"/>${T('?',3.5)}`;
 }
 function renderRoute(){
@@ -1569,8 +1569,15 @@ function renderRoute(){
   const n = S.route.length, cur = Math.min(S.routeStep, n-1);
   const amp = [2,3,4][fl], dyOf = i=> +(amp*Math.sin(i*1.7 + fl + 1)).toFixed(2);
   const X = i=> (i+0.5)/n*1000;
-  let path = `M${X(0)} ${20+dyOf(0)}`; for(let i=1;i<n;i++) path += ` Q${((X(i-1)+X(i))/2).toFixed(1)} ${(20+dyOf(i-1)+(i%2?-5:5)).toFixed(1)} ${X(i).toFixed(1)} ${20+dyOf(i)}`;
-  const trail = path.split(' Q').slice(0, cur+1).join(' Q');
+  // the fork you stand at is under the token (its two doors are on screen), so only forks ahead are drawn split
+  const isFork = i=> S.route[i]==='enc' && i>S.routeStep && typeof FORK_SLOTS!=='undefined' && FORK_SLOTS.includes(i) && !(i===S.routeStep && !S.forkChoice) && !(S.guide && S.guide.stage && S.guide.stage!=='done') && !(typeof depthRank==='function' && depthRank('gauntlet')>=2);
+  // a fork (shown as two doors, 8px above and below the line) splits the path into two branches that rejoin after it
+  const ends = i=> isFork(i) ? [20+dyOf(i)-8, 20+dyOf(i)+8] : [20+dyOf(i)];
+  const seg = (a, b)=>{ const xa = X(a), xb = X(b), mx = ((xa+xb)/2).toFixed(1), bend = (b%2?-5:5); let d = '';
+    ends(a).forEach(ya=> ends(b).forEach(yb=>{ const cy = ends(a).length>1 || ends(b).length>1 ? (ends(a).length>1 ? ya : yb) : (ya+yb)/2 + bend; d += `M${xa.toFixed(1)} ${ya.toFixed(1)} Q${mx} ${cy.toFixed(1)} ${xb.toFixed(1)} ${yb.toFixed(1)} `; }));
+    return d; };
+  let path = '', trail = '';
+  for(let i=1;i<n;i++){ const d = seg(i-1, i); path += d; if(i<=cur) trail += d; }
   const sheets = []; for(let k=0;k<fl;k++){ const back = fl-k; sheets.push(`<polygon points="${rmRag(k+7, 0)}" transform="translate(${back*4} ${back*4}) rotate(${-back*.6} 500 20)" fill="${RM_PAL[k][0]}" stroke="#0c0705" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`); }
   const cracks = fl>=1 ? `<path d="M300 2 l7 16 l-6 12 l8 10" ${fl>=2?'':''}stroke="${pal[1]}" stroke-width="1.5" fill="none" vector-effect="non-scaling-stroke"/>` + (fl>=2 ? `<path d="M720 38 l-5 -14 l7 -12 l-4 -10" stroke="${pal[1]}" stroke-width="1.5" fill="none" vector-effect="non-scaling-stroke"/>` : '') : '';
   const paper = `<svg class="rm-paper" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true"><defs><radialGradient id="rm-pv" cx="50%" cy="50%" r="70%"><stop offset="55%" stop-color="${pal[0]}"/><stop offset="100%" stop-color="${pal[1]}"/></radialGradient></defs>${sheets.join('')}<polygon points="${rmRag(fl+1, 0)}" fill="url(#rm-pv)" stroke="#0c0705" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>${cracks}</svg>`;
@@ -1580,7 +1587,7 @@ function renderRoute(){
     const cls = i<S.routeStep?'done':(i===S.routeStep?'current':'');
     const statusSuffix = cls==='done' ? ' (cleared)' : (cls==='current' ? ' (current)' : ' (ahead)');
     let tip = (ROUTE_STEP_DESC[step]||'') + statusSuffix, g;
-    const fork = step==='enc' && i>=S.routeStep && typeof FORK_SLOTS!=='undefined' && FORK_SLOTS.includes(i) && !(i===S.routeStep && !S.forkChoice) && !(S.guide && S.guide.stage && S.guide.stage!=='done') && !(typeof depthRank==='function' && depthRank('gauntlet')>=2);
+    const fork = isFork(i) || (i===S.routeStep && !!S.forkChoice && S.route[i]==='enc'); // standing at a fork: still a fork room (its tooltip), drawn under the token
     if(fork){ const kinds = (i===S.routeStep && S.forkChoice) ? S.forkChoice.doors.map(d=>d.kind) : ['?','Elite'];
       tip = `A fork: choose one of two doors (${kinds.map(k=>k==='?'?'unknown':k).join(' or ')})${statusSuffix}`; g = rmGlyph('fork', ink, [kinds[0], kinds[1], pal[0]]); }
     else if(step==='boss') g = rmGlyph('boss', ink);
