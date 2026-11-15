@@ -5908,10 +5908,11 @@ function endScreenHTML(o){
   const na = (S.newAchievements||[]).length; if(na) news.push(`${na} achievement${na>1?'s':''}`);
   const nb = (S.newBoonDice||[]).filter((n,i,a)=>a.indexOf(n)===i).length; if(nb) news.push(`${nb} Starting Boon${nb>1?'s':''}`);
   news.push('Run Summary');
-  return `<div class="panel end-screen${o.stage?' has-stage':''}"><h2>${o.title}</h2>${o.stage || `<p class="end-lede">${o.lede}</p>`}
+  // a defeat scene (Nov 15) sits under the title on a phone and atop the details column in PC mode (CSS shows one)
+  return `<div class="panel end-screen${o.stage?' has-stage':''}${o.scene?' has-scene':''}"><h2>${o.title}</h2>${o.scene ? o.scene.replace('defeat-scene ','defeat-scene ds-phone ') : ''}${o.stage || `<p class="end-lede">${o.lede}</p>`}
     <div class="end-swap">
       <div class="end-main">${runCardHTML(o.outcome)}${o.note||''}</div>
-      <div class="end-details" hidden>${o.seal}${o.relic}${newAchievementsHTML(S.newAchievements)}${newBoonsHTML()}${summaryStatsHTML()}
+      <div class="end-details" hidden>${o.scene ? o.scene.replace('defeat-scene ','defeat-scene ds-pc ') : ''}${o.seal}${o.relic}${newAchievementsHTML(S.newAchievements)}${newBoonsHTML()}${summaryStatsHTML()}
         ${BUILD.release ? '' : '<button class="btn-export end-send-btn" onclick="openExportDataModal()">Send Play Data</button>'}</div>
     </div>
     <div class="end-actions"><button id="save-run-card-btn">Save Card</button><button class="primary" onclick="location.reload()">${o.again}</button></div>
@@ -6153,6 +6154,21 @@ function demoTeaserHTML(){
   return `<div class="demo-teaser"><div class="demo-teaser-cap">${BUILD.demo ? 'Floor 3 and the Big Bosses wait in the full game, with dice like these:' : 'Two more floors wait in the full game, with dice like these:'}</div>
     <div class="demo-teaser-row">${dice.map((d,i)=>`<div class="demo-teaser-die" title="${d.name}: ${d.faces.map(f=>LABEL[f.type]+(f.value!=null&&f.type!=='blank'?' '+f.value:'')).join(', ')}"><div class="demo-teaser-top"><img class="demo-teaser-art tier-${GILDED.includes(d)?'gilded':'magic'}" src="${LOOT_ART[d.name]}" alt="${d.name}"><div class="demo-teaser-faces">${d.faces.map(f=>`<span class="demo-face${f.type==='blank'?' blank':''}">${f.type==='blank'?'':iconSpan(f.type, f.value)}</span>`).join('')}</div></div><span class="demo-teaser-name tier-${GILDED.includes(d)?'gilded':'magic'}">${d.name}</span></div>`).join('')}</div></div>`;
 }
+// Defeat scene (Nov 15, Jeremy): the room the hero fell in, drawn by the fight's own renderEncounterCard, without bars,
+// signs or chips; the hero lies on the floor with their gear scattered, and the foe that won wears their best piece
+// (through the carried-loot drawing, e.carry). Nothing is drawn when the room can't be (no foe, a reload).
+function defeatSceneHTML(cls){
+  const e = S.encounter; if(!e || !(e.health>0) || !foPlayer || typeof renderEncounterCard!=='function') return '';
+  const g = heroGear(), best = g.head || g.back || g.float || g.ground[0] || null;
+  const was = e.carry; let card = '';
+  try{ e.carry = best ? best.name : null; card = renderEncounterCard(e, 'faceoff'); }catch(err){ card = ''; } finally { e.carry = was; }
+  if(!card) return '';
+  const strewn = [g.back, g.float, ...g.ground].filter(d=> d && d!==best).slice(0, 4);
+  const SPOTS = [[40,64,-100],[54,76,-20],[6,74,12],[64,70,70]]; // left %, top %, turn
+  const loot = strewn.map((d,i)=>{ const [x,y,r] = SPOTS[i]; const h = Math.round(Math.min(.5,(LOOT_GEAR_SIZE[d.name]||.3))*100);
+    return `<img class="ds-loot" src="${LOOT_ART[d.name]}" alt="" style="left:${x}%;top:${y}%;height:calc(${h}px * var(--dsz));transform:rotate(${r}deg)">`; }).join(''); // sized against the hero (about 100px tall), like worn gear
+  return `<div class="defeat-scene ${cls||''}" aria-hidden="true"><div class="ds-room">${card}</div>${loot}<i class="ds-shade"></i></div>`;
+}
 // Nov 12 (polish roadmap E1): a loss is when players decide whether to go again, so name the nearest goal and how this
 // run measured up. One line each, plain words; nothing when there's nothing honest to say.
 function defeatGoalHTML(){
@@ -6191,8 +6207,9 @@ function renderGameOver(){
   if(S.carryoverOptions && S.carryoverOptions.length && !S.carryoverChosenName){
     // Oct 28 (release review): the moment a player decides whether to go again gets the hero, what beat them and a clear choice
     const rd = runCardData('defeat');
-    app.innerHTML = `<div class="panel end-screen defeat-keep"><h2>Defeated</h2>
-      <div class="dk-hero">${rd.portrait ? `<img class="dk-portrait" src="${rd.portrait}" alt=""/>` : ''}<div class="dk-id"><div class="dk-name">${(rd.name || rd.who).replace(/</g,'&lt;')}</div><div class="dk-fell">${rd.outcome}</div><div class="dk-sub">${rd.stats.map(([k,v])=>`${v} ${k.toLowerCase()}`).join(' &middot; ')}</div></div></div>
+    const dkScene = defeatSceneHTML('ds-keep');
+    app.innerHTML = `<div class="panel end-screen defeat-keep"><h2>Defeated</h2>${dkScene}
+      <div class="dk-hero">${rd.portrait && !dkScene ? `<img class="dk-portrait" src="${rd.portrait}" alt=""/>` : ''}<div class="dk-id"><div class="dk-name">${(rd.name || rd.who).replace(/</g,'&lt;')}</div><div class="dk-fell">${rd.outcome}</div><div class="dk-sub">${rd.stats.map(([k,v])=>`${v} ${k.toLowerCase()}`).join(' &middot; ')}</div></div></div>
       <div class="dk-box"><div class="dk-title">Keep one die for your next run</div>
         <p class="dk-hint">${S.carryoverOptions.length>1 ? 'Tap one' : 'Tap it'} to keep it: it joins your tray at the start of your next run.</p>
         <div class="swap-list" id="carryover-list"></div></div>
@@ -6215,7 +6232,7 @@ function renderGameOver(){
   const carryNote = S.carryoverChosenName ? `<p class="hint">${S.carryoverChosenName} will join your tray at the start of your next run.</p>` : '';
   const goalNote = defeatGoalHTML();
   app.innerHTML = endScreenHTML({ outcome:'defeat', title:'Defeated', lede: goalNote || 'Your adventurer limps back to town. The dungeon will be waiting.',
-    note:carryNote, seal:'', relic:'', again:'Try Again' });
+    note:carryNote, seal:'', relic:'', again:'Try Again', scene: defeatSceneHTML() });
   wireRunCard('defeat');
 }
 

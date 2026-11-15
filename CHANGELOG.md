@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.144 (Nov 15, 2026)
+- Foes carry their drop: an Elite-door foe or a floor boss visibly carries one loot die (worn like the hero's gear, mirrored), and that die is always one of your loot choices. Placement follows each monster's visible body (MONSTER_ART_BOX, tools/art/monster_boxes.py).
+- Defeat scene: the room you fell in, the hero down with their gear scattered, the winner wearing your best piece. Under the title on the defeat screen (the run card's dice now sit in two rows of eight), in place of the portrait on the keep-a-die screen, atop the details column on PC.
+- Fix: during turn playback, gaining Block could drop the +Block tag from your health number until the next full redraw.
+
 ## 1.42.143 (Nov 15, 2026)
 - The item pop-up beside the hero when a loot die plays is gone (too crowded; the dice, path and damage numbers already show it). On the victory stage, floor gear sits above the name banner.
 

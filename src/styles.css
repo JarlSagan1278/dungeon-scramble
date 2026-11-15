@@ -3969,3 +3969,20 @@ body.pc .vic-stage{ height:200px; } body.pc .vic-hero{ height:120px; }
 /* C: the item flashes up beside the hero when its die plays */
 .vic-hero-wrap{ display:inline-block; margin-bottom:-6px; z-index:2; }
 .vic-hero-wrap > .vic-hero{ margin-bottom:0; }
+
+/* ==== Defeat scene (Nov 15, Jeremy): the room you fell in, the hero down, gear scattered, the winner wearing your best piece */
+.defeat-scene{ position:relative; overflow:hidden; height:calc(132px + (var(--screen-h, 769px) - 769px) * .4); margin:4px 0 8px; border:3px solid #0c0705; border-radius:16px; box-shadow:0 4px 0 #0c0705; background:#1b100a; flex:none; }
+.defeat-scene .ds-room{ position:absolute; left:0; right:0; bottom:calc(-34px * var(--dsz)); zoom:var(--dsz); pointer-events:none; }
+.defeat-scene{ --dsz:.6; } .defeat-keep .defeat-scene{ --dsz:.8; } body.pc .defeat-scene.ds-pc{ --dsz:.85; }
+.defeat-scene .enc-card{ margin:0 !important; animation:none !important; }
+.defeat-scene :is(.fo-hpwrap, .fo-chips, .fo-name, .fo-turnlabel, .fo-type, .fo-vs, .fo-hud, .relic-strip, .fo-quests-float, .door-dust){ visibility:hidden !important; }
+.defeat-scene .fo-player .hero-gear{ display:none; }
+.defeat-scene .fo-player .fo-fig{ transform:translate(60%, 4%) rotate(-82deg) !important; transform-origin:50% 100%; filter:grayscale(.15) brightness(.92); position:relative; z-index:4; animation:none !important; }
+.defeat-scene .fo-player .fo-fig > *{ animation:none !important; }
+.defeat-scene .ds-loot{ position:absolute; z-index:5; width:auto; max-width:none; filter:drop-shadow(0 2px 0 rgba(12,7,5,.7)) brightness(.85); }
+.defeat-scene .ds-shade{ position:absolute; inset:0; z-index:6; pointer-events:none; background:radial-gradient(ellipse 70% 50% at 30% 90%, rgba(150,30,20,.28), transparent 70%), linear-gradient(transparent 65%, rgba(0,0,0,.3)); }
+.defeat-keep .defeat-scene{ height:calc(200px + (var(--screen-h, 769px) - 769px) * .5); }
+.end-screen.has-scene .run-card .rc-portrait{ display:none; }
+.end-screen.has-scene .run-card .rc-dice{ grid-template-columns:repeat(8,30px); } /* two rows of eight: room for the scene */
+body:not(.pc) .defeat-scene.ds-pc, body.pc .defeat-scene.ds-phone{ display:none; }
+body.pc .defeat-scene.ds-pc{ height:230px; margin:0 0 12px; }
