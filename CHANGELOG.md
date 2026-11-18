@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.147 (Nov 18, 2026)
+- Foes no longer carry a loot item in fights (Jeremy: there are several loot choices). The defeat scene's winner still wears your best piece.
+
 ## 1.42.146 (Nov 15, 2026)
 - Route map: forks split the inked path to their two doors and rejoin after; the fork you stand at is one line (its doors are on screen). The Floor tab's text is centred in a slightly wider box.
 
