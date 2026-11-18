@@ -1189,14 +1189,7 @@ function drawEncounter(kind){
   }
   S.usedCards.add(e.name);
   if(e.type!=='Shrine') bestiaryNote(e.name, 'met');
-  // Nov 15 (Jeremy): an Elite-door foe or a floor boss visibly carries one loot die, which is sure to be in its drop
-  // (the Elite's from the next floor's pool, like its extra choice). The final boss drops no loot, so it carries none.
-  e.carry = null;
-  if((e.forkBonus || kind==='boss') && S.floorIdx < FLOORS.length-1){
-    const next = e.forkBonus && FLOORS[S.floorIdx+1] && FLOORS[S.floorIdx+1].lootPool.length ? FLOORS[S.floorIdx+1].lootPool : floor.lootPool;
-    const drawable = next.filter(d=> typeof LOOT_ART!=='undefined' && LOOT_ART[d.name] && LOOT_SLOT[d.name]);
-    if(drawable.length) e.carry = pickLootUnused(drawable).name;
-  }
+  e.carry = null; // Nov 18 (Jeremy): foes don't carry loot (there are several choices); e.carry is only the defeat scene's
   if(e.health>0){ e.health = Math.max(1, Math.round(e.health * floorHpMul(S.floorIdx) * (/^(elite|deadly)$/.test(encounterTier(e)) ? 1 + DREAD_HP*depthRank('dread') : 1))); if(e.maxHealth!==undefined) e.maxHealth = e.health; }
   e.curHealth = e.health;
   e.curDOT = 0; e.curHOT = 0; e.curShield = 0; e.turn = 0;
@@ -2860,12 +2853,6 @@ function onEncounterDefeated(){
   // Nov 4 (Jeremy): the Elite door's extra choice comes from the next floor's better loot (on the last floor it stays Magic).
   const deeper = !isFinal && e.forkBonus && FLOORS[S.floorIdx+1] && FLOORS[S.floorIdx+1].lootPool.length;
   if(deeper){ const d = pickLootNUnused(FLOORS[S.floorIdx+1].lootPool, 1)[0]; if(d){ options = options.slice(0, Math.max(1, options.length-1)).concat([d]); } }
-  // The die the foe carried is always one of the choices (it takes the place of one random option).
-  const carried = !isFinal && e.carry ? findLootDieByName(e.carry) : null;
-  if(carried && !options.some(o=>o.name===carried.name)){
-    if(deeper) options = options.slice(0, options.length-1).concat([carried]);
-    else options = [carried].concat(options.filter(o=>o.name!==carried.name).slice(0, Math.max(0, options.length-1)));
-  }
   S.lootChoice = { options, lootName: floor.lootName, overkill, nearMiss, final: isFinal };
   teleLog('room_win', {name:e.name, type:e.type, turns:S.turnNumber+1, ms:(S._roomStartedAt!=null)?Math.max(0,teleActiveMs()-S._roomStartedAt):null, overkill, overBy:Math.max(0,Math.round(-e.curHealth)), nearMiss, offered:options.length, hp:S.health});
   if(!isFinal) teleLog('loot_offer', {tier:(options[0]&&options[0].cat)||null, overkill, offered:options.map(o=>o.name)});

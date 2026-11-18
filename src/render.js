@@ -1905,7 +1905,7 @@ function renderEncounterCard(e, mode){
     const questLine = questSignHTML(e);
     const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
     const sz = encounterSize(e);
-    // Nov 15: a foe carrying its loot die wraps its picture (ec-wrap takes the footing drop) so the item sits on the body
+    // a foe wearing an item (only the defeat scene's winner) wraps its picture (ec-wrap takes the footing drop) so the item sits on the body
     const carryOn = !!(art && e.carry && LOOT_ART[e.carry] && !(e.curHealth<=0 && S.resolvingIdx==null));
     const monsterFig = carryOn ? `<span class="ec-wrap" style="--sz:${sz};--drop:${encounterDrop(e)}%;${enemyCarryBoxVars(e, !!flipCls)}">${enemyCarryHTML(e,'back')}<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz};--drop:0%"/>${enemyCarryHTML(e)}</span>`
       : art ? `<img class="fo-img ${flipCls} enc-art" src="${art}" alt="${e.name}" style="--sz:${sz};--drop:${encounterDrop(e)}%"/>`
@@ -1926,7 +1926,7 @@ function renderEncounterCard(e, mode){
         </div><!--/z2-->
         <!--z3--><div class="fo-vs"><span class="fo-vs-txt${(performance.now()-UIFX.vsAt)<3400?' vs-intro':''}" style="animation-delay:-${Math.max(0,Math.round(performance.now()-UIFX.vsAt))}ms">vs</span></div><!--/z3-->
         <!--z4--><div class="fo-side fo-enemy${isBoss?' fo-boss-side':''}">
-          ${doorDustHTML}<div class="fo-fig enc-portrait ${(BOSS_DROP_PENDING&&/Boss/.test(e.type))?'boss-drop-wait ':''}${sz>1.05?'fo-big ':''}${(sz>1.05&&/Boss/.test(e.type))?'fo-bossbig ':''}${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}" style="--sz:${sz}"${carryOn?` title="${e.name} carries ${e.carry}: beat it and it's one of your loot choices"`:''}>${monsterFig}</div><div class="fo-floor"></div>
+          ${doorDustHTML}<div class="fo-fig enc-portrait ${(BOSS_DROP_PENDING&&/Boss/.test(e.type))?'boss-drop-wait ':''}${sz>1.05?'fo-big ':''}${(sz>1.05&&/Boss/.test(e.type))?'fo-bossbig ':''}${(e.curHealth<=0 && S.resolvingIdx==null)?"fo-dead ":""}${fx.cls==='flash-damage'?'dmg-flash':fx.cls==='flash-heal'?'heal-flash':''}" style="--sz:${sz}">${monsterFig}</div><div class="fo-floor"></div>
           <div class="fo-hpwrap status-tooltip-target" ${statusTip?`title="${statusTip}"`:''} style="position:relative;">${isBoss ? bossArcBarHTML({hpPct, prevLeft:dmgPreviewLeftPct, prevW:dmgPreviewWidthPct, shieldVal:e.curShield, shieldMax:e.maxHealth, cls:`${fx.cls} ${killHint?'bar-'+killHint.state:''}`, numHTML:`<span class="bar-num">${curHealthClamped.toFixed(0)}${shieldNumHTML(e.curShield)}/${e.maxHealth}</span>`}) : `<div class="bar ${fx.cls} ${killHint?'bar-'+killHint.state:''}">
               ${hpFillHTML('enemy','hp',hpPct)}
               ${dmgPreviewWidthPct>0?`<div class="bar-fill dmg-preview" style="left:${dmgPreviewLeftPct}%; width:${dmgPreviewWidthPct}%;" title="Projected damage from your current path"></div>`:''}
@@ -5891,8 +5891,8 @@ function heroGearHTML(part){
   if(!g.ground.length && !g.float && !g.head) return '';
   return `<span class="hero-gear" aria-hidden="true">${g.ground[0]?img(g.ground[0],'hg-ground hg-gl'):''}${g.ground[1]?img(g.ground[1],'hg-ground hg-gr'):''}${g.float?img(g.float,'hg-float'):''}${g.head?img(g.head,'hg-head'):''}</span>`;
 }
-// Nov 15 (Jeremy): an Elite-door foe or a floor boss carries the loot die it will drop (e.carry, logic.js drawEncounter),
-// drawn like the hero's gear but mirrored, since foes face left: back items over its right shoulder, the floating item
+// The defeat scene's winner wears the hero's best piece (e.carry, set only while defeatSceneHTML draws the room; foes
+// don't carry loot in fights since Nov 18), drawn like the hero's gear but mirrored, since foes face left: back items over its right shoulder, the floating item
 // and ground items on the side toward the hero.
 function enemyCarryBoxVars(e, flipped){
   const b = MONSTER_ART_BOX[e.name] || [.1,.1,.9,1];
