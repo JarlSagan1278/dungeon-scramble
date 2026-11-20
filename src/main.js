@@ -108,36 +108,8 @@ document.addEventListener('keydown', (ev)=>{
 render();
 setTimeout(()=>{ try{ resendUnconfirmedRuns(); flushRunUploads(); }catch(e){} }, 4000); // send any runs left over from an offline session
 
-// Splash (Jeremy, Oct 13): one tap before the title screen. Browsers keep audio locked until the player touches the
-// page, so this tap unlocks it and the title theme starts with the title. Automated test browsers skip it.
-(function showSplash(){
-  if(navigator.webdriver) return;
-  const sp = document.createElement('div');
-  sp.id = 'splash'; sp.setAttribute('role','button'); sp.setAttribute('aria-label','Tap to begin');
-  sp.innerHTML = `<div class="splash-inner">
-      <div class="splash-die" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
-      <div class="splash-title">Dungeon Scramble</div>
-      <div class="splash-tap">Tap to begin</div>
-    </div>
-    <div class="splash-legal">&copy; 2026 Jeremy and Katlynn Friedman. All rights reserved.</div>`;
-  document.body.appendChild(sp);
-  let gone = false;
-  const go = ()=>{
-    if(gone) return; gone = true;
-    try{ if(typeof musicCtx==='function') musicCtx(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); }catch(e){}
-    try{ if(typeof musicUpdate==='function') musicUpdate(); }catch(e){}
-    sp.classList.add('splash-out'); setTimeout(()=> sp.remove(), 450);
-    // The tap that dismisses the splash must not also press whatever sits under it (Jeremy, Oct 17): swallow
-    // clicks until that finger lifts (plus a beat), even if it is held past the fade.
-    let until = Infinity;
-    const swallow = ev=>{ if(performance.now() < until){ ev.stopPropagation(); ev.preventDefault(); } else window.removeEventListener('click', swallow, true); };
-    window.addEventListener('click', swallow, true);
-    const lift = ()=>{ until = performance.now() + 350; window.removeEventListener('pointerup', lift, true); window.removeEventListener('pointercancel', lift, true); };
-    window.addEventListener('pointerup', lift, true); window.addEventListener('pointercancel', lift, true);
-    setTimeout(()=>{ if(until===Infinity) until = 0; }, 4000); // never leave the game deaf if a pointerup goes missing
-  };
-  sp.addEventListener('pointerdown', go); sp.addEventListener('keydown', ev=>{ ev.preventDefault(); go(); }); sp.tabIndex = 0;
-})();
+// Nov 20 (Jeremy): no "Tap to begin" splash any more (one less tap before play). The first touch anywhere unlocks
+// audio and starts the music (audioUnlockOnGesture, music.js), and still does what it touched.
 
 
 // Android Back button in the store app (Oct 26): close what's on top first, pause a run with the Settings menu (it has

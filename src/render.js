@@ -6518,7 +6518,7 @@ const GUIDE_TEXT = {
        'One more! A <b>Combo</b> hits harder when it touches Hits.',
        'That number is your Path\'s damage. Keep going through more dice, or tap <b>Go</b>!'],
   t2roll: 'New turn! <b>Flick the lid</b> open (or double-tap it) to roll your dice. On a phone, you can shake it instead.',
-  t2: 'Monsters show their <b>next move</b> under their name, so you can plan for it. Your Tray re-rolled: build any Path and finish the fight!',
+  t2: 'Your dice re-rolled: <b>build any Path</b> and finish the fight! (The monster\'s <b>next move</b> shows under its name, so you can plan for it.)',
 };
 function guideNudge(idx){
   const d = document.querySelector(`#tray .die[data-idx="${idx}"]`); if(!d) return;
@@ -6564,7 +6564,7 @@ function updateGuide(){
   } else if(S.guide.stage==='t2'){
     if(S.path.length) return hide();
     text = GUIDE_TEXT.t2;
-    target = document.querySelector('#enc-panel .fo-enemy .fo-chips:not(.fo-buffs)'); // ring the next-move chips
+    target = tray; // Nov 20: ring what to do next (the dice), not the next-move chips, which only open a tooltip when tapped
   }
   if(!b){
     b = document.createElement('div'); b.id = 'guide-bubble'; b.className = 'guide-bubble';

@@ -396,5 +396,5 @@ function audioUnlockOnGesture(){
     if(!Music.on || stale) musicUpdate();
   }catch(e){}
 }
-// Capture phase, so it runs before the splash's own tap handler starts the music.
+// Capture phase, so audio is unlocked before the touched button's own handler runs (the first touch is usually New Run).
 ['pointerdown','keydown'].forEach(ev=> document.addEventListener(ev, audioUnlockOnGesture, {passive:true, capture:true}));
