@@ -1,0 +1,38 @@
+# itch.io demo (Nov 20, 2026): every push to main rebuilds the free demo (Floors 1-2, `node build.js --demo`) and
+# uploads it to https://dungeonscramble.itch.io/dungeon-scramble with butler, itch's own upload tool. It replaces the
+# hand-made demo zip. Run it by hand from the Actions tab (itch demo > Run workflow) after the first setup.
+# Needs one repository secret (Settings > Secrets and variables > Actions):
+#   BUTLER_API_KEY -- an itch.io API key (itch.io > Settings > API keys > Generate new API key)
+# Without the secret the job builds the demo and skips the upload, so it never fails main.
+# First time only, on itch (Edit game > Uploads): the new upload appears as channel "html"; tick "This file will be
+# played in the browser" on it, then delete the old hand-uploaded zip. Butler keeps updating that same upload after.
+name: itch demo
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency: { group: itch-demo, cancel-in-progress: true }
+jobs:
+  push-demo:
+    runs-on: ubuntu-latest
+    env:
+      BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Build the demo
+        run: node build.js --demo
+      - name: Install butler
+        if: env.BUTLER_API_KEY != ''
+        run: |
+          curl -sSL -o butler.zip https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default
+          unzip -q butler.zip -d butler && chmod +x butler/butler && ./butler/butler -V
+      - name: Upload to itch
+        if: env.BUTLER_API_KEY != ''
+        run: |
+          VER=$(node -e "const s=require('fs').readFileSync('src/data.js','utf8');console.log(s.match(/GAME_VERSION = '([^']+)'/)[1])")
+          ./butler/butler push dist/demo/web dungeonscramble/dungeon-scramble:html --userversion "$VER"
+      - name: No itch key yet
+        if: env.BUTLER_API_KEY == ''
+        run: echo "BUTLER_API_KEY is not set; built the demo, skipped the itch upload."
