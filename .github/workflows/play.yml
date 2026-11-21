@@ -1,0 +1,68 @@
+# Google Play closed test (Nov 21, 2026). Jeremy: small updates pile up and go out together, not one per release.
+# So this runs once a week (Fridays, after the week's releases) and by hand (Actions tab > Google Play > Run workflow).
+# The weekly run only uploads when GAME_VERSION changed in the last 7 days; a hand run always uploads.
+# It builds the app flavour (Floor 1 free, then the unlock), signs the bundle with the upload key, and sends it to the
+# closed testing track (track id "alpha" unless another is typed in). Each upload goes through Google's review.
+# Needs repository secrets: DS_UPLOAD_KEYSTORE_B64, DS_UPLOAD_KEY_PASSWORD (the upload key) and
+#   PLAY_SERVICE_ACCOUNT_JSON -- the JSON key of a Google Cloud service account that has release rights for this app
+#   in Play Console (Users and permissions). Without it the job builds the bundle and stops.
+# The app's versionCode follows the game version (tools/app/prepare.js), so every new game version is a valid update.
+name: Google Play
+on:
+  schedule:
+    - cron: '17 4 * * 6'   # Saturdays 04:17 UTC = Friday evening in California
+  workflow_dispatch:
+    inputs:
+      track:
+        description: 'Play track id (alpha = Closed testing)'
+        default: 'alpha'
+concurrency: { group: play-upload, cancel-in-progress: false }
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DS_UPLOAD_KEYSTORE_B64: ${{ secrets.DS_UPLOAD_KEYSTORE_B64 }}
+      DS_UPLOAD_KEY_PASSWORD: ${{ secrets.DS_UPLOAD_KEY_PASSWORD }}
+      PLAY_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 200 }
+      - name: Anything new this week?
+        id: gate
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then echo "go=yes" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if git log --since="7 days ago" -p -- src/data.js | grep -q "^+const GAME_VERSION"; then echo "go=yes" >> "$GITHUB_OUTPUT"; else echo "go=no" >> "$GITHUB_OUTPUT"; echo "No new game version this week; nothing to upload."; fi
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.go == 'yes'
+        with: { node-version: '22' }
+      - uses: actions/setup-java@v4
+        if: steps.gate.outputs.go == 'yes'
+        with: { distribution: 'temurin', java-version: '21' }
+      - name: Build the game (app flavour) and copy it into the app
+        if: steps.gate.outputs.go == 'yes'
+        run: node build.js --app && node tools/app/prepare.js
+      - name: Install Capacitor and sync
+        if: steps.gate.outputs.go == 'yes'
+        working-directory: app
+        run: npm ci && npx cap sync android
+      - name: Build the signed bundle
+        if: steps.gate.outputs.go == 'yes' && env.DS_UPLOAD_KEYSTORE_B64 != ''
+        working-directory: app/android
+        run: |
+          chmod +x gradlew
+          echo "$DS_UPLOAD_KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          DS_UPLOAD_KEYSTORE="$RUNNER_TEMP/upload.jks" ./gradlew bundleRelease --no-daemon
+          rm -f "$RUNNER_TEMP/upload.jks"
+      - name: Send it to Google Play
+        if: steps.gate.outputs.go == 'yes' && env.PLAY_JSON != '' && env.DS_UPLOAD_KEYSTORE_B64 != ''
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.dungeonscramble.game
+          releaseFiles: app/android/app/build/outputs/bundle/release/app-release.aab
+          track: ${{ github.event.inputs.track || 'alpha' }}
+          status: completed
+      - name: No Play key yet
+        if: steps.gate.outputs.go == 'yes' && env.PLAY_JSON == ''
+        run: echo "PLAY_SERVICE_ACCOUNT_JSON is not set; built the bundle, skipped the upload."
