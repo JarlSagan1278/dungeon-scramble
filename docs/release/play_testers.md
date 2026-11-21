@@ -4,6 +4,8 @@ Google won't let a new personal developer account apply for public release until
 for 14 days in a row**. Testers come from tester-swap communities: you test their app, they test yours. Keep each swap
 honest: install their app, open it on a few different days, leave a line of feedback if they ask.
 
+**Tester group (Nov 21):** dungeon-scramble-testers@googlegroups.com, join page https://groups.google.com/g/dungeon-scramble-testers.
+
 **Before posting:** in Play Console > Testing > Closed testing > your track > Testers, copy the **opt-in link**
 (it looks like https://play.google.com/apps/testing/com.dungeonscramble.game) and, if you use a Google Group for
 testers, the group's join link. Replace the [brackets] below.
@@ -21,7 +23,7 @@ Track who joined in the table at the bottom: the 14 days only count while at lea
 > step on hits, blocks or heals, in order. Monsters show their next move, so you can plan around the roll.
 > Floor 1 is free in the test build. No ads, no account, works offline.
 >
-> **To join:** [join the Google Group: link] then opt in here: [opt-in link], then install from the Play Store link
+> **To join:** join the Google Group: https://groups.google.com/g/dungeon-scramble-testers then opt in here: [opt-in link], then install from the Play Store link
 > on that page. Please keep it installed for 14 days and open it now and then.
 >
 > Feedback welcome but not required. Thank you!
@@ -33,7 +35,7 @@ Track who joined in the table at the bottom: the 14 days only count while at lea
 > Looking for testers for my first Play Store game: a dice-path roguelike made from our board game (roll 16 dice,
 > draw one path, each die you step on hits, blocks or heals, in order). No ads, no sign-in, works offline.
 >
-> Opt in: [opt-in link] (join [Google Group link] first if it asks).
+> Opt in: [opt-in link] (join https://groups.google.com/g/dungeon-scramble-testers first).
 > I'll test yours back for the full 14 days: comment your link or DM me.
 
 ## Testers Community Google Group (and similar "12 testers" groups)
