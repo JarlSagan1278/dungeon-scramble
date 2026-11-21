@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.149 (Nov 21, 2026)
+- Run card: opens with the moment (the defeat scene, or the hero with trophies after a win), ends with "Draw one path. Every step counts." and the itch link; the share sheet gets the link too, and the button reads "Share Card" where the phone can share.
+- Android: a portrait screen is no longer required (Play availability warning).
+
 ## 1.42.148 (Nov 21, 2026)
 - No "Tap to begin" splash: the game opens on the title, and the first touch (usually New Run) starts the music and still does what it touched.
 - Guided fight, turn 2: the highlight rings the dice (it was on the next-move chips, which only opened a tooltip) and the text leads with "build any Path".
