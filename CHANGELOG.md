@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.148 (Nov 21, 2026)
+- No "Tap to begin" splash: the game opens on the title, and the first touch (usually New Run) starts the music and still does what it touched.
+- Guided fight, turn 2: the highlight rings the dice (it was on the next-move chips, which only opened a tooltip) and the text leads with "build any Path".
+- The itch demo now uploads itself on every release (GitHub workflow with butler).
+
 ## 1.42.147 (Nov 18, 2026)
 - Foes no longer carry a loot item in fights (Jeremy: there are several loot choices). The defeat scene's winner still wears your best piece.
 
