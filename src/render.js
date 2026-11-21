@@ -5824,10 +5824,43 @@ function rcSvgImg(svg, color){
   if(!/xmlns=/.test(t)) t = t.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"');
   return rcLoadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(t));
 }
+// Nov 21 (Jeremy: let players recruit): the card opens with a picture of the moment (the defeat scene: the hero down,
+// gear scattered, the winner wearing the best piece; or the hero with trophies after a win) and closes with the itch
+// link, and the share sheet gets the link too. Drawn with plain canvas images (no DOM capture).
+const SHARE_URL = 'https://dungeonscramble.itch.io/dungeon-scramble';
+async function rcScene(g, X, Y, W, H, outcome){
+  const grd = g.createLinearGradient(0, Y, 0, Y+H); grd.addColorStop(0, '#24160d'); grd.addColorStop(.55, '#3b2617'); grd.addColorStop(1, '#4a2f1d');
+  g.save(); g.beginPath(); g.rect(X, Y, W, H); g.clip(); g.fillStyle = grd; g.fillRect(X, Y, W, H);
+  g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(X+W/2, Y+H-8, W*.62, 34, 0, 0, Math.PI*2); g.fill(); // floor shadow
+  for(let i=0;i<6;i++){ g.strokeStyle = 'rgba(0,0,0,.25)'; g.lineWidth = 2; g.beginPath(); g.moveTo(X, Y+18+i*16); g.lineTo(X+W, Y+18+i*16); g.stroke(); } // wall courses
+  const hero = await rcLoadImg(S.portrait && !S.portrait.placeholder ? S.portrait.img : null);
+  const draw = (im, cx, by, h, rot, flip, alpha)=>{ if(!im) return; const w = h*im.width/im.height; g.save(); g.translate(cx, by - h/2); if(rot) g.rotate(rot); if(flip) g.scale(-1,1); if(alpha!=null) g.globalAlpha = alpha; g.drawImage(im, -w/2, -h/2, w, h); g.restore(); };
+  const e = S.encounter, won = outcome==='victory' || outcome==='demo';
+  if(!won && e && MONSTER_ART[e.name] && !ART_WRONG.has(e.name)){
+    if(outcome==='defeat'){ g.fillStyle = 'rgba(150,30,20,.28)'; g.beginPath(); g.ellipse(X+W*.3, Y+H-14, W*.32, 26, 0, 0, Math.PI*2); g.fill(); }
+    const gear = heroGear(), best = gear.head || gear.back || gear.float || gear.ground[0] || null;
+    const strewn = [gear.back, gear.float, ...gear.ground].filter(x=> x && x!==best).slice(0, 4);
+    const foe = await rcLoadImg(MONSTER_ART[e.name]), fh = H*.78, fcx = X+W*.72, fby = Y+H-14;
+    draw(foe, fcx, fby, fh, 0, !ENCOUNTER_NO_FLIP.has(e.name));
+    if(best){ const im = await rcLoadImg(LOOT_ART[best.name]); const b = (MONSTER_ART_BOX[e.name]||[.1,.1,.9,1]); const fw = foe ? fh*foe.width/foe.height : fh;
+      draw(im, fcx, fby - fh*(1-b[1]) + 18, 46, -0.15, false); }
+    draw(hero, X+W*.26, Y+H-6, H*.62, -1.43, false, .92); // lying down
+    const spots = [[.48,-6,-1.75],[.1,-4,.2],[.56,-26,1.2],[.4,-30,-.35]];
+    for(let i=0;i<strewn.length;i++){ const im = await rcLoadImg(LOOT_ART[strewn[i].name]); const [fx, dy, rot] = spots[i]; draw(im, X+W*fx, Y+H+dy, 34, rot, false, .9); }
+  } else {
+    const rays = g.createRadialGradient(X+W/2, Y+H*.55, 10, X+W/2, Y+H*.55, W*.55); rays.addColorStop(0, 'rgba(255,215,106,.45)'); rays.addColorStop(1, 'rgba(255,215,106,0)');
+    g.fillStyle = rays; g.fillRect(X, Y, W, H);
+    draw(hero, X+W/2, Y+H-8, H*.86, 0, false);
+    const tro = (typeof victoryTrophies==='function' ? victoryTrophies() : []).slice(0, 4);
+    const tx = [.16,.3,.7,.84];
+    for(let i=0;i<tro.length;i++){ const im = await rcLoadImg(LOOT_ART[tro[i].name]); draw(im, X+W*tx[i], Y+H-12, 52, (i<2?-1:1)*.12, false); }
+  }
+  g.restore();
+}
 async function saveRunCard(outcome){
   const d = runCardData(outcome);
-  const W = 540, pad = 28, dieS = 52, gap = 10, cols = 4;
-  const H = 300 + 4*(dieS+gap) + (d.relics.length ? 70 : 0);
+  const W = 540, pad = 28, dieS = 52, gap = 10, cols = 4, SC = 190; // SC: the scene's height
+  const H = 300 + SC + 4*(dieS+gap) + (d.relics.length ? 70 : 0) + 30;
   const cv = document.createElement('canvas'); cv.width = W*2; cv.height = H*2;
   const g = cv.getContext('2d'); g.scale(2,2);
   const rr = (x,y,w,h,r)=>{ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); };
@@ -5839,11 +5872,12 @@ async function saveRunCard(outcome){
   g.fillStyle = '#ffd76a'; g.font = 'bold 30px Alegreya, Georgia, serif'; g.fillText(d.name || d.who, tx, 62, W-tx-pad);
   g.fillStyle = '#fff1d6'; g.font = '18px Alegreya, Georgia, serif'; g.fillText((d.name ? d.who+' · ' : '')+'Depth '+d.depth, tx, 90, W-tx-pad);
   g.fillStyle = d.win ? '#9affa0' : '#ff9a8a'; g.font = 'italic 18px Alegreya, Georgia, serif'; g.fillText(d.outcome, tx, 118, W-tx-pad);
+  { g.save(); rr(pad, 148, W-2*pad, SC, 14); g.clip(); await rcScene(g, pad, 148, W-2*pad, SC, outcome); g.restore(); rr(pad, 148, W-2*pad, SC, 14); g.lineWidth = 3; g.strokeStyle = '#0c0705'; g.stroke(); }
   const sw = (W-2*pad-16)/4;
-  d.stats.forEach(([k,v],i)=>{ const x = pad+8+i*sw; rr(x+3,166,sw-6,64,12); g.fillStyle = '#2a1c10'; g.fill();
-    g.textAlign = 'center'; g.fillStyle = '#ffd76a'; g.font = 'bold 26px Alegreya, Georgia, serif'; g.fillText(String(v), x+sw/2, 200);
-    g.fillStyle = '#e9dcc4'; g.font = '13px Alegreya, Georgia, serif'; g.fillText(k, x+sw/2, 220); g.textAlign = 'left'; });
-  const gx = (W - (cols*dieS + (cols-1)*gap))/2, gy = 252;
+  d.stats.forEach(([k,v],i)=>{ const x = pad+8+i*sw; rr(x+3,166+SC,sw-6,64,12); g.fillStyle = '#2a1c10'; g.fill();
+    g.textAlign = 'center'; g.fillStyle = '#ffd76a'; g.font = 'bold 26px Alegreya, Georgia, serif'; g.fillText(String(v), x+sw/2, 200+SC);
+    g.fillStyle = '#e9dcc4'; g.font = '13px Alegreya, Georgia, serif'; g.fillText(k, x+sw/2, 220+SC); g.textAlign = 'left'; });
+  const gx = (W - (cols*dieS + (cols-1)*gap))/2, gy = 252+SC;
   const icons = await Promise.all(d.dice.map(x=>{ const c = RC_DIE_COLORS[x.cat]||RC_DIE_COLORS.alloy; return rcSvgImg(x.type==='blank'?'':(ICON_SVG[x.type]||''), c[1]); }));
   d.dice.forEach((x,i)=>{ const c = RC_DIE_COLORS[x.cat]||RC_DIE_COLORS.alloy, X = gx+(i%cols)*(dieS+gap), Y = gy+Math.floor(i/cols)*(dieS+gap);
     rr(X,Y,dieS,dieS,10); g.fillStyle = c[0]; g.fill(); g.lineWidth = 3; g.strokeStyle = '#0c0705'; g.stroke();
@@ -5854,16 +5888,19 @@ async function saveRunCard(outcome){
     const gs = 40, ry = gy + 4*(dieS+gap) + 12, rx0 = (W - (d.relics.length*(gs+6)-6))/2;
     gems.forEach((im,i)=>{ if(im) g.drawImage(im, rx0+i*(gs+6), ry, gs, gs); });
   }
-  g.fillStyle = 'rgba(255,241,214,.6)'; g.font = '13px Alegreya, Georgia, serif'; g.textAlign = 'center'; g.fillText('Dungeon Scramble v'+GAME_VERSION, W/2, H-20); g.textAlign = 'left';
+  g.textAlign = 'center'; g.fillStyle = '#ffd76a'; g.font = 'bold 17px Alegreya, Georgia, serif'; g.fillText('Draw one path. Every step counts.', W/2, H-46);
+  g.fillStyle = '#fff1d6'; g.font = '15px Alegreya, Georgia, serif'; g.fillText('Play free: dungeonscramble.itch.io/dungeon-scramble', W/2, H-24); g.textAlign = 'left';
   const blob = await new Promise(res=>cv.toBlob(res, 'image/png'));
   const fname = `dungeon-scramble-${outcome}-${Date.now()}.png`;
   try{
     const file = new File([blob], fname, {type:'image/png'});
-    if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:'Dungeon Scramble run'}); return; }
+    const text = (d.win ? `${d.outcome} in Dungeon Scramble!` : `${d.outcome} in Dungeon Scramble.`) + ' Play free: ' + SHARE_URL;
+    if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:'Dungeon Scramble run', text}); return; }
   }catch(err){ if(err && err.name==='AbortError') return; }
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fname; document.body.appendChild(a); a.click();
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1500);
 }
+function rcCanShare(){ try{ return !!(navigator.canShare && navigator.canShare({files:[new File([''], 'x.png', {type:'image/png'})]})); }catch(e){ return false; } }
 function wireRunCard(outcome){ const b = document.getElementById('save-run-card-btn'); if(b) b.onclick = ()=>{ b.disabled = true; saveRunCard(outcome).finally(()=>{ b.disabled = false; }); }; wireEndDetails(outcome==='victory'); }
 
 // End screens (Oct 17 design fixes, items 6-7): the run card and [Save Card][Try Again] fit one 769px screen; the
@@ -5944,7 +5981,7 @@ function endScreenHTML(o){
       <div class="end-details" hidden>${o.scene ? o.scene.replace('defeat-scene ','defeat-scene ds-pc ') : ''}${o.seal}${o.relic}${newAchievementsHTML(S.newAchievements)}${newBoonsHTML()}${summaryStatsHTML()}
         ${BUILD.release ? '' : '<button class="btn-export end-send-btn" onclick="openExportDataModal()">Send Play Data</button>'}</div>
     </div>
-    <div class="end-actions"><button id="save-run-card-btn">Save Card</button><button class="primary" onclick="location.reload()">${o.again}</button></div>
+    <div class="end-actions"><button id="save-run-card-btn">${rcCanShare() ? 'Share Card' : 'Save Card'}</button><button class="primary" onclick="location.reload()">${o.again}</button></div>
     <button id="end-details-btn" class="end-details-btn"><span class="end-details-word">Details</span><small>${news.join(' &middot; ')}</small></button>
     ${shareDataAskHTML()}
   </div>`;
