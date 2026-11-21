@@ -281,3 +281,6 @@ Sheet `1W1TyynfdWTlxMqzr7TJOTZKMY6sOPBVPfXVd41kcGSM`, 40 run records. **One** st
 
 ## Play data check (Nov 19, 2026)
 Since the Nov 12 check: no new strangers. New rows are the tester phones (p-w2ufd840ax42, p-aqcmiim0wh1p, p-b1xld6j0skhs: depth 3-8 runs, a depth 7 victory and a depth 7 Floor 3 defeat to the Extractnid Matriarch) plus two desktop IDs (p-jptt45y5zxj1 Nov 13 on 1.42.108, p-qp07r1qnxrjl Nov 14 on 1.42.130). Those two played playtest-site-only versions, never on itch, so they are almost certainly Jeremy's PC-layout testing, not strangers. Strangers who shared, all time: still 1 (p-w4nirwl3l1zv, Nov 6). Too few for funnel.py. Itch got demo 1.42.146 and a devlog Nov 16, and creator round 2 went out Nov 16; check again after the Nov 23 follow-ups.
+
+## Weekly players
+- **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.
