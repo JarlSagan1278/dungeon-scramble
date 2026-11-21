@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Nov 21: portrait lock without requiring a portrait screen, so Play doesn't block tablets, Chromebooks and
+         Google Play Games on PC (Play Console warned that the implied requirement restricted availability) -->
+    <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
