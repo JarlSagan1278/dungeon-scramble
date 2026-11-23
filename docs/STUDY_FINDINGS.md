@@ -304,6 +304,9 @@ per cell, Guard x7 200) and the regular profile at depth 0 (80 per cell).
   Whip -6, Unlabelled Mixture -6, Blunderbuss -5. Strongest: Thorned Bulwark +7, Medsack +5/+6, Triage Turret +4/+7.
   The five weak ones were buffed (decisions/depth_and_balance.md, Nov 23); Hidden Estoc was left (four Hit 2s: likely
   how the bot uses it, not the die).
+- **Buff check (same setup, 60 runs per cell, with the buffs):** Dagger -1/-1, Leeching Lance +2/+6, Whip 0/-1,
+  Unlabelled Mixture +4/+1, Blunderbuss -1/-1 (expert/regular, against the average); the expert bot now takes them more
+  (Dagger held in 353 runs, was 115). All five are back in line; none overshoots.
 
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.
