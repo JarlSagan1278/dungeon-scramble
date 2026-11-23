@@ -2349,7 +2349,7 @@ span > .info-tap, label > .info-tap{ display:none; }
 .end-actions button{ flex:0 1 150px; }
 button.end-details-btn{ display:flex; flex-direction:column; align-items:center; gap:1px; width:min(100%, 340px); margin:12px auto 0; padding:6px 10px; background:#4a3220; color:#ffd76a; }
 button.end-details-btn:hover:not(:disabled){ background:#5a3e28; }
-.end-details-btn small{ font-weight:normal; font-size:11px; color:var(--parchment); opacity:.85; white-space:normal; }
+.end-details-btn small{ font-weight:normal; font-size:11px; color:var(--parchment); opacity:.85; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; display:block; } /* one line, so a long list never grows the screen (Nov 23) */
 .end-screen .share-ask{ margin-top:10px; }
 .dk-hero{ display:flex; gap:12px; align-items:center; background:var(--panel2); border:2px solid var(--line); border-radius:var(--r-lg); padding:10px 12px; box-shadow:0 4px 0 var(--line); }
 .dk-portrait{ width:76px; height:76px; object-fit:contain; filter:grayscale(.55) brightness(.85) drop-shadow(0 3px 0 var(--line)); transform:rotate(-6deg); }
@@ -4011,3 +4011,6 @@ body.pc .defeat-scene.ds-pc{ height:230px; margin:0 0 12px; }
 .renown-box.renown-compact{ display:flex; align-items:center; gap:10px; padding:7px 10px; margin:6px 0; }
 .renown-compact .rc-col{ flex:1; min-width:0; } .renown-compact .renown-head b{ font-size:16px; } .renown-compact .renown-bar{ margin:5px 0 0; height:10px; }
 .defeat-keep:has(.renown-compact) .defeat-scene{ height:calc(150px + (var(--screen-h, 769px) - 769px) * .5); }
+/* Daily Dungeon button on the title (Nov 23) */
+.title-daily-btn{ width:100%; margin-top:8px; padding:9px 12px; font-size:16px; background:linear-gradient(#3f8f8a,#2c6b67); color:#f3fbf9; }
+.title-daily-btn.done{ background:linear-gradient(#5a4a7a,#40345a); }

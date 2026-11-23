@@ -323,7 +323,7 @@ const RANKS = [
   {name:'Transfinite', at:5400, sym:'\u2135', gift:'title',  text:'The title "Transfinite" on your run card.'},
   {name:'Infinite',    at:7000, sym:'\u221E', gift:'title2', text:'The title "Infinite" and a crown on your class badge.'},
 ];
-const RENOWN = { foe:8, boss:40, floor:20, win:150, demo:60, depthMul:0.15 };
+const RENOWN = { run:10, foe:8, boss:40, floor:20, win:150, demo:60, depthMul:0.15 }; // run: every finished run earns at least this
 function originRelicFor(originId){ return RELICS.find(r=>r.origin===originId); }
 
 // ---- Origin dice ----

@@ -43,7 +43,7 @@ function migrateSave(data){
 // gets a field that is in neither list: put a new field in one of them (when unsure, RUN: that's what used to happen).
 const RUN_FIELDS = [
   // who and where
-  'screen','charName','origin','klass','portrait','depth','depthMods','floorIdx','routeStep','route','encounter','turnNumber','guide','coachRun',
+  'screen','charName','origin','klass','portrait','depth','depthMods','floorIdx','routeStep','route','encounter','turnNumber','guide','coachRun','daily',
   // you
   'health','maxHealth','playerDOT','playerHOT','playerBlock','tray','backPocket','relics','path','classAbilityUsed','freezeNext',
   'nullifyTokens','freezeTokens','swapTokens','rerollTokens','boostTokenCharges','boostTokenValue','pendingFreeBoost','swapLog','trayAct',
@@ -543,6 +543,7 @@ function loadMeta(){
       classRuns: (parsed.classRuns && typeof parsed.classRuns==='object') ? parsed.classRuns : {},
       coachSeen: (parsed.coachSeen && typeof parsed.coachSeen==='object') ? parsed.coachSeen : {},
       renown: Math.max(0, +parsed.renown||0),
+      daily: (parsed.daily && typeof parsed.daily==='object') ? parsed.daily : {},
     };
   } catch(e){ return { lifetime: {...DEFAULT_LIFETIME}, achievements: {}, favoriteBoons: [], relicsFound: [] }; }
 }
@@ -715,15 +716,21 @@ function rankNow(){ return rankIndexFor(META.renown||0); }
 function hasRankGift(g){ const k = rankNow(); return RANKS.slice(0, k+1).some(r=> r.gift===g); }
 function renownForRun(outcome){
   const st = S.stats || {}, R = RENOWN;
-  const base = (st.encountersDefeated||0)*R.foe + (st.bossesDefeated||0)*R.boss + (S.floorIdx||0)*R.floor + (outcome==='victory' ? R.win : outcome==='demo' ? R.demo : 0);
+  const base = R.run + (st.encountersDefeated||0)*R.foe + (st.bossesDefeated||0)*R.boss + (S.floorIdx||0)*R.floor + (outcome==='victory' ? R.win : outcome==='demo' ? R.demo : 0);
   return Math.round(base * (1 + R.depthMul * (currentDepth()||0)));
 }
-function recordMetaProgress(outcome){
-  const L = META.lifetime;
-  // Guild Rank: every finished run earns renown (wins and losses alike); S.renownGain drives the end screens
+// Guild Rank: every finished run earns renown (wins, losses and the demo's end alike); S.renownGain drives the end
+// screens. Also files the Daily Dungeon result. Called once per run (recordMetaProgress, renderDemoEnd).
+function awardRenown(outcome){
   { const before = META.renown||0, gain = (S.klass && S.klass.debug) ? 0 : renownForRun(outcome);
     META.renown = before + gain; const r0 = rankIndexFor(before), r1 = rankIndexFor(META.renown);
     S.renownGain = { before, gain, after: META.renown, ranksUp: RANKS.slice(r0+1, r1+1).map(r=>r.name) }; }
+  if(S.daily){ if(outcome==='defeat') dailyMark('X'); dailyRecord(outcome); }
+  saveMeta();
+}
+function recordMetaProgress(outcome){
+  const L = META.lifetime;
+  awardRenown(outcome);
   L.runsPlayed++;
   if(outcome==='victory') L.victories++;
   L.bestFloorReached = Math.max(L.bestFloorReached, S.floorIdx+1);
@@ -906,7 +913,44 @@ function maybeAutosave(){
   saveGame();
 }
 
-function rand(n){ return Math.floor(Math.random()*n); }
+// Gameplay randomness goes through RNG (Nov 23, Daily Dungeon): Math.random normally; a Daily run reseeds it per room
+// from the day's key (dailyReseed), so every player meets the same rooms, shrines and loot offers that day.
+let RNG = Math.random;
+function rand(n){ return Math.floor(RNG()*n); }
+function seedRng(str){ let h = 2166136261>>>0; for(let i=0;i<str.length;i++){ h = Math.imul(h ^ str.charCodeAt(i), 16777619)>>>0; }
+  let a = h || 1; return ()=>{ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a>>>15, 1 | a); t = t + Math.imul(t ^ t>>>7, 61 | t) ^ t; return ((t ^ t>>>14)>>>0) / 4294967296; }; }
+function dailyReseed(tag){ RNG = (S && S.daily) ? seedRng(S.daily.key + '|' + tag) : Math.random; }
+// The day's Daily Dungeon: number, key (local date) and the origin/class everyone plays (only the starting origins).
+const DAILY_EPOCH = Date.UTC(2026, 10, 23); // Daily #1 = Nov 23, 2026
+function dailyToday(){
+  const d = new Date(), key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const n = Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - DAILY_EPOCH)/86400000) + 1;
+  const r = seedRng('daily|' + key); const origins = ['dwarf','gnome'], classes = ['armsmaster','guard','dungeoneer','arcanist'];
+  return { key, n, origin: origins[Math.floor(r()*2)], klass: classes[Math.floor(r()*4)] };
+}
+function dailyResult(key){ return (META.daily && META.daily[key]) || null; }
+function startDaily(){
+  const t = dailyToday(); if(dailyResult(t.key)) return;
+  RNG = seedRng(t.key + '|start');
+  newGame(t.origin, t.klass, null, '', {});
+  S.daily = { key: t.key, n: t.n, log: [] };
+  RNG = Math.random;
+  saveGame && saveGame();
+  render();
+}
+function dailyMark(ch){ if(S && S.daily){ (S.daily.log = S.daily.log || []).push(ch); } }
+function dailyRecord(outcome){
+  if(!S || !S.daily) return;
+  if(!META.daily) META.daily = {};
+  if(!META.daily[S.daily.key]) META.daily[S.daily.key] = { n: S.daily.n, outcome, floor: S.floorIdx+1, log: (S.daily.log||[]).join(''), who: S.origin.name+' '+S.klass.name, killedBy: S.stats.killedBy||'', turns: S.stats.turnsTaken };
+  saveMeta();
+}
+function dailyShareText(res){
+  const EM = { W:'\u{1F7E9}', E:'\u{1F7E8}', B:'\u{1F480}', S:'\u{1F7E6}', C:'\u26FA', X:'\u{1F7E5}', '|':'\n' };
+  const grid = (res.log||'').split('').map(c=>EM[c]||'').join('');
+  const head = res.outcome==='victory' ? `Conquered in ${res.turns} turns` : res.outcome==='demo' ? `Cleared the demo in ${res.turns} turns` : `Fell on Floor ${res.floor}${res.killedBy?` to ${res.killedBy}`:''}`;
+  return `Dungeon Scramble Daily #${res.n}\n${res.who}: ${head}\n${grid}\nhttps://dungeonscramble.itch.io/dungeon-scramble`;
+}
 function pick(arr){ return arr[rand(arr.length)]; }
 function pickN(arr,n){ const pool=arr.slice(); const out=[]; while(out.length<n && pool.length){ out.push(pool.splice(rand(pool.length),1)[0]); } return out; }
 function clone(o){ return JSON.parse(JSON.stringify(o)); }
@@ -1183,14 +1227,14 @@ function drawRoomCard(floor){
   const baseTier = S._forceTier || ROOM_TIER_SLOTS[S.routeStep] || 'standard';
   // Oct 30 (Jeremy): no shrine in the first two rooms of a run either -- a shrine as room 2 interrupts the tutorial flow
   const tooEarlyForShrine = S.floorIdx===0 && S.routeStep<=2;
-  if(!tooEarlyForShrine && baseTier!=='elite' && !S.segmentShrineUsed && floor.shrines.length && Math.random() < shrineSlotChance()){
+  if(!tooEarlyForShrine && baseTier!=='elite' && !S.segmentShrineUsed && floor.shrines.length && RNG() < shrineSlotChance()){
     const sh = floor.shrines.filter(unused);
     return pick(sh.length ? sh : floor.shrines);
   }
   const fights = floor.enemies.concat(isVeryFirstEncounter || S.segmentTrapUsed ? [] : floor.traps);
   if(tier==='elite'){
     const deadly = fights.filter(c=>encounterTier(c)==='deadly' && unused(c) && (!c.dreadOnly || depthRank('dread'))); // v1.39.0: dreadOnly cards appear only with the Dread modifier
-    if(deadly.length && Math.random() < DEADLY_CHANCE + 0.12*depthRank('dread')) return pick(deadly);
+    if(deadly.length && RNG() < DEADLY_CHANCE + 0.12*depthRank('dread')) return pick(deadly);
   }
   const fallback = {easy:['easy','standard','elite'], standard:['standard','easy','elite'], elite:['elite','standard','easy']}[tier];
   for(const t of fallback){
@@ -1296,7 +1340,7 @@ function advanceRoute(){
     if(BUILD.demo && S.floorIdx===1){ S.screen='demoEnd'; return; } // free demo build: Floors 1-2 (Nov 8, Jeremy; was Floor 1 only)
     if(S.floorIdx===0 && !hasFullGame()){ S.screen='unlock'; return; } // store app: Floor 1 is free, one purchase unlocks the rest
     if(S.floorIdx < FLOORS.length-1){
-      S.floorIdx++;
+      S.floorIdx++; dailyMark('|');
       S.routeStep = 0;
       S.route = buildRoute();
       logMsg('sys', `— Floor ${S.floorIdx+1} —`, true);
@@ -1309,6 +1353,8 @@ function advanceRoute(){
     }
   }
   const step = S.route[S.routeStep];
+  if(S.daily) dailyReseed(`room-${S.floorIdx}-${S.routeStep}`);
+  if(S.daily && step==='camp') dailyMark('C');
   if(step==='camp'){
     S.screen='camp';
     S.encounter = null;
@@ -1343,7 +1389,7 @@ function advanceRoute(){
       S.shrineResult = null;
       logMsg('sys', `A door creaks open: ${drawn.name} (${drawn.type})`);
       teleLog('room_start', {type:'Shrine', name:drawn.name, hp:S.health, maxHp:S.maxHealth});
-      S.stats.shrinesVisited++;
+      S.stats.shrinesVisited++; dailyMark('S');
       // Shrines skipped the same "A new room..." callout regular encounters
       // get, so stepping into one gave no sense of having entered anything --
       // one-shot flag consumed by renderShrineEncounter() (render.js), same
@@ -2855,6 +2901,8 @@ function onEncounterDefeated(){
   logMsg('sys', `${e.name} defeated!`);
   S.stats.encountersDefeated++;
   if(e.type==='Boss' || e.type==='Big Boss') S.stats.bossesDefeated = (S.stats.bossesDefeated||0) + 1;
+  dailyMark((e.type==='Boss' || e.type==='Big Boss') ? 'B' : /^(elite|deadly)$/.test(encounterTier(e)) ? 'E' : 'W');
+  if(S.daily) dailyReseed(`loot-${S.floorIdx}-${S.routeStep}`); // the same loot offers for everyone
   bestiaryNote(e.name, 'won');
   // loot: draw dice from the floor pool, pick 1. Overkill (10+ damage beyond
   // what was needed) adds one extra option to choose from, per the manual's
