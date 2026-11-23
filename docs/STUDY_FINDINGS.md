@@ -307,6 +307,11 @@ per cell, Guard x7 200) and the regular profile at depth 0 (80 per cell).
 - **Buff check (same setup, 60 runs per cell, with the buffs):** Dagger -1/-1, Leeching Lance +2/+6, Whip 0/-1,
   Unlabelled Mixture +4/+1, Blunderbuss -1/-1 (expert/regular, against the average); the expert bot now takes them more
   (Dagger held in 353 runs, was 115). All five are back in line; none overshoots.
+- **Where the power comes from (ablation, expert depth 7, Armsmaster dwarf+gnome, 200 runs each):** base 82.5%;
+  forks always Standard 85% (no effect); no quest posters 74% (-8.5); relics declined 69.5% (-13); no shrines 67.5% (-15).
+  So the drift since October is not one new feature (forks don't matter); shrines, relics and posters carry most of the
+  player's power, and many small player buffs since October likely added up. Tuning levers if real players also find
+  it easy: shrine chance, poster rewards, relic strength. Not retuned (real data first).
 
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.
