@@ -282,5 +282,28 @@ Sheet `1W1TyynfdWTlxMqzr7TJOTZKMY6sOPBVPfXVd41kcGSM`, 40 run records. **One** st
 ## Play data check (Nov 19, 2026)
 Since the Nov 12 check: no new strangers. New rows are the tester phones (p-w2ufd840ax42, p-aqcmiim0wh1p, p-b1xld6j0skhs: depth 3-8 runs, a depth 7 victory and a depth 7 Floor 3 defeat to the Extractnid Matriarch) plus two desktop IDs (p-jptt45y5zxj1 Nov 13 on 1.42.108, p-qp07r1qnxrjl Nov 14 on 1.42.130). Those two played playtest-site-only versions, never on itch, so they are almost certainly Jeremy's PC-layout testing, not strangers. Strangers who shared, all time: still 1 (p-w4nirwl3l1zv, Nov 6). Too few for funnel.py. Itch got demo 1.42.146 and a devlog Nov 16, and creator round 2 went out Nov 16; check again after the Nov 23 follow-ups.
 
+## Class, build and loot check (Nov 23, 2026, build 1.42.149)
+study_maneuver.js, 4 classes x 4 origins; expert at internal depth 7 (Tougher Scuffs, Zeal, Rationing, Swarming; 80 runs
+per cell, Guard x7 200) and the regular profile at depth 0 (80 per cell).
+
+| Class | Regular, depth 0 | Expert, depth 7 |
+|---|---|---|
+| Guard | 86% | 94% |
+| Armsmaster | 88% | 87% |
+| Dungeoneer | 93% | 88% |
+| Arcanist | 93% | 80% |
+
+- **Much easier than the Oct 16 baseline** (1.41.54: expert depth 7 50-63%, regular 68-83%). Bot win rates are not
+  targets, but this matters for climbing: low Depths no longer challenge a careful player. Not retuned (TODO: retune
+  only from real data); revisit with the first ~10 real runs.
+- **Same class pattern as October:** movement classes help regular players most, the converter classes (Guard) reward
+  skill. No class is clearly behind.
+- **Builds** (main lean of the loot held when entering Floor 2, so short dead runs don't skew it): every lean wins
+  82-100% for the expert; damage-heavy loot is the weakest lean (82% expert, 73% regular), Block and healing the strongest.
+- **Weakest dice** (runs holding them, against the profile's average): Dagger -8, Leeching Lance -6/-5, Hidden Estoc -5,
+  Whip -6, Unlabelled Mixture -6, Blunderbuss -5. Strongest: Thorned Bulwark +7, Medsack +5/+6, Triage Turret +4/+7.
+  The five weak ones were buffed (decisions/depth_and_balance.md, Nov 23); Hidden Estoc was left (four Hit 2s: likely
+  how the bot uses it, not the die).
+
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.
