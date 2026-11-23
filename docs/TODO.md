@@ -1,6 +1,6 @@
 # Dungeon Scramble — TODO
 
-Updated Nov 15, 2026 (build 1.42.142; since Nov 13: PC layout default and Steam Deck fixes 1.42.108-1.42.133, strapped chest with barrel lid 1.42.119-120, dice rings cleanup 1.42.130, victory stage 1.42.134, stat tiles 1.42.135, loot worn on the hero 1.42.136-142). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
+Updated Nov 23, 2026 (build 1.42.150; Nov 16-23: route map, share card, itch auto-upload, Google Play closed test set up, Guild Rank, Daily Dungeon, clever-play stamps, weak dice buffed; earlier, since Nov 13: PC layout default and Steam Deck fixes 1.42.108-1.42.133, strapped chest with barrel lid 1.42.119-120, dice rings cleanup 1.42.130, victory stage 1.42.134, stat tiles 1.42.135, loot worn on the hero 1.42.136-142). Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`);
 study results in `STUDY_FINDINGS.md`. The release checklist (40 items, owner and status) is the Checklist tab of
 the release plan doc: https://claude.ai/artifact/ExGeVZnx3Xe1RZnYnHmxLH
 
@@ -36,6 +36,9 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
 - **Armsmaster red Skill vs red Clear:** options shown Oct 15.
 
 ## Next for Claude
+- **Google Play (Nov 21-23):** first release in review. When approved: post the tester swaps (docs/release/play_testers.md), run the Google Play workflow once by hand to prove the service account, then build real billing for the unlock (needed before production; the unlock is a free placeholder).
+- **Difficulty drift (Nov 23 study):** bots win far more than in October (expert depth 7 80-94%); shrines, relics and posters carry the player's power. Retune only once real players' runs show it's too easy (weekly players report).
+- **Guild Rank / Daily Dungeon (1.42.150):** watch real use; possible next: class mastery tracks, more cosmetic rank rewards, a Daily streak.
 - **Forks (shipped 1.42.55-1.42.62):** two doors at slots 3 and 6; the Elite door's extra loot choice is a next-floor die. Bot study: always Elite 50% vs always Standard 39% (STUDY_FINDINGS). Watch real players' picks in the play data (`fork_pick` events) before tuning.
 - **PC release layout (Jeremy, Nov 4; 1.42.103-1.42.133):** split fight screen, hover footer, keyboard/controller/numpad cursor, landscape title/setup/camp, end screens and pop-ups fitted; on by default on wide windows. Steam Deck (Chrome, 1024x640): layout and old-Chrome fixes in 1.42.121-1.42.129; **controller confirmed working Nov 15** once Jeremy bound the Deck's buttons individually in Steam's controller settings (the default Gamepad template didn't reach Chrome). Still to do: Steam-only pieces (fullscreen toggle, controller glyph set, store build); a native build would drive the controller directly.
 - **Monster bodies (MONSTER_ART_BOX):** the defeat scene's winner wears the hero's best piece on its body; new monster art: rerun `python3 tools/art/monster_boxes.py`. (Foes carrying their drop, Nov 15, was removed Nov 18.)

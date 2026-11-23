@@ -5806,6 +5806,7 @@ function runHighlightsHTML(){
   return `<div class="key-card run-highlights" style="text-align:left;">
     <div class="camp-section-title" style="font-weight:800; text-align:center; margin-bottom:6px;">Highlights</div>
     ${rows.map(r=>`<div class="hl-row"><span class="hl-k">${r[0]}${r[3]?tag(r[3]):''}</span><span class="hl-v"><b>${r[1]}</b>${r[2]?` <small>${r[2]}</small>`:''}</span></div>`).join('')}
+    ${(st.bestTurnPath||[]).length ? `<div class="hl-path" title="The dice of your biggest turn, in order">${st.bestTurnPath.map((x,k)=>{ const c = RC_DIE_COLORS[x.c]||RC_DIE_COLORS.alloy; return `${k?'<i class="hl-arrow">›</i>':''}<span class="rc-die" style="background:${c[0]};color:${c[1]}">${x.t==='blank'?'':iconSpan(x.t, x.v, true)}</span>`; }).join('')}</div>` : ''}
   </div>`;
 }
 
