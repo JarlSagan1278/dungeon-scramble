@@ -4021,3 +4021,6 @@ body.pc .defeat-scene.ds-pc{ height:230px; margin:0 0 12px; }
 .loot-opt .boon-pips i.on{ background:#ffd76a; }
 .loot-opt .boon-pips b{ font-size:10px; color:#ffd76a; margin-left:2px; }
 .loot-opt .boon-pips.boon-next{ box-shadow:0 0 0 2px #ffd76a; }
+/* Clever-play stamps (Nov 23): the Overkill seal in teal, a little smaller, two-line text */
+.kill-seal.clever-seal{ width:104px; height:104px; margin:-52px 0 0 -52px; }
+.kill-seal.clever-seal b{ color:#e6fffb; text-shadow:0 2px 0 #0b3b37; font-size:16px; text-align:center; max-width:78px; line-height:1.05; }

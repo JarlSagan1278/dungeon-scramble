@@ -2814,6 +2814,20 @@ document.addEventListener('pointerdown', ev=>{
 // (the doors' wood and rivets) with the boss's name and a red DEFEATED ribbon, plus the seal on the boss if it was
 // also an Overkill. Same 1.4 s as the old text callouts.
 const WAX_SEAL_SVG = `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 C58 4 60 10 66 9 C73 8 78 14 82 18 C88 24 90 30 92 36 C96 44 94 52 96 58 C97 66 91 72 87 78 C82 85 76 88 70 92 C62 96 56 95 50 97 C43 98 36 94 30 92 C22 89 17 84 13 78 C8 71 5 64 4 56 C3 48 6 42 8 35 C11 27 15 21 21 16 C28 10 36 6 42 5 C45 4 47 4 50 4Z" fill="#b02a1c" stroke="#120b07" stroke-width="3"/><circle cx="50" cy="50" r="33" fill="none" stroke="#7a1f14" stroke-width="3"/><circle cx="50" cy="50" r="33" fill="none" stroke="#e8746b" stroke-width="1.2" stroke-dasharray="2 5"/></svg>`;
+// Clever-play stamps (Nov 23, Jeremy: players should walk away feeling smart): a teal wax seal that names a smart decision
+// the moment it pays off. side 'e' = on the foe, 'p' = on the hero. Counted in S.stats.clever for the run summary.
+const CLEVER_SEAL_SVG = WAX_SEAL_SVG.replace(/#b02a1c/g, '#1f7a73');
+function showCleverStamp(text, side){
+  if(!document.querySelector('#enc-panel')) return;
+  S.stats.clever = (S.stats.clever||0) + 1;
+  const fig = document.querySelector(side==='e' ? '#enc-panel .fo-enemy .fo-img' : '#enc-panel .fo-player .fo-img') || document.querySelector('#enc-panel');
+  const r = fig.getBoundingClientRect();
+  const seal = el(`<div class="kill-seal clever-seal" role="status" aria-label="${text}">${CLEVER_SEAL_SVG}<b>${text}</b></div>`);
+  seal.style.left = (r.left + r.width/2)+'px'; seal.style.top = (r.top + r.height*0.5)+'px';
+  document.body.appendChild(seal);
+  try{ if(typeof playTone==='function') playTone('relicProc'); if(typeof vibrate==='function') vibrate([15,25,15]); }catch(e){}
+  setTimeout(()=>{ if(seal.parentNode) seal.remove(); }, 1400);
+}
 function showKillCallout(lines){
   document.querySelectorAll('#kill-callout, .kill-seal').forEach(n=>n.remove());
   const boss = lines.find(l=>/\bboss\b/.test(l.cls||''));
@@ -6084,7 +6098,7 @@ function summaryStatsHTML(){
       <div class="camp-section-title" style="font-weight:800; text-align:center; margin-bottom:8px;">Run Summary</div>
       <div class="sum-grid">
         ${[['Floor reached', S.floorIdx+1, '/3'], ['Turns taken', st.turnsTaken], ['Damage dealt', Math.round(st.damageDealt)], ['Foes defeated', st.encountersDefeated],
-           ['Shrines visited', st.shrinesVisited], ['Damage blocked', st.damageBlocked||0], ['Overkills', st.overkills], ['Loot dice', st.lootCollected]]
+           ['Clever plays', st.clever||0], ['Damage blocked', st.damageBlocked||0], ['Overkills', st.overkills], ['Loot dice', st.lootCollected]]
           .map(([k,v,suf])=>`<div class="sum-chip sum-tile"><b><span class="sum-count" data-to="${v}">${v}</span>${suf||''}</b><small>${k}</small></div>`).join('')}
       </div>
       ${(S.relics||[]).length ? `<div class="sum-relics">${S.relics.map(id=>relicBadgeHTML(relicById(id),'rc-gem')).join('')}</div>` : ''}

@@ -1111,7 +1111,7 @@ function newGame(originId, classId, boonDieName, charName, depthMods){
     // carryover die.
     usedLootNames: new Set([carryDie && carryDie.name, appliedBoonName].filter(Boolean)),
     _lastPlayerHealth: startHp, // for the heal/damage flash effect on the health bar
-    stats: { turnsTaken:0, damageDealt:0, encountersDefeated:0, bossesDefeated:0, shrinesVisited:0, overkills:0, lootCollected:0, bestTurn:0, bestTurnFoe:'', bestOverBy:0, bestOverFoe:'', longestPath:0, nearMisses:0, damageBlocked:0 },
+    stats: { turnsTaken:0, damageDealt:0, encountersDefeated:0, bossesDefeated:0, clever:0, shrinesVisited:0, overkills:0, lootCollected:0, bestTurn:0, bestTurnFoe:'', bestOverBy:0, bestOverFoe:'', longestPath:0, nearMisses:0, damageBlocked:0 },
     tele: newTelemetry(),
     campRested: false,
     shrineResult: null,
@@ -2222,6 +2222,8 @@ function startTurnTransition(){
   // A free Boost token is spent by end of turn whether or not it landed on anything. Cleared only AFTER the path is
   // computed (Oct 17 bug hunt: it was cleared first, so tokens previewed but never applied).
   S.pendingFreeBoost = 0;
+  { const man = path.filter(i=>{ const f = getFaceForIdx(i); return f && /^(leap|pivot|dodge)$/.test(f.type); }).length; // a long path woven through Maneuvers
+    if(path.length>=6 && man>=3 && typeof showCleverStamp==='function') setTimeout(()=> showCleverStamp('Clever route!', 'p'), 200); }
   runPlayerPathSteps(steps, 0, path, effects);
 }
 
@@ -2449,6 +2451,7 @@ function dealEncounterDamage(e, amount){
   const eoBack = eo.reflect==='blocked' ? blocked : 2;
   if(amount>0 && blocked>0 && (eo.reflect==='full' ? dealt===0 : true) && hasRelic('spite_thorns') && e.curHealth>0){ e.curHealth = capUpper(e.curHealth-absorbWithShield(e, eoBack), e.maxHealth); fireRelic('spite_thorns',eoBack+' back'); }
   S.health = cap(S.health-dealt, S.maxHealth);
+  if(amount>=3 && dealt===0 && S.playerBlock===0 && typeof showCleverStamp==='function') setTimeout(()=> showCleverStamp('Perfect Block!', 'p'), 120); // exactly enough Block, none wasted
   if(blocked>0){ // Oct 12 (Jeremy): make prevented damage visible -- a Block floater on your HP bar + a run total
     S.stats.damageBlocked = (S.stats.damageBlocked||0) + blocked;
     if(typeof fxTick==='function') fxTick('player','block',blocked);
@@ -2550,7 +2553,7 @@ function bossTakeTurn(e, frozen){
   const parts = kit.each.map(a=>applyEnemyAct(e, a));
   const sp = bossNextSpecial(e);
   e.specialIdx = (e.specialIdx||0) + 1;
-  if(frozen){ parts.push(`${e.name} is frozen: ${sp.name} is cancelled.`); logMsg('sys', `${e.name} is frozen: ${sp.name} is cancelled.`); }
+  if(frozen){ parts.push(`${e.name} is frozen: ${sp.name} is cancelled.`); logMsg('sys', `${e.name} is frozen: ${sp.name} is cancelled.`); if(typeof showCleverStamp==='function') setTimeout(()=> showCleverStamp('Called it!', 'e'), 120); }
   else {
     parts.push(`${sp.name}!`);
     S._wardHalf = !!(sp.windup && hasRelic('warding_bell') && !e._wardUsed); if(S._wardHalf) e._wardUsed = true;
@@ -2600,6 +2603,7 @@ function runEncounterAction(){
   if(frozen){
     const text = heavy ? `${e.name} is frozen: its heavy turn is skipped.` : `${e.name} is frozen and skips its action.`;
     if(heavy) teleLog('heavy_turn', {name:e.name, frozen:true});
+    if(heavy && typeof showCleverStamp==='function') setTimeout(()=> showCleverStamp('Called it!', 'e'), 120); // froze the heavy turn
     logMsg('sys', text);
     return text;
   }
@@ -2901,6 +2905,7 @@ function onEncounterDefeated(){
   logMsg('sys', `${e.name} defeated!`);
   S.stats.encountersDefeated++;
   if(e.type==='Boss' || e.type==='Big Boss') S.stats.bossesDefeated = (S.stats.bossesDefeated||0) + 1;
+  if(e.curHealth===0 && typeof showCleverStamp==='function') setTimeout(()=> showCleverStamp('Exact!', 'e'), 60); // exactly lethal: no damage wasted
   dailyMark((e.type==='Boss' || e.type==='Big Boss') ? 'B' : /^(elite|deadly)$/.test(encounterTier(e)) ? 'E' : 'W');
   if(S.daily) dailyReseed(`loot-${S.floorIdx}-${S.routeStep}`); // the same loot offers for everyone
   bestiaryNote(e.name, 'won');
