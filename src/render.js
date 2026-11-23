@@ -1015,7 +1015,7 @@ function renderTitle(){
             ${continueBtn}
             <button class="${saved?'':'primary'}" id="title-newrun-btn">${saved?'Start New Run':'New Run'}</button>
             ${(()=>{ if(BUILD.app && !hasFullGame()) return ''; const t = dailyToday(), r = dailyResult(t.key); // Daily Dungeon (Nov 23)
-              return r ? `<button class="title-daily-btn done" id="title-daily-btn" title="Share today's result">Daily #${t.n}: ${r.outcome==='victory'?'Conquered':r.outcome==='demo'?'Cleared':'Floor '+r.floor} &middot; Share</button>`
+              return r ? `<div class="title-daily-row"><button class="title-daily-btn done" id="title-daily-btn" title="Share today's result">Daily #${t.n}: ${r.outcome==='victory'?'Conquered':r.outcome==='demo'?'Cleared':'Floor '+r.floor} &middot; Share</button><button class="title-daily-btn practice" id="title-daily-practice" title="Play today's dungeon again for practice (your shared result stays)">Practice</button></div>`
                        : `<button class="title-daily-btn" id="title-daily-btn" title="Today's dungeon is the same for everyone: one try">Daily Dungeon #${t.n}</button>`; })()}
             <div class="title-links">
               <button id="title-codex-btn" class="btn-codex">Codex</button>
@@ -1031,18 +1031,21 @@ function renderTitle(){
   { const rb = document.getElementById('title-rank-btn'); if(rb) rb.onclick = ()=> openRecordsModal('rank'); }
   { const db = document.getElementById('title-daily-btn'); if(db) db.onclick = ()=>{ const t = dailyToday(), r = dailyResult(t.key);
       if(r){ shareText(dailyShareText(r)); return; }
-      const go = ()=>{ resetSetupPortraitPreviews(); startDaily(); };
+      dailyStart(false); }; }
+  { const pb = document.getElementById('title-daily-practice'); if(pb) pb.onclick = ()=> dailyStart(true); }
+  function dailyStart(practice){ const db = null;
+      const go = ()=>{ resetSetupPortraitPreviews(); startDaily(practice); };
       if(!saved) return go();
       // a saved run would be replaced: ask first, like New Run does
       const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
-          <h2>Start the Daily?</h2>
+          <h2>${practice ? 'Practice the Daily?' : 'Start the Daily?'}</h2>
           <p>Your saved run (${saved.originName} ${saved.className}, Floor ${saved.floorIdx+1}) will be lost.</p>
           <div class="small-btn-row" style="justify-content:center;"><button id="daily-cancel">Keep Saved Run</button><button class="danger" id="daily-go">Start the Daily</button></div>
         </div></div>`);
       openModal(overlay);
       overlay.querySelector('#daily-cancel').onclick = ()=> closeModal(overlay);
       overlay.querySelector('#daily-go').onclick = ()=> closeModal(overlay, ()=>{ abandonSavedRunTelemetry(); clearSave(); go(); });
-      overlay.onclick = (ev)=>{ if(ev.target===overlay) closeModal(overlay); }; }; }
+      overlay.onclick = (ev)=>{ if(ev.target===overlay) closeModal(overlay); }; }
   if(saved) document.getElementById('title-continue-btn').onclick = ()=>{ if(loadGame()){ render(); if(typeof resumeCommittedTurn==='function') resumeCommittedTurn(); } };
   document.getElementById('title-newrun-btn').onclick = ()=>{
     if(!saved && guideWanted()){ resetSetupPortraitPreviews(); newGame('dwarf', 'armsmaster'); return; } // quick start: first run picks Dwarf Armsmaster
@@ -5921,7 +5924,7 @@ async function saveRunCard(outcome){
   const fname = `dungeon-scramble-${outcome}-${Date.now()}.png`;
   try{
     const file = new File([blob], fname, {type:'image/png'});
-    const text = (S.daily && dailyResult(S.daily.key)) ? dailyShareText(dailyResult(S.daily.key)) : (d.win ? `${d.outcome} in Dungeon Scramble!` : `${d.outcome} in Dungeon Scramble.`) + ' Play free: ' + SHARE_URL;
+    const text = (S.daily && !S.daily.practice && dailyResult(S.daily.key)) ? dailyShareText(dailyResult(S.daily.key)) : (d.win ? `${d.outcome} in Dungeon Scramble!` : `${d.outcome} in Dungeon Scramble.`) + ' Play free: ' + SHARE_URL;
     if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:'Dungeon Scramble run', text}); return; }
   }catch(err){ if(err && err.name==='AbortError') return; }
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fname; document.body.appendChild(a); a.click();

@@ -929,18 +929,18 @@ function dailyToday(){
   return { key, n, origin: origins[Math.floor(r()*2)], klass: classes[Math.floor(r()*4)] };
 }
 function dailyResult(key){ return (META.daily && META.daily[key]) || null; }
-function startDaily(){
-  const t = dailyToday(); if(dailyResult(t.key)) return;
+function startDaily(practice){ // Nov 23 (Jeremy): after the one scored try, practice runs replay the same dungeon, unscored
+  const t = dailyToday(); if(dailyResult(t.key) && !practice) return;
   RNG = seedRng(t.key + '|start');
   newGame(t.origin, t.klass, null, '', {});
-  S.daily = { key: t.key, n: t.n, log: [] };
+  S.daily = { key: t.key, n: t.n, log: [], practice: !!practice };
   RNG = Math.random;
   saveGame && saveGame();
   render();
 }
 function dailyMark(ch){ if(S && S.daily){ (S.daily.log = S.daily.log || []).push(ch); } }
 function dailyRecord(outcome){
-  if(!S || !S.daily) return;
+  if(!S || !S.daily || S.daily.practice) return;
   if(!META.daily) META.daily = {};
   if(!META.daily[S.daily.key]) META.daily[S.daily.key] = { n: S.daily.n, outcome, floor: S.floorIdx+1, log: (S.daily.log||[]).join(''), who: S.origin.name+' '+S.klass.name, killedBy: S.stats.killedBy||'', turns: S.stats.turnsTaken };
   saveMeta();
