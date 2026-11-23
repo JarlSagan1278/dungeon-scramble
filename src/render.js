@@ -4354,6 +4354,13 @@ function lootChestSVG(tier){
 </svg>`;
 }
 
+// Nov 23: progress toward a Starting Boon right on the loot card (copies collected across runs), so a pick can be a
+// step toward a permanent starting die; the pick that completes it says so.
+function lootBoonPipsHTML(d){
+  if(!d || !d.name || (typeof isBoonReady==='function' && isBoonReady(d.name))) return '';
+  const have = dieCopies(d.name), need = BOON_COPIES_NEEDED, done = have + 1 >= need;
+  return `<span class="boon-pips${done?' boon-next':''}" title="${done ? 'Take it: this copy makes it a Starting Boon for future runs' : `Collected ${have}/${need} for a Starting Boon`}">${[...Array(need)].map((_,k)=>`<i class="${k<have?'on':''}"></i>`).join('')}${done?'<b>Boon!</b>':''}</span>`;
+}
 function renderLootModal(){
   const {options, lootName, overkill, fromShrine} = S.lootChoice;
   const fin = !!S.lootChoice.final; // the final boss's chest: the grandest look, and nothing about options
@@ -4398,7 +4405,7 @@ function renderLootModal(){
       const deep = !fin && opt.cat && opt.cat!==tier && LOOT_TIER_ACCENT[opt.cat];
       const acc = deep ? LOOT_TIER_ACCENT[opt.cat] : accent;
       const card = el(`<div class="loot-opt loot-opt-reveal${deep?' loot-opt-deeper':''}" style="--loot-tier-color:${acc.color}; --loot-tier-glow:${acc.glow}; animation-delay:${(i*0.1).toFixed(2)}s;">
-          ${isNew?'<span class="new-tag new-tag-card">NEW!</span>':''}${deep?`<span class="deeper-tag">Deeper loot</span>`:''}
+          ${isNew?'<span class="new-tag new-tag-card">NEW!</span>':''}${deep?`<span class="deeper-tag">Deeper loot</span>`:''}${lootBoonPipsHTML(opt)}
           <div class="loot-opt-streaks">${lootStreaksHTML(0.5+i*0.12)}</div>
           ${lootPreviewTileHTML(opt, `loot-${i}`, art)}
           <div class="faces-tiles">${opt.faces.map(f=>f.type==='blank'

@@ -4014,3 +4014,9 @@ body.pc .defeat-scene.ds-pc{ height:230px; margin:0 0 12px; }
 /* Daily Dungeon button on the title (Nov 23) */
 .title-daily-btn{ width:100%; margin-top:8px; padding:9px 12px; font-size:16px; background:linear-gradient(#3f8f8a,#2c6b67); color:#f3fbf9; }
 .title-daily-btn.done{ background:linear-gradient(#5a4a7a,#40345a); }
+/* Starting Boon progress on a loot card (Nov 23) */
+.loot-opt .boon-pips{ position:absolute; left:6px; bottom:6px; z-index:3; display:flex; align-items:center; gap:3px; padding:2px 5px; border-radius:8px; background:rgba(12,7,5,.72); }
+.loot-opt .boon-pips i{ width:7px; height:7px; border-radius:50%; border:1.5px solid #ffd76a; }
+.loot-opt .boon-pips i.on{ background:#ffd76a; }
+.loot-opt .boon-pips b{ font-size:10px; color:#ffd76a; margin-left:2px; }
+.loot-opt .boon-pips.boon-next{ box-shadow:0 0 0 2px #ffd76a; }
