@@ -360,10 +360,10 @@ const ALLOY = lootSet([
   ['Greathammer', ['Hit2','Hit2','Combo2','blank','blank','blank']],
   ['Spiked Shield', ['Hit2','Block2','Block2','Nullify','blank','blank']],
   ['Buckler', ['Combo1','Combo1','Block1','Block1','Nullify','blank']],
-  ['Whip', ['Combo1','Combo1','Combo1','Pivot','blank','blank']],
-  ['Dagger', ['Hit1','Hit1','Combo1','Combo1','Dodge','blank']],
+  ['Whip', ['Combo2','Combo1','Combo1','Pivot','Hit1','blank']], // Nov 23: buffed (bot study: runs holding it won 5-8 points less)
+  ['Dagger', ['Hit1','Hit1','Combo2','Combo1','Dodge','Hit1']], // Nov 23: buffed (bot study: runs holding it won 5-8 points less)
   ['Longbow', ['Hit2','Hit2','Boost1','Boost1','Block1','blank']],
-  ['Unlabelled Mixture', ['Combo1','Boost1','Fumble1','HOT1','Nullify','blank']],
+  ['Unlabelled Mixture', ['Combo1','Boost1','Fumble1','HOT1','Nullify','Heal2']], // Nov 23: buffed (bot study: runs holding it won 5-8 points less)
   ['Healing Draught', ['Heal2','Heal2','HOT1','Nullify','blank','blank']],
   ['Tarot Deck', ['Boost1','Dodge','Leap','Pivot','Block1','Reroll']],
   ['Lance', ['Hit1','Hit1','Combo1','Combo1','Leap','blank']],
@@ -372,7 +372,7 @@ const ALLOY = lootSet([
   ['Rapier', ['Hit1','Hit1','Hit1','Hit1','Combo1','Dodge']],
   ['Longsword', ['Hit1','Hit1','Hit1','Combo2','blank','blank']],
   ['Crossbow', ['Hit2','Hit2','Boost1','Dodge','Block1','blank']],
-  ['Blunderbuss', ['Hit2','Hit2','Boost2','Fumble1','Leap','blank']],
+  ['Blunderbuss', ['Hit2','Hit2','Boost2','Fumble1','Leap','Hit2']], // Nov 23: buffed (bot study: runs holding it won 5-8 points less)
   ['Ironskin Draught', ['HOT1','HOT1','Block1','Block2','blank','blank']],
   ['Acid Potion', ['Hit1','Hit2','DOT2','DOT2','Fumble1','blank']],
   ['Grappling Set', ['Combo2','Dodge','Dodge','Leap','Leap','blank']],
@@ -398,7 +398,7 @@ const GILDED = lootSet([
   ['Poison Sword', ['Hit2','Hit2','Combo2','DOT2','blank','blank']],
   ['Sporific Staff', ['DOT1','Leech1','Leech1','Pivot','HOT1','blank']],
   ['Genetic Drifter', ['Combo1','Leech1','Leech1','Pivot','Swap','Nullify']],
-  ['Leeching Lance', ['Hit1','Combo1','DOT2','Leech1','Pivot','blank']],
+  ['Leeching Lance', ['Hit2','Combo1','DOT2','Leech2','Pivot','blank']], // Nov 23: buffed (bot study: runs holding it won 5-8 points less)
   ['Pleasant Parasite?', ['Combo1','Combo1','Fumble1','Heal2','Heal2','HOT2']],
 ], 'gilded');
 
