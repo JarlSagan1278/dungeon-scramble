@@ -6061,6 +6061,12 @@ function renownHTML(compact){
     <div class="renown-bar" style="--p0:${pctBefore.toFixed(1)}%;--p1:${pct.toFixed(1)}%"><i></i></div>
     <div class="renown-next">${nx ? `${hi - g.after} to ${nx.name}: ${nx.text}` : 'Highest rank reached.'}</div>${ups}</div>`;
 }
+// A rank-up is an event: a chime and a sparkle burst on the renown box, once per run (Nov 23)
+function rankUpFx(){
+  if(!S || !S.renownGain || !S.renownGain.ranksUp.length || S._rankFxDone) return; S._rankFxDone = true;
+  setTimeout(()=>{ try{ if(typeof playTone==='function') playTone('floorUp');
+    if(typeof spawnParticleBurstAtEl==='function' && document.querySelector('.renown-box:not([hidden])')) spawnParticleBurstAtEl('.renown-box', ['#ffd76a','#9affa0','#fff5d6']); }catch(e){} }, 1100);
+}
 function rankLadderHTML(){
   const k = rankNow(), have = META.renown||0;
   return `<div class="rank-ladder"><p class="hint" style="margin:0 0 8px;">Every run earns renown, win or lose: foes and bosses beaten, floors reached, a win, all multiplied by your Depth. Each rank adds a gift to every future run.</p>`
@@ -6212,7 +6218,7 @@ function renderVictory(){
   if(!S.gameOverRecorded){
     S.gameOverRecorded = true;
     recordRunHistory('victory');
-    S.newAchievements = recordMetaProgress('victory');
+    S.newAchievements = recordMetaProgress('victory'); rankUpFx();
     clearSave();
     if(typeof musicSting==='function') musicSting('win'); else playTone('grandVictory'); // Oct 13: the run-win sting
     if(typeof spawnConfettiRain==='function') spawnConfettiRain();
@@ -6252,7 +6258,7 @@ function renderDemoEnd(){
     S.gameOverRecorded = true;
     recordRunHistory('demo');
     S.newAchievements = [];
-    awardRenown('demo');
+    awardRenown('demo'); rankUpFx();
     clearSave();
     if(typeof musicSting==='function') musicSting('win'); else playTone('grandVictory');
     if(typeof spawnConfettiRain==='function') spawnConfettiRain();
@@ -6313,7 +6319,7 @@ function renderGameOver(){
   if(!S.gameOverRecorded){
     S.gameOverRecorded = true;
     recordRunHistory('defeat');
-    S.newAchievements = recordMetaProgress('defeat');
+    S.newAchievements = recordMetaProgress('defeat'); rankUpFx();
     clearSave();
     if(typeof musicSting==='function') musicSting('lose'); else playTone('defeat'); // Oct 13: the defeat sting
   }
