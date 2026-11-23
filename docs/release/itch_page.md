@@ -57,7 +57,6 @@ Made by Jeremy and Katlynn Friedman. https://dungeonscramble.com · contact@dung
 
 If the Guild Rank and Daily Dungeon ship, add after "Play your way": *Every run earns renown toward a permanent rank with a starting gift at each step, and the Daily Dungeon is the same dungeon for everyone each day, with a result to share.*
 
-**Platforms field:** tick Windows, macOS and Linux as well as Android ("HTML5" games list the systems they run on); the Inputs list (keyboard, mouse, touchscreen, gamepad) is right as is.
 
 ## After it goes public
 
