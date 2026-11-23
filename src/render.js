@@ -6077,7 +6077,7 @@ function renownHTML(compact){
   if(compact) return `<div class="renown-box renown-compact">${rankBadgeHTML(k)}<div class="rc-col"><div class="renown-head"><b>${g.ranksUp.length ? 'Rank up: ' : ''}${r.name}</b><span class="renown-gain">+${g.gain} renown</span></div><div class="renown-bar" style="--p0:${pctBefore.toFixed(1)}%;--p1:${pct.toFixed(1)}%"><i></i></div></div></div>`;
   return `<div class="renown-box"><div class="renown-head">${rankBadgeHTML(k)}<b>${r.name}</b><span class="renown-gain">+${g.gain} renown</span></div>
     <div class="renown-bar" style="--p0:${pctBefore.toFixed(1)}%;--p1:${pct.toFixed(1)}%"><i></i></div>
-    <div class="renown-next">${nx ? `${hi - g.after} to ${nx.name}: ${nx.text}` : 'Highest rank reached.'}</div>${ups}</div>`;
+    <div class="renown-next">${nx ? `${hi - g.after} to ${nx.name}: ${nx.text}` : 'Highest rank reached.'}</div>${S.screen==='victory' ? `<div class="renown-next renown-climb">Next challenge: Depth ${(currentDepth()||0)+1} earns &times;${(1 + RENOWN.depthMul*((currentDepth()||0)+1)).toFixed(2)} renown.</div>` : ''}${ups}</div>`;
 }
 // A rank-up is an event: a chime and a sparkle burst on the renown box, once per run (Nov 23)
 function rankUpFx(){

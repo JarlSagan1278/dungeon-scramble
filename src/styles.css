@@ -4028,3 +4028,4 @@ body.pc .defeat-scene.ds-pc{ height:230px; margin:0 0 12px; }
 .hl-path{ display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:3px; margin:6px 0 2px; }
 .hl-path .rc-die{ width:26px; height:26px; }
 .hl-path .hl-arrow{ font-style:normal; color:#c9b88f; font-size:14px; }
+.renown-climb{ margin-top:4px; color:#ffd76a; } /* after a win: the next Depth is worth more (Nov 23) */
