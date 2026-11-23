@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.42.150 (Nov 23, 2026)
+- Guild Rank: every run earns renown (foes, bosses, floors, a win; times Depth; at least 10), raising a permanent rank through 12 number systems (Natural to Infinite). Each rank adds a starting gift to every run: a Reroll token, +3 max health, a Swap token, Patron's Gift (pick 1 of 3 found relics at Base Camp), a level II Attack and Maneuver die, a 4-relic Patron, +3 more health, then cosmetic titles. Renown bar and rank-ups on the end screens, a Rank tab in Records, the rank on the title.
+- Daily Dungeon: the same dungeon for everyone each day (same rooms, shrines and loot offers), one scored try with an emoji share line, then unscored practice runs.
+- Clever-play stamps: Exact!, Perfect Block!, Called it!, Clever route!, counted as Clever plays in the Run Summary.
+- Loot cards show Starting Boon progress (copies collected; Boon! on the pick that completes one).
+- Buffed the five weakest loot dice: Dagger, Leeching Lance, Whip, Unlabelled Mixture, Blunderbuss.
+- Copyright line in Credits; PC end screens fit at 1024x640 with long results.
+
 ## 1.42.149 (Nov 21, 2026)
 - Run card: opens with the moment (the defeat scene, or the hero with trophies after a win), ends with "Draw one path. Every step counts." and the itch link; the share sheet gets the link too, and the button reads "Share Card" where the phone can share.
 - Android: a portrait screen is no longer required (Play availability warning).
