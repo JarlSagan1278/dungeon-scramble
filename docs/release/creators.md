@@ -95,3 +95,8 @@ still go to the public demo link. Rebuild only when a creator needs a fix.
 | Adin Walls | Nov 16 (round 2, clip_crescendo.mp4) | | |
 | 2 Headed Hero | Nov 16 (round 2, clip_crescendo.mp4) | | |
 | I Dream of Indie Games | Nov 16 (round 2, clip_crescendo.mp4) | Nov 16: organic spots full; offered paid integrations/shorts (rates sent) | no (paid only) |
+
+## Inbound pitches
+| Date | From | What | Answer |
+|---|---|---|---|
+| Nov 21 | Light Quest (French creator marketing agency) | Paid French-language creator coverage for the demo or mobile launch | Not now: English only, no paid campaigns before a store launch (suggested reply sent to Jeremy) |
