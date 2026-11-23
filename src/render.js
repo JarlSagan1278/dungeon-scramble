@@ -996,7 +996,7 @@ function renderTitle(){
   const saved = hasSave() ? peekSave() : null;
   const L = META.lifetime;
   const lifetimeLine = L.runsPlayed>0
-    ? `<p class="hint" style="text-align:center; margin:0 0 6px;">${L.runsPlayed} run${L.runsPlayed===1?'':'s'} played &middot; ${L.victories} victor${L.victories===1?'y':'ies'}</p>`
+    ? `<p class="hint title-rank-line" style="text-align:center; margin:0 0 6px;"><button class="title-rank-btn" id="title-rank-btn" title="Your Guild Rank: see what each rank gives">${rankBadgeHTML(rankNow())} ${RANKS[rankNow()].name}</button> &middot; ${L.runsPlayed} run${L.runsPlayed===1?'':'s'} &middot; ${L.victories} victor${L.victories===1?'y':'ies'}</p>`
     : '';
   const continueBtn = saved ? `
       <button class="primary" id="title-continue-btn">Continue Saved Game</button>
@@ -1025,6 +1025,7 @@ function renderTitle(){
       </div>
     </div>
   `;
+  { const rb = document.getElementById('title-rank-btn'); if(rb) rb.onclick = ()=> openRecordsModal('rank'); }
   if(saved) document.getElementById('title-continue-btn').onclick = ()=>{ if(loadGame()){ render(); if(typeof resumeCommittedTurn==='function') resumeCommittedTurn(); } };
   document.getElementById('title-newrun-btn').onclick = ()=>{
     if(!saved && guideWanted()){ resetSetupPortraitPreviews(); newGame('dwarf', 'armsmaster'); return; } // quick start: first run picks Dwarf Armsmaster
@@ -4030,14 +4031,14 @@ function openRecordsModal(tab){
   const overlay = el(`<div class="modal-overlay"><div class="modal codex-modal" style="text-align:center; max-width:400px;">
       <button class="modal-x-btn" id="records-x-btn" title="Close">✕</button>
       <h2 style="margin-top:0;">Records</h2>
-      <div class="codex-tabs"><button class="codex-tab" data-tab="history">Run History</button><button class="codex-tab" data-tab="achievements">Achievements</button><button class="codex-tab" data-tab="backup">Backup</button></div>
+      <div class="codex-tabs"><button class="codex-tab" data-tab="rank">Rank</button><button class="codex-tab" data-tab="history">Run History</button><button class="codex-tab" data-tab="achievements">Achievements</button><button class="codex-tab" data-tab="backup">Backup</button></div>
       <div class="codex-body" id="records-body"></div>
     </div></div>`);
   openModal(overlay);
   const body = overlay.querySelector('#records-body');
   const show = t=>{
     overlay.querySelectorAll('.codex-tab').forEach(b=>b.classList.toggle('on', b.dataset.tab===t));
-    body.innerHTML = t==='achievements' ? achievementsHTML() : t==='backup' ? backupPanelHTML() : runHistoryHTML();
+    body.innerHTML = t==='achievements' ? achievementsHTML() : t==='backup' ? backupPanelHTML() : t==='rank' ? rankLadderHTML() : runHistoryHTML();
     if(t==='backup') wireBackupPanel(body);
     body.querySelectorAll('.achv-medal').forEach(m=> m.onclick = ()=>{
       body.querySelectorAll('.achv-medal').forEach(x=>x.classList.toggle('picked', x===m));
@@ -4744,7 +4745,7 @@ function renderRelicChoiceModal(){
   const {name, options} = S.relicChoice;
   const overlay = el(`<div class="modal-overlay"><div class="modal" style="max-width:360px;">
       <h2 style="text-align:center;">${name}</h2>
-      <p style="text-align:center;">${(S.relicChoice.left||1)>1?`Choose ${S.relicChoice.left} Relics, one at a time.`:'Choose a Relic.'} It lasts for the rest of your run.</p>
+      <p style="text-align:center;">${S.relicChoice.patron ? `Your Guild Rank (${RANKS[rankNow()].name}) earns a gift. Choose one of the relics you've found.` : (S.relicChoice.left||1)>1?`Choose ${S.relicChoice.left} Relics, one at a time.`:'Choose a Relic.'} It lasts for the rest of your run.</p>
       <div class="relic-choice-list" id="relic-choice-list"></div>
     </div></div>`);
   openUniqueOverlay('relic-choice', overlay);
@@ -5638,6 +5639,7 @@ function renderCamp(){
     </div>`;
   // Nov 12: camp redraws in place (morphHTML) when camp is already on screen, so the fire, dice and buttons aren't rebuilt
   if(app.querySelector('.camp-status-card')) morphHTML(app, campHTML); else app.innerHTML = campHTML;
+  if(S.relicChoice) setTimeout(()=>{ if(S && S.relicChoice && S.screen==='camp') renderRelicChoiceModal(); }, 0); // Guild Rank: Patron's Gift at Base Camp
   const restBtn = document.getElementById('rest-btn');
   if(restBtn) restBtn.onclick = ()=>{ if(!S.campRested) confirmCampfire('rest', campRest); };
   const trainBtn = document.getElementById('train-btn');
@@ -5973,12 +5975,13 @@ function endScreenHTML(o){
   if(o.relic) news.push('Origin relic');
   const na = (S.newAchievements||[]).length; if(na) news.push(`${na} achievement${na>1?'s':''}`);
   const nb = (S.newBoonDice||[]).filter((n,i,a)=>a.indexOf(n)===i).length; if(nb) news.push(`${nb} Starting Boon${nb>1?'s':''}`);
+  if(S.renownGain && S.renownGain.ranksUp.length) news.unshift('Rank up: '+S.renownGain.ranksUp[S.renownGain.ranksUp.length-1]); else if(S.renownGain && S.renownGain.gain) news.unshift('+'+S.renownGain.gain+' renown');
   news.push('Run Summary');
   // a defeat scene (Nov 15) sits under the title on a phone and atop the details column in PC mode (CSS shows one)
   return `<div class="panel end-screen${o.stage?' has-stage':''}${o.scene?' has-scene':''}"><h2>${o.title}</h2>${o.scene ? o.scene.replace('defeat-scene ','defeat-scene ds-phone ') : ''}${o.stage || `<p class="end-lede">${o.lede}</p>`}
     <div class="end-swap">
       <div class="end-main">${runCardHTML(o.outcome)}${o.note||''}</div>
-      <div class="end-details" hidden>${o.scene ? o.scene.replace('defeat-scene ','defeat-scene ds-pc ') : ''}${o.seal}${o.relic}${newAchievementsHTML(S.newAchievements)}${newBoonsHTML()}${summaryStatsHTML()}
+      <div class="end-details" hidden>${o.scene ? o.scene.replace('defeat-scene ','defeat-scene ds-pc ') : ''}${renownHTML()}${o.seal}${o.relic}${newAchievementsHTML(S.newAchievements)}${newBoonsHTML()}${summaryStatsHTML()}
         ${BUILD.release ? '' : '<button class="btn-export end-send-btn" onclick="openExportDataModal()">Send Play Data</button>'}</div>
     </div>
     <div class="end-actions"><button id="save-run-card-btn">${rcCanShare() ? 'Share Card' : 'Save Card'}</button><button class="primary" onclick="location.reload()">${o.again}</button></div>
@@ -6016,6 +6019,25 @@ function originRelicEarnedHTML(){
   </div>`;
 }
 
+// Guild Rank (Nov 23): renown gained this run, the bar toward the next rank, and any rank-up with its gift.
+function rankBadgeHTML(k){ return `<span class="rank-sym" aria-hidden="true">${k+1}</span>`; } // the rank's number (the fonts lack the number-system letters)
+function renownHTML(compact){
+  const g = S.renownGain; if(!g) return '';
+  const k = rankIndexFor(g.after), r = RANKS[k], nx = RANKS[k+1];
+  const lo = r.at, hi = nx ? nx.at : r.at, pct = nx ? Math.max(0, Math.min(100, (g.after-lo)/(hi-lo)*100)) : 100;
+  const pctBefore = nx ? Math.max(0, Math.min(100, (Math.max(lo, g.before)-lo)/(hi-lo)*100)) : 100;
+  const ups = g.ranksUp.map(n=>{ const rr = RANKS.find(x=>x.name===n); return `<div class="rank-up">${rankBadgeHTML(RANKS.indexOf(rr))}<div><b>Rank up: ${rr.name}!</b><span>${rr.text||''}</span></div></div>`; }).join('');
+  if(compact) return `<div class="renown-box renown-compact">${rankBadgeHTML(k)}<div class="rc-col"><div class="renown-head"><b>${g.ranksUp.length ? 'Rank up: ' : ''}${r.name}</b><span class="renown-gain">+${g.gain} renown</span></div><div class="renown-bar" style="--p0:${pctBefore.toFixed(1)}%;--p1:${pct.toFixed(1)}%"><i></i></div></div></div>`;
+  return `<div class="renown-box"><div class="renown-head">${rankBadgeHTML(k)}<b>${r.name}</b><span class="renown-gain">+${g.gain} renown</span></div>
+    <div class="renown-bar" style="--p0:${pctBefore.toFixed(1)}%;--p1:${pct.toFixed(1)}%"><i></i></div>
+    <div class="renown-next">${nx ? `${hi - g.after} to ${nx.name}: ${nx.text}` : 'Highest rank reached.'}</div>${ups}</div>`;
+}
+function rankLadderHTML(){
+  const k = rankNow(), have = META.renown||0;
+  return `<div class="rank-ladder"><p class="hint" style="margin:0 0 8px;">Every run earns renown, win or lose: foes and bosses beaten, floors reached, a win, all multiplied by your Depth. Each rank adds a gift to every future run.</p>`
+    + RANKS.map((r,i)=>`<div class="rank-row ${i<=k?'got':''} ${i===k?'now':''}">${rankBadgeHTML(i)}<div><b>${r.name}</b> <small>${r.at} renown</small><span>${r.text||'Where every adventurer starts.'}</span></div></div>`).join('')
+    + `<p class="hint" style="margin:8px 0 0;">You have ${have} renown.</p></div>`;
+}
 function summaryStatsHTML(){
   const st = S.stats;
   return `
@@ -6276,6 +6298,7 @@ function renderGameOver(){
     const dkScene = defeatSceneHTML('ds-keep');
     app.innerHTML = `<div class="panel end-screen defeat-keep"><h2>Defeated</h2>${dkScene}
       <div class="dk-hero">${rd.portrait && !dkScene ? `<img class="dk-portrait" src="${rd.portrait}" alt=""/>` : ''}<div class="dk-id"><div class="dk-name">${(rd.name || rd.who).replace(/</g,'&lt;')}</div><div class="dk-fell">${rd.outcome}</div><div class="dk-sub">${rd.stats.map(([k,v])=>`${v} ${k.toLowerCase()}`).join(' &middot; ')}</div></div></div>
+      ${renownHTML(true)}
       <div class="dk-box"><div class="dk-title">Keep one die for your next run</div>
         <p class="dk-hint">${S.carryoverOptions.length>1 ? 'Tap one' : 'Tap it'} to keep it: it joins your tray at the start of your next run.</p>
         <div class="swap-list" id="carryover-list"></div></div>

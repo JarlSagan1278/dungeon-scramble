@@ -305,6 +305,25 @@ function relicUnlocked(r){
   if(t==='S') return ((typeof DEPTH_BEST!=='undefined' && DEPTH_BEST.overall)||0) >= 2;
   return true;
 }
+// ---- Guild Rank (Nov 23, prototype for Jeremy): renown earned by EVERY run, won or lost, raises a permanent rank named
+// after the number systems, and each rank adds a starting gift to every future run. Depth multiplies renown, so
+// climbing Depth climbs the ranks faster. Gifts: reroll/swap = tokens at the start; hp = max health; patron = pick 1 of
+// N found relics at Base Camp; atk2/man2 = one starting basic die starts at level II; cosmetic = a trim on the origin die.
+const RANKS = [
+  {name:'Natural',     at:0,    sym:'\u2115'},
+  {name:'Whole',       at:120,  sym:'W', gift:'reroll', text:'Start every run with 1 Reroll token.'},
+  {name:'Integer',     at:300,  sym:'\u2124', gift:'hp3',    text:'Start every run with +3 max health.'},
+  {name:'Rational',    at:550,  sym:'\u211A', gift:'swap',   text:'Start every run with 1 Swap token.'},
+  {name:'Irrational',  at:850,  sym:'\u03C0', gift:'patron', text:"Patron's Gift: at Base Camp, pick 1 of 3 relics you've found."},
+  {name:'Real',        at:1250, sym:'\u211D', gift:'atk2',   text:'One starting Attack die begins at level II.'},
+  {name:'Imaginary',   at:1750, sym:'i',      gift:'man2',   text:'One starting Maneuver die begins at level II.'},
+  {name:'Complex',     at:2400, sym:'\u2102', gift:'patron4',text:"Patron's Gift offers 4 relics."},
+  {name:'Quaternion',  at:3200, sym:'\u210D', gift:'hp3b',   text:'+3 more max health.'},
+  {name:'Octonion',    at:4200, sym:'\U0001D546', gift:'trim', text:'A gilded trim on your origin die.'},
+  {name:'Transfinite', at:5400, sym:'\u2135', gift:'title',  text:'The title "Transfinite" on your run card.'},
+  {name:'Infinite',    at:7000, sym:'\u221E', gift:'title2', text:'The title "Infinite" and a crown on your class badge.'},
+];
+const RENOWN = { foe:8, boss:40, floor:20, win:150, demo:60, depthMul:0.15 };
 function originRelicFor(originId){ return RELICS.find(r=>r.origin===originId); }
 
 // ---- Origin dice ----

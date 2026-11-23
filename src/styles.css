@@ -3985,3 +3985,29 @@ body.pc .defeat-scene.ds-pc{ height:230px; margin:0 0 12px; }
 .route-map .mascot-wrap.rm-token{ bottom:auto !important; transform:translate(-50%, -50%); transition:none; z-index:3; }
 .route-map .rm-coin{ display:flex; align-items:center; justify-content:center; width:30px; height:30px; box-sizing:border-box; border-radius:50%; border:3px solid #e6c25a; background:#f3e3c3; box-shadow:0 0 0 2.5px #0c0705, 0 3px 0 2px #0c0705; overflow:hidden; }
 .route-map .rm-coin .mascot-marker{ width:30px !important; height:30px !important; object-fit:cover; object-position:50% 20%; filter:none; }
+
+/* ==== Guild Rank (Nov 23): renown box on the end screens, the ladder in Records, the rank on the title */
+.rank-sym{ display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; flex:none; border-radius:50%; background:radial-gradient(circle at 35% 30%, #ffe9a8, #d4a640 60%, #8a6420); border:2px solid var(--line, #0c0705); box-shadow:0 2px 0 #0c0705; color:#3a2410; font:400 14px/1 var(--font-display); }
+.renown-box{ margin:8px 0; padding:10px 12px; border:3px solid #0c0705; border-radius:14px; background:#2b1c10; box-shadow:0 4px 0 #0c0705; text-align:left; }
+.renown-head{ display:flex; align-items:center; gap:8px; } .renown-head b{ font-family:var(--font-display); color:#ffd76a; font-weight:normal; font-size:18px; }
+.renown-gain{ margin-left:auto; color:#9affa0; font-weight:800; font-size:14px; }
+.renown-bar{ position:relative; height:12px; margin:8px 0 6px; border:2px solid #0c0705; border-radius:8px; background:#1a110a; overflow:hidden; }
+.renown-bar::before{ content:''; position:absolute; inset:0 auto 0 0; width:var(--p0); background:#c99a3a; }
+.renown-bar i{ position:absolute; top:0; bottom:0; left:var(--p0); width:calc(var(--p1) - var(--p0)); background:#9affa0; animation:renown-grow .9s ease-out .3s both; transform-origin:0 50%; }
+@keyframes renown-grow{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
+.reduced-motion .renown-bar i{ animation:none; }
+.renown-next{ font-size:12.5px; color:#e9dcc4; }
+.rank-up{ display:flex; align-items:center; gap:8px; margin-top:8px; padding:6px 8px; border:2px solid #0c0705; border-radius:10px; background:#4a3214; animation:rank-up-in .5s cubic-bezier(.3,1.5,.5,1) .9s both; }
+.rank-up b{ display:block; color:#ffd76a; } .rank-up span{ font-size:12.5px; color:#f3e3c3; }
+@keyframes rank-up-in{ from{ transform:scale(.6); opacity:0; } to{ transform:none; opacity:1; } }
+.reduced-motion .rank-up{ animation:none; }
+.rank-ladder{ text-align:left; }
+.rank-row{ display:flex; align-items:center; gap:10px; padding:6px 8px; border-radius:10px; opacity:.55; }
+.rank-row.got{ opacity:1; } .rank-row.now{ background:#4a3214; border:2px solid #0c0705; }
+.rank-row b{ color:#ffd76a; } .rank-row small{ color:#c9b88f; } .rank-row span{ display:block; font-size:12.5px; color:#f3e3c3; }
+.title-rank-btn{ display:inline-flex; align-items:center; gap:4px; padding:0 8px 0 2px; min-height:0; font-size:inherit; background:transparent; border:0; box-shadow:none; filter:none; color:#ffd76a; cursor:pointer; }
+.title-rank-btn .rank-sym{ width:20px; height:20px; font-size:12px; }
+
+.renown-box.renown-compact{ display:flex; align-items:center; gap:10px; padding:7px 10px; margin:6px 0; }
+.renown-compact .rc-col{ flex:1; min-width:0; } .renown-compact .renown-head b{ font-size:16px; } .renown-compact .renown-bar{ margin:5px 0 0; height:10px; }
+.defeat-keep:has(.renown-compact) .defeat-scene{ height:calc(150px + (var(--screen-h, 769px) - 769px) * .5); }

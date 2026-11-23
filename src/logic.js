@@ -66,7 +66,7 @@ const SCREEN_FIELDS = [
   // open panels
   'organizeSelection','_pocketOpen',
   // end-of-run screens (never autosaved: the save is cleared when a run ends)
-  'gameOverRecorded','carryoverOptions','carryoverChosenName','depthResult','newAchievements','newBoonDice','newOriginRelic','personalBests',
+  'gameOverRecorded','carryoverOptions','carryoverChosenName','depthResult','newAchievements','newBoonDice','newOriginRelic','personalBests','renownGain',
 ];
 const RUN_FIELD_SET = new Set(RUN_FIELDS), SCREEN_FIELD_SET = new Set(SCREEN_FIELDS);
 function unclassifiedStateFields(st){ return Object.keys(st||{}).filter(k=>!RUN_FIELD_SET.has(k) && !SCREEN_FIELD_SET.has(k)); }
@@ -542,6 +542,7 @@ function loadMeta(){
       bestiary: (parsed.bestiary && typeof parsed.bestiary==='object') ? parsed.bestiary : {},
       classRuns: (parsed.classRuns && typeof parsed.classRuns==='object') ? parsed.classRuns : {},
       coachSeen: (parsed.coachSeen && typeof parsed.coachSeen==='object') ? parsed.coachSeen : {},
+      renown: Math.max(0, +parsed.renown||0),
     };
   } catch(e){ return { lifetime: {...DEFAULT_LIFETIME}, achievements: {}, favoriteBoons: [], relicsFound: [] }; }
 }
@@ -708,8 +709,21 @@ function debugUnlockEverything(){
 // each already guarded against re-firing on re-render) with S still intact
 // (before clearSave() wipes the in-progress run). Returns any Achievements
 // newly unlocked by this run, for the caller to announce.
+// ---- Guild Rank (data.js RANKS): helpers ----
+function rankIndexFor(renown){ let k = 0; RANKS.forEach((r,i)=>{ if(renown >= r.at) k = i; }); return k; }
+function rankNow(){ return rankIndexFor(META.renown||0); }
+function hasRankGift(g){ const k = rankNow(); return RANKS.slice(0, k+1).some(r=> r.gift===g); }
+function renownForRun(outcome){
+  const st = S.stats || {}, R = RENOWN;
+  const base = (st.encountersDefeated||0)*R.foe + (st.bossesDefeated||0)*R.boss + (S.floorIdx||0)*R.floor + (outcome==='victory' ? R.win : outcome==='demo' ? R.demo : 0);
+  return Math.round(base * (1 + R.depthMul * (currentDepth()||0)));
+}
 function recordMetaProgress(outcome){
   const L = META.lifetime;
+  // Guild Rank: every finished run earns renown (wins and losses alike); S.renownGain drives the end screens
+  { const before = META.renown||0, gain = (S.klass && S.klass.debug) ? 0 : renownForRun(outcome);
+    META.renown = before + gain; const r0 = rankIndexFor(before), r1 = rankIndexFor(META.renown);
+    S.renownGain = { before, gain, after: META.renown, ranksUp: RANKS.slice(r0+1, r1+1).map(r=>r.name) }; }
   L.runsPlayed++;
   if(outcome==='victory') L.victories++;
   L.bestFloorReached = Math.max(L.bestFloorReached, S.floorIdx+1);
@@ -956,7 +970,8 @@ function getSetupPreviewPortrait(originId){
 
 function newGame(originId, classId, boonDieName, charName, depthMods){
   depthMods = depthMods || {};
-  const startHp = Math.max(8, 20 - 4*(depthMods.frail||0));
+  const rankHp = (CLASSES.find(c=>c.id===classId)||{}).debug ? 0 : (hasRankGift('hp3')?3:0) + (hasRankGift('hp3b')?3:0); // Guild Rank gifts
+  const startHp = Math.max(8, 20 - 4*(depthMods.frail||0)) + rankHp;
   // Defense in depth: the Setup screen is the only place that offers an
   // Origin choice, and it already refuses to let a locked one be selected,
   // but falling back here too means a stale/tampered call can't bypass the
@@ -999,6 +1014,9 @@ function newGame(originId, classId, boonDieName, charName, depthMods){
       const boonDie = findLootDieByName(boonDieName);
       if(boonDie){ dice[7] = boonDie; appliedBoonName = boonDie.name; }
     }
+    // Guild Rank gifts (data.js RANKS): one basic die starts at level II
+    if(hasRankGift('atk2')){ const i = dice.findIndex(d=> d.name==='Attack Die I'); if(i>=0) dice[i] = {name:'Attack Die II', faces: basic('attack',2).faces, cat:'attack', level:2}; }
+    if(hasRankGift('man2')){ const i = dice.findIndex(d=> d.name==='Maneuver Die I'); if(i>=0) dice[i] = {name:'Maneuver Die II', faces: basic('maneuver',2).faces, cat:'maneuver', level:2}; }
     // shuffle into 4x4
     shuffled = pickN(dice, dice.length);
   }
@@ -1049,7 +1067,7 @@ function newGame(originId, classId, boonDieName, charName, depthMods){
     // carryover die.
     usedLootNames: new Set([carryDie && carryDie.name, appliedBoonName].filter(Boolean)),
     _lastPlayerHealth: startHp, // for the heal/damage flash effect on the health bar
-    stats: { turnsTaken:0, damageDealt:0, encountersDefeated:0, shrinesVisited:0, overkills:0, lootCollected:0, bestTurn:0, bestTurnFoe:'', bestOverBy:0, bestOverFoe:'', longestPath:0, nearMisses:0, damageBlocked:0 },
+    stats: { turnsTaken:0, damageDealt:0, encountersDefeated:0, bossesDefeated:0, shrinesVisited:0, overkills:0, lootCollected:0, bestTurn:0, bestTurnFoe:'', bestOverBy:0, bestOverFoe:'', longestPath:0, nearMisses:0, damageBlocked:0 },
     tele: newTelemetry(),
     campRested: false,
     shrineResult: null,
@@ -1057,6 +1075,17 @@ function newGame(originId, classId, boonDieName, charName, depthMods){
     segmentTrapUsed: false,
     guide: guideWanted() ? {stage:'pending'} : null, // guided first fight (Oct 22): first run on a device only
   };
+  // Guild Rank gifts (data.js RANKS): starting tokens, and the Patron's Gift relic pick shown at Base Camp
+  if(!klass.debug){
+    if(hasRankGift('reroll')) S.rerollTokens += 1;
+    if(hasRankGift('swap')) S.swapTokens += 1;
+    if(hasRankGift('patron')){
+      const found = new Set(META.relicsFound||[]);
+      const pool = RELICS.filter(r=> !r.origin && relicUnlocked(r) && found.has(r.id));
+      const opts = pickN(pool, Math.min(hasRankGift('patron4') ? 4 : 3, pool.length)).map(r=>r.id);
+      if(opts.length) S.relicChoice = { name:"Patron's Gift", options: opts, left:1, patron:true };
+    }
+  }
   // Ability teaching (Oct 13): the Skill button pulses until used each turn for a class's first few runs.
   if(!META.classRuns) META.classRuns = {};
   META.classRuns[klass.id] = (META.classRuns[klass.id]||0) + 1; saveMeta();
@@ -2808,6 +2837,7 @@ function chooseRelic(id){
   grantRelic(id, {silent:true, via:'shrine'});
   const r = relicById(id);
   if(rc && rc.left>1){ const rest = rc.options.filter(x=>x!==id && !hasRelic(x)); if(rest.length){ S.relicChoice = { name, options: rest, left: rc.left-1 }; render(); return; } }
+  if(rc && rc.patron){ logMsg('sys', `Patron's Gift: ${r.name}. ${r.desc}`, 'good'); render(); return; } // Guild Rank: picked at Base Camp
   S.shrineFx = {kind:'relic', id};
   S.shrineResult = { title: name, text: `Gained relic: ${r.name}. ${r.desc}` };
   render();
@@ -2824,6 +2854,7 @@ function onEncounterDefeated(){
   clearAllMinions();
   logMsg('sys', `${e.name} defeated!`);
   S.stats.encountersDefeated++;
+  if(e.type==='Boss' || e.type==='Big Boss') S.stats.bossesDefeated = (S.stats.bossesDefeated||0) + 1;
   bestiaryNote(e.name, 'won');
   // loot: draw dice from the floor pool, pick 1. Overkill (10+ damage beyond
   // what was needed) adds one extra option to choose from, per the manual's
