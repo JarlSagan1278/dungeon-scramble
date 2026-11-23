@@ -39,6 +39,26 @@ If you choose to share play data at the end of a run, it helps us balance the ga
 
 Made by Jeremy and Katlynn Friedman. https://dungeonscramble.com · contact@dungeonscramble.com
 
+## Description refresh (Nov 23, 2026: paste over the old one; the old text never mentions PC)
+
+**Short description / tagline:** Roll sixteen dice, draw one path. Free demo: the first two floors, on phone or PC.
+
+> Dungeon Scramble is a turn-based roguelike. Roll sixteen dice into a 4x4 tray, then draw one path through them: each die you step on hits, blocks or heals, in order. Monsters always show their next move, so you can plan around the roll, and Maneuver faces like Leap, Sidestep and Pivot bend the rules of the path. Chain them right and a modest roll becomes a monster-flattening turn.
+>
+> **This free demo is the first two floors:** pick your origin and class, fight through the rooms, visit shrines and camps, beat the Floor 1 boss, then find Gilded loot on Floor 2 and take on its boss.
+>
+> **Play your way:** on a phone held upright, or on a computer with mouse, keyboard or a controller (it also runs on the Steam Deck in its browser). Your loot shows up on your hero, and when a monster beats you, it wears your best piece.
+>
+> The full game has three dungeon floors, 50+ six-sided loot dice, 20+ relics and the Big Bosses. It is coming to Android, iPhone and PC.
+>
+> Your progress is saved in your browser. If you choose to share play data at the end of a run, it helps us balance the game. Privacy policy: https://dungeonscramble.com/privacy
+>
+> Made by Jeremy and Katlynn Friedman, from the board game we designed together. https://dungeonscramble.com · contact@dungeonscramble.com
+
+If the Guild Rank and Daily Dungeon ship, add after "Play your way": *Every run earns renown toward a permanent rank with a starting gift at each step, and the Daily Dungeon is the same dungeon for everyone each day, with a result to share.*
+
+**Platforms field:** tick Windows, macOS and Linux as well as Android ("HTML5" games list the systems they run on); the Inputs list (keyboard, mouse, touchscreen, gamepad) is right as is.
+
 ## After it goes public
 
 - Add the itch.io link to the press kit and home page (`docs/release/presskit.html`, `tools/site.js`), rebuild the site, upload.
