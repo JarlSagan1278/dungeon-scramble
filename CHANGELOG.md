@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.161 (Nov 25, 2026)
+- PC: the blurred cover behind the game is replaced by a dark stone dungeon wall lit warm from below.
+- High Depths: Elite and Deadly foes' Depth health bonus (Tougher Scuffs + Dread) adds up instead of multiplying, capped at +80% (a Floor 2 Whence Wolf reached 156 HP at Depth 14; now 109).
+- Play app: real Google Play purchase for the full game (needs the full_game product in Play Console).
+
 ## 1.42.160 (Nov 25, 2026)
 - Play data: each run records which build it came from (app = Google Play, tester = playtest site, demo = itch, steam).
 

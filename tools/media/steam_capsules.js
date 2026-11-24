@@ -17,6 +17,7 @@ const LOGO = TITLE_PNG;
 const BOSSES = ['Rogue_Golemancer', 'Heating_Elemental', 'Grosteque_Grafter', 'The_Necrorancher', 'Bellicose_Biomancer', 'Ceramic_Golem',
   'Myceleus_Co_consul_of_Rot', 'Extruzeon_Co_consul_of_Waste', 'Toadtaur_Wizard_Assistant_to_the_Co_consul'].map(n => u('MONSTER_ART/' + n + '.webp'));
 const HEROES = ['DWARF_PORTRAITS/0.webp', 'GNOME_PORTRAITS/0.webp', 'HALFLING_PORTRAITS/0.webp', 'PIXIE_PORTRAITS/0.webp'].map(u);
+const WALL = `background:radial-gradient(ellipse at 50% 108%, rgba(255,140,50,.28), rgba(0,0,0,0) 55%), radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 30%, rgba(0,0,0,.7) 100%), url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22160%22%20height%3D%2280%22%20viewBox%3D%220%200%20160%2080%22%3E%3Crect%20width%3D%22160%22%20height%3D%2280%22%20fill%3D%22%230d0906%22/%3E%3Crect%20x%3D%222%22%20y%3D%222%22%20width%3D%2276%22%20height%3D%2236%22%20rx%3D%223%22%20fill%3D%22%2333251b%22/%3E%3Crect%20x%3D%2282%22%20y%3D%222%22%20width%3D%2276%22%20height%3D%2236%22%20rx%3D%223%22%20fill%3D%22%232c2017%22/%3E%3Crect%20x%3D%22-38%22%20y%3D%2242%22%20width%3D%2276%22%20height%3D%2236%22%20rx%3D%223%22%20fill%3D%22%232a1e15%22/%3E%3Crect%20x%3D%2242%22%20y%3D%2242%22%20width%3D%2276%22%20height%3D%2236%22%20rx%3D%223%22%20fill%3D%22%2335271c%22/%3E%3Crect%20x%3D%22122%22%20y%3D%2242%22%20width%3D%2276%22%20height%3D%2236%22%20rx%3D%223%22%20fill%3D%22%232a1e15%22/%3E%3Crect%20x%3D%222%22%20y%3D%222%22%20width%3D%2276%22%20height%3D%224%22%20fill%3D%22%234a3627%22%20opacity%3D%22.55%22/%3E%3Crect%20x%3D%2282%22%20y%3D%222%22%20width%3D%2276%22%20height%3D%224%22%20fill%3D%22%2345321f%22%20opacity%3D%22.5%22/%3E%3Crect%20x%3D%2242%22%20y%3D%2242%22%20width%3D%2276%22%20height%3D%224%22%20fill%3D%22%234a3627%22%20opacity%3D%22.55%22/%3E%3Crect%20x%3D%22-38%22%20y%3D%2242%22%20width%3D%2276%22%20height%3D%224%22%20fill%3D%22%2345321f%22%20opacity%3D%22.5%22/%3E%3Crect%20x%3D%22122%22%20y%3D%2242%22%20width%3D%2276%22%20height%3D%224%22%20fill%3D%22%2345321f%22%20opacity%3D%22.5%22/%3E%3C/svg%3E') 0 0 / 160px 80px repeat, #1b130e`; // the game's PC backdrop (Nov 25, Jeremy: no blurred art)
 const base = `*{box-sizing:border-box;margin:0;padding:0} html,body{width:100%;height:100%;overflow:hidden;background:#130d09}
  .stage{position:relative;width:100%;height:100%;overflow:hidden}
  .cover{position:absolute;inset:0;background:url(${COVER}) center/cover no-repeat}
@@ -27,7 +28,7 @@ const base = `*{box-sizing:border-box;margin:0;padding:0} html,body{width:100%;h
 const coverAt = (y, extra='') => `<div class="cover" style="background-position:50% ${y}%;${extra}"></div>`;
 // A wide frame from the portrait cover: the cover itself (lettering and heroes) on the right, the same art blurred and
 // darkened filling the rest, so nothing has to be cropped out of the lettering.
-const wideCover = (w, h, small) => `<div class="cover" style="background-position:50% 100%;filter:blur(${small ? 8 : 16}px) brightness(.45);transform:scale(1.15)"></div>
+const wideCover = (w, h, small) => `<div class="shade" style="${WALL}"></div>
   <div class="cover" style="left:auto;width:${Math.round(h * 860 / 1021)}px;right:${Math.round(w * 0.06)}px;background-size:100% auto;background-position:50% 0;box-shadow:0 0 40px 10px rgba(0,0,0,.6)"></div>
   ${small ? '' : HEROES.map((x, i) => `<img class="mon" src="${x}" style="left:${Math.round(w * 0.04 + i * w * 0.13)}px;height:${Math.round(h * 0.42)}px;bottom:${Math.round(h * 0.05)}px">`).join('')}`;
 const IMAGES = [
@@ -45,7 +46,7 @@ const IMAGES = [
   // Library header
   ['library_header_920x430', 920, 430, false, LOGO ? coverAt(74) + `<img class="logo" src="${LOGO}" style="top:14px;width:470px">` : wideCover(920, 430)],
   // Library hero (behind the game's library page; no logo: Steam lays the library logo over it)
-  ['library_hero_3840x1240', 3840, 1240, false, `<div class="cover" style="background-position:50% 100%;filter:blur(22px) brightness(.4);transform:scale(1.1)"></div>
+  ['library_hero_3840x1240', 3840, 1240, false, `<div class="shade" style="${WALL}"></div>
     <div class="shade" style="background:radial-gradient(ellipse at 50% 100%,rgba(255,150,60,.32),rgba(19,13,9,0) 62%),linear-gradient(180deg,rgba(19,13,9,.55),rgba(19,13,9,0) 40%)"></div>
     ${HEROES.map((h, i) => `<img class="mon" src="${h}" style="left:${560 + i * 250}px;height:${430 - (i % 2) * 30}px;bottom:${70 + (i % 2) * 40}px;z-index:2">`).join('')}
     ${BOSSES.slice(0, 6).map((b, i) => `<img class="mon" src="${b}" style="left:${1660 + i * 330}px;height:${520 + (i % 2) * 70}px;bottom:${60 + (i % 2) * 50}px;z-index:${i % 2 ? 1 : 2}">`).join('')}`],

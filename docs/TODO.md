@@ -48,6 +48,7 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
 - **Performance on slow phones:** load fixed on itch (split build), playback redraws trimmed (1.42.63, STUDY_FINDINGS). What's left in a turn is paint/compositing of running animations; only worth doing if testers report stutter.
 
 ## Later
+- **Depth 14+ Floor 1 attrition (Jeremy: B later, Nov 25):** at Depth 14 64% of expert runs end on Floor 1 (Clumsy + Zeal + Rationing, nothing to heal with yet). Option B: a small heal after each Floor 1 fight when those rules are on. Study in STUDY_FINDINGS (High Depths).
 - **Optional caps, only if play feels unfair:** damage-per-Minion specials count at most 8 Minions; Extruzeon layers max +12.
 - **Relic look polish:** a bracelet view in the relic list, sockets that grow with depth.
 - **Replay tool** for the tray/path telemetry.

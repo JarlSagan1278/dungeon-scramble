@@ -30,7 +30,7 @@ if(LEGACY_ZOOM){
 }
 document.getElementById('settings-btn').onclick = openSettingsModal;
 // Wide screens (a computer): the cover scene, dimmed, fills the space around the game card instead of a black void (Oct 28).
-try{ if(typeof COVER_ART!=='undefined' && COVER_ART) document.documentElement.style.setProperty('--backdrop', `url("${COVER_ART}")`); }catch(e){}
+// (Nov 25: the desktop backdrop is a stone wall drawn in CSS; it no longer uses the cover art)
 applyReducedMotionClass();
 try{ applyPcMode(); }catch(e){} // PC layout (opt-in while it is built): before the first draw
 // Existing players: everything already found counts as "seen", so NEW! tags
