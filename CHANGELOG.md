@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.154 (Nov 25, 2026)
+- Steam-ready PC polish: camp fills big windows, the settings gear grows with the window and sits in the fight's hint footer, a larger footer on big screens, Fullscreen (Settings switch, F11, Alt+Enter), controller button glyphs.
+- Null Hypothesis softened: it alternates Combo and D.O.T. and never cancels Hit (the Hit turn was unfair).
+- A one-time tip the first time you meet each foe rule.
+
 ## 1.42.153 (Nov 24, 2026)
 - Foe rules: Null Hypothesis (Illegal Operation: one face type deals it no damage each turn), Odd Permutation (Transposer Kitty: the right path parity deals x1.5, the other x0.75), Most Wanted (Gnome Chomper: completing its Wanted poster makes the path hit twice). Each shows a plaque under the foe, marks on the dice or the damage counter, and a callout.
 - The defeat screen explains the loss from the killing blow and the fight.
