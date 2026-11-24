@@ -5848,13 +5848,22 @@ const DEFEAT_TIPS = [
   'Dice in your Back Pocket can save you from a killing blow.',
   'Enemies show their next move. Block when a big hit is coming.',
 ];
+// Nov 24: why you lost, from what actually happened (the killing blow and the fight), so the next run starts smarter
+function defeatInsight(){
+  const b = S._lastBlow, taken = S._fightTaken||0, blocked = S._fightBlocked||0;
+  if(b && b.kind==='dot') return `D.O.T. finished you (${b.amount} a turn). Heal and H.O.T. faces outpace it, and a Nullify clears it.`;
+  if(b && b.kind==='heavy') return `${b.special ? `<b>${b.special}</b>` : 'Its heavy turn'} landed for ${b.amount}${b.blocked ? ` (you Blocked ${b.blocked})` : ' with no Block up'}. Big moves are shown a turn early: Freeze cancels them, Block soaks them.`;
+  if(taken >= 8 && blocked === 0) return `You took ${taken} damage this fight and Blocked none. One Block die in a path each turn adds up fast.`;
+  if(taken >= 8 && blocked > 0 && blocked < taken/4) return `You took ${taken} damage this fight and Blocked ${blocked}. Its next attack is always shown: Block when it's big.`;
+  return '';
+}
 function defeatKillerHTML(){
   const k = S.stats && S.stats.killedByInfo;
   if(!k || !k.name) return '';
   const art = (typeof ART_WRONG!=='undefined' && ART_WRONG.has(k.name)) ? null : MONSTER_ART[k.name];
   const boss = /Boss/.test(k.type||'');
   const close = k.max && k.hp>0 && k.hp/k.max <= 0.25 ? `So close: it had only ${k.hp} Health left. ` : '';
-  const tip = boss ? 'Bosses show their next move above them, so you can Block before the big ones.' : DEFEAT_TIPS[(S.stats.turnsTaken||0) % DEFEAT_TIPS.length];
+  const tip = defeatInsight() || (boss ? 'Bosses show their next move above them, so you can Block before the big ones.' : DEFEAT_TIPS[(S.stats.turnsTaken||0) % DEFEAT_TIPS.length]);
   return `<div class="dk-killer">${art ? `<img src="${art}" alt="">` : ''}<div><div class="dk-k-kicker">What beat you</div>
     <div class="dk-k-name">${nbHyphen(k.name)}</div><div class="dk-k-tip">${close}${tip}</div></div></div>`;
 }

@@ -45,7 +45,7 @@ const RUN_FIELDS = [
   // who and where
   'screen','charName','origin','klass','portrait','depth','depthMods','floorIdx','routeStep','route','encounter','turnNumber','guide','coachRun','daily',
   // you
-  'health','maxHealth','playerDOT','playerHOT','playerBlock','tray','backPocket','relics','path','classAbilityUsed','freezeNext',
+  'health','maxHealth','playerDOT','playerHOT','playerBlock','tray','backPocket','relics','path','classAbilityUsed','freezeNext','_lastBlow','_fightTaken','_fightBlocked',
   'nullifyTokens','freezeTokens','swapTokens','rerollTokens','boostTokenCharges','boostTokenValue','pendingFreeBoost','swapLog','trayAct',
   'needRoll','_pendingMinions','_reveals','committedTurn','_lw',
   // choices waiting on you (a shrine choice holds functions: maybeAutosave never saves while one is open)
@@ -59,7 +59,7 @@ const RUN_FIELDS = [
 const SCREEN_FIELDS = [
   // turn playback
   'transitioning','resolveTotal','resolvingIdx','resolvingFx','_advance','_pendingTimeout','_skipAll','_resolvingPath','_hitStreak',
-  '_heavyHit','_wardHalf','_downBeat','_foeNullShown','lastComboRipple','lastMinionClearIdx','_relicQ',
+  '_heavyHit','_wardHalf','_downBeat','_foeNullShown','_specialName','lastComboRipple','lastMinionClearIdx','_relicQ',
   // one-shot animations and highlights
   '_roll','_ghost','_shieldFx','_lastPlayerHealth','_abilityReveal','justConvertedIdx','justRerolledIdx','justScrambled','justSwappedIdx',
   'newRoomFx','shrineFx','_fuseFx','_forkSeamless','_mascotFloor','_mascotLeft','_enemySoundN','_enemySoundReset','_unlockFx','_forceTier',
@@ -1288,7 +1288,7 @@ function drawEncounter(kind){
   // enemy's own stacks just above. (Mid-fight, a Nullify is still the only
   // way to clear it early.)
   // Block (like every other status) is a clean slate in a new room too.
-  S.playerDOT = 0; S.playerHOT = 0; S.playerBlock = 0;
+  S.playerDOT = 0; S.playerHOT = 0; S.playerBlock = 0; S._fightTaken = 0; S._fightBlocked = 0; S._lastBlow = null;
   e.questsDone = (e.quests||[]).map(()=>false);
   e.minionsSpawned = 0;
   clearAllMinions();
@@ -2467,6 +2467,7 @@ function runPlayerUpkeep(){
   const parts = [];
   if(S.playerDOT>0){
     S.health = cap(S.health-S.playerDOT, S.maxHealth);
+    S._lastBlow = { kind:'dot', amount:S.playerDOT }; // Nov 24: what the defeat screen explains
     if(typeof playPlayerHitSound==='function') playPlayerHitSound();
     const t = `You take ${S.playerDOT} D.O.T. damage.`;
     logMsg('dmg', t); parts.push(t);
@@ -2498,6 +2499,9 @@ function dealEncounterDamage(e, amount){
   const eoBack = eo.reflect==='blocked' ? blocked : 2;
   if(amount>0 && blocked>0 && (eo.reflect==='full' ? dealt===0 : true) && hasRelic('spite_thorns') && e.curHealth>0){ e.curHealth = capUpper(e.curHealth-absorbWithShield(e, eoBack), e.maxHealth); fireRelic('spite_thorns',eoBack+' back'); }
   S.health = cap(S.health-dealt, S.maxHealth);
+  if(dealt>0){ S._lastBlow = { kind: S._heavyHit ? 'heavy' : 'hit', special: S._specialName || null, amount:dealt, blocked, foe:e.name, frozenAvail: (S.freezeTokens||0)>0 };
+    S._fightTaken = (S._fightTaken||0) + dealt; }
+  if(blocked>0) S._fightBlocked = (S._fightBlocked||0) + blocked;
   if(amount>=3 && dealt===0 && S.playerBlock===0 && typeof showCleverStamp==='function') setTimeout(()=> showCleverStamp('Perfect Block!', 'p'), 120); // exactly enough Block, none wasted
   if(blocked>0){ // Oct 12 (Jeremy): make prevented damage visible -- a Block floater on your HP bar + a run total
     S.stats.damageBlocked = (S.stats.damageBlocked||0) + blocked;
@@ -2604,9 +2608,9 @@ function bossTakeTurn(e, frozen){
   else {
     parts.push(`${sp.name}!`);
     S._wardHalf = !!(sp.windup && hasRelic('warding_bell') && !e._wardUsed); if(S._wardHalf) e._wardUsed = true;
-    S._heavyHit = true;
+    S._heavyHit = true; S._specialName = sp.name;
     sp.acts.forEach(a=>{ const t = applyEnemyAct(e, a); if(t) parts.push(t); });
-    S._wardHalf = false; S._heavyHit = false;
+    S._wardHalf = false; S._heavyHit = false; S._specialName = null;
   }
   teleLog('boss_move', {name:sp.name, frozen:!!frozen, phase:e.phase||1});
   if(kit===e.kit && e.kit.phase2 && e.curHealth>0 && e.curHealth <= e.maxHealth/2){
