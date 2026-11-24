@@ -327,5 +327,20 @@ Guard and Arcanist x dwarf/gnome, regular depth 0 and expert depth 7, 60 runs pe
 Uniform increases hit Arcanist hardest, on Floor 1; the shaped increase keeps the opening fair and puts the new losses on
 Floors 2-3.
 
+## Balance on 1.42.154 (Nov 25, 2026: harder enemy health, foe rules, dice buffs)
+4 classes x 4 origins, 80 runs per cell.
+
+| Class | Regular, depth 0 | Expert, depth 7 |
+|---|---|---|
+| Guard | 87% | 85% |
+| Armsmaster | 80% | 74% |
+| Dungeoneer | 91% | 77% |
+| Arcanist | 89% | 74% |
+
+Deaths by floor (share of all runs): regular 1% / 6% / 7%, expert 4% / 13% / 6%. Down from 86-93% / 80-94% on
+1.42.149; the spread between classes is a little narrower; Floor 1 stays gentle. Gnome is the weakest origin for experts
+(66-82%). The end-of-run loot lean puts damage-heavy and movement-heavy loot low, but that measure is skewed by short
+runs that die early holding little loot (the Floor-2-entry measure on 1.42.149 showed every lean 73-100%).
+
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.
