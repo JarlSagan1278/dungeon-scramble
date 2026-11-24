@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.152 (Nov 24, 2026)
+- Daily streak: consecutive Dailies on the title button and in the share line.
+- Depth closes in: a crimson vignette in the fight room that grows with Depth.
+- Fix: renown gave Depth 0 runs the Depth 1 bonus, and the after-win pointer named the wrong Depth.
+
 ## 1.42.151 (Nov 24, 2026)
 - A bit harder: enemy health +5% on Floor 1 and +15% on Floors 2-3.
 - End-screen Highlights show the dice of your biggest turn, in order.
