@@ -633,7 +633,7 @@ const HEAVY_EVERY = {elite:3, deadly:2};
 // Foe rules (Nov 24, Jeremy: enemies that reward reading the preview). Each shows on the foe, on the dice and on the
 // path counter while you plan, and calls out when it bites. Names are Claude's placeholders (blue in the names sheet).
 const FOE_RULES = {
-  null:   { name:'Null Hypothesis', text:t=>`Immune to <b>${t.nullLabel}</b> this turn.`, tip:'Each turn one face type (Combo, then Hit, then D.O.T.) deals no damage to it. Route around it.' },
+  null:   { name:'Null Hypothesis', text:t=>`Immune to <b>${t.nullLabel}</b> this turn.`, tip:'Each turn one face type (Combo, then D.O.T., alternating) deals no damage to it. Route around it.' },
   parity: { name:'Odd Permutation', text:t=>`<b>${t.weak==='even'?'Even':'Odd'}</b>-length paths deal &times;1.5 this turn; ${t.weak==='even'?'odd':'even'} &times;0.75.`, tip:'It flips each turn: count your path. The right parity deals 50% more, the wrong one 25% less.' },
   bounty: { name:'Most Wanted', text:()=>`Complete its <b>Wanted</b> poster: the path hits <b>twice</b>.`, tip:'A path that completes one of its Wanted posters deals its damage a second time, as a bounty.' },
 };

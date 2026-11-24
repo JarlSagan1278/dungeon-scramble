@@ -1854,11 +1854,11 @@ function getFaceForIdx(idx){
 // Pure calculator -- no side effects. Used both for the actual turn
 // resolution and for the live running-total preview while building a path.
 // ---- Foe rules (data.js FOE_RULES): this turn's state and the damage multiplier per face type ----
-const NULL_CYCLE = ['combo','hit','dot'];
+const NULL_CYCLE = ['combo','dot']; // Nov 25: never Hit (a Hit turn blanked most basic dice: expert deaths in that fight 1.7% -> 11.7%; this cycle 5.8%)
 function foeRuleState(e){
   e = e || (S && S.encounter); if(!e || !e.rule) return null;
   const n = e.turnsActed||0;
-  if(e.rule==='null'){ const t = NULL_CYCLE[n % 3]; return { rule:'null', nullType:t, nullLabel: t==='dot' ? 'D.O.T.' : LABEL[t] }; }
+  if(e.rule==='null'){ const t = NULL_CYCLE[n % NULL_CYCLE.length]; return { rule:'null', nullType:t, nullLabel: t==='dot' ? 'D.O.T.' : LABEL[t] }; }
   if(e.rule==='parity') return { rule:'parity', weak: n % 2 === 0 ? 'even' : 'odd' };
   if(e.rule==='bounty') return { rule:'bounty' };
   return null;

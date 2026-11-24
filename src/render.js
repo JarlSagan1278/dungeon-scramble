@@ -5438,8 +5438,10 @@ function pcFitCamp(){
   if(!pcMode()) return;
   const p = document.querySelector('#app > .panel:has(> .camp-status-card)'); if(!p) return;
   p.style.removeProperty('zoom');
-  const h = p.getBoundingClientRect().height, room = window.innerHeight - 16;
-  if(h > room) p.style.zoom = ((p.currentCSSZoom || 1) * room / h).toFixed(3);
+  // Nov 25 (Steam): grow to fill big windows too (it only shrank before), limited by the window's width
+  const r = p.getBoundingClientRect(), z = p.currentCSSZoom || 1, room = window.innerHeight - 16, wroom = window.innerWidth - 48;
+  const k = Math.min(room / r.height, wroom / r.width);
+  if(Math.abs(k - 1) > 0.02) p.style.zoom = (z * k).toFixed(3);
 }
 // PC layout: the end screens (victory, defeat, demo end, unlock) keep the phone card, scaled to the window height.
 function pcFitCard(again){
@@ -5465,14 +5467,14 @@ function pcFitFight(){
   // the tray stretches to the column's height (CSS), so its own height is read with the stretch off for a moment
   let hTray = 381; if(tr){ tr.style.alignSelf = 'start'; hTray = tr.offsetHeight; tr.style.removeProperty('align-self'); }
   const hRoute = ro ? ro.offsetHeight : 51, hRoom = rm ? rm.offsetHeight : 285;
-  const pad = Math.round(Math.max(12, H*0.018)), gap = Math.round(Math.max(24, W*0.018)), foot = Math.round(Math.max(80, Math.min(104, H*0.09))); // room for the hover caption at its tallest (a die: name + six faces)
+  const pad = Math.round(Math.max(12, H*0.018)), gap = Math.round(Math.max(24, W*0.018)), foot = Math.round(Math.max(80, Math.min(150, H*0.09))); // Nov 25: taller on big windows (Steam 1440p: the caption was tiny) // room for the hover caption at its tallest (a die: name + six faces)
   // left column = (route + room) * zr, right column = tray * zt, equal heights; widths 379 * (zr + zt) + gap fit the window
   const k = hTray / (hRoute + hRoom); // zr = zt * k
   const zt = Math.min((H - 2*pad - foot) / hTray, (W - 48 - gap) / (379 * (1 + k)));
   const zr = zt * k;
   const st = document.body.style, set = (n, v)=>{ if(st.getPropertyValue(n) !== v) st.setProperty(n, v); };
   set('--pc-zt', zt.toFixed(3)); set('--pc-zr', zr.toFixed(3)); set('--pc-zroute', zr.toFixed(3));
-  set('--pc-pad', pad+'px'); set('--pc-gap', gap+'px'); set('--pc-foot', foot+'px'); set('--pc-zh', Math.max(0.8, Math.min(1.5, (foot - 12)/80)).toFixed(3)); // the footer strip is foot - 8 tall, a die's caption ~80 px at zoom 1 // a die's caption is ~80 px tall at zoom 1
+  set('--pc-pad', pad+'px'); set('--pc-gap', gap+'px'); set('--pc-foot', foot+'px'); set('--pc-zh', Math.max(0.8, Math.min(1.75, (foot - 12)/80)).toFixed(3)); // the footer strip is foot - 8 tall, a die's caption ~80 px at zoom 1 // a die's caption is ~80 px tall at zoom 1
 }
 // Nov 14 (Steam Deck: only the touchscreen worked): say what controller, if any, the browser reports, so a player can
 // tell a game problem from a browser/Steam setting. The browser only lists a pad after one of its buttons is pressed.
@@ -5564,7 +5566,18 @@ function pcHoverRender(){
   if(inn.innerHTML !== html) inn.innerHTML = html;
 }
 // Sits under the room, as wide as it; hidden when PC mode is off or the screen has no room.
+// PC fight: the gear sits centred in the right end of the hint footer (the top-right corner is the damage counter's).
+// Measured from the footer itself; the gear's own zoom scales its offsets, so divide by it. Other screens: reset.
+function pcGearReset(){
+  const g = document.querySelector('.settings-btn-floating'); if(!g) return;
+  const f = pcMode() && document.querySelector('#app > #enc-panel') && document.getElementById('pc-hover');
+  if(!f){ g.style.removeProperty('bottom'); g.style.removeProperty('right'); return; }
+  const r = f.getBoundingClientRect(), z = g.currentCSSZoom || 1;
+  g.style.setProperty('bottom', ((window.innerHeight - (r.top + r.height/2))/z - 16).toFixed(1)+'px', 'important');
+  g.style.setProperty('right', ((window.innerWidth - r.right + 14)/z).toFixed(1)+'px', 'important');
+}
 function pcHoverSync(){
+  pcGearReset();
   const n = document.getElementById('pc-hover'); if(!n && !pcMode()) return;
   const el = pcHoverEl(), room = pcMode() ? document.querySelector('#app > #enc-panel') : null, tray = room && document.querySelector('#app > .tray-panel');
   if(!room || !tray){ el.hidden = true; if(el.parentNode !== document.body) document.body.appendChild(el); return; }

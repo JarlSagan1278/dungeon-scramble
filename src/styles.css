@@ -3642,7 +3642,11 @@ body.pc #app:has(> #enc-panel) > #pc-hover{ position:relative; grid-column:1 / 3
 body.pc #app:has(> #enc-panel) > .route-float{ grid-column:1; grid-row:1; justify-self:stretch; width:379px; margin:0 !important; zoom:var(--pc-zroute, 1.6); }
 body.pc #app:has(> #enc-panel) > #enc-panel{ grid-column:1; grid-row:2; width:379px; zoom:var(--pc-zr, 2.4); background:transparent !important; border-color:transparent !important; box-shadow:none !important; }
 body.pc #app:has(> #enc-panel) > .tray-panel{ grid-column:2; grid-row:1 / 3; width:379px; margin:0 !important; zoom:var(--pc-zt, 2); }
-body.pc .settings-btn-floating{ right:14px !important; top:12px !important; zoom:1.5; }
+body.pc .settings-btn-floating{ right:14px !important; top:12px !important; zoom:1.5; } /* grows with the window below (Nov 25, Steam: 1440p and up) */
+@media (min-height:1000px){ body.pc .settings-btn-floating{ zoom:1.9; } }
+@media (min-height:1350px){ body.pc .settings-btn-floating{ zoom:2.4; } }
+/* the fight's top-right corner is the damage counter's: there the gear sits in the right end of the hint footer */
+body.pc:has(#app > #enc-panel) .settings-btn-floating{ top:auto !important; } /* bottom/right set by pcFitFight */
 body.pc{ margin:0 !important; padding:0 !important; }
 body.pc .wrap{ min-height:0 !important; height:100vh; }
 /* pop-up windows keep the phone's design, enlarged; the scrim still covers the window (it is zoomed with them) */
@@ -3694,7 +3698,7 @@ body.pc #app:has(> #enc-panel) > .tray-panel{ align-self:stretch; }
 #pc-hover{ position:fixed; z-index:20; box-sizing:border-box; display:flex; align-items:center; background:rgb(51,32,15); border:2px solid #0c0705; border-radius:14px; overflow:hidden; } /* framed like the panels above it (Nov 14) */
 #pc-hover .pch-in{ zoom:var(--pc-zh, 1.4); display:flex; align-items:center; gap:12px; width:100%; padding:6px 12px; box-sizing:border-box; color:var(--parchment); }
 #pc-hover .pch-idle{ align-items:center; }
-#pc-hover .pch-idle .pch-text{ text-align:center; font-size:11.5px; }
+#pc-hover .pch-idle .pch-text{ text-align:center; font-size:13px; }
 #pc-hover[hidden]{ display:none; }
 #pc-hover .pch-dice{ flex:0 0 auto; display:flex; flex-direction:column; gap:4px; }
 #pc-hover .pch-main{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; gap:2px; }
