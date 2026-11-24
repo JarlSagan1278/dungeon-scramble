@@ -5566,13 +5566,15 @@ function pcHoverRender(){
     const t = String(pcHoverTip).replace(/</g,'&lt;'), m = /^([^:.]{2,40}): (.+)$/s.exec(t);
     html = m ? `<div class="pch-main"><div class="pch-head"><b>${m[1]}</b></div><div class="pch-text">${m[2]}</div></div>` : `<div class="pch-main"><div class="pch-text">${t}</div></div>`; }
   if(!html) html = `<div class="pch-main pch-idle"><div class="pch-text">Point at a die, a monster's move or a relic to read it. ${document.body.classList.contains('pad')
-    ? 'Controller: <b>D-pad</b> or stick moves the cursor, <b>A</b> picks (hold it on a Hold button), <b>B</b> steps back, <b>X</b> is Skill, <b>Y</b> is Go.'
+    ? `Controller: <b>D-pad</b> or stick moves the cursor, ${padGlyph('A')} picks (hold it on a Hold button), ${padGlyph('B')} steps back, ${padGlyph('X')} is Skill, ${padGlyph('Y')} is Go.`
     : 'Keys: <b>1 2 3 4 / Q W E R / A S D F / Z X C V</b> pick dice, <b>Enter</b> is Go, <b>Backspace</b> is Clear. Or use the <b>arrow keys</b> and <b>Space</b>; <b>Esc</b> steps back.'}</div></div>`;
   if(inn.innerHTML !== html) inn.innerHTML = html;
 }
 // Sits under the room, as wide as it; hidden when PC mode is off or the screen has no room.
 // PC fight: the gear sits centred in the right end of the hint footer (the top-right corner is the damage counter's).
 // Measured from the footer itself; the gear's own zoom scales its offsets, so divide by it. Other screens: reset.
+// Controller button glyphs (Nov 25, Steam ready): the face buttons as coloured round icons, matching the Go/Skill badges
+function padGlyph(k){ return `<i class="pad-glyph pg-${k.toLowerCase()}">${k}</i>`; }
 function pcGearReset(){
   const g = document.querySelector('.settings-btn-floating'); if(!g) return;
   const f = pcMode() && document.querySelector('#app > #enc-panel') && document.getElementById('pc-hover');

@@ -4047,3 +4047,7 @@ body.pc .defeat-scene.ds-pc{ height:230px; margin:0 0 12px; }
 .pcf-rule.good{ background:#9affa0; } .pcf-rule.bad{ background:#ffb3a3; }
 .kill-seal.foe-rule-seal{ width:96px; height:96px; margin:-48px 0 0 -48px; }
 .kill-seal.foe-rule-seal b{ color:#f3e8ff; text-shadow:0 2px 0 #2a1840; font-size:16px; text-align:center; max-width:74px; line-height:1.05; }
+/* Controller glyphs (Nov 25): A green, B red, X blue, Y yellow; with a controller in use the dice drop their keyboard letters */
+.pad-glyph{ display:inline-flex; align-items:center; justify-content:center; width:1.7em; height:1.7em; border-radius:50%; border:2px solid #0c0705; font:800 1.05em/1 var(--font-ui); font-style:normal; vertical-align:-.2em; color:#fff; }
+.pad-glyph.pg-a{ background:#3f9a4f; } .pad-glyph.pg-b{ background:#c0392b; } .pad-glyph.pg-x{ background:#3f7fd0; } .pad-glyph.pg-y{ background:#d9a520; color:#241c10; }
+body.pc.pad #tray > .die::before{ content:none !important; }
