@@ -348,3 +348,9 @@ function pcPadPoll(){
   requestAnimationFrame(pcPadPoll);
 }
 requestAnimationFrame(pcPadPoll);
+
+// Fullscreen keys (Nov 25, Steam ready): F11 and Alt+Enter toggle the game's own fullscreen (render.js toggleFullscreen)
+window.addEventListener('keydown', ev=>{
+  if(!(typeof canFullscreen==='function' && canFullscreen())) return;
+  if(ev.key==='F11' || (ev.key==='Enter' && ev.altKey)){ ev.preventDefault(); ev.stopPropagation(); toggleFullscreen(); }
+}, true);

@@ -3900,6 +3900,9 @@ function openCreditsModal(){
     <p class="hint">Version ${GAME_VERSION}</p>
   </div>`);
 }
+// Fullscreen (Nov 25, Steam ready): a Settings switch and F11 / Alt+Enter on a computer. Phones and the store app skip it.
+function canFullscreen(){ try{ return !!(document.fullscreenEnabled && document.documentElement.requestFullscreen) && !(typeof BUILD!=='undefined' && BUILD.app) && matchMedia('(pointer: fine)').matches; }catch(e){ return false; } }
+function toggleFullscreen(){ try{ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>{}); }catch(e){} }
 function openSettingsModal(){
   const inRun = !!S;
   const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:340px;">
@@ -3914,6 +3917,7 @@ function openSettingsModal(){
         ${settingsToggleRowHTML('pref-vibration', 'Vibration (phones)', PREFS.vibration!==false)}
         ${settingsToggleRowHTML('pref-flick-roll', 'Flick or shake to roll each turn', PREFS.flickRoll!==false)}
         ${pcFits() ? settingsToggleRowHTML('pref-pc-layout', 'Wide-screen layout', pcWanted()) : ''}
+        ${canFullscreen() ? settingsToggleRowHTML('pref-fullscreen', 'Fullscreen (F11)', !!document.fullscreenElement) : ''}
         ${pcMode() ? `<p class="hint" id="pc-pad-status" style="text-align:left;margin:2px 0 0;">${pcPadStatusText()}</p>` : ''}
         ${PLAYDATA_URL ? settingsToggleRowHTML('pref-share-data', 'Share play data automatically', shareDataPref()==='yes') : ''}
       </div>
@@ -3951,6 +3955,7 @@ function openSettingsModal(){
   overlay.querySelector('#pref-reduced-motion').onchange = (ev)=> setPref('reducedMotion', ev.target.checked);
   overlay.querySelector('#pref-large-text').onchange = (ev)=> setPref('largeText', ev.target.checked);
   overlay.querySelector('#pref-low-intensity').onchange = (ev)=> setPref('lowIntensity', ev.target.checked);
+  { const t = overlay.querySelector('#pref-fullscreen'); if(t) t.onchange = ()=> toggleFullscreen(); }
   { const t = overlay.querySelector('#pref-pc-layout'); if(t) t.onchange = (ev)=>{ try{ localStorage.setItem('dungeonScramblePC', ev.target.checked ? '1' : '0'); }catch(e){} closeModal(overlay, ()=>{ applyPcMode(); render(); }); }; }
   overlay.querySelector('#pref-flick-roll').onchange = (ev)=>{ setPref('flickRoll', ev.target.checked); if(!ev.target.checked && S && S.needRoll && rollNow()) render(); };
   overlay.querySelector('#pref-vibration').onchange = (ev)=>{ setPref('vibration', ev.target.checked); if(ev.target.checked) vibrate(30); };
