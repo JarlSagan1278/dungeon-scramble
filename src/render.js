@@ -2061,7 +2061,10 @@ function pathCounterHTML(){
   { const st = (typeof foeRuleState==='function') ? foeRuleState() : null;
     if(st && st.rule==='parity'){ const even = S.path.length % 2 === 0, good = even === (st.weak==='even'); extras.push(`<span class="pcf-rule ${good?'good':'bad'}">${even?'Even':'Odd'} &times;${good?'1.5':'0.75'}</span>`); }
     if(st && st.rule==='bounty'){ let live = false; try{ const ctx = questCtxFromEffects(preview); live = (S.encounter.quests||[]).some((q,i)=> !S.encounter.questsDone[i] && questEval(parseQuestSpec(q).cond, ctx).done); }catch(err){}
-      if(live) extras.push(`<span class="pcf-rule good">Bounty &times;2</span>`); } }
+      if(live) extras.push(`<span class="pcf-rule good">Bounty &times;2</span>`); }
+    if(st && st.rule==='zerosum' && preview.blockGain>0) extras.push(`<span class="pcf-rule bad">Heals it +${Math.round(preview.blockGain)}</span>`);
+    if(st && st.rule==='pythag'){ let d = 0; try{ d = computePathSteps(S.path).filter(x=>x.foeDiag).length; }catch(err){} if(d) extras.push(`<span class="pcf-rule good">Diagonal &times;1.5</span>`); }
+    if(st && st.rule==='asymptote'){ let c = false; try{ c = computePathSteps(S.path).some(x=>x.foeCapped); }catch(err){} if(c) extras.push(`<span class="pcf-rule bad">Capped at ${ASYMPTOTE_CAP}</span>`); } }
   if(!val && extras.length) return `<div class="path-counter-float pcf-nodmg"><span class="pcf-extra">${extras.join(' ')}</span></div>`;
   return `<div class="path-counter-float ${big?'pcf-big':''} ${tier>=2?'pcf-t'+tier:''}">
       <span class="pcf-main"><span class="pcf-num" data-from="${fromVal}" data-to="${val}" style="font-size:${size}px;">${val%1?val.toFixed(1):val}</span><span class="pcf-lbl">damage</span></span>
@@ -6873,6 +6876,9 @@ const TIP_TEXT = {
   // Nov 25: the first meeting with each foe rule points at its plaque
   rule_null: ()=>'This foe tests a <b>Null Hypothesis</b>: one face type does <b>no damage</b> to it this turn (marked on your dice). It changes every turn, so route around it.',
   rule_parity: ()=>'<b>Odd Permutation</b>: count your path! The right length (odd or even) deals <b>50% more</b>, the wrong one 25% less. It flips every turn; the counter shows which you have.',
+  rule_zerosum: ()=>'<b>Zero-Sum Game</b>: every point of <b>Block</b> you gain this turn heals this foe as much. Hit hard instead of hiding.',
+  rule_pythag: ()=>'<b>Pythagorean Theorem</b>: dice you step onto <b>diagonally</b> deal 50% more to this foe. Sidesteps, Pivots and the Arcanist\'s X shine here.',
+  rule_asymptote: ()=>`<b>Asymptote</b>: your path deals it at most <b>${ASYMPTOTE_CAP}</b> a turn, however big. <b>D.O.T.</b> ticks ignore the limit, so stack it.`,
   rule_bounty: ()=>'<b>Most Wanted</b>: finish one of its <b>Wanted</b> posters and your whole path hits <b>twice</b>. The counter says "Bounty" when your path will collect.',
   quest: q=>{ const {rewardText, cond} = parseQuestSpec(q); const allFight = QUEST_ALL_FIGHT.test(cond);
     const rw = rewardText ? ` (here: <b>${rewardText.toLowerCase()}</b>)` : '';

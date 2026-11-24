@@ -477,7 +477,7 @@ const FLOOR2_ENEMIES = [
   enc('Transposer Kitty','Enemy',18,{rule:'parity',dmg:3,flavor:'"I think that one had a collar. Where\u2019d it go?"'}),
   enc('Armored Gear-Pest','Enemy',17,{dmg:2,flavor:'A well-documented example of dungeon adaptation.'}),
   enc('Rusty Golem','Enemy',20,{dmg:4,quests:['16 damage: survive turn 4'],flavor:'"Looks like it was falling apart on its own"'}),
-  enc('Rogue Technician','Enemy',16,{dmg:4,flavor:'"I\u2019m not here to fix your lockpick, I have an ideology!"'}),
+  enc('Rogue Technician','Enemy',16,{dmg:4,rule:'zerosum',flavor:'"I\u2019m not here to fix your lockpick, I have an ideology!"'}),
   enc('The Warcart','Enemy',18,{dmg:2,shield:2,quests:['8 damage: 4 maneuvers','8 damage: route straightedge'],flavor:'The top contributing reason as to why mining is the most dangerous profession.'}),
   enc('Blastogenesis Engine','Enemy',14,{dmg:3,minion:2,flavor:'A true perpetual devotion machine.'}),
   enc('Half-life Host','Enemy',22,{dmg:3,shield:2,quests:['8 damage: 2 heal'],flavor:'"\u2018Release spores. Multiply.\u2019? - Now I\u2019m always saying that!"'}),
@@ -535,14 +535,14 @@ const FLOOR3_ENEMIES = [
   enc('Gestalt Network','Enemy',20,{dmg:5,dot:2,flavor:'"You will join us. Our population is mushrooming."'}),
   enc("Oilephant's Foot",'Enemy',30,{dmg:4,hot:3,quests:['15 damage: 4 support actions'],flavor:'"An Oilephant never forgets" refers to the long-lasting effects of radiation.'}),
   enc('Extractnid Matriarch','Enemy',22,{dmg:6,minion:3,quests:['nullify: 10+ damage'],flavor:'Undisturbed for eons, this primordial weaver and its brood now stir and hunger for glass.'}),
-  enc('The Punished','Enemy',36,{dmg:6,minion:1,flavor:'Those foolish enough to try and harness forms they are unable to comprehend.'}),
+  enc('The Punished','Enemy',36,{dmg:6,rule:'asymptote',minion:1,flavor:'Those foolish enough to try and harness forms they are unable to comprehend.'}),
   enc('Profane Geometry','Enemy',35,{dmg:6,hot:2,quests:['10 damage: adventurer H.O.T. = D.O.T.'],flavor:'A simulacrum of the divine, insatiable as the curiosity by which it was conjured.'}),
   enc('Sacred(?) Geometry','Enemy',38,{dmg:6,dot:2,quests:['10 damage: encounter D.O.T. = H.O.T.'],flavor:'A mere reflection of the divine geometry. The impossible beauty pains your eyes.'}),
   enc('Eelagator Escapee','Enemy',44,{dmg:5,shield:2,quests:['10 damage: 2 nullify','10 damage: route hollow proof'],flavor:'"Such a successful grafting that it escaped of its own measure!"'}),
   enc('Toadtaur Warrior','Enemy',30,{dmg:7,quests:['8 damage: 3 maneuvers','10 damage: route pivot point'],flavor:'"Definitely a \'can we\' vs. a \'should we\' decision, looking back."'}),
 ];
 const FLOOR3_TRAPS = [
-  enc('Anti-Euclidian Space','Trap',40,{dmg:9,shield:2,quests:['10 damage: any 10 actions','15 damage: any 12 actions','20 damage: any 15 actions'],flavor:'Where forbidden postulates are illogically deduced from perfidious axioms.'}),
+  enc('Anti-Euclidian Space','Trap',40,{dmg:9,rule:'pythag',shield:2,quests:['10 damage: any 10 actions','15 damage: any 12 actions','20 damage: any 15 actions'],flavor:'Where forbidden postulates are illogically deduced from perfidious axioms.'}),
   enc('Ergot Eruption','Trap',40,{dmg:7,hot:3,quests:['15 damage: 4 maneuvers','20 damage: 3 pivot','3 hot: 15+ damage'],flavor:'"Fortune favors the mold" — Plinthi the Eldar before death.'}),
   enc('Self-Replicating Forge','Trap',40,{dmg:5,minion:4,quests:['15 damage: 4 maneuvers','20 damage: 3 boosts','1 freeze: 15+ damage'],flavor:'Hydra-aulic systems rebuild themselves stronger when damaged.'}),
   enc('Bio-Mutant Escape','Trap',40,{dmg:5,minion:4,quests:['15 damage: 2 nullify','20 damage: 4 support actions','20 damage: survive 4'],flavor:'No weapon known to gnome can stop 30-50 feral mutants.'}),
@@ -632,9 +632,14 @@ const HEAVY_EVERY = {elite:3, deadly:2};
 // (value x Minions on your tray), dropShield (loses all its Shield).
 // Foe rules (Nov 24, Jeremy: enemies that reward reading the preview). Each shows on the foe, on the dice and on the
 // path counter while you plan, and calls out when it bites. Names are Claude's placeholders (blue in the names sheet).
+const ASYMPTOTE_CAP = 12; // Asymptote (foe rule): the most path damage it takes in one turn
 const FOE_RULES = {
   null:   { name:'Null Hypothesis', short:t=>`immune to <b>${t.nullLabel}</b>`, text:t=>`Immune to <b>${t.nullLabel}</b> this turn.`, tip:'Each turn one face type (Combo, then D.O.T., alternating) deals no damage to it. Route around it.' },
   parity: { name:'Odd Permutation', short:t=>`<b>${t.weak==='even'?'Even':'Odd'}</b> paths ×1.5`, text:t=>`<b>${t.weak==='even'?'Even':'Odd'}</b>-length paths deal &times;1.5 this turn; ${t.weak==='even'?'odd':'even'} &times;0.75.`, tip:'It flips each turn: count your path. The right parity deals 50% more, the wrong one 25% less.' },
+  // Nov 25 (Jeremy picked 4, 5, 6 of six ideas: rules that press on whole builds): turtling, diagonal routes, burst vs D.O.T.
+  zerosum:   { name:'Zero-Sum Game', short:()=>`<b>Block</b> heals it`, text:()=>`Block you gain this turn <b>heals it</b> by the same amount.`, tip:'Every point of Block you gain also heals it. Hit hard instead of hiding.' },
+  pythag:    { name:'Pythagorean Theorem', short:()=>`<b>diagonals</b> &times;1.5`, text:()=>`Dice you reach by a <b>diagonal</b> step deal &times;1.5.`, tip:'Step onto a die diagonally (a Sidestep, a Pivot, the Arcanist\'s X) and it deals 50% more to this foe.' },
+  asymptote: { name:'Asymptote', short:()=>`max <b>${ASYMPTOTE_CAP}</b> a turn`, text:()=>`Your path deals it at most <b>${ASYMPTOTE_CAP}</b> a turn. <b>D.O.T.</b> ignores the limit.`, tip:`It takes at most ${ASYMPTOTE_CAP} path damage a turn, however big the path. D.O.T. ticks ignore the limit: stack it.` },
   bounty: { name:'Most Wanted', short:()=>`<b>Wanted</b> hits twice`, text:()=>`Complete its <b>Wanted</b> poster: the path hits <b>twice</b>.`, tip:'A path that completes one of its Wanted posters deals its damage a second time, as a bounty.' },
 };
 const BOSS_KITS = {

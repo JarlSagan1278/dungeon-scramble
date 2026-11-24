@@ -1868,6 +1868,7 @@ function foeRuleState(e){
   if(e.rule==='null'){ const t = NULL_CYCLE[n % NULL_CYCLE.length]; return { rule:'null', nullType:t, nullLabel: t==='dot' ? 'D.O.T.' : LABEL[t] }; }
   if(e.rule==='parity') return { rule:'parity', weak: n % 2 === 0 ? 'even' : 'odd' };
   if(e.rule==='bounty') return { rule:'bounty' };
+  if(e.rule==='zerosum' || e.rule==='pythag' || e.rule==='asymptote') return { rule:e.rule };
   return null;
 }
 function foeRuleMul(type, len){
@@ -1912,7 +1913,7 @@ function computePathEffects(path){
 
   // Relics adjust the per-die steps (see applyRelicsToSteps); take the totals
   // from them so the live preview includes every relic bonus.
-  if((S.relics && S.relics.length) || (S.klass && S.klass.seamDamage) || (S.encounter && S.encounter.rule==='parity')){ // parity: whole-number totals from the steps
+  if((S.relics && S.relics.length) || (S.klass && S.klass.seamDamage) || (S.encounter && /^(parity|pythag|asymptote)$/.test(S.encounter.rule||''))){ // these foe rules: totals from the steps
     const st = computePathSteps(path);
     totalDamage = st.reduce((a,x)=>a+x.dmg,0);
     dotToEncounter = st.reduce((a,x)=>a+x.dotToEncounter,0);
@@ -1975,12 +1976,17 @@ function computePathSteps(path){
     out.forEach(st=>{ const m = foeRuleMul(st.type, path.length); if(m!==1){ st.dmg = (st.dmg||0)*m; st.dotToEncounter = (st.dotToEncounter||0)*m; if(m===0) st.foeNulled = true; } });
     // Nov 24: x1.5 / x0.75 must not leave fractions ("0.8 damage"): the path's total is rounded (half up) and the
     // whole numbers handed back to the steps with the largest fractional parts
-    if(S.encounter.rule==='parity') ['dmg','dotToEncounter'].forEach(k=>{
+    // Pythagorean Theorem (Nov 25): a die reached by a diagonal step (row and column both change) deals x1.5
+    if(S.encounter.rule==='pythag') out.forEach((st,k)=>{ if(k===0) return; const a = path[k-1], b = path[k];
+      if(Math.floor(a/4)!==Math.floor(b/4) && a%4!==b%4 && (st.dmg>0 || st.dotToEncounter>0)){ st.dmg = (st.dmg||0)*1.5; st.dotToEncounter = (st.dotToEncounter||0)*1.5; st.foeDiag = true; } });
+    if(S.encounter.rule==='parity' || S.encounter.rule==='pythag') ['dmg','dotToEncounter'].forEach(k=>{
       const tot = out.reduce((a,x)=>a+(x[k]||0),0); let left = Math.round(tot + 1e-9);
       const fr = out.map((x,i)=>({i, f:(x[k]||0) - Math.floor(x[k]||0)}));
       out.forEach(x=>{ if(x[k]) { x[k] = Math.floor(x[k]); left -= x[k]; } });
       fr.filter(o=>o.f>1e-9).sort((a,b)=> b.f-a.f || b.i-a.i).forEach(o=>{ if(left>0){ out[o.i][k]++; left--; } });
     });
+    // Asymptote (Nov 25): the path deals it at most ASYMPTOTE_CAP a turn; D.O.T. stacks (and their ticks) are not capped
+    if(S.encounter.rule==='asymptote'){ let left = ASYMPTOTE_CAP; out.forEach(st=>{ if(!(st.dmg>0)) return; if(st.dmg > left){ st.dmg = left; st.foeCapped = true; } left -= st.dmg; }); }
   }
   return out;
 }
@@ -2030,6 +2036,8 @@ function applyPathStep(step){
   if(step.revealIdx!=null) revealMinionAt(step.revealIdx);
   if(step.relicFx) step.relicFx.forEach(r=>fireRelic(r.id, r.text));
   if(step.seamBonus){ if(!S._relicQ) S._relicQ = []; S._relicQ.push({die:step.idx, text:'+'+step.seamBonus+' Wrap'}); } // Dungeoneer passive: pops on the die it boosted
+  if(step.foeDiag && !S._foeNullShown){ S._foeNullShown = true; if(typeof showFoeRuleCallout==='function') showFoeRuleCallout('Diagonal! \u00d71.5', 'e'); }
+  if(step.foeCapped && !S._foeNullShown){ S._foeNullShown = true; if(typeof showFoeRuleCallout==='function') showFoeRuleCallout('Capped!', 'e'); }
   if(step.foeNulled && !S._foeNullShown){ S._foeNullShown = true; if(typeof showFoeRuleCallout==='function') showFoeRuleCallout('Immune!', 'e'); } // Null Hypothesis bit: once per turn
   if(step.dmg>0){
     e.curHealth = capUpper(e.curHealth-absorbWithShield(e, step.dmg), e.maxHealth);
@@ -2286,6 +2294,7 @@ function startTurnTransition(){
 // neighbor ripple it always had, now timed to its own beat instead of
 // firing for the whole path at once), then move on.
 function runPlayerPathSteps(steps, i, path, effects){
+  if(i===0) S._foeNullShown = false; // foe-rule callouts: once per turn
   if(i>=steps.length){
     S.resolvingIdx = null; S.resolvingFx = null; S.lastComboRipple = null; S.lastMinionClearIdx = null;
     finishPlayerPath(path, effects);
@@ -2336,6 +2345,9 @@ function finishPlayerPath(path, effects){
   if(effects.totalDamage>0) logMsg('dmg', `Path dealt ${effects.totalDamage.toFixed(1)} damage.`);
   const doneBefore = (e.questsDone||[]).filter(Boolean).length;
   checkQuests(e, questCtxFromEffects(effects));
+  // Zero-Sum Game (Nov 25): the Block this path gave you heals the foe by as much
+  if(e.rule==='zerosum' && effects.blockGain>0 && e.curHealth>0){ const h = Math.min(Math.round(effects.blockGain), e.maxHealth - e.curHealth);
+    if(h>0){ e.curHealth += h; logMsg('sys', `Zero-Sum: your Block heals ${e.name} ${h}.`); if(typeof showFoeRuleCallout==='function') showFoeRuleCallout(`Zero-Sum! +${h}`, 'e'); if(typeof fxTick==='function') fxTick('enemy','hot',h); } }
   // Most Wanted (foe rule): a path that completes its Wanted poster hits a second time, as a bounty
   if(e.rule==='bounty' && (e.questsDone||[]).filter(Boolean).length > doneBefore && (S.resolveTotal||0) > 0 && e.curHealth > 0){
     const extra = S.resolveTotal; e.curHealth = capUpper(e.curHealth - absorbWithShield(e, extra), e.maxHealth);
