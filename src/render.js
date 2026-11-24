@@ -6353,7 +6353,7 @@ function renderUnlock(){
   const msg = t=>{ const m = document.getElementById('unlock-msg'); if(m) m.textContent = t; };
   const busy = on=>document.querySelectorAll('.unlock-actions button').forEach(b=>b.disabled = on);
   document.getElementById('unlock-buy-btn').onclick = ()=>{ busy(true); msg('Opening the store...');
-    STORE.buy().then(ok=>{ if(ok){ grantFullGame(test ? 'test' : 'purchase'); S._unlockFx = false; continueAfterUnlock(); render(); } else { busy(false); msg('The purchase did not go through. Nothing was charged.'); } }); };
+    STORE.buy().then(ok=>{ if(ok){ grantFullGame(test ? 'test' : 'purchase'); S._unlockFx = false; continueAfterUnlock(); render(); } else { busy(false); msg(window.DSStore && window.DSStore.pending ? 'Your payment is pending. The full dungeon unlocks as soon as Google confirms it (or tap Restore purchase later).' : 'The purchase did not go through. Nothing was charged.'); } }); };
   document.getElementById('unlock-restore-btn').onclick = ()=>{ busy(true); msg('Checking for an earlier purchase...');
     STORE.restore().then(ok=>{ if(ok){ grantFullGame('restore'); S._unlockFx = false; continueAfterUnlock(); render(); } else { busy(false); msg(test ? 'Test build: there is no store to restore from yet.' : 'No earlier purchase was found on this account.'); } }); };
   document.getElementById('unlock-later-btn').onclick = ()=>{ S._unlockFx = false; S.screen = 'demoEnd'; render(); };

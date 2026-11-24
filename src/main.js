@@ -130,6 +130,35 @@ setTimeout(()=>{ try{ resendUnconfirmedRuns(); flushRunUploads(); }catch(e){} },
   });
 })();
 
+// Google Play Billing for the unlock (Nov 25; store app only): window.DSStore is what STORE (logic.js) talks to. One
+// one-time product, 'full_game' (Play Console > Monetize > One-time products). The price shown is Google's, in the player's
+// currency. A purchase still pending (cash or slow payment methods) unlocks later, on the next launch or Restore. On every
+// launch a purchase already on this Google account unlocks quietly (reinstall, new phone), and any purchase Google has not
+// had acknowledged yet is acknowledged (Google refunds unacknowledged ones after 3 days).
+(function(){
+  const cap = typeof window!=='undefined' && window.Capacitor;
+  if(typeof BUILD==='undefined' || !BUILD.app || !cap || !cap.isNativePlatform || !cap.isNativePlatform()) return;
+  const IAP = cap.registerPlugin ? cap.registerPlugin('NativePurchases') : (cap.Plugins && cap.Plugins.NativePurchases);
+  if(!IAP || !IAP.purchaseProduct) return;
+  const PID = 'full_game', TYPE = 'inapp';
+  const state = t=> String(t && t.purchaseState != null ? t.purchaseState : '1'); // Android: 1 purchased, 2 pending, 0 unknown
+  const mine = t=> t && t.productIdentifier===PID;
+  const settle = list=>{ let owned = false, pending = false;
+    (list||[]).filter(mine).forEach(t=>{ const st = state(t);
+      if(st==='1'){ owned = true; if(t.isAcknowledged===false && t.purchaseToken && IAP.acknowledgePurchase) IAP.acknowledgePurchase({purchaseToken:t.purchaseToken}).catch(()=>{}); }
+      else if(st==='2') pending = true; });
+    DS.pending = pending && !owned; return owned; };
+  const DS = window.DSStore = {
+    price: null, pending: false,
+    buy: async ()=>{ try{ const t = await IAP.purchaseProduct({productIdentifier:PID, productType:TYPE}); return settle([t]); }catch(e){ DS.pending = false; return false; } },
+    restore: async ()=>{ try{ if(IAP.restorePurchases) await IAP.restorePurchases().catch(()=>{}); const r = await IAP.getPurchases({productType:TYPE}); return settle(r && r.purchases); }catch(e){ return false; } },
+  };
+  IAP.getProducts({productIdentifiers:[PID], productType:TYPE}).then(r=>{ const p = r && r.products && r.products.find(x=>x.identifier===PID);
+    if(p && p.priceString){ DS.price = p.priceString; if(typeof S!=='undefined' && S && S.screen==='unlock') render(); } }).catch(()=>{});
+  DS.restore().then(ok=>{ if(ok && typeof hasFullGame==='function' && !hasFullGame() && typeof grantFullGame==='function'){ grantFullGame('restore');
+    if(typeof S!=='undefined' && S && S.screen==='unlock'){ S._unlockFx = false; continueAfterUnlock(); render(); } } });
+})();
+
 // ---- Cursor: keyboard and controller play (PC layout, mockup H; Nov 13) ----
 // One mechanism for the whole game instead of per-screen key maps: a gold cursor sits on something clickable, the
 // arrow keys / D-pad / left stick move it to the nearest clickable thing in that direction, and A (Space) presses it

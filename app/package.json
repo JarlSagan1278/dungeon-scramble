@@ -9,7 +9,8 @@
   "dependencies": {
     "@capacitor/android": "8.5.3",
     "@capacitor/app": "8.1.2",
-    "@capacitor/core": "8.5.3"
+    "@capacitor/core": "8.5.3",
+    "@capgo/native-purchases": "8.9.6"
   },
   "devDependencies": {
     "@capacitor/cli": "8.5.3"
