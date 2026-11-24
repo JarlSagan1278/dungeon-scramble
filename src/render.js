@@ -4989,7 +4989,7 @@ function renderSwapModal(){
 // First loot pick (Nov 8, Jeremy: new players didn't know a loot die replaces one): a one-time bubble above the
 // Equip sheet, pointing down at "Your Tray". It goes away on a tap, or when the sheet closes.
 function showLootSwapTip(overlay){
-  if(!overlay || !overlay.isConnected || document.getElementById('loot-tip')) return;
+  if(!overlay || !overlay.isConnected || overlay.classList.contains('modal-closing') || document.getElementById('loot-tip')) return; // a quick pick already closed the sheet
   const head = overlay.querySelector('.swap-modal'); if(!head) return;
   markTipSeen('lootswap');
   const b = document.createElement('div'); b.id='loot-tip'; b.className='guide-bubble tip-bubble loot-tip';
@@ -4999,7 +4999,7 @@ function showLootSwapTip(overlay){
     b.style.width = bw+'px'; b.style.left = Math.round((innerWidth-bw)/2)+'px'; b.style.top = Math.max(8, Math.round(r.top - b.offsetHeight - 14))+'px'; };
   place();
   const kill = ()=>{ clearInterval(iv); b.remove(); };
-  const iv = setInterval(()=>{ if(!overlay.isConnected) kill(); else place(); }, 300);
+  const iv = setInterval(()=>{ if(!overlay.isConnected || overlay.classList.contains('modal-closing')) kill(); else place(); }, 300);
   b.onclick = kill;
 }
 // ---- Shrine ritual (v1.36.0) ----

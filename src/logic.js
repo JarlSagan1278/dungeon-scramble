@@ -2387,7 +2387,7 @@ function runEnemyBeat(i, noWind){
   }
   const beats = [
     () => {
-      if(!(e.curDOT>0)) return null;
+      if(!(e.curDOT>0)) return {quiet:true}; // nothing to show: no pause (Nov 25 feel audit: empty beats were ~1.1 s of dead air a turn)
       e.curHealth = capUpper(e.curHealth-e.curDOT, e.maxHealth);
       const t = `${e.name} takes ${e.curDOT} D.O.T. damage.`;
       logMsg('dmg', t, 'bad');
@@ -2421,7 +2421,7 @@ function runEnemyBeat(i, noWind){
       const t = runPlayerUpkeep();
       if(t) showToastIfAvailable(t, S.health>=S.maxHealth?'good':null);
       if(S.health<=0) return {stop:'playerDefeated'};
-      return null;
+      return t ? null : {quiet:true};
     },
   ];
   if(i>=beats.length){ endTurn(); return; }
@@ -2443,7 +2443,7 @@ function runEnemyBeat(i, noWind){
     runEnemyBeat(i+1);
   };
   S._advance = advance;
-  if(S._skipAll) advance();
+  if(S._skipAll || result.quiet) advance();
   else S._pendingTimeout = setTimeout(advance, 550);
 }
 
