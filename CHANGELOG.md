@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.151 (Nov 24, 2026)
+- A bit harder: enemy health +5% on Floor 1 and +15% on Floors 2-3.
+- End-screen Highlights show the dice of your biggest turn, in order.
+- After a win, the renown box points to the next Depth and its renown bonus.
+
 ## 1.42.150 (Nov 23, 2026)
 - Guild Rank: every run earns renown (foes, bosses, floors, a win; times Depth; at least 10), raising a permanent rank through 12 number systems (Natural to Infinite). Each rank adds a starting gift to every run: a Reroll token, +3 max health, a Swap token, Patron's Gift (pick 1 of 3 found relics at Base Camp), a level II Attack and Maneuver die, a 4-relic Patron, +3 more health, then cosmetic titles. Renown bar and rank-ups on the end screens, a Rank tab in Records, the rank on the title.
 - Daily Dungeon: the same dungeon for everyone each day (same rooms, shrines and loot offers), one scored try with an emoji share line, then unscored practice runs.

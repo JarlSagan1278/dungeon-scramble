@@ -313,5 +313,19 @@ per cell, Guard x7 200) and the regular profile at depth 0 (80 per cell).
   player's power, and many small player buffs since October likely added up. Tuning levers if real players also find
   it easy: shrine chance, poster rewards, relic strength. Not retuned (real data first).
 
+## Enemy health sweep (Nov 24, 2026, build 1.42.150)
+Guard and Arcanist x dwarf/gnome, regular depth 0 and expert depth 7, 60 runs per cell (80 for the chosen shape).
+
+| Enemy health | Regular d0 | Expert d7 | Expert Arcanist |
+|---|---|---|---|
+| unchanged | 94% | 83% | 75% |
+| +10% all floors | 88% | 79% | 66% |
+| +15% all floors | 83% | 72% | 58% (Floor 1 deaths up) |
+| +20% all floors | 82% | 60% | 48% |
+| **+5% F1, +15% F2-3 (shipped 1.42.151)** | **87%** | **78%** | **70%** |
+
+Uniform increases hit Arcanist hardest, on Floor 1; the shaped increase keeps the opening fair and puts the new losses on
+Floors 2-3.
+
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.

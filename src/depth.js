@@ -7,7 +7,7 @@
    ============================================================ */
 
 // Floor-by-floor enemy HP multiplier for the base game (Depth 1).
-const BASE_HP_MUL = [1, 1.5, 1.75];
+const BASE_HP_MUL = [1.05, 1.725, 2.0]; // Nov 24 (Jeremy: a bit harder): +5% on Floor 1, +15% on Floors 2-3 (was 1, 1.5, 1.75)
 
 // v1.39.3 (Oct 12 depth study): ranks reshaped/recosted so each point of depth is worth about the same
 // (~6 win points for a skilled player). costs[] = depth added by each rank, in order.
