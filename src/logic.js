@@ -527,7 +527,7 @@ const DEFAULT_LIFETIME = {
   runsPlayed:0, victories:0, bestFloorReached:0, totalDamageDealt:0,
   totalEncountersDefeated:0, totalOverkills:0, totalShrinesVisited:0,
   victoriesByOrigin:{}, victoriesByClass:{},
-  bestTurnDamage:0, bestOverkillBy:0, bestPathLen:0,
+  bestTurnDamage:0, bestOverkillBy:0, bestPathLen:0, totalClever:0,
 };
 function loadMeta(){
   try{
@@ -590,6 +590,13 @@ const ACHIEVEMENTS = [
   // first_victory, not harder. This is the one that's genuinely a step up
   // from "win a run," which is what lets it gate Pixie behind something
   // that unlocks strictly after Halfling (see isOriginUnlocked() below).
+  // Nov 24: this week's systems
+  {id:'clever_25', name:'Sharp Mind', desc:'Make 25 clever plays (Exact!, Perfect Block!, Called it!, Clever route!), lifetime.',
+    check: L => (L.totalClever||0)>=25},
+  {id:'daily_7', name:'Daily Devotion', desc:'Play the Daily Dungeon 7 days in a row.',
+    check: L => (typeof dailyStreak==='function' ? dailyStreak() : 0)>=7},
+  {id:'rank_irrational', name:'Irrational Number', desc:'Reach the Irrational rank.',
+    check: L => (META.renown||0) >= (RANKS.find(r=>r.name==='Irrational')||{at:1e9}).at},
   {id:'origin_duo', name:'Two Roads', desc:'Win a run with 2 different Origins.',
     check: L => Object.values(L.victoriesByOrigin||{}).filter(n=>n>0).length>=2},
 ];
@@ -738,6 +745,7 @@ function recordMetaProgress(outcome){
   L.totalEncountersDefeated += S.stats.encountersDefeated;
   L.totalOverkills += S.stats.overkills;
   L.totalShrinesVisited += S.stats.shrinesVisited;
+  L.totalClever = (L.totalClever||0) + (S.stats.clever||0);
   // Personal bests: flagged only when beating a real earlier mark (a first
   // run would otherwise "beat" zero in every category).
   S.personalBests = [];

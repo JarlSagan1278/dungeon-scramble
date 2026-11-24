@@ -5647,7 +5647,8 @@ function renderCamp(){
     <div class="panel ${baseCamp?'base-camp':''}">
       ${renderRoute()}
       <h2 style="margin-bottom:6px;">${baseCamp?'Base Camp':'Camp'} ${infoDot(baseCamp?'Your adventure begins here. Upgrade or organize your dice if you like.':'Prepare before pressing onward. The campfire gives you one choice: Rest or Train.')}</h2>
-      ${baseCamp ? (rankGiftLine() ? `<p class="hint rank-gift-line" style="margin:0 0 6px;">${rankGiftLine()}</p>` : '<p class="hint" style="margin:0 0 6px;">Nothing here is required. Set out whenever you&#39;re ready.</p>') : ''}
+      ${baseCamp && S.daily ? `<p class="hint" style="margin:0 0 6px; color:#9fe3dc;">Daily Dungeon #${S.daily.n}${S.daily.practice ? ' (practice: your shared result stays)' : ': the same dungeon for everyone today. One try.'}</p>` : ''}
+      ${baseCamp && !S.daily ? (rankGiftLine() ? `<p class="hint rank-gift-line" style="margin:0 0 6px;">${rankGiftLine()}</p>` : '<p class="hint" style="margin:0 0 6px;">Nothing here is required. Set out whenever you&#39;re ready.</p>') : ''}
 
       <div class="camp-section camp-status-card">
         <div class="bar-row camp-hp-row" style="position:relative;"><span style="flex:0 0 auto;">Health</span><div class="fo-hpwrap camp-hpwrap" style="position:relative;"><div class="bar ${campFx.cls}"><div class="bar-fill hp player camp-hp-fill" style="width:${S.health/S.maxHealth*100}%"></div></div><span class="bar-num camp-hp-num">${S.health}/${S.maxHealth}</span></div>${campFx.deltaHTML}</div>
