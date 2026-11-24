@@ -5647,7 +5647,7 @@ function renderCamp(){
     <div class="panel ${baseCamp?'base-camp':''}">
       ${renderRoute()}
       <h2 style="margin-bottom:6px;">${baseCamp?'Base Camp':'Camp'} ${infoDot(baseCamp?'Your adventure begins here. Upgrade or organize your dice if you like.':'Prepare before pressing onward. The campfire gives you one choice: Rest or Train.')}</h2>
-      ${baseCamp?'<p class="hint" style="margin:0 0 6px;">Nothing here is required. Set out whenever you&#39;re ready.</p>':''}
+      ${baseCamp ? (rankGiftLine() ? `<p class="hint rank-gift-line" style="margin:0 0 6px;">${rankGiftLine()}</p>` : '<p class="hint" style="margin:0 0 6px;">Nothing here is required. Set out whenever you&#39;re ready.</p>') : ''}
 
       <div class="camp-section camp-status-card">
         <div class="bar-row camp-hp-row" style="position:relative;"><span style="flex:0 0 auto;">Health</span><div class="fo-hpwrap camp-hpwrap" style="position:relative;"><div class="bar ${campFx.cls}"><div class="bar-fill hp player camp-hp-fill" style="width:${S.health/S.maxHealth*100}%"></div></div><span class="bar-num camp-hp-num">${S.health}/${S.maxHealth}</span></div>${campFx.deltaHTML}</div>
@@ -6086,6 +6086,15 @@ function rankUpFx(){
   if(!S || !S.renownGain || !S.renownGain.ranksUp.length || S._rankFxDone) return; S._rankFxDone = true;
   setTimeout(()=>{ try{ if(typeof playTone==='function') playTone('floorUp');
     if(typeof spawnParticleBurstAtEl==='function' && document.querySelector('.renown-box:not([hidden])')) spawnParticleBurstAtEl('.renown-box', ['#ffd76a','#9affa0','#fff5d6']); }catch(e){} }, 1100);
+}
+// Base Camp names the rank's gifts this run (Nov 24), so permanent progress is felt at the start of every run
+function rankGiftLine(){
+  if(!S || (S.klass && S.klass.debug)) return '';
+  const g = []; if(hasRankGift('reroll')) g.push('1 Reroll'); if(hasRankGift('swap')) g.push('1 Swap');
+  const hp = (hasRankGift('hp3')?3:0) + (hasRankGift('hp3b')?3:0); if(hp) g.push(`+${hp} max health`);
+  if(hasRankGift('atk2')) g.push('an Attack II'); if(hasRankGift('man2')) g.push('a Maneuver II');
+  if(!g.length) return '';
+  const k = rankNow(); return `${rankBadgeHTML(k)} <b>${RANKS[k].name}</b> rank gifts: ${g.join(', ')}.`;
 }
 function rankLadderHTML(){
   const k = rankNow(), have = META.renown||0;
