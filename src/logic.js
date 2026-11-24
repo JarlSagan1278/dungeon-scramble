@@ -309,12 +309,15 @@ function teleLog(type, data){
   } catch(err){ /* telemetry must never break the game */ }
 }
 
+// Nov 25 (Jeremy: do Google Play testers' runs reach the play data sheet? yes): which build a run came from, so the sheet
+// can tell the Play app ('app') from the playtest site ('tester'), the itch demo ('demo') and the Steam app ('steam').
+function buildFlavour(){ return BUILD.app ? 'app' : BUILD.steam ? 'steam' : BUILD.demo ? 'demo' : BUILD.release ? 'release' : 'tester'; }
 function finalizeTelemetry(outcome){
   try{
     if(!S.tele) S.tele = newTelemetry();
     teleLog('run_end', {outcome});
     const rec = {
-      runId: S.tele.runId, startedAt: S.tele.startedAt, endedAt: Date.now(), version: S.tele.version,
+      runId: S.tele.runId, startedAt: S.tele.startedAt, endedAt: Date.now(), version: S.tele.version, build: buildFlavour(),
       origin: S.origin.name, klass: S.klass.name, outcome, floorReached: S.floorIdx+1,
       runNo: ((S.tele.events.find(e=>e.e==='run_start')||{}).runNo) || null, depth: (typeof currentDepth==='function') ? currentDepth() : 1,
       stats: {...S.stats, damageDealt: Math.round(S.stats.damageDealt)},
@@ -413,7 +416,7 @@ function sendLiveRun(why){
     if(now - _liveSentAt < gap) return;
     _liveSentAt = now;
     const rec = { runId:S.tele.runId, startedAt:S.tele.startedAt, endedAt:now, version:S.tele.version, origin:S.origin.name, klass:S.klass.name,
-      outcome:'in_progress', floorReached:S.floorIdx+1, runNo:((S.tele.events.find(e=>e.e==='run_start')||{}).runNo)||null,
+      outcome:'in_progress', build:buildFlavour(), floorReached:S.floorIdx+1, runNo:((S.tele.events.find(e=>e.e==='run_start')||{}).runNo)||null,
       depth:(typeof currentDepth==='function') ? currentDepth() : 1, stats:{...S.stats, damageDealt:Math.round(S.stats.damageDealt)},
       relics:(S.relics||[]).slice(), events:S.tele.events };
     const body = JSON.stringify({ kind:'run', player:getTelePlayerId(), screen:(typeof window!=='undefined' ? window.innerWidth+'x'+window.innerHeight : ''), rec });
@@ -431,7 +434,7 @@ function buildPlayDataExport(){
   try{
     if(S && S.tele && S.screen!=='victory' && S.screen!=='gameover' && S.origin){
       inProgress = { runId:S.tele.runId, startedAt:S.tele.startedAt, version:S.tele.version, origin:S.origin.name, klass:S.klass.name,
-        outcome:'in_progress', floorReached:S.floorIdx+1, stats:{...S.stats, damageDealt:Math.round(S.stats.damageDealt)}, events:S.tele.events };
+        outcome:'in_progress', build:buildFlavour(), floorReached:S.floorIdx+1, stats:{...S.stats, damageDealt:Math.round(S.stats.damageDealt)}, events:S.tele.events };
     }
   } catch(e){}
   return {
