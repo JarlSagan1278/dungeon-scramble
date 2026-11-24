@@ -632,12 +632,12 @@ const HEAVY_EVERY = {elite:3, deadly:2};
 // (value x Minions on your tray), dropShield (loses all its Shield).
 // Foe rules (Nov 24, Jeremy: enemies that reward reading the preview). Each shows on the foe, on the dice and on the
 // path counter while you plan, and calls out when it bites. Names are Claude's placeholders (blue in the names sheet).
-const ASYMPTOTE_CAP = 12; // Asymptote (foe rule): the most path damage it takes in one turn
+const ASYMPTOTE_CAP = 16; // Asymptote (foe rule): the most path damage it takes in one turn
 const FOE_RULES = {
   null:   { name:'Null Hypothesis', short:t=>`immune to <b>${t.nullLabel}</b>`, text:t=>`Immune to <b>${t.nullLabel}</b> this turn.`, tip:'Each turn one face type (Combo, then D.O.T., alternating) deals no damage to it. Route around it.' },
   parity: { name:'Odd Permutation', short:t=>`<b>${t.weak==='even'?'Even':'Odd'}</b> paths ×1.5`, text:t=>`<b>${t.weak==='even'?'Even':'Odd'}</b>-length paths deal &times;1.5 this turn; ${t.weak==='even'?'odd':'even'} &times;0.75.`, tip:'It flips each turn: count your path. The right parity deals 50% more, the wrong one 25% less.' },
   // Nov 25 (Jeremy picked 4, 5, 6 of six ideas: rules that press on whole builds): turtling, diagonal routes, burst vs D.O.T.
-  zerosum:   { name:'Zero-Sum Game', short:()=>`<b>Block</b> heals it`, text:()=>`Block you gain this turn <b>heals it</b> by the same amount.`, tip:'Every point of Block you gain also heals it. Hit hard instead of hiding.' },
+  zerosum:   { name:'Zero-Sum Game', short:()=>`<b>Block</b> heals it`, text:()=>`Block you gain this turn <b>heals it</b> twice as much.`, tip:'Every point of Block you gain heals it 2. Hit hard instead of hiding.' },
   pythag:    { name:'Pythagorean Theorem', short:()=>`<b>diagonals</b> &times;1.5`, text:()=>`Dice you reach by a <b>diagonal</b> step deal &times;1.5.`, tip:'Step onto a die diagonally (a Sidestep, a Pivot, the Arcanist\'s X) and it deals 50% more to this foe.' },
   asymptote: { name:'Asymptote', short:()=>`max <b>${ASYMPTOTE_CAP}</b> a turn`, text:()=>`Your path deals it at most <b>${ASYMPTOTE_CAP}</b> a turn. <b>D.O.T.</b> ignores the limit.`, tip:`It takes at most ${ASYMPTOTE_CAP} path damage a turn, however big the path. D.O.T. ticks ignore the limit: stack it.` },
   bounty: { name:'Most Wanted', short:()=>`<b>Wanted</b> hits twice`, text:()=>`Complete its <b>Wanted</b> poster: the path hits <b>twice</b>.`, tip:'A path that completes one of its Wanted posters deals its damage a second time, as a bounty.' },

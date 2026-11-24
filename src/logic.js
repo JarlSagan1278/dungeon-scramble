@@ -2345,8 +2345,8 @@ function finishPlayerPath(path, effects){
   if(effects.totalDamage>0) logMsg('dmg', `Path dealt ${effects.totalDamage.toFixed(1)} damage.`);
   const doneBefore = (e.questsDone||[]).filter(Boolean).length;
   checkQuests(e, questCtxFromEffects(effects));
-  // Zero-Sum Game (Nov 25): the Block this path gave you heals the foe by as much
-  if(e.rule==='zerosum' && effects.blockGain>0 && e.curHealth>0){ const h = Math.min(Math.round(effects.blockGain), e.maxHealth - e.curHealth);
+  // Zero-Sum Game (Nov 25): the Block this path gave you heals the foe twice as much
+  if(e.rule==='zerosum' && effects.blockGain>0 && e.curHealth>0){ const h = Math.min(Math.round(effects.blockGain*2), e.maxHealth - e.curHealth); // heals twice the Block (round 2 of the Nov 25 study: 1x barely bit)
     if(h>0){ e.curHealth += h; logMsg('sys', `Zero-Sum: your Block heals ${e.name} ${h}.`); if(typeof showFoeRuleCallout==='function') showFoeRuleCallout(`Zero-Sum! +${h}`, 'e'); if(typeof fxTick==='function') fxTick('enemy','hot',h); } }
   // Most Wanted (foe rule): a path that completes its Wanted poster hits a second time, as a bounty
   if(e.rule==='bounty' && (e.questsDone||[]).filter(Boolean).length > doneBefore && (S.resolveTotal||0) > 0 && e.curHealth > 0){

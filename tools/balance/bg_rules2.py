@@ -5,10 +5,11 @@ import json, os, subprocess, sys
 from concurrent.futures import ThreadPoolExecutor
 HERE = os.path.dirname(os.path.abspath(__file__))
 RUNS = int(sys.argv[1]) if len(sys.argv) > 1 else 60
+TAG = sys.argv[2] if len(sys.argv) > 2 else 'ru2'
 REG = {"skill":60,"abilityRate":0.35,"trayActRate":0.3,"tokenRate":0.3,"lootRandomRate":0.6}
 D7 = {"foes":1,"fury":1,"rest":1,"swarm":1}
-FORCE = """(function(){ const T={1:['Rogue Technician'],2:['Anti-Euclidian Space','The Punished']}; const o=drawRoomCard;
- window.drawRoomCard=function(fl){ const L=T[S.floorIdx]; if(L && Math.random()<0.5){ const all=[...FLOOR2_ENEMIES,...FLOOR3_ENEMIES,...FLOOR3_TRAPS]; const c=all.find(x=>x.name===L[Math.floor(Math.random()*L.length)]); if(c) return c; } return o(fl); }; })();"""
+FORCE = """(function(){ const T={1:['Rogue Technician'],2:['Anti-Euclidian Space','Anti-Euclidian Space','The Punished']}; const o=drawRoomCard;
+ window.drawRoomCard=function(fl){ const L=T[S.floorIdx]; if(L && Math.random()<0.6){ const all=[...FLOOR2_ENEMIES,...FLOOR3_ENEMIES,...FLOOR3_TRAPS]; const c=all.find(x=>x.name===L[Math.floor(Math.random()*L.length)]); if(c) return c; } return o(fl); }; })();"""
 OFF = "['Rogue Technician','Anti-Euclidian Space','The Punished'].forEach(n=>{ [...FLOOR2_ENEMIES,...FLOOR3_ENEMIES,...FLOOR3_TRAPS].forEach(c=>{ if(c.name===n) delete c.rule; }); });"
 STYLES = [('guard','dwarf'),('arcanist','gnome'),('armsmaster','dwarf'),('dungeoneer','dwarf'),('armsmaster','gnome')]
 cells = []
@@ -16,7 +17,7 @@ for rule in ['on','off']:
     for pn, pc, dm in [('x7', {}, D7), ('r0', REG, {})]:
         for k, o in STYLES:
             cfg = dict(pc); cfg.update(klass=k, origin=o, depthMods=dm, patchJs=FORCE + (OFF if rule=='off' else ''))
-            cells.append(('ru2_%s_%s_%s-%s' % (rule, pn, k, o), cfg))
+            cells.append(('%s_%s_%s_%s-%s' % (TAG, rule, pn, k, o), cfg))
 def run(c):
     label, cfg = c; path = os.path.join(HERE, 'out_' + label + '.json')
     if os.path.exists(path): return
