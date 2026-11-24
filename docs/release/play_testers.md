@@ -44,6 +44,9 @@ Track who joined in the table at the bottom: the 14 days only count while at lea
 > offline). Join https://groups.google.com/g/dungeon-scramble-testers , then opt in here: https://play.google.com/apps/testing/com.dungeonscramble.game . Reply with your app's link and I'll test it for the full 14 days.
 > Thanks! Jeremy
 
+## Log
+- Nov 25, 2026: posted to r/AndroidClosedTesting and r/TestersCommunity (text posts with the one-turn clip, docs/release/media/reddit_turn.mp4/.gif, made by tools/media/clip.js).
+
 ## Testers
 
 | # | Who (email or handle) | Where from | Joined | Their app I'm testing |
