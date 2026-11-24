@@ -6776,6 +6776,10 @@ const TIP_TEXT = {
   skillblank: c=>`That <b>blank</b> is in your Skill zone: tap <b>Skill</b>, then the blank, and it becomes a <b>${c ? (LABEL[c.type]||c.type)+' '+c.value : 'better face'}</b>. Blanks are the best dice to convert.`,
   longpath: ()=>'Longer Paths add up: each die you step on takes effect, in order, and each <b>Combo</b> grows with the attacking dice beside it.',
   // Nov 4 (Jeremy): quests were hard to understand. Name this fight's own quest and reward so the lesson is concrete.
+  // Nov 25: the first meeting with each foe rule points at its plaque
+  rule_null: ()=>'This foe tests a <b>Null Hypothesis</b>: one face type does <b>no damage</b> to it this turn (marked on your dice). It changes every turn, so route around it.',
+  rule_parity: ()=>'<b>Odd Permutation</b>: count your path! The right length (odd or even) deals <b>50% more</b>, the wrong one 25% less. It flips every turn; the counter shows which you have.',
+  rule_bounty: ()=>'<b>Most Wanted</b>: finish one of its <b>Wanted</b> posters and your whole path hits <b>twice</b>. The counter says "Bounty" when your path will collect.',
   quest: q=>{ const {rewardText, cond} = parseQuestSpec(q); const allFight = QUEST_ALL_FIGHT.test(cond);
     const rw = rewardText ? ` (here: <b>${rewardText.toLowerCase()}</b>)` : '';
     return `<b>Wanted!</b> Do what the poster says ${allFight ? 'during this fight' : 'in a single turn'} (${questCondShort(cond)}) to earn the reward on its right${rw}. It's optional.`; },
@@ -6785,6 +6789,7 @@ function tipTargets(){
   const e = S.encounter, tray = document.getElementById('tray'); if(!tray || !e) return null;
   const at = i=> `#tray .die[data-idx="${i}"]`;
   if(!S.path.length){
+    if(e.rule && !TIPS_SEEN.has('rule_'+e.rule) && document.querySelector('#enc-panel .foe-rule')) return {k:'rule_'+e.rule, el:'#enc-panel .foe-rule', arg:null};
     if(!TIPS_SEEN.has('dot') && (e.curDOT>0 || S.playerDOT>0)){
       const side = e.curDOT>0 ? 'fo-enemy' : 'fo-player', sel = `#enc-panel .${side} .fo-buffs .status-chip[title^="D.O.T."]`;
       if(document.querySelector(sel)) return {k:'dot', el:sel, arg: e.curDOT>0 ? 'the monster' : 'you'}; }
