@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.163 (Nov 25, 2026)
+- Attack dice are a deeper red, so players with red-green colour blindness still see them darker than the cream maneuver dice.
+- Slow phones switch to the lighter effects by themselves (the dice roll stuttered at budget-phone speed); the room floor is cached per size.
+
 ## 1.42.162 (Nov 25, 2026)
 - Settings > Fast turns: the path and the foe's reply play about 1.6x quicker.
 - Long paths play quicker on their own: the first three dice keep their beat, each die after that comes faster (down to 60%).
