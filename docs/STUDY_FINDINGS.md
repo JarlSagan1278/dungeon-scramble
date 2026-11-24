@@ -360,5 +360,20 @@ per row, about ±3 points). Floor 1 unchanged in every variant.
 +1 per hit makes Floor 2 a wall (regular Armsmaster 50%), the kind of enemy-side jump the balance philosophy avoids. Fewer
 shrines plus +10% health lowers both profiles by 5-8 points and spreads the extra deaths over Floors 2 and 3.
 
+## High Depths (Nov 25, 2026, build 1.42.160)
+Expert bot, 4 classes x dwarf/gnome, 50 runs per cell (400 per mix).
+
+| Depth mix | Win % (Guard / Arcanist / Armsmaster / Dungeoneer) | All | Deaths F1 / F2 / F3 |
+|---|---|---|---|
+| 10a: Tougher Scuffs 2, Zeal 1, Rationing 1, Swarming 1, Dread 1, Clumsy 1, Union Dues | 44 / 22 / 24 / 21 | 28% | 37 / 28 / 7 |
+| 10b: Tougher Scuffs 4, Dread 3, Night Shift 1, Rounding Error | 54 / 23 / 23 / 29 | 32% | 32 / 32 / 4 |
+| 14: Tougher Scuffs 4, Zeal 1, Dread 2, Rationing 2, Swarming 1, Clumsy 1, Union Dues | 12 / 4 / 5 / 4 | 6% | 77 / 16 / 2 |
+
+(Expert at the usual depth 7 mix: 68-76%.) The curve falls off a cliff between Depth 10 and 14, and the losses move to
+**Floor 1**: at 14 the hero starts fight 2 at about 6 of 16 HP (Clumsy, Zeal's +1 per hit, nothing to heal with yet), and the
+Floor 1 Deadly (Prickly Porcupanther, 42 HP there) or the Leper Con-Trap ends 53-56% of the runs that meet them. On Floor 2 the
+Deadly Whence Wolf reaches 136-156 HP (base 32 x Floor 2 health x Tougher Scuffs x Dread, all multiplied) and ends 38-61% of the
+runs that meet it. Guard holds up best at every high Depth. Not retuned (Jeremy's call; options in the Nov 25 report).
+
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.
