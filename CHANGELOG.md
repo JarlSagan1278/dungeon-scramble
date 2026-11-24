@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.42.158 (Nov 25, 2026)
+- Room doors open on their own after a beat (1.2 s, a boss's 1.9 s); a tap still opens them sooner.
+- A calmer kill: no New Action card or tutorial toast on top of the win; they wait for the next calm moment.
+- One lesson per room: a floor tip or a New Action card, never two back to back; the rest come in later rooms.
+- Guided first fight: a one-turn kill (the path can go past the three glowing dice) moves the turn-2 lessons (flick the lid, the next move) to the next fight.
+
 ## 1.42.157 (Nov 25, 2026)
 - Snappier turns: the foe's reply skips its empty beats (no D.O.T. on it, nothing ticking on you) instead of pausing 0.55 s for each. Median wait after Go in a first run: 2.9 s -> 1.8 s.
 - The first-loot tip no longer pops up after you've already picked where the die goes.

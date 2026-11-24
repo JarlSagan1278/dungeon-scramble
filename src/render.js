@@ -2948,6 +2948,8 @@ function maybeShowSymbolIntro(){
     if(document.getElementById('symbol-intro')) return;
     if(document.querySelector('.modal-overlay')) return;
     if(S.screen!=='game' || !S.encounter) return;
+    if(!(S.encounter.curHealth>0) || S.lootChoice || S.transitioning) return; // Nov 25: never on the kill (the win lands first); the next room shows it
+    if(LESSON_ROOM===lessonRoomKey()) return; // one lesson (New Action card or tip) per room
     let key = null;
     for(const c of S.tray){
       if(c.minion || c.blank) continue;
@@ -2965,7 +2967,8 @@ function maybeShowSymbolIntro(){
     const delay = S.newRoomFx ? 1700 : 350;
     let tries = 0;
     const showCard = ()=>{
-      if(document.getElementById('symbol-intro') || S.screen!=='game') return;
+      if(document.getElementById('symbol-intro') || S.screen!=='game' || !S.encounter || !(S.encounter.curHealth>0) || S.lootChoice) return;
+      LESSON_ROOM = lessonRoomKey();
       // wait out the "A new room..." banner (it holds until tapped) and any open modal
       if((document.getElementById('room-callout-scrim') || document.getElementById('room-callout') || document.querySelector('.modal-overlay')) && tries++ < 60){ setTimeout(showCard, 500); return; }
       const card = el(`<div id="symbol-intro" class="symbol-intro" role="status"><div class="symbol-intro-icon">${icon}</div><div class="symbol-intro-text"><div class="symbol-intro-kicker">New Action</div><strong>${name}</strong><span>${desc}</span></div></div>`);
@@ -3048,6 +3051,11 @@ function showRoomCallout(fx, onDismiss){
   };
   node.addEventListener('click', dismiss);
   scrim.addEventListener('click', dismiss);
+  // Nov 25 (Jeremy, feel audit: ~25 extra taps a run): the door opens on its own after a beat; a tap opens it sooner.
+  // Off for webdriver (tests click it) unless localStorage dungeonScrambleDoorTest is set.
+  let auto = true; try{ if(navigator.webdriver && !localStorage.getItem('dungeonScrambleDoorTest')) auto = false; }catch(e){}
+  if(auto){ const ms = fx.boss ? 1900 : seamless ? 700 : 1200;
+    setTimeout(()=>{ if(node.isConnected && !node.classList.contains('dismissing') && scrim.isConnected) dismiss(); }, ms); }
 }
 
 // ---- Sound effects: short generated tones via Web Audio, no external
@@ -6709,15 +6717,22 @@ function guideNudge(idx){
   d.classList.remove('guide-nudge'); void d.offsetWidth; d.classList.add('guide-nudge');
   const r = document.getElementById('guide-ring'); if(r){ r.classList.remove('guide-flash'); void r.offsetWidth; r.classList.add('guide-flash'); }
 }
+let GUIDE_TOAST_PENDING = false; // the end-of-guide toast waits until the kill, loot and the next door are done (Nov 25)
 function guideSkip(){ guideFinish('skip'); updateGuide(); if(typeof saveGame==='function') saveGame(); }
 function updateGuide(){
   let b = document.getElementById('guide-bubble'), r = document.getElementById('guide-ring');
   const hide = ()=>{ if(b) b.hidden = true; if(r) r.hidden = true; };
+  const calm = ()=> S && S.screen==='game' && S.encounter && S.encounter.curHealth>0 && !S.transitioning && !S.needRoll && !S.lootChoice && !document.querySelector('.modal-overlay, #room-callout, #room-callout-scrim, #symbol-intro');
+  if(GUIDE_TOAST_PENDING && calm()){ GUIDE_TOAST_PENDING = false; if(typeof showToast==='function') showToast('Nicely done! Long-press any die to see what its face does.', 'good'); }
   if(typeof S==='undefined' || !S || !S.guide || S.guide.stage==='done' || S.guide.stage==='pending'){ if(b) b.remove(); if(r) r.remove(); return; }
   if(S.screen!=='game' || !S.encounter || S.encounter.curHealth<=0){
-    guideFinish('won'); if(b) b.remove(); if(r) r.remove();
-    if(typeof showToast==='function') showToast('Nicely done! Long-press any die to see what its face does.', 'good');
-    return;
+    if(b) b.remove(); if(r) r.remove();
+    // Nov 25 (Jeremy): a first-turn kill (the path can go past the three guided dice) skipped the turn-2 lessons (flick the
+    // lid, the monster's next move): they move to the next fight instead
+    if(S.guide.stage==='t1'){ S.guide.stage = 't2'; S.guide.carry = lessonRoomKey(); return; }
+    if(S.guide.carry && S.guide.carry===lessonRoomKey()) return; // still the first room (loot, then the next door)
+    if(S.guide.carry && S.screen==='game' && S.encounter && S.encounter.curHealth>0) { /* next fight: carry on below */ }
+    else { guideFinish('won'); GUIDE_TOAST_PENDING = true; return; }
   }
   const tray = document.getElementById('tray');
   if(!tray || S.transitioning || document.querySelector('.modal-overlay') || document.getElementById('room-callout') || document.getElementById('room-callout-scrim')) return hide();
@@ -6810,6 +6825,10 @@ const TIP_TEXT = {
     return `<b>Wanted!</b> Do what the poster says ${allFight ? 'during this fight' : 'in a single turn'} (${questCondShort(cond)}) to earn the reward on its right${rw}. It's optional.`; },
 };
 let _tip = null; // {k, pathLen, at, targetSel}
+// Nov 25 (Jeremy, feel audit: ~5 tips in the first minute, two back to back): at most one lesson per room, a floor tip or
+// a New Action card; the rest wait for later rooms (each still shows the first time its situation comes up again).
+let LESSON_ROOM = null;
+function lessonRoomKey(){ return S ? `${S.floorIdx}-${S.routeStep}-${S.encounter ? S.encounter.name : ''}` : ''; }
 function tipTargets(){
   const e = S.encounter, tray = document.getElementById('tray'); if(!tray || !e) return null;
   const at = i=> `#tray .die[data-idx="${i}"]`;
@@ -6846,9 +6865,9 @@ function updateTips(){
   if(_tip){
     if(busy || S.path.length!==_tip.pathLen || performance.now()-_tip.at>9000) return hideTip();
   } else {
-    if(busy) return;
+    if(busy || LESSON_ROOM===lessonRoomKey()) return;
     const t = tipTargets(); if(!t || !t.el || !document.querySelector(t.el)) return;
-    markTipSeen(t.k);
+    markTipSeen(t.k); LESSON_ROOM = lessonRoomKey();
     _tip = {k:t.k, pathLen:S.path.length, at:performance.now(), el:t.el};
     const b = document.createElement('div'); b.id='tip-bubble'; b.className='guide-bubble tip-bubble';
     b.innerHTML = `<div class="guide-text">${TIP_TEXT[t.k](t.arg)}</div>`; b.onclick = hideTip; document.body.appendChild(b);
