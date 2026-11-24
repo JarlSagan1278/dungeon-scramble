@@ -4032,3 +4032,14 @@ body.pc .defeat-scene.ds-pc{ height:230px; margin:0 0 12px; }
 /* Depth closes in (Nov 24): a crimson vignette in the room that grows with the Depth you see */
 .room-tint.room-depth{ background:radial-gradient(ellipse 80% 70% at 50% 50%, transparent 40%, rgba(110,10,6,calc(.25 + var(--dd)*.5)) 100%); }
 .rank-gift-line{ display:flex; align-items:center; gap:5px; flex-wrap:wrap; } .rank-gift-line .rank-sym{ width:18px; height:18px; font-size:11px; } .rank-gift-line b{ color:#ffd76a; }
+
+/* ==== Foe rules (Nov 24): the rule plaque, nulled dice, the counter tag, the violet callout */
+.foe-rule{ margin:5px auto 0; max-width:200px; padding:4px 8px; border:2px solid #0c0705; border-radius:9px; background:#3a2752; box-shadow:0 2px 0 #0c0705; text-align:center; line-height:1.15; cursor:help; }
+.foe-rule b{ display:block; font:400 12px/1.1 var(--font-display); color:#e2c8ff; letter-spacing:.3px; }
+.foe-rule span{ display:block; font-size:11px; color:#f3e3c3; } .foe-rule span b{ display:inline; font:inherit; font-weight:800; color:#ffd76a; }
+.tray .die.foe-nulled{ filter:saturate(.35) brightness(.7) drop-shadow(0 4px 0 var(--line)); }
+.tray .die.foe-nulled::after{ content:''; position:absolute; inset:14%; z-index:8; pointer-events:none; border-radius:50%; border:4px solid #c9a0ff; box-shadow:0 0 0 2px #2a1840, inset 0 0 0 2px #2a1840; background:linear-gradient(45deg, transparent 44%, #2a1840 44% 46%, #c9a0ff 46% 54%, #2a1840 54% 56%, transparent 56%); }
+.pcf-rule{ display:inline-block; padding:1px 6px; border-radius:7px; border:2px solid #0c0705; font-size:11px; font-weight:800; color:#0c0705; }
+.pcf-rule.good{ background:#9affa0; } .pcf-rule.bad{ background:#ffb3a3; }
+.kill-seal.foe-rule-seal{ width:96px; height:96px; margin:-48px 0 0 -48px; }
+.kill-seal.foe-rule-seal b{ color:#f3e8ff; text-shadow:0 2px 0 #2a1840; font-size:16px; text-align:center; max-width:74px; line-height:1.05; }

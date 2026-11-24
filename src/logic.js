@@ -59,7 +59,7 @@ const RUN_FIELDS = [
 const SCREEN_FIELDS = [
   // turn playback
   'transitioning','resolveTotal','resolvingIdx','resolvingFx','_advance','_pendingTimeout','_skipAll','_resolvingPath','_hitStreak',
-  '_heavyHit','_wardHalf','_downBeat','lastComboRipple','lastMinionClearIdx','_relicQ',
+  '_heavyHit','_wardHalf','_downBeat','_foeNullShown','lastComboRipple','lastMinionClearIdx','_relicQ',
   // one-shot animations and highlights
   '_roll','_ghost','_shieldFx','_lastPlayerHealth','_abilityReveal','justConvertedIdx','justRerolledIdx','justScrambled','justSwappedIdx',
   'newRoomFx','shrineFx','_fuseFx','_forkSeamless','_mascotFloor','_mascotLeft','_enemySoundN','_enemySoundReset','_unlockFx','_forceTier',
@@ -1853,6 +1853,22 @@ function getFaceForIdx(idx){
 
 // Pure calculator -- no side effects. Used both for the actual turn
 // resolution and for the live running-total preview while building a path.
+// ---- Foe rules (data.js FOE_RULES): this turn's state and the damage multiplier per face type ----
+const NULL_CYCLE = ['combo','hit','dot'];
+function foeRuleState(e){
+  e = e || (S && S.encounter); if(!e || !e.rule) return null;
+  const n = e.turnsActed||0;
+  if(e.rule==='null'){ const t = NULL_CYCLE[n % 3]; return { rule:'null', nullType:t, nullLabel: t==='dot' ? 'D.O.T.' : LABEL[t] }; }
+  if(e.rule==='parity') return { rule:'parity', weak: n % 2 === 0 ? 'even' : 'odd' };
+  if(e.rule==='bounty') return { rule:'bounty' };
+  return null;
+}
+function foeRuleMul(type, len){
+  const st = foeRuleState(); if(!st || !/^(hit|combo|dot|leech)$/.test(type)) return 1;
+  if(st.rule==='null') return (type===st.nullType || (st.nullType==='dot' && type==='leech')) ? 0 : 1;
+  if(st.rule==='parity') return ((len % 2 === 0) === (st.weak==='even')) ? 1.5 : 0.75;
+  return 1;
+}
 function computePathEffects(path){
   let totalDamage=0, boostMult = S.pendingFreeBoost>0 ? S.pendingFreeBoost : 1;
   let dotToEncounter=0, hotToPlayer=0, blockGain=0, healGain=0, selfDot=0, freeze=false, nullifyCount=0;
@@ -1863,10 +1879,10 @@ function computePathEffects(path){
     const f = pathFaceForIdx(idx);
     const val = f.value||0;
     switch(f.type){
-      case 'hit': hitCount++; totalDamage += val*boostMult; break;
-      case 'combo': { comboCount++; const nAdj=attackNeighborsCount(idx); totalDamage += val*(1+nAdj)*boostMult; break; }
-      case 'dot': dotCount++; dotToEncounter += val*boostMult; break;
-      case 'leech': dotToEncounter += val*boostMult; hotToPlayer += val*boostMult; break;
+      case 'hit': hitCount++; totalDamage += val*boostMult*foeRuleMul('hit', path.length); break;
+      case 'combo': { comboCount++; const nAdj=attackNeighborsCount(idx); totalDamage += val*(1+nAdj)*boostMult*foeRuleMul('combo', path.length); break; }
+      case 'dot': dotCount++; dotToEncounter += val*boostMult*foeRuleMul('dot', path.length); break;
+      case 'leech': dotToEncounter += val*boostMult*foeRuleMul('leech', path.length); hotToPlayer += val*boostMult; break;
       case 'heal': supportCount++; healCount++; healGain += Math.max(1, val - depthRank('round'))*boostMult; break;
       case 'hot': supportCount++; hotCount++; hotToPlayer += val*boostMult; break;
       case 'block': supportCount++; blockCount++; blockGain += val*boostMult; break;
@@ -1946,7 +1962,10 @@ function computePathSteps(path){
     if(f.type!=='boost') boostMult = 1;
     return step;
   });
-  return applyClassToSteps(applyRelicsToSteps(steps, path));
+  const out = applyClassToSteps(applyRelicsToSteps(steps, path));
+  // Foe rules scale what each face does to the foe (the same multipliers computePathEffects uses for the preview)
+  if(S && S.encounter && S.encounter.rule) out.forEach(st=>{ const m = foeRuleMul(st.type, path.length); if(m!==1){ st.dmg = (st.dmg||0)*m; st.dotToEncounter = (st.dotToEncounter||0)*m; if(m===0) st.foeNulled = true; } });
+  return out;
 }
 
 // Un-minions the first minion-covered tray cell found (tray order), same
@@ -1994,6 +2013,7 @@ function applyPathStep(step){
   if(step.revealIdx!=null) revealMinionAt(step.revealIdx);
   if(step.relicFx) step.relicFx.forEach(r=>fireRelic(r.id, r.text));
   if(step.seamBonus){ if(!S._relicQ) S._relicQ = []; S._relicQ.push({die:step.idx, text:'+'+step.seamBonus+' Wrap'}); } // Dungeoneer passive: pops on the die it boosted
+  if(step.foeNulled && !S._foeNullShown){ S._foeNullShown = true; if(typeof showFoeRuleCallout==='function') showFoeRuleCallout('Immune!', 'e'); } // Null Hypothesis bit: once per turn
   if(step.dmg>0){
     e.curHealth = capUpper(e.curHealth-absorbWithShield(e, step.dmg), e.maxHealth);
     S.stats.damageDealt += step.dmg;
@@ -2297,7 +2317,15 @@ function crescendoTier(tot, maxHp){
 function finishPlayerPath(path, effects){
   const e = S.encounter;
   if(effects.totalDamage>0) logMsg('dmg', `Path dealt ${effects.totalDamage.toFixed(1)} damage.`);
+  const doneBefore = (e.questsDone||[]).filter(Boolean).length;
   checkQuests(e, questCtxFromEffects(effects));
+  // Most Wanted (foe rule): a path that completes its Wanted poster hits a second time, as a bounty
+  if(e.rule==='bounty' && (e.questsDone||[]).filter(Boolean).length > doneBefore && (S.resolveTotal||0) > 0 && e.curHealth > 0){
+    const extra = S.resolveTotal; e.curHealth = capUpper(e.curHealth - absorbWithShield(e, extra), e.maxHealth);
+    S.stats.damageDealt += extra; S.resolveTotal += extra; logMsg('dmg', `Bounty! The path hits ${e.name} again for ${Math.round(extra)}.`);
+    if(typeof showFoeRuleCallout==='function') showFoeRuleCallout('Bounty! \u00d72', 'e');
+    if(typeof fxTick==='function') fxTick('enemy','dmg',Math.round(extra));
+  }
   { const tt = Math.round(S.resolveTotal||0);
     if(tt > (S.stats.bestTurn||0)){ S.stats.bestTurn = tt; S.stats.bestTurnFoe = e.name;
       // Nov 23: the dice of the biggest turn, shown back in the end-screen Highlights ("this was your move")

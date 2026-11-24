@@ -1760,7 +1760,9 @@ function renderDie(cell, idx){
     const rings = ring('cr'+lvl+'a',1.3,1.0) + (lvl>=2 ? ring('cr'+lvl+'b',2.8,1.0) : '');
     return `<svg class="combo-ring combo-ring-${lvl}" viewBox="-8 -8 40 40" aria-hidden="true">${rings}</svg>`;
   })();
-  return `<div class="die ${dieTypeCls} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${strongGlint?'glint-strong':''} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${boostReachCls} ${resolveCls} ${minionClearCls} ${comboActiveCls} ${trayActCls}"
+  const foeSt = (typeof foeRuleState==='function') ? foeRuleState() : null;
+  const foeNull = !!(foeSt && foeSt.rule==='null' && !cell.minion && (f.type===foeSt.nullType || (foeSt.nullType==='dot' && f.type==='leech')));
+  return `<div class="die ${dieTypeCls} ${foeNull?'foe-nulled':''} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${strongGlint?'glint-strong':''} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${boostReachCls} ${resolveCls} ${minionClearCls} ${comboActiveCls} ${trayActCls}"
             data-idx="${idx}" title="${isLastMove?'Click to undo this move':(cell.minion?'Minion die':(taReady?`Tap to ${LABEL[trayActFaceAt(idx)]}`:cell.die.name))}" ${shakeDelay}>
             ${num?`<div class="pathnum">${num}</div>`:''}
             ${boostReachCls==='boost-yes'?`<span class="boost-reach-chip" aria-hidden="true">${iconSpan('boost')}</span>`:''}
@@ -1959,6 +1961,7 @@ function renderEncounterCard(e, mode){
           <div class="fo-chips fo-buffs">${hudChips(statuses)}</div>
           ${chipsOnly?`<div class="fo-turnlabel${nextTurn.heavy?' heavy':''}" title="${isBoss?'Every turn the boss makes its base attack plus the special shown (Freeze cancels the special).':(HEAVY_EVERY[e.tier]?'The enemy does all of these every turn. Every '+HEAVY_EVERY[e.tier]+(HEAVY_EVERY[e.tier]===2?'nd':'rd')+' turn is a heavy turn that doubles one of them (Freeze cancels it).':'The enemy does all of these every turn.')}">${isBoss?(e.phase===2?(nextTurn.heavy?'Phase 2 &middot; Wind-up!':'Phase 2'):(nextTurn.heavy?'Wind-up next!':'Next turn')):(nextTurn.heavy?'Heavy turn next!':(HEAVY_EVERY[e.tier]?'Heavy in '+(HEAVY_EVERY[e.tier]-((e.turnsActed||0)%HEAVY_EVERY[e.tier])):'Every turn'))}</div>`:''}
           <div class="fo-chips">${chipsOnly}</div>
+          ${foeRulePlaqueHTML(e)}
         </div><!--/z4-->
       </div>
       ${e.flavor?`<div class="fo-flavor">${e.flavor}</div>`:''}
@@ -2050,6 +2053,11 @@ function pathCounterHTML(){
   if(preview.freeze) extras.push(iconSpan('freeze'));
   // Nov 10: a path with no damage but other effects shows just those (a big "0 damage" read as a wasted path)
   for(let k=0;k<extras.length;k++) extras[k] = `<span class="pcf-x">${extras[k]}</span>`; // Nov 11: one element per effect (layout options)
+  // Foe rules on the counter (Nov 24): the parity this path has, or the bounty it would collect
+  { const st = (typeof foeRuleState==='function') ? foeRuleState() : null;
+    if(st && st.rule==='parity'){ const even = S.path.length % 2 === 0, good = even === (st.weak==='even'); extras.push(`<span class="pcf-rule ${good?'good':'bad'}">${even?'Even':'Odd'} &times;${good?'1.5':'0.75'}</span>`); }
+    if(st && st.rule==='bounty'){ let live = false; try{ const ctx = questCtxFromEffects(preview); live = (S.encounter.quests||[]).some((q,i)=> !S.encounter.questsDone[i] && questEval(parseQuestSpec(q).cond, ctx).done); }catch(err){}
+      if(live) extras.push(`<span class="pcf-rule good">Bounty &times;2</span>`); } }
   if(!val && extras.length) return `<div class="path-counter-float pcf-nodmg"><span class="pcf-extra">${extras.join(' ')}</span></div>`;
   return `<div class="path-counter-float ${big?'pcf-big':''} ${tier>=2?'pcf-t'+tier:''}">
       <span class="pcf-main"><span class="pcf-num" data-from="${fromVal}" data-to="${val}" style="font-size:${size}px;">${val%1?val.toFixed(1):val}</span><span class="pcf-lbl">damage</span></span>
@@ -2819,6 +2827,22 @@ const WAX_SEAL_SVG = `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50
 // Clever-play stamps (Nov 23, Jeremy: players should walk away feeling smart): a teal wax seal that names a smart decision
 // the moment it pays off. side 'e' = on the foe, 'p' = on the hero. Counted in S.stats.clever for the run summary.
 const CLEVER_SEAL_SVG = WAX_SEAL_SVG.replace(/#b02a1c/g, '#1f7a73');
+const FOE_SEAL_SVG = WAX_SEAL_SVG.replace(/#b02a1c/g, '#5b3a8a'); // foe-rule callouts: violet
+// Foe rules (Nov 24): a plaque under the foe's next move naming its rule for this turn, a callout when it bites
+function foeRulePlaqueHTML(e){
+  const st = (typeof foeRuleState==='function') ? foeRuleState(e) : null; if(!st) return '';
+  const R = FOE_RULES[st.rule];
+  return `<div class="foe-rule foe-rule-${st.rule}" title="${R.name}: ${R.tip}"><b>${R.name}</b><span>${R.text(st)}</span></div>`;
+}
+function showFoeRuleCallout(text, side){
+  const fig = document.querySelector(side==='e' ? '#enc-panel .fo-enemy .fo-img' : '#enc-panel .fo-player .fo-img') || document.querySelector('#enc-panel');
+  if(!fig) return; const r = fig.getBoundingClientRect();
+  const seal = el(`<div class="kill-seal foe-rule-seal" role="status" aria-label="${text}">${FOE_SEAL_SVG}<b>${text}</b></div>`);
+  seal.style.left = (r.left + r.width/2)+'px'; seal.style.top = (r.top + r.height*0.45)+'px';
+  document.body.appendChild(seal);
+  try{ if(typeof playTone==='function') playTone('clank'); }catch(e){}
+  setTimeout(()=>{ if(seal.parentNode) seal.remove(); }, 1300);
+}
 function showCleverStamp(text, side){
   if(!document.querySelector('#enc-panel')) return;
   S.stats.clever = (S.stats.clever||0) + 1;

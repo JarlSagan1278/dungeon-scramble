@@ -474,7 +474,7 @@ const FLOOR1_BOSSES = [
 ];
 
 const FLOOR2_ENEMIES = [
-  enc('Transposer Kitty','Enemy',18,{dmg:3,flavor:'"I think that one had a collar. Where\u2019d it go?"'}),
+  enc('Transposer Kitty','Enemy',18,{rule:'parity',dmg:3,flavor:'"I think that one had a collar. Where\u2019d it go?"'}),
   enc('Armored Gear-Pest','Enemy',17,{dmg:2,flavor:'A well-documented example of dungeon adaptation.'}),
   enc('Rusty Golem','Enemy',20,{dmg:4,quests:['16 damage: survive turn 4'],flavor:'"Looks like it was falling apart on its own"'}),
   enc('Rogue Technician','Enemy',16,{dmg:4,flavor:'"I\u2019m not here to fix your lockpick, I have an ideology!"'}),
@@ -483,7 +483,7 @@ const FLOOR2_ENEMIES = [
   enc('Half-life Host','Enemy',22,{dmg:3,shield:2,quests:['8 damage: 2 heal'],flavor:'"\u2018Release spores. Multiply.\u2019? - Now I\u2019m always saying that!"'}),
   enc('Lichen-Thrope','Enemy',24,{dmg:3,heal:1,flavor:'Under the luminance of the full bloom, this creature becomes a true hater.'}),
   enc('Fungal Flayer','Enemy',24,{dmg:3,hot:2,quests:['16 damage: accumulate 5 block'],flavor:'It is, in fact, acceptable to hate the flayer.'}),
-  enc('Illegal Operation','Enemy',19,{dmg:4,hot:1,flavor:'"Oh no, maybe we try multiplying by zero this time??"'}),
+  enc('Illegal Operation','Enemy',19,{rule:'null',dmg:4,hot:1,flavor:'"Oh no, maybe we try multiplying by zero this time??"'}),
   enc('Rabbid Rabbats','Enemy',18,{dmg:2,minion:1,quests:['5 damage: 2 leap','8 damage: route leapfrog'],flavor:'"They multiply like rabbits and, as a group, have inverse operations."'}),
   enc('Roudy Rinotter','Enemy',15,{dmg:2,heal:1,quests:['5 damage: 2 heal','8 damage: route hollow proof'],flavor:'"Is that some cornbread on its tummy?"'}),
   enc('Whence Wolf','Enemy',32,{dmg:3,dot:1,quests:['10 damage: 3 maneuvers','8 damage: route antipodal'],flavor:'"Why, Grandma, what uncertain provenance you have."'}),
@@ -529,7 +529,7 @@ const FLOOR2_BOSSES = [
 const FLOOR3_ENEMIES = [
   enc('Morel Dilemma','Enemy',18,{dmg:6,minion:2,hot:1,flavor:'A fungal species that has stumped, and subsequently eaten, philosophers for generations.'}),
   enc('Chimeric Sludge','Enemy',25,{dmg:7,hot:2,quests:['12 damage: 4 maneuvers','10 damage: route antipodal'],flavor:'Biological slag, made up of countless individual chimeras.'}),
-  enc('Gnome Chomper','Enemy',28,{dmg:8,quests:['6 damage: 3 maneuvers','10 damage: route running start'],flavor:'"The Gnomish Chempire is the leading zealot state!"'}),
+  enc('Gnome Chomper','Enemy',28,{rule:'bounty',dmg:8,quests:['6 damage: 3 maneuvers','10 damage: route running start'],flavor:'"The Gnomish Chempire is the leading zealot state!"'}),
   // v1.39.0: replaces Parasite Seer (its art was a cropped copy of another gnome); Jeremy's idea, same slot and stats.
   enc('Gnomeowners Association','Enemy',20,{dmg:5,shield:3,flavor:'"Only good and gracious hosts are allowed in this neighborhood."'}),
   enc('Gestalt Network','Enemy',20,{dmg:5,dot:2,flavor:'"You will join us. Our population is mushrooming."'}),
@@ -630,6 +630,13 @@ const HEAVY_EVERY = {elite:3, deadly:2};
 // switches to it after the first enemy turn that ends at or below half HP.
 // Act types: dmg, minion, shield, heal, hot, dot (to you), dmgPerMinion
 // (value x Minions on your tray), dropShield (loses all its Shield).
+// Foe rules (Nov 24, Jeremy: enemies that reward reading the preview). Each shows on the foe, on the dice and on the
+// path counter while you plan, and calls out when it bites. Names are Claude's placeholders (blue in the names sheet).
+const FOE_RULES = {
+  null:   { name:'Null Hypothesis', text:t=>`Immune to <b>${t.nullLabel}</b> this turn.`, tip:'Each turn one face type (Combo, then Hit, then D.O.T.) deals no damage to it. Route around it.' },
+  parity: { name:'Odd Permutation', text:t=>`<b>${t.weak==='even'?'Even':'Odd'}</b>-length paths deal &times;1.5 this turn; ${t.weak==='even'?'odd':'even'} &times;0.75.`, tip:'It flips each turn: count your path. The right parity deals 50% more, the wrong one 25% less.' },
+  bounty: { name:'Most Wanted', text:()=>`Complete its <b>Wanted</b> poster: the path hits <b>twice</b>.`, tip:'A path that completes one of its Wanted posters deals its damage a second time, as a bounty.' },
+};
 const BOSS_KITS = {
   'Rogue Golemancer':{ each:[{type:'dmg',value:1}], specials:[
     {name:'Summon Golems', acts:[{type:'minion',value:2}]},
