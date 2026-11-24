@@ -373,7 +373,8 @@ Expert bot, 4 classes x dwarf/gnome, 50 runs per cell (400 per mix).
 **Floor 1**: at 14 the hero starts fight 2 at about 6 of 16 HP (Clumsy, Zeal's +1 per hit, nothing to heal with yet), and the
 Floor 1 Deadly (Prickly Porcupanther, 42 HP there) or the Leper Con-Trap ends 53-56% of the runs that meet them. On Floor 2 the
 Deadly Whence Wolf reaches 136-156 HP (base 32 x Floor 2 health x Tougher Scuffs x Dread, all multiplied) and ends 38-61% of the
-runs that meet it. Guard holds up best at every high Depth. Not retuned (Jeremy's call; options in the Nov 25 report).
+runs that meet it. Guard holds up best at every high Depth.
+- **After A (Elite/Deadly Depth health bonus added, capped at +80%; same setup):** 10a 28% -> 34%, 10b (the health-stacking mix) 32% -> 53% (Floor 1 deaths 32% -> 12%), 14: 6% -> 9%. Whence Wolf 136-156 -> 91-109 HP (dies 23-42% instead of 38-61%), Porcupanther 42-48 -> 28-34 HP. Depth 14 still loses 64% of runs on Floor 1: that wall is attrition (Clumsy, Zeal, Rationing), not foe health (option B would address it; not done).
 
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.
