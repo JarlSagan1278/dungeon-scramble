@@ -2839,7 +2839,7 @@ const FOE_SEAL_SVG = WAX_SEAL_SVG.replace(/#b02a1c/g, '#5b3a8a'); // foe-rule ca
 function foeRulePlaqueHTML(e){
   const st = (typeof foeRuleState==='function') ? foeRuleState(e) : null; if(!st) return '';
   const R = FOE_RULES[st.rule];
-  return `<div class="foe-rule foe-rule-${st.rule}" title="${R.name}: ${R.tip}"><b>${R.name}</b><span class="fr-long">${R.text(st)}</span><span class="fr-short">${R.short(st)}</span></div>`; // fr-short: the phone's one-line plaque
+  return `<div class="foe-rule foe-rule-${st.rule}" title="${R.name}: ${R.tip}"><b>${R.phoneName ? `<i class="frn-long">${R.name}</i><i class="frn-short">${R.phoneName}</i>` : R.name}</b><span class="fr-long">${R.text(st)}</span><span class="fr-short">${R.short(st)}</span></div>`; // fr-short: the phone's one-line plaque
 }
 function showFoeRuleCallout(text, side){
   const fig = document.querySelector(side==='e' ? '#enc-panel .fo-enemy .fo-img' : '#enc-panel .fo-player .fo-img') || document.querySelector('#enc-panel');

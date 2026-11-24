@@ -4048,6 +4048,7 @@ body.pc .defeat-scene.ds-pc{ height:230px; margin:0 0 12px; }
 .foe-rule b{ display:block; font:400 12px/1.1 var(--font-display); color:#e2c8ff; letter-spacing:.3px; }
 .foe-rule span{ display:block; font-size:11px; color:#f3e3c3; } .foe-rule span b{ display:inline; font:inherit; font-weight:800; color:#ffd76a; }
 .foe-rule .fr-short{ display:none; }
+.foe-rule b i{ font-style:normal; } .foe-rule .frn-short{ display:none; } body:not(.pc) .foe-rule .frn-long{ display:none; } body:not(.pc) .foe-rule .frn-short{ display:inline; } /* a shorter name on the phone's one-line plaque (Nov 25) */
 /* Nov 25 (bug hunt): a hero's back gear could poke past the screen's left edge for a moment when the hero recoils from a hit; the room band clips sideways only */
 body:not(.pc) .fo-band{ overflow-x:clip; }
 /* Codex: foe rules (Nov 25), on a foe's Bestiary page and under the Key */

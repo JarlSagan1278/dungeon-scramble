@@ -376,5 +376,24 @@ Deadly Whence Wolf reaches 136-156 HP (base 32 x Floor 2 health x Tougher Scuffs
 runs that meet it. Guard holds up best at every high Depth.
 - **After A (Elite/Deadly Depth health bonus added, capped at +80%; same setup):** 10a 28% -> 34%, 10b (the health-stacking mix) 32% -> 53% (Floor 1 deaths 32% -> 12%), 14: 6% -> 9%. Whence Wolf 136-156 -> 91-109 HP (dies 23-42% instead of 38-61%), Porcupanther 42-48 -> 28-34 HP. Depth 14 still loses 64% of runs on Floor 1: that wall is attrition (Clumsy, Zeal, Rationing), not foe health (option B would address it; not done).
 
+## New foe rules (Nov 25, 2026, Jeremy picked 3 of 6 ideas)
+Their foes drawn in about half the rooms of their floor, rule on vs off, five play styles (Guard dwarf = Block, Arcanist
+gnome = diagonals/Boost, Armsmaster dwarf = burst, Dungeoneer dwarf = routes, Armsmaster gnome = D.O.T.), expert depth 7
+and regular depth 0, 60 then 80 runs per cell. Numbers are per fight with that foe (on / off).
+
+- **Zero-Sum Game (Rogue Technician, Floor 2): Block heals it.** At 1x Block it barely bit (+0.3 turns). At **2x** (shipped):
+  fights +0.5 turns on average, but the Block-heavy Guard is hit hardest (expert 2.7 -> 3.5 turns, regular 2.8 -> 4.3, +1.5
+  damage taken); deaths unchanged (expert 6/4%, regular 2/1%). The bot keeps blocking; a person who adapts loses less.
+- **Pythagorean Theorem (Anti-Euclidian Space, Floor 3 trap): dice reached diagonally x1.5.** A mild reward: experts take
+  5.9 -> 5.2 damage there, the Arcanist most (turns 2.5 -> 2.1); deaths unchanged within noise (8/6%, regular 12/11%).
+- **Asymptote (The Punished, Floor 3 Elite): at most N path damage a turn, D.O.T. uncapped.** Cap 12 was too harsh (fights
+  1.5-2x longer, expert Arcanist deaths 7 -> 20%). At **16** (shipped): fights 3.5 -> 5.0 turns, +2 damage taken, deaths
+  9 -> 12% (expert), 4 -> 7% (regular); the D.O.T. style (Armsmaster gnome) unchanged for experts (14 vs 16%).
+
+## Daily Dungeon spread (Nov 25, 2026)
+The next 60 Dailies (Nov 25 - Jan 23), regular bot, 40 runs each: median win 84%, most days 60-100%, three days 28-32%
+(Dec 17, Jan 8, Jan 19). The hard ones pair the regular bot's weakest set-up (a gnome Arcanist or Dungeoneer) with a
+Deadly room (The Strike/Break-er) or Illegal Operation on Floor 2. Floor 1 deaths stay at 0-8% on every day.
+
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.
