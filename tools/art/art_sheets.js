@@ -3,7 +3,8 @@
 // sets how big it prints). usage: node build.js && node tools/art/art_sheets.js [outDir]  (default docs/art_sheets/)
 const { chromium } = require('playwright'); const fs = require('fs'), path = require('path');
 const ROOT = path.resolve(__dirname, '../..'), ART = path.join(ROOT, 'src/art');
-const OUT = path.resolve(process.argv[2] || path.join(ROOT, 'docs/art_sheets'));
+const CLEAR = process.argv.includes('--transparent'); // no backing boxes or page colour: the art's own transparency shows
+const OUT = path.resolve(process.argv.filter(a=>!a.startsWith('--'))[2] || path.join(ROOT, 'docs/art_sheets'));
 fs.mkdirSync(OUT, { recursive: true });
 const asset = fs.readFileSync(path.join(ROOT, 'src/assets.js'), 'utf8');
 // "name": "art:PATH" pairs inside one const block
@@ -26,7 +27,8 @@ const css = `@page{ size:Letter landscape; margin:0.4in; } *{ box-sizing:border-
  h1{ font-size:26px; margin:0 0 4px; } .sub{ color:#6b5a42; font-size:12px; margin:0 0 14px; } h2{ font-size:17px; margin:18px 0 8px; padding-bottom:3px; border-bottom:2px solid #241c10; break-after:avoid; }
  .grid{ display:flex; flex-wrap:wrap; gap:12px; } .card{ break-inside:avoid; border:1.5px solid #241c10; border-radius:8px; padding:6px; width:var(--w); background:#fbf6ea; }
  .card .pic{ height:var(--h); display:flex; align-items:center; justify-content:center; background:#e9dfc9; border-radius:5px; } .card img{ max-width:100%; max-height:100%; image-rendering:auto; }
- .card b{ display:block; font-size:12px; margin-top:5px; line-height:1.15; } .card small{ display:block; font-size:9.5px; color:#6b5a42; line-height:1.25; } .big{ --w:100%; } .big .pic{ height:auto; } .big img{ max-height:6.4in; }`;
+ .card b{ display:block; font-size:12px; margin-top:5px; line-height:1.15; } .card small{ display:block; font-size:9.5px; color:#6b5a42; line-height:1.25; } .big{ --w:100%; } .big .pic{ height:auto; } .big img{ max-height:6.4in; }`
+ + (CLEAR ? ` .card{ background:none; border-color:#cfc3a8; } .card .pic{ background:none; } html, body{ background:none; }` : '');
 const card = (src, title, lines, w, h)=> `<div class="card" style="--w:${w};--h:${h}"><div class="pic"><img src="file://${src}"></div><b>${esc(title)}</b>${lines.map(l=>`<small>${esc(l)}</small>`).join('')}</div>`;
 const meta = f => { const [w,h] = imageSize(path.join(ART, f)); return `${w} x ${h} px, ${path.basename(f)}`; };
 (async()=>{
@@ -40,10 +42,10 @@ const meta = f => { const [w,h] = imageSize(path.join(ART, f)); return `${w} x $
     const loot = {}; [['Alloy',ALLOY],['Gilded',GILDED],['Magic',MAGIC]].forEach(([t,l])=>l.forEach(d=>{ loot[d.name] = { tier:t, faces:d.faces.map(f=>f.type==='blank'?'blank':(LABEL[f.type]||f.type)+(f.value?' '+f.value:'')).join(', ') }; }));
     const origins = ORIGINS.map(o=>({id:o.id, name:o.name})); return { m, loot, origins }; });
   await b.close();
-  const pdf = async (file, title, body)=>{ const html = `<!doctype html><meta charset="utf-8"><style>${css}</style><h1>${esc(title)}</h1><p class="sub">Dungeon Scramble art, ${new Date().toISOString().slice(0,10)}. Every image is embedded at its full source resolution; the caption gives its pixel size and file.</p>${body}`;
+  const pdf = async (file, title, body)=>{ const html = `<!doctype html><meta charset="utf-8"><style>${css}</style><h1>${esc(title)}</h1><p class="sub">Dungeon Scramble art, ${new Date().toISOString().slice(0,10)}. Every image is embedded at its full source resolution${CLEAR ? ', with its own transparent background' : ''}; the caption gives its pixel size and file.</p>${body}`;
     const hp = path.join(OUT, file.replace('.pdf','.html')); fs.writeFileSync(hp, html);
     const b2 = await chromium.launch(); const p2 = await b2.newPage(); await p2.goto('file://' + hp); await p2.waitForTimeout(800);
-    await p2.pdf({ path: path.join(OUT, file), format:'Letter', landscape:true, printBackground:true, preferCSSPageSize:true }); await b2.close(); fs.unlinkSync(hp); };
+    await p2.pdf({ path: path.join(OUT, CLEAR ? file.replace('.pdf',' (transparent).pdf') : file), format:'Letter', landscape:true, printBackground:!CLEAR, preferCSSPageSize:true, omitBackground:CLEAR }); await b2.close(); fs.unlinkSync(hp); };
   // 1. Monsters, traps, bosses, shrines: by floor, then kind
   const mons = block('MONSTER_ART');
   const order = { 'Enemy':0, 'Trap':1, 'Shrine':2, 'Boss':3, 'Big Boss':4 };
