@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.157 (Nov 25, 2026)
+- Snappier turns: the foe's reply skips its empty beats (no D.O.T. on it, nothing ticking on you) instead of pausing 0.55 s for each. Median wait after Go in a first run: 2.9 s -> 1.8 s.
+- The first-loot tip no longer pops up after you've already picked where the die goes.
+
 ## 1.42.156 (Nov 25, 2026)
 - Foe rules on phones: the rule is a one-line plaque at the bottom of the room, so the tray and chest no longer get pushed off the bottom of the screen (it was 37px too tall on a 769px phone).
 - Odd Permutation never shows or deals fractions ("0.8 damage"): a path's total is rounded to a whole number.
