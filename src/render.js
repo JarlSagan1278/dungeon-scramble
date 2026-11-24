@@ -608,6 +608,9 @@ function bakedFloorCanvas(W, H){
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     const key = W+'x'+H+'x'+dpr+'x'+ROOM_TEX_VER;
     if(bakedFloorCanvas._c && bakedFloorCanvas._c.key === key) return bakedFloorCanvas._c.cv;
+    // Nov 25 (slow-phone check): the room changes height (lid on/off, rule plaque, quests), so keep the last few sizes
+    const kept = (bakedFloorCanvas._all = bakedFloorCanvas._all || new Map()).get(key);
+    if(kept){ bakedFloorCanvas._c = {key, cv:kept}; return kept; }
     // Nov 4: always a fresh canvas -- redrawing the one still on screen (the old floor is now removed after measuring)
     // could show torn, streaky rows on phones while the GPU layer was being repainted
     const cv = document.createElement('canvas');
@@ -631,6 +634,7 @@ function bakedFloorCanvas(W, H){
     gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(.5, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,.55)');
     g.fillStyle = gr; g.fillRect(0, 0, W, H);
     bakedFloorCanvas._c = { key, cv };
+    { const all = bakedFloorCanvas._all; all.set(key, cv); if(all.size > 4) all.delete(all.keys().next().value); } // at most 4 sizes kept
     return cv;
   }catch(e){ return null; }
 }
@@ -3596,7 +3600,25 @@ function vibrate(pattern){
 }
 // Low intensity: smaller shakes, fewer particles, no hit-stop. (Reduce Motion
 // still turns movement off entirely.)
-function juiceLow(){ return !!PREFS.lowIntensity; }
+function juiceLow(){ return !!PREFS.lowIntensity || SLOW_DEVICE; }
+// Slow phones (Nov 25, slow-phone check: at budget-phone speed the dice roll ran at 19 fps with a 317 ms freeze): frames are
+// timed while a turn plays or the dice roll; if the median frame is slower than ~35 fps (or 1 in 10 frames freezes), the lighter effects (the same as
+// Settings > Gentler effects) switch on by themselves for the rest of the session. Fast devices never change.
+let SLOW_DEVICE = false;
+(function(){
+  if(typeof window==='undefined' || !window.requestAnimationFrame) return;
+  let last = 0, f = [], checks = 0;
+  const loop = t=>{
+    const busy = typeof S!=='undefined' && S && (S.transitioning || document.querySelector('#tray > .roll-layer'));
+    if(busy && last && !document.hidden){ const dt = t - last; if(dt > 4 && dt < 250) f.push(dt); }
+    last = t;
+    if(f.length >= 90){ const sorted = f.slice().sort((a,b)=>a-b), m = sorted[45], long = f.filter(x=>x>50).length; f = []; checks++;
+      // slow on average, or one frame in ten freezing
+      if(m > 28 || long >= 9){ SLOW_DEVICE = true; try{ teleLog('slow_device', {median:Math.round(m)}); }catch(e){} return; } // stays on: stop timing
+      if(checks >= 3) return; } // three good windows: a fast device, stop timing
+    requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+})();
 
 function applyReducedMotionClass(){
   document.body.classList.toggle('reduced-motion', !!PREFS.reducedMotion);
