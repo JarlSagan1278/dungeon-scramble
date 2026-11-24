@@ -36,7 +36,7 @@ line ("Art by Jeremy Friedman"; how to note the untouched pixie portraits), Jere
 - **Armsmaster red Skill vs red Clear:** options shown Oct 15.
 
 ## Next for Claude
-- **Google Play (Nov 21-23):** first release in review. When approved: post the tester swaps (docs/release/play_testers.md), run the Google Play workflow once by hand to prove the service account, then build real billing for the unlock (needed before production; the unlock is a free placeholder).
+- **Google Play (Nov 21-25):** review passed Nov 25; the hand-run upload of 1.42.158 to the closed test (alpha) succeeded, so the service account works and the Friday uploads run on their own. Next: Jeremy posts the tester swaps (12 testers needed). Earlier: first release in review. When approved: post the tester swaps (docs/release/play_testers.md), run the Google Play workflow once by hand to prove the service account, then build real billing for the unlock (needed before production; the unlock is a free placeholder).
 - **Difficulty drift (Nov 23 study):** bots win far more than in October (expert depth 7 80-94%); shrines, relics and posters carry the player's power. Retune only once real players' runs show it's too easy (weekly players report).
 - **Guild Rank / Daily Dungeon (1.42.150):** watch real use; possible next: class mastery tracks, more cosmetic rank rewards, a Daily streak.
 - **Forks (shipped 1.42.55-1.42.62):** two doors at slots 3 and 6; the Elite door's extra loot choice is a next-floor die. Bot study: always Elite 50% vs always Standard 39% (STUDY_FINDINGS). Watch real players' picks in the play data (`fork_pick` events) before tuning.
