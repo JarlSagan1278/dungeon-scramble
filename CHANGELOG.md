@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.160 (Nov 25, 2026)
+- Play data: each run records which build it came from (app = Google Play, tester = playtest site, demo = itch, steam).
+
 ## 1.42.159 (Nov 25, 2026)
 - Tutorial and tip bubbles point at what they talk about: the bubble slides over its target, the arrow sits right above it, and a dotted line runs down to the ringed die or button (Go, Skill and lower rows included).
 - Floor Cleared / unlock and the other end screens never scroll on a phone: a card taller than the window (a short phone, a long run card) shrinks just enough to fit.
