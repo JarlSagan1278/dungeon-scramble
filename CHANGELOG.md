@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.156 (Nov 25, 2026)
+- Foe rules on phones: the rule is a one-line plaque at the bottom of the room, so the tray and chest no longer get pushed off the bottom of the screen (it was 37px too tall on a 769px phone).
+- Odd Permutation never shows or deals fractions ("0.8 damage"): a path's total is rounded to a whole number.
+- PC: Go's Enter key cap moved to the bottom corner (the damage counter covered it).
+
 ## 1.42.155 (Nov 25, 2026)
 - A bit harder: shrines appear less often (30/35/40% per room slot on Floors 1-3, was 40/45/50%) and Floor 2-3 enemies have another 10% health. Floor 1 is unchanged.
 - Steam desktop app: the game in its own window (steam/, built by the Steam build workflow for Windows and Linux), fullscreen by default and remembered, Quit Game in Settings.

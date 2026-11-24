@@ -33,6 +33,8 @@ const SCREENS = [
   ['fight', () => { __fight(); render(); }],
   ['fight-path', () => { __fight(); render(); const h = [...Array(16).keys()].filter(i => canSelect(i)); toggleSelect(h[0]);
     for (let k = 0; k < 3; k++) { const n = [...Array(16).keys()].find(i => canSelect(i) && !S.path.includes(i)); if (n == null) break; toggleSelect(n); } render(); }],
+  ['foe-rule', () => { __fight(); S.floorIdx = 1; const c = FLOOR2_ENEMIES.find(x => x.name === 'Transposer Kitty'); const o = window.drawRoomCard; window.drawRoomCard = () => c; // Nov 24: a foe rule must not make the room taller
+    S.encounter = drawEncounter('enc'); window.drawRoomCard = o; render(); const h = [...Array(16).keys()].filter(i => canSelect(i)); toggleSelect(h[0]); render(); }],
   ['boss', () => { __fight('gnome', 'arcanist'); S.encounter = drawEncounter('boss'); render(); }],
   ['camp', () => { __fight(); S.screen = 'camp'; S.floorIdx = 0; S.routeStep = 4; S.campChoice = null; S.campRested = false; S.campFireOut = false; S.campUpgrades = {}; render(); }],
   ['shrine', () => { __fight(); const s = FLOORS[0].shrines[0]; const o = window.drawRoomCard; window.drawRoomCard = () => s; S.encounter = drawEncounter('enc'); window.drawRoomCard = o;

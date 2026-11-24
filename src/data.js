@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.42.155';
+const GAME_VERSION = '1.42.156';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false, steam:false };
@@ -633,9 +633,9 @@ const HEAVY_EVERY = {elite:3, deadly:2};
 // Foe rules (Nov 24, Jeremy: enemies that reward reading the preview). Each shows on the foe, on the dice and on the
 // path counter while you plan, and calls out when it bites. Names are Claude's placeholders (blue in the names sheet).
 const FOE_RULES = {
-  null:   { name:'Null Hypothesis', text:t=>`Immune to <b>${t.nullLabel}</b> this turn.`, tip:'Each turn one face type (Combo, then D.O.T., alternating) deals no damage to it. Route around it.' },
-  parity: { name:'Odd Permutation', text:t=>`<b>${t.weak==='even'?'Even':'Odd'}</b>-length paths deal &times;1.5 this turn; ${t.weak==='even'?'odd':'even'} &times;0.75.`, tip:'It flips each turn: count your path. The right parity deals 50% more, the wrong one 25% less.' },
-  bounty: { name:'Most Wanted', text:()=>`Complete its <b>Wanted</b> poster: the path hits <b>twice</b>.`, tip:'A path that completes one of its Wanted posters deals its damage a second time, as a bounty.' },
+  null:   { name:'Null Hypothesis', short:t=>`immune to <b>${t.nullLabel}</b>`, text:t=>`Immune to <b>${t.nullLabel}</b> this turn.`, tip:'Each turn one face type (Combo, then D.O.T., alternating) deals no damage to it. Route around it.' },
+  parity: { name:'Odd Permutation', short:t=>`<b>${t.weak==='even'?'Even':'Odd'}</b> paths ×1.5`, text:t=>`<b>${t.weak==='even'?'Even':'Odd'}</b>-length paths deal &times;1.5 this turn; ${t.weak==='even'?'odd':'even'} &times;0.75.`, tip:'It flips each turn: count your path. The right parity deals 50% more, the wrong one 25% less.' },
+  bounty: { name:'Most Wanted', short:()=>`<b>Wanted</b> hits twice`, text:()=>`Complete its <b>Wanted</b> poster: the path hits <b>twice</b>.`, tip:'A path that completes one of its Wanted posters deals its damage a second time, as a bounty.' },
 };
 const BOSS_KITS = {
   'Rogue Golemancer':{ each:[{type:'dmg',value:1}], specials:[

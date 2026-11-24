@@ -1905,7 +1905,7 @@ function computePathEffects(path){
 
   // Relics adjust the per-die steps (see applyRelicsToSteps); take the totals
   // from them so the live preview includes every relic bonus.
-  if((S.relics && S.relics.length) || (S.klass && S.klass.seamDamage)){
+  if((S.relics && S.relics.length) || (S.klass && S.klass.seamDamage) || (S.encounter && S.encounter.rule==='parity')){ // parity: whole-number totals from the steps
     const st = computePathSteps(path);
     totalDamage = st.reduce((a,x)=>a+x.dmg,0);
     dotToEncounter = st.reduce((a,x)=>a+x.dotToEncounter,0);
@@ -1964,7 +1964,17 @@ function computePathSteps(path){
   });
   const out = applyClassToSteps(applyRelicsToSteps(steps, path));
   // Foe rules scale what each face does to the foe (the same multipliers computePathEffects uses for the preview)
-  if(S && S.encounter && S.encounter.rule) out.forEach(st=>{ const m = foeRuleMul(st.type, path.length); if(m!==1){ st.dmg = (st.dmg||0)*m; st.dotToEncounter = (st.dotToEncounter||0)*m; if(m===0) st.foeNulled = true; } });
+  if(S && S.encounter && S.encounter.rule){
+    out.forEach(st=>{ const m = foeRuleMul(st.type, path.length); if(m!==1){ st.dmg = (st.dmg||0)*m; st.dotToEncounter = (st.dotToEncounter||0)*m; if(m===0) st.foeNulled = true; } });
+    // Nov 24: x1.5 / x0.75 must not leave fractions ("0.8 damage"): the path's total is rounded (half up) and the
+    // whole numbers handed back to the steps with the largest fractional parts
+    if(S.encounter.rule==='parity') ['dmg','dotToEncounter'].forEach(k=>{
+      const tot = out.reduce((a,x)=>a+(x[k]||0),0); let left = Math.round(tot + 1e-9);
+      const fr = out.map((x,i)=>({i, f:(x[k]||0) - Math.floor(x[k]||0)}));
+      out.forEach(x=>{ if(x[k]) { x[k] = Math.floor(x[k]); left -= x[k]; } });
+      fr.filter(o=>o.f>1e-9).sort((a,b)=> b.f-a.f || b.i-a.i).forEach(o=>{ if(left>0){ out[o.i][k]++; left--; } });
+    });
+  }
   return out;
 }
 
