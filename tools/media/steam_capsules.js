@@ -8,7 +8,12 @@ const { chromium } = require('playwright'); const fs = require('fs'), path = req
 const ROOT = path.resolve(__dirname, '../..'), ART = path.join(ROOT, 'src/art'), OUT = path.join(ROOT, 'docs/release/media/steam');
 fs.mkdirSync(OUT, { recursive: true });
 const u = f => 'file://' + path.join(ART, f);
-const COVER = u('COVER_ART.jpeg'), LOGO = u('LOGO_IMG.png'), PAPER = u('PAPER_TILE.jpeg');
+const COVER = u('COVER_ART.jpeg'), PAPER = u('PAPER_TILE.jpeg');
+// Nov 25 (Jeremy): the hand-lettered title is the logo (the dice-letter LOGO_IMG.png is old and unused). Until the lettering
+// exists on its own (transparent PNG exported from the title PSD, set TITLE_PNG below), the wide capsules show the cover's
+// own lettering and the library logo is cut from the cover.
+const TITLE_PNG = null; // e.g. u('TITLE_LETTERING.png')
+const LOGO = TITLE_PNG;
 const BOSSES = ['Rogue_Golemancer', 'Heating_Elemental', 'Grosteque_Grafter', 'The_Necrorancher', 'Bellicose_Biomancer', 'Ceramic_Golem',
   'Myceleus_Co_consul_of_Rot', 'Extruzeon_Co_consul_of_Waste', 'Toadtaur_Wizard_Assistant_to_the_Co_consul'].map(n => u('MONSTER_ART/' + n + '.webp'));
 const HEROES = ['DWARF_PORTRAITS/0.webp', 'GNOME_PORTRAITS/0.webp', 'HALFLING_PORTRAITS/0.webp', 'PIXIE_PORTRAITS/0.webp'].map(u);
@@ -20,30 +25,33 @@ const base = `*{box-sizing:border-box;margin:0;padding:0} html,body{width:100%;h
  .mon{position:absolute;bottom:0;filter:drop-shadow(0 8px 0 rgba(0,0,0,.35))}`;
 // each image: [file, width, height, transparent?, body html]
 const coverAt = (y, extra='') => `<div class="cover" style="background-position:50% ${y}%;${extra}"></div>`;
+// A wide frame from the portrait cover: the cover itself (lettering and heroes) on the right, the same art blurred and
+// darkened filling the rest, so nothing has to be cropped out of the lettering.
+const wideCover = (w, h, small) => `<div class="cover" style="background-position:50% 100%;filter:blur(${small ? 8 : 16}px) brightness(.45);transform:scale(1.15)"></div>
+  <div class="cover" style="left:auto;width:${Math.round(h * 860 / 1021)}px;right:${Math.round(w * 0.06)}px;background-size:100% auto;background-position:50% 0;box-shadow:0 0 40px 10px rgba(0,0,0,.6)"></div>
+  ${small ? '' : HEROES.map((x, i) => `<img class="mon" src="${x}" style="left:${Math.round(w * 0.04 + i * w * 0.13)}px;height:${Math.round(h * 0.42)}px;bottom:${Math.round(h * 0.05)}px">`).join('')}`;
 const IMAGES = [
   // Header capsule (store page top, search, recommendations)
-  ['header_capsule_920x430', 920, 430, false, coverAt(74) + `<div class="shade" style="background:linear-gradient(180deg,rgba(19,13,9,.82) 0,rgba(19,13,9,.25) 46%,rgba(19,13,9,0) 62%)"></div>
-    <img class="logo" src="${LOGO}" style="top:14px;width:470px">`],
+  ['header_capsule_920x430', 920, 430, false, LOGO ? coverAt(74) + `<img class="logo" src="${LOGO}" style="top:14px;width:470px">` : wideCover(920, 430)],
   // Small capsule (lists): the logo must read at this size
-  ['small_capsule_462x174', 462, 174, false, coverAt(70, 'filter:brightness(.55) saturate(1.1)') + `<img class="logo" src="${LOGO}" style="top:18px;width:390px">`],
+  ['small_capsule_462x174', 462, 174, false, LOGO ? coverAt(70, 'filter:brightness(.55) saturate(1.1)') + `<img class="logo" src="${LOGO}" style="top:18px;width:390px">` : wideCover(462, 174, true)],
   // Main capsule (front page carousel)
-  ['main_capsule_1232x706', 1232, 706, false, coverAt(76) + `<div class="shade" style="background:linear-gradient(180deg,rgba(19,13,9,.85) 0,rgba(19,13,9,.3) 40%,rgba(19,13,9,0) 58%)"></div>
-    <img class="logo" src="${LOGO}" style="top:22px;width:620px">`],
+  ['main_capsule_1232x706', 1232, 706, false, LOGO ? coverAt(76) + `<img class="logo" src="${LOGO}" style="top:22px;width:620px">` : wideCover(1232, 706)],
   // Vertical capsule (seasonal sales): the cover as drawn, title lettering included
   ['vertical_capsule_748x896', 748, 896, false, `<div class="cover" style="background-size:748px auto;background-position:50% 0"></div>
     <div class="shade" style="top:auto;height:60px;background:linear-gradient(180deg,rgba(19,13,9,0),#130d09)"></div>`],
   // Library capsule (the player's game library grid)
   ['library_capsule_600x900', 600, 900, false, `<div class="cover" style="background-size:auto 900px;background-position:46% 0"></div>`],
   // Library header
-  ['library_header_920x430', 920, 430, false, coverAt(74) + `<div class="shade" style="background:linear-gradient(180deg,rgba(19,13,9,.82) 0,rgba(19,13,9,.25) 46%,rgba(19,13,9,0) 62%)"></div>
-    <img class="logo" src="${LOGO}" style="top:14px;width:470px">`],
+  ['library_header_920x430', 920, 430, false, LOGO ? coverAt(74) + `<img class="logo" src="${LOGO}" style="top:14px;width:470px">` : wideCover(920, 430)],
   // Library hero (behind the game's library page; no logo: Steam lays the library logo over it)
   ['library_hero_3840x1240', 3840, 1240, false, `<div class="cover" style="background-position:50% 100%;filter:blur(22px) brightness(.4);transform:scale(1.1)"></div>
     <div class="shade" style="background:radial-gradient(ellipse at 50% 100%,rgba(255,150,60,.32),rgba(19,13,9,0) 62%),linear-gradient(180deg,rgba(19,13,9,.55),rgba(19,13,9,0) 40%)"></div>
     ${HEROES.map((h, i) => `<img class="mon" src="${h}" style="left:${560 + i * 250}px;height:${430 - (i % 2) * 30}px;bottom:${70 + (i % 2) * 40}px;z-index:2">`).join('')}
     ${BOSSES.slice(0, 6).map((b, i) => `<img class="mon" src="${b}" style="left:${1660 + i * 330}px;height:${520 + (i % 2) * 70}px;bottom:${60 + (i % 2) * 50}px;z-index:${i % 2 ? 1 : 2}">`).join('')}`],
   // Library logo (transparent; Steam places it over the hero)
-  ['library_logo_1280x720', 1280, 720, true, `<img class="logo" src="${LOGO}" style="top:50%;transform:translate(-50%,-50%);width:1240px;filter:drop-shadow(0 10px 0 #0c0705)">`],
+  ['library_logo_1280x720', 1280, 720, !!LOGO, LOGO ? `<img class="logo" src="${LOGO}" style="top:50%;transform:translate(-50%,-50%);width:1240px;filter:drop-shadow(0 10px 0 #0c0705)">`
+    : `<div class="cover" style="background-size:1280px auto;background-position:50% 6%"></div>`], // stand-in until TITLE_PNG exists (Steam wants it transparent)
   // Community icon and client icon
   ['community_icon_184x184', 184, 184, false, `<div class="cover" style="background-size:430px auto;background-position:50% 62%"></div>`],
 ];
