@@ -5463,7 +5463,7 @@ function pcFitCamp(){
 }
 // PC layout: the end screens (victory, defeat, demo end, unlock) keep the phone card, scaled to the window height.
 function pcFitCard(again){
-  if(!pcMode()) return;
+  if(!pcMode()){ phoneFitCard(again); return; }
   if(!again){ const scr = S && S.screen; setTimeout(()=>{ if(S && S.screen===scr) pcFitCard(true); }, 300); } // images (portrait, dice) can grow the card after the draw
   const a = document.getElementById('app'), c = a && a.firstElementChild; if(!c) return;
   // measure what the card holds (the card itself stretches to the window height)
@@ -5474,6 +5474,15 @@ function pcFitCard(again){
   // the card sits a little below the top: everything scales from the window's top, so shrink by the overshoot
   const bottom = Math.max(...kids.map(k=>k.getBoundingClientRect().bottom)), room = window.innerHeight - 10;
   if(kids.length && bottom > room) a.style.zoom = Math.max(0.6, parseFloat(a.style.zoom) * room / bottom).toFixed(3);
+}
+// Phone end screens (Nov 25, Jeremy: the Floor Cleared page scrolls slightly): when the card is taller than the window
+// (a short phone, a long run card) it shrinks just enough to fit, never below 80%; otherwise it is left alone.
+function phoneFitCard(again){
+  if(!again){ const scr = S && S.screen; setTimeout(()=>{ if(S && S.screen===scr) phoneFitCard(true); }, 300); }
+  const a = document.getElementById('app'), c = a && a.firstElementChild; if(!c || !c.classList.contains('end-screen')) return;
+  c.style.zoom = '';
+  const over = document.documentElement.scrollHeight - window.innerHeight;
+  if(over > 1){ const h = c.getBoundingClientRect().height; if(h > 0) c.style.zoom = Math.max(0.8, (h - over - 2) / h).toFixed(3); }
 }
 // PC fight layout (Nov 13): route + room in the left column, the tray in the right, both exactly as tall, and the hover
 // caption under both. Heights are measured (offsetHeight is the unzoomed size), so a taller tray (quest rows) or room still

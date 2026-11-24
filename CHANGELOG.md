@@ -2,6 +2,7 @@
 
 ## 1.42.159 (Nov 25, 2026)
 - Tutorial and tip bubbles point at what they talk about: the bubble slides over its target, the arrow sits right above it, and a dotted line runs down to the ringed die or button (Go, Skill and lower rows included).
+- Floor Cleared / unlock and the other end screens never scroll on a phone: a card taller than the window (a short phone, a long run card) shrinks just enough to fit.
 
 ## 1.42.158 (Nov 25, 2026)
 - Room doors open on their own after a beat (1.2 s, a boss's 1.9 s); a tap still opens them sooner.
