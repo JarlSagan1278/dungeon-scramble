@@ -8,7 +8,7 @@
 const GAME_VERSION = '1.42.154';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
-var BUILD = { demo:false, release:false, app:false };
+var BUILD = { demo:false, release:false, app:false, steam:false };
 
 function face(str){
   if(str==null) return {type:'blank'};

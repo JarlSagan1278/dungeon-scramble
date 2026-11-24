@@ -13,8 +13,9 @@ const SRC = path.join(__dirname, 'src');
 // --release = public/store build in dist/release/ (no Debug unlock); --demo = free Floors 1-2 build in dist/demo/ (Nov 8: was Floor 1 only).
 const DEMO = process.argv.includes('--demo');
 const APP = process.argv.includes('--app'); // Oct 26: the store app (release + Floor 1 free, one purchase unlocks the rest) in dist/app/
-const RELEASE = DEMO || APP || process.argv.includes('--release');
-const DIST_DIR = path.join(__dirname, 'dist', DEMO ? 'demo' : APP ? 'app' : RELEASE ? 'release' : '');
+const STEAM = process.argv.includes('--steam'); // Nov 24: the Steam desktop build (release, full game, desktop wrapper in steam/) in dist/steam/
+const RELEASE = DEMO || APP || STEAM || process.argv.includes('--release');
+const DIST_DIR = path.join(__dirname, 'dist', DEMO ? 'demo' : APP ? 'app' : STEAM ? 'steam' : RELEASE ? 'release' : '');
 const OUT = path.join(DIST_DIR, DEMO ? 'dungeon_scramble_demo.html' : 'dungeon_scramble.html');
 
 function read(name) {
@@ -25,8 +26,8 @@ const head = read('_head.html').replace('<title>Dungeon Scramble</title>', DEMO 
 // Comments are for us, not the player: strip them from the shipped CSS (no string in styles.css contains "/*").
 const styles = read('styles.css').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\n[ \t]*(?=\n)/g, '').replace(/\n{2,}/g, '\n');
 const body = read('_body.html');
-let data = read('data.js').replace('var BUILD = { demo:false, release:false, app:false };', `var BUILD = { demo:${DEMO}, release:${RELEASE}, app:${APP} };`);
-if (RELEASE && !/var BUILD = \{ demo:(true|false), release:true, app:(true|false) \}/.test(data)) throw new Error('build flags line not found in data.js');
+let data = read('data.js').replace('var BUILD = { demo:false, release:false, app:false, steam:false };', `var BUILD = { demo:${DEMO}, release:${RELEASE}, app:${APP}, steam:${STEAM} };`);
+if (RELEASE && !/var BUILD = \{ demo:(true|false), release:true, app:(true|false), steam:(true|false) \}/.test(data)) throw new Error('build flags line not found in data.js');
 // LOGO_IMG is only used by the rulebook (tools/gen.js reads src/assets.js itself), so the game builds leave it out.
 // Nov 12: the pictures are files in src/art/; assets.js holds "art:<path>" references that inlineArt() turns back into data: URLs.
 const { inlineArt } = require('./tools/art/inline.js');
@@ -133,7 +134,7 @@ const webAssets = assets.replace(/(["'])data:image\/(png|jpeg|webp);base64,([A-Z
 });
 const webScriptParts = [data, webAssets, logic, depth, render, music, main].join('\n'); // music added Oct 17 (was missing from the web build since 1.39.5)
 const webBase = html.replace(scriptParts, () => webScriptParts);
-const webHtml = webBase.replace('</head>', PWA_HEAD).replace('</body>', PWA_REG);
+const webHtml = STEAM ? webBase : webBase.replace('</head>', PWA_HEAD).replace('</body>', PWA_REG); // the Steam app loads files from disk: no manifest or service worker
 fs.writeFileSync(path.join(WEB, 'index.html'), webHtml, 'utf8');
 const ICONS = ['icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png', 'favicon-48.png'];
 ICONS.forEach(f => fs.copyFileSync(path.join(SRC, 'pwa', f), path.join(WEB, f)));
@@ -149,7 +150,7 @@ fs.writeFileSync(path.join(WEB, 'manifest.webmanifest'), JSON.stringify({
   ]
 }, null, 2), 'utf8');
 const SW = `// Dungeon Scramble service worker -- cache name is stamped with the game version.
-const CACHE = 'ds-${DEMO ? 'demo-' : APP ? 'app-' : ''}${VERSION}';
+const CACHE = 'ds-${DEMO ? 'demo-' : APP ? 'app-' : STEAM ? 'steam-' : ''}${VERSION}';
 const FILES = ['./', 'index.html', 'manifest.webmanifest'].concat(${JSON.stringify(ICONS)}).concat(${JSON.stringify([...ART_FILES].map(f => 'art/' + f))});
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));

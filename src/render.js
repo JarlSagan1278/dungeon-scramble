@@ -3901,8 +3901,11 @@ function openCreditsModal(){
   </div>`);
 }
 // Fullscreen (Nov 25, Steam ready): a Settings switch and F11 / Alt+Enter on a computer. Phones and the store app skip it.
-function canFullscreen(){ try{ return !!(document.fullscreenEnabled && document.documentElement.requestFullscreen) && !(typeof BUILD!=='undefined' && BUILD.app) && matchMedia('(pointer: fine)').matches; }catch(e){ return false; } }
-function toggleFullscreen(){ try{ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>{}); }catch(e){} }
+// Steam desktop app (Nov 24, steam/): window.DSDesktop (steam/preload.js) runs the real window's fullscreen and Quit.
+function desktopApp(){ return typeof window!=='undefined' && window.DSDesktop ? window.DSDesktop : null; }
+function isFullscreenNow(){ const d = desktopApp(); return d ? !!d.isFullscreen() : !!document.fullscreenElement; }
+function canFullscreen(){ if(desktopApp()) return true; try{ return !!(document.fullscreenEnabled && document.documentElement.requestFullscreen) && !(typeof BUILD!=='undefined' && BUILD.app) && matchMedia('(pointer: fine)').matches; }catch(e){ return false; } }
+function toggleFullscreen(){ const d = desktopApp(); if(d){ d.toggleFullscreen(); return; } try{ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>{}); }catch(e){} }
 function openSettingsModal(){
   const inRun = !!S;
   const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:340px;">
@@ -3917,7 +3920,7 @@ function openSettingsModal(){
         ${settingsToggleRowHTML('pref-vibration', 'Vibration (phones)', PREFS.vibration!==false)}
         ${settingsToggleRowHTML('pref-flick-roll', 'Flick or shake to roll each turn', PREFS.flickRoll!==false)}
         ${pcFits() ? settingsToggleRowHTML('pref-pc-layout', 'Wide-screen layout', pcWanted()) : ''}
-        ${canFullscreen() ? settingsToggleRowHTML('pref-fullscreen', 'Fullscreen (F11)', !!document.fullscreenElement) : ''}
+        ${canFullscreen() ? settingsToggleRowHTML('pref-fullscreen', 'Fullscreen (F11)', isFullscreenNow()) : ''}
         ${pcMode() ? `<p class="hint" id="pc-pad-status" style="text-align:left;margin:2px 0 0;">${pcPadStatusText()}</p>` : ''}
         ${PLAYDATA_URL ? settingsToggleRowHTML('pref-share-data', 'Share play data automatically', shareDataPref()==='yes') : ''}
       </div>
@@ -3933,11 +3936,13 @@ function openSettingsModal(){
         ${inRun ? '<button id="settings-restart-btn" class="danger">Abandon Run</button>' : ''}
         <button id="settings-reset-progress-btn" class="danger-outline">Reset Progress</button>
       </div>
+      ${desktopApp() ? '<button id="settings-quit-btn" class="settings-quit-btn">Quit Game</button>' : ''}
       <p class="hint" style="margin:10px 0 0;">v${GAME_VERSION}</p>
     </div></div>`);
   openModal(overlay);
   const close = ()=> closeModal(overlay);
   overlay.querySelector('#settings-x-btn').onclick = close;
+  { const q = overlay.querySelector('#settings-quit-btn'); if(q) q.onclick = ()=> desktopApp().quit(); } // the run in progress is already saved (Continue)
   const logBtn = overlay.querySelector('#settings-log-btn');
   if(logBtn) logBtn.onclick = ()=>{ close(); openInfoModal('Log', logViewHTML()); const j = document.getElementById('log-journal'); if(j) j.scrollTop = j.scrollHeight; };
   overlay.querySelector('#settings-how-to-play-btn').onclick = ()=>{ close(); openTutorialModal(0); };

@@ -1,0 +1,47 @@
+{
+  "name": "dungeon-scramble-steam",
+  "productName": "Dungeon Scramble",
+  "version": "1.42.154",
+  "private": true,
+  "description": "Steam desktop app for Dungeon Scramble. Game files come from `node build.js --steam` via prepare.js.",
+  "main": "main.js",
+  "author": "Jeremy Friedman",
+  "scripts": {
+    "prepare-web": "node prepare.js",
+    "start": "npm run prepare-web && electron .",
+    "dist": "npm run prepare-web && electron-builder --dir"
+  },
+  "devDependencies": {
+    "electron": "45.2.3",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "com.dungeonscramble.game",
+    "productName": "Dungeon Scramble",
+    "executableName": "DungeonScramble",
+    "directories": {
+      "output": "out"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "package.json",
+      "web/**/*"
+    ],
+    "asar": true,
+    "win": {
+      "target": "dir",
+      "icon": "icon.png"
+    },
+    "linux": {
+      "target": "dir",
+      "icon": "icon.png",
+      "category": "Game"
+    },
+    "mac": {
+      "target": "dir",
+      "icon": "icon.png",
+      "category": "public.app-category.games"
+    }
+  }
+}

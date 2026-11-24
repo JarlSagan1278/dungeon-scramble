@@ -1,0 +1,29 @@
+# Builds the Steam desktop app (Nov 24): the --steam game build in an Electron window (steam/), for Windows and Linux
+# (Linux runs natively on the Steam Deck). By hand only: Actions tab > Steam build > Run workflow. Each run attaches
+# "dungeon-scramble-steam-windows" and "dungeon-scramble-steam-linux": the folders to upload to Steam as depots.
+name: Steam build
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - { os: windows-latest, platform: win, name: windows, folder: win-unpacked }
+          - { os: ubuntu-latest, platform: linux, name: linux, folder: linux-unpacked }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Build the game (Steam flavour)
+        run: node build.js --steam
+      - name: Package the desktop app
+        working-directory: steam
+        run: npm ci && node prepare.js && npx electron-builder --dir --${{ matrix.platform }} --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dungeon-scramble-steam-${{ matrix.name }}
+          path: steam/out/${{ matrix.folder }}
+          if-no-files-found: error

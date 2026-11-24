@@ -8,7 +8,9 @@ REG = {"skill":60,"abilityRate":0.35,"trayActRate":0.3,"tokenRate":0.3,"lootRand
 D7 = {"foes":1,"fury":1,"rest":1,"swarm":1}
 SHR = "SHRINE_SLOT_CHANCE[0]=0.30; SHRINE_SLOT_CHANCE[1]=0.35; SHRINE_SLOT_CHANCE[2]=0.40;"
 VAR = [('base', {}), ('shrine', {"patchJs":SHR}), ('hp10', {"hpMul":[1,1.1,1.1]}), ('hit1', {"hitAdd":[0,1,1]}),
-       ('mix', {"patchJs":SHR, "hpMul":[1,1.05,1.05]})]
+       ('mix', {"patchJs":SHR, "hpMul":[1,1.05,1.05]}),
+       # round 2: combinations, and +1 hit on Floor 3 only
+       ('hpshr', {"patchJs":SHR, "hpMul":[1,1.1,1.1]}), ('hit3', {"hitAdd":[0,0,1]}), ('hp10hit3', {"hpMul":[1,1.1,1.1], "hitAdd":[0,0,1]})]
 CL = [('guard','dwarf'),('arcanist','gnome'),('armsmaster','gnome'),('dungeoneer','dwarf')]
 cells = []
 for v, vc in VAR:
