@@ -1258,7 +1258,11 @@ function drawRoomCard(floor){
   const fights = floor.enemies.concat(isVeryFirstEncounter || S.segmentTrapUsed ? [] : floor.traps);
   if(tier==='elite'){
     const deadly = fights.filter(c=>encounterTier(c)==='deadly' && unused(c) && (!c.dreadOnly || depthRank('dread'))); // v1.39.0: dreadOnly cards appear only with the Dread modifier
-    if(deadly.length && RNG() < DEADLY_CHANCE + 0.12*depthRank('dread')) return pick(deadly);
+    // Daily Dungeon (Nov 25, Jeremy picked B after the 60-day check: the hardest days paired a weak set-up with a Deadly room):
+    // at most one Deadly room per Daily, and none before the middle of Floor 2
+    const dailyOk = !S.daily || ((S.floorIdx===2 || (S.floorIdx===1 && S.routeStep >= Math.floor((S.route||[]).length/2)))
+      && !FLOORS.some(f=>[...f.enemies, ...f.traps].some(c=>encounterTier(c)==='deadly' && S.usedCards.has(c.name))));
+    if(dailyOk && deadly.length && RNG() < DEADLY_CHANCE + 0.12*depthRank('dread')) return pick(deadly);
   }
   const fallback = {easy:['easy','standard','elite'], standard:['standard','easy','elite'], elite:['elite','standard','easy']}[tier];
   for(const t of fallback){

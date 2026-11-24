@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.165 (Nov 25, 2026)
+- Three new foe rules: Zero-Sum Game (Rogue Technician: Block you gain heals it twice as much), Pythagorean Theorem (Anti-Euclidian Space: dice reached by a diagonal step deal x1.5), Asymptote (The Punished: your path deals it at most 16 a turn; D.O.T. ignores the limit). Each with its plaque, counter badge, call-out, tip and Codex entry.
+- Daily Dungeon: at most one Deadly room per Daily, and none before the middle of Floor 2.
+
 ## 1.42.164 (Nov 25, 2026)
 - Codex: the foe rules (Null Hypothesis, Odd Permutation, Most Wanted) under the Key, and on each such foe's Bestiary page, once you've met it.
 - Sound: New Action cards and tips now chime when they appear.
