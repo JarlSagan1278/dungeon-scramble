@@ -2977,6 +2977,7 @@ function maybeShowSymbolIntro(){
       if((document.getElementById('room-callout-scrim') || document.getElementById('room-callout') || document.querySelector('.modal-overlay')) && tries++ < 60){ setTimeout(showCard, 500); return; }
       const card = el(`<div id="symbol-intro" class="symbol-intro" role="status"><div class="symbol-intro-icon">${icon}</div><div class="symbol-intro-text"><div class="symbol-intro-kicker">New Action</div><strong>${name}</strong><span>${desc}</span></div></div>`);
       document.body.appendChild(card);
+      try{ playTone('glint'); }catch(e){} // Nov 25 sound audit: a lesson card should be heard, not only seen
       // Oct 28 (release review): sit at the top of the fight scene (over the back wall), never over the dice, the rail
       // buttons, the HP bars or the enemy's next-move chips
       const place = ()=>{ const f = document.querySelector('.fo-side'); const scene = f && f.parentElement; if(!scene || !card.isConnected) return;
@@ -4227,7 +4228,16 @@ function keyCardHTML(){
       <div class="key-desc" id="key-desc">Tap an action to see what it does.</div>
     </div>
     ${S && S.klass ? `<p class="hint" style="margin-top:8px;">${S.klass.name} zone highlighted with dashed outline on the Tray. ${S.klass.ability}</p>` : ''}
+    ${foeRulesKeyHTML()}
   `;
+}
+// Nov 25 (Jeremy): the foe rules in the Codex, so they can be looked up after their one-time tip. A rule shows once you've
+// met a foe that has it (the Bestiary page of that foe says it too); the others stay hidden.
+function foeRulesKeyHTML(){
+  const B = META.bestiary || {}, all = [...FLOOR1_ENEMIES, ...FLOOR2_ENEMIES, ...FLOOR3_ENEMIES].filter(e=>e.rule && FOE_RULES[e.rule]);
+  if(!all.length) return '';
+  return `<div class="cx-rules"><div class="cx-rules-h">Foe rules</div>${all.map(e=>{ const R = FOE_RULES[e.rule];
+    return B[e.name] ? `<div class="cx-rule"><b>${R.name}</b> <small>(${e.name})</small><span>${R.tip}</span></div>` : `<div class="cx-rule locked"><b>???</b><span>Meet the foe that follows this rule to learn it.</span></div>`; }).join('')}</div>`;
 }
 function keyShow(cell){
   const t = cell.dataset.key, box = document.getElementById('key-desc'); if(!box) return;
@@ -4801,7 +4811,7 @@ function bestiaryHTML(){
     }
     const id = 'b'+i;
     CODEX_PAGES[id] = codexPageHTML('Bestiary', `${art?`<img class="cx-big" src="${art}" alt=""/>`:''}<div class="cx-pname">${e.name}</div>
-      <div><span class="cx-tag t-${tk}">${tier} &middot; Floor ${floor} &middot; ${hp} HP</span></div>${moves}${bestiaryQuestsHTML(e)}
+      <div><span class="cx-tag t-${tk}">${tier} &middot; Floor ${floor} &middot; ${hp} HP</span></div>${moves}${bestiaryQuestsHTML(e)}${e.rule && FOE_RULES[e.rule] ? `<div class="cx-rule"><b>${FOE_RULES[e.rule].name}</b><span>${FOE_RULES[e.rule].tip}</span></div>` : ''}
       ${e.flavor ? `<p class="cx-flav">${e.flavor}</p>` : ''}
       <div class="cx-tally">Beaten ${b.won||0}${b.lost ? ` &middot; <span class="bst-lost">Beat you ${b.lost}</span>` : ''}</div>`);
     return codexCardHTML({page:id, pic, name:e.name, tag:tier, tagCls:'t-'+tk});
@@ -6914,7 +6924,7 @@ function updateTips(){
     markTipSeen(t.k); LESSON_ROOM = lessonRoomKey();
     _tip = {k:t.k, pathLen:S.path.length, at:performance.now(), el:t.el};
     const b = document.createElement('div'); b.id='tip-bubble'; b.className='guide-bubble tip-bubble';
-    b.innerHTML = `<div class="guide-text">${TIP_TEXT[t.k](t.arg)}</div>`; b.onclick = hideTip; document.body.appendChild(b);
+    b.innerHTML = `<div class="guide-text">${TIP_TEXT[t.k](t.arg)}</div>`; b.onclick = hideTip; document.body.appendChild(b); try{ playTone('uiTick'); }catch(e){}
     const r = document.createElement('div'); r.id='tip-ring'; r.className='guide-ring'; document.body.appendChild(r);
   }
   const b=document.getElementById('tip-bubble'), r=document.getElementById('tip-ring'), tray=document.getElementById('tray');

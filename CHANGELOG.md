@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.42.164 (Nov 25, 2026)
+- Codex: the foe rules (Null Hypothesis, Odd Permutation, Most Wanted) under the Key, and on each such foe's Bestiary page, once you've met it.
+- Sound: New Action cards and tips now chime when they appear.
+- Play app: until the full_game product is offered, the Floor 1 unlock stays free (testers were stuck after Floor 1).
+- A hero's back gear no longer pokes past the screen edge when the hero recoils (phones).
+
 ## 1.42.163 (Nov 25, 2026)
 - Attack dice are a deeper red, so players with red-green colour blindness still see them darker than the cream maneuver dice.
 - Slow phones switch to the lighter effects by themselves (the dice roll stuttered at budget-phone speed); the room floor is cached per size.

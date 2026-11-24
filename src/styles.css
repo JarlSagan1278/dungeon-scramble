@@ -4048,6 +4048,13 @@ body.pc .defeat-scene.ds-pc{ height:230px; margin:0 0 12px; }
 .foe-rule b{ display:block; font:400 12px/1.1 var(--font-display); color:#e2c8ff; letter-spacing:.3px; }
 .foe-rule span{ display:block; font-size:11px; color:#f3e3c3; } .foe-rule span b{ display:inline; font:inherit; font-weight:800; color:#ffd76a; }
 .foe-rule .fr-short{ display:none; }
+/* Nov 25 (bug hunt): a hero's back gear could poke past the screen's left edge for a moment when the hero recoils from a hit; the room band clips sideways only */
+body:not(.pc) .fo-band{ overflow-x:clip; }
+/* Codex: foe rules (Nov 25), on a foe's Bestiary page and under the Key */
+.cx-rule{ margin:8px 0 0; padding:5px 9px; border:2px solid #0c0705; border-radius:9px; background:#3a2752; box-shadow:0 2px 0 #0c0705; text-align:left; line-height:1.25; }
+.cx-rule b{ font:400 14px/1.2 var(--font-display); color:#e2c8ff; } .cx-rule small{ color:#cdb8e6; font-size:11px; }
+.cx-rule span{ display:block; font-size:12.5px; color:#f3e3c3; margin-top:2px; } .cx-rule.locked{ opacity:.6; }
+.cx-rules{ margin-top:12px; } .cx-rules-h{ font:400 16px var(--font-display); color:var(--gold); margin-bottom:2px; }
 /* Phone (Nov 24): one line hung under the foe's column, so a foe rule never makes the room taller (it pushed the tray 37px down, off a 769px phone) */
 body:not(.pc) .foe-rule{ position:absolute; top:100%; right:calc(100% - 50px); margin:2px 0 0; max-width:none; padding:1px 8px 2px; white-space:nowrap; line-height:1.1; z-index:2; }
 body:not(.pc) .foe-rule b{ display:inline; font-size:12px; margin-right:5px; }

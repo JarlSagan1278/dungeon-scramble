@@ -148,13 +148,15 @@ setTimeout(()=>{ try{ resendUnconfirmedRuns(); flushRunUploads(); }catch(e){} },
       if(st==='1'){ owned = true; if(t.isAcknowledged===false && t.purchaseToken && IAP.acknowledgePurchase) IAP.acknowledgePurchase({purchaseToken:t.purchaseToken}).catch(()=>{}); }
       else if(st==='2') pending = true; });
     DS.pending = pending && !owned; return owned; };
-  const DS = window.DSStore = {
+  // Nov 25: the bridge goes live only once Google offers the product. Until full_game exists in Play Console (and in tracks
+  // where it isn't offered), STORE falls back to the free test unlock, as before billing, so testers are never stuck.
+  const DS = {
     price: null, pending: false,
     buy: async ()=>{ try{ const t = await IAP.purchaseProduct({productIdentifier:PID, productType:TYPE}); return settle([t]); }catch(e){ DS.pending = false; return false; } },
     restore: async ()=>{ try{ if(IAP.restorePurchases) await IAP.restorePurchases().catch(()=>{}); const r = await IAP.getPurchases({productType:TYPE}); return settle(r && r.purchases); }catch(e){ return false; } },
   };
   IAP.getProducts({productIdentifiers:[PID], productType:TYPE}).then(r=>{ const p = r && r.products && r.products.find(x=>x.identifier===PID);
-    if(p && p.priceString){ DS.price = p.priceString; if(typeof S!=='undefined' && S && S.screen==='unlock') render(); } }).catch(()=>{});
+    if(p){ DS.price = p.priceString || null; window.DSStore = DS; if(typeof S!=='undefined' && S && S.screen==='unlock') render(); } }).catch(()=>{});
   DS.restore().then(ok=>{ if(ok && typeof hasFullGame==='function' && !hasFullGame() && typeof grantFullGame==='function'){ grantFullGame('restore');
     if(typeof S!=='undefined' && S && S.screen==='unlock'){ S._unlockFx = false; continueAfterUnlock(); render(); } } });
 })();
