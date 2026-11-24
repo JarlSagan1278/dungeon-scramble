@@ -22,7 +22,7 @@ const DEPTH_MODS = [
   { id:'swarm', name:'Swarming',       max:2, costs:[1,2], desc:r=>`Minion spawns place ${r} extra die${r>1?'s':''}.` },
   { id:'slim',  name:'Burden of Choice', max:1, costs:[1], desc:r=> 'Overkills add no loot option, and every loot reward offers one fewer die.' },
   { id:'fury',  name:'Zeal',           max:2, costs:[3,1], desc:r=> r===1 ? 'Every enemy hit deals +1 damage.' : 'Every enemy hit deals +1 damage, and heavy turns and boss specials +1 more.' },
-  { id:'dread', name:'Dread',          max:3, costs:[1,1,1], desc:r=>`Deadly encounters are ${r*12}% more likely to take an Elite room, Elite and Deadly foes have +${Math.round(r*DREAD_HP*100)}% HP, and Floor 1 gains its own Deadly card.` },
+  { id:'dread', name:'Dread',          max:3, costs:[1,1,1], desc:r=>`Deadly encounters are ${r*12}% more likely to take an Elite room, Elite and Deadly foes have +${Math.round(r*DREAD_HP*100)}% HP (with Tougher Scuffs, at most +${Math.round(STRONG_FOE_DEPTH_CAP*100)}% in all), and Floor 1 gains its own Deadly card.` },
   // Oct 12 (Jeremy: "test out these two"): cheap one-point levers, being measured.
   { id:'dues',  name:'Union Dues',     max:1, costs:[1], desc:r=>'Receiving a shrine\'s boon costs 2 HP.' },
   { id:'round', name:'Rounding Error', max:1, costs:[2], desc:r=>'Your Heal faces heal 1 less (never below 1).' },
@@ -63,6 +63,12 @@ function depthScoreMul(depth){ return 1 + 0.25*((depth||1)-1); }
 
 function floorHpMul(floorIdx){
   return (BASE_HP_MUL[floorIdx]||1) * (1 + 0.15*depthRank('foes'));
+}
+// Elite and Deadly foes (Nov 25, Jeremy picked A after the high-Depth study): Tougher Scuffs and Dread add up instead of
+// multiplying, and their Depth bonus tops out at +80% (it reached +156%: a 156 HP Whence Wolf on Floor 2 at Depth 14).
+const STRONG_FOE_DEPTH_CAP = 0.8;
+function strongFoeHpMul(floorIdx){
+  return (BASE_HP_MUL[floorIdx]||1) * (1 + Math.min(STRONG_FOE_DEPTH_CAP, 0.15*depthRank('foes') + DREAD_HP*depthRank('dread')));
 }
 
 /* ---- Persistent bests ---- */

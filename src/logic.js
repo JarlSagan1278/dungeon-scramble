@@ -1283,7 +1283,7 @@ function drawEncounter(kind){
   S.usedCards.add(e.name);
   if(e.type!=='Shrine') bestiaryNote(e.name, 'met');
   e.carry = null; // Nov 18 (Jeremy): foes don't carry loot (there are several choices); e.carry is only the defeat scene's
-  if(e.health>0){ e.health = Math.max(1, Math.round(e.health * floorHpMul(S.floorIdx) * (/^(elite|deadly)$/.test(encounterTier(e)) ? 1 + DREAD_HP*depthRank('dread') : 1))); if(e.maxHealth!==undefined) e.maxHealth = e.health; }
+  if(e.health>0){ e.health = Math.max(1, Math.round(e.health * (/^(elite|deadly)$/.test(encounterTier(e)) ? strongFoeHpMul(S.floorIdx) : floorHpMul(S.floorIdx)))); if(e.maxHealth!==undefined) e.maxHealth = e.health; }
   e.curHealth = e.health;
   e.curDOT = 0; e.curHOT = 0; e.curShield = 0; e.turn = 0;
   // Your own D.O.T./H.O.T. don't carry from one encounter into the next
