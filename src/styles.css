@@ -4029,3 +4029,5 @@ body.pc .defeat-scene.ds-pc{ height:230px; margin:0 0 12px; }
 .hl-path .rc-die{ width:26px; height:26px; }
 .hl-path .hl-arrow{ font-style:normal; color:#c9b88f; font-size:14px; }
 .renown-climb{ margin-top:4px; color:#ffd76a; } /* after a win: the next Depth is worth more (Nov 23) */
+/* Depth closes in (Nov 24): a crimson vignette in the room that grows with the Depth you see */
+.room-tint.room-depth{ background:radial-gradient(ellipse 80% 70% at 50% 50%, transparent 40%, rgba(110,10,6,calc(.25 + var(--dd)*.5)) 100%); }

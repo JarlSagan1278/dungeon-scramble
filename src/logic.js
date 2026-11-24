@@ -717,7 +717,7 @@ function hasRankGift(g){ const k = rankNow(); return RANKS.slice(0, k+1).some(r=
 function renownForRun(outcome){
   const st = S.stats || {}, R = RENOWN;
   const base = R.run + (st.encountersDefeated||0)*R.foe + (st.bossesDefeated||0)*R.boss + (S.floorIdx||0)*R.floor + (outcome==='victory' ? R.win : outcome==='demo' ? R.demo : 0);
-  return Math.round(base * (1 + R.depthMul * (currentDepth()||0)));
+  return Math.round(base * (1 + R.depthMul * depthLabel(currentDepth()))); // the Depth players see (internal depth 1 = Depth 0)
 }
 // Guild Rank: every finished run earns renown (wins, losses and the demo's end alike); S.renownGain drives the end
 // screens. Also files the Daily Dungeon result. Called once per run (recordMetaProgress, renderDemoEnd).
@@ -945,11 +945,20 @@ function dailyRecord(outcome){
   if(!META.daily[S.daily.key]) META.daily[S.daily.key] = { n: S.daily.n, outcome, floor: S.floorIdx+1, log: (S.daily.log||[]).join(''), who: S.origin.name+' '+S.klass.name, killedBy: S.stats.killedBy||'', turns: S.stats.turnsTaken };
   saveMeta();
 }
+// Daily streak (Nov 24): consecutive Dailies played (scored tries), counting back from today, or from yesterday if
+// today's isn't played yet (the streak is still alive until the day ends).
+function dailyStreak(){
+  const played = new Set(Object.values(META.daily||{}).map(r=> r && r.n).filter(Boolean));
+  let n = dailyToday().n; if(!played.has(n)) n--;
+  let k = 0; while(played.has(n)){ k++; n--; }
+  return k;
+}
 function dailyShareText(res){
   const EM = { W:'\u{1F7E9}', E:'\u{1F7E8}', B:'\u{1F480}', S:'\u{1F7E6}', C:'\u26FA', X:'\u{1F7E5}', '|':'\n' };
   const grid = (res.log||'').split('').map(c=>EM[c]||'').join('');
   const head = res.outcome==='victory' ? `Conquered in ${res.turns} turns` : res.outcome==='demo' ? `Cleared the demo in ${res.turns} turns` : `Fell on Floor ${res.floor}${res.killedBy?` to ${res.killedBy}`:''}`;
-  return `Dungeon Scramble Daily #${res.n}\n${res.who}: ${head}\n${grid}\nhttps://dungeonscramble.itch.io/dungeon-scramble`;
+  const st = dailyStreak();
+  return `Dungeon Scramble Daily #${res.n}${st>1 ? ` \u{1F525}${st}` : ''}\n${res.who}: ${head}\n${grid}\nhttps://dungeonscramble.itch.io/dungeon-scramble`;
 }
 function pick(arr){ return arr[rand(arr.length)]; }
 function pickN(arr,n){ const pool=arr.slice(); const out=[]; while(out.length<n && pool.length){ out.push(pool.splice(rand(pool.length),1)[0]); } return out; }

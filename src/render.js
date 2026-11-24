@@ -804,6 +804,8 @@ function decorateArch(){
     card.querySelectorAll('.room-tint').forEach(n=>n.remove());
     const T = ROOM_TINTS[lvl];
     if(T) card.insertAdjacentHTML('afterbegin', `<div class="room-tint" style="background:${T[0]};mix-blend-mode:multiply"></div><div class="room-tint" style="background:radial-gradient(ellipse at 50% 45%, transparent 45%, ${T[1]} 100%)"></div>`);
+    // Nov 24: Depth closes in on the room: a crimson vignette that grows with the Depth you see (none at Depth 0)
+    { const dd = Math.min(1, depthLabel(currentDepth())/12); if(dd>0) card.insertAdjacentHTML('afterbegin', `<div class="room-tint room-depth" style="--dd:${dd.toFixed(2)}"></div>`); }
     try{ document.body.classList.toggle('is-resolving', !!S.transitioning); }catch(e){}
     syncIdleBreath(); syncMascotHop(); rollHpNumbers();
     // Headroom above the monster (offset sizes again), so big monsters grow upward only until the arch would hide them.
@@ -1015,8 +1017,8 @@ function renderTitle(){
             ${continueBtn}
             <button class="${saved?'':'primary'}" id="title-newrun-btn">${saved?'Start New Run':'New Run'}</button>
             ${(()=>{ if(BUILD.app && !hasFullGame()) return ''; const t = dailyToday(), r = dailyResult(t.key); // Daily Dungeon (Nov 23)
-              return r ? `<div class="title-daily-row"><button class="title-daily-btn done" id="title-daily-btn" title="Share today's result">Daily #${t.n}: ${r.outcome==='victory'?'Conquered':r.outcome==='demo'?'Cleared':'Floor '+r.floor} &middot; Share</button><button class="title-daily-btn practice" id="title-daily-practice" title="Play today's dungeon again for practice (your shared result stays)">Practice</button></div>`
-                       : `<button class="title-daily-btn" id="title-daily-btn" title="Today's dungeon is the same for everyone: one try">Daily Dungeon #${t.n}</button>`; })()}
+              return r ? `<div class="title-daily-row"><button class="title-daily-btn done" id="title-daily-btn" title="Share today's result">Daily #${t.n}: ${r.outcome==='victory'?'Conquered':r.outcome==='demo'?'Cleared':'Floor '+r.floor}${dailyStreak()>1?` &middot; ${dailyStreak()}-day streak`:''} &middot; Share</button><button class="title-daily-btn practice" id="title-daily-practice" title="Play today's dungeon again for practice (your shared result stays)">Practice</button></div>`
+                       : `<button class="title-daily-btn" id="title-daily-btn" title="Today's dungeon is the same for everyone: one try">Daily Dungeon #${t.n}${dailyStreak()>0?` <small>&middot; keep your ${dailyStreak()}-day streak</small>`:''}</button>`; })()}
             <div class="title-links">
               <button id="title-codex-btn" class="btn-codex">Codex</button>
               <button id="title-history-btn" class="btn-records">Records</button>
@@ -6077,7 +6079,7 @@ function renownHTML(compact){
   if(compact) return `<div class="renown-box renown-compact">${rankBadgeHTML(k)}<div class="rc-col"><div class="renown-head"><b>${g.ranksUp.length ? 'Rank up: ' : ''}${r.name}</b><span class="renown-gain">+${g.gain} renown</span></div><div class="renown-bar" style="--p0:${pctBefore.toFixed(1)}%;--p1:${pct.toFixed(1)}%"><i></i></div></div></div>`;
   return `<div class="renown-box"><div class="renown-head">${rankBadgeHTML(k)}<b>${r.name}</b><span class="renown-gain">+${g.gain} renown</span></div>
     <div class="renown-bar" style="--p0:${pctBefore.toFixed(1)}%;--p1:${pct.toFixed(1)}%"><i></i></div>
-    <div class="renown-next">${nx ? `${hi - g.after} to ${nx.name}: ${nx.text}` : 'Highest rank reached.'}</div>${S.screen==='victory' ? `<div class="renown-next renown-climb">Next challenge: Depth ${(currentDepth()||0)+1} earns &times;${(1 + RENOWN.depthMul*((currentDepth()||0)+1)).toFixed(2)} renown.</div>` : ''}${ups}</div>`;
+    <div class="renown-next">${nx ? `${hi - g.after} to ${nx.name}: ${nx.text}` : 'Highest rank reached.'}</div>${S.screen==='victory' ? `<div class="renown-next renown-climb">Next challenge: Depth ${depthLabel(currentDepth())+1} earns &times;${(1 + RENOWN.depthMul*(depthLabel(currentDepth())+1)).toFixed(2)} renown.</div>` : ''}${ups}</div>`;
 }
 // A rank-up is an event: a chime and a sparkle burst on the renown box, once per run (Nov 23)
 function rankUpFx(){
