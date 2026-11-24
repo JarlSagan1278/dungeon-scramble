@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.153 (Nov 24, 2026)
+- Foe rules: Null Hypothesis (Illegal Operation: one face type deals it no damage each turn), Odd Permutation (Transposer Kitty: the right path parity deals x1.5, the other x0.75), Most Wanted (Gnome Chomper: completing its Wanted poster makes the path hit twice). Each shows a plaque under the foe, marks on the dice or the damage counter, and a callout.
+- The defeat screen explains the loss from the killing blow and the fight.
+- Base Camp names your rank gifts (or the Daily); achievements for clever plays, a 7-day Daily streak and the Irrational rank; rank numbers show on the Rank ladder.
+
 ## 1.42.152 (Nov 24, 2026)
 - Daily streak: consecutive Dailies on the title button and in the share line.
 - Depth closes in: a crimson vignette in the fight room that grows with Depth.
