@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.42.154';
+const GAME_VERSION = '1.42.155';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false, steam:false };
@@ -616,7 +616,7 @@ const FORK_ELITE_BONUS = 1;
 const DEADLY_CHANCE = 0.12;      // per elite slot; Floor 1's only deadly card (Prickly Porcupanther) is dreadOnly
 // Chance a Shrine takes an easy/standard slot (max one per segment): rises by
 // floor and with depth (v1.36.0). See shrineSlotChance() in logic.js.
-const SHRINE_SLOT_CHANCE = [0.40, 0.45, 0.50];
+const SHRINE_SLOT_CHANCE = [0.30, 0.35, 0.40]; // Nov 24 (Jeremy: rebalance a bit): was 0.40/0.45/0.50; shrines carried most of the bots' extra power
 const SHRINE_CHANCE_PER_DEPTH = 0.03, SHRINE_CHANCE_MAX = 0.7;
 // Elite and deadly enemies telegraph a heavy turn every Nth turn (double attack,
 // or double their biggest effect if they don't attack).

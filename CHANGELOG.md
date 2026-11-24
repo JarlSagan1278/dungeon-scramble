@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.155 (Nov 25, 2026)
+- A bit harder: shrines appear less often (30/35/40% per room slot on Floors 1-3, was 40/45/50%) and Floor 2-3 enemies have another 10% health. Floor 1 is unchanged.
+- Steam desktop app: the game in its own window (steam/, built by the Steam build workflow for Windows and Linux), fullscreen by default and remembered, Quit Game in Settings.
+
 ## 1.42.154 (Nov 25, 2026)
 - Steam-ready PC polish: camp fills big windows, the settings gear grows with the window and sits in the fight's hint footer, a larger footer on big screens, Fullscreen (Settings switch, F11, Alt+Enter), controller button glyphs.
 - Null Hypothesis softened: it alternates Combo and D.O.T. and never cancels Hit (the Hit turn was unfair).

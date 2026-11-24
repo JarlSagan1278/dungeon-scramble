@@ -342,5 +342,23 @@ Deaths by floor (share of all runs): regular 1% / 6% / 7%, expert 4% / 13% / 6%.
 (66-82%). The end-of-run loot lean puts damage-heavy and movement-heavy loot low, but that measure is skewed by short
 runs that die early holding little loot (the Floor-2-entry measure on 1.42.149 showed every lean 73-100%).
 
+## Rebalance levers (Nov 24, 2026, build 1.42.154)
+Expert depth 7 and regular depth 0; Guard dwarf, Arcanist gnome, Armsmaster gnome, Dungeoneer dwarf; 60 runs per cell (240
+per row, about ±3 points). Floor 1 unchanged in every variant.
+
+| Variant | Expert d7 | Regular d0 | Deaths F1/F2/F3, expert | regular |
+|---|---|---|---|---|
+| unchanged | 76% | 81% | 5/15/4 | 0/9/10 |
+| fewer shrines (30/35/40%, was 40/45/50%) | 70% | 81% | 6/18/7 | 0/10/8 |
+| enemy health +10% Floors 2-3 | 65% | 79% | 6/22/7 | 0/10/11 |
+| +1 damage per enemy hit, Floors 2-3 | 62% | 67% | 6/25/8 | 0/23/10 |
+| fewer shrines + health +5% | 68% | 85% | 8/19/5 | 0/7/8 |
+| **fewer shrines + health +10% (shipped 1.42.155)** | **68%** | **76%** | 6/17/9 | 0/13/10 |
+| +1 hit on Floor 3 only | 75% | 80% | 7/15/4 | 2/8/11 |
+| health +10% + Floor 3 hit +1 | 62% | 66% | 4/22/12 | 0/13/20 |
+
++1 per hit makes Floor 2 a wall (regular Armsmaster 50%), the kind of enemy-side jump the balance philosophy avoids. Fewer
+shrines plus +10% health lowers both profiles by 5-8 points and spreads the extra deaths over Floors 2 and 3.
+
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.
