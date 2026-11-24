@@ -837,7 +837,7 @@ function saveSeen(seen){
 // should survive across runs (including after a run ends and the save is
 // cleared). ----
 const PREFS_KEY = 'dungeonScramblePrefs_v1';
-const DEFAULT_PREFS = { sound: true, music: true, reducedMotion: false, lowIntensity: false, vibration: true, sfxVol: 1, musicVol: 1, flickRoll: true, largeText: false }; // volumes 0-1 (Oct 13 sliders; 0 also turns sound/music off)
+const DEFAULT_PREFS = { sound: true, music: true, reducedMotion: false, lowIntensity: false, vibration: true, sfxVol: 1, musicVol: 1, flickRoll: true, largeText: false, fastTurns: false }; // volumes 0-1 (Oct 13 sliders; 0 also turns sound/music off)
 let PREFS = loadPrefs();
 function loadPrefs(){
   try{
@@ -846,6 +846,10 @@ function loadPrefs(){
     return { ...DEFAULT_PREFS, ...JSON.parse(raw) };
   }catch(e){ return { ...DEFAULT_PREFS }; }
 }
+// Turn speed (Nov 25, Jeremy, feel audit part 2: boss turns took 3-4.5 s to play out): Settings > Fast turns plays the
+// path and the foe's reply about 1.6x quicker. Long paths speed up on their own (playStepMs): dice 4+ come quicker.
+function playMs(ms){ return Math.round(ms * (PREFS && PREFS.fastTurns ? 0.62 : 1)); }
+function playStepMs(i, base){ return playMs(base * (i < 3 ? 1 : Math.max(0.6, 1 - 0.12*(i-2)))); }
 function savePrefs(){
   try{ localStorage.setItem(PREFS_KEY, JSON.stringify(PREFS)); } catch(e){}
 }
@@ -2313,7 +2317,7 @@ function runPlayerPathSteps(steps, i, path, effects){
   const advance = () => { S._pendingTimeout=null; runPlayerPathSteps(steps, i+1, path, effects); };
   S._advance = advance;
   if(S._skipAll) advance();
-  else S._pendingTimeout = setTimeout(advance, 320 + hitStop);
+  else S._pendingTimeout = setTimeout(advance, playStepMs(i, 320) + playMs(hitStop));
 }
 
 // Once every die in the path has landed: the path's own damage already
@@ -2367,7 +2371,7 @@ function finishPlayerPath(path, effects){
       teleLog('crescendo', {total:Math.round(tot), tier});
       const go = () => { S._pendingTimeout=null; runEnemyBeat(0); };
       S._advance = go;
-      S._pendingTimeout = setTimeout(go, calm ? 450 : [0,650,800,950][tier]);
+      S._pendingTimeout = setTimeout(go, playMs(calm ? 450 : [0,650,800,950][tier]));
       return;
     } }
   runEnemyBeat(0);
@@ -2385,7 +2389,7 @@ function runEnemyBeat(i, noWind){
     lungeFigure('enemyWind');
     const go = () => { if(S._pendingTimeout){ clearTimeout(S._pendingTimeout); S._pendingTimeout=null; } runEnemyBeat(1, true); };
     S._advance = go;
-    S._pendingTimeout = setTimeout(go, 210);
+    S._pendingTimeout = setTimeout(go, playMs(210));
     return;
   }
   const beats = [
@@ -2447,7 +2451,7 @@ function runEnemyBeat(i, noWind){
   };
   S._advance = advance;
   if(S._skipAll || result.quiet) advance();
-  else S._pendingTimeout = setTimeout(advance, 550);
+  else S._pendingTimeout = setTimeout(advance, playMs(550));
 }
 
 function showToastIfAvailable(text, kind){ if(typeof showToast==='function') showToast(text, kind); }

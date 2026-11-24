@@ -3925,7 +3925,7 @@ function openSettingsModal(){
         ${settingsSliderRowHTML('pref-music', 'Music', PREFS.music!==false ? (PREFS.musicVol!=null?PREFS.musicVol:1) : 0)}
         <div class="settings-pair">${settingsToggleRowHTML('pref-reduced-motion', 'Reduce motion', PREFS.reducedMotion)}${settingsToggleRowHTML('pref-large-text', 'Larger text', PREFS.largeText)}</div>
         ${settingsToggleRowHTML('pref-low-intensity', 'Gentler effects (fewer sparks)', PREFS.lowIntensity)}
-        ${settingsToggleRowHTML('pref-vibration', 'Vibration (phones)', PREFS.vibration!==false)}
+        <div class="settings-pair">${settingsToggleRowHTML('pref-fast-turns', 'Fast turns', !!PREFS.fastTurns)}${settingsToggleRowHTML('pref-vibration', 'Vibration (phones)', PREFS.vibration!==false)}</div>
         ${settingsToggleRowHTML('pref-flick-roll', 'Flick or shake to roll each turn', PREFS.flickRoll!==false)}
         ${pcFits() ? settingsToggleRowHTML('pref-pc-layout', 'Wide-screen layout', pcWanted()) : ''}
         ${canFullscreen() ? settingsToggleRowHTML('pref-fullscreen', 'Fullscreen (F11)', isFullscreenNow()) : ''}
@@ -3966,6 +3966,7 @@ function openSettingsModal(){
   sfxSl.onchange = ()=>{ if(PREFS.sound) playTone('hit'); };
   musSl.oninput = ()=>{ const v = musSl.value/100; const was = PREFS.music!==false; setPref('musicVol', v); setPref('music', v>0); settingsSliderLabel(musSl); if(was!==(v>0)) musicUpdate(); else musicSetVolume(); };
   overlay.querySelector('#pref-reduced-motion').onchange = (ev)=> setPref('reducedMotion', ev.target.checked);
+  { const t = overlay.querySelector('#pref-fast-turns'); if(t) t.onchange = (ev)=> setPref('fastTurns', ev.target.checked); }
   overlay.querySelector('#pref-large-text').onchange = (ev)=> setPref('largeText', ev.target.checked);
   overlay.querySelector('#pref-low-intensity').onchange = (ev)=> setPref('lowIntensity', ev.target.checked);
   { const t = overlay.querySelector('#pref-fullscreen'); if(t) t.onchange = ()=> toggleFullscreen(); }

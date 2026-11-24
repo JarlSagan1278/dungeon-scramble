@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.162 (Nov 25, 2026)
+- Settings > Fast turns: the path and the foe's reply play about 1.6x quicker.
+- Long paths play quicker on their own: the first three dice keep their beat, each die after that comes faster (down to 60%).
+
 ## 1.42.161 (Nov 25, 2026)
 - PC: the blurred cover behind the game is replaced by a dark stone dungeon wall lit warm from below.
 - High Depths: Elite and Deadly foes' Depth health bonus (Tougher Scuffs + Dread) adds up instead of multiplying, capped at +80% (a Floor 2 Whence Wolf reached 156 HP at Depth 14; now 109).
