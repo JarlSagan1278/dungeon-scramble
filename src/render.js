@@ -6779,9 +6779,10 @@ function updateGuide(){
   b.style.left = Math.round(tr.left) + 'px'; b.style.width = bw + 'px';
   b.style.top = Math.round(tr.top - b.offsetHeight - 12) + 'px';
   const q = target ? target.getBoundingClientRect() : null;
-  const pointsDown = !!(q && q.top >= tr.top - 2);
+  const pointsDown = !!(q && q.top >= tr.top - 2 && target!==tray); // the whole tray as target: no arrow
   b.classList.toggle('no-arrow', !pointsDown);
-  if(pointsDown) b.style.setProperty('--arrow-x', Math.max(14, Math.min(bw - 14, q.left + q.width/2 - tr.left)) + 'px');
+  if(!pointsDown) b.style.setProperty('--tail', '0px');
+  if(pointsDown) pointBubbleAt(b, bw, q, tr.top - b.offsetHeight - 12);
   if(target){
     r.hidden = false;
     r.style.left = Math.round(q.left - 5) + 'px'; r.style.top = Math.round(q.top - 5) + 'px';
@@ -6789,6 +6790,17 @@ function updateGuide(){
   } else r.hidden = true;
 }
 if(typeof window!=='undefined') setInterval(()=>{ try{ updateGuide(); }catch(e){} }, 150);
+// Nov 25 (Jeremy: the bubbles don't point at what they talk about): a bubble above the tray slides sideways to sit over
+// its target (clamped to the screen), its arrow sits right above the target, and a dotted line runs from the arrow down
+// to the ring when the target is further down (a die in a lower row, the Go or Skill button on the rail).
+function pointBubbleAt(b, bw, q, topY){
+  const left = Math.max(8, Math.min(innerWidth - bw - 8, q.left + q.width/2 - bw/2));
+  b.style.left = Math.round(left) + 'px'; b.style.top = Math.round(topY) + 'px';
+  b.classList.remove('no-arrow');
+  b.style.setProperty('--arrow-x', Math.max(16, Math.min(bw - 16, q.left + q.width/2 - left)) + 'px');
+  const tail = (q.top - 7) - (topY + b.offsetHeight + 8);
+  b.style.setProperty('--tail', Math.max(0, Math.round(tail)) + 'px');
+}
 
 /* ---- Floor tips (Jeremy, Oct 26): one-line lessons the first time a situation comes up ----
    The "New Action" cards say what a face is; these say when it matters, on the turn it matters, with the guide's bubble
@@ -6879,14 +6891,14 @@ function updateTips(){
   const tr=tray.getBoundingClientRect(), q=tel.getBoundingClientRect(), bw=Math.round(tr.width*0.72);
   b.style.width=bw+'px';
   const inTray = q.top >= tr.top-2;
-  if(inTray){ b.style.left=Math.round(tr.left)+'px'; b.style.top=Math.round(tr.top-b.offsetHeight-12)+'px'; b.classList.remove('no-arrow'); b.style.setProperty('--arrow-x', Math.max(14, Math.min(bw-14, q.left+q.width/2-tr.left))+'px'); }
+  if(inTray){ pointBubbleAt(b, bw, q, tr.top-b.offsetHeight-12); }
   else if(_tip.k==='quest'){ // the quest sign hangs near the top of the room: the bubble sits just under it, the ring says where
     const left = Math.max(8, Math.min(innerWidth-bw-8, q.left+q.width/2-bw/2));
-    b.style.left=Math.round(left)+'px'; b.style.top=Math.round(q.bottom+12)+'px'; b.classList.add('no-arrow'); }
+    b.style.left=Math.round(left)+'px'; b.style.top=Math.round(q.bottom+12)+'px'; b.classList.add('no-arrow'); b.style.setProperty('--tail','0px'); }
   else { // a chip or HP bar up in the room: the bubble sits above it, pointing down at it (it may cover the art for a moment, never the dice)
     const left = Math.max(8, Math.min(innerWidth-bw-8, q.left+q.width/2-bw/2));
     b.style.left=Math.round(left)+'px'; b.style.top=Math.round(Math.max(4, q.top-b.offsetHeight-12))+'px'; b.classList.remove('no-arrow');
-    b.style.setProperty('--arrow-x', Math.max(14, Math.min(bw-14, q.left+q.width/2-left))+'px'); }
+    b.style.setProperty('--arrow-x', Math.max(14, Math.min(bw-14, q.left+q.width/2-left))+'px'); b.style.setProperty('--tail','0px'); }
   r.style.left=Math.round(q.left-5)+'px'; r.style.top=Math.round(q.top-5)+'px'; r.style.width=Math.round(q.width+10)+'px'; r.style.height=Math.round(q.height+10)+'px';
 }
 if(typeof window!=='undefined') setInterval(()=>{ try{ updateTips(); }catch(e){} }, 300);

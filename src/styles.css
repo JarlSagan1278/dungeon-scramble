@@ -1938,6 +1938,10 @@ body:has(.modal-overlay) .settings-btn-floating{ visibility:hidden; }
 .guide-bubble{ position:fixed; z-index:70; box-sizing:border-box; background:var(--parchment); color:#2b1d14; border:3px solid var(--line); border-radius:14px;
   padding:8px 10px 6px; font-size:14px; line-height:1.28; box-shadow:0 4px 0 var(--line); text-align:center; pointer-events:auto; }
 .guide-bubble.no-arrow::after{ display:none; }
+/* the dotted line from the arrow to the ringed target (Nov 25; pointBubbleAt sets --tail) */
+.guide-bubble::before{ content:''; position:absolute; left:var(--arrow-x, 50%); top:calc(100% + 8px); height:var(--tail, 0px); margin-left:-2px;
+  border-left:4px dotted #ffd76a; filter:drop-shadow(0 0 1px #0c0705) drop-shadow(0 0 1px #0c0705); pointer-events:none; }
+.guide-bubble.no-arrow::before{ display:none; }
 .guide-bubble::after{ content:''; position:absolute; left:var(--arrow-x, 50%); bottom:-11px; width:16px; height:16px; margin-left:-8px; background:var(--parchment);
   border-right:3px solid var(--line); border-bottom:3px solid var(--line); transform:rotate(45deg); }
 .guide-bubble .guide-skip{ display:inline-block; margin-top:4px; font-size:12px; color:#7a5a3a; text-decoration:underline; cursor:pointer; }
