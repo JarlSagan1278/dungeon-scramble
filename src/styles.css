@@ -4073,7 +4073,7 @@ body:not(.pc) .foe-rule .fr-long{ display:none; } body:not(.pc) .foe-rule .fr-sh
 body.pc.pad #tray > .die::before{ content:none !important; }
 
 /* Ranger prototype (Nov 25): Pointer sits on a die (a friendly Minion: the die stays readable); the dice beside it get a +1 tag */
-.die .pet-token{ position:absolute; top:-14px; right:-12px; width:40px; height:40px; z-index:5; pointer-events:none; filter:drop-shadow(0 2px 0 #0c0705); animation:pet-bob 1.8s ease-in-out infinite; }
+.die .pet-token{ position:absolute; top:1px; right:1px; width:31px; height:31px; z-index:5; pointer-events:none; filter:drop-shadow(0 1.5px 0 rgba(12,7,5,.6)); /* inside the die: the die clips its overflow (the old -14px spot cut the head in half) */ animation:pet-bob 1.8s ease-in-out infinite; }
 @keyframes pet-bob{ 0%,100%{ transform:translateY(0) rotate(-4deg); } 50%{ transform:translateY(-2px) rotate(4deg); } }
 .reduced-motion .die .pet-token{ animation:none; }
 .die.pet-aura{ outline:3px dashed #f2c14e; outline-offset:-3px; }
