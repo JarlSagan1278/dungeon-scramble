@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.172 (Nov 25, 2026)
+- The secret Additive Inverse die has its own look: a violet void with a magic pulse running backwards, and every few seconds it flips to its negative.
+
 ## 1.42.171 (Nov 25, 2026)
 - The first time a boss's big hit is coming next turn, a tip points at it and explains how to answer it (Block, Freeze, or win first). Floor 1 study: the Rogue Golemancer's wind-up was the main wall for new players.
 - Steam: achievements report to Steam once the app is on Steam (nothing changes elsewhere).
