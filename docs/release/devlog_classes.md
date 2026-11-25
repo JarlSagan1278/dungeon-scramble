@@ -39,7 +39,7 @@ ALSO NEW
 
 As always, if the game asks to share play data at the end of a run, saying yes is the biggest help.
 
-Jeremy (and Katlynn, who designed the board game with me)
+Jeremy and Katlynn
 ```
 
 **Tags:** roguelike, dice, turn-based, puzzle, dungeon-crawler, board-game, strategy, cute

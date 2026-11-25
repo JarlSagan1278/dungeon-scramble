@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.171 (Nov 25, 2026)
+- The first time a boss's big hit is coming next turn, a tip points at it and explains how to answer it (Block, Freeze, or win first). Floor 1 study: the Rogue Golemancer's wind-up was the main wall for new players.
+- Steam: achievements report to Steam once the app is on Steam (nothing changes elsewhere).
+- Store, press kit and website text: 9 classes (5 to unlock), Pointer, 35 achievements.
+
 ## 1.42.170 (Nov 25, 2026)
 - The five unlockable classes each bring a signature object, shown beside the hero all run: Pointer the grey schnauzer (Ranger), a little 3D printer (Engineer), a bubbling cauldron (Alchemist), a field kit (Field Medic) and a deck of cards (Trickster). Pointer's head on the dice is no longer cut off.
 - The Wanted pop-up is the paper poster itself, enlarged, with route goals explained on it.
