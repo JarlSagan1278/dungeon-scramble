@@ -400,3 +400,6 @@ window.addEventListener('keydown', ev=>{
   ['pointerdown','pointermove','keydown','wheel','touchstart','gamepadconnected'].forEach(ev=> window.addEventListener(ev, wake, {passive:true, capture:true}));
   window.__calmWake = wake; wake();
 })();
+
+// Steam (Nov 25): once the game has started, tell the desktop app every achievement already earned (no-op elsewhere).
+setTimeout(()=>{ if(typeof steamAchievementsSync==='function') steamAchievementsSync(); }, 2500);

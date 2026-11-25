@@ -1,8 +1,8 @@
 # Dungeon Scramble: Steam store page draft
 
-Drafted Nov 25, 2026 from build 1.42.164 (counts read from the built game: 37 enemies, 12 traps, 9 bosses, 32 shrines,
-56 loot dice (20 Alloy, 20 Gilded, 16 Magic), 27 relics, 10 Depth modifiers, 12 Guild Ranks, 3 foe rules). Recount before
-submitting if content changes. Steam pages are edited in Steamworks > Store Page Admin once the $100 app fee is paid.
+Drafted Nov 25, 2026 from build 1.42.164, recounted for 1.42.170 (counts read from the built game: 37 enemies, 12 traps, 9 bosses, 32 shrines,
+56 loot dice (20 Alloy, 20 Gilded, 16 Magic), 27 relics, 10 Depth modifiers, 12 Guild Ranks, 6 foe rules (+1 secret), 9 classes (5 to unlock), 35 achievements), 27 relics, 10 Depth modifiers, 12 Guild Ranks, 3 foe rules). Recount before
+Recount before submitting if content changes. Steam pages are edited in Steamworks > Store Page Admin once the $100 app fee is paid.
 Wording follows the Play listing (store_listing.md) and the press kit. No other games' names anywhere (Steam rejects them in
 tags and they read badly in descriptions).
 
@@ -29,15 +29,16 @@ faces like Leap, Sidestep and Pivot bend the rules of the path, so a modest roll
 
 Monsters always show their next move. Block the big hit, freeze the wind-up, or burst it down before it lands. Some foes
 follow rules of their own: one is immune to a different face type every turn, one rewards paths of the right length, one
-pays a bounty for its Wanted poster.
+pays a bounty for its Wanted poster, and three more wait deeper down.
 
 WHAT'S INSIDE
-- 4 origins (Dwarf, Gnome, Halfling, Pixie) and 4 classes, each with its own zone of the tray and its own skill
+- 4 origins (Dwarf, Gnome, Halfling, Pixie) and 9 classes: 4 to start and 5 to unlock, among them a Ranger with Pointer, a grey schnauzer who boosts the dice around him. Each class has its own zone of the tray and its own skill
 - 3 dungeon floors with 37 monsters, 12 traps and 9 bosses
 - 50+ loot dice to find, wear and unlock as starting boons, and 20+ relics
 - 32 shrines, camps where you rest or train your dice, and forks where you pick your door
 - A Daily Dungeon: the same dungeon for everyone each day, one scored try, and a result to share
 - Guild Ranks: every run earns renown toward 12 ranks, each with a gift for future runs
+- 35 achievements, from first blood to bronze, silver and gold milestones (and a secret or two)
 - Depth: 10 difficulty rules you stack yourself, for players who want the dungeon to bite back
 
 MADE FOR YOUR DESK AND YOUR COUCH

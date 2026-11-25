@@ -28,6 +28,19 @@ function create(){
 ipcMain.on('ds:isFullscreen', e => { e.returnValue = win ? win.isFullScreen() : true; });
 ipcMain.on('ds:toggleFullscreen', () => { if(win) win.setFullScreen(!win.isFullScreen()); });
 ipcMain.on('ds:quit', () => app.quit());
+// Steam achievements (Nov 25): steamworks.js talks to the Steam client. The app ID comes from steam_appid.txt next to the
+// app (or DS_STEAM_APPID); with no ID, no Steam client or no library, achievements quietly do nothing. The game sends the
+// achievement's API name (its id in upper case, the list in docs/release/steam_achievements.md) when it unlocks, and the
+// full list of unlocked ones at start, so medals earned while Steam was offline still reach it.
+let steam = null;
+try{
+  let id = Number(process.env.DS_STEAM_APPID || process.env.SteamAppId || 0); // Steam sets SteamAppId when it launches the game
+  if(!id){ try{ id = Number(fs.readFileSync(path.join(path.dirname(app.getPath('exe')), 'steam_appid.txt'), 'utf8').trim()); }catch(e){} } // for testing outside Steam
+  if(id > 0){ steam = require('steamworks.js').init(id); }
+}catch(e){ steam = null; }
+const unlock = name => { try{ if(steam && name && !steam.achievement.isActivated(name)) steam.achievement.activate(name); }catch(e){} };
+ipcMain.on('ds:achievement', (_e, name) => unlock(String(name)));
+ipcMain.on('ds:achievements', (_e, names) => { (Array.isArray(names) ? names : []).forEach(n => unlock(String(n))); });
 if(!app.requestSingleInstanceLock()) app.quit();
 else {
   app.on('second-instance', () => { if(win){ if(win.isMinimized()) win.restore(); win.focus(); } });

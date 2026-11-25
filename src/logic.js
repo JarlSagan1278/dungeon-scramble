@@ -637,6 +637,9 @@ const ACHIEVEMENTS = [
 // the medals this build shows (the purchase medal only exists in the store app)
 function achievementsShown(){ return ACHIEVEMENTS.filter(a=> !a.only || a.only()); }
 
+// Steam (Nov 25): the desktop app forwards these to Steam (steam/main.js); the API name is the id in upper case.
+function steamAchievement(id){ try{ if(typeof window!=='undefined' && window.DSDesktop && window.DSDesktop.achievement) window.DSDesktop.achievement(String(id).toUpperCase()); }catch(e){} }
+function steamAchievementsSync(){ try{ if(typeof window!=='undefined' && window.DSDesktop && window.DSDesktop.achievements) window.DSDesktop.achievements(Object.keys(META.achievements||{}).map(id=> id.toUpperCase())); }catch(e){} }
 function checkAchievements(){
   const newlyUnlocked = [];
   achievementsShown().forEach(a=>{
@@ -647,6 +650,7 @@ function checkAchievements(){
     }
   });
   if(newlyUnlocked.length) saveMeta();
+  newlyUnlocked.forEach(a=> steamAchievement(a.id));
   return newlyUnlocked;
 }
 

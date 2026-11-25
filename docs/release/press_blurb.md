@@ -22,7 +22,7 @@ Dungeon Scramble is a roguelike dungeon crawler where you roll a 4x4 tray of dic
 | Release window | 2027 (internal target: around September; release gates decide the date) |
 | Price model | Free to download, Floor 1 free. One-time "Full Dungeon" unlock, planned $5.99 on phones (Steam price to be announced). No ads, no subscriptions, no account. |
 | Players | Single player (co-op is being explored, not promised) |
-| Content (build 1.41.76) | 4 origins, 4 classes, 3 dungeon floors, 37 monsters, 12 traps, 9 bosses (including 3 Big Bosses), 32 shrines, 50+ loot dice, 20+ relics, 10 stackable depth modifiers |
+| Content (build 1.42.170) | 4 origins, 9 classes (5 to unlock), 35 achievements, 3 dungeon floors, 37 monsters, 12 traps, 9 bosses (including 3 Big Bosses), 32 shrines, 50+ loot dice, 20+ relics, 10 stackable depth modifiers |
 | Languages | English |
 | Pre-launch | App Store pre-order and Google Play pre-registration (planned) |
 | Website / press kit | https://dungeonscramble.com (press kit: https://dungeonscramble.com/press) |

@@ -4155,7 +4155,7 @@ function runHistoryHTML(){
 // History and the Dice Compendium.
 // Oct 29 (Jeremy picked R2): achievements are medals, gold once earned; tapping one shows how to earn it.
 // Oct 31 (Jeremy, 2A): each medal shows its own icon: a dark silhouette until earned, then a gold coin.
-const ACH_ICON = { first_blood:'hit', first_victory:'boss', all_origins:'dodge', all_classes:'pivot', floor_3:'door', overkill_10:'combo',
+const ACH_ICON = { clever_25:'freeze', daily_7:'camp', daily_30:'camp', daily_win:'boss', rank_irrational:'block', rule_breaker:'nullify', first_blood:'hit', first_victory:'boss', all_origins:'dodge', all_classes:'pivot', floor_3:'door', overkill_10:'combo',
   shrines_25:'heal', monster_hunter_100:'boss', veteran_10:'camp', damage_1000:'boost', origin_duo:'leap',
   overkill_50:'combo', overkill_200:'combo', damage_10000:'boost', damage_50000:'boost', monster_hunter_500:'boss', monster_hunter_1500:'boss',
   veteran_50:'camp', veteran_150:'camp', shrines_100:'heal', exact_10:'hit', exact_50:'hit', exact_150:'hit', path_man10:'dodge', path_hit10:'hit',

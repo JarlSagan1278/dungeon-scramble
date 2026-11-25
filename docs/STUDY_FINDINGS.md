@@ -461,5 +461,19 @@ strong). Picked B: elite-level danger, a fight you feel.
   it stays as is. Worth watching: the Rogue Golemancer as a newcomer wall; the Field Medic unlock (10 runs) reaches the
   struggling player at run 10. Small sample (about 12 players).
 
+## Floor 1 bosses for newcomers (Nov 25, 2026, build 1.42.170; after the play data showed the Rogue Golemancer stopping 3 new players' runs)
+Each Floor 1 boss forced, 240 runs per boss and profile (4 classes x 2 origins x 30, random doors).
+
+| Boss | Novice: died at the boss | Novice: health lost there | Regular: died | Regular: health lost |
+|---|---|---|---|---|
+| Rogue Golemancer | **8.8%** | **38%** of max | 0.4% | 39% |
+| Grosteque Grafter | 5.4% | 31% | 0% | 26% |
+| Heating Elemental | 2.9% | 25% | 0% | 22% |
+
+Novices reach the boss with ~57% health (regular ~70%). The Golemancer is the newcomer wall: ~3x the Elemental's kill
+rate, from its 7-damage wind-up (Golem Lemma) landing while Summoned Golems clog the tray. Regular players are fine
+with all three. Options (not decided): teach the wind-up the first time (a lesson bubble: "Block it or Freeze it"),
+Golem Lemma 7 -> 6, or Summon Golems 2 -> 1 at Depth 0.
+
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.

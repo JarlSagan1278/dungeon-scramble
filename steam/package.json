@@ -26,7 +26,8 @@
       "main.js",
       "preload.js",
       "package.json",
-      "web/**/*"
+      "web/**/*",
+      "node_modules/steamworks.js/**/*"
     ],
     "asar": true,
     "win": {
@@ -42,6 +43,12 @@
       "target": "dir",
       "icon": "icon.png",
       "category": "public.app-category.games"
-    }
+    },
+    "asarUnpack": [
+      "node_modules/steamworks.js/**/*"
+    ]
+  },
+  "dependencies": {
+    "steamworks.js": "0.4.0"
   }
 }
