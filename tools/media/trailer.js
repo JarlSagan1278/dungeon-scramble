@@ -14,7 +14,7 @@ const SL = ms => L.sleep(ms / RATE); // the script's own waits, in game time
 const SLOWMO = rate => { const rn = performance.now.bind(performance), t0 = rn(); performance.now = ()=> t0 + (rn()-t0)*rate;
   const rd = Date.now, d0 = rd(); window.__realNow = rd; Date.now = ()=> d0 + (rd()-d0)*rate;
   const st = window.setTimeout, si = window.setInterval; window.setTimeout = (f, ms, ...a)=> st(f, (ms||0)/rate, ...a); window.setInterval = (f, ms, ...a)=> si(f, (ms||0)/rate, ...a);
-  const raf = window.requestAnimationFrame.bind(window); window.requestAnimationFrame = cb => raf(ts => cb(t0 + (ts - t0)*rate)); };
+  const raf = window.requestAnimationFrame.bind(window); window.requestAnimationFrame = cb => raf(() => cb(performance.now())); }; // the frame time is the slowed clock itself (a scaled rAF timestamp drifted from performance.now: the damage counter's count-up read -18895)
 const ONLY = (process.env.ONLY||'').split(',').filter(Boolean); // re-shoot just these scenes
 async function scene(b, name, setup, act){
   if(ONLY.length && !ONLY.includes(name)) return;
