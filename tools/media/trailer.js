@@ -18,9 +18,11 @@ const SLOWMO = rate => { const rn = performance.now.bind(performance), t0 = rn()
 const ONLY = (process.env.ONLY||'').split(',').filter(Boolean); // re-shoot just these scenes
 async function scene(b, name, setup, act){
   if(ONLY.length && !ONLY.includes(name)) return;
-  const ctx = await b.newContext(VERT ? { viewport:{ width:432, height:768 }, deviceScaleFactor:2.5, hasTouch:true, isMobile:true } : { viewport:{ width:1920, height:1080 }, deviceScaleFactor:1 });
+  // vertical: the screencast captures CSS pixels (a 2.5x device scale is ignored), so the page is 1080x1920 and the game is zoomed 2.5x
+  const ctx = await b.newContext(VERT ? { viewport:{ width:1080, height:1920 }, deviceScaleFactor:1, hasTouch:true, isMobile:true } : { viewport:{ width:1920, height:1080 }, deviceScaleFactor:1 });
   const p = await ctx.newPage(); p.on('pageerror', e=>console.log('PAGEERR', name, e.message));
-  await p.addInitScript(`window.__vert = ${VERT};`); await p.addInitScript(SLOWMO, RATE);
+  await p.addInitScript(`window.__vert = ${VERT};`);
+  if(VERT) await p.addInitScript(()=>{ document.addEventListener('DOMContentLoaded', ()=>{ document.documentElement.style.zoom = '2.5'; }); }); await p.addInitScript(SLOWMO, RATE);
   const acdp = await ctx.newCDPSession(p); await acdp.send('Animation.enable'); await acdp.send('Animation.setPlaybackRate', { playbackRate: RATE });
   await p.addInitScript(()=>{ try{ localStorage.setItem('dungeonScrambleRollTest','1'); localStorage.setItem('dungeonScramblePC', window.__vert ? '0' : '1'); localStorage.setItem('dungeonScrambleTutorialSeen_v1','1'); }catch(e){}
     document.addEventListener('DOMContentLoaded',()=>{ const s=document.createElement('style'); s.textContent='#symbol-intro,#tip-bubble,#tip-ring,.toast{display:none!important}'; document.head.appendChild(s); }); });
