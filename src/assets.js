@@ -465,6 +465,6 @@ const LOOT_GEAR_SIZE = {
   'Pixie Powder': 0.43,
 };
 const COVER_ART = "art:COVER_ART.jpeg";
-// Oct 15 (Jeremy: heavy paper on the environment): seamless 256px paper-relief tile (grey = no change), blended
+// Oct 15 (Jeremy: heavy paper on the environment): seamless 256px paper-relief tile (gray = no change), blended
 // soft-light into the stone walls, floor, archway and dice chest.
 const PAPER_TILE = 'art:PAPER_TILE.jpeg';

@@ -16,15 +16,15 @@ const BASE_HP_MUL = [1.05, 1.9, 2.2]; // Nov 24 (Jeremy: a bit harder): +5% Floo
 // Oct 15 (per-modifier study, docs/STUDY_FINDINGS.md): Rounding Error 1 -> 2 depth (it cost ~17 win points),
 // Rationing rank 2 2 -> 1 depth (~9 points for 2 depth). The rest stay: modest unevenness is part of the fun (Jeremy).
 const DEPTH_MODS = [
-  { id:'foes',  name:'Tougher Scuffs', max:4, costs:[1,1,1,1], desc:r=>`Enemies and bosses have +${r*15}% HP.` },
+  { id:'foes',  name:'Tougher Scuffs', max:4, costs:[1,1,1,1], desc:r=>`Enemies and bosses have +${r*15}% Health.` },
   { id:'rest',  name:'Rationing Rations', max:2, costs:[1,2], /* Nov 25 (census): rank 2 (no camp heal) was the ladder's biggest 1-point drop; costs 2 */ desc:r=> r===2 ? 'Camp rest heals nothing.' : 'Camp rest heals half as much.' },
-  { id:'frail', name:'Clumsy',         max:3, costs:[1,1,2], desc:r=>`Start with ${r*4} less max HP.` },
+  { id:'frail', name:'Clumsy',         max:3, costs:[1,1,2], desc:r=>`Start with ${r*4} less max Health.` },
   { id:'swarm', name:'Swarming',       max:2, costs:[1,2], desc:r=>`Minion spawns place ${r} extra die${r>1?'s':''}.` },
   { id:'slim',  name:'Burden of Choice', max:1, costs:[1], desc:r=> 'Overkills add no loot option, and every loot reward offers one fewer die.' },
   { id:'fury',  name:'Zeal',           max:2, costs:[3,1], desc:r=> r===1 ? 'Every enemy hit deals +1 damage.' : 'Every enemy hit deals +1 damage, and heavy turns and boss specials +1 more.' },
-  { id:'dread', name:'Dread',          max:3, costs:[1,1,1], desc:r=>`Deadly encounters are ${r*12}% more likely to take an Elite room, Elite and Deadly foes have +${Math.round(r*DREAD_HP*100)}% HP (with Tougher Scuffs, at most +${Math.round(STRONG_FOE_DEPTH_CAP*100)}% in all), and Floor 1 gains its own Deadly card.` },
+  { id:'dread', name:'Dread',          max:3, costs:[1,1,1], desc:r=>`Deadly encounters are ${r*12}% more likely to take an Elite room, Elite and Deadly foes have +${Math.round(r*DREAD_HP*100)}% Health (with Tougher Scuffs, at most +${Math.round(STRONG_FOE_DEPTH_CAP*100)}% in all), and Floor 1 gains its own Deadly card.` },
   // Oct 12 (Jeremy: "test out these two"): cheap one-point levers, being measured.
-  { id:'dues',  name:'Union Dues',     max:1, costs:[1], desc:r=>'Receiving a shrine\'s boon costs 2 HP.' },
+  { id:'dues',  name:'Union Dues',     max:1, costs:[1], desc:r=>'Receiving a shrine\'s boon costs 2 Health.' },
   { id:'round', name:'Rounding Error', max:1, costs:[2], desc:r=>'Your Heal faces heal 1 less (never below 1).' },
   { id:'gauntlet', name:'Night Shift', max:2, costs:[1,2], desc:r=> r===1 ? 'Easy rooms become Standard rooms. Shrines appear as usual.' : 'Easy and Standard rooms become Elite rooms. Shrines appear as usual.' },
 ];
@@ -141,7 +141,7 @@ function recordDepthResult(outcome){
 const BADGE_RIM = { 1:['#d79a5a','#7a4a22'], 2:['#e3e8ec','#8a949c'], 3:['#f6d56a','#b8872a'], 4:['#fff0a8','#c08a1e'] };
 // Oct 21 (Jeremy, "try it"): each class has its own badge shape -- Guard a shield, Armsmaster crossed swords
 // behind the medal, Arcanist an eight-point star with its X, Dungeoneer a stone archway. The rim keeps the
-// bronze/silver/gold tier colours; unknown classes keep the old rosette.
+// bronze/silver/gold tier colors; unknown classes keep the old rosette.
 const BADGE_ROSETTE = 'M52 4L60 9L70 7L75 16L85 20L84 31L92 39L88 49L93 59L85 66L84 77L74 80L68 89L58 87L52 94L46 87L36 89L30 80L20 77L19 66L11 59L16 49L12 39L20 31L19 20L29 16L34 7L44 9Z';
 function badgeStar(){ let d=''; for(let i=0;i<16;i++){ const r=i%2?33:45, t=(i*22.5-90)*Math.PI/180; d+=(i?'L':'M')+(52+r*Math.cos(t)).toFixed(1)+' '+(48+r*Math.sin(t)).toFixed(1); } return d+'Z'; }
 function badgeSword(rot){

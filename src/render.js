@@ -125,7 +125,7 @@ function updateLowHealthVignette(){
 }
 
 // ---- Path trail: a connecting line drawn between the dice you've tapped,
-// so building a Path actually reads as routing a line across the board --
+// so building a path actually reads as routing a line across the board --
 // the game's core Boggle-style mechanic -- instead of just lighting up
 // isolated tiles. Lives once in document.body as a position:fixed SVG (same
 // pattern as the low-health vignette/toast stack) since app.innerHTML gets
@@ -573,7 +573,7 @@ function bossArcBarHTML(o){
     if(m) s += `<path class="ba-seg ba-shield${m[1]||''}" pathLength="100" d="${P}" ${seg(+m[2],+m[3])} style="${m[4]}"/>`; }
   if(o.prevW>0){ s += `<path class="ba-seg ba-prev" pathLength="100" d="${P}" ${seg(o.prevLeft,o.prevW)}/><path class="ba-seg ba-prev-end" pathLength="100" d="${P}" ${seg(o.prevLeft+o.prevW-1.2,1.2)}/>`; }
   // round the fill's outer ends to the track's rounded caps
-  { // butt-capped segments leave the bar's two ends square: add round end caps in the colour of whichever segment touches that end
+  { // butt-capped segments leave the bar's two ends square: add round end caps in the color of whichever segment touches that end
     const ends = [{c:'#ff3b3b', a:0, b:hp}];
     const mS = o.shieldVal>0 ? /left:([\d.]+)%; width:([\d.]+)%/.exec(shieldBarHTML(o.shieldVal,o.shieldMax,hp,'enemy')||'') : null;
     if(mS) ends.push({c:'#5fa8d8', a:+mS[1], b:+mS[1]+ +mS[2]});
@@ -715,7 +715,7 @@ function syncRoomFloor(card){
     const fcv = bakedFloorCanvas(vw, Math.max(1, Math.round(app.offsetHeight - hy - floorBelow)));
     if(fcv){ fl.innerHTML = '<div class="rf-light"></div>'; fl.insertBefore(fcv, fl.firstChild); }
     else fl.innerHTML = '<div class="rf-plane"></div><div class="rf-fade"></div><div class="rf-light"></div><div class="rf-vig"></div>';
-    // Oct 31 (Jeremy): the floor's colour per floor (ROOM_TINTS) carries on below the arch, down the rest of the screen;
+    // Oct 31 (Jeremy): the floor's color per floor (ROOM_TINTS) carries on below the arch, down the rest of the screen;
     // the part inside the arch is already tinted by the card's own layer, so this starts at the card's bottom edge
     { const T = ROOM_TINTS[Math.min(3,(S.floorIdx||0)+1)]; if(T) fl.insertAdjacentHTML('beforeend', `<div class="room-tint" style="top:${yb}px;background:${T[0]};mix-blend-mode:multiply"></div>`); }
     // Ground shadows: a feet shadow plus a tall soft pool running down through the health bar, name and chips.
@@ -804,7 +804,7 @@ function decorateArch(){
     card.appendChild(decorateArch._c.img);
     // the vines layer goes first in the card, so the quest paper and the monster (same layer, later) paint over it
     if(decorateArch._c.vimg) card.insertBefore(decorateArch._c.vimg, card.firstChild);
-    // Oct 29 (Jeremy picked D1): the room's colour and light change with depth -- warm torchlight on Floor 1, cool and damp
+    // Oct 29 (Jeremy picked D1): the room's color and light change with depth -- warm torchlight on Floor 1, cool and damp
     // on Floor 2, deep violet with darker edges on Floor 3. Under everything else in the card, so figures and text are untouched.
     card.querySelectorAll('.room-tint').forEach(n=>n.remove());
     const T = ROOM_TINTS[lvl];
@@ -1528,8 +1528,8 @@ function pcCombatCenter(){
 }
 function pcPlaceDoors(){
   if(!pcMode()) return;
-  // Nov 14 (Jeremy, Deck screenshot): the door stands in the room's own archway, centred on the room picture and sized to fit
-  // inside it (it used to centre on route + room and could cover the hero and the route)
+  // Nov 14 (Jeremy, Deck screenshot): the door stands in the room's own archway, centered on the room picture and sized to fit
+  // inside it (it used to center on route + room and could cover the hero and the route)
   const rm = document.querySelector('#app > #enc-panel'); if(!rm) return;
   const card = rm.querySelector('.enc-card') || rm, a = card.getBoundingClientRect();
   const cx = a.left + a.width/2, cy = a.top + a.height/2;
@@ -1698,7 +1698,7 @@ function minionEyeStyle(idx){
 }
 
 function renderDie(cell, idx){
-  if(S.needRoll){ // under the chest lid (Scramble flick, Oct 24): the die's colour and name, no face yet
+  if(S.needRoll){ // under the chest lid (Scramble flick, Oct 24): the die's color and name, no face yet
     const named = cell.die.cat!=='attack' && cell.die.cat!=='maneuver';
     return `<div class="die dietype-${cell.die.cat} unrolled" data-idx="${idx}">${named?`<div class="name-tag">${nameTagSVG(cell.die.name, idx)}</div>`:''}</div>`;
   }
@@ -1929,7 +1929,7 @@ function renderEncounterCard(e, mode){
     const frozen = !!S.freezeNext;
     const spMain0 = sp.acts.find(a=>iconKey[a.type]) || sp.acts[0];
     const spMain = spMain0.type==='dmg' ? {...spMain0, value:enemyHitTaken(spMain0.value + zealBonus(true), wardSp)} : spMain0;
-    const spTip = `${sp.name}: ${sp.herald?`(brought ${sp.herald.value} Minions with its warning) `:''}${sp.acts.map(a=>actText({...a,_hv:true})).join(', ')}${frozen?' (cancelled by Freeze)':''}${relicNote}`;
+    const spTip = `${sp.name}: ${sp.herald?`(brought ${sp.herald.value} Minions with its warning) `:''}${sp.acts.map(a=>actText({...a,_hv:true})).join(', ')}${frozen?' (canceled by Freeze)':''}${relicNote}`;
     const spNum = !spMain.value ? '' : spMain.type==='dmgPerMinion' ? perMinNum(spMain, true) : `<b class="enc-n">${spMain.value}</b>`;
     const special = `<span class="boss-cycle-item next enemy-action-badge boss-special${sp.windup&&!frozen?' heavy':''}${frozen?' frozen':''}" title="${spTip}">${iconKey[spMain.type]?iconSpanSolid(iconKey[spMain.type]):''}${spNum} ${sp.name}</span>`;
     return `<div class="boss-cycle-row${kit.each.length>1?' crowded':''}"><span class="hint" style="margin:0;">Next turn:</span>${base}${special}</div>`;
@@ -2055,7 +2055,7 @@ function pathCounterHTML(){
   // instead of maxing out small and getting visually capped at 44px.
   // Growth tapers (sqrt) past the early numbers so a 30-damage path still
   // reads big without the badge trying to outgrow the whole screen.
-  const size = Math.min(46, Math.round(22 + Math.sqrt(Math.max(val,0))*11)); // Nov 11: capped (a 33 used to swallow the tray); the colour/glow tiers still escalate
+  const size = Math.min(46, Math.round(22 + Math.sqrt(Math.max(val,0))*11)); // Nov 11: capped (a 33 used to swallow the tray); the color/glow tiers still escalate
   const big = val>=8;
   const extras = [];
   if(preview.healGain) extras.push(`+${preview.healGain}${iconSpan('heal')}`);
@@ -2403,7 +2403,7 @@ function renderPathStrip(){
 const ABILITY_COACH = {
   // Nov 25: the five unlockable classes
   medic:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the bottom row) to turn it into a Heal (1). <b>Blanks too!</b> And half of any healing past your full health becomes Block, so heal even when you are nearly full.',
-  alchemist:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the centre 2x2) to turn it into a D.O.T. (2). <b>Blanks too!</b> Every D.O.T. face you play is 1 stronger, so poison early: it ticks every turn.',
+  alchemist:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the center 2x2) to turn it into a D.O.T. (2). <b>Blanks too!</b> Every D.O.T. face you play is 1 stronger, so poison early: it ticks every turn.',
   engineer:'Once every turn, tap <b>Skill</b>, then <b>any</b> die to copy its face, then a die in your dashed zone (the left column) to print it there. A printed die keeps that face for the <b>whole fight</b>, so build up your column turn by turn.',
   trickster:'Once every turn, tap <b>Skill</b>, then a die in your dashed zone (the four corners), then any other die: they swap places. Pull a strong die into reach of your path, or move a Blank out of the way.',
   ranger:'Meet <b>Pointer</b>! Your dog lands on a die each turn, and the four dice beside it get <b>+1</b>. Tap <b>Skill</b> for <b>Fetch!</b>: after your path, Pointer runs 2 more steps from its last die and uses those dice too. End your path near good dice.',
@@ -2760,7 +2760,7 @@ function headlineParts(text){
     [/A die from the Back Pocket comes up blank/i, ()=>['Back Pocket', 'a blank, die lost']],
     [/^(.+?) joins your tray/, m=>['Joins your tray', m[1]]],
     [/^Swapped (.+?) into your Tray/, m=>['Swapped in', m[1]]],
-    [/^Union Dues: the shrine takes (\d+) HP/, m=>['Union Dues', `-${m[1]} HP`]],
+    [/^Union Dues: the shrine takes (\d+) Health/, m=>['Union Dues', `-${m[1]} HP`]],
     [/^— Floor (\d+) —$/, m=>[`Floor ${m[1]}`, '']],
     [/^(.+?) is locked: (.+?)\.?$/, m=>[`${m[1]} locked`, m[2]]],
   ];
@@ -2788,7 +2788,7 @@ function pocketSaveFx(saver, hp, spent){
     const card = el(`<div id="pocket-save" class="pocket-save${(typeof PREFS!=='undefined' && PREFS.reducedMotion)?' ps-still':''}" role="status">
         <div class="ps-title">Saved!</div>
         <div class="ps-row">${face}<span>Your Back Pocket's <b>${saver ? saver.name : 'die'}</b> rolled ${f ? `<b>${LABEL[f.type]||f.type}${f.value?' '+f.value:''}</b>` : 'true'}.</span></div>
-        <div class="ps-sub">Back to ${hp} HP &middot; ${spent} spare ${spent===1?'die':'dice'} spent</div>
+        <div class="ps-sub">Back to ${hp} Health &middot; ${spent} spare ${spent===1?'die':'dice'} spent</div>
       </div>`);
     card.style.left = (r.left + r.width/2) + 'px'; card.style.top = (r.top + r.height*0.42) + 'px';
     document.body.appendChild(card);
@@ -3695,7 +3695,7 @@ function screenShake(intensity){
 const UIFX = {ticks:[], quests:[], flareAt:-1e9, vsAt:-1e9};
 function fxTick(side,type,amt){ if(amt>0) UIFX.ticks.push({side,type,amt,t:performance.now()}); }
 // Nov 8 (playtest: "never sure whether Fumble or Acid Potion was on me or on the enemy"): when a D.O.T. lands, a label
-// floats up over whoever got it, in that side's colour (yours blue, the monster's red): "D.O.T. 2 → Filement Bunny" or
+// floats up over whoever got it, in that side's color (yours blue, the monster's red): "D.O.T. 2 → Filement Bunny" or
 // "D.O.T. 1 → You". Lives on <body>, so redraws don't cut it short; several in a row stack upward.
 function dotLandFx(side, amt){
   try{
@@ -3929,7 +3929,7 @@ function spawnConfettiRain(){
   }
 }
 
-// Oct 28 (Jeremy picked 8B): Settings' links are toy tiles, an icon over the word, each its own colour; no Close tile (the X closes).
+// Oct 28 (Jeremy picked 8B): Settings' links are toy tiles, an icon over the word, each its own color; no Close tile (the X closes).
 // Oct 31 (Jeremy, S1): chunky drawn icons in the toy style (filled, dark outline) instead of thin generic line icons.
 const SETTINGS_TILE_ICONS = {
   log:'<rect x="6" y="5" width="20" height="23" rx="3" fill="#f3e3bf"/><path d="M11 12h10M11 17h10M11 22h6" stroke="#8a5a2b"/><rect x="4" y="3" width="24" height="5" rx="2.5" fill="#c9a66b"/>',
@@ -4127,7 +4127,7 @@ function openTutorialModal(stepIdx){
 // A persisted log of past runs (see recordRunHistory/getRunHistory in
 // logic.js), reachable any time from Settings -- including from the
 // Victory/Game Over screens, since the settings gear lives outside #app.
-// Oct 29 (Jeremy picked R2): each run is a small card topped with its class colour and the result.
+// Oct 29 (Jeremy picked R2): each run is a small card topped with its class color and the result.
 function runHistoryHTML(){
   const history = getRunHistory();
   const victories = history.filter(r=>r.outcome==='victory');
@@ -4150,7 +4150,7 @@ function runHistoryHTML(){
 }
 
 // Lifetime Achievements (ACHIEVEMENTS, logic.js) -- locked entries show
-// greyed-out with just name+desc; unlocked entries show the date earned.
+// grayed-out with just name+desc; unlocked entries show the date earned.
 // Reachable from Settings at any time (not just post-run), same as Run
 // History and the Dice Compendium.
 // Oct 29 (Jeremy picked R2): achievements are medals, gold once earned; tapping one shows how to earn it.
@@ -4305,7 +4305,7 @@ function backPocketViewHTML(){
     <p class="hint" style="margin-top:8px;"><b style="color:#e8746b">&#9829; Safety net ready.</b> If you fall to 0 Health, these dice are rolled until one isn't blank: it saves you at 5 Health, and <b>every</b> die here is spent. ${infoDot('Visit Camp to swap these into your Tray.')}</p>`;
 }
 
-// Oct 31 (Jeremy, G1): the Log is a parchment journal: rooms grouped under floor headings, a small coloured icon per
+// Oct 31 (Jeremy, G1): the Log is a parchment journal: rooms grouped under floor headings, a small colored icon per
 // entry, the key word in bold and details on a smaller line. The messages themselves are unchanged (the headline
 // strip reads them); they are reworded here, for display only.
 function logEntryHTML(t){
@@ -4537,7 +4537,7 @@ function renderLootModal(){
     options.forEach((opt,i)=>{
       const art = LOOT_ART[opt.name];
       const isNew = (S.lootChoice.fresh||[]).includes(opt.name);
-      // Nov 4: a die from a deeper floor (the Elite door's extra choice) keeps its own tier colour and says where it came from
+      // Nov 4: a die from a deeper floor (the Elite door's extra choice) keeps its own tier color and says where it came from
       const deep = !fin && !opt.inverse && opt.cat && opt.cat!==tier && LOOT_TIER_ACCENT[opt.cat];
       const acc = deep ? LOOT_TIER_ACCENT[opt.cat] : accent;
       const card = el(`<div class="loot-opt loot-opt-reveal${deep?' loot-opt-deeper':''}" style="--loot-tier-color:${acc.color}; --loot-tier-glow:${acc.glow}; animation-delay:${(i*0.1).toFixed(2)}s;">
@@ -4924,7 +4924,7 @@ function renderRelicChoiceModal(){
   });
 }
 
-// Each shrine option its own colour, matching what it gives (Oct 17 design fixes, item 10).
+// Each shrine option its own color, matching what it gives (Oct 17 design fixes, item 10).
 // Oct 31 (Jeremy, S1): each shrine option is a card: drawn icon (a gold + badge when it adds or upgrades), the effect
 // in the title font and one plain line under it. The labels themselves (data.js) are unchanged.
 // Oct 31 (Jeremy, S2): the shrine's boon line is a pinned parchment note; the effect words are bold, the joining
@@ -5093,7 +5093,7 @@ const SHRINE_HOLD_MS = 700; // the ring around the round Hold button fills over 
 // The shrine's hold / Continue button floats over the bottom of the shrine scene, just above the tray, like the
 // room callout: it no longer takes a row of its own, so the dice stay where they are (Jeremy, Oct 12).
 function placeShrineFloat(){
-  // Oct 16 (Jeremy): the shrine's round Hold / Continue button sits in the dead centre of the screen
+  // Oct 16 (Jeremy): the shrine's round Hold / Continue button sits in the dead center of the screen
   const f = document.getElementById('shrine-float');
   if(!f) return;
   const vw = document.documentElement.clientWidth || window.innerWidth, vh = window.innerHeight;
@@ -5668,7 +5668,7 @@ function pcHoverDieHTML(idx){
   if(S.klass && S.klass.pet && S.petIdx===idx) notes.push('Pointer is sitting here.');
   else if(typeof petNear==='function' && petNear(idx)) notes.push('+1 from Pointer, right beside it.');
   if(cell.spent) notes.push('Used this turn.');
-  const k = S.path ? S.path.indexOf(idx) : -1; if(k>=0) notes.push(`Step ${k+1} of your Path.`);
+  const k = S.path ? S.path.indexOf(idx) : -1; if(k>=0) notes.push(`Step ${k+1} of your path.`);
   return `<div class="pch-dice"><div class="pch-head"><b>${die.name}</b>${key}</div><div class="faces-tiles">${faces}</div></div>
     <div class="pch-main"><div class="pch-head"><b>${nm}</b></div><div class="pch-text">${FACE_DESC[f.type]||'No effect this turn.'}${notes.length?` <i>${notes.join(' ')}</i>`:''}</div></div>`;
 }
@@ -5685,9 +5685,9 @@ function pcHoverRender(){
   if(inn.innerHTML !== html) inn.innerHTML = html;
 }
 // Sits under the room, as wide as it; hidden when PC mode is off or the screen has no room.
-// PC fight: the gear sits centred in the right end of the hint footer (the top-right corner is the damage counter's).
+// PC fight: the gear sits centered in the right end of the hint footer (the top-right corner is the damage counter's).
 // Measured from the footer itself; the gear's own zoom scales its offsets, so divide by it. Other screens: reset.
-// Controller button glyphs (Nov 25, Steam ready): the face buttons as coloured round icons, matching the Go/Skill badges
+// Controller button glyphs (Nov 25, Steam ready): the face buttons as colored round icons, matching the Go/Skill badges
 function padGlyph(k){ return `<i class="pad-glyph pg-${k.toLowerCase()}">${k}</i>`; }
 function pcGearReset(){
   const g = document.querySelector('.settings-btn-floating'); if(!g) return;
@@ -6139,7 +6139,7 @@ function heroGear(){
   return { back: pick('back',1)[0], ground: pick('ground',2), float: pick('float',1)[0], head: pick('head',1)[0] };
 }
 // Nov 25 (Jeremy: signature objects for the unlockable classes; the starting four stay subtle): a companion object at
-// the hero's feet, on the wall side, in fights and on the victory screen. Toy-like: chunky dark outlines, flat colours.
+// the hero's feet, on the wall side, in fights and on the victory screen. Toy-like: chunky dark outlines, flat colors.
 const CLASS_PROP_SVG = {
   ranger: `<svg viewBox="0 0 84 84"><path d="M59 66 L67 54" stroke="#0c0705" stroke-width="14" stroke-linecap="round"/><path d="M59 66 L67 54" stroke="#8f949a" stroke-width="5" stroke-linecap="round"/>
     <path d="M23 80 C19 62 25 47 42 45 C59 47 65 62 61 80 Z" fill="#8f949a" stroke="#0c0705" stroke-width="4.5" stroke-linejoin="round"/><path d="M27 60 C30 50 36 47 42 47 C48 47 54 50 57 60" fill="none" stroke="#5d636b" stroke-width="5" stroke-linecap="round"/>
@@ -6639,7 +6639,7 @@ function newAchievementsHTML(newAchievements){
 // Barrel lid (Nov 14, Jeremy): boards run left to right round the dome, each seam arching up (strongly near the top,
 // flat at the front) and crowding toward the top; a soft highlight on the upper curve (lid-sheen).
 const CHEST_LID_HTML = `<div class="chest-lid" id="chest-lid" title="Flick or double-tap to open (or shake your phone)"><svg class="lid-seams" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="#0c0705" stroke-opacity=".55" stroke-width="2"><path vector-effect="non-scaling-stroke" d="M0 15.01 Q50 -1.01 100 15.01"/><path vector-effect="non-scaling-stroke" d="M0 20.20 Q50 5.80 100 20.20"/><path vector-effect="non-scaling-stroke" d="M0 26.30 Q50 13.70 100 26.30"/><path vector-effect="non-scaling-stroke" d="M0 33.32 Q50 22.68 100 33.32"/><path vector-effect="non-scaling-stroke" d="M0 41.30 Q50 32.70 100 41.30"/><path vector-effect="non-scaling-stroke" d="M0 50.26 Q50 43.74 100 50.26"/><path vector-effect="non-scaling-stroke" d="M0 60.25 Q50 55.75 100 60.25"/><path vector-effect="non-scaling-stroke" d="M0 71.31 Q50 68.69 100 71.31"/><path vector-effect="non-scaling-stroke" d="M0 84.48 Q50 83.52 100 84.48"/></g></svg><i class="lid-sheen"></i><i class="strap s1"></i><i class="strap s2"></i><i class="rim"></i></div>`;
-// Oct 31 (Jeremy): no class crest; instead a gag sticker on the lid, like a well-travelled crate. 4 rooms in 10 get one
+// Oct 31 (Jeremy): no class crest; instead a gag sticker on the lid, like a well-traveled crate. 4 rooms in 10 get one
 // (Nov 14, Jeremy: much more common; was 1 in 10), picked per room (same sticker every turn of that room), never in the guided first fight.
 const stkT = (x,y,size,fill,txt,len,font)=>`<text x="${x}" y="${y}" text-anchor="middle" style="font-family:${font==='d'?'var(--font-display)':'var(--font-ui)'};font-weight:${font==='d'?400:800}" font-size="${size}" fill="${fill}"${len?` textLength="${len}" lengthAdjust="spacingAndGlyphs"`:''}>${txt}</text>`;
 const LID_STICKERS = [
@@ -6840,12 +6840,12 @@ function bindScrambleFlick(el){
 })();
 
 const GUIDE_TEXT = {
-  t1: ['<b>This is your Tray.</b> <b style="color:#e8574f">Red</b> dice are actions (Hit, Combo); <b>white</b> dice are Maneuvers that bend your Path (Leap, Sidestep, Pivot). Tap the glowing die to start a Path.',
+  t1: ['<b>This is your Tray.</b> <b style="color:#e8574f">Red</b> dice are actions (Hit, Combo); <b>white</b> dice are Maneuvers that bend your path (Leap, Sidestep, Pivot). Tap the glowing die to start a path.',
        'Now tap the glowing neighbor. Each die you step on hits, blocks or heals, in order.',
        'One more! A <b>Combo</b> hits harder when it touches Hits.',
-       'That number is your Path\'s damage. Keep going through more dice, or tap <b>Go</b>!'],
+       'That number is your path\'s damage. Keep going through more dice, or tap <b>Go</b>!'],
   t2roll: 'New turn! <b>Flick the lid</b> open (or double-tap it) to roll your dice. On a phone, you can shake it instead.',
-  t2: 'Your dice re-rolled: <b>build any Path</b> and finish the fight! (The monster\'s <b>next move</b> shows under its name, so you can plan for it.)',
+  t2: 'Your dice re-rolled: <b>build any path</b> and finish the fight! (The monster\'s <b>next move</b> shows under its name, so you can plan for it.)',
 };
 function guideNudge(idx){
   const d = document.querySelector(`#tray .die[data-idx="${idx}"]`); if(!d) return;
@@ -6940,7 +6940,7 @@ function pointBubbleAt(b, bw, q, topY){
 /* ---- Floor tips (Jeremy, Oct 26): one-line lessons the first time a situation comes up ----
    The "New Action" cards say what a face is; these say when it matters, on the turn it matters, with the guide's bubble
    and ring on the die or chip in question. Each tip shows once per device, one at a time, never during the guided fight,
-   a room banner, a pop-up or a New Action card, and goes away on a tap, when the Path changes, or after 9 s. */
+   a room banner, a pop-up or a New Action card, and goes away on a tap, when the path changes, or after 9 s. */
 const TIPS_KEY = 'dungeonScrambleTips_v1';
 let TIPS_SEEN = (()=>{ try{ return new Set(JSON.parse(localStorage.getItem(TIPS_KEY)||'[]')); }catch(e){ return new Set(); } })();
 function tipsWanted(){
@@ -6950,15 +6950,15 @@ function tipsWanted(){
 function markTipSeen(k){ TIPS_SEEN.add(k); try{ localStorage.setItem(TIPS_KEY, JSON.stringify([...TIPS_SEEN])); }catch(e){} teleLog('tip', {k}); }
 const TIP_TEXT = {
   combo: n=>`This <b>Combo</b> touches ${n} attacking dice, so it hits harder. The glow grows with every Hit, Combo, Shield, H.O.T. or D.O.T. beside it.`,
-  leap: ()=>'A <b>Leap</b> jumps over the next die in a straight line, so a Blank or Minion in the way doesn\'t have to end your Path.',
-  chain: ()=>'<b>Grow your Path!</b> Tap this die, then a <b>neighbour</b> to add it, and keep going. <b>Every</b> die in the Path acts, in order, so a longer Path hits much harder.',
-  windup: a=>`<b>Big hit next turn!</b> ${a.name} hits for <b>${a.sp}</b>${a.dmg>a.sp ? `, <b>${a.dmg}</b> with its usual attack` : ''}. Put <b>Block</b> faces in this Path to soak it, use a <b>Freeze</b> to skip it, or hit hard enough to win first.`,
-  heavy: ()=>'A <b>heavy turn</b> is coming: this monster hits harder next turn. Block faces in this Path will soak it.',
+  leap: ()=>'A <b>Leap</b> jumps over the next die in a straight line, so a Blank or Minion in the way doesn\'t have to end your path.',
+  chain: ()=>'<b>Grow your path!</b> Tap this die, then a <b>neighbor</b> to add it, and keep going. <b>Every</b> die in the path acts, in order, so a longer path hits much harder.',
+  windup: a=>`<b>Big hit next turn!</b> ${a.name} hits for <b>${a.sp}</b>${a.dmg>a.sp ? `, <b>${a.dmg}</b> with its usual attack` : ''}. Put <b>Block</b> faces in this path to soak it, use a <b>Freeze</b> to skip it, or hit hard enough to win first.`,
+  heavy: ()=>'A <b>heavy turn</b> is coming: this monster hits harder next turn. Block faces in this path will soak it.',
   minion: ()=>'<b>Minion</b> dice clog your Tray. Every point of damage you deal clears one, and a Leap clears any it jumps over.',
-  overkill: n=>`This Path wins the fight. Deal ${n} more for an <b>Overkill</b>: an extra loot choice.`,
+  overkill: n=>`This path wins the fight. Deal ${n} more for an <b>Overkill</b>: an extra loot choice.`,
   // Nov 8 (We Playtest Games session: the tester thought Dodge defends, never worked out D.O.T. targets or the Skill,
   // and wondered whether longer paths are worth anything)
-  sidestep: ()=>'A <b>Sidestep</b> doesn\'t block anything: it lets your Path\'s next step go <b>diagonally</b>.',
+  sidestep: ()=>'A <b>Sidestep</b> doesn\'t block anything: it lets your path\'s next step go <b>diagonally</b>.',
   dot: who=>`<b>D.O.T.</b> (damage over time) is on ${who}: it deals its number in damage at the end of each turn, then drops by 1. <b>Blue</b> chips are on you, <b>red</b> chips on the monster.`,
   skill: k=>{ const c = k && k.convertTo; const zone = ({armsmaster:'the right column', guard:'the 2x2 square, middle right'})[k && k.id] || 'your dashed zone';
     return `Your <b>Skill</b>: tap it, then tap any die in ${zone} (dashed), <b>even a blank</b>, to turn it into a <b>${c ? (LABEL[c.type]||c.type)+' '+c.value : 'better face'}</b>. Once every turn.`; },
@@ -6986,7 +6986,7 @@ function tipTargets(){
   const e = S.encounter, tray = document.getElementById('tray'); if(!tray || !e) return null;
   const at = i=> `#tray .die[data-idx="${i}"]`;
   if(!S.path.length){
-    // Nov 25 (play data): after a one-die turn that could have been longer, point at a die with a neighbour to add.
+    // Nov 25 (play data): after a one-die turn that could have been longer, point at a die with a neighbor to add.
     // Allowed even if this room already had a lesson (urgent): it's the core of the game.
     if(!TIPS_SEEN.has('chain') && (S._singleDieTurns||0) >= 1){
       for(let i=0;i<16;i++){ const c = S.tray[i]; if(!c || c.minion || c.spent || c.blank) continue; const f = currentFace(c); if(!f || !/^(hit|combo)$/.test(f.type)) continue;

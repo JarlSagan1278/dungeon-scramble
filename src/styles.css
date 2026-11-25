@@ -464,7 +464,7 @@
     z-index:3; box-shadow:0 2px 6px rgba(0,0,0,0.5); }
   .skip-turn-btn:hover{ background:var(--gold); color:#241c10; }
   /* Played-path queue: small inked tokens (dark bevel + hard border + a
-     drop shadow) instead of flat grey pills with a plain "1." text prefix --
+     drop shadow) instead of flat gray pills with a plain "1." text prefix --
      matches the dice tray's own tactile language rather than reading like a
      default list/tag component. The step number is a little pressed-metal
      coin instead of plain text, echoing the gold .pathnum badges already
@@ -1154,7 +1154,7 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
   .title-panel button{ padding-top:14px; padding-bottom:14px; }
 }
 
-/* ===== Health bars: number inside, bar centred across the whole column ===== */
+/* ===== Health bars: number inside, bar centered across the whole column ===== */
 
 /* ---- v1.32: anticipation pips, near-miss chip, run highlights, origin relic ---- */
 
@@ -1379,7 +1379,7 @@ body.is-resolving .lethal-tag, body.is-resolving .die .face-val .icon-svg, body.
 /* Quest note: aged parchment (stains + darkened edges), no ruled lines */
 .fo-quests-label{ border-bottom:none !important; padding-bottom:0 !important; margin-bottom:2px !important; }
 
-/* ---- Quest note lit by the room: torchlight warms the edges, the note dims toward the centre/bottom and flickers with the torches ---- */
+/* ---- Quest note lit by the room: torchlight warms the edges, the note dims toward the center/bottom and flickers with the torches ---- */
 
 /* ---- Infrequent idle moves (a glint plus one small move per long cycle) ---- */
 @keyframes idle-move-p{
@@ -1861,7 +1861,7 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 .relic-fx.class-fx .relic-float{ color:#ffb15c; font-size:14px; } /* Dungeoneer wrap bonus pop (Oct 16) */
 
 /* ---- Oct 17 design fixes (audit Part 2, items 1, 3, 4, 5) ---- */
-/* Each menu button its own colour; the same colour means the same place everywhere (title, Settings, Codex tabs) */
+/* Each menu button its own color; the same color means the same place everywhere (title, Settings, Codex tabs) */
 button.btn-codex{ background:#5f8a3c; color:#fff3dc; }
 button.btn-records{ background:#4f6aa6; color:#fff3dc; }
 button.btn-howto{ background:#8a5aa0; color:#fff3dc; }
@@ -1887,7 +1887,7 @@ button.danger-outline:hover:not(:disabled){ background:#2c1a12; box-shadow:inset
 
 /* ---- Oct 17 design fixes, part 2 (audit Part 2, items 8-22, 25-26, plus Jeremy's 1.41.60 review) ---- */
 
-/* 9: every Origin and Class pill carries its own colour as a rim, so no two neighbours look alike */
+/* 9: every Origin and Class pill carries its own color as a rim, so no two neighbors look alike */
 #class-tab-row .class-tab-btn{ --tab-rim:var(--class-color); }
 .origin-tab-dwarf{ --tab-rim:#c8873a; } .origin-tab-gnome{ --tab-rim:#d9534f; } .origin-tab-halfling{ --tab-rim:#e8c25a; } .origin-tab-pixie{ --tab-rim:#c77ddb; }
 .class-tab-btn:not(.selected){ opacity:1; box-shadow:inset 0 -5px 0 var(--tab-rim, transparent) !important; }
@@ -1905,13 +1905,13 @@ textarea.paper-input:focus{ box-shadow:0 0 0 2px var(--gold); }
 
 /* 14: headings in Metamorphous (small caps labels stay serif) */
 .achv-unlock-title, .origin-relic-earned .ore-kicker{ font-family:var(--font-display); font-weight:400; text-transform:none; letter-spacing:.5px; font-size:16px; }
-/* 15-16: every pop-up title centred; the same ✕ in the same corner, red-brown so it never matches the gear (hidden under pop-ups) */
+/* 15-16: every pop-up title centered; the same ✕ in the same corner, red-brown so it never matches the gear (hidden under pop-ups) */
 .modal h2{ text-align:center !important; padding-left:4px; padding-right:4px; }
 .modal:has(> .modal-x-btn) h2{ padding-left:32px; padding-right:32px; }
 .modal-x-btn{ width:30px; height:30px; top:9px; right:9px; background:#7a2e22 !important; color:#ffe3d6 !important; font-size:14px; font-weight:900; z-index:3; }
 .modal-x-btn:hover:not(:disabled){ background:#923a2c !important; color:#fff !important; }
 body:has(.modal-overlay) .settings-btn-floating{ visibility:hidden; }
-/* 17: Key tiles drawn like tray dice: same colours, 3px outline (support faces in the Gilded gold) */
+/* 17: Key tiles drawn like tray dice: same colors, 3px outline (support faces in the Gilded gold) */
 .key-item{ border:3px solid var(--line); box-shadow:inset 0 3px 0 rgba(255,255,255,.3); filter:drop-shadow(0 3px 0 var(--line)); margin-bottom:3px; }
 .key-item.blk-attack{ background:#d8323a; } .key-item.blk-maneuver{ background:#ffe9a8; } .key-item.blk-support{ background:#d4af52; }
 .key-item.blk-attack .key-icon, .key-item.blk-attack .key-label{ color:#fff3e6; }
@@ -1919,16 +1919,16 @@ body:has(.modal-overlay) .settings-btn-floating{ visibility:hidden; }
 .key-item .key-label{ font-weight:900; }
 .key-item.on{ outline:3px solid #fff1d6; outline-offset:1px; }
 
-/* 19: achievement box and run-card stat tiles outlined in the line colour (gold stays for the heading) */
+/* 19: achievement box and run-card stat tiles outlined in the line color (gold stays for the heading) */
 .achv-unlock-box{ border:3px solid var(--line); }
 .rc-stat{ border:2px solid var(--line); }
 .share-ask{ background:rgba(255,220,160,.07); }
-/* 20: origin die-face chips outlined; the Signature Relic box dashed in the line colour */
+/* 20: origin die-face chips outlined; the Signature Relic box dashed in the line color */
 .die-face-chip{ border:2px solid var(--line); }
 .origin-relic-line{ border:2px solid var(--line); }
 .origin-relic-line.locked{ border-style:dashed; }
 /* 21: no dead tray rail on shrines; a disabled rail button is darkened, never see-through */
-.util-rail.rail-shrine > *{ visibility:visible; } /* Oct 31 (Jeremy): the rail stays at shrines, all greyed out */
+.util-rail.rail-shrine > *{ visibility:visible; } /* Oct 31 (Jeremy): the rail stays at shrines, all grayed out */
 .util-btn.disabled:not(.rail-go){ opacity:1 !important; position:relative; }
 .util-btn.disabled:not(.rail-go)::before{ content:''; position:absolute; inset:0; border-radius:inherit; background:rgba(28,17,9,.6); pointer-events:none; z-index:3; }
 
@@ -2050,7 +2050,7 @@ body{ font-variant-numeric: lining-nums; }
 .symbol-intro-kicker{ font-size:10.5px; }
 .round-badge{ font-size:13px; }
 
-/* Buttons (Jeremy, Oct 28: B3): every button keeps its own colour and gets a chunky toy bevel: a light top edge and a
+/* Buttons (Jeremy, Oct 28: B3): every button keeps its own color and gets a chunky toy bevel: a light top edge and a
    dark bottom lip. Buttons with their own glow or shape (class rules) keep theirs. */
 button{ border-radius:12px; box-shadow: inset 0 3px 0 rgba(255,255,255,.30), inset 0 -5px 0 rgba(0,0,0,.28); }
 button:active:not(:disabled){ box-shadow: inset 0 2px 0 rgba(255,255,255,.18), inset 0 -2px 0 rgba(0,0,0,.28); }
@@ -2058,7 +2058,7 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 
 /* ---- Oct 28 screen fixes (Jeremy: 1C, 2A, 3A, 7A, 8B) ---- */
 /* Blank sides stay plain (Jeremy, Oct 30: option A; the 1C socket collided with loot dice's curved names). */
-/* 2A: before the first tap Go is a dark slot that says what to do; disabled rail buttons keep their colour, dimmed. */
+/* 2A: before the first tap Go is a dark slot that says what to do; disabled rail buttons keep their color, dimmed. */
 .util-btn.rail-go .go-hint{ display:none; }
 .util-btn.rail-go.disabled{ opacity:1 !important; background:#2a1d13 !important; color:rgba(233,215,174,.5);
   box-shadow:inset 0 3px 8px rgba(0,0,0,.65), inset 0 0 0 2px rgba(212,175,82,.35) !important; }
@@ -2083,7 +2083,7 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 
 /* ---- Oct 28 second screen pass (Jeremy: T3, D1, C2, K1 + drop-in sag, consent line) ---- */
 
- /* -14% centres the art; the extra -2.9% centres its logo (Jeremy, Oct 30) */
+ /* -14% centers the art; the extra -2.9% centers its logo (Jeremy, Oct 30) */
 
 .upg-die{ width:24px; height:24px; border-radius:6px; border:2px solid var(--line); display:inline-flex; align-items:center; justify-content:center; flex:none;
   font-size:11px; font-weight:800; box-shadow:inset 0 2px 0 rgba(255,255,255,.3); }
@@ -2309,7 +2309,7 @@ span > .info-tap, label > .info-tap{ display:none; }
 /* G1: the idle Go keeps a faint GO with "pick dice" on one line under it. */
 .util-btn.rail-go.go-idle .go-word{ display:block !important; color:#e9d7ae; opacity:.45; }
 .util-btn.rail-go.go-idle .go-hint{ position:absolute; left:0; right:0; bottom:10px; font-size:11px !important; letter-spacing:.06em !important; opacity:.85; }
-/* Small fix: the greyed-out Go at shrines shows a faint GO instead of an empty slot. */
+/* Small fix: the grayed-out Go at shrines shows a faint GO instead of an empty slot. */
 .util-rail.rail-shrine .rail-go span{ color:#e9d7ae !important; opacity:.4; }
 .mark-svg{ width:1em; height:1em; vertical-align:-.12em; }
 .src-chip .sc-ic .mark-svg, .hl-strip .hl-ic .mark-svg{ width:14px; height:14px; }
@@ -2372,7 +2372,7 @@ button.end-details-btn:hover:not(:disabled){ background:#5a3e28; }
 .dk-k-kicker{ font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--parchment-dim,#bfa983); }
 .dk-k-name{ font-family:'Metamorphous',serif; color:#ff8a7a; font-size:18px; line-height:1.15; margin:2px 0 4px; }
 .dk-k-tip{ font-size:13.5px; color:#e9d7ae; line-height:1.35; }
-/* 5A: end-screen title and line centred with room above */
+/* 5A: end-screen title and line centered with room above */
 .end-screen > h2{ text-align:center; margin-top:34px !important; font-size:34px !important; }
 .end-lede{ text-align:center; max-width:300px; margin:4px auto 10px !important; }
 
@@ -2527,7 +2527,7 @@ button.end-details-btn:hover:not(:disabled){ background:#5a3e28; }
 #floor-card .fc-tablet, #floor-card .fc-name{ text-shadow:none !important; -webkit-text-stroke:0 !important; }
 #floor-card .fc-tablet{ transform:none !important; }
 
-/* Oct 31 (Jeremy): the floor label takes its floor's loot die colour: Floor I Alloy (steel), II Gilded (gold), III Magic (purple) */
+/* Oct 31 (Jeremy): the floor label takes its floor's loot die color: Floor I Alloy (steel), II Gilded (gold), III Magic (purple) */
 .tray-head .round-badge .rb-floor.rb-alloy, #floor-card .fc-tablet.rb-alloy{ background:var(--paper-tile) repeat, linear-gradient(180deg,#b6bec5,#8a939b) !important; color:#1a1410 !important; }
 .tray-head .round-badge .rb-floor.rb-gilded, #floor-card .fc-tablet.rb-gilded{ background:var(--paper-tile) repeat, linear-gradient(180deg,#e6c86e,#c49a3c) !important; color:#241c10 !important; }
 .tray-head .round-badge .rb-floor.rb-magic, #floor-card .fc-tablet.rb-magic{ background:var(--paper-tile) repeat, linear-gradient(180deg,#a47ac8,#7a4fa0) !important; color:#f5eaff !important; }
@@ -2668,7 +2668,7 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 
 .fo-quests-label .q-bonus-b{ padding:1px 3px 0; letter-spacing:.6px; }
 
-/* Nov 8: the "D.O.T. N -> target" label (dotLandFx), in the target's colour */
+/* Nov 8: the "D.O.T. N -> target" label (dotLandFx), in the target's color */
 .dot-land{ position:fixed; z-index:45; pointer-events:none; transform:translate(-50%,0); display:inline-flex; align-items:center; gap:4px; white-space:nowrap; max-width:92vw;
   padding:2px 8px 2px 5px; border:2px solid #0c0705; border-radius:999px; box-shadow:0 2px 0 #0c0705; font:800 12px/1.2 var(--font-ui);
   animation:dot-land 1.6s ease-out forwards; }
@@ -2686,7 +2686,7 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
    Was ~70 rules in ~30 places from Oct 13 - Nov 9; the history of each value is in git. Edit here, not further down.
    Notes kept from the old rules: --qdx/--qdy come from QUEST_PAPER_NUDGE (render.js) and keep rewards clear of big monsters;
    the ::before/::after pins sit above the cut-paper layer (z-index 2); the q-live-done green (#17501b) is dark on purpose so it
-   stays readable with red-green colour blindness (Nov 9). ==== */
+   stays readable with red-green color blindness (Nov 9). ==== */
 .fo-quests-float .fo-quest.complete{ color:#2d6a2f !important; text-decoration:line-through; }
 .fo-quests-float .fo-quest{ display:block; white-space:normal; text-wrap:balance; }
 .fo-quests-float::before{ content:''; position:absolute; border-radius:50%; box-shadow:0 1px 1px rgba(0,0,0,.6); top:3px; left:6px; margin-left:0; width:5px; height:5px; background:radial-gradient(circle at 35% 30%, #d8d8d8, #7d7d7d 60%, #3b3b3b); }
@@ -2935,18 +2935,18 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 .die.undoable{ box-shadow:0 0 0 3px #e05a5a, 0 0 10px 2px rgba(224,90,90,0.6) !important; cursor:pointer; }
 .die.resolving{ animation:die-resolve-pulse 0.32s ease-out; z-index:2; }
 .reduced-motion .die.resolving{ animation:none; }
-.die.dietype-attack{ color:#fff3e6; background:#d8323a !important; } /* Nov 25 (colour-blind check, Jeremy picked A): a deeper red than the old #ff5b5b, so red-green colour-blind players still see attack dice darker than the cream maneuver dice */
+.die.dietype-attack{ color:#fff3e6; background:#d8323a !important; } /* Nov 25 (color-blind check, Jeremy picked A): a deeper red than the old #ff5b5b, so red-green color-blind players still see attack dice darker than the cream maneuver dice */
 .die.dietype-maneuver{ color:#241c10; background:#ffe9a8 !important; }
 .die .name-tag-svg text{ fill:currentColor; font-family:inherit; opacity:.95 !important; font-weight:900 !important; paint-order:stroke; stroke:rgba(0,0,0,.35); stroke-width:.6px; }
 .die .face-val{ font-size:clamp(18px, 10.5cqw, 34px); line-height:1; }
 .die.camp-die-tile{ padding:0 !important; justify-content:center !important; }
-/* Basic dice: icon dead-centre in the tile, word pinned along the bottom */
+/* Basic dice: icon dead-center in the tile, word pinned along the bottom */
 #tray .die.dietype-attack:not(.blank), #tray .die.dietype-maneuver:not(.blank){ position:relative; padding-top:0 !important; padding-bottom:0 !important; }
 #tray .die.dietype-attack:not(.blank) .face-val, #tray .die.dietype-maneuver:not(.blank) .face-val{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
 #tray .die.dietype-attack:not(.blank) .face-word, #tray .die.dietype-maneuver:not(.blank) .face-word{ position:absolute; left:0; right:0; bottom:3px; margin:0; text-align:center; }
 .die.combo-active .face-val .icon-svg{ position:relative; overflow:visible; border-radius:0 !important; box-shadow:none !important; animation:none !important; filter:none !important; }
 
-/* Class-coloured zone: the cells your class ability applies to, and the armed ability button / class zone cells in the dice chest: solid line in the class color */
+/* Class-colored zone: the cells your class ability applies to, and the armed ability button / class zone cells in the dice chest: solid line in the class color */
 .zone-cell{ outline-offset:-3px; outline-color:color-mix(in srgb, var(--class-color,#fff) 65%, #fff) !important; box-shadow:inset 0 0 0 5px rgba(20,10,4,.55), inset 0 0 14px 3px color-mix(in srgb, var(--class-color,#fff) 80%, transparent), inset 0 3px 0 rgba(255,255,255,.3); outline-style:solid !important; }
 
 /* Class-ability zones: quiet colored halo (mat) idle; softer armed pulse */
@@ -3154,20 +3154,20 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 .camp-status-card > *{ position:relative; z-index:1; }
 /* Oct 15 (Jeremy): a campfire in a dark room -- the light falls off toward the edges (above the floor, under the hero, fire and buttons) */
 .camp-status-card::after{ content:""; position:absolute; inset:0; pointer-events:none; z-index:0; background:radial-gradient(ellipse 62% 70% at 50% 52%, rgba(8,4,2,0) 30%, rgba(8,4,2,.55) 70%, rgba(8,4,2,.9) 100%); }
-/* One ink colour everywhere. Camp props get a slimmer outline than the characters: logs 2px, flames 2.5px / Oct 15 (Jeremy): the campfire logs are in-world, so they get the paper grain too */
+/* One ink color everywhere. Camp props get a slimmer outline than the characters: logs 2px, flames 2.5px / Oct 15 (Jeremy): the campfire logs are in-world, so they get the paper grain too */
 .campfire-logs, .campfire-logs::before, .campfire-logs::after{ border:2px solid var(--line); box-sizing:border-box; filter:url(#fx-paper); }
 /* Camp (Oct 16, Jeremy): combine buttons stay covered (stripes + lock) until Train is chosen at the campfire. */
 .upgrade-btn.upgrade-locked{ position:relative; cursor:not-allowed; }
 /* tapping a locked combine nudges the Train button */
 .cf-btn.cf-nudge{ animation:cf-nudge .5s ease-in-out; }
-/* Camp upgrade rows take their die's colour (Attack red, Maneuver cream, like the tray); the "?" matches its row */
+/* Camp upgrade rows take their die's color (Attack red, Maneuver cream, like the tray); the "?" matches its row */
 .upg-attack .upgrade-btn, .upg-attack .upgrade-preview-btn{ background:#e8574f; color:#fff; }
 .upg-maneuver .upgrade-btn, .upg-maneuver .upgrade-preview-btn{ background:#ffe9a8; color:#3a2410; }
 .upg-attack .upgrade-btn:hover:not(:disabled), .upg-attack .upgrade-preview-btn:hover:not(:disabled){ background:#f06a62; }
 .upg-maneuver .upgrade-btn:hover:not(:disabled), .upg-maneuver .upgrade-preview-btn:hover:not(:disabled){ background:#fff2c8; }
 .upg-attack .upgrade-btn:disabled{ background:#6a2f2a !important; color:#f4c9c2 !important; }
 .upg-maneuver .upgrade-btn:disabled{ background:#6a5a34 !important; color:#f3e3b8 !important; }
-/* The one-time campfire confirm uses the colour of the button that opened it */
+/* The one-time campfire confirm uses the color of the button that opened it */
 button.cf-go-rest{ background:var(--green); color:var(--parchment); }
 button.cf-go-rest:hover:not(:disabled){ background:#57a06b; }
 button.cf-go-train{ background:var(--purple); color:var(--parchment); }
@@ -3192,7 +3192,7 @@ button.cf-go-train:hover:not(:disabled){ background:#9a6fc2; }
 .upgrade-btn.upgrade-locked .upg-lbl::before{ content:''; position:absolute; left:6px; top:50%; width:15px; height:17px; transform:translateY(-50%); pointer-events:none; background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 18'%3E%3Crect x='1.5' y='7.5' width='13' height='9.5' rx='2' fill='%23f2e4c8' stroke='%230c0705' stroke-width='1.6'/%3E%3Cpath d='M4.5 7.5V5a3.5 3.5 0 0 1 7 0v2.5' fill='none' stroke='%230c0705' stroke-width='3.2'/%3E%3Cpath d='M4.5 7.5V5a3.5 3.5 0 0 1 7 0v2.5' fill='none' stroke='%23f2e4c8' stroke-width='1.4'/%3E%3C/svg%3E"); }
 /* Camp scene (Jeremy, Oct 17: "the wall is too high up compared to the campfire"): the floor starts just behind the hero and fire (their feet sit ~30px below the horizon, like a fight room), so they stand on it with the wall behind them */
 .camp-status-card::before{ content:""; position:absolute; left:0; right:0; bottom:0; border-top:3px solid #120b07; background:linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.55)), var(--tex-floor) 50% 0/320px 320px; pointer-events:none; z-index:0; top:90px; height:auto; }
-/* Campfire buttons: the label is centred vertically whether or not it has a sub-line, and Rest and Train line up */
+/* Campfire buttons: the label is centered vertically whether or not it has a sub-line, and Rest and Train line up */
 .campfire-choice .cf-btn{ justify-content:center; min-height:52px; }
 .campfire-choice .cf-btn small{ line-height:1.15; }
 /* C2: upgrade rows as little dice */
@@ -3345,7 +3345,7 @@ button.cf-go-train:hover:not(:disabled){ background:#9a6fc2; }
 .door-kick .fo-enemy .fo-fig{ animation:door-burst .55s cubic-bezier(.2,1.25,.4,1) .1s both; }
 .fo-enemy{ position:relative; }
 body.hit-stop .fo-enemy .fo-fig{ filter:brightness(2.4) saturate(.35); }
-/* Spend the extra device height on the doorway scene (scales with --screen-h; unchanged at 720) / v1.32.19 monster presence: per-encounter size (--sz). Big ones grow up AND down, looming behind their health bar. / v1.32.19 dark hallway: two torch-lit foci, a faint warm centre, near-black edges / Hallway floor: the bottom of the doorway warms toward the dice-box brown instead of dropping to black; the base edge is solid ink, not the torch gradient bleeding through the transparent border */
+/* Spend the extra device height on the doorway scene (scales with --screen-h; unchanged at 720) / v1.32.19 monster presence: per-encounter size (--sz). Big ones grow up AND down, looming behind their health bar. / v1.32.19 dark hallway: two torch-lit foci, a faint warm center, near-black edges / Hallway floor: the bottom of the doorway warms toward the dice-box brown instead of dropping to black; the base edge is solid ink, not the torch gradient bleeding through the transparent border */
 .enc-card.fo-arch{ position:relative; overflow:visible !important; border:5px solid transparent !important; border-radius:120px 120px 12px 12px / 90px 90px 12px 12px !important; filter:none !important; margin:0 !important; padding:15px 8px 2px; padding-top:12px; box-sizing:border-box; display:flex; flex-direction:column; justify-content:center; min-height:calc(253px + (var(--screen-h) - 720px) * 0.65) !important; --fh:calc(104px + (var(--screen-h) - 720px) * 0.25); background:radial-gradient(circle at 19px 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
     radial-gradient(circle at calc(100% - 19px) 53px, rgba(255,140,40,.78) 0, rgba(235,105,25,.46) 46px, rgba(160,70,18,.18) 125px, transparent 215px),
     radial-gradient(ellipse at 50% 62%, rgba(120,80,42,.5) 0%, transparent 70%),
@@ -3415,7 +3415,7 @@ body.hit-stop .fo-enemy .fo-fig{ filter:brightness(2.4) saturate(.35); }
 /* S2: the shrine's boon line is a small parchment note pinned under the shrine (same footprint as the old box) */
 .fo-shrine .fo-enemy .fo-quests.boon-note{ display:block !important; position:relative; max-width:170px; margin:4px auto 0 !important; padding:6px 10px 5px !important; border-radius:4px !important; background:var(--paper-tile) repeat, #f3e3bf !important; background-size:110px 110px, auto !important; background-blend-mode:soft-light, normal; color:#3a2410 !important; border:3px solid var(--line); box-shadow:0 4px 0 var(--line); transform:rotate(1.5deg); font:400 13px/1.3 var(--font-ui) !important; text-align:center; text-shadow:none !important; }
 .fo-shrine .fo-enemy .fo-quests.boon-note::before{ content:''; position:absolute; top:-7px; left:50%; width:12px; height:12px; margin-left:-6px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#ff9a7a,#b02a1c 70%); border:2px solid var(--line); }
-/* Nov 8 (playtest: "never sure whether the D.O.T. was on me or the enemy"): status chips take their owner's colour. Yours are blue, the monster's are deep red, whatever the status is. 2px toy outline. */
+/* Nov 8 (playtest: "never sure whether the D.O.T. was on me or the enemy"): status chips take their owner's color. Yours are blue, the monster's are deep red, whatever the status is. 2px toy outline. */
 .fo-player .fo-buffs .status-chip{ background:linear-gradient(160deg,#4f86c6,#2d5a93) !important; color:#eef5ff !important; border:2px solid #0c0705 !important; box-shadow:0 2px 0 #0c0705; }
 .fo-enemy .fo-buffs .status-chip{ background:linear-gradient(160deg,#c0453a,#7e2219) !important; color:#fff0e8 !important; border:2px solid #0c0705 !important; box-shadow:0 2px 0 #0c0705; }
 .fo-player .fo-buffs .status-chip .icon-svg, .fo-enemy .fo-buffs .status-chip .icon-svg{ color:inherit !important; }
@@ -3486,7 +3486,7 @@ body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
 #shrine-options.shrine-pick.sp3{ gap:7px; grid-template-columns:repeat(3, minmax(0,1fr)); }
 .shrine-pick .shrine-opt{ display:flex !important; flex-direction:column; align-items:center; gap:6px; padding:12px 8px 11px !important; margin:0 !important; width:auto !important; min-height:0 !important; background:#3a2819 !important; border:3px solid var(--line) !important; border-radius:12px !important; box-shadow:0 4px 0 var(--line), inset 0 2px 0 rgba(255,255,255,.08) !important; text-align:center; cursor:pointer; min-width:0 !important; max-width:none !important; flex:none !important; box-sizing:border-box; }
 .shrine-pick .shrine-opt h4, .shrine-pick .sp-sub{ overflow-wrap:anywhere; }
-/* 10: each shrine option its own colour, matching what it gives */
+/* 10: each shrine option its own color, matching what it gives */
 #shrine-options .loot-opt.shrine-opt{ border:3px solid var(--line); filter:drop-shadow(0 3px 0 var(--line)); }
 #shrine-options .loot-opt.shrine-opt h4{ margin:2px 0; font-size:14px; }
 .shrine-opt.so-wasted{ opacity:.55; }
@@ -3716,7 +3716,7 @@ body.pc #app:has(> #enc-panel) > .tray-panel{ align-self:stretch; }
 #pc-hover .pch-text i{ color:var(--parchment-dim); }
 #pc-hover .pch-idle .pch-text{ color:var(--parchment-dim); }
 #pc-hover .faces-tiles{ display:flex; gap:3px; }
-/* Nov 14 (Jeremy: hard-to-read icons): the faces drawn like the Equip window's face row (dark icon on the face's own colour,
+/* Nov 14 (Jeremy: hard-to-read icons): the faces drawn like the Equip window's face row (dark icon on the face's own color,
    full strength); the face showing gets the gold ring */
 #pc-hover .mini-face{ width:48px; height:48px; opacity:1; border-radius:9px; }
 #pc-hover .mini-face .icon-svg{ background:transparent !important; box-shadow:none !important; margin:0 !important; width:30px !important; height:30px !important; }
@@ -3809,7 +3809,7 @@ body.pc .swap-modal > #swap-list{ grid-area:l; margin:0; }
 body.pc .swap-modal > .small-btn-row{ grid-area:b; align-self:end; flex-direction:column; gap:10px; }
 body.pc .swap-modal > .small-btn-row > button{ width:100%; }
 /* Nov 14 (Steam Deck: Chrome at 125% is 1024x640): the phone card's 720 px minimum height must not apply in PC mode, or a
-   shorter window centres everything 40 px low and cuts off the bottom */
+   shorter window centers everything 40 px low and cuts off the bottom */
 body.pc .wrap, body.pc #app{ min-height:0 !important; }
 body.pc #app:not(:has(> #enc-panel)):has(> .title-screen-fill), body.pc #app:not(:has(> #enc-panel)):has(> .setup-panel), body.pc #app:not(:has(> #enc-panel)):has(> .panel > .camp-status-card){ height:100vh !important; max-height:100vh; }
 /* ==== Dice roll (Nov 13, option G): 3D cubes made by startCubeRoll (render.js), one per die, in a layer inside #tray */
@@ -3846,7 +3846,7 @@ svg.chest-art{ overflow:visible; filter:url(#fx-worn); }
   background:radial-gradient(ellipse 75% 16% at 50% 21%, rgba(255,240,210,.85), rgba(255,240,210,0) 100%), linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 12%, rgba(0,0,0,0) 60%, rgba(0,0,0,.35) 100%); }
 
 /* Nov 14 (Steam Deck): the PC cursor is an outline on its target (pcCursorDraw), drawn by the browser in the right place */
-html body #tray > .die.pc-cur, html body .tray-panel .pc-cur{ position:relative; z-index:9 !important; } /* above its neighbours, so they never cover the outline */
+html body #tray > .die.pc-cur, html body .tray-panel .pc-cur{ position:relative; z-index:9 !important; } /* above its neighbors, so they never cover the outline */
 html body .pc-cur, html body #tray > .die.pc-cur{ outline:4px solid var(--gold) !important; outline-offset:4px !important; /* beats the class-zone dice's outline:none !important (Nov 14) */ } /* no animation or shadow of its own: setting either replaced the element's own (a loot card's settle replayed and twitched, Nov 14) */
 @keyframes pc-cur-pulse{ 0%,100%{ outline-color:var(--gold); } 50%{ outline-color:#fff3c4; } }
 /* Nov 14 (Jeremy): "tap to enter" sits on the door's lower panel as a small dark tag, not below the door over the hero */
@@ -4100,7 +4100,7 @@ body.calm .hero-gear .hg-float, body.calm .enemy-carry .ec-float, body.calm .tra
 
 /* ==== Additive Inverse (Nov 25 Easter egg): your own portrait as the foe, inverted; and its one-of-a-kind die */
 .fo-img.inverse-art{ filter:invert(1) grayscale(.4) brightness(.4) contrast(1.6) sepia(.6) hue-rotate(230deg) drop-shadow(0 0 3px rgba(190,140,255,.95)); }
-/* The die itself (Nov 25, Jeremy: no art on dice, so colour and motion carry it, "inverse" and pulsing like a magic die):
+/* The die itself (Nov 25, Jeremy: no art on dice, so color and motion carry it, "inverse" and pulsing like a magic die):
    a violet void (dark at the heart, violet at the rim) with pale lavender faces; its pulse is the magic dice's run backwards
    (a dark core breathing in, a ring collapsing inward, .sheen-inverse); every few seconds it flips to its exact negative. */
 .die.die-inverse{ background:radial-gradient(circle at 50% 55%, #0d0714 0%, #24133a 52%, #5d3a94 100%) !important; color:#f1e6ff; outline:2px solid #b89cff; outline-offset:-7px;
@@ -4155,7 +4155,7 @@ body.pc .setup-panel > #start-btn{ margin-bottom:0 !important; }
 
 /* ==== Class props (Nov 25): the unlockable classes' signature objects at the hero's feet, on the wall side */
 .fo-fig, .vic-hero-wrap{ position:relative; }
-.class-prop{ position:absolute; left:-31%; bottom:-3%; width:48%; aspect-ratio:1; pointer-events:none; z-index:2; /* in front of the worn loot (Jeremy: the class object is the one to emphasize all run) */ filter:drop-shadow(0 2px 0 rgba(12,7,5,.55)); } /* no paper filter: it greyed the black outlines (Jeremy: outlines black like the rest) */
+.class-prop{ position:absolute; left:-31%; bottom:-3%; width:48%; aspect-ratio:1; pointer-events:none; z-index:2; /* in front of the worn loot (Jeremy: the class object is the one to emphasize all run) */ filter:drop-shadow(0 2px 0 rgba(12,7,5,.55)); } /* no paper filter: it grayed the black outlines (Jeremy: outlines black like the rest) */
 .class-prop svg{ width:100%; height:100%; display:block; overflow:visible; }
 .class-prop.cp-ranger{ width:52%; left:-34%; animation:cp-sit 3.8s ease-in-out infinite; transform-origin:50% 100%; }
 .class-prop.cp-alchemist svg circle{ animation:cp-bubble 2.6s ease-in-out infinite; }

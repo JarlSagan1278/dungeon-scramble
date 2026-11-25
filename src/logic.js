@@ -151,7 +151,7 @@ function grantRelic(id, opts){
   return true;
 }
 
-// Relics that change a Path's numbers. Mutates the per-die `steps` that
+// Relics that change a path's numbers. Mutates the per-die `steps` that
 // computePathSteps() builds, so the live preview (computePathEffects), the
 // step-by-step playback, and the final totals all agree.
 // A step that crosses the Dungeoneer's seam (edge to edge), by the same rule canSelect() uses: both squares in the zone,
@@ -345,7 +345,7 @@ function shareDataPref(){ try{ return localStorage.getItem(SHARE_KEY); }catch(e)
 function setShareData(on, alsoRunId){
   try{ localStorage.setItem(SHARE_KEY, on ? 'yes' : 'no'); }catch(e){}
   // Release prep (Oct 21): opting in covers runs finished from now on only. Runs already on the device are marked
-  // as not-to-send, so saying yes never uploads a back-catalogue the player didn't know about.
+  // as not-to-send, so saying yes never uploads a back-catalog the player didn't know about.
   // Oct 25 (Jeremy): the end-of-run question also covers the run just finished ("this run and future ones"), passed as
   // alsoRunId, so a new player's first run can be sent. The Settings switch still covers future runs only.
   if(on){
@@ -612,7 +612,7 @@ const ACHIEVEMENTS = [
   {id:'origin_duo', name:'Two Roads', desc:'Win a run with 2 different Origins.',
     check: L => Object.values(L.victoriesByOrigin||{}).filter(n=>n>0).length>=2},
   // Nov 25 (Dylan's notes): tiered medals. A medal with `tier` is a step of the one before it ('silver' and 'gold' go up
-  // from the bronze original); the Achievements screen colours the coin by tier. Plus the one-path feats, Exact! kills,
+  // from the bronze original); the Achievements screen colors the coin by tier. Plus the one-path feats, Exact! kills,
   // Depth wins and the full-game purchase (store app only: `only`).
   {id:'overkill_50', name:'Overkill Devotee', tier:'silver', desc:'Land 50 Overkills, lifetime.', check: L => L.totalOverkills>=50},
   {id:'overkill_200', name:'Overkill Legend', tier:'gold', desc:'Land 200 Overkills, lifetime.', check: L => L.totalOverkills>=200},
@@ -1590,7 +1590,7 @@ function scrambleTray(gate){
   abilityArmed = false;
   S.justScrambled = true; S.needRoll = false;
   if(S.klass && S.klass.pet){ S.petIdx = rand(16); S.fetchArmed = false; } // Ranger (Nov 25): Pointer lands with the dice
-  // a turn's opening roll waits for the flick (the guided first turn's ready-made Path does not)
+  // a turn's opening roll waits for the flick (the guided first turn's ready-made path does not)
   if(gate && rollGateOn() && !(S.guide && (S.guide.stage==='pending' || S.guide.stage==='t1'))){ S.needRoll = true; S.justScrambled = false; return; }
   if(typeof playDiceRollSound==='function') playDiceRollSound();
 }
@@ -1685,7 +1685,7 @@ function anyMoveAvailable(){
 }
 
 // ---- Guided first fight (Oct 22, release prep, checklist #23) ----
-// A device's first run: the first room is the Filement Bunny and its first tray has a ready-made Path in the middle
+// A device's first run: the first room is the Filement Bunny and its first tray has a ready-made path in the middle
 // row (Hit, Hit, Combo). Stage 't1' walks the player through tapping it and pressing Go; 't2' points at the enemy's
 // next-turn chips and lets them finish the fight freely; the guide ends when the room ends or on Skip.
 const GUIDE_DONE_KEY = 'dungeonScrambleGuideDone_v1';
@@ -1702,7 +1702,7 @@ function guideFinish(how){
   teleLog('guide_end', {how});
 }
 function guideSetupTray(){
-  const T = [4, 5, 6]; // middle-left row: a straight Path anyone can see
+  const T = [4, 5, 6]; // middle-left row: a straight path anyone can see
   const faceAt = (d, type)=> d.faces.findIndex(f=>f.type===type);
   const used = new Set();
   const pickDie = type=>{ for(let i=0;i<S.tray.length;i++){ const c = S.tray[i]; if(!used.has(i) && !c.minion && faceAt(c.die, type)>=0){ used.add(i); return i; } } return -1; };
@@ -1731,9 +1731,9 @@ function guideSetupTray(){
 
 function toggleSelect(idx){
   if(S.needRoll){ if(typeof scrambleHint==='function') scrambleHint(); return; } // dice are still in the cup
-  if(S.guide && S.guide.stage==='t1'){ // guided first turn: only the glowing dice (or stepping back) until the shown Path is built
+  if(S.guide && S.guide.stage==='t1'){ // guided first turn: only the glowing dice (or stepping back) until the shown path is built
     const undo = S.path.length && S.path[S.path.length-1]===idx;
-    // Oct 30 (Jeremy): once the three glowing dice are in, the Path is the player's: any legal die may extend it
+    // Oct 30 (Jeremy): once the three glowing dice are in, the path is the player's: any legal die may extend it
     if(!undo && S.path.length < S.guide.plan.length && idx!==S.guide.plan[S.path.length]){ if(typeof guideNudge==='function') guideNudge(idx); return; }
   }
   if(S.trayAct){ if(trayActTap(idx)) fastTrayRender(); return; } // v1.38.0: an armed Swap/Reroll takes the tap
@@ -2008,7 +2008,7 @@ function computePathEffects(path){
     // through consecutive Boosts, is spent by the Attack/Support action it
     // multiplies, and otherwise dissipates unused (Dodge/Leap/Pivot/Fumble/
     // Freeze/Nullify don't carry it forward), per the manual's "dissipates
-    // across non-Attack Actions... unless the Path continues through another
+    // across non-Attack Actions... unless the path continues through another
     // BOOST" rule.
     if(f.type!=='boost') boostMult = 1;
   });
@@ -2372,7 +2372,7 @@ function startTurnTransition(){
   S.stats.turnsTaken++;
   S.stats.longestPath = Math.max(S.stats.longestPath||0, S.path.length);
   // Nov 25 (play data: tutorial skippers played one-die paths for whole fights): count a one-die turn in the first runs
-  // when a neighbour could have been added; the next turn opens with the chain hint (render.js tipTargets, 'chain')
+  // when a neighbor could have been added; the next turn opens with the chain hint (render.js tipTargets, 'chain')
   if(S.path.length===1 && ((META.lifetime && META.lifetime.runsPlayed)||0) < 5){ try{ if([...Array(16).keys()].some(j=> j!==S.path[0] && canSelect(j))) S._singleDieTurns = (S._singleDieTurns||0) + 1; }catch(err){} }
   { let man = 0, hit = 0, bc = 0; S.path.forEach(i=>{ const c = S.tray[i]; if(!c || c.minion) return; const f = currentFace(c) || {}; // one-path feats (Nov 25 achievements)
       if(MANEUVER_TYPES.includes(f.type)) man++; else if(f.type==='hit') hit++; else if(f.type==='boost' || f.type==='combo') bc++; });
@@ -2479,7 +2479,7 @@ function finishPlayerPath(path, effects){
   if((S.resolveTotal||0) > 0 && e.curHealth > 0 && e.curHealth <= 3 && e.maxHealth >= 8){
     S.stats.nearMisses = (S.stats.nearMisses||0) + 1;
     teleLog('close_call', {enemy:e.name, left:Math.ceil(e.curHealth)});
-    showToastIfAvailable(`Just ${Math.ceil(e.curHealth)} HP left!`, null);
+    showToastIfAvailable(`Just ${Math.ceil(e.curHealth)} Health left!`, null);
     if(typeof playTone==='function') playTone('closeCall');
   }
   // Closing beat for a strong turn (polish roadmap E3, Nov 12): the dice each show their own number, so the turn's TOTAL
@@ -2738,7 +2738,7 @@ function bossKitNow(e){ return (e.phase===2 && e.kit.phase2) ? e.kit.phase2 : e.
 function bossNextSpecial(e){ const k = bossKitNow(e); return k.specials[(e.specialIdx||0) % k.specials.length]; }
 
 // A boss turn: its base attack (kit.each) always lands; the telegraphed
-// special lands too unless Freeze cancelled it. A boss with a phase 2 enters
+// special lands too unless Freeze canceled it. A boss with a phase 2 enters
 // it after the first turn that ends at or below half HP, so the special the
 // player saw coming is always the one that happens.
 function bossTakeTurn(e, frozen){
@@ -2746,7 +2746,7 @@ function bossTakeTurn(e, frozen){
   const parts = kit.each.map(a=>applyEnemyAct(e, a));
   const sp = bossNextSpecial(e);
   e.specialIdx = (e.specialIdx||0) + 1;
-  if(frozen){ parts.push(`${e.name} is frozen: ${sp.name} is cancelled.`); logMsg('sys', `${e.name} is frozen: ${sp.name} is cancelled.`); if(typeof showCleverStamp==='function') setTimeout(()=> showCleverStamp('Called it!', 'e'), 120); }
+  if(frozen){ parts.push(`${e.name} is frozen: ${sp.name} is canceled.`); logMsg('sys', `${e.name} is frozen: ${sp.name} is canceled.`); if(typeof showCleverStamp==='function') setTimeout(()=> showCleverStamp('Called it!', 'e'), 120); }
   else {
     parts.push(`${sp.name}!`);
     S._wardHalf = !!(sp.windup && hasRelic('warding_bell') && !e._wardUsed); if(S._wardHalf) e._wardUsed = true;
@@ -2937,7 +2937,7 @@ function runShrineEffect(e, effect){
       S.maxHealth += effect.amount;
       S.health = cap(S.health+effect.amount, S.maxHealth);
       const t = `Max health +${effect.amount}.`;
-      S.shrineFx = {kind:'hp', text:`+${effect.amount} Max HP`};
+      S.shrineFx = {kind:'hp', text:`+${effect.amount} Max Health`};
       logMsg('sys', `${e.name}: ${t}`);
       S.shrineResult = { title: e.name, text: t };
       render(); return;
@@ -3070,7 +3070,7 @@ function continueFromShrine(){
 }
 
 function applyShrineBoon(e){
-  if(depthRank('dues') && e.effect){ const was = S.health; S.health = Math.max(1, S.health-2); if(S.health<was) logMsg('dmg', `Union Dues: the shrine takes ${was-S.health} HP.`, 'bad'); }
+  if(depthRank('dues') && e.effect){ const was = S.health; S.health = Math.max(1, S.health-2); if(S.health<was) logMsg('dmg', `Union Dues: the shrine takes ${was-S.health} Health.`, 'bad'); }
   if(!e.effect){
     const t = `${e.name} has no coded effect yet (boon: "${e.boon}"); log-only for now.`;
     logMsg('sys', t);
@@ -3407,7 +3407,7 @@ function selectOrganize(type, idx){
   const trayCell = S.tray[trayIndex];
   const bpDie = S.backPocket[bpIdx];
   if(!trayCell || !trayCell.die || !bpDie){ S.organizeSelection = null; render(); return; }
-  // Swapping two identical dice changes nothing -- say so and keep the selection instead of looking like it cancelled.
+  // Swapping two identical dice changes nothing -- say so and keep the selection instead of looking like it canceled.
   if(trayCell.die.name===bpDie.name){ if(typeof showToast==='function') showToast('Those two dice are identical. Pick a different one.', null); render(); return; }
   S.backPocket[bpIdx] = trayCell.die;
   trayCell.die = bpDie;
@@ -3451,7 +3451,7 @@ function campRest(){
   S.health = cap(S.health+heal, S.maxHealth);
   if(typeof UIFX!=='undefined' && S.health>hpFrom) UIFX.campHeal = {from:hpFrom, to:S.health, at:performance.now(), dur:900+Math.min(heal,10)*120};
   campFireUsedBy('rest'); S.campHealed = S.health - hpFrom;
-  logMsg('heal', `Rested: +${S.campHealed} HP`, 'good');
+  logMsg('heal', `Rested: +${S.campHealed} Health`, 'good');
   if(heal>0 && typeof playTone==='function') playTone('restChord');
   render();
 }

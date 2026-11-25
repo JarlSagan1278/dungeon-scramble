@@ -19,11 +19,11 @@ TRICKSTER (play 5 Daily Dungeons)
 Sleight of Hand: swap a corner die with any other die, once a turn. Pull the good dice into reach.
 
 RANGER AND POINTER (reach the Rational Guild Rank)
-Pointer, a very good grey schnauzer, lands on a die each turn and gives the dice beside him +1. Call Fetch! and he
+Pointer, a very good gray schnauzer, lands on a die each turn and gives the dice beside him +1. Call Fetch! and he
 runs two more steps after your path and uses those dice too.
 
 ALCHEMIST (beat every foe that follows a rule)
-Turn a centre die into poison, and every D.O.T. you play is stronger. Brew early; it ticks every turn.
+Turn a center die into poison, and every D.O.T. you play is stronger. Brew early; it ticks every turn.
 
 ENGINEER (win at Depth 3)
 Print: copy any die's face onto your left column, and it stays printed for the whole fight. Build your machine one

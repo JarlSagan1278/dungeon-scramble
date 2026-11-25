@@ -32,7 +32,7 @@ follow rules of their own: one is immune to a different face type every turn, on
 pays a bounty for its Wanted poster, and three more wait deeper down.
 
 WHAT'S INSIDE
-- 4 origins (Dwarf, Gnome, Halfling, Pixie) and 9 classes: 4 to start and 5 to unlock, among them a Ranger with Pointer, a grey schnauzer who boosts the dice around him. Each class has its own zone of the tray and its own skill
+- 4 origins (Dwarf, Gnome, Halfling, Pixie) and 9 classes: 4 to start and 5 to unlock, among them a Ranger with Pointer, a gray schnauzer who boosts the dice around him. Each class has its own zone of the tray and its own skill
 - 3 dungeon floors with 37 monsters, 12 traps and 9 bosses
 - 50+ loot dice to find, wear and unlock as starting boons, and 20+ relics
 - 32 shrines, camps where you rest or train your dice, and forks where you pick your door

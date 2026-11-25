@@ -48,14 +48,14 @@ function faces(arr){ return arr.map(face); }
 // Route-goal quests (Nov 8, Jeremy: option C, names only in the long-press details and the Bestiary, not on the sign).
 // Quest data: '5 damage: route square root'. The check lives in routeGoalMet (logic.js).
 const ROUTE_GOALS = {
-  'square root':       {name:'Square Root',       short:'2×2 square',        desc:'Four dice of one Path fill a 2×2 square.'},
-  'running start':     {name:'Running Start',     short:'Move, Boost',  desc:'A Boost right after a Sidestep, Leap or Pivot, in one Path.'},
-  'leapfrog':          {name:'Leapfrog',          short:'Leap to Leap',  desc:'A Leap that lands on another Leap, in one Path.'},
-  'diagonal argument': {name:'Diagonal Argument', short:'3 on a diagonal',   desc:'Three dice in a row along one diagonal, in one Path (two Sidesteps, one after the other).'},
-  'pivot point':       {name:'Pivot Point',       short:'Pivot, Combo', desc:'A Combo right after a Pivot, in one Path.'},
-  'straightedge':      {name:'Straightedge',      short:'4 in a line',       desc:'Four dice in a row along one full row or column of the Tray, one after another in one Path.'}, // Nov 9: replaced Turning Number (turn 3 times), which 97% of paths did by accident
-  'antipodal':         {name:'Antipodal',         short:'Far corners',  desc:'One Path that starts in a corner of the Tray and ends in the opposite corner.'},
-  'hollow proof':      {name:'Hollow Proof',      short:'Edge path 5+',      desc:'One Path of 5 or more dice that never touches the middle four.'},
+  'square root':       {name:'Square Root',       short:'2×2 square',        desc:'Four dice of one path fill a 2×2 square.'},
+  'running start':     {name:'Running Start',     short:'Move, Boost',  desc:'A Boost right after a Sidestep, Leap or Pivot, in one path.'},
+  'leapfrog':          {name:'Leapfrog',          short:'Leap to Leap',  desc:'A Leap that lands on another Leap, in one path.'},
+  'diagonal argument': {name:'Diagonal Argument', short:'3 on a diagonal',   desc:'Three dice in a row along one diagonal, in one path (two Sidesteps, one after the other).'},
+  'pivot point':       {name:'Pivot Point',       short:'Pivot, Combo', desc:'A Combo right after a Pivot, in one path.'},
+  'straightedge':      {name:'Straightedge',      short:'4 in a line',       desc:'Four dice in a row along one full row or column of the Tray, one after another in one path.'}, // Nov 9: replaced Turning Number (turn 3 times), which 97% of paths did by accident
+  'antipodal':         {name:'Antipodal',         short:'Far corners',  desc:'One path that starts in a corner of the Tray and ends in the opposite corner.'},
+  'hollow proof':      {name:'Hollow Proof',      short:'Edge path 5+',      desc:'One path of 5 or more dice that never touches the middle four.'},
 };
 const LABEL = { hit:'Hit', combo:'Combo', boost:'Boost', dot:'D.O.T.', leech:'Leech', fumble:'Fumble',
   dodge:'Sidestep', leap:'Leap', pivot:'Pivot', freeze:'Freeze', swap:'Swap', reroll:'Reroll', heal:'Heal', hot:'H.O.T.', block:'Block', nullify:'Nullify', blank:'—'};
@@ -288,7 +288,7 @@ const RELICS = [
   {id:'forgeplate', name:'Stronger Infill',         mono:'SI', origin:'dwarf',    amt:1, desc:'Start every fight with 1 Block.'}, // was 5 (Oct 12 relic study: +37; 2 Block +21, 1 Block +9 -- Jeremy picked 1)
   {id:'spore_satchel',name:'Mycorrhizal Bond',    mono:'MB', origin:'gnome',    desc:'Leech faces also add +2 D.O.T. and heal +1 more.'},
   {id:'picnic_basket',name:'Coffee Break',    mono:'CB', origin:'halfling', heal:0, hot:1, desc:'H.O.T. faces add +1 H.O.T.'}, // was also Heal +2 (Oct 12 relic study: +46 -> +13)
-  {id:'glimmer_dust',name:'Faerie Fire',      mono:'FF', origin:'pixie',    cap:2, desc:'Each Sidestep, Leap or Pivot in your Path adds +1 damage to its last damaging die (at most +2 per path).'}, // cap added (Oct 12 relic study: +29 -> +12)
+  {id:'glimmer_dust',name:'Faerie Fire',      mono:'FF', origin:'pixie',    cap:2, desc:'Each Sidestep, Leap or Pivot in your path adds +1 damage to its last damaging die (at most +2 per path).'}, // cap added (Oct 12 relic study: +29 -> +12)
 ];
 function relicById(id){ return RELICS.find(r=>r.id===id); }
 // Relic gating (Jeremy, Oct 12; tiers from the Oct 12 relic study): the strongest shrine relics are quietly held
@@ -345,13 +345,13 @@ const CLASSES = [
     zone:(r,c)=> c===3, convertTo:{type:'hit', value:2}},
   {id:'guard', name:'Guard', color:'#2fb8b8', ability:'Once per turn, turn any die in your zone (a 2x2 square, middle right), even a Blank, into a Block (1).',
     zone:(r,c)=> (r===1||r===2) && (c===2||c===3), convertTo:{type:'block', value:1}}, // 2x2 square again (Jeremy, Oct 25; was a 3-square L from Oct 12, 63% -> 58% at depth 7) // Block 2 -> 1 (Jeremy, Oct 12 class study: Guard won 89% vs 40-67%)
-  {id:'dungeoneer', name:'Dungeoneer', color:'#d4812e', ability:'Your zone (the left and right edges) wraps left-to-right when building a Path, on every row. Each wrap adds +1 damage to your next attacking die.',
+  {id:'dungeoneer', name:'Dungeoneer', color:'#d4812e', ability:'Your zone (the left and right edges) wraps left-to-right when building a path, on every row. Each wrap adds +1 damage to your next attacking die.',
     zone:(r,c)=> c===0 || c===3, wrap:true, seamDamage:1}, // seamDamage: Oct 16 study (experts at depth 7: 36% -> 55%) // every row wraps (Jeremy, Oct 12; was the two middle rows)
   {id:'arcanist', name:'Arcanist', color:'#b4419a', ability:'Your zone is both diagonals. Once on the X, you may step diagonally along it, as if using Sidestep. Your Boosts are 1 stronger (x2 becomes x3).',
     zone:(r,c)=> r===c || r+c===3, diagonalZone:'both', boostPlus:1}, // both diagonals; diagonal steps only from an X square to an X square (Jeremy, Oct 16; was 'either' from Oct 12, 53% vs 29% at depth 7)
   // Nov 25 (Jeremy: develop these four, then simulate them against the others): prototypes, hidden from the class picker
   // (proto) until Jeremy approves them. skill:'print' / 'sleight' are two-tap Skills run through the tray-action flow.
-  {id:'alchemist', name:'Alchemist', color:'#4f9a3a', ability:'Once per turn, turn any die in your zone (the centre 2x2), even a Blank, into a D.O.T. (2). Every D.O.T. face you play is 1 stronger.',
+  {id:'alchemist', name:'Alchemist', color:'#4f9a3a', ability:'Once per turn, turn any die in your zone (the center 2x2), even a Blank, into a D.O.T. (2). Every D.O.T. face you play is 1 stronger.',
     zone:(r,c)=> (r===1||r===2) && (c===1||c===2), convertTo:{type:'dot', value:2}, dotPlus:1},
   {id:'medic', name:'Field Medic', color:'#d0565a', ability:'Once per turn, turn any die in your zone (the bottom row), even a Blank, into a Heal (1). Half of any overhealing becomes Block.',
     zone:(r,c)=> r===3, convertTo:{type:'heal', value:1}, overhealBlock:true}, // Nov 25 recheck: Heal 2 won 95-96% for experts at Depth 7 (the overheal Block was not the cause); Heal 1: 85%
