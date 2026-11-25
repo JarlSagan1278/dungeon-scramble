@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.42.168 (Nov 25, 2026)
+- A secret: something waits for anyone who gazes into a fountain's water.
+- Tap the Wanted sign to read the quests in a large pop-up (a big monster's art could cover the sign).
+- Fix: a class Skill can no longer change a die that is already in your path (converting a Pivot kept its diagonal step and added the damage).
+- Battery: the game stops its frame loop when no controller is connected, and the room's looping decorations pause after 20 seconds with no input.
+- 19 new achievements: bronze, silver and gold steps for Overkills, damage, monsters, runs, Shrines, Exact! kills and Depth wins, plus one-path feats (10 Maneuvers, 10 Hits, 5 Boosts or Combos).
+
 ## 1.42.167 (Nov 25, 2026)
 - Null Hypothesis shows next turn's immunity too ("Immune to Combo this turn, D.O.T. next turn").
 - Odd Permutation: the right parity deals x1.25 (was x1.5). Gnome Chomper health 28 -> 32.

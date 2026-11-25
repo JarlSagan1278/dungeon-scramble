@@ -1735,7 +1735,7 @@ function renderDie(cell, idx){
   // The die's own color is fixed by what it physically IS (dietype-attack/
   // maneuver/origin/alloy/gilded/magic) -- it never changes with the face
   // showing. A blank face just shows that color with no symbol on it.
-  const dieTypeCls = cell.minion ? 'minion' : `dietype-${cell.die.cat}`;
+  const dieTypeCls = cell.minion ? 'minion' : `dietype-${cell.die.cat}${cell.die.inverse?' die-inverse':''}`; // the Easter egg die's dark finish (Nov 25)
   const label = isBlank ? '' : `<div class="face-val">${iconSpan(f.type, f.value)}</div><div class="face-word">${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?(' '+f.value):''}</div>`;
   // Non-starter dice (Origin + Loot, i.e. anything that isn't a plain Basic
   // Attack/Maneuver die) show their own name, faded toward the die's own
@@ -1898,7 +1898,7 @@ function renderEncounterCard(e, mode){
     const chips = items.map(it=>{ const v0 = (it.stat===hs ? it.val*2 : it.val) + (it.stat==='dmg' ? zealBonus(!!hs) : 0); const v = it.stat==='dmg' ? enemyHitTaken(v0, nextTurn.ward) : v0; return `<span class="boss-cycle-item next enemy-action-badge${it.stat===hs?' heavy':''}" title="${it.label} ${v}${it.stat===hs?' (heavy turn: doubled)':''}${it.stat==='dmg'&&v!==v0?relicNote:''}: ${enemyActionTooltip(it.type, v)}">${iconSpanSolid(it.type)}<b class="enc-n">${v}</b></span>`; }).join('');
     return `<div class="boss-cycle-row"><span class="hint" style="margin:0;">Each turn:</span>${chips}</div>`;
   })() : '';
-  const art = ART_WRONG.has(e.name) ? null : MONSTER_ART[e.name];
+  const art = e.inverse ? ((S.portrait && !S.portrait.placeholder) ? S.portrait.img : null) : ART_WRONG.has(e.name) ? null : MONSTER_ART[e.name]; // the Easter egg wears your own portrait
   // v1.35.0: a boss's base attack (every turn) plus its next special, named.
   const bossCycle = (isBoss && e.kit) ? (()=>{
     const iconKey = {dmg:'hit', dmgPerMinion:'hit', minion:'minion', shield:'block', heal:'heal', hot:'hot', dot:'dot'};
@@ -1933,7 +1933,7 @@ function renderEncounterCard(e, mode){
     const typeWord = isBoss ? (e.type + '') : [tierWord, e.type!=='Enemy'?e.type:''].filter(Boolean).join(' ');
     const typeTag = typeWord ? `<small class="fo-type${isBoss?' fo-type-inline':''}${e.tier==='deadly'?' fo-type-deadly':''}">${typeWord}</small>` : '';
     const questLine = questSignHTML(e);
-    const flipCls = ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip';
+    const flipCls = (ENCOUNTER_NO_FLIP.has(e.name) ? '' : 'fo-flip') + (e.inverse ? ' inverse-art' : '');
     const sz = encounterSize(e);
     // a foe wearing an item (only the defeat scene's winner) wraps its picture (ec-wrap takes the footing drop) so the item sits on the body
     const carryOn = !!(art && e.carry && LOOT_ART[e.carry] && !(e.curHealth<=0 && S.resolvingIdx==null));
@@ -2063,6 +2063,7 @@ function pathCounterHTML(){
     if(st && st.rule==='parity'){ const even = S.path.length % 2 === 0, good = even === (st.weak==='even'); extras.push(`<span class="pcf-rule ${good?'good':'bad'}">${even?'Even':'Odd'} &times;${good?'1.25':'0.75'}</span>`); }
     if(st && st.rule==='bounty'){ let live = false; try{ const ctx = questCtxFromEffects(preview); live = (S.encounter.quests||[]).some((q,i)=> !S.encounter.questsDone[i] && questEval(parseQuestSpec(q).cond, ctx).done); }catch(err){}
       if(live) extras.push(`<span class="pcf-rule good">Bounty &times;2</span>`); }
+    if(st && st.rule==='mirror' && preview.totalDamage>=2) extras.push(`<span class="pcf-rule bad">Echo +${Math.min(INVERSE_ECHO_CAP, Math.floor(preview.totalDamage/2))} next turn</span>`);
     if(st && st.rule==='zerosum' && preview.blockGain>0) extras.push(`<span class="pcf-rule bad">Heals it +${Math.round(preview.blockGain*2)}</span>`);
     if(st && st.rule==='pythag'){ let d = 0; try{ d = computePathSteps(S.path).filter(x=>x.foeDiag).length; }catch(err){} if(d) extras.push(`<span class="pcf-rule good">Diagonal &times;1.5</span>`); }
     if(st && st.rule==='asymptote'){ let c = false; try{ c = computePathSteps(S.path).some(x=>x.foeCapped); }catch(err){} if(c) extras.push(`<span class="pcf-rule bad">Capped at ${ASYMPTOTE_CAP}</span>`); } }
@@ -2363,7 +2364,7 @@ function bindTrayDice(){
       if(longPressed){ longPressed = false; return; } // long-press consumed this interaction
       if(abilityArmed){ // Skill armed: a zone die converts (and is not added to the path); any other die backs out and taps normally
         abilityArmed = false;
-        if((inZone(idx) || S.klass.skill==='print') && !S.classAbilityUsed){ playTone('skillUse'); useClassAbility(idx); return; }
+        if((inZone(idx) || S.klass.skill==='print') && !S.classAbilityUsed && !S.path.includes(idx)){ playTone('skillUse'); useClassAbility(idx); return; } // a die already in the path can't be converted (Nov 25)
         playTone('skillDisarm');
       }
       if(node.classList.contains('used') && !node.classList.contains('undoable')) return;
@@ -2587,6 +2588,11 @@ function pokeAnim(el, kind){
 document.addEventListener('click', ev=>{
   const hero = ev.target && ev.target.closest ? ev.target.closest('.camp-hero') : null;
   if(hero){ pokeAnim(hero,'shake'); return; }
+  // Nov 25 (Kat's notes): a big foe's art can sit over the Wanted sign, so a tap anywhere inside the sign's outline opens
+  // the quest poster, even through the portraits (a tap on the sign itself is its own onclick).
+  if(S && S.screen==='game' && ev.target && ev.target.closest && !ev.target.closest('.fo-quests-float, button, .die, .status-chip, .fo-hpwrap, .modal-overlay')){
+    const qs = document.querySelector('#enc-panel .fo-quests-float:not(.shrine-boon-float)');
+    if(qs){ const r = qs.getBoundingClientRect(); if(ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom){ openQuestPoster(); return; } } }
   const fig = ev.target && ev.target.closest ? ev.target.closest('.fo-arch .fo-fig') : null;
   if(!fig || !S || (S.screen!=='game' && S.screen!=='shrine')) return; // shrines too (Jeremy, Oct 16)
   if(fig.closest('.fo-player')){
@@ -2854,7 +2860,7 @@ function showFoeRuleCallout(text, side){
 }
 function showCleverStamp(text, side){
   if(!document.querySelector('#enc-panel')) return;
-  S.stats.clever = (S.stats.clever||0) + 1;
+  S.stats.clever = (S.stats.clever||0) + 1; if(/^Exact/.test(text)) S.stats.exact = (S.stats.exact||0) + 1; // Exact! kills count for their own medals (Nov 25)
   const fig = document.querySelector(side==='e' ? '#enc-panel .fo-enemy .fo-img' : '#enc-panel .fo-player .fo-img') || document.querySelector('#enc-panel');
   const r = fig.getBoundingClientRect();
   const seal = el(`<div class="kill-seal clever-seal" role="status" aria-label="${text}">${CLEVER_SEAL_SVG}<b>${text}</b></div>`);
@@ -3617,6 +3623,7 @@ let SLOW_DEVICE = false;
   const loop = t=>{
     const busy = typeof S!=='undefined' && S && (S.transitioning || document.querySelector('#tray > .roll-layer'));
     if(busy && last && !document.hidden){ const dt = t - last; if(dt > 4 && dt < 250) f.push(dt); }
+    if(!busy){ last = 0; setTimeout(()=>requestAnimationFrame(loop), 400); return; } // idle: check again in a moment, no frame loop (Nov 25)
     last = t;
     if(f.length >= 90){ const sorted = f.slice().sort((a,b)=>a-b), m = sorted[45], long = f.filter(x=>x>50).length; f = []; checks++;
       // slow on average, or one frame in ten freezing
@@ -4122,16 +4129,19 @@ function runHistoryHTML(){
 // Oct 29 (Jeremy picked R2): achievements are medals, gold once earned; tapping one shows how to earn it.
 // Oct 31 (Jeremy, 2A): each medal shows its own icon: a dark silhouette until earned, then a gold coin.
 const ACH_ICON = { first_blood:'hit', first_victory:'boss', all_origins:'dodge', all_classes:'pivot', floor_3:'door', overkill_10:'combo',
-  shrines_25:'heal', monster_hunter_100:'boss', veteran_10:'camp', damage_1000:'boost', origin_duo:'leap' };
+  shrines_25:'heal', monster_hunter_100:'boss', veteran_10:'camp', damage_1000:'boost', origin_duo:'leap',
+  overkill_50:'combo', overkill_200:'combo', damage_10000:'boost', damage_50000:'boost', monster_hunter_500:'boss', monster_hunter_1500:'boss',
+  veteran_50:'camp', veteran_150:'camp', shrines_100:'heal', exact_10:'hit', exact_50:'hit', exact_150:'hit', path_man10:'dodge', path_hit10:'hit',
+  path_bc5:'boost', depth_1:'door', depth_5:'door', depth_10:'door', patron:'heal' };
 function achievementsHTML(){
-  const unlockedCount = ACHIEVEMENTS.filter(a=>META.achievements[a.id]).length;
-  const medals = ACHIEVEMENTS.map(a=>{
+  const SHOWN = achievementsShown(), unlockedCount = SHOWN.filter(a=>META.achievements[a.id]).length;
+  const medals = SHOWN.map(a=>{
     const unlocked = META.achievements[a.id];
     const dateStr = unlocked ? new Date(unlocked.date).toLocaleDateString(undefined, {month:'short', day:'numeric'}) : '';
-    return `<div class="achv-medal ${unlocked?'on':''}" role="button" tabindex="0" data-name="${a.name.replace(/"/g,'&quot;')}" data-desc="${a.desc.replace(/"/g,'&quot;')}" data-date="${dateStr}">
+    return `<div class="achv-medal ${unlocked?'on':''} ${a.tier?'tier-'+a.tier:''}" role="button" tabindex="0" data-name="${a.name.replace(/"/g,'&quot;')}" data-desc="${a.desc.replace(/"/g,'&quot;')}" data-date="${dateStr}">
         <span class="achv-coin">${iconSpanSolid(ACH_ICON[a.id]||'combo')}</span><span class="achv-mname">${a.name}</span></div>`;
   }).join('');
-  return `<p class="hint">${unlockedCount}/${ACHIEVEMENTS.length} earned &middot; tap a medal to see how to earn it</p>
+  return `<p class="hint">${unlockedCount}/${SHOWN.length} earned &middot; tap a medal to see how to earn it</p>
     <div class="achv-medals">${medals}</div><div class="achv-detail" id="achv-detail"></div>`;
 }
 // Records (Oct 13): Run History + Achievements in one tabbed window (shorter settings menu).
@@ -4239,7 +4249,7 @@ function keyCardHTML(){
 // Nov 25 (Jeremy): the foe rules in the Codex, so they can be looked up after their one-time tip. A rule shows once you've
 // met a foe that has it (the Bestiary page of that foe says it too); the others stay hidden.
 function foeRulesKeyHTML(){
-  const B = META.bestiary || {}, all = [...FLOOR1_ENEMIES, ...FLOOR2_ENEMIES, ...FLOOR3_ENEMIES].filter(e=>e.rule && FOE_RULES[e.rule]);
+  const B = META.bestiary || {}, all = [...FLOOR1_ENEMIES, ...FLOOR2_ENEMIES, ...FLOOR3_ENEMIES].filter(e=>e.rule && FOE_RULES[e.rule]).concat(B[INVERSE_NAME] ? [{name:INVERSE_NAME, rule:'mirror'}] : []); // the Easter egg's rule shows only once you've met it
   if(!all.length) return '';
   return `<div class="cx-rules"><div class="cx-rules-h">Foe rules</div>${all.map(e=>{ const R = FOE_RULES[e.rule];
     return B[e.name] ? `<div class="cx-rule"><b>${R.name}</b> <small>(${e.name})</small><span>${R.tip}</span></div>` : `<div class="cx-rule locked"><b>???</b><span>Meet the foe that follows this rule to learn it.</span></div>`; }).join('')}</div>`;
@@ -4304,7 +4314,7 @@ function logViewHTML(){
 function lootPreviewTileHTML(opt, uniqueId, artSrc){
   const pf = pickPreviewFace(opt.faces);
   const label = artSrc ? `<img class="loot-tile-art" src="${artSrc}" alt="${opt.name}"/>` : `<div class="face-val">${iconSpan(pf.type, pf.value)}</div><div class="face-word">${LABEL[pf.type]}${(pf.value && !ICON_VALUE_SLOT.has(pf.type))?(' '+pf.value):''}</div>`;
-  return `<div class="die loot-preview-tile dietype-${opt.cat}">
+  return `<div class="die loot-preview-tile dietype-${opt.cat}${opt.inverse?' die-inverse':''}">
       <div class="name-tag">${nameTagSVG(opt.name, uniqueId)}</div>
       ${label}
     </div>`;
@@ -4463,7 +4473,7 @@ function lootBoonPipsHTML(d){
 function renderLootModal(){
   const {options, lootName, overkill, fromShrine} = S.lootChoice;
   const fin = !!S.lootChoice.final; // the final boss's chest: the grandest look, and nothing about options
-  const tier = fin ? 'magic' : ((options[0] && options[0].cat) || 'alloy');
+  const tier = fin ? 'magic' : (((options.find(o=>!o.inverse) || options[0]) || {}).cat || 'alloy'); // the Easter egg die doesn't set the window's tier
   const accent = LOOT_TIER_ACCENT[tier] || LOOT_TIER_ACCENT.alloy;
   // Overkill's 3rd option (or a Boss's 3-option draw) gets the bigger,
   // denser burst below -- reads as "bigger haul", not just a recolor.
@@ -4501,7 +4511,7 @@ function renderLootModal(){
       const art = LOOT_ART[opt.name];
       const isNew = (S.lootChoice.fresh||[]).includes(opt.name);
       // Nov 4: a die from a deeper floor (the Elite door's extra choice) keeps its own tier colour and says where it came from
-      const deep = !fin && opt.cat && opt.cat!==tier && LOOT_TIER_ACCENT[opt.cat];
+      const deep = !fin && !opt.inverse && opt.cat && opt.cat!==tier && LOOT_TIER_ACCENT[opt.cat];
       const acc = deep ? LOOT_TIER_ACCENT[opt.cat] : accent;
       const card = el(`<div class="loot-opt loot-opt-reveal${deep?' loot-opt-deeper':''}" style="--loot-tier-color:${acc.color}; --loot-tier-glow:${acc.glow}; animation-delay:${(i*0.1).toFixed(2)}s;">
           ${isNew?'<span class="new-tag new-tag-card">NEW!</span>':''}${deep?`<span class="deeper-tag">Deeper loot</span>`:''}${lootBoonPipsHTML(opt)}
@@ -5334,7 +5344,19 @@ function questSignHTML(e){
   const lock = QSIGN_H.get(e), lockH = lock && lock.h;
   const style = questPaperStyle(e), hs = lock ? `--qh:${lock.h}px;--qfit:${lock.fit};` : '';
   const st = !hs ? style : style ? style.replace('style="', 'style="'+hs) : ` style="${hs}"`;
-  return `<div class="fo-quests-float${anyLive?' q-glow':''}${lockH?' q-locked':''}"${st} title="Wanted: optional quests, each pays the reward on its right"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label"><b class="q-bonus-b">Wanted</b> ${label}</div><div class="fo-quests">${rows}</div></div>`;
+  return `<div class="fo-quests-float${anyLive?' q-glow':''}${lockH?' q-locked':''}"${st} title="Wanted: optional quests, each pays the reward on its right. Tap to read them." onclick="openQuestPoster()"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label"><b class="q-bonus-b">Wanted</b> ${label}</div><div class="fo-quests">${rows}</div></div>`;
+}
+// Nov 25 (Kat's notes: a big foe's art can cover the sign's lines): tapping the sign opens the quests as a large poster.
+function openQuestPoster(){
+  const e = S.encounter; if(!e || !e.quests || !e.quests.length || S.transitioning) return;
+  try{ playTone('uiTick'); }catch(err){}
+  const rows = e.quests.map((q,i)=>{
+    const done = e.questsDone[i], {cond} = parseQuestSpec(q), m = cond.match(/^route (.+)$/), g = m && ROUTE_GOALS[m[1].trim()];
+    return `<div class="qp-row${done?' done':''}"><div class="qp-main fo-quest ${done?'complete':''}">${questRowHTML(q, done, null)}</div>${g?`<div class="qp-desc">${g.desc}</div>`:''}</div>`;
+  }).join('');
+  const oneTurn = e.quests.some(q=>!QUEST_ALL_FIGHT.test(parseQuestSpec(q).cond));
+  const ov = openInfoModal('Wanted', `<div class="quest-poster"><div class="qp-sub">${oneTurn?'Finish one in a single turn':'Finish one during this fight'} to collect the reward on its right. Optional.</div>${rows}</div>`);
+  ov.classList.add('quest-poster-modal');
 }
 function questRowHTML(q, done, live){
   const {rewardText, cond} = parseQuestSpec(q);
@@ -5940,7 +5962,7 @@ function defeatInsight(){
 function defeatKillerHTML(){
   const k = S.stats && S.stats.killedByInfo;
   if(!k || !k.name) return '';
-  const art = (typeof ART_WRONG!=='undefined' && ART_WRONG.has(k.name)) ? null : MONSTER_ART[k.name];
+  const art = k.name===INVERSE_NAME ? ((S.portrait && !S.portrait.placeholder) ? S.portrait.img : null) : (typeof ART_WRONG!=='undefined' && ART_WRONG.has(k.name)) ? null : MONSTER_ART[k.name];
   const boss = /Boss/.test(k.type||'');
   const close = k.max && k.hp>0 && k.hp/k.max <= 0.25 ? `So close: it had only ${k.hp} Health left. ` : '';
   const tip = defeatInsight() || (boss ? 'Bosses show their next move above them, so you can Block before the big ones.' : DEFEAT_TIPS[(S.stats.turnsTaken||0) % DEFEAT_TIPS.length]);
@@ -6878,6 +6900,7 @@ const TIP_TEXT = {
   // Nov 25: the first meeting with each foe rule points at its plaque
   rule_null: ()=>'This foe tests a <b>Null Hypothesis</b>: one face type does <b>no damage</b> to it this turn (marked on your dice). It changes every turn, so route around it.',
   rule_parity: ()=>'<b>Odd Permutation</b>: count your path! The right length (odd or even) deals <b>25% more</b>, the wrong one 25% less. It flips every turn; the counter shows which you have.',
+  rule_mirror: ()=>`<b>Mirror Image</b>: half the damage you deal it this turn (up to ${INVERSE_ECHO_CAP}) is added to its <b>next</b> attack. Block the echo, or finish it fast.`,
   rule_zerosum: ()=>'<b>Zero-Sum Game</b>: every point of <b>Block</b> you gain this turn heals this foe 2. Hit hard instead of hiding.',
   rule_pythag: ()=>'<b>Pythagorean Theorem</b>: dice you step onto <b>diagonally</b> deal 50% more to this foe. Sidesteps, Pivots and the Arcanist\'s X shine here.',
   rule_asymptote: ()=>`<b>Asymptote</b>: your path deals it at most <b>${ASYMPTOTE_CAP}</b> a turn, however big. <b>D.O.T.</b> ticks ignore the limit, so stack it.`,

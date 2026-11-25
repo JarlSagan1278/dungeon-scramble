@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.42.167';
+const GAME_VERSION = '1.42.168';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false, steam:false };
@@ -353,8 +353,8 @@ const CLASSES = [
   // (proto) until Jeremy approves them. skill:'print' / 'sleight' are two-tap Skills run through the tray-action flow.
   {id:'alchemist', name:'Alchemist', color:'#4f9a3a', proto:true, ability:'Once per turn, turn any die in your zone (the centre 2x2), even a Blank, into a D.O.T. (2). Every D.O.T. face you play is 1 stronger.',
     zone:(r,c)=> (r===1||r===2) && (c===1||c===2), convertTo:{type:'dot', value:2}, dotPlus:1},
-  {id:'medic', name:'Field Medic', color:'#d0565a', proto:true, ability:'Once per turn, turn any die in your zone (the bottom row), even a Blank, into a Heal (2). Half of any healing past your full health becomes Block.',
-    zone:(r,c)=> r===3, convertTo:{type:'heal', value:2}, overhealBlock:true},
+  {id:'medic', name:'Field Medic', color:'#d0565a', proto:true, ability:'Once per turn, turn any die in your zone (the bottom row), even a Blank, into a Heal (1). Half of any healing past your full health becomes Block.',
+    zone:(r,c)=> r===3, convertTo:{type:'heal', value:1}, overhealBlock:true}, // Nov 25 recheck: Heal 2 won 95-96% for experts at Depth 7 (the overheal Block was not the cause); Heal 1: 85%
   {id:'engineer', name:'Engineer', color:'#c7902c', proto:true, ability:'Once per turn, Print: tap any die in your Tray, then a die in your zone (the left column): the zone die becomes a copy of that face, and keeps it for the rest of the fight.',
     zone:(r,c)=> c===0, skill:'print'},
   {id:'trickster', name:'Trickster', color:'#3d7fd0', proto:true, ability:'Once per turn, Sleight of Hand: tap a die in your zone (the four corners), then any other die: they trade places.',
@@ -466,6 +466,7 @@ const FLOOR1_SHRINES = [
   enc('Half-Empty Fountain','Shrine',0,{boon:'Heal 20 or +10 max health', effect:{type:'choice', options:[
     {label:'Heal 20', effect:{type:'heal', amount:20}},
     {label:'+10 Max Health', effect:{type:'maxHealthUp', amount:10}},
+    {label:'Gaze into your reflection', effect:{type:'inverseGaze'}}, // Nov 25 Easter egg: your reflection waits on the next floor
   ]}}),
   enc('Scroll Dispenser: CRELA','Shrine',0,{boon:'5 Nullify tokens, plus one of two loot dice', loot:true, effect:{type:'grantToken', token:'nullify', charges:5}}),
   enc('Scroll Dispenser: AWSP','Shrine',0,{boon:'3 Swap tokens (trade two dice, even mid-path), plus one of two loot dice', loot:true, effect:{type:'grantToken', token:'swap', charges:3}}),
@@ -517,6 +518,7 @@ const FLOOR2_SHRINES = [
   enc('Half-Full Fountain','Shrine',0,{boon:'Heal 15 or +10 max health', effect:{type:'choice', options:[
     {label:'Heal 15', effect:{type:'heal', amount:15}},
     {label:'+10 Max Health', effect:{type:'maxHealthUp', amount:10}},
+    {label:'Gaze into your reflection', effect:{type:'inverseGaze'}}, // Nov 25 Easter egg: your reflection waits on the next floor
   ]}}),
   enc('Scroll Dispenser: GIB','Shrine',0,{boon:'3 Boost x4 tokens, plus one of two loot dice', loot:true, effect:{type:'grantToken', token:'boost', value:4, charges:3}}),
   enc('Scroll Dispenser: DOER','Shrine',0,{boon:'3 Reroll tokens (reroll a die, even mid-path), plus one of two loot dice', loot:true, effect:{type:'grantToken', token:'reroll', charges:3}}),
@@ -645,6 +647,9 @@ const HEAVY_EVERY = {elite:3, deadly:2};
 // Foe rules (Nov 24, Jeremy: enemies that reward reading the preview). Each shows on the foe, on the dice and on the
 // path counter while you plan, and calls out when it bites. Names are Claude's placeholders (blue in the names sheet).
 const ASYMPTOTE_CAP = 16; // Asymptote (foe rule): the most path damage it takes in one turn
+const INVERSE_NAME = 'Your Additive Inverse', INVERSE_ECHO_CAP = 6; // Nov 25 study: health 1.2x yours + echo cap 10 killed 10% of runs there; 1.0x + cap 6: 1.3%, 38% of max health
+// The Easter egg's prize (Nov 25): one of a kind, never in a loot pool; dark finish in styles.css (.die-inverse)
+const INVERSE_DIE = {name:'Additive Inverse', cat:'magic', inverse:true, faces:faces(['Hit3','Block3','Heal3','Leech1','Boost3','Pivot'])};
 const FOE_RULES = {
   null:   { name:'Null Hypothesis', short:t=>`no <b>${t.nullLabel}</b>, then ${t.nextLabel}`, text:t=>`Immune to <b>${t.nullLabel}</b> this turn, <b>${t.nextLabel}</b> next turn.`, tip:'Each turn one face type (Combo, then D.O.T., alternating) deals no damage to it. Route around it.' },
   parity: { name:'Odd Permutation', short:t=>`<b>${t.weak==='even'?'Even':'Odd'}</b> paths ×1.25`, text:t=>`<b>${t.weak==='even'?'Even':'Odd'}</b>-length paths deal &times;1.25 this turn; ${t.weak==='even'?'odd':'even'} &times;0.75.`, tip:'It flips each turn: count your path. The right parity deals 25% more, the wrong one 25% less.' },
@@ -652,6 +657,8 @@ const FOE_RULES = {
   zerosum:   { name:'Zero-Sum Game', short:()=>`<b>Block</b> heals it`, text:()=>`Block you gain this turn <b>heals it</b> twice as much.`, tip:'Every point of Block you gain heals it 2. Hit hard instead of hiding.' },
   pythag:    { name:'Pythagorean Theorem', phoneName:'Pythagoras', short:()=>`<b>diagonals</b> &times;1.5`, text:()=>`Dice you reach by a <b>diagonal</b> step deal &times;1.5.`, tip:'Step onto a die diagonally (a Sidestep, a Pivot, the Arcanist\'s X) and it deals 50% more to this foe.' },
   asymptote: { name:'Asymptote', short:()=>`max <b>${ASYMPTOTE_CAP}</b> a turn`, text:()=>`Your path deals it at most <b>${ASYMPTOTE_CAP}</b> a turn. <b>D.O.T.</b> ignores the limit.`, tip:`It takes at most ${ASYMPTOTE_CAP} path damage a turn, however big the path. D.O.T. ticks ignore the limit: stack it.` },
+  // Nov 25 (Easter egg, Jeremy: a dark version of the player): Your Additive Inverse hits back with half of what you dealt it, a turn later
+  mirror: { name:'Mirror Image', short:t=>t.echo ? `echo <b>+${t.echo}</b> next hit` : `<b>echoes</b> your damage`, text:t=>`Half the damage you deal it this turn is added to its <b>next</b> attack${t.echo?` (now <b>+${t.echo}</b>)`:''}.`, tip:`Every turn, half the damage you deal it (at most ${INVERSE_ECHO_CAP}) is added to its next attack. Block the echo, Freeze it away, or finish it fast.` },
   bounty: { name:'Most Wanted', short:()=>`<b>Wanted</b> hits twice`, text:()=>`Complete its <b>Wanted</b> poster: the path hits <b>twice</b>.`, tip:'A path that completes one of its Wanted posters deals its damage a second time, as a bounty.' },
 };
 const BOSS_KITS = {

@@ -429,5 +429,25 @@ Regular players: every class 77-88%, all fine. Experts: the Medic is far ahead (
 dies); Alchemist and Engineer sit at Guard's level and end fights fastest; the Ranger is understated because the bot's
 path search counts Pointer's +1 but never plans where its path ends for Fetch.
 
+**Recheck (Nov 25, after two fixes):** the bot now plans for Fetch (its path value includes Pointer's 2 steps): Ranger
+expert 59% -> 65% (= Dungeoneer), regular 85%. The Medic converting half of its overheal (not all) changed nothing
+(expert 96%); a cause test (expert d7, 320 runs each): no overheal Block 95%, Heal 1 instead of Heal 2: 85%, both: 84%.
+The free Heal 2 every turn was the strength, so the Medic now converts to Heal 1 (keeps half overheal as Block).
+
+## Kat's playtest notes: early elites and the first run (Nov 25, 2026, build 1.42.167)
+- **Floor 1 elites/deadlies with more health (idea: from run 2 on):** regular bot, Elite door at every fork, 320 runs per
+  step. +15% health: they take 2.7 turns instead of 2.5 and cost 14% of max health (was 13%); +30%: 3.0 turns, 19%. No
+  Floor 1 deaths at any step, overall win rate unchanged within noise (77/79/81%). +30% is felt without being unfair.
+- **First run:** a novice-like bot (looks at few paths, rarely uses the Skill, Swaps or tokens, random doors and loot)
+  wins 45% at Depth 0 (deaths F1/F2/F3 4/34/17%), against 86% for the regular bot with the same doors. A first run is
+  more likely lost than won for a true beginner, mostly on Floor 2; the guided first fight and coaching aren't modelled.
+
+## Easter egg fight: Your Additive Inverse (Nov 25, 2026, build 1.42.168)
+Forced as Floor 2's first fight, regular bot, random doors, 320 runs per version (baseline without it: 82% wins, Floor 2's
+first fight 0% deaths, 13% of max health). First cut (health 1.2x yours, hit 3, echo half capped at 10): 10.4% of runs
+died there, 50% of max health taken, overall wins 76%: an unfair wall for a secret. A: 0.9x, hit 2, cap 8: 0.6% / 26%;
+B: 1.0x, hit 3, cap 6: 1.3% / 38%; C: 0.8x, hit 3, cap 8: 0.9% / 25%. Runs that beat it win 85-87% (its die is
+strong). Picked B: elite-level danger, a fight you feel.
+
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.

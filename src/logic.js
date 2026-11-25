@@ -44,6 +44,7 @@ function migrateSave(data){
 const RUN_FIELDS = [
   // who and where
   'screen','charName','origin','klass','portrait','depth','depthMods','floorIdx','routeStep','route','encounter','turnNumber','guide','coachRun','daily',
+  'inverseFloor','inverseMet', // Nov 25 Easter egg: the fountain's reflection waits on this floor
   // you
   'health','maxHealth','playerDOT','playerHOT','playerBlock','tray','backPocket','relics','path','classAbilityUsed','freezeNext','_lastBlow','_fightTaken','_fightBlocked',
   'nullifyTokens','freezeTokens','swapTokens','rerollTokens','boostTokenCharges','boostTokenValue','pendingFreeBoost','swapLog','trayAct',
@@ -577,15 +578,15 @@ const ACHIEVEMENTS = [
     check: L => ['guard','armsmaster','dungeoneer','arcanist'].every(id=>(L.victoriesByClass[id]||0)>0)},
   {id:'floor_3', name:'Into the Deep', desc:'Reach Floor 3 in a single run.',
     check: L => L.bestFloorReached>=3},
-  {id:'overkill_10', name:'Overkill Enthusiast', desc:'Land 10 Overkills, lifetime.',
+  {id:'overkill_10', tier:'bronze', name:'Overkill Enthusiast', desc:'Land 10 Overkills, lifetime.',
     check: L => L.totalOverkills>=10},
-  {id:'shrines_25', name:'Shrine Seeker', desc:'Visit 25 Shrines, lifetime.',
+  {id:'shrines_25', tier:'bronze', name:'Shrine Seeker', desc:'Visit 25 Shrines, lifetime.',
     check: L => L.totalShrinesVisited>=25},
-  {id:'monster_hunter_100', name:'Monster Hunter', desc:'Defeat 100 encounters, lifetime.',
+  {id:'monster_hunter_100', tier:'bronze', name:'Monster Hunter', desc:'Defeat 100 encounters, lifetime.',
     check: L => L.totalEncountersDefeated>=100},
-  {id:'veteran_10', name:'Veteran Adventurer', desc:'Play 10 runs.',
+  {id:'veteran_10', tier:'bronze', name:'Veteran Adventurer', desc:'Play 10 runs.',
     check: L => L.runsPlayed>=10},
-  {id:'damage_1000', name:'Heavy Hitter', desc:'Deal 1,000 damage, lifetime.',
+  {id:'damage_1000', tier:'bronze', name:'Heavy Hitter', desc:'Deal 1,000 damage, lifetime.',
     check: L => L.totalDamageDealt>=1000},
   // Deliberately requires 2 victories (with different Origins), not just
   // one -- floor_3 above is reached on the way to *any* win (and even by
@@ -610,11 +611,35 @@ const ACHIEVEMENTS = [
     check: L => (typeof dailyStreak==='function' ? dailyStreak() : 0)>=30},
   {id:'origin_duo', name:'Two Roads', desc:'Win a run with 2 different Origins.',
     check: L => Object.values(L.victoriesByOrigin||{}).filter(n=>n>0).length>=2},
+  // Nov 25 (Kat's notes): tiered medals. A medal with `tier` is a step of the one before it ('silver' and 'gold' go up
+  // from the bronze original); the Achievements screen colours the coin by tier. Plus the one-path feats, Exact! kills,
+  // Depth wins and the full-game purchase (store app only: `only`).
+  {id:'overkill_50', name:'Overkill Devotee', tier:'silver', desc:'Land 50 Overkills, lifetime.', check: L => L.totalOverkills>=50},
+  {id:'overkill_200', name:'Overkill Legend', tier:'gold', desc:'Land 200 Overkills, lifetime.', check: L => L.totalOverkills>=200},
+  {id:'damage_10000', name:'Heavier Hitter', tier:'silver', desc:'Deal 10,000 damage, lifetime.', check: L => L.totalDamageDealt>=10000},
+  {id:'damage_50000', name:'Heaviest Hitter', tier:'gold', desc:'Deal 50,000 damage, lifetime.', check: L => L.totalDamageDealt>=50000},
+  {id:'monster_hunter_500', name:'Monster Slayer', tier:'silver', desc:'Defeat 500 encounters, lifetime.', check: L => L.totalEncountersDefeated>=500},
+  {id:'monster_hunter_1500', name:'Monster Bane', tier:'gold', desc:'Defeat 1,500 encounters, lifetime.', check: L => L.totalEncountersDefeated>=1500},
+  {id:'veteran_50', name:'Seasoned Adventurer', tier:'silver', desc:'Play 50 runs.', check: L => L.runsPlayed>=50},
+  {id:'veteran_150', name:'Living Legend', tier:'gold', desc:'Play 150 runs.', check: L => L.runsPlayed>=150},
+  {id:'shrines_100', name:'Pilgrim', tier:'silver', desc:'Visit 100 Shrines, lifetime.', check: L => L.totalShrinesVisited>=100},
+  {id:'exact_10', tier:'bronze', name:'Exact Change', desc:'Land 10 Exact! kills (not one point of damage wasted), lifetime.', check: L => (L.totalExact||0)>=10},
+  {id:'exact_50', name:'Precise Change', tier:'silver', desc:'Land 50 Exact! kills, lifetime.', check: L => (L.totalExact||0)>=50},
+  {id:'exact_150', name:'Perfect Change', tier:'gold', desc:'Land 150 Exact! kills, lifetime.', check: L => (L.totalExact||0)>=150},
+  {id:'path_man10', name:'Light on Your Feet', desc:'Use 10 Maneuvers in one path.', check: L => (L.bestPathMan||0)>=10},
+  {id:'path_hit10', name:'Flurry of Blows', desc:'Use 10 Hit dice in one path.', check: L => (L.bestPathHit||0)>=10},
+  {id:'path_bc5', name:'Chain Reaction', desc:'Use 5 Boost or Combo dice in one path.', check: L => (L.bestPathBC||0)>=5},
+  {id:'depth_1', tier:'bronze', name:'Going Deeper', desc:'Win a run at Depth 1 or deeper.', check: L => depthLabel(DEPTH_BEST.overall) >= 1},
+  {id:'depth_5', name:'The Deep End', tier:'silver', desc:'Win a run at Depth 5 or deeper.', check: L => depthLabel(DEPTH_BEST.overall) >= 5},
+  {id:'depth_10', name:'Bottomless', tier:'gold', desc:'Win a run at Depth 10 or deeper.', check: L => depthLabel(DEPTH_BEST.overall) >= 10},
+  {id:'patron', name:'Patron of the Guild', desc:'Unlock the whole dungeon. Thank you!', only: ()=> BUILD.app, check: L => BUILD.app && hasFullGame()},
 ];
+// the medals this build shows (the purchase medal only exists in the store app)
+function achievementsShown(){ return ACHIEVEMENTS.filter(a=> !a.only || a.only()); }
 
 function checkAchievements(){
   const newlyUnlocked = [];
-  ACHIEVEMENTS.forEach(a=>{
+  achievementsShown().forEach(a=>{
     if(META.achievements[a.id]) return;
     if(a.check(META.lifetime)){
       META.achievements[a.id] = { date: Date.now() };
@@ -757,6 +782,8 @@ function recordMetaProgress(outcome){
   L.totalOverkills += S.stats.overkills;
   L.totalShrinesVisited += S.stats.shrinesVisited;
   L.totalClever = (L.totalClever||0) + (S.stats.clever||0);
+  L.totalExact = (L.totalExact||0) + (S.stats.exact||0); // Nov 25
+  L.bestPathMan = Math.max(L.bestPathMan||0, S.stats.pathMan||0); L.bestPathHit = Math.max(L.bestPathHit||0, S.stats.pathHit||0); L.bestPathBC = Math.max(L.bestPathBC||0, S.stats.pathBC||0);
   // Personal bests: flagged only when beating a real earlier mark (a first
   // run would otherwise "beat" zero in every category).
   S.personalBests = [];
@@ -1281,6 +1308,15 @@ function drawRoomCard(floor){
   return pick(any.length ? any : fights); // every eligible card already seen this run -- last resort repeat
 }
 
+// Nov 25 Easter egg (Jeremy: a dark version of the player, met after a certain shrine choice): gazing into a fountain's
+// water on one floor puts Your Additive Inverse in the first fight of the next. It wears your own portrait, inverted,
+// has your max health (before the floor's scaling), and its rule (FOE_RULES.mirror) adds half the damage you dealt it to its next attack.
+// Beating it gives the one-of-a-kind Additive Inverse die.
+function makeInverseEncounter(){
+  const hp = Math.round(S.maxHealth||26), dmg = 2 + (S.floorIdx||0);
+  return enc(INVERSE_NAME, 'Enemy', hp, { dmg, baseDmg:dmg, rule:'mirror', inverse:true,
+    quests:['8 damage: 4 maneuvers','6 damage: 2 leap'], flavor:'Everything you are, times negative one. It remembers every blow you strike.' });
+}
 function drawEncounter(kind){
   const floor = FLOORS[S.floorIdx];
   let e;
@@ -1291,6 +1327,7 @@ function drawEncounter(kind){
     const guideFoe = (S.guide && S.guide.stage==='pending' && S.floorIdx===0) ? FLOOR1_ENEMIES.find(x=>x.name==='Filement Bunny') : null;
     const forkCard = (!guideFoe && S.forkPick) ? findRoomCard(S.forkPick.name) : null;
     e = clone(guideFoe || forkCard || drawRoomCard(floor));
+    if(S.inverseFloor===S.floorIdx && !S.inverseMet && !guideFoe && e.type==='Enemy'){ e = makeInverseEncounter(); S.inverseMet = true; } // Nov 25 Easter egg
     if(forkCard && /^(elite|deadly)$/.test(encounterTier(e))) e.forkBonus = FORK_ELITE_BONUS; // chose the harder door: +1 loot choice
     S.forkPick = null;
     if(e.type==='Trap') S.segmentTrapUsed = true;
@@ -1804,7 +1841,7 @@ function useClassAbility(idx){
     S.trayAct = {kind:'print', src:idx, token:false, first:null, skill:true, face:clone(f)}; logMsg('sys', 'Print: now tap a die in your zone to copy that face onto it.'); fastTrayRender(); return; }
   if(S.klass.skill==='sleight'){ if(!inZone(idx)) return; const c = S.tray[idx]; if(!c || c.minion || c.spent || S.path.includes(idx)) return;
     S.trayAct = {kind:'swap', src:idx, token:false, first:null, skill:true}; logMsg('sys', 'Sleight of Hand: now tap any die to trade places with it.'); fastTrayRender(); return; }
-  if(!inZone(idx)) return;
+  if(!inZone(idx) || S.path.includes(idx)) return; // Nov 25 (Kat's notes): a die already in the path keeps its face (converting a Pivot step to Hit kept the diagonal and added the damage)
   const cell = S.tray[idx];
   if(cell.minion){ revealMinionAt(idx); blankReveal(idx); S._abilityReveal = idx; } // the converted die shakes off its Minion
   cell.forcedFace = clone(S.klass.convertTo);
@@ -1909,6 +1946,7 @@ function foeRuleState(e){
     return { rule:'null', nullType:t, nullLabel: lab(t), nextLabel: lab(u) }; } // Nov 25 (census): next turn's immunity shows too, so a player can plan ahead
   if(e.rule==='parity') return { rule:'parity', weak: n % 2 === 0 ? 'even' : 'odd' };
   if(e.rule==='bounty') return { rule:'bounty' };
+  if(e.rule==='mirror') return { rule:'mirror', echo: Math.max(0, (e.dmg||0) - (e.baseDmg||0)) };
   if(e.rule==='zerosum' || e.rule==='pythag' || e.rule==='asymptote') return { rule:e.rule };
   return null;
 }
@@ -2310,6 +2348,9 @@ function startTurnTransition(){
   S._hitStreak = 0; // climbing pitch for consecutive damage-dealing dice this turn -- see playStepTone()
   S.stats.turnsTaken++;
   S.stats.longestPath = Math.max(S.stats.longestPath||0, S.path.length);
+  { let man = 0, hit = 0, bc = 0; S.path.forEach(i=>{ const c = S.tray[i]; if(!c || c.minion) return; const f = currentFace(c) || {}; // one-path feats (Nov 25 achievements)
+      if(MANEUVER_TYPES.includes(f.type)) man++; else if(f.type==='hit') hit++; else if(f.type==='boost' || f.type==='combo') bc++; });
+    S.stats.pathMan = Math.max(S.stats.pathMan||0, man); S.stats.pathHit = Math.max(S.stats.pathHit||0, hit); S.stats.pathBC = Math.max(S.stats.pathBC||0, bc); }
   // Compact tray snapshot so rolls/paths can be replayed offline: one token per cell, "<die code><face>",
   // e.g. "A:h2" (Attack die, hit 2); "M" = covered by a Minion; "_" = blank. Die codes: A attack, M maneuver
   // (lowercase letters = the die's category initial), O origin, L alloy, G gilded, X magic.
@@ -2392,6 +2433,8 @@ function finishPlayerPath(path, effects){
   // Zero-Sum Game (Nov 25): the Block this path gave you heals the foe twice as much
   if(e.rule==='zerosum' && effects.blockGain>0 && e.curHealth>0){ const h = Math.min(Math.round(effects.blockGain*2), e.maxHealth - e.curHealth); // heals twice the Block (round 2 of the Nov 25 study: 1x barely bit)
     if(h>0){ e.curHealth += h; logMsg('sys', `Zero-Sum: your Block heals ${e.name} ${h}.`); if(typeof showFoeRuleCallout==='function') showFoeRuleCallout(`Zero-Sum! +${h}`, 'e'); if(typeof fxTick==='function') fxTick('enemy','hot',h); } }
+  // Mirror Image (the Easter egg's rule): half of this turn's damage comes back on its next attack
+  if(e.rule==='mirror'){ e.echoNext = Math.min(e.echoCap || INVERSE_ECHO_CAP, Math.floor((S.resolveTotal||0) / 2)); if(e.echoNext > 0 && e.curHealth > 0) logMsg('sys', `${e.name} remembers: +${e.echoNext} on its next attack.`); }
   // Most Wanted (foe rule): a path that completes its Wanted poster hits a second time, as a bounty
   if(e.rule==='bounty' && (e.questsDone||[]).filter(Boolean).length > doneBefore && (S.resolveTotal||0) > 0 && e.curHealth > 0){
     const extra = S.resolveTotal; e.curHealth = capUpper(e.curHealth - absorbWithShield(e, extra), e.maxHealth);
@@ -2723,8 +2766,10 @@ function runEncounterAction(){
   if(e.kit) return bossTakeTurn(e, frozen);
   const heavy = enemyHeavyNext(e);
   e.turnsActed = (e.turnsActed||0) + 1;
+  // the Easter egg's echo: this turn's attack is already set; the echo of your last path loads into the next one
+  const echoShift = ()=>{ if(e.rule==='mirror'){ e.dmg = (e.baseDmg||0) + (e.echoNext||0); e.echoNext = 0; } };
   // Freeze (Jeremy, Oct 22): a regular enemy skips its whole turn, heavy or not; a skipped heavy turn still counts as used.
-  if(frozen){
+  if(frozen){ echoShift();
     const text = heavy ? `${e.name} is frozen: its heavy turn is skipped.` : `${e.name} is frozen and skips its action.`;
     if(heavy) teleLog('heavy_turn', {name:e.name, frozen:true});
     if(heavy && typeof showCleverStamp==='function') setTimeout(()=> showCleverStamp('Called it!', 'e'), 120); // froze the heavy turn
@@ -2750,6 +2795,7 @@ function runEncounterAction(){
   }
   S._wardHalf = false;
   if(heavy) teleLog('heavy_turn', {name:e.name, frozen:false});
+  echoShift();
   return parts.length ? parts.join(' ') : `${e.name} takes no action.`;
 }
 
@@ -2956,6 +3002,11 @@ function runShrineEffect(e, effect){
       S.shrineResult = { title: e.name, text: texts.join(' ') };
       render(); return;
     }
+    case 'inverseGaze': { // Nov 25 Easter egg: the reflection that looks back waits on the next floor
+      S.inverseFloor = S.floorIdx + 1; S.inverseMet = false; teleLog('inverse_gaze', {floor:S.floorIdx+1});
+      S.shrineResult = { title: e.name, text: 'You lean over the water. Your reflection blinks a moment too late, then is gone. Something below waits for you.' };
+      render(); return;
+    }
     case 'leave': {
       S.shrineResult = { title: e.name, text: 'You leave the offering untouched.' };
       render(); return;
@@ -3058,6 +3109,7 @@ function onEncounterDefeated(){
   // Oct 31 (Jeremy): the final boss needs no loot -- its chest opens straight onto the victory screen (openFinalChest)
   const isFinal = e.type==='Big Boss' && S.floorIdx===FLOORS.length-1;
   let options = isFinal ? [] : pickLootNUnused(floor.lootPool, Math.min(drawCount, floor.lootPool.length));
+  if(e.inverse && !isFinal) options = [clone(INVERSE_DIE)].concat(options.slice(0, 1)); // Nov 25 Easter egg: its own die (plus one ordinary choice)
   // Nov 4 (Jeremy): the Elite door's extra choice comes from the next floor's better loot (on the last floor it stays Magic).
   const deeper = !isFinal && e.forkBonus && FLOORS[S.floorIdx+1] && FLOORS[S.floorIdx+1].lootPool.length;
   if(deeper){ const d = pickLootNUnused(FLOORS[S.floorIdx+1].lootPool, 1)[0]; if(d){ options = options.slice(0, Math.max(1, options.length-1)).concat([d]); } }

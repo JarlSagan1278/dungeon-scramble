@@ -201,7 +201,7 @@ function pcCursorRing(){
   return ring;
 }
 function pcCursorSet(n){
-  pcCur = n; pcCurOn = !!n; pcCurWhere = pcWhere();
+  pcCur = n; pcCurOn = !!n; pcCurWhere = pcWhere(); if(pcCurOn) pcPadWake();
   if(n){ pcCurPt = pcCentre(n); try{ n.scrollIntoView({block:'nearest', inline:'nearest'}); }catch(e){} }
   // the hover panel explains what the cursor is on, as it does for the mouse
   try{
@@ -376,12 +376,27 @@ function pcPadPoll(){
     else if(dir && now - pcPad.at > (pcPad.rep ? 130 : 300)){ pcPad.at = now; pcPad.rep++; pcMove(x, x?0:y); } // held: repeat
   }
   if(pcCurOn) pcCursorDraw(); // keeps the ring on its target through redraws and animations
-  requestAnimationFrame(pcPadPoll);
+  // Nov 25 (Kat: a warm phone, cap idle work): the frame loop only runs while a controller is connected or the key cursor
+  // is showing; otherwise it stops, and a connected pad (or the cursor) starts it again.
+  if(gp || pcCurOn) requestAnimationFrame(pcPadPoll); else pcPadLoop = false;
 }
-requestAnimationFrame(pcPadPoll);
+var pcPadLoop = false;
+function pcPadWake(){ if(!pcPadLoop){ pcPadLoop = true; requestAnimationFrame(pcPadPoll); } }
+window.addEventListener('gamepadconnected', pcPadWake);
+setInterval(()=>{ if(pcPadLoop || document.hidden) return; let has = !!window.__pcPads; try{ if(!has && navigator.getGamepads) has = [...navigator.getGamepads()].some(p=> p && p.connected!==false); }catch(e){} if(has) pcPadWake(); }, 1000); // a pad that was already connected, or a test's fake one
+pcPadWake();
 
 // Fullscreen keys (Nov 25, Steam ready): F11 and Alt+Enter toggle the game's own fullscreen (render.js toggleFullscreen)
 window.addEventListener('keydown', ev=>{
   if(!(typeof canFullscreen==='function' && canFullscreen())) return;
   if(ev.key==='F11' || (ev.key==='Enter' && ev.altKey)){ ev.preventDefault(); ev.stopPropagation(); toggleFullscreen(); }
 }, true);
+
+// Calm (Nov 25, Kat's notes: hard-cap idle work so a phone left on a screen doesn't run warm): after 20 s with no input the
+// looping room dressing pauses (styles.css "Calm"); the next touch, key, wheel, mouse move or gamepad wakes it.
+(function(){
+  if(typeof document==='undefined') return; let t = 0;
+  const wake = ()=>{ if(document.body && document.body.classList.contains('calm')) document.body.classList.remove('calm'); clearTimeout(t); t = setTimeout(()=>{ if(document.body) document.body.classList.add('calm'); }, 20000); };
+  ['pointerdown','pointermove','keydown','wheel','touchstart','gamepadconnected'].forEach(ev=> window.addEventListener(ev, wake, {passive:true, capture:true}));
+  window.__calmWake = wake; wake();
+})();

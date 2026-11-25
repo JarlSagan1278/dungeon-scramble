@@ -3067,6 +3067,7 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 .tray.ability-armed > *:not(.zone-cell){ filter:brightness(.5) saturate(.6); }
 /* armed zone: a bit stronger than the softest pass / armed zone: thinner line, slight pulse (box-shadow is !important at idle, so pulse via transform+filter) / armed zone: crisp twitch instead of scale/filter pulse (those blurred the face) */
 .tray.ability-armed > .zone-cell{ position:relative; z-index:2; cursor:crosshair; outline:2px solid color-mix(in srgb,var(--class-color,#fff) 40%,#fff3d6) !important; outline-offset:-2px; box-shadow:inset 0 0 0 4px rgba(20,10,4,.45), inset 0 0 12px 3px color-mix(in srgb,var(--class-color,#fff) 75%,transparent), 0 0 0 3px color-mix(in srgb,var(--class-color,#fff) 55%,transparent) !important; filter:none; }
+.tray.ability-armed > .zone-cell.used{ filter:brightness(.5) saturate(.6); outline:none !important; cursor:default; } /* Nov 25: path dice can't be converted */
 .reduced-motion .tray.ability-armed > .zone-cell{ box-shadow:0 0 14px 4px var(--class-color,#fff), inset 0 0 18px 6px var(--class-color,#fff); animation:none !important; }
 /* armed zone: all twitch together, 3 quick twitches then ~8s rest */
 .tray.ability-armed > .zone-cell, .tray.ability-armed > .zone-cell:nth-child(2n), .tray.ability-armed > .zone-cell:nth-child(3n){ animation:zoneTwitch 9s steps(1,end) infinite !important; animation-delay:0s !important; animation-duration:5s !important; }
@@ -4079,3 +4080,26 @@ body.pc.pad #tray > .die::before{ content:none !important; }
 .die.pet-aura::after{ content:'+1'; position:absolute; top:2px; left:3px; padding:0 4px; border-radius:6px; background:#f2c14e; color:#241c10; font:800 10px/14px var(--font-ui); border:1.5px solid #0c0705; z-index:4; }
 /* Engineer prototype (Nov 25): a printed face wears a blueprint grid until the fight ends */
 #tray .die.printed{ background-image:linear-gradient(rgba(120,180,255,.28) 1px, transparent 1px), linear-gradient(90deg, rgba(120,180,255,.28) 1px, transparent 1px) !important; background-size:8px 8px !important; outline:3px solid #6fb2ff; outline-offset:-3px; }
+
+/* ==== Calm (Nov 25, Kat: a phone ran warm after two clears): after 20 s with no input, body.calm pauses the looping
+   room dressing (torches, motes, breathing portraits, glows); any touch, key or mouse move brings it back. main.js. */
+body.calm #room-floor .rf-light, body.calm .hall-fx .hf-glow, body.calm .hall-fx i, body.calm .fo-torch, body.calm .idle-breath,
+body.calm .hero-gear .hg-float, body.calm .enemy-carry .ec-float, body.calm .tray-wrap .tray::before, body.calm .chest-lock .ch-shine, body.calm .fo-quests-float > .fq-light{ animation-play-state:paused !important; }
+
+/* ==== Quest poster pop-up (Nov 25): the Wanted sign, large, on parchment (an in-world object) */
+.quest-poster-modal .modal{ max-width:340px; }
+.quest-poster{ background:var(--parchment, #f1e2bf); color:#2a1d10; border:3px solid #3a2614; border-radius:12px; padding:10px 12px 12px; display:flex; flex-direction:column; gap:8px; }
+.quest-poster .qp-sub{ font-size:13px; line-height:1.35; opacity:.8; }
+.quest-poster .qp-row{ display:flex; flex-direction:column; gap:2px; padding:7px 8px; border:2px solid rgba(58,38,20,.45); border-radius:8px; background:rgba(255,248,228,.55); }
+.quest-poster .qp-row.done{ opacity:.6; }
+.quest-poster .qp-main{ position:static !important; display:flex; align-items:center; gap:10px; font-size:17px; line-height:1.3; }
+.quest-poster .qp-desc{ font-size:13px; line-height:1.35; opacity:.85; }
+.quest-poster .qp-main > :last-child{ margin-left:auto; }
+/* Nov 25 (Kat): tiered medals: bronze, silver and gold coins once earned (untiered medals stay gold) */
+.achv-medal.on.tier-bronze .achv-coin{ background:radial-gradient(circle at 35% 30%, #ffd9b0, #c27a3e 55%, #7a4519); color:#3e2008; }
+.achv-medal.on.tier-silver .achv-coin{ background:radial-gradient(circle at 35% 30%, #ffffff, #c4cbd4 55%, #7d8794); color:#2e3540; }
+
+/* ==== Additive Inverse (Nov 25 Easter egg): your own portrait as the foe, inverted; and its one-of-a-kind die */
+.fo-img.inverse-art{ filter:invert(1) grayscale(.4) brightness(.4) contrast(1.6) sepia(.6) hue-rotate(230deg) drop-shadow(0 0 3px rgba(190,140,255,.95)); }
+.die.die-inverse{ background:linear-gradient(160deg, #3a2a52, #150f1f) !important; color:#efe3ff; outline:2px solid #9b7bd6; outline-offset:-7px; }
+.die.die-inverse .face-word, .die.die-inverse .face-val{ color:#efe3ff; }
