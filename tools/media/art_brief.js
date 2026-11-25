@@ -11,7 +11,6 @@ const ITEMS = [
   { key: 'alchemist', file: 'CLASS_PROP__alchemist.png', w: 240, h: 240, title: 'Cauldron (Alchemist)', note: 'Bubbling green brew, a few bubbles rising.' },
   { key: 'medic', file: 'CLASS_PROP__medic.png', w: 240, h: 240, title: 'Field kit (Field Medic)', note: 'Satchel or case with the Heal heart. No red cross (protected emblem).' },
   { key: 'trickster', file: 'CLASS_PROP__trickster.png', w: 240, h: 240, title: 'Deck of cards (Trickster)', note: 'Two or three fanned cards; any suits but no real-brand designs.' },
-  { key: 'inverse', file: 'LOOT_ART__Additive_Inverse.png', w: 220, h: 220, title: 'Additive Inverse (secret die)', note: 'Item art for the dark violet die from the Easter egg fight: something "times minus one".' },
   { key: 'fetch', file: 'CLASS_PROP__ranger_fetch.png', w: 240, h: 240, title: 'Pointer running (optional)', note: 'For a Fetch! animation later. Side view, ears flying.' },
 ];
 (async () => {

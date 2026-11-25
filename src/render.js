@@ -1785,7 +1785,7 @@ function renderDie(cell, idx){
               ${cell.forcedFace?`<span class="forced-badge ${justConverted?'badge-pop-in':''}" title="Converted by a class ability">${MARK_STAR}</span>`:''}
               ${boostTargetCls?`<span class="boost-target-badge" title="Your armed Boost token will apply to this action">${iconSpan('boost')}</span>`:''}
             </div>` : ''}
-            ${(!cell.minion && !cell.blank && ['gilded','alloy','magic'].includes(cell.die.cat)) ? `<span class="die-sheen sheen-${cell.die.cat}" style="--sd:${(idx*0.37).toFixed(2)}s"></span>` : ''}
+            ${(!cell.minion && !cell.blank && ['gilded','alloy','magic'].includes(cell.die.cat)) ? `<span class="die-sheen sheen-${cell.die.inverse ? 'inverse' : cell.die.cat}" style="--sd:${(idx*0.37).toFixed(2)}s"></span>${cell.die.inverse ? `<span class="inv-flip" style="--sd:${(idx*0.37).toFixed(2)}s"></span><span class="inv-tint" style="--sd:${(idx*0.37).toFixed(2)}s"></span>` : ''}` : ''}
             ${nameTag}
             ${comboRingHTML ? label.replace('<span class="icon-svg">','<span class="icon-svg">'+comboRingHTML) : label}
             ${resolveFx && resolveFx.text ? `<span class="delta-float ${resolveFx.cls}" ${resolveFx.size?`style="font-size:${resolveFx.size}px;"`:''}>${resolveFx.text}</span>` : ''}
@@ -4343,7 +4343,7 @@ function lootPreviewTileHTML(opt, uniqueId, artSrc){
   const label = artSrc ? `<img class="loot-tile-art" src="${artSrc}" alt="${opt.name}"/>` : `<div class="face-val">${iconSpan(pf.type, pf.value)}</div><div class="face-word">${LABEL[pf.type]}${(pf.value && !ICON_VALUE_SLOT.has(pf.type))?(' '+pf.value):''}</div>`;
   return `<div class="die loot-preview-tile dietype-${opt.cat}${opt.inverse?' die-inverse':''}">
       <div class="name-tag">${nameTagSVG(opt.name, uniqueId)}</div>
-      ${label}
+      ${label}${opt.inverse ? '<span class="die-sheen sheen-inverse"></span><span class="inv-flip"></span><span class="inv-tint"></span>' : ''}
     </div>`;
 }
 

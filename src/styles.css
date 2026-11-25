@@ -4100,8 +4100,26 @@ body.calm .hero-gear .hg-float, body.calm .enemy-carry .ec-float, body.calm .tra
 
 /* ==== Additive Inverse (Nov 25 Easter egg): your own portrait as the foe, inverted; and its one-of-a-kind die */
 .fo-img.inverse-art{ filter:invert(1) grayscale(.4) brightness(.4) contrast(1.6) sepia(.6) hue-rotate(230deg) drop-shadow(0 0 3px rgba(190,140,255,.95)); }
-.die.die-inverse{ background:linear-gradient(160deg, #3a2a52, #150f1f) !important; color:#efe3ff; outline:2px solid #9b7bd6; outline-offset:-7px; }
-.die.die-inverse .face-word, .die.die-inverse .face-val{ color:#efe3ff; }
+/* The die itself (Nov 25, Jeremy: no art on dice, so colour and motion carry it, "inverse" and pulsing like a magic die):
+   a violet void (dark at the heart, violet at the rim) with pale lavender faces; its pulse is the magic dice's run backwards
+   (a dark core breathing in, a ring collapsing inward, .sheen-inverse); every few seconds it flips to its exact negative. */
+.die.die-inverse{ background:radial-gradient(circle at 50% 55%, #0d0714 0%, #24133a 52%, #5d3a94 100%) !important; color:#f1e6ff; outline:2px solid #b89cff; outline-offset:-7px;
+ }
+.die.die-inverse .face-word, .die.die-inverse .face-val{ color:#f1e6ff; }
+/* the flip: white in 'difference' mode turns everything under it into its exact negative, for a beat (no filter on the die) */
+.die .inv-flip{ position:absolute; inset:0; z-index:4; border-radius:inherit; pointer-events:none; background:#fff; mix-blend-mode:difference; opacity:0; animation:dieInverseFlip 6.4s linear infinite; animation-delay:var(--sd,0s); }
+@keyframes dieInverseFlip{ 0%,86%{ opacity:0; } 88%,92%{ opacity:1; } 94%,100%{ opacity:0; } }
+/* ...then a violet 'color' layer keeps the flash in the die's own hue: light and dark swap, violet stays violet */
+.die .inv-tint{ position:absolute; inset:0; z-index:5; border-radius:inherit; pointer-events:none; background:#8a5cd6; mix-blend-mode:color; opacity:0; animation:dieInverseFlip 6.4s linear infinite; animation-delay:var(--sd,0s); }
+.die-sheen.sheen-inverse::before{ content:''; position:absolute; inset:0; mix-blend-mode:multiply;
+  background:radial-gradient(circle at 50% 55%, rgba(0,0,0,.9), rgba(30,8,60,.5) 38%, transparent 68%);
+  animation:sheenInverse 3.2s ease-in-out infinite; animation-delay:var(--sd,0s); }
+.die-sheen.sheen-inverse::after{ content:''; position:absolute; left:50%; top:50%; width:30%; aspect-ratio:1; border-radius:50%; border:2px solid rgba(214,182,255,.9);
+  transform:translate(-50%,-50%) scale(3.2); opacity:0; animation:sheenInverseRing 3.2s ease-in infinite; animation-delay:var(--sd,0s); }
+@keyframes sheenInverse{ 0%,100%{ opacity:.8; transform:scale(1.05); } 50%{ opacity:.2; transform:scale(.8); } }
+@keyframes sheenInverseRing{ 0%{ opacity:0; transform:translate(-50%,-50%) scale(3.2); } 15%{ opacity:.85; } 60%,100%{ opacity:0; transform:translate(-50%,-50%) scale(.3); } }
+.reduced-motion .die .inv-flip, .reduced-motion .die .inv-tint, .reduced-motion .die-sheen.sheen-inverse::before, .reduced-motion .die-sheen.sheen-inverse::after{ animation:none !important; }
+body.calm .die .inv-flip, body.calm .die .inv-tint, body.calm .die-sheen.sheen-inverse::before, body.calm .die-sheen.sheen-inverse::after{ animation-play-state:paused !important; }
 
 /* ==== Class picker, two rows (Nov 25: nine classes): the starting four on top, the five unlockable classes below */
 #class-tab-row{ flex-wrap:wrap; row-gap:8px; }
