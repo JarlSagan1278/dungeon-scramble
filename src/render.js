@@ -1147,7 +1147,7 @@ function dieFaceChipsHTML(faceArr, toneCls){
 // glance the same way the Origin die's faces do. Dungeoneer's path-wrapping
 // rule has no equivalent die-face icon, so it gets its own distinct glyph
 // instead of being stretched onto an unrelated one.
-const CLASS_ACTION_ICON = { guard:'block', armsmaster:'hit', arcanist:'dodge' };
+const CLASS_ACTION_ICON = { guard:'block', armsmaster:'hit', arcanist:'dodge', medic:'heal', alchemist:'dot', engineer:'reroll', trickster:'swap', ranger:'leap' }; // Nov 25: the five new classes too (their badge was an empty square)
 const CLASS_WRAP_ICON_SVG = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path><path d="M3 21v-5h5"></path></svg>`;
 function classActionIconHTML(k){
   if(k.id==='dungeoneer') return CLASS_WRAP_ICON_SVG;
@@ -1312,7 +1312,7 @@ function renderSetup(){
       const c = el(`<button type="button" class="class-tab-btn origin-tab-${o.id} ${o.id===chosenOrigin?'selected':''} ${previewing?'previewing':''} ${unlocked?'':'locked'}">${unlocked?'':lockSVG(10)+' '}${o.name}</button>`);
       c.onclick = ()=>{
         previewedOriginId = o.id;
-        if(unlocked){ chosenOrigin = o.id; } else if(typeof showToast==='function') showToast(ORIGIN_UNLOCK_HINT[o.id]||'Locked', null);
+        if(unlocked){ chosenOrigin = o.id; } else showLockHint(o.name, ORIGIN_UNLOCK_HINT[o.id]||'Locked.');
         renderOriginTabs();
         renderOriginShowcaseNow();
         checkReady();
@@ -1349,7 +1349,7 @@ function renderSetup(){
       const c = el(`<button type="button" class="class-tab-btn ${k.id===chosenClass?'selected':''} ${previewing?'previewing':''} ${unlocked?'':'locked'} ${CLASS_UNLOCKS[k.id]?'class-tab-new':''}" style="--class-color:${k.color}">${unlocked?'':lockSVG(10)+' '}${k.name}</button>`);
       c.onclick = ()=>{
         previewedClassId = k.id;
-        if(unlocked) chosenClass = k.id; else if(typeof showToast==='function') showToast(CLASS_UNLOCKS[k.id].hint, null);
+        if(unlocked) chosenClass = k.id; else showLockHint(k.name, CLASS_UNLOCKS[k.id].hint);
         renderClassTabs();
         renderClassShowcaseNow();
         checkReady();
@@ -1468,7 +1468,13 @@ function renderSetup(){
 function fitSetup(opts){
   const p = document.querySelector('.setup-panel'); if(!p) return;
   const se = document.scrollingElement || document.documentElement;
-  const boxes = [['#origin-showcase', opts && opts.origin], ['#class-showcase', opts && opts.klass], ['#boon-showcase', opts && opts.boon]];
+  const boxes = [['#origin-showcase', opts && opts.origin], ['#class-showcase', opts && opts.klass], ['#boon-showcase', opts && opts.boon]]
+    .filter(([sel])=> !(sel==='#origin-showcase' && pcMode())); // PC: the Origin panel fills its column instead (Nov 25)
+  if(pcMode()){ const o = document.querySelector('#origin-showcase'); if(o) o.style.removeProperty('min-height');
+    // the Origin column spans exactly the rows the Class column uses (Boon and Depth only show for veterans)
+    const sec = [...p.children].find(c=> c.querySelector && c.querySelector('.origin-layout'));
+    const right = [...p.children].filter(c=> c!==sec && !c.classList.contains('setup-back-btn') && !c.classList.contains('setup-name-row') && getComputedStyle(c).display!=='none').length;
+    if(sec && right) sec.style.gridRow = `2 / span ${right}`; }
   const lockHeights = ()=>{
     boxes.forEach(([sel, list])=>{
       const box = document.querySelector(sel); if(!box || !list || !list.length) return;
@@ -2750,11 +2756,21 @@ function headlineParts(text){
     [/^Swapped (.+?) into your Tray/, m=>['Swapped in', m[1]]],
     [/^Union Dues: the shrine takes (\d+) HP/, m=>['Union Dues', `-${m[1]} HP`]],
     [/^— Floor (\d+) —$/, m=>[`Floor ${m[1]}`, '']],
+    [/^(.+?) is locked: (.+?)\.?$/, m=>[`${m[1]} locked`, m[2]]],
   ];
   for(const [re, f] of R){ const m = text.match(re); if(m) return f(m); }
   return [text.replace(/[.!]$/, ''), ''];
 }
 let HEADLINE_Q = [];
+// Nov 25 (Jeremy: lock hints stayed around and stacked, so it wasn't clear which applied to which): a lock hint names
+// the thing and replaces any lock hint showing or waiting, instead of queueing behind it.
+function showLockHint(name, hint){
+  HEADLINE_Q = HEADLINE_Q.filter(q=> !q.lock);
+  const cur = document.getElementById('headline-strip');
+  if(cur && cur.dataset.lock){ cur.remove(); }
+  HEADLINE_Q.unshift({ text: `${name} is locked: ${hint}`, kind:'bad', lock:true });
+  if(!document.getElementById('headline-strip')) nextHeadline();
+}
 // Back Pocket save (Nov 11): a gold card over the room naming the die that saved you and the face it rolled. It goes
 // away on its own (taps pass through), so it never stalls the turn that carries on underneath.
 function pocketSaveFx(saver, hp, spent){
@@ -2788,10 +2804,12 @@ function nextHeadline(){
   const r = base.getBoundingClientRect();
   const strip = el(`<div id="headline-strip" class="hl-strip hl-${tone}" role="status"><i class="hl-ic">${bad ? '!' : tone==='good' ? MARK_CHECK : MARK_STAR}</i><span><b>${key}</b>${detail ? ` &middot; ${detail}` : ''}</span></div>`);
   strip.style.left = (r.left + 10) + 'px'; strip.style.width = Math.max(200, r.width - 20) + 'px'; strip.style.top = Math.max(4, r.top + 8) + 'px';
+  if(item.lock) strip.dataset.lock = '1';
   document.body.appendChild(strip);
   const words = (key + ' ' + detail).trim().split(/\s+/).length;
   let done = false;
-  const close = ()=>{ if(done) return; done = true; strip.classList.add('hl-out'); setTimeout(()=>{ strip.remove(); nextHeadline(); }, 220); };
+  const close = ()=>{ if(done || !strip.isConnected) return; done = true; // a lock hint replaced early is already gone (showLockHint)
+  strip.classList.add('hl-out'); setTimeout(()=>{ strip.remove(); nextHeadline(); }, 220); };
   setTimeout(close, Math.min(5000, 1000 + 300*words));
 }
 

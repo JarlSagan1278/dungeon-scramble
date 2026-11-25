@@ -4117,3 +4117,14 @@ body.calm .hero-gear .hg-float, body.calm .enemy-carry .ec-float, body.calm .tra
 .setup-panel.fit6 .class-mini-tray{ width:66px; flex-basis:66px; }
 .setup-panel.fit6 .class-showcase-ability{ font-size:11px !important; line-height:1.22 !important; }
 .setup-panel.fit6 .setup-section{ margin-top:0; margin-bottom:3px; }
+/* Nov 25 (Jeremy: the heights should line up): PC setup, the Origin column runs the full height of the Class column (its
+   bottom meets the bottom of Enter the Dungeon); the four Origin tabs share that height; both rows of class tabs match. */
+body.pc .setup-panel > .setup-section:has(.origin-layout){ align-self:stretch !important; display:flex; flex-direction:column; margin-bottom:0 !important; contain:size; } /* contain:size: the Class column alone sets the height */
+body.pc .origin-layout .origin-showcase{ min-height:0 !important; }
+body.pc .setup-panel > .setup-section:has(.origin-layout) > .origin-layout{ flex:1 1 auto; }
+body.pc .origin-layout #origin-tab-row .class-tab-btn{ height:auto !important; }
+body.pc .origin-layout .origin-showcase{ display:flex; flex-direction:column; justify-content:space-evenly; }
+#class-tab-row .class-tab-btn.class-tab-new{ font-size:12px; letter-spacing:-.3px; }
+body.pc .setup-panel > #start-btn{ margin-bottom:0 !important; }
+#class-tab-row .class-tab-btn.class-tab-new{ white-space:nowrap; }
+#class-tab-row .class-tab-btn.class-tab-new.locked{ padding-right:9px; padding-left:1px; }

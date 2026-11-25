@@ -26,6 +26,7 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     toFight(); ok(S.encounter.name !== INVERSE_NAME, 'Floor 1 fights stay ordinary');
     // 2. next floor: the first fight is the Inverse
     S.floorIdx = 1; S.encounter = null; S.screen = 'game'; S.encounter = drawEncounter('enc');
+    for (let k = 0; k < 12 && S.encounter.type !== 'Enemy'; k++) { ok(S.encounter.name !== INVERSE_NAME && !S.inverseMet, 'a shrine or trap first: the reflection waits for a fight'); S.encounter = drawEncounter('enc'); }
     const e = S.encounter;
     ok(e.name === INVERSE_NAME && e.inverse && e.rule === 'mirror', 'next floor: Your Additive Inverse');
     ok(drawEncounter('enc').name !== INVERSE_NAME, 'only once');
