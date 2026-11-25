@@ -328,7 +328,7 @@ function originRelicFor(originId){ return RELICS.find(r=>r.origin===originId); }
 
 // ---- Origin dice ----
 const ORIGINS = [
-  {id:'dwarf', name:'Dwarf', die:'Dwarven Doohickie', blurb:'Shield up, then pop it for a big Hit.', faces:faces(['Hit2','Boost1','Boost1','Pivot','Block2','Block2'])},
+  {id:'dwarf', name:'Dwarf', die:'Dwarven Doohickie', blurb:'Brace with Block, then Boost a big Hit.', faces:faces(['Hit2','Boost1','Boost1','Pivot','Block2','Block2'])},
   {id:'gnome', name:'Gnome', die:'Gnomish Mushroom Cap', blurb:'Continuous damage and self-sustain over time.', faces:faces(['Combo1','Boost1','DOT2','DOT2','Leech1','Dodge'])},
   {id:'halfling', name:'Halfling', die:'Bonus Breakfast', blurb:'Second breakfast and good cheer: healing and buffs to keep the party going.', faces:faces(['Combo1','Boost1','Heal2','Heal2','HOT1','Nullify'])},
   {id:'pixie', name:'Pixie', die:'Pixie Powder', blurb:'Blinks past trouble and leaves a little mischief behind.', faces:faces(['Combo2','Boost1','DOT2','Swap','Leap','Freeze'])},

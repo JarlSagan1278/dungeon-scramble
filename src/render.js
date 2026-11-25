@@ -6192,7 +6192,7 @@ function endScreenHTML(o){
         ${BUILD.release ? '' : '<button class="btn-export end-send-btn" onclick="openExportDataModal()">Send Play Data</button>'}</div>
     </div>
     <div class="end-actions"><button id="save-run-card-btn">${rcCanShare() ? 'Share Card' : 'Save Card'}</button><button class="primary" onclick="location.reload()">${o.again}</button></div>
-    <button id="end-details-btn" class="end-details-btn"><span class="end-details-word">Details</span><small>${news.join(' &middot; ')}</small></button>
+    <button id="end-details-btn" class="end-details-btn"><span class="end-details-word">Details</span><small>${(news.length > 4 ? [...news.slice(0, 3), `+${news.length - 3} more`] : news).join(' &middot; ')}</small></button>
     ${shareDataAskHTML()}
   </div>`;
 }

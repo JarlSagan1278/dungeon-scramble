@@ -3,6 +3,8 @@
 ## 1.42.169 (Nov 25, 2026)
 - Five new classes to unlock: Field Medic (play 10 runs), Trickster (play 5 Daily Dungeons), Ranger and his dog Pointer (reach the Rational Guild Rank), Alchemist (earn Rule Breaker), Engineer (win at Depth 3). The class picker has two rows; a locked class shows its goal, and the end screen announces a new one.
 - Field Medic now turns a die into Heal 1 (was Heal 2); half of any overhealing becomes Block.
+- Locked class tabs: tapping one names the class, and a new tap replaces the last message instead of stacking. On PC the Origin and Class columns line up.
+- Text audit: nothing is cut off or crammed any more (locked tab names, "Sidestep" on small loot tiles, Codex tags, the victory card's name and summary line). The Dwarven Doohickie now reads "Brace with Block, then Boost a big Hit."
 
 ## 1.42.168 (Nov 25, 2026)
 - A secret: something waits for anyone who gazes into a fountain's water.
