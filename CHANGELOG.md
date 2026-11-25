@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.42.170 (Nov 25, 2026)
+- The five unlockable classes each bring a signature object, shown beside the hero all run: Pointer the grey schnauzer (Ranger), a little 3D printer (Engineer), a bubbling cauldron (Alchemist), a field kit (Field Medic) and a deck of cards (Trickster). Pointer's head on the dice is no longer cut off.
+- The Wanted pop-up is the paper poster itself, enlarged, with route goals explained on it.
+- First-fight Skill tips for the five new classes; long-press and hover explain printed dice and Pointer's +1.
+
 ## 1.42.169 (Nov 25, 2026)
 - Five new classes to unlock: Field Medic (play 10 runs), Trickster (play 5 Daily Dungeons), Ranger and his dog Pointer (reach the Rational Guild Rank), Alchemist (earn Rule Breaker), Engineer (win at Depth 3). The class picker has two rows; a locked class shows its goal, and the end screen announces a new one.
 - Field Medic now turns a die into Heal 1 (was Heal 2); half of any overhealing becomes Block.
