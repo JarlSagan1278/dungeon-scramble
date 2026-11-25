@@ -4137,7 +4137,7 @@ body.pc .setup-panel > #start-btn{ margin-bottom:0 !important; }
 
 /* ==== Class props (Nov 25): the unlockable classes' signature objects at the hero's feet, on the wall side */
 .fo-fig, .vic-hero-wrap{ position:relative; }
-.class-prop{ position:absolute; left:-31%; bottom:-3%; width:48%; aspect-ratio:1; pointer-events:none; z-index:0; /* drawn before the worn loot, so a ground item stays on top */ filter:drop-shadow(0 2px 0 rgba(12,7,5,.55)); } /* no paper filter: it greyed the black outlines (Jeremy: outlines black like the rest) */
+.class-prop{ position:absolute; left:-31%; bottom:-3%; width:48%; aspect-ratio:1; pointer-events:none; z-index:2; /* in front of the worn loot (Jeremy: the class object is the one to emphasize all run) */ filter:drop-shadow(0 2px 0 rgba(12,7,5,.55)); } /* no paper filter: it greyed the black outlines (Jeremy: outlines black like the rest) */
 .class-prop svg{ width:100%; height:100%; display:block; overflow:visible; }
 .class-prop.cp-ranger{ width:52%; left:-34%; animation:cp-sit 3.8s ease-in-out infinite; transform-origin:50% 100%; }
 .class-prop.cp-alchemist svg circle{ animation:cp-bubble 2.6s ease-in-out infinite; }
@@ -4146,3 +4146,5 @@ body.pc .setup-panel > #start-btn{ margin-bottom:0 !important; }
 @keyframes cp-bubble{ 0%,100%{ transform:translateY(0); opacity:1; } 50%{ transform:translateY(-3px); opacity:.75; } }
 .reduced-motion .class-prop, .reduced-motion .class-prop *{ animation:none !important; }
 body.calm .class-prop, body.calm .class-prop *{ animation-play-state:paused !important; }
+/* Nov 25 (Jeremy, option 1): with a class object by the wall, the left-foot ground item slides in toward the feet so the two sit side by side */
+.hero-gear.has-prop .hg-gl{ left:13%; }

@@ -2157,7 +2157,7 @@ function renderGame(){
   { const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
     foPlayer = { statusHTML:`${S.playerDOT?`<span class="status-chip status-tooltip-target" title="D.O.T. ${S.playerDOT}: ${STATUS_DESC.dot}">${iconSpan('dot', S.playerDOT)} DOT</span>`:''}        ${S.playerHOT?`<span class="status-chip status-tooltip-target" title="H.O.T. ${S.playerHOT}: ${STATUS_DESC.hot}">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}        ${S.playerBlock?`<span class="status-chip status-tooltip-target" title="Block ${S.playerBlock}: ${STATUS_DESC.block}">${iconSpan('block', S.playerBlock)} Block</span>`:''}        ${minionCount?`<span class="status-chip status-tooltip-target" title="Minions ${minionCount}: ${STATUS_DESC.minions}"><span class="chip-minion" aria-hidden="true"><i></i><i></i></span><b class="chip-n">${minionCount}</b></span>`:''}${S.pendingFreeBoost?`<span class="status-chip status-tooltip-target" style="background:var(--gold);color:#241c10;" title="Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}">${iconSpan('boost')} Boost x${S.pendingFreeBoost} armed</span>`:''}`, fxCls:playerFx.cls, deltaHTML:playerFx.deltaHTML, hpPct, tip:playerStatusTip,
       figCls: playerFx.cls==='flash-damage'?'dmg-flash':playerFx.cls==='flash-heal'?'heal-flash':'',
-      figHTML: portrait.placeholder ? mysteryFigureHTML('width:60px; height:60px;') : `${heroGearHTML('back')}<img class="fo-img" src="${portrait.img}" alt="${S.origin.name}">${classPropHTML()}${heroGearHTML()}` }; }
+      figHTML: portrait.placeholder ? mysteryFigureHTML('width:60px; height:60px;') : `${heroGearHTML('back')}<img class="fo-img" src="${portrait.img}" alt="${S.origin.name}">${heroGearHTML()}${classPropHTML()}` }; }
   const html = `
     <!--z0--><div class="panel route-float" style="margin-bottom:8px;">
       ${renderRoute()}
@@ -6171,7 +6171,7 @@ function heroGearHTML(part){
   const g = heroGear(), img = (d, cls)=> `<img class="hg ${cls}${LOOT_FLIP.has(d.name)?' hg-flip':''}${(LOOT_GEAR_TWEAK[d.name]||{}).flat?' hg-flat':''}${(LOOT_GEAR_TWEAK[d.name]||{}).board?' hg-board':''}" src="${LOOT_ART[d.name]}" alt="" title="${d.name}" style="height:${Math.round(Math.min((LOOT_GEAR_SIZE[d.name]||.3) * (LOOT_SLOT[d.name]==='float' ? 1.3 : 1), CAP[LOOT_SLOT[d.name]]||.5)*((LOOT_GEAR_TWEAK[d.name]||{}).size||1)*100)}%;${(LOOT_GEAR_TWEAK[d.name]||{}).out ? `--hg-out:${LOOT_GEAR_TWEAK[d.name].out};` : ''}${(LOOT_GEAR_TWEAK[d.name]||{}).rot!=null ? `transform:rotate(${LOOT_GEAR_TWEAK[d.name].rot}deg);` : ''}">`;
   if(part==='back') return g.back ? `<span class="hero-gear hg-behind" aria-hidden="true">${(LOOT_HILT_UP[g.back.name]!=null ? img(g.back,'hg-back hg-hilt').replace('style="', `style="transform:rotate(${LOOT_HILT_UP[g.back.name]}deg);`) : img(g.back,'hg-back')).replace(/height:(\d+)%/, (m,h)=>`height:${Math.min(98, Math.round(h*1.35))}%`)}</span>` : ''; // bigger and more central, so it still peeks out (Jeremy)
   if(!g.ground.length && !g.float && !g.head) return '';
-  return `<span class="hero-gear" aria-hidden="true">${g.ground[0]?img(g.ground[0],'hg-ground hg-gl'):''}${g.ground[1]?img(g.ground[1],'hg-ground hg-gr'):''}${g.float?img(g.float,'hg-float'):''}${g.head?img(g.head,'hg-head'):''}</span>`;
+  return `<span class="hero-gear${(S.klass && CLASS_PROP_SVG[S.klass.id]) ? ' has-prop' : ''}" aria-hidden="true">${g.ground[0]?img(g.ground[0],'hg-ground hg-gl'):''}${g.ground[1]?img(g.ground[1],'hg-ground hg-gr'):''}${g.float?img(g.float,'hg-float'):''}${g.head?img(g.head,'hg-head'):''}</span>`;
 }
 // The defeat scene's winner wears the hero's best piece (e.carry, set only while defeatSceneHTML draws the room; foes
 // don't carry loot in fights since Nov 18), drawn like the hero's gear but mirrored, since foes face left: back items over its right shoulder, the floating item
@@ -6205,7 +6205,7 @@ function victoryStageHTML(){
   const tr = victoryTrophies().filter(x=> !worn.has(x.name)); // what the hero wears is not repeated as a trophy
   return `<div class="vic-stage" style="--rc-class:${d.color}">
     <div class="vic-rays" aria-hidden="true"></div>
-    ${d.portrait ? `<div class="vic-hero-wrap">${heroGearHTML('back')}<img class="vic-hero" src="${d.portrait}" alt="">${classPropHTML()}${heroGearHTML()}</div>` : ''}
+    ${d.portrait ? `<div class="vic-hero-wrap">${heroGearHTML('back')}<img class="vic-hero" src="${d.portrait}" alt="">${heroGearHTML()}${classPropHTML()}</div>` : ''}
     <div class="vic-plinth"><span>${(d.name || d.who).replace(/</g,'&lt;')} &middot; Depth ${d.depth}</span></div>
     <div class="vic-outcome">${d.outcome}</div>
     ${tr.length ? (()=>{ const t = (x,i)=>`<img class="vic-trophy t-${x.cat}" style="--i:${i}" src="${LOOT_ART[x.name]}" alt="${x.name}" title="${x.name}">`;
