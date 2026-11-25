@@ -4071,9 +4071,11 @@ body:not(.pc) .foe-rule .fr-long{ display:none; } body:not(.pc) .foe-rule .fr-sh
 .pad-glyph.pg-a{ background:#3f9a4f; } .pad-glyph.pg-b{ background:#c0392b; } .pad-glyph.pg-x{ background:#3f7fd0; } .pad-glyph.pg-y{ background:#d9a520; color:#241c10; }
 body.pc.pad #tray > .die::before{ content:none !important; }
 
-/* Ranger prototype (Nov 25): Pointer sits on a die (a friendly Minion: the die stays readable); the dice beside it glow */
-.die .pet-token{ position:absolute; top:-7px; right:-7px; width:24px; height:24px; border-radius:50%; background:#8a5a2b radial-gradient(circle at 50% 62%, #f3e3c3 0 4px, transparent 5px), #8a5a2b;
-  border:2px solid #0c0705; box-shadow:0 2px 0 #0c0705; z-index:4; pointer-events:none; }
-.die .pet-token::before, .die .pet-token::after{ content:''; position:absolute; top:4px; width:5px; height:5px; border-radius:50%; background:#f3e3c3; }
-.die .pet-token::before{ left:5px; } .die .pet-token::after{ right:5px; }
+/* Ranger prototype (Nov 25): Pointer sits on a die (a friendly Minion: the die stays readable); the dice beside it get a +1 tag */
+.die .pet-token{ position:absolute; top:-14px; right:-12px; width:40px; height:40px; z-index:5; pointer-events:none; filter:drop-shadow(0 2px 0 #0c0705); animation:pet-bob 1.8s ease-in-out infinite; }
+@keyframes pet-bob{ 0%,100%{ transform:translateY(0) rotate(-4deg); } 50%{ transform:translateY(-2px) rotate(4deg); } }
+.reduced-motion .die .pet-token{ animation:none; }
 .die.pet-aura{ outline:3px dashed #f2c14e; outline-offset:-3px; }
+.die.pet-aura::after{ content:'+1'; position:absolute; top:2px; left:3px; padding:0 4px; border-radius:6px; background:#f2c14e; color:#241c10; font:800 10px/14px var(--font-ui); border:1.5px solid #0c0705; z-index:4; }
+/* Engineer prototype (Nov 25): a printed face wears a blueprint grid until the fight ends */
+#tray .die.printed{ background-image:linear-gradient(rgba(120,180,255,.28) 1px, transparent 1px), linear-gradient(90deg, rgba(120,180,255,.28) 1px, transparent 1px) !important; background-size:8px 8px !important; outline:3px solid #6fb2ff; outline-offset:-3px; }
