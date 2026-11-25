@@ -20,7 +20,7 @@ wiring. Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PR
 
 ## Waiting on Jeremy
 - **Art to make** (names sheet "Art Needed" tab; `tools/media/art_brief.js` draws the exact-size sheet): the five class
-  objects and Pointer's head token (placeholders in the game now), the floor props, optional Pointer running. Send the
+  objects and Pointer's head token (placeholders in the game now), optional Pointer running. Send the
   PNGs and Claude swaps them in.
 - **Title art** (2048x2434 canvas `DungeonScramble_TitleArt_canvas.psd`; export full size; keep the logo layer for Steam).
 - **Redraw the remaining AI-assisted art** (pixie portraits, the remaining original loot) to shrink the disclosure.
@@ -40,7 +40,7 @@ wiring. Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PR
 - **Forks:** watch real `fork_pick` events before tuning (bot: always Elite 50% vs Standard 39%).
 - **Hero gear:** per-item settings in assets.js (LOOT_SLOT etc.); class objects sit in front by the wall and the
   left-foot item makes room (`.hero-gear.has-prop`).
-- **Room dressing:** per-floor prop placeholders (Nov 25); swap in Jeremy's drawings; his own ivy strands (V3) if wanted.
+- **Room dressing:** no per-floor props (Nov 25, Jeremy: plenty of screen clutter already); his own ivy strands (V3) only if wanted.
 - **Performance on slow phones:** idle work capped (Nov 25: no frame loop without a controller, looping decor pauses
   after 20 s idle). What's left is paint of running animations; only if testers report stutter.
 
