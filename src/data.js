@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.42.168';
+const GAME_VERSION = '1.42.169';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false, steam:false };
@@ -313,7 +313,7 @@ const RANKS = [
   {name:'Natural',     at:0,    sym:'\u2115'},
   {name:'Whole',       at:120,  sym:'W', gift:'reroll', text:'Start every run with 1 Reroll token.'},
   {name:'Integer',     at:300,  sym:'\u2124', gift:'hp3',    text:'Start every run with +3 max health.'},
-  {name:'Rational',    at:550,  sym:'\u211A', gift:'swap',   text:'Start every run with 1 Swap token.'},
+  {name:'Rational',    at:550,  sym:'\u211A', gift:'swap',   text:'Start every run with 1 Swap token. The Ranger (and Pointer) join the guild.'},
   {name:'Irrational',  at:850,  sym:'\u03C0', gift:'patron', text:"Patron's Gift: at Base Camp, pick 1 of 3 relics you've found."},
   {name:'Real',        at:1250, sym:'\u211D', gift:'atk2',   text:'One starting Attack die begins at level II.'},
   {name:'Imaginary',   at:1750, sym:'i',      gift:'man2',   text:'One starting Maneuver die begins at level II.'},
@@ -351,15 +351,15 @@ const CLASSES = [
     zone:(r,c)=> r===c || r+c===3, diagonalZone:'both', boostPlus:1}, // both diagonals; diagonal steps only from an X square to an X square (Jeremy, Oct 16; was 'either' from Oct 12, 53% vs 29% at depth 7)
   // Nov 25 (Jeremy: develop these four, then simulate them against the others): prototypes, hidden from the class picker
   // (proto) until Jeremy approves them. skill:'print' / 'sleight' are two-tap Skills run through the tray-action flow.
-  {id:'alchemist', name:'Alchemist', color:'#4f9a3a', proto:true, ability:'Once per turn, turn any die in your zone (the centre 2x2), even a Blank, into a D.O.T. (2). Every D.O.T. face you play is 1 stronger.',
+  {id:'alchemist', name:'Alchemist', color:'#4f9a3a', ability:'Once per turn, turn any die in your zone (the centre 2x2), even a Blank, into a D.O.T. (2). Every D.O.T. face you play is 1 stronger.',
     zone:(r,c)=> (r===1||r===2) && (c===1||c===2), convertTo:{type:'dot', value:2}, dotPlus:1},
-  {id:'medic', name:'Field Medic', color:'#d0565a', proto:true, ability:'Once per turn, turn any die in your zone (the bottom row), even a Blank, into a Heal (1). Half of any healing past your full health becomes Block.',
+  {id:'medic', name:'Field Medic', color:'#d0565a', ability:'Once per turn, turn any die in your zone (the bottom row), even a Blank, into a Heal (1). Half of any overhealing becomes Block.',
     zone:(r,c)=> r===3, convertTo:{type:'heal', value:1}, overhealBlock:true}, // Nov 25 recheck: Heal 2 won 95-96% for experts at Depth 7 (the overheal Block was not the cause); Heal 1: 85%
-  {id:'engineer', name:'Engineer', color:'#c7902c', proto:true, ability:'Once per turn, Print: tap any die in your Tray, then a die in your zone (the left column): the zone die becomes a copy of that face, and keeps it for the rest of the fight.',
+  {id:'engineer', name:'Engineer', color:'#c7902c', ability:'Once per turn, Print: copy any die\'s face onto a die in your zone (the left column). The copy lasts the whole fight.',
     zone:(r,c)=> c===0, skill:'print'},
-  {id:'trickster', name:'Trickster', color:'#3d7fd0', proto:true, ability:'Once per turn, Sleight of Hand: tap a die in your zone (the four corners), then any other die: they trade places.',
+  {id:'trickster', name:'Trickster', color:'#3d7fd0', ability:'Once per turn, Sleight of Hand: tap a die in your zone (the four corners), then any other die: they trade places.',
     zone:(r,c)=> (r===0||r===3) && (c===0||c===3), skill:'sleight'},
-  {id:'ranger', name:'Ranger', color:'#6f8f2f', proto:true, ability:'Your dog Pointer bounds out with the dice and lands on one: the four dice beside it get +1. Once per turn, Fetch!: after your path, Pointer runs 2 more steps from its last die and uses those dice too.',
+  {id:'ranger', name:'Ranger', color:'#6f8f2f', ability:'Your dog Pointer lands on a die: the four beside it get +1. Once per turn, Fetch!: after your path, Pointer runs 2 more steps and uses those dice too.',
     zone:(r,c)=> false, pet:true, skill:'fetch'},
   {id:'debug', name:'Debug', color:'#9aa3ab', ability:'No class ability. Starting tray is a random assortment of every die type in the game, for testing.',
     zone:(r,c)=> false, debug:true},

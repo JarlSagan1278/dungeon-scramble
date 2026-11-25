@@ -1203,6 +1203,7 @@ function originRelicLineHTML(o){
 // icon (or Dungeoneer's own wrap glyph), in a fixed-height panel so nothing
 // reflows as the player taps between the 4 tabs above it.
 function classShowcaseHTML(k){
+  const unlocked = isClassUnlocked(k.id); // a locked class shows its goal where the depth badge sits (it has no wins yet)
   // A little 4x4 tray with this class's zone lit up in the class color.
   const cells = [];
   for(let r=0;r<4;r++) for(let c=0;c<4;c++) cells.push(`<i class="${k.zone(r,c)?'zone':''}"></i>`);
@@ -1215,7 +1216,7 @@ function classShowcaseHTML(k){
       </div>
       <div class="class-showcase-ability">${k.ability}</div>
     </div>
-    <div class="class-showcase-badge">${classBadgeHTML(k, 48, true)}</div>
+    <div class="class-showcase-badge">${unlocked ? classBadgeHTML(k, 48, true) : `<div class="class-lock-goal">${lockSVG(14)}<span>${CLASS_UNLOCKS[k.id].hint.replace(/ to unlock\.$/,'')}</span></div>`}</div>
   `;
 }
 
@@ -1289,7 +1290,7 @@ function renderSetup(){
   // isn't looking at a fully-filled-in showcase with no visible selection
   // ring anywhere and wondering what, if anything, is actually chosen --
   // tapping a different Origin or Class still overrides this as normal.
-  const defaultClassId = CLASSES.find(k=>!k.debug && !k.proto).id;
+  const defaultClassId = CLASSES.find(k=>!k.debug && isClassUnlocked(k.id)).id;
   let chosenOrigin='dwarf', chosenClass=defaultClassId, chosenBoonName=null, charName='';
   let previewedOriginId = 'dwarf', previewedClassId = defaultClassId;
 
@@ -1340,13 +1341,15 @@ function renderSetup(){
   // Debug class has no tab of its own -- it's a testing tool, not a real
   // choice -- and is instead armed by rapid-clicking the section label
   // (see the class-header handler below).
-  const realClasses = CLASSES.filter(k=>!k.debug && (!k.proto || protoClassesOn())); // Nov 25: prototype classes only with ?proto=1 / localStorage dungeonScrambleProto
+  const realClasses = CLASSES.filter(k=>!k.debug); // Nov 25: every class shows; the new ones stay locked until their goal (CLASS_UNLOCKS, logic.js)
   function renderClassTabs(){
     classTabRow.innerHTML = '';
     realClasses.forEach(k=>{
-      const c = el(`<button type="button" class="class-tab-btn ${k.id===chosenClass?'selected':''}" style="--class-color:${k.color}">${k.name}</button>`);
+      const unlocked = isClassUnlocked(k.id), previewing = (k.id===previewedClassId && k.id!==chosenClass);
+      const c = el(`<button type="button" class="class-tab-btn ${k.id===chosenClass?'selected':''} ${previewing?'previewing':''} ${unlocked?'':'locked'} ${CLASS_UNLOCKS[k.id]?'class-tab-new':''}" style="--class-color:${k.color}">${unlocked?'':lockSVG(10)+' '}${k.name}</button>`);
       c.onclick = ()=>{
-        previewedClassId = k.id; chosenClass = k.id;
+        previewedClassId = k.id;
+        if(unlocked) chosenClass = k.id; else if(typeof showToast==='function') showToast(CLASS_UNLOCKS[k.id].hint, null);
         renderClassTabs();
         renderClassShowcaseNow();
         checkReady();
@@ -1475,11 +1478,11 @@ function fitSetup(opts){
       box.innerHTML = keep; box.style.setProperty('min-height', max + 'px', 'important');
     });
   };
-  p.classList.remove('fit1','fit2','fit3','fit4','fit5');
+  p.classList.remove('fit1','fit2','fit3','fit4','fit5','fit6');
   lockHeights();
   // PC layout: the page never scrolls there (the card is scaled into the window), so measure the card itself
   const fits = ()=> pcMode() ? p.getBoundingClientRect().bottom <= window.innerHeight - 6 : se.scrollHeight <= window.innerHeight + 1;
-  for(const c of ['fit1','fit2','fit3','fit4','fit5']){ if(fits()) break; p.classList.add(c); lockHeights(); }
+  for(const c of ['fit1','fit2','fit3','fit4','fit5','fit6']){ if(fits()) break; p.classList.add(c); lockHeights(); }
 }
 
 // Forks (Nov 4, Jeremy picked two doors): after the room before an Elite slot, two of the game's doors stand side by
@@ -2588,7 +2591,7 @@ function pokeAnim(el, kind){
 document.addEventListener('click', ev=>{
   const hero = ev.target && ev.target.closest ? ev.target.closest('.camp-hero') : null;
   if(hero){ pokeAnim(hero,'shake'); return; }
-  // Nov 25 (Kat's notes): a big foe's art can sit over the Wanted sign, so a tap anywhere inside the sign's outline opens
+  // Nov 25 (Dylan's notes): a big foe's art can sit over the Wanted sign, so a tap anywhere inside the sign's outline opens
   // the quest poster, even through the portraits (a tap on the sign itself is its own onclick).
   if(S && S.screen==='game' && ev.target && ev.target.closest && !ev.target.closest('.fo-quests-float, button, .die, .status-chip, .fo-hpwrap, .modal-overlay')){
     const qs = document.querySelector('#enc-panel .fo-quests-float:not(.shrine-boon-float)');
@@ -5346,7 +5349,7 @@ function questSignHTML(e){
   const st = !hs ? style : style ? style.replace('style="', 'style="'+hs) : ` style="${hs}"`;
   return `<div class="fo-quests-float${anyLive?' q-glow':''}${lockH?' q-locked':''}"${st} title="Wanted: optional quests, each pays the reward on its right. Tap to read them." onclick="openQuestPoster()"><i class="fq-body"></i><i class="fq-light" style="animation-delay:-${Math.round(performance.now()%3100)}ms"></i><div class="fo-quests-label"><b class="q-bonus-b">Wanted</b> ${label}</div><div class="fo-quests">${rows}</div></div>`;
 }
-// Nov 25 (Kat's notes: a big foe's art can cover the sign's lines): tapping the sign opens the quests as a large poster.
+// Nov 25 (Dylan's notes: a big foe's art can cover the sign's lines): tapping the sign opens the quests as a large poster.
 function openQuestPoster(){
   const e = S.encounter; if(!e || !e.quests || !e.quests.length || S.transitioning) return;
   try{ playTone('uiTick'); }catch(err){}
@@ -6159,6 +6162,7 @@ function endScreenHTML(o){
   if(o.seal) news.push(S.depthResult && S.depthResult.newClassBest ? 'New best depth' : 'Depth seal');
   if(o.relic) news.push('Origin relic');
   const na = (S.newAchievements||[]).length; if(na) news.push(`${na} achievement${na>1?'s':''}`);
+  (S.newClasses||[]).forEach(id=>{ const k = CLASSES.find(c=>c.id===id); if(k) news.unshift('New class: '+k.name); });
   const nb = (S.newBoonDice||[]).filter((n,i,a)=>a.indexOf(n)===i).length; if(nb) news.push(`${nb} Starting Boon${nb>1?'s':''}`);
   if(S.renownGain && S.renownGain.ranksUp.length) news.unshift('Rank up: '+S.renownGain.ranksUp[S.renownGain.ranksUp.length-1]); else if(S.renownGain && S.renownGain.gain) news.unshift('+'+S.renownGain.gain+' renown');
   news.push('Run Summary');
@@ -6166,7 +6170,7 @@ function endScreenHTML(o){
   return `<div class="panel end-screen${o.stage?' has-stage':''}${o.scene?' has-scene':''}"><h2>${o.title}</h2>${o.scene ? o.scene.replace('defeat-scene ','defeat-scene ds-phone ') : ''}${o.stage || `<p class="end-lede">${o.lede}</p>`}
     <div class="end-swap">
       <div class="end-main">${runCardHTML(o.outcome)}${o.note||''}</div>
-      <div class="end-details" hidden>${o.scene ? o.scene.replace('defeat-scene ','defeat-scene ds-pc ') : ''}${renownHTML(typeof pcMode==='function' && pcMode())}${o.seal}${o.relic}${newAchievementsHTML(S.newAchievements)}${newBoonsHTML()}${summaryStatsHTML()}
+      <div class="end-details" hidden>${o.scene ? o.scene.replace('defeat-scene ','defeat-scene ds-pc ') : ''}${renownHTML(typeof pcMode==='function' && pcMode())}${o.seal}${o.relic}${newClassesHTML()}${newAchievementsHTML(S.newAchievements)}${newBoonsHTML()}${summaryStatsHTML()}
         ${BUILD.release ? '' : '<button class="btn-export end-send-btn" onclick="openExportDataModal()">Send Play Data</button>'}</div>
     </div>
     <div class="end-actions"><button id="save-run-card-btn">${rcCanShare() ? 'Share Card' : 'Save Card'}</button><button class="primary" onclick="location.reload()">${o.again}</button></div>
@@ -6547,6 +6551,13 @@ function newBoonsHTML(){
       <div class="achv-unlock-title">Starting Boon${names.length>1?'s':''} unlocked!</div>
       ${rows}
     </div>`;
+}
+// Nov 25: a class whose goal this run reached (CLASS_UNLOCKS, logic.js)
+function newClassesHTML(){
+  const ks = (S.newClasses||[]).map(id=>CLASSES.find(c=>c.id===id)).filter(Boolean);
+  if(!ks.length) return '';
+  return `<div class="achv-unlock-box class-unlock-box"><div class="achv-unlock-title">New Class${ks.length>1?'es':''}!</div>${ks.map(k=>
+    `<div class="achv-unlock-row"><span class="achv-unlock-icon class-unlock-dot" style="--class-color:${k.color}"></span><div><div class="achv-unlock-name">${k.name}</div><div class="achv-unlock-desc">${k.ability}</div></div></div>`).join('')}</div>`;
 }
 function newAchievementsHTML(newAchievements){
   if(!newAchievements || !newAchievements.length) return '';

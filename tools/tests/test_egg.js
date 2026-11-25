@@ -1,4 +1,4 @@
-// Nov 25 batch (Kat's notes + the Easter egg). Checks: the fountain's "Gaze into your reflection" puts Your Additive
+// Nov 25 batch (Dylan's playtest notes + the Easter egg). Checks: the fountain's "Gaze into your reflection" puts Your Additive
 // Inverse in the next floor's first fight (only once), its Mirror Image echo (half your damage, capped, on its next
 // attack; Freeze still loads it), its loot offers the Additive Inverse die, the egg survives save/resume; the
 // Armsmaster-style Skill can't convert a die already in the path; tapping the Wanted sign opens the quest poster;
@@ -64,6 +64,18 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     S.path = []; const cand = [...Array(16).keys()].filter(i => !S.tray[i].minion && currentFace(S.tray[i]).type === 'hit');
     S.stats.pathHit = 0; S.path = cand.slice(0, 1); startTurnTransition(); ok((S.stats.pathHit || 0) >= Math.min(1, cand.length), 'path feats count Hit dice in a path');
     ok(achievementsShown().every(a => !a.only || a.only()) && !achievementsShown().some(a => a.id === 'patron'), 'the purchase medal is hidden outside the store app');
+    // 9. class unlocks (Nov 25)
+    const L0 = JSON.parse(JSON.stringify(META.lifetime)), A0 = JSON.parse(JSON.stringify(META.achievements)), R0 = META.renown, D0 = JSON.parse(JSON.stringify(META.daily || {})), B0 = DEPTH_BEST.overall;
+    META.lifetime.runsPlayed = 0; META.renown = 0; META.daily = {}; delete META.achievements.rule_breaker; DEPTH_BEST.overall = 1;
+    ok(['guard','armsmaster','dungeoneer','arcanist'].every(isClassUnlocked), 'the starting four are always open');
+    ok(['medic','trickster','ranger','alchemist','engineer'].every(id => !isClassUnlocked(id)), 'the five new classes start locked');
+    META.lifetime.runsPlayed = 9; newGame('dwarf', 'guard'); S.guide = null; S.stats.damageDealt = 0; recordMetaProgress('defeat');
+    ok(isClassUnlocked('medic') && (S.newClasses || []).includes('medic'), 'the 10th run unlocks the Field Medic and the end screen says so');
+    META.daily = { a: {}, b: {}, c: {}, d: {}, e: {} }; ok(isClassUnlocked('trickster'), '5 Daily Dungeons unlock the Trickster');
+    META.renown = RANKS.find(r => r.name === 'Rational').at; ok(isClassUnlocked('ranger'), 'the Rational rank unlocks the Ranger');
+    META.achievements.rule_breaker = { date: 1 }; ok(isClassUnlocked('alchemist'), 'Rule Breaker unlocks the Alchemist');
+    DEPTH_BEST.overall = 4; ok(isClassUnlocked('engineer'), 'a Depth 3 win unlocks the Engineer');
+    META.lifetime = L0; META.achievements = A0; META.renown = R0; META.daily = D0; DEPTH_BEST.overall = B0; saveMeta();
     return res;
   });
   out.forEach(l => console.log(l));

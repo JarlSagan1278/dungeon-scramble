@@ -376,7 +376,7 @@ function pcPadPoll(){
     else if(dir && now - pcPad.at > (pcPad.rep ? 130 : 300)){ pcPad.at = now; pcPad.rep++; pcMove(x, x?0:y); } // held: repeat
   }
   if(pcCurOn) pcCursorDraw(); // keeps the ring on its target through redraws and animations
-  // Nov 25 (Kat: a warm phone, cap idle work): the frame loop only runs while a controller is connected or the key cursor
+  // Nov 25 (Dylan: a warm phone, cap idle work): the frame loop only runs while a controller is connected or the key cursor
   // is showing; otherwise it stops, and a connected pad (or the cursor) starts it again.
   if(gp || pcCurOn) requestAnimationFrame(pcPadPoll); else pcPadLoop = false;
 }
@@ -392,7 +392,7 @@ window.addEventListener('keydown', ev=>{
   if(ev.key==='F11' || (ev.key==='Enter' && ev.altKey)){ ev.preventDefault(); ev.stopPropagation(); toggleFullscreen(); }
 }, true);
 
-// Calm (Nov 25, Kat's notes: hard-cap idle work so a phone left on a screen doesn't run warm): after 20 s with no input the
+// Calm (Nov 25, Dylan's notes: hard-cap idle work so a phone left on a screen doesn't run warm): after 20 s with no input the
 // looping room dressing pauses (styles.css "Calm"); the next touch, key, wheel, mouse move or gamepad wakes it.
 (function(){
   if(typeof document==='undefined') return; let t = 0;

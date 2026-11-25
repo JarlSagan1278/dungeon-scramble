@@ -4081,7 +4081,7 @@ body.pc.pad #tray > .die::before{ content:none !important; }
 /* Engineer prototype (Nov 25): a printed face wears a blueprint grid until the fight ends */
 #tray .die.printed{ background-image:linear-gradient(rgba(120,180,255,.28) 1px, transparent 1px), linear-gradient(90deg, rgba(120,180,255,.28) 1px, transparent 1px) !important; background-size:8px 8px !important; outline:3px solid #6fb2ff; outline-offset:-3px; }
 
-/* ==== Calm (Nov 25, Kat: a phone ran warm after two clears): after 20 s with no input, body.calm pauses the looping
+/* ==== Calm (Nov 25, Dylan: a phone ran warm after two clears): after 20 s with no input, body.calm pauses the looping
    room dressing (torches, motes, breathing portraits, glows); any touch, key or mouse move brings it back. main.js. */
 body.calm #room-floor .rf-light, body.calm .hall-fx .hf-glow, body.calm .hall-fx i, body.calm .fo-torch, body.calm .idle-breath,
 body.calm .hero-gear .hg-float, body.calm .enemy-carry .ec-float, body.calm .tray-wrap .tray::before, body.calm .chest-lock .ch-shine, body.calm .fo-quests-float > .fq-light{ animation-play-state:paused !important; }
@@ -4095,7 +4095,7 @@ body.calm .hero-gear .hg-float, body.calm .enemy-carry .ec-float, body.calm .tra
 .quest-poster .qp-main{ position:static !important; display:flex; align-items:center; gap:10px; font-size:17px; line-height:1.3; }
 .quest-poster .qp-desc{ font-size:13px; line-height:1.35; opacity:.85; }
 .quest-poster .qp-main > :last-child{ margin-left:auto; }
-/* Nov 25 (Kat): tiered medals: bronze, silver and gold coins once earned (untiered medals stay gold) */
+/* Nov 25 (Dylan): tiered medals: bronze, silver and gold coins once earned (untiered medals stay gold) */
 .achv-medal.on.tier-bronze .achv-coin{ background:radial-gradient(circle at 35% 30%, #ffd9b0, #c27a3e 55%, #7a4519); color:#3e2008; }
 .achv-medal.on.tier-silver .achv-coin{ background:radial-gradient(circle at 35% 30%, #ffffff, #c4cbd4 55%, #7d8794); color:#2e3540; }
 
@@ -4103,3 +4103,17 @@ body.calm .hero-gear .hg-float, body.calm .enemy-carry .ec-float, body.calm .tra
 .fo-img.inverse-art{ filter:invert(1) grayscale(.4) brightness(.4) contrast(1.6) sepia(.6) hue-rotate(230deg) drop-shadow(0 0 3px rgba(190,140,255,.95)); }
 .die.die-inverse{ background:linear-gradient(160deg, #3a2a52, #150f1f) !important; color:#efe3ff; outline:2px solid #9b7bd6; outline-offset:-7px; }
 .die.die-inverse .face-word, .die.die-inverse .face-val{ color:#efe3ff; }
+
+/* ==== Class picker, two rows (Nov 25: nine classes): the starting four on top, the five unlockable classes below */
+#class-tab-row{ flex-wrap:wrap; row-gap:5px; }
+#class-tab-row .class-tab-btn{ flex:1 1 calc(25% - 6px); height:34px !important; font-size:12px; }
+#class-tab-row .class-tab-btn.class-tab-new{ flex:1 1 calc(20% - 6px); font-size:11px; letter-spacing:-.2px; }
+.class-lock-goal{ width:74px; display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; font-size:11px; line-height:1.2; color:var(--parchment-dim); }
+.class-lock-goal svg{ opacity:.85; }
+/* Nov 25: fit6 (nine classes in two rows): the last tightening step for a 360x722 phone */
+.setup-panel.fit6 #class-tab-row .class-tab-btn{ height:30px !important; }
+.setup-panel.fit6 #class-tab-row{ row-gap:4px; }
+.setup-panel.fit6 .origin-showcase-portrait{ width:60px !important; height:60px !important; }
+.setup-panel.fit6 .class-mini-tray{ width:66px; flex-basis:66px; }
+.setup-panel.fit6 .class-showcase-ability{ font-size:11px !important; line-height:1.22 !important; }
+.setup-panel.fit6 .setup-section{ margin-top:0; margin-bottom:3px; }

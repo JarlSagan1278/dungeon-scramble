@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42.169 (Nov 25, 2026)
+- Five new classes to unlock: Field Medic (play 10 runs), Trickster (play 5 Daily Dungeons), Ranger and his dog Pointer (reach the Rational Guild Rank), Alchemist (earn Rule Breaker), Engineer (win at Depth 3). The class picker has two rows; a locked class shows its goal, and the end screen announces a new one.
+- Field Medic now turns a die into Heal 1 (was Heal 2); half of any overhealing becomes Block.
+
 ## 1.42.168 (Nov 25, 2026)
 - A secret: something waits for anyone who gazes into a fountain's water.
 - Tap the Wanted sign to read the quests in a large pop-up (a big monster's art could cover the sign).

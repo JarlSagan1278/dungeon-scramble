@@ -434,7 +434,7 @@ expert 59% -> 65% (= Dungeoneer), regular 85%. The Medic converting half of its 
 (expert 96%); a cause test (expert d7, 320 runs each): no overheal Block 95%, Heal 1 instead of Heal 2: 85%, both: 84%.
 The free Heal 2 every turn was the strength, so the Medic now converts to Heal 1 (keeps half overheal as Block).
 
-## Kat's playtest notes: early elites and the first run (Nov 25, 2026, build 1.42.167)
+## Dylan's playtest notes: early elites and the first run (Nov 25, 2026, build 1.42.167)
 - **Floor 1 elites/deadlies with more health (idea: from run 2 on):** regular bot, Elite door at every fork, 320 runs per
   step. +15% health: they take 2.7 turns instead of 2.5 and cost 14% of max health (was 13%); +30%: 3.0 turns, 19%. No
   Floor 1 deaths at any step, overall win rate unchanged within noise (77/79/81%). +30% is felt without being unfair.

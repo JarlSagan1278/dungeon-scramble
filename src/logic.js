@@ -67,7 +67,7 @@ const SCREEN_FIELDS = [
   // open panels
   'organizeSelection','_pocketOpen',
   // end-of-run screens (never autosaved: the save is cleared when a run ends)
-  'gameOverRecorded','carryoverOptions','carryoverChosenName','depthResult','newAchievements','newBoonDice','newOriginRelic','personalBests','renownGain','_rankFxDone',
+  'gameOverRecorded','carryoverOptions','carryoverChosenName','depthResult','newAchievements','newClasses','newBoonDice','newOriginRelic','personalBests','renownGain','_rankFxDone',
 ];
 const RUN_FIELD_SET = new Set(RUN_FIELDS), SCREEN_FIELD_SET = new Set(SCREEN_FIELDS);
 function unclassifiedStateFields(st){ return Object.keys(st||{}).filter(k=>!RUN_FIELD_SET.has(k) && !SCREEN_FIELD_SET.has(k)); }
@@ -611,7 +611,7 @@ const ACHIEVEMENTS = [
     check: L => (typeof dailyStreak==='function' ? dailyStreak() : 0)>=30},
   {id:'origin_duo', name:'Two Roads', desc:'Win a run with 2 different Origins.',
     check: L => Object.values(L.victoriesByOrigin||{}).filter(n=>n>0).length>=2},
-  // Nov 25 (Kat's notes): tiered medals. A medal with `tier` is a step of the one before it ('silver' and 'gold' go up
+  // Nov 25 (Dylan's notes): tiered medals. A medal with `tier` is a step of the one before it ('silver' and 'gold' go up
   // from the bronze original); the Achievements screen colours the coin by tier. Plus the one-path feats, Exact! kills,
   // Depth wins and the full-game purchase (store app only: `only`).
   {id:'overkill_50', name:'Overkill Devotee', tier:'silver', desc:'Land 50 Overkills, lifetime.', check: L => L.totalOverkills>=50},
@@ -771,8 +771,25 @@ function awardRenown(outcome){
   if(S.daily){ if(outcome==='defeat') dailyMark('X'); dailyRecord(outcome); }
   saveMeta();
 }
+// Class unlocks (Nov 25, Jeremy: build the unlocks; the Medic is the easier start that comes early, like a gentler
+// character in other roguelikes). The four starting classes are always open; each new class has its own goal, picked to
+// fill a gap in the rewards: runs played, the Daily, Guild Ranks, the rule-following foes, Depth. ?proto=1 (or
+// localStorage dungeonScrambleProto) opens them all for testing.
+const CLASS_UNLOCKS = {
+  medic:     { hint:'Play 10 runs to unlock.', ok:()=> (META.lifetime.runsPlayed||0) >= 10 },
+  trickster: { hint:'Play 5 Daily Dungeons to unlock.', ok:()=> Object.keys(META.daily||{}).length >= 5 },
+  ranger:    { hint:'Reach the Rational Guild Rank to unlock.', ok:()=> (META.renown||0) >= (RANKS.find(r=>r.name==='Rational')||{at:1e9}).at },
+  alchemist: { hint:'Beat every foe that follows a rule (Rule Breaker) to unlock.', ok:()=> !!(META.achievements||{}).rule_breaker },
+  engineer:  { hint:'Win a run at Depth 3 or deeper to unlock.', ok:()=> depthLabel(DEPTH_BEST.overall) >= 3 },
+};
+function isClassUnlocked(id){
+  const u = CLASS_UNLOCKS[id]; if(!u) return true;
+  try{ if(typeof protoClassesOn==='function' && protoClassesOn()) return true; return !!u.ok(); }catch(e){ return false; }
+}
+function unlockedNewClassIds(){ return Object.keys(CLASS_UNLOCKS).filter(isClassUnlocked); }
 function recordMetaProgress(outcome){
   const L = META.lifetime;
+  const classesBefore = unlockedNewClassIds();
   awardRenown(outcome);
   L.runsPlayed++;
   if(outcome==='victory') L.victories++;
@@ -802,7 +819,9 @@ function recordMetaProgress(outcome){
     L.victoriesByClass[S.klass.id] = (L.victoriesByClass[S.klass.id]||0)+1;
   }
   saveMeta();
-  return checkAchievements();
+  const na = checkAchievements();
+  S.newClasses = unlockedNewClassIds().filter(id=> !classesBefore.includes(id)); // shown on the end screen
+  return na;
 }
 
 // ---- Discovered Loot dice -- which Alloy/Gilded/Magic dice (by name) the
@@ -1841,7 +1860,7 @@ function useClassAbility(idx){
     S.trayAct = {kind:'print', src:idx, token:false, first:null, skill:true, face:clone(f)}; logMsg('sys', 'Print: now tap a die in your zone to copy that face onto it.'); fastTrayRender(); return; }
   if(S.klass.skill==='sleight'){ if(!inZone(idx)) return; const c = S.tray[idx]; if(!c || c.minion || c.spent || S.path.includes(idx)) return;
     S.trayAct = {kind:'swap', src:idx, token:false, first:null, skill:true}; logMsg('sys', 'Sleight of Hand: now tap any die to trade places with it.'); fastTrayRender(); return; }
-  if(!inZone(idx) || S.path.includes(idx)) return; // Nov 25 (Kat's notes): a die already in the path keeps its face (converting a Pivot step to Hit kept the diagonal and added the damage)
+  if(!inZone(idx) || S.path.includes(idx)) return; // Nov 25 (Dylan's notes): a die already in the path keeps its face (converting a Pivot step to Hit kept the diagonal and added the damage)
   const cell = S.tray[idx];
   if(cell.minion){ revealMinionAt(idx); blankReveal(idx); S._abilityReveal = idx; } // the converted die shakes off its Minion
   cell.forcedFace = clone(S.klass.convertTo);
