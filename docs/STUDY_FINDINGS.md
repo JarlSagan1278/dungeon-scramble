@@ -449,5 +449,17 @@ died there, 50% of max health taken, overall wins 76%: an unfair wall for a secr
 B: 1.0x, hit 3, cap 6: 1.3% / 38%; C: 0.8x, hit 3, cap 8: 0.9% / 25%. Runs that beat it win 85-87% (its die is
 strong). Picked B: elite-level danger, a fight you feel.
 
+## Real first runs (Nov 25, 2026, the play-data sheet: 69 shared runs, Oct 15 - Nov 25)
+- First runs that finished: 4 wins, 1 loss (plus one demo ending). The winners took 26-49 minutes. The loss: a Play
+  tester killed by the Feral Pet Rock (Floor 1, room 3, 4 minutes in).
+- Five more first runs were shared unfinished (in_progress = closed mid-run): three stopped on Floor 1 (one at the
+  Rogue Golemancer), two on Floor 2.
+- One new Play tester (since Nov 24) is 0 for 7: four runs ended on Floor 1 (Feral Pet Rock, Amanitabomination, the
+  Rogue Golemancer twice), three on Floor 2. The Golemancer stopped or killed three of the new players' runs.
+- Reading: the experienced friends win their first run; true newcomers lose often, mostly on Floor 1, close to the
+  novice bot (45% wins, deaths mostly Floor 2) but earlier. Raising elite health would hurt exactly these players, so
+  it stays as is. Worth watching: the Rogue Golemancer as a newcomer wall; the Field Medic unlock (10 runs) reaches the
+  struggling player at run 10. Small sample (about 12 players).
+
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.
