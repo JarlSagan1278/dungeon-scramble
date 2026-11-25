@@ -475,5 +475,17 @@ rate, from its 7-damage wind-up (Golem Lemma) landing while Summoned Golems clog
 with all three. Options (not decided): teach the wind-up the first time (a lesson bubble: "Block it or Freeze it"),
 Golem Lemma 7 -> 6, or Summon Golems 2 -> 1 at Depth 0.
 
+## Real first runs: how new players start (Nov 25, 2026; run records of 7 newcomers since Nov 13)
+- **The guided first fight works when followed:** four newcomers played it through (3-9 dice paths from the first
+  turn; the Filement Bunny down in 1-2 turns, no health lost or 2).
+- **Skipping it is the biggest warning sign:** two skipped within seconds. One then played single-die paths for the
+  whole first fight (8 turns, 14 of 20 health lost) and lost the run on Floor 1; across 7 runs their paths grew only
+  slowly (2-3 dice by run 2, 5-7 by run 6), 0 wins. The other quit with 0 turns played.
+- **The Skill is used:** almost every newcomer converts a die most turns (class_ability events).
+- **Restarts at Base Camp** (runs abandoned within a minute, 0 turns) are common and look like re-picking class or
+  origin, not quitting.
+- Devices: newcomers mostly on phones (360-436 px wide); two on desktops shared one mid-run each.
+- Proposed fix (not decided): a one-time "chain the dice" nudge for tutorial skippers (see TODO).
+
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.
