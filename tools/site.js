@@ -36,7 +36,7 @@ const home = `<!doctype html>\n${head.replace(/^<!doctype html>\s*/i, '')}<body>
 <div class="hero"><figure><img src="press/media/crescendo_turn.gif" alt="A six-die path resolves die by die, then the turn total, 17 DAMAGE, slams onto the monster"></figure></div>
 <p class="lead">Monsters always show their next move, so every turn is a puzzle you can plan for. Four origins, four classes, 50+ 6-sided loot dice and 20+ powerful relics to challenge threats like Extruzeon, Co-consul of Waste, and Myceleus, Co-consul of Rot.</p>
 <p class="lead"><strong>Coming to iPhone and Android.</strong> Floor 1 is free; one purchase unlocks the full dungeon. No ads. <a href="https://dungeonscramble.itch.io/dungeon-scramble">Play the free demo (the first two floors)</a> in your browser on itch.io.</p>
-<div class="links"><a href="https://dungeonscramble.itch.io/dungeon-scramble">Play the demo</a><a href="press/">Press kit</a><a href="privacy/">Privacy policy</a><a href="mailto:contact@dungeonscramble.com">Contact</a></div>
+<div class="links"><a href="https://dungeonscramble.itch.io/dungeon-scramble">Play the demo</a><a href="https://youtu.be/JPX5PqwpdOg">Watch the trailer</a><a href="press/">Press kit</a><a href="privacy/">Privacy policy</a><a href="mailto:contact@dungeonscramble.com">Contact</a></div>
 <p class="foot">Made by Jeremy and Katlynn Friedman &middot; contact@dungeonscramble.com</p>
 </div></body></html>
 `;

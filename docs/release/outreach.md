@@ -101,4 +101,4 @@ Tips:
 | Browser plays | 1 | 4 | 1 | 2 | 2 | 6 | 3 | 1 | 0 | 1 | 1 |
 
 Totals: 58 views, 22 plays (38%). Referrers (30 days): reddit.com 13, dungeonscramble.com 3, itch.io front 2, itch browse/tag pages 6 (newest puzzle, new-and-popular dungeon-crawler, mobile/singleplayer, free mobile-web), itch feed 1. Read: Reddit sent 2 more visits since Oct 29, so the r/indiegames video (no link in the post) and Sharing Saturday brought almost no clicks; the itch-link posts (r/WebGames, r/playmygame) did most of the work. The demo was still 1.42.36 through Nov 3; 1.42.50 demo zip made Nov 3 for the Nov 4 r/playmygame redo.
-
+- Nov 25, 2026: trailer on YouTube https://youtu.be/JPX5PqwpdOg and as a Short https://youtube.com/shorts/nnYn4LTtMsg; vertical trailer on the press kit (dungeonscramble.com/press).

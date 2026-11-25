@@ -99,4 +99,4 @@ Planned $7.99 on Steam (release plan, Oct 21: $5.99 phones / $7.99 Steam). Steam
 Header capsule 920x430, small 462x174, main 1232x706, vertical 748x896, library capsule 600x900, library header 920x430,
 library hero 3840x1240, library logo 1280x720 (needs the transparent title lettering from the PSD), community icon 184x184.
 Screenshots: at least 5 at 1920x1080 from the PC layout (node tools/pc_shots.js fight,boss,camp,fork,stamp 1920x1080).
-Trailer: optional for the Coming Soon page; a 30-60 s cut of the turn clips works (tools/media/clip.js).
+Trailer: docs/release/media/trailer.mp4 (38 s, 1920x1080, with the game's own music; tools/media/trailer*.js); on YouTube: https://youtu.be/JPX5PqwpdOg. Steam takes the MP4 upload directly.
