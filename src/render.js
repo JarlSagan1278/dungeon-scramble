@@ -6951,6 +6951,7 @@ function markTipSeen(k){ TIPS_SEEN.add(k); try{ localStorage.setItem(TIPS_KEY, J
 const TIP_TEXT = {
   combo: n=>`This <b>Combo</b> touches ${n} attacking dice, so it hits harder. The glow grows with every Hit, Combo, Shield, H.O.T. or D.O.T. beside it.`,
   leap: ()=>'A <b>Leap</b> jumps over the next die in a straight line, so a Blank or Minion in the way doesn\'t have to end your Path.',
+  chain: ()=>'<b>Grow your Path!</b> Tap this die, then a <b>neighbour</b> to add it, and keep going. <b>Every</b> die in the Path acts, in order, so a longer Path hits much harder.',
   windup: a=>`<b>Big hit next turn!</b> ${a.name} hits for <b>${a.sp}</b>${a.dmg>a.sp ? `, <b>${a.dmg}</b> with its usual attack` : ''}. Put <b>Block</b> faces in this Path to soak it, use a <b>Freeze</b> to skip it, or hit hard enough to win first.`,
   heavy: ()=>'A <b>heavy turn</b> is coming: this monster hits harder next turn. Block faces in this Path will soak it.',
   minion: ()=>'<b>Minion</b> dice clog your Tray. Every point of damage you deal clears one, and a Leap clears any it jumps over.',
@@ -6985,6 +6986,12 @@ function tipTargets(){
   const e = S.encounter, tray = document.getElementById('tray'); if(!tray || !e) return null;
   const at = i=> `#tray .die[data-idx="${i}"]`;
   if(!S.path.length){
+    // Nov 25 (play data): after a one-die turn that could have been longer, point at a die with a neighbour to add.
+    // Allowed even if this room already had a lesson (urgent): it's the core of the game.
+    if(!TIPS_SEEN.has('chain') && (S._singleDieTurns||0) >= 1){
+      for(let i=0;i<16;i++){ const c = S.tray[i]; if(!c || c.minion || c.spent || c.blank) continue; const f = currentFace(c); if(!f || !/^(hit|combo)$/.test(f.type)) continue;
+        if(!canSelect(i)) continue; const keep = S.path; S.path = [i]; let ok = false; try{ ok = [...Array(16).keys()].some(j=> j!==i && canSelect(j)); }catch(err){} S.path = keep;
+        if(ok) return {k:'chain', el:at(i), arg:null, urgent:true}; } }
     // first in line: it only matters on the turn before the hit lands. Nov 25 (Floor 1 boss study: the Rogue Golemancer's wind-up was the newcomers' wall): the first time a boss's big
     // special is next, name it and its damage, and say how to answer it
     if(!TIPS_SEEN.has('windup') && e.kit){ try{ const pv = enemyNextTurnPreview(e); if(pv.heavy && pv.special && document.querySelector('#enc-panel .fo-enemy .boss-special')) { const sp = (pv.special.acts||[]).filter(a=>a.type==='dmg').reduce((t,a)=>t+(a.value||0),0) + (typeof zealBonus==='function' ? zealBonus(true) : 0);
@@ -7021,8 +7028,9 @@ function updateTips(){
   if(_tip){
     if(busy || S.path.length!==_tip.pathLen || performance.now()-_tip.at>9000) return hideTip();
   } else {
-    if(busy || LESSON_ROOM===lessonRoomKey()) return;
+    if(busy) return;
     const t = tipTargets(); if(!t || !t.el || !document.querySelector(t.el)) return;
+    if(LESSON_ROOM===lessonRoomKey() && !t.urgent) return;
     markTipSeen(t.k); LESSON_ROOM = lessonRoomKey();
     _tip = {k:t.k, pathLen:S.path.length, at:performance.now(), el:t.el};
     const b = document.createElement('div'); b.id='tip-bubble'; b.className='guide-bubble tip-bubble';

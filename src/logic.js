@@ -59,7 +59,7 @@ const RUN_FIELDS = [
 ];
 const SCREEN_FIELDS = [
   // turn playback
-  'transitioning','resolveTotal','resolvingIdx','resolvingFx','_advance','_pendingTimeout','_skipAll','_resolvingPath','_hitStreak',
+  'transitioning','resolveTotal','resolvingIdx','resolvingFx','_advance','_singleDieTurns','_pendingTimeout','_skipAll','_resolvingPath','_hitStreak',
   '_heavyHit','_wardHalf','_downBeat','_foeNullShown','_specialName','lastComboRipple','lastMinionClearIdx','_relicQ',
   // one-shot animations and highlights
   '_roll','_ghost','_shieldFx','_lastPlayerHealth','_abilityReveal','justConvertedIdx','justRerolledIdx','justScrambled','justSwappedIdx',
@@ -2371,6 +2371,9 @@ function startTurnTransition(){
   S._hitStreak = 0; // climbing pitch for consecutive damage-dealing dice this turn -- see playStepTone()
   S.stats.turnsTaken++;
   S.stats.longestPath = Math.max(S.stats.longestPath||0, S.path.length);
+  // Nov 25 (play data: tutorial skippers played one-die paths for whole fights): count a one-die turn in the first runs
+  // when a neighbour could have been added; the next turn opens with the chain hint (render.js tipTargets, 'chain')
+  if(S.path.length===1 && ((META.lifetime && META.lifetime.runsPlayed)||0) < 5){ try{ if([...Array(16).keys()].some(j=> j!==S.path[0] && canSelect(j))) S._singleDieTurns = (S._singleDieTurns||0) + 1; }catch(err){} }
   { let man = 0, hit = 0, bc = 0; S.path.forEach(i=>{ const c = S.tray[i]; if(!c || c.minion) return; const f = currentFace(c) || {}; // one-path feats (Nov 25 achievements)
       if(MANEUVER_TYPES.includes(f.type)) man++; else if(f.type==='hit') hit++; else if(f.type==='boost' || f.type==='combo') bc++; });
     S.stats.pathMan = Math.max(S.stats.pathMan||0, man); S.stats.pathHit = Math.max(S.stats.pathHit||0, hit); S.stats.pathBC = Math.max(S.stats.pathBC||0, bc); }

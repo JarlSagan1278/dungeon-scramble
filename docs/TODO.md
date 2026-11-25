@@ -10,7 +10,7 @@ wiring. Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PR
 1. **Onboarding for tutorial skippers (Nov 25 play-data read, STUDY_FINDINGS "Real first runs: how new players
    start"):** the two newcomers who skipped the guided fight did worst (single-die paths for a whole fight; a quit with
    0 turns). Proposed: a one-time "chain the dice" nudge when a first-runs player presses Go with a one-die path while a
-   longer one is on offer. Waiting on Jeremy's pick.
+   longer one is on offer. Built Nov 25 (not live yet); watch whether skippers' path lengths grow.
 2. **Google Play closed test:** 12 testers for 14 days (posts out); the Friday workflow uploads new versions. Then
    create the `full_game` product (~Dec 5), License testing + a test purchase on Jeremy's phone, then production.
 3. **Keep reading the play data** (sheet `1W1TyynfdWTlxMqzr7TJOTZKMY6sOPBVPfXVd41kcGSM`; records in Drive folder
