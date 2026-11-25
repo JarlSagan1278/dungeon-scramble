@@ -26,5 +26,13 @@ subprocess.run(['ffmpeg','-loglevel','error','-y','-f','lavfi','-i','color=c=0x1
 parts.append(card)
 with open(os.path.join(D, 'all.txt'), 'w') as f:
     for p_ in parts: f.write(f"file '{os.path.basename(p_)}'\n")
-subprocess.run(['ffmpeg','-loglevel','error','-y','-f','concat','-safe','0','-i',os.path.join(D,'all.txt'),'-c','copy','-movflags','+faststart',M+'trailer.mp4'], check=True)
+subprocess.run(['ffmpeg','-loglevel','error','-y','-f','concat','-safe','0','-i',os.path.join(D,'all.txt'),'-c','copy',os.path.join(D,'video.mp4')], check=True)
+wav = os.path.join(D, 'soundtrack.wav')  # made by trailer_audio.js (the game's own music and sounds, timed to the cut)
+if os.path.exists(wav):
+    dur = float(subprocess.run(['ffprobe','-v','error','-show_entries','format=duration','-of','csv=p=0',os.path.join(D,'video.mp4')],capture_output=True,text=True).stdout)
+    subprocess.run(['ffmpeg','-loglevel','error','-y','-i',os.path.join(D,'video.mp4'),'-i',wav,'-filter_complex',
+                    f'[1:a]atrim=0:{dur:.2f},afade=t=out:st={dur-2:.2f}:d=2,loudnorm=I=-16:TP=-1.5:LRA=11[a]','-map','0:v','-map','[a]',
+                    '-c:v','copy','-c:a','aac','-b:a','192k','-movflags','+faststart',M+'trailer.mp4'], check=True)
+else:
+    subprocess.run(['ffmpeg','-loglevel','error','-y','-i',os.path.join(D,'video.mp4'),'-c','copy','-movflags','+faststart',M+'trailer.mp4'], check=True)
 print('trailer.mp4', os.path.getsize(M+'trailer.mp4')//1024, 'KB')

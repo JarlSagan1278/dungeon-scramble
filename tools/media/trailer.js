@@ -13,10 +13,16 @@ async function scene(b, name, setup, act){
   await p.evaluate(()=>{ META.lifetime.victories=4; META.lifetime.bestFloorReached=3; META.coachSeen={armsmaster:1,guard:1,dungeoneer:1,arcanist:1}; META.relicHintSeen=Date.now(); saveMeta(); });
   if(setup) await setup(p); await L.sleep(900);
   const dir = path.join(DIR, name); fs.rmSync(dir, { recursive:true, force:true }); fs.mkdirSync(dir, { recursive:true });
+  // log every game sound call with its wall-clock time, so trailer_audio.js can replay them in sync (Nov 25)
+  await p.evaluate(()=>{ window.__snd = []; window.__sndOn = false;
+    ['enemySound','playStepTone','playWhoosh','playIceCrackle','playTone','playDoorCreak','playNoiseBurst','playKillImpact','playBarBend','playDiceRollSound','cubeLandClick','playMaterialClack','playRerollSound','playPlayerHitSound','playShrineFx','musicChime','musicSting'].forEach(n=>{
+      const f = window[n]; if(typeof f!=='function') return;
+      window[n] = function(...a){ if(window.__sndOn && !window.__sndDepth){ try{ window.__snd.push({fn:n, t:Date.now()/1000, args:JSON.parse(JSON.stringify(a, (k,v)=> (v && typeof v==='object' && v.nodeType) ? undefined : v))}); }catch(e){} } window.__sndDepth = (window.__sndDepth||0) + 1; try{ return f.apply(this, a); } finally { window.__sndDepth--; } }; }); }); // only outer calls: a sound that plays another isn't logged twice
   const frames = []; const cdp = await ctx.newCDPSession(p);
   cdp.on('Page.screencastFrame', async f=>{ fs.writeFileSync(path.join(dir, 'f'+String(frames.length).padStart(4,'0')+'.jpg'), Buffer.from(f.data,'base64')); frames.push(f.metadata.timestamp); try{ await cdp.send('Page.screencastFrameAck', { sessionId:f.sessionId }); }catch(e){} });
   await cdp.send('Page.startScreencast', { format:'jpeg', quality:92, maxWidth:1920, maxHeight:1080 });
-  await L.sleep(300); await act(p); await cdp.send('Page.stopScreencast');
+  await p.evaluate(()=>{ window.__sndOn = true; }); await L.sleep(300); await act(p); await cdp.send('Page.stopScreencast');
+  fs.writeFileSync(path.join(dir, 'sounds.json'), JSON.stringify(await p.evaluate(()=>window.__snd)));
   fs.writeFileSync(path.join(dir, 'times.json'), JSON.stringify(frames)); console.log(name, frames.length, 'frames', frames.length ? (frames[frames.length-1]-frames[0]).toFixed(1)+'s' : '');
   await ctx.close();
 }
