@@ -6951,6 +6951,7 @@ function markTipSeen(k){ TIPS_SEEN.add(k); try{ localStorage.setItem(TIPS_KEY, J
 const TIP_TEXT = {
   combo: n=>`This <b>Combo</b> touches ${n} attacking dice, so it hits harder. The glow grows with every Hit, Combo, Shield, H.O.T. or D.O.T. beside it.`,
   leap: ()=>'A <b>Leap</b> jumps over the next die in a straight line, so a Blank or Minion in the way doesn\'t have to end your Path.',
+  windup: a=>`<b>Big hit next turn!</b> ${a.name} hits for <b>${a.sp}</b>${a.dmg>a.sp ? `, <b>${a.dmg}</b> with its usual attack` : ''}. Put <b>Block</b> faces in this Path to soak it, use a <b>Freeze</b> to skip it, or hit hard enough to win first.`,
   heavy: ()=>'A <b>heavy turn</b> is coming: this monster hits harder next turn. Block faces in this Path will soak it.',
   minion: ()=>'<b>Minion</b> dice clog your Tray. Every point of damage you deal clears one, and a Leap clears any it jumps over.',
   overkill: n=>`This Path wins the fight. Deal ${n} more for an <b>Overkill</b>: an extra loot choice.`,
@@ -6984,6 +6985,10 @@ function tipTargets(){
   const e = S.encounter, tray = document.getElementById('tray'); if(!tray || !e) return null;
   const at = i=> `#tray .die[data-idx="${i}"]`;
   if(!S.path.length){
+    // first in line: it only matters on the turn before the hit lands. Nov 25 (Floor 1 boss study: the Rogue Golemancer's wind-up was the newcomers' wall): the first time a boss's big
+    // special is next, name it and its damage, and say how to answer it
+    if(!TIPS_SEEN.has('windup') && e.kit){ try{ const pv = enemyNextTurnPreview(e); if(pv.heavy && pv.special && document.querySelector('#enc-panel .fo-enemy .boss-special')) { const sp = (pv.special.acts||[]).filter(a=>a.type==='dmg').reduce((t,a)=>t+(a.value||0),0) + (typeof zealBonus==='function' ? zealBonus(true) : 0);
+      return {k:'windup', el:'#enc-panel .fo-enemy .boss-special', arg:{name:pv.special.name, sp, dmg:pv.dmg}}; } }catch(err){} }
     if(e.rule && !TIPS_SEEN.has('rule_'+e.rule) && document.querySelector('#enc-panel .foe-rule')) return {k:'rule_'+e.rule, el:'#enc-panel .foe-rule', arg:null};
     if(!TIPS_SEEN.has('dot') && (e.curDOT>0 || S.playerDOT>0)){
       const side = e.curDOT>0 ? 'fo-enemy' : 'fo-player', sel = `#enc-panel .${side} .fo-buffs .status-chip[title^="D.O.T."]`;
