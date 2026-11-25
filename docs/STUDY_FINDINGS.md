@@ -410,5 +410,24 @@ Depth preset 0-27 and regular 0-10 (40 per class each). Report page: https://cla
 - **Depth ladder (expert):** 98% at 0, 62% at 7, 61% at 8, **44% at 9** (Rationing rank 2: camp rest heals nothing, costs 1
   Depth), 37% at 10, 21% at 13 (Burden of Choice), <=12% from 17, <=2% from 20. Regular: 77% at 0, 47% at 3, 22% at 7, ~10% at 9-10.
 
+## Prototype classes vs the starting four (Nov 25, 2026, build 1.42.167 + prototypes)
+9 classes x 4 origins, 120 runs per cell (480 per class per profile): regular bot depth 0, expert at the depth-7 preset.
+
+| Class | Regular d0 | Expert d7 | Expert deaths F1/F2/F3 % | Expert turns per fight |
+|---|---|---|---|---|
+| Guard | 78% | 81% | 1/9/9 | 3.7 |
+| Armsmaster | 77% | 59% | 2/25/13 | 3.2 |
+| Dungeoneer | 88% | 65% | 7/21/8 | 3.4 |
+| Arcanist | 86% | 61% | 11/20/8 | 3.4 |
+| Alchemist | 88% | 85% | 0/6/8 | 2.7 |
+| **Field Medic** | 87% | **95%** | 0/0/4 | 4.0 |
+| Engineer (prints last the fight) | 86% | 85% | 1/8/6 | 2.8 |
+| Trickster | 81% | 70% | 5/22/4 | 3.2 |
+| Ranger | 84% | 59% | 11/22/8 | 3.5 |
+
+Regular players: every class 77-88%, all fine. Experts: the Medic is far ahead (overheal becomes Block, so it almost never
+dies); Alchemist and Engineer sit at Guard's level and end fights fastest; the Ranger is understated because the bot's
+path search counts Pointer's +1 but never plans where its path ends for Fetch.
+
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.
