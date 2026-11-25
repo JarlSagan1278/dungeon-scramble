@@ -20,6 +20,7 @@ function disarmClearConfirm(){
 // the tap. Reset alongside every S.classAbilityUsed=false (logic.js) so it
 // never survives into a turn/floor where nothing is actually armed.
 let abilityArmed = false;
+function protoClassesOn(){ try{ return /[?&]proto=1/.test(location.search) || localStorage.getItem('dungeonScrambleProto')==='1'; }catch(e){ return false; } } // Nov 25: prototype classes in the picker
 
 // Colors for the per-die resolve pulse (see .die.resolving in styles.css),
 // keyed by the same "what kind of thing just happened" bucket describeStepFx()
@@ -1288,7 +1289,7 @@ function renderSetup(){
   // isn't looking at a fully-filled-in showcase with no visible selection
   // ring anywhere and wondering what, if anything, is actually chosen --
   // tapping a different Origin or Class still overrides this as normal.
-  const defaultClassId = CLASSES.find(k=>!k.debug).id;
+  const defaultClassId = CLASSES.find(k=>!k.debug && !k.proto).id;
   let chosenOrigin='dwarf', chosenClass=defaultClassId, chosenBoonName=null, charName='';
   let previewedOriginId = 'dwarf', previewedClassId = defaultClassId;
 
@@ -1339,7 +1340,7 @@ function renderSetup(){
   // Debug class has no tab of its own -- it's a testing tool, not a real
   // choice -- and is instead armed by rapid-clicking the section label
   // (see the class-header handler below).
-  const realClasses = CLASSES.filter(k=>!k.debug);
+  const realClasses = CLASSES.filter(k=>!k.debug && (!k.proto || protoClassesOn())); // Nov 25: prototype classes only with ?proto=1 / localStorage dungeonScrambleProto
   function renderClassTabs(){
     classTabRow.innerHTML = '';
     realClasses.forEach(k=>{
@@ -2174,7 +2175,7 @@ function renderGame(){
           <div class="util-btn rail-pocket" id="open-backpocket-btn" title="${S.backPocket.length?'Safety net ready: if you fall to 0 Health, your Back Pocket can save you once (it spends every die in it).':'Back Pocket empty: no safety net until a die lands here.'}">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?'<span class="badge pocket-heart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.2 C 5.5 15.6 2 12.4 2 8.2 C 2 5.1 4.4 2.8 7.3 2.8 C 9.2 2.8 10.9 3.8 12 5.4 C 13.1 3.8 14.8 2.8 16.7 2.8 C 19.6 2.8 22 5.1 22 8.2 C 22 12.4 18.5 15.6 12 21.2 Z" fill="currentColor"/></svg></span>':''}</div>
           <div class="util-btn rail-item ${(totalTokens&&!S.needRoll)?'':'disabled'}" id="open-tokens-btn">${iconSpan('use')}<span>Item</span>${totalTokens?`<span class="badge">${totalTokens}</span>`:''}</div>
           <div class="util-btn danger-accent rail-clear ${(S.transitioning||S.needRoll)?'disabled':''} ${clearConfirmArmed?'pulse':''}" id="clear-path-btn">${iconSpan('fumble')}<span>${clearConfirmArmed?'Sure?':'Clear'}</span></div>
-          ${S.klass.convertTo ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning||S.needRoll)?'disabled':''} ${abilityArmed?'armed':''} ${(S.coachRun && !S.classAbilityUsed && !S.transitioning && !S.needRoll && !abilityArmed && !(S.encounter && S.encounter.type==='Shrine'))?'pulse coach-pulse':''}" id="ability-btn" style="--class-color:${S.klass.color||'#d4af52'}"><span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
+          ${(S.klass.convertTo || S.klass.skill) ? `<div class="util-btn rail-ability ${(S.classAbilityUsed||S.transitioning||S.needRoll)?'disabled':''} ${abilityArmed?'armed':''} ${(S.coachRun && !S.classAbilityUsed && !S.transitioning && !S.needRoll && !abilityArmed && !(S.encounter && S.encounter.type==='Shrine'))?'pulse coach-pulse':''}" id="ability-btn" style="--class-color:${S.klass.color||'#d4af52'}"><span>${S.classAbilityUsed?'Used':(abilityArmed?'Pick a Die':'Skill')}</span></div>`
             : S.klass.debug ? `<div class="util-btn rail-ability ${(!S.encounter||S.transitioning)?'disabled':''}" id="debug-win-btn"><span>Win</span></div>` : ''}
         </div><!--/z5-->
       </div>
@@ -2361,7 +2362,7 @@ function bindTrayDice(){
       if(longPressed){ longPressed = false; return; } // long-press consumed this interaction
       if(abilityArmed){ // Skill armed: a zone die converts (and is not added to the path); any other die backs out and taps normally
         abilityArmed = false;
-        if(inZone(idx) && !S.classAbilityUsed){ playTone('skillUse'); useClassAbility(idx); return; }
+        if((inZone(idx) || S.klass.skill==='print') && !S.classAbilityUsed){ playTone('skillUse'); useClassAbility(idx); return; }
         playTone('skillDisarm');
       }
       if(node.classList.contains('used') && !node.classList.contains('undoable')) return;
@@ -5191,7 +5192,7 @@ function renderShrineEncounter(){
           <div class="util-btn rail-pocket disabled">${iconSpan('bag')}<span>Pocket</span>${S.backPocket.length?`<span class="badge">${S.backPocket.length}</span>`:''}</div>
           <div class="util-btn rail-item disabled">${iconSpan('use')}<span>Item</span></div>
           <div class="util-btn danger-accent rail-clear disabled">${iconSpan('fumble')}<span>Clear</span></div>
-          ${S.klass.convertTo ? `<div class="util-btn rail-ability disabled" style="--class-color:${S.klass.color||'#d4af52'}"><span>Skill</span></div>` : ''}
+          ${(S.klass.convertTo || S.klass.skill) ? `<div class="util-btn rail-ability disabled" style="--class-color:${S.klass.color||'#d4af52'}"><span>Skill</span></div>` : ''}
         </div>
       </div>
     </div>

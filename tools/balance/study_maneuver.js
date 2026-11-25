@@ -350,7 +350,20 @@ let res = await page.evaluate((cfg)=>{
   }
   // playerLike class ability: try converting each die in the zone, keep the best (Armsmaster Hit 2, Guard Block 2)
   function useAbility(){
-    if(!cfg.playerLike || cfg.noAbility || !S.klass.convertTo || S.classAbilityUsed) return;
+    if(!cfg.playerLike || cfg.noAbility || S.classAbilityUsed) return;
+    // Nov 25 prototypes: two-tap Skills. Try a handful of (source, target) pairs, keep the one whose best path is worth most.
+    if(S.klass.skill){ const base = pathValue(bestPath(Math.ceil(cfg.skill/3))||[]); let best=null, bv=base+0.5;
+      const ok = i=>{ const c=S.tray[i]; return c && !c.minion && !c.spent && !c.forcedFace; };
+      const val = f=> f.type==='hit'||f.type==='combo' ? 3*(f.value||1) : f.type==='boost' ? 4 : f.type==='dot'||f.type==='heal'||f.type==='block' ? 2*(f.value||1) : f.type==='blank' ? 0 : 1;
+      const pairs = [];
+      if(S.klass.skill==='print'){ const srcs = [...Array(16).keys()].filter(i=>ok(i) && currentFace(S.tray[i]).type!=='blank').sort((a,b)=>val(currentFace(S.tray[b]))-val(currentFace(S.tray[a])));
+        const seen=new Set(); const top=[]; for(const i of srcs){ const f=currentFace(S.tray[i]), k=f.type+(f.value||0); if(!seen.has(k)){ seen.add(k); top.push(i); } if(top.length>=3) break; }
+        top.forEach(a=>[...Array(16).keys()].filter(j=>inZone(j)&&ok(j)&&j!==a).forEach(b=>pairs.push([a,b]))); }
+      else { const z=[...Array(16).keys()].filter(i=>inZone(i)&&ok(i)); const others=[...Array(16).keys()].filter(i=>ok(i)&&!inZone(i)).sort((a,b)=>val(currentFace(S.tray[b]))-val(currentFace(S.tray[a]))).slice(0,5); z.forEach(a=>others.forEach(b=>pairs.push([a,b]))); }
+      for(const [a,b] of pairs){ useClassAbility(a); if(!S.trayAct){ continue; } trayActTap(b); const bp=bestPath(Math.ceil(cfg.skill/3)); const v=bp.length?pathValue(bp):-1e9; clearPathAll(); if(v>bv){ bv=v; best=[a,b]; } }
+      if(best){ useClassAbility(best[0]); trayActTap(best[1]); (window.__tok=window.__tok||{}).ability=(window.__tok.ability||0)+1; }
+      return; }
+    if(!S.klass.convertTo) return;
     const base = pathValue(bestPath(Math.ceil(cfg.skill/3))||[]); let best=-1, bv=base+0.5;
     for(let i=0;i<16;i++){
       if(!inZone(i)) continue; const c=S.tray[i]; if(c.minion||c.spent||c.forcedFace) continue;

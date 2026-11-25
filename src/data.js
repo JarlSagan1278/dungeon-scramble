@@ -349,6 +349,16 @@ const CLASSES = [
     zone:(r,c)=> c===0 || c===3, wrap:true, seamDamage:1}, // seamDamage: Oct 16 study (experts at depth 7: 36% -> 55%) // every row wraps (Jeremy, Oct 12; was the two middle rows)
   {id:'arcanist', name:'Arcanist', color:'#b4419a', ability:'Your zone is both diagonals. Once on the X, you may step diagonally along it, as if using Sidestep. Your Boosts are 1 stronger (x2 becomes x3).',
     zone:(r,c)=> r===c || r+c===3, diagonalZone:'both', boostPlus:1}, // both diagonals; diagonal steps only from an X square to an X square (Jeremy, Oct 16; was 'either' from Oct 12, 53% vs 29% at depth 7)
+  // Nov 25 (Jeremy: develop these four, then simulate them against the others): prototypes, hidden from the class picker
+  // (proto) until Jeremy approves them. skill:'print' / 'sleight' are two-tap Skills run through the tray-action flow.
+  {id:'alchemist', name:'Alchemist', color:'#4f9a3a', proto:true, ability:'Once per turn, turn any die in your zone (the centre 2x2), even a Blank, into a D.O.T. (2). Every D.O.T. face you play is 1 stronger.',
+    zone:(r,c)=> (r===1||r===2) && (c===1||c===2), convertTo:{type:'dot', value:2}, dotPlus:1},
+  {id:'medic', name:'Field Medic', color:'#d0565a', proto:true, ability:'Once per turn, turn any die in your zone (the bottom row), even a Blank, into a Heal (2). Healing past your full health becomes Block.',
+    zone:(r,c)=> r===3, convertTo:{type:'heal', value:2}, overhealBlock:true},
+  {id:'engineer', name:'Engineer', color:'#c7902c', proto:true, ability:'Once per turn, Print: tap any die in your Tray, then a die in your zone (the left column): the zone die becomes a copy of that face.',
+    zone:(r,c)=> c===0, skill:'print'},
+  {id:'trickster', name:'Trickster', color:'#3d7fd0', proto:true, ability:'Once per turn, Sleight of Hand: tap a die in your zone (the four corners), then any other die: they trade places.',
+    zone:(r,c)=> (r===0||r===3) && (c===0||c===3), skill:'sleight'},
   {id:'debug', name:'Debug', color:'#9aa3ab', ability:'No class ability. Starting tray is a random assortment of every die type in the game, for testing.',
     zone:(r,c)=> false, debug:true},
 ];

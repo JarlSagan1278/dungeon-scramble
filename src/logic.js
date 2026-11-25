@@ -1723,7 +1723,8 @@ function trayActTargetOk(idx){
   const a = S.trayAct; if(!a) return false;
   const c = S.tray[idx]; if(!c || c.minion || c.spent) return false;
   if(idx===a.src || idx===a.first) return false;
-  if(S.path.includes(idx)) return false; // never move or change a step already in the path
+  if(S.path.includes(idx)) return false;
+  if(a.kind==='print' && !inZone(idx)) return false; // Print copies onto a zone die // never move or change a step already in the path
   if(a.kind==='reroll' && c.forcedFace) return false; // a class-ability conversion holds
   return true;
 }
@@ -1731,19 +1732,22 @@ function trayActTap(idx){
   const a = S.trayAct; if(!a) return false;
   if(idx===a.src || idx===a.first){ cancelTrayAct(); return true; } // tap the armed die again to back out
   if(!trayActTargetOk(idx)) return false;
-  if(a.kind==='swap'){
+  if(a.kind==='print'){ const c = S.tray[idx]; c.forcedFace = Object.assign(clone(a.face), {printed:true}); S.classAbilityUsed = true; S.justConvertedIdx = idx;
+    teleLog('class_ability', {klass:S.klass.id, turn:S.turnNumber, floor:S.floorIdx+1}); logMsg('sys', `Print: copied ${LABEL[a.face.type]||a.face.type}${a.face.value?' '+a.face.value:''} onto ${c.die.name}.`); }
+  else if(a.kind==='swap'){
     if(a.token && a.first==null){ a.first = idx; return true; }
-    doTraySwap(a.token ? a.first : a.src, idx, a.token);
+    doTraySwap(a.token ? a.first : a.src, idx, a.token, a.skill);
+    if(a.skill){ S.classAbilityUsed = true; teleLog('class_ability', {klass:S.klass.id, turn:S.turnNumber, floor:S.floorIdx+1}); }
   } else doTrayReroll(idx, a.src, a.token);
   S.trayAct = null;
   return true;
 }
-function doTraySwap(i, j, token){
+function doTraySwap(i, j, token, skill){
   const A = S.tray[i], B = S.tray[j];
-  if(!token) markTrayActUsed(A); // the Swap die moves to j and is used up there
+  if(!token && !skill) markTrayActUsed(A); // a Sleight of Hand (Trickster Skill) uses nothing up // the Swap die moves to j and is used up there
   S.tray[i] = B; S.tray[j] = A;
   if(token) S.swapTokens = Math.max(0,(S.swapTokens||0)-1);
-  (S.swapLog = S.swapLog||[]).push({i, j, token:!!token});
+  (S.swapLog = S.swapLog||[]).push({i, j, token:!!token, skill:!!skill});
   S.justSwappedIdx = [i, j];
   if(typeof playTone==='function') playTone('swapFlip');
   logMsg('sys', `Swapped ${A.die.name} and ${B.die.name}.`);
@@ -1755,7 +1759,7 @@ function undoTraySwaps(){
     const r = L.pop();
     const A = S.tray[r.j], B = S.tray[r.i];
     S.tray[r.i] = A; S.tray[r.j] = B;
-    if(r.token) S.swapTokens = (S.swapTokens||0)+1; else { delete A.spent; delete A.actUsed; if(A.forcedFace && A.forcedFace.fromAct) delete A.forcedFace; }
+    if(r.skill){ /* Sleight of Hand: nothing was used up */ } else if(r.token) S.swapTokens = (S.swapTokens||0)+1; else { delete A.spent; delete A.actUsed; if(A.forcedFace && A.forcedFace.fromAct) delete A.forcedFace; }
   }
 }
 function doTrayReroll(idx, src, token){
@@ -1792,6 +1796,12 @@ function clearPathAll(){
 
 function useClassAbility(idx){
   if(S.classAbilityUsed) return;
+  // Nov 25 prototypes: two-tap Skills. Print (Engineer): first any die (the face to copy), then a zone die. Sleight of Hand
+  // (Trickster): first a zone die, then any die, and they swap. Both go through the tray-action flow (S.trayAct).
+  if(S.klass.skill==='print'){ const c = S.tray[idx]; if(!c || c.minion || c.spent || S.path.includes(idx)) return; const f = currentFace(c); if(!f || f.type==='blank') return;
+    S.trayAct = {kind:'print', src:idx, token:false, first:null, skill:true, face:clone(f)}; logMsg('sys', 'Print: now tap a die in your zone to copy that face onto it.'); fastTrayRender(); return; }
+  if(S.klass.skill==='sleight'){ if(!inZone(idx)) return; const c = S.tray[idx]; if(!c || c.minion || c.spent || S.path.includes(idx)) return;
+    S.trayAct = {kind:'swap', src:idx, token:false, first:null, skill:true}; logMsg('sys', 'Sleight of Hand: now tap any die to trade places with it.'); fastTrayRender(); return; }
   if(!inZone(idx)) return;
   const cell = S.tray[idx];
   if(cell.minion){ revealMinionAt(idx); blankReveal(idx); S._abilityReveal = idx; } // the converted die shakes off its Minion
@@ -1862,6 +1872,7 @@ function pathFaceForIdx(idx){
 // path is computed (pathFaceForIdx) and where the tray draws a die, so what you see is what you get.
 function classFace(f){
   if(f && f.type==='boost' && S && S.klass && S.klass.boostPlus) return Object.assign({}, f, {value:(f.value||1) + S.klass.boostPlus});
+  if(f && f.type==='dot' && S && S.klass && S.klass.dotPlus) return Object.assign({}, f, {value:(f.value||1) + S.klass.dotPlus}); // Alchemist (Nov 25)
   return f;
 }
 function getFaceForIdx(idx){
@@ -2014,6 +2025,7 @@ function healPlayer(n){
   const over = S.health + n - S.maxHealth;
   S.health = cap(S.health+n, S.maxHealth);
   if(over>0 && hasRelic('overflow_chalice')){ S.playerBlock += over; fireRelic('overflow_chalice','+'+over+' Block'); }
+  if(over>0 && S.klass && S.klass.overhealBlock){ S.playerBlock += over; logMsg('sys', `Field Medic: ${over} extra healing becomes Block.`); } // Nov 25
 }
 // Strength in Mooks (grave_tally, v1.36.0): each Minion the player clears gives 1 Block.
 function graveTally(n){ if(n>0 && hasRelic('grave_tally')){ S.playerBlock += n; fireRelic('grave_tally','+'+n+' Block'); } }
