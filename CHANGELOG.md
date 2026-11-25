@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.166 (Nov 25, 2026)
+- New achievements: Rule Breaker (beat every foe that follows a rule), Daily Conqueror (win a scored Daily Dungeon), Creature of Habit (a 30-day Daily streak).
+
 ## 1.42.165 (Nov 25, 2026)
 - Three new foe rules: Zero-Sum Game (Rogue Technician: Block you gain heals it twice as much), Pythagorean Theorem (Anti-Euclidian Space: dice reached by a diagonal step deal x1.5), Asymptote (The Punished: your path deals it at most 16 a turn; D.O.T. ignores the limit). Each with its plaque, counter badge, call-out, tip and Codex entry.
 - Daily Dungeon: at most one Deadly room per Daily, and none before the middle of Floor 2.

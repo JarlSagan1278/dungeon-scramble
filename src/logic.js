@@ -600,6 +600,14 @@ const ACHIEVEMENTS = [
     check: L => (typeof dailyStreak==='function' ? dailyStreak() : 0)>=7},
   {id:'rank_irrational', name:'Irrational Number', desc:'Reach the Irrational rank.',
     check: L => (META.renown||0) >= (RANKS.find(r=>r.name==='Irrational')||{at:1e9}).at},
+  // Nov 25: foe rules and the Daily Dungeon
+  {id:'rule_breaker', name:'Rule Breaker', desc:'Beat every foe that follows a rule (Null Hypothesis, Odd Permutation, Most Wanted, Zero-Sum Game, Pythagorean Theorem, Asymptote).',
+    check: L => { const B = META.bestiary||{}, all = [...FLOOR1_ENEMIES,...FLOOR2_ENEMIES,...FLOOR3_ENEMIES,...FLOOR1_TRAPS,...FLOOR2_TRAPS,...FLOOR3_TRAPS].filter(e=>e.rule);
+      return all.length>0 && all.every(e=>B[e.name] && B[e.name].won>0); }},
+  {id:'daily_win', name:'Daily Conqueror', desc:'Win a Daily Dungeon on its scored try.',
+    check: L => Object.values(META.daily||{}).some(r=>r && r.outcome==='victory')},
+  {id:'daily_30', name:'Creature of Habit', desc:'Play the Daily Dungeon 30 days in a row.',
+    check: L => (typeof dailyStreak==='function' ? dailyStreak() : 0)>=30},
   {id:'origin_duo', name:'Two Roads', desc:'Win a run with 2 different Origins.',
     check: L => Object.values(L.victoriesByOrigin||{}).filter(n=>n>0).length>=2},
 ];
