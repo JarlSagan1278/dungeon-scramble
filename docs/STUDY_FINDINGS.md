@@ -395,5 +395,20 @@ The next 60 Dailies (Nov 25 - Jan 23), regular bot, 40 runs each: median win 84%
 (Dec 17, Jan 8, Jan 19). The hard ones pair the regular bot's weakest set-up (a gnome Arcanist or Dungeoneer) with a
 Deadly room (The Strike/Break-er) or Illegal Operation on Floor 2. Floor 1 deaths stay at 0-8% on every day.
 
+## Content census and Depth ladder (Nov 25, 2026, build 1.42.166)
+14,240 bot runs: 16 class x origin pairs, regular depth 0 and expert at the depth-7 preset (250 runs each); expert at every
+Depth preset 0-27 and regular 0-10 (40 per class each). Report page: https://claude.ai/artifact/2TEXSTQ4rfA76qPnq2N1kk
+- **Overall:** regular 79%, expert (depth 7 preset) 69%; expert Guard 83%, others 63-65%; Halfling the strongest origin.
+- **Walls:** Illegal Operation (Null Hypothesis) ends 4.5% of regular fights vs 1.6% for other Floor 2 Elites (expert 7.6 vs
+  4.6). Whence Wolf ends 16% of expert fights (other F2 Deadly 11.8%).
+- **Pushovers:** Transposer Kitty (Odd Permutation) costs 9-10% health vs 16-17% for F2 Standard peers; Gnome Chomper (Most
+  Wanted) is the easiest F3 Elite (13-19% vs 22-27%).
+- **Loot:** heavy-blank weapons (Greathammer, Greaterhammer, Longsword) and move-heavy dice (Grappling Set, Winged Boots,
+  Eye-Frame, Cool Whip) trail by 5-15 points in both profiles; experts never take Grappling Set or Humor-inverter (0% of
+  ~3,000 offers). Healing leads (Medsack +14/+24, Healing Draught +10, Glacial Gorget +8). Taken-vs-skipped gaps are
+  confounded by survival (heal/Block keep any run alive): leads, not proof.
+- **Depth ladder (expert):** 98% at 0, 62% at 7, 61% at 8, **44% at 9** (Rationing rank 2: camp rest heals nothing, costs 1
+  Depth), 37% at 10, 21% at 13 (Burden of Choice), <=12% from 17, <=2% from 20. Regular: 77% at 0, 47% at 3, 22% at 7, ~10% at 9-10.
+
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.
