@@ -4086,15 +4086,14 @@ body.pc.pad #tray > .die::before{ content:none !important; }
 body.calm #room-floor .rf-light, body.calm .hall-fx .hf-glow, body.calm .hall-fx i, body.calm .fo-torch, body.calm .idle-breath,
 body.calm .hero-gear .hg-float, body.calm .enemy-carry .ec-float, body.calm .tray-wrap .tray::before, body.calm .chest-lock .ch-shine, body.calm .fo-quests-float > .fq-light{ animation-play-state:paused !important; }
 
-/* ==== Quest poster pop-up (Nov 25): the Wanted sign, large, on parchment (an in-world object) */
-.quest-poster-modal .modal{ max-width:340px; }
-.quest-poster{ background:var(--parchment, #f1e2bf); color:#2a1d10; border:3px solid #3a2614; border-radius:12px; padding:10px 12px 12px; display:flex; flex-direction:column; gap:8px; }
-.quest-poster .qp-sub{ font-size:13px; line-height:1.35; opacity:.8; }
-.quest-poster .qp-row{ display:flex; flex-direction:column; gap:2px; padding:7px 8px; border:2px solid rgba(58,38,20,.45); border-radius:8px; background:rgba(255,248,228,.55); }
-.quest-poster .qp-row.done{ opacity:.6; }
-.quest-poster .qp-main{ position:static !important; display:flex; align-items:center; gap:10px; font-size:17px; line-height:1.3; }
-.quest-poster .qp-desc{ font-size:13px; line-height:1.35; opacity:.85; }
-.quest-poster .qp-main > :last-child{ margin-left:auto; }
+/* ==== Quest poster pop-up (Nov 25; Jeremy: like the paper poster itself): the Wanted sign, enlarged, without its notch */
+.quest-poster-overlay{ display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.quest-poster-overlay .fo-quests-float{ position:relative !important; left:auto !important; top:auto !important; width:150px; zoom:2.15; --nr:200%; --nb:200%;
+  transform:rotate(-1.8deg) !important; animation:qp-in .22s cubic-bezier(.3,1.5,.5,1) both !important; pointer-events:auto; }
+.quest-poster-overlay .fo-quests-float .qp-notes{ position:relative; z-index:1; margin-top:4px; padding-top:3px; border-top:1px dashed rgba(58,36,16,.45); text-align:left; font-size:6.2px; line-height:1.3; color:#3a2410; display:flex; flex-direction:column; gap:2px; }
+.quest-poster-overlay .fo-quests-float .qp-hint{ position:relative; z-index:1; margin-top:4px; font-size:5.4px; color:#5a3a1e; font-style:italic; }
+@keyframes qp-in{ from{ transform:rotate(-6deg) scale(.6); opacity:0; } to{ transform:rotate(-1.8deg) scale(1); opacity:1; } }
+.reduced-motion .quest-poster-overlay .fo-quests-float{ animation:none !important; }
 /* Nov 25 (Dylan): tiered medals: bronze, silver and gold coins once earned (untiered medals stay gold) */
 .achv-medal.on.tier-bronze .achv-coin{ background:radial-gradient(circle at 35% 30%, #ffd9b0, #c27a3e 55%, #7a4519); color:#3e2008; }
 .achv-medal.on.tier-silver .achv-coin{ background:radial-gradient(circle at 35% 30%, #ffffff, #c4cbd4 55%, #7d8794); color:#2e3540; }
@@ -4138,9 +4137,9 @@ body.pc .setup-panel > #start-btn{ margin-bottom:0 !important; }
 
 /* ==== Class props (Nov 25): the unlockable classes' signature objects at the hero's feet, on the wall side */
 .fo-fig, .vic-hero-wrap{ position:relative; }
-.class-prop{ position:absolute; left:-25%; bottom:-3%; width:48%; aspect-ratio:1; pointer-events:none; z-index:1; filter:url(#fx-paper-soft) drop-shadow(0 2px 0 rgba(12,7,5,.55)); } /* the paper texture the Wanted sign uses, so the flat drawings sit with the hand-drawn art */
+.class-prop{ position:absolute; left:-31%; bottom:-3%; width:48%; aspect-ratio:1; pointer-events:none; z-index:0; /* drawn before the worn loot, so a ground item stays on top */ filter:drop-shadow(0 2px 0 rgba(12,7,5,.55)); } /* no paper filter: it greyed the black outlines (Jeremy: outlines black like the rest) */
 .class-prop svg{ width:100%; height:100%; display:block; overflow:visible; }
-.class-prop.cp-ranger{ width:52%; left:-29%; animation:cp-sit 3.8s ease-in-out infinite; transform-origin:50% 100%; }
+.class-prop.cp-ranger{ width:52%; left:-34%; animation:cp-sit 3.8s ease-in-out infinite; transform-origin:50% 100%; }
 .class-prop.cp-alchemist svg circle{ animation:cp-bubble 2.6s ease-in-out infinite; }
 .class-prop.cp-alchemist svg circle:nth-of-type(2){ animation-delay:-.9s; } .class-prop.cp-alchemist svg circle:nth-of-type(3){ animation-delay:-1.7s; }
 @keyframes cp-sit{ 0%,70%,100%{ transform:rotate(0deg); } 78%{ transform:rotate(-4deg); } 86%{ transform:rotate(3deg); } }

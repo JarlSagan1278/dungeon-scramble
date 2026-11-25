@@ -1778,7 +1778,7 @@ function renderDie(cell, idx){
   const foeNull = !!(foeSt && foeSt.rule==='null' && !cell.minion && (f.type===foeSt.nullType || (foeSt.nullType==='dot' && f.type==='leech')));
   return `<div class="die ${dieTypeCls} ${(typeof petNear==='function' && petNear(idx))?'pet-aura':''} ${cell.forcedFace && cell.forcedFace.printed ? 'printed' : ''} ${foeNull?'foe-nulled':''} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${strongGlint?'glint-strong':''} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${boostReachCls} ${resolveCls} ${minionClearCls} ${comboActiveCls} ${trayActCls}"
             data-idx="${idx}" title="${isLastMove?'Click to undo this move':(cell.minion?'Minion die':(taReady?`Tap to ${LABEL[trayActFaceAt(idx)]}`:cell.die.name))}" ${shakeDelay}>
-            ${num?`<div class="pathnum">${num}</div>`:''}${S.klass && S.klass.pet && S.petIdx===idx ? '<svg class="pet-token" viewBox="0 0 40 40" aria-label="Pointer"><path d="M8 12 C3 14 2 26 7 28 C10 29 11 22 12 17Z" fill="#5a3418" stroke="#0c0705" stroke-width="2.5"/><path d="M32 12 C37 14 38 26 33 28 C30 29 29 22 28 17Z" fill="#5a3418" stroke="#0c0705" stroke-width="2.5"/><ellipse cx="20" cy="21" rx="12" ry="12" fill="#c98a4b" stroke="#0c0705" stroke-width="2.5"/><ellipse cx="20" cy="27" rx="7" ry="5.5" fill="#f1dcb4" stroke="#0c0705" stroke-width="2"/><circle cx="15" cy="19" r="2.2" fill="#0c0705"/><circle cx="25" cy="19" r="2.2" fill="#0c0705"/><ellipse cx="20" cy="24.5" rx="3" ry="2.2" fill="#0c0705"/><path d="M20 27 L20 29.5" stroke="#0c0705" stroke-width="1.6"/></svg>' : ''}
+            ${num?`<div class="pathnum">${num}</div>`:''}${S.klass && S.klass.pet && S.petIdx===idx ? '<svg class="pet-token" viewBox="0 0 40 40" aria-label="Pointer"><rect x="8" y="6" width="24" height="22" rx="7" fill="#8f949a" stroke="#0c0705" stroke-width="3"/><path d="M9 9 L2 14 L8 20 Z" fill="#5d636b" stroke="#0c0705" stroke-width="3" stroke-linejoin="round"/><path d="M31 9 L38 14 L32 20 Z" fill="#5d636b" stroke="#0c0705" stroke-width="3" stroke-linejoin="round"/><path d="M11 22 C11 31 15 36 20 36 C25 36 29 31 29 22 C25 25 15 25 11 22 Z" fill="#e3e6e9" stroke="#0c0705" stroke-width="3" stroke-linejoin="round"/><path d="M10 13 C13 9 17 10 19 12 L17 14 C15 13 12 13 10 15 Z" fill="#eef0f2"/><path d="M30 13 C27 9 23 10 21 12 L23 14 C25 13 28 13 30 15 Z" fill="#eef0f2"/><circle cx="15" cy="17" r="1.9" fill="#0c0705"/><circle cx="25" cy="17" r="1.9" fill="#0c0705"/><ellipse cx="20" cy="22" rx="3.3" ry="2.5" fill="#0c0705"/></svg>' : ''}
             ${boostReachCls==='boost-yes'?`<span class="boost-reach-chip" aria-hidden="true">${iconSpan('boost')}</span>`:''}
             ${cell.minion?`<div class="minion-eyes" aria-hidden="true" style="${minionEyeStyle(idx)}"><i class="minion-eye"></i><i class="minion-eye"></i></div>`:''}
             ${(cell.forcedFace || boostTargetCls) ? `<div class="corner-badges">
@@ -2157,7 +2157,7 @@ function renderGame(){
   { const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
     foPlayer = { statusHTML:`${S.playerDOT?`<span class="status-chip status-tooltip-target" title="D.O.T. ${S.playerDOT}: ${STATUS_DESC.dot}">${iconSpan('dot', S.playerDOT)} DOT</span>`:''}        ${S.playerHOT?`<span class="status-chip status-tooltip-target" title="H.O.T. ${S.playerHOT}: ${STATUS_DESC.hot}">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}        ${S.playerBlock?`<span class="status-chip status-tooltip-target" title="Block ${S.playerBlock}: ${STATUS_DESC.block}">${iconSpan('block', S.playerBlock)} Block</span>`:''}        ${minionCount?`<span class="status-chip status-tooltip-target" title="Minions ${minionCount}: ${STATUS_DESC.minions}"><span class="chip-minion" aria-hidden="true"><i></i><i></i></span><b class="chip-n">${minionCount}</b></span>`:''}${S.pendingFreeBoost?`<span class="status-chip status-tooltip-target" style="background:var(--gold);color:#241c10;" title="Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}">${iconSpan('boost')} Boost x${S.pendingFreeBoost} armed</span>`:''}`, fxCls:playerFx.cls, deltaHTML:playerFx.deltaHTML, hpPct, tip:playerStatusTip,
       figCls: playerFx.cls==='flash-damage'?'dmg-flash':playerFx.cls==='flash-heal'?'heal-flash':'',
-      figHTML: portrait.placeholder ? mysteryFigureHTML('width:60px; height:60px;') : `${heroGearHTML('back')}<img class="fo-img" src="${portrait.img}" alt="${S.origin.name}">${heroGearHTML()}${classPropHTML()}` }; }
+      figHTML: portrait.placeholder ? mysteryFigureHTML('width:60px; height:60px;') : `${heroGearHTML('back')}<img class="fo-img" src="${portrait.img}" alt="${S.origin.name}">${classPropHTML()}${heroGearHTML()}` }; }
   const html = `
     <!--z0--><div class="panel route-float" style="margin-bottom:8px;">
       ${renderRoute()}
@@ -5377,13 +5377,15 @@ function questSignHTML(e){
 function openQuestPoster(){
   const e = S.encounter; if(!e || !e.quests || !e.quests.length || S.transitioning) return;
   try{ playTone('uiTick'); }catch(err){}
-  const rows = e.quests.map((q,i)=>{
-    const done = e.questsDone[i], {cond} = parseQuestSpec(q), m = cond.match(/^route (.+)$/), g = m && ROUTE_GOALS[m[1].trim()];
-    return `<div class="qp-row${done?' done':''}"><div class="qp-main fo-quest ${done?'complete':''}">${questRowHTML(q, done, null)}</div>${g?`<div class="qp-desc">${g.desc}</div>`:''}</div>`;
-  }).join('');
-  const oneTurn = e.quests.some(q=>!QUEST_ALL_FIGHT.test(parseQuestSpec(q).cond));
-  const ov = openInfoModal('Wanted', `<div class="quest-poster"><div class="qp-sub">${oneTurn?'Finish one in a single turn':'Finish one during this fight'} to collect the reward on its right. Optional.</div>${rows}</div>`);
-  ov.classList.add('quest-poster-modal');
+  // Nov 25 (Jeremy: make it look like the paper poster itself): the real sign, enlarged -- the same notch-less paper,
+  // nails, red Wanted stamp and reward chips -- with each route goal's explanation written on the paper below its rows.
+  const notes = e.quests.map(q=>{ const {cond} = parseQuestSpec(q), m = cond.match(/^route (.+)$/), g = m && ROUTE_GOALS[m[1].trim()];
+    return g ? `<div class="qp-note"><b>${g.name}:</b> ${g.desc}</div>` : ''; }).join('');
+  const raw = questSignHTML(e).replace(' onclick="openQuestPoster()"', '').replace(/ q-locked/, '').replace(/--qh:[^;"]*;?/, '').replace(/--qfit:[^;"]*;?/, '');
+  const end = raw.lastIndexOf('</div>'); // the sign's own closing tag: notes and the hint go inside the paper
+  const sign = raw.slice(0, end) + `${notes ? `<div class="qp-notes">${notes}</div>` : ''}<div class="qp-hint">Optional. Tap to close.</div>` + raw.slice(end);
+  const ov = el(`<div class="modal-overlay quest-poster-overlay" role="dialog" aria-label="Wanted">${sign}</div>`);
+  openModal(ov); ov.onclick = ()=> closeModal(ov);
 }
 function questRowHTML(q, done, live){
   const {rewardText, cond} = parseQuestSpec(q);
@@ -6139,24 +6141,28 @@ function heroGear(){
 // Nov 25 (Jeremy: signature objects for the unlockable classes; the starting four stay subtle): a companion object at
 // the hero's feet, on the wall side, in fights and on the victory screen. Toy-like: chunky dark outlines, flat colours.
 const CLASS_PROP_SVG = {
-  ranger: `<svg viewBox="0 0 84 84"><path d="M58 62 C70 58 74 46 70 40" fill="none" stroke="#0c0705" stroke-width="7" stroke-linecap="round"/><path d="M58 62 C70 58 74 46 70 40" fill="none" stroke="#c98a4b" stroke-width="3.5" stroke-linecap="round"/>
-    <path d="M24 78 C20 60 26 44 42 42 C58 44 64 60 60 78 Z" fill="#c98a4b" stroke="#0c0705" stroke-width="3.5" stroke-linejoin="round"/><path d="M34 78 C33 66 36 58 42 56 C48 58 51 66 50 78 Z" fill="#f1dcb4" stroke="#0c0705" stroke-width="2.5"/>
-    <path d="M28 78 v-8 M56 78 v-8" stroke="#0c0705" stroke-width="2.5"/><ellipse cx="42" cy="28" rx="15" ry="14" fill="#c98a4b" stroke="#0c0705" stroke-width="3.5"/>
-    <path d="M28 20 C20 22 18 36 24 38 C28 39 29 30 30 25Z" fill="#5a3418" stroke="#0c0705" stroke-width="3"/><path d="M56 20 C64 22 66 36 60 38 C56 39 55 30 54 25Z" fill="#5a3418" stroke="#0c0705" stroke-width="3"/>
-    <ellipse cx="42" cy="35" rx="8" ry="6" fill="#f1dcb4" stroke="#0c0705" stroke-width="2.5"/><circle cx="36" cy="26" r="2.6" fill="#0c0705"/><circle cx="48" cy="26" r="2.6" fill="#0c0705"/><ellipse cx="42" cy="32" rx="3.4" ry="2.5" fill="#0c0705"/>
-    <path d="M30 43 Q42 49 54 43" fill="none" stroke="#d0565a" stroke-width="4" stroke-linecap="round"/><circle cx="42" cy="48" r="3" fill="#f2c14e" stroke="#0c0705" stroke-width="2"/></svg>`,
-  engineer: `<svg viewBox="0 0 84 84"><rect x="10" y="22" width="64" height="54" rx="7" fill="#6f7c86" stroke="#0c0705" stroke-width="3.5"/><rect x="18" y="30" width="48" height="34" rx="4" fill="#24313a" stroke="#0c0705" stroke-width="3"/>
-    <path d="M18 38 h48" stroke="#0c0705" stroke-width="3"/><rect x="35" y="36" width="14" height="9" rx="2" fill="#c7902c" stroke="#0c0705" stroke-width="2.5"/><path d="M42 45 v5" stroke="#0c0705" stroke-width="3"/>
-    <rect x="31" y="51" width="22" height="13" rx="3" fill="#9fd0ff" stroke="#0c0705" stroke-width="2.5"/><path d="M38 51 v13 M46 51 v13 M31 57.5 h22" stroke="#4f8fd6" stroke-width="1.3"/>
-    <rect x="16" y="68" width="10" height="4" rx="2" fill="#5fb37a" stroke="#0c0705" stroke-width="1.5"/><circle cx="64" cy="70" r="3" fill="#f2c14e" stroke="#0c0705" stroke-width="1.5"/><path d="M42 22 v-10 M36 12 h12" stroke="#0c0705" stroke-width="3.5" stroke-linecap="round"/></svg>`,
-  alchemist: `<svg viewBox="0 0 84 84"><path d="M22 78 l-5 4 M62 78 l5 4" stroke="#0c0705" stroke-width="4" stroke-linecap="round"/><path d="M12 40 h60 l-5 28 a12 12 0 0 1 -12 10 h-26 a12 12 0 0 1 -12 -10z" fill="#3b2c20" stroke="#0c0705" stroke-width="3.5" stroke-linejoin="round"/>
-    <path d="M18 52 h48" stroke="#6b5440" stroke-width="2.5"/><ellipse cx="42" cy="40" rx="31" ry="7.5" fill="#7ad04f" stroke="#0c0705" stroke-width="3.5"/><ellipse cx="34" cy="39" rx="9" ry="2.5" fill="#b6f08a"/>
-    <circle cx="33" cy="28" r="4.5" fill="#9be36e" stroke="#0c0705" stroke-width="2"/><circle cx="49" cy="20" r="3.5" fill="#9be36e" stroke="#0c0705" stroke-width="2"/><circle cx="42" cy="9" r="2.5" fill="#9be36e" stroke="#0c0705" stroke-width="1.8"/></svg>`,
-  medic: `<svg viewBox="0 0 84 84"><path d="M30 30 v-10 a4 4 0 0 1 4 -4 h16 a4 4 0 0 1 4 4 v10" fill="none" stroke="#0c0705" stroke-width="7"/><path d="M30 30 v-10 a4 4 0 0 1 4 -4 h16 a4 4 0 0 1 4 4 v10" fill="none" stroke="#8a5a32" stroke-width="3"/>
-    <rect x="8" y="28" width="68" height="50" rx="8" fill="#f1e4c3" stroke="#0c0705" stroke-width="3.5"/><path d="M8 40 h68" stroke="#0c0705" stroke-width="3"/><rect x="8" y="28" width="68" height="12" rx="6" fill="#d9c7a0" stroke="#0c0705" stroke-width="3"/>
-    <path d="M42 46 v24 M30 58 h24" stroke="#0c0705" stroke-width="12" stroke-linecap="round"/><path d="M42 46 v24 M30 58 h24" stroke="#d0565a" stroke-width="7" stroke-linecap="round"/></svg>`,
-  trickster: `<svg viewBox="0 0 84 84"><g transform="rotate(-16 30 50)"><rect x="12" y="22" width="34" height="50" rx="6" fill="#f1e4c3" stroke="#0c0705" stroke-width="3.5"/><path d="M29 38 l7 9 l-7 9 l-7 -9z" fill="#d0565a" stroke="#0c0705" stroke-width="2"/></g>
-    <g transform="rotate(14 54 48)"><rect x="38" y="20" width="34" height="50" rx="6" fill="#3d7fd0" stroke="#0c0705" stroke-width="3.5"/><rect x="43" y="25" width="24" height="40" rx="4" fill="none" stroke="#9fc4f0" stroke-width="2"/><path d="M55 36 l6 9 l-6 9 l-6 -9z" fill="#f2c14e" stroke="#0c0705" stroke-width="2"/></g></svg>`,
+  ranger: `<svg viewBox="0 0 84 84"><path d="M59 66 L67 54" stroke="#0c0705" stroke-width="14" stroke-linecap="round"/><path d="M59 66 L67 54" stroke="#8f949a" stroke-width="5" stroke-linecap="round"/>
+    <path d="M23 80 C19 62 25 47 42 45 C59 47 65 62 61 80 Z" fill="#8f949a" stroke="#0c0705" stroke-width="4.5" stroke-linejoin="round"/><path d="M27 60 C30 50 36 47 42 47 C48 47 54 50 57 60" fill="none" stroke="#5d636b" stroke-width="5" stroke-linecap="round"/>
+    <rect x="31" y="58" width="9" height="23" rx="4.5" fill="#d9dcdf" stroke="#0c0705" stroke-width="4.5"/><rect x="44" y="58" width="9" height="23" rx="4.5" fill="#d9dcdf" stroke="#0c0705" stroke-width="4.5"/>
+    <rect x="26" y="13" width="32" height="28" rx="9" fill="#8f949a" stroke="#0c0705" stroke-width="4.5"/>
+    <path d="M28 16 L17 23 L25 32 Z" fill="#5d636b" stroke="#0c0705" stroke-width="4.5" stroke-linejoin="round"/><path d="M56 16 L67 23 L59 32 Z" fill="#5d636b" stroke="#0c0705" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M30 33 C30 44 35 50 42 51 C49 50 54 44 54 33 C50 36 34 36 30 33 Z" fill="#e3e6e9" stroke="#0c0705" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M28 21 C32 15 38 16 41 20 L38 23 C35 21 31 21 28 23 Z" fill="#eef0f2"/><path d="M56 21 C52 15 46 16 43 20 L46 23 C49 21 53 21 56 23 Z" fill="#eef0f2"/>
+    <circle cx="35" cy="27" r="2.6" fill="#0c0705"/><circle cx="49" cy="27" r="2.6" fill="#0c0705"/><ellipse cx="42" cy="33" rx="4.6" ry="3.4" fill="#0c0705"/>
+    <path d="M34 39 C38 42 46 42 50 39" fill="none" stroke="#b8bdc2" stroke-width="2"/>
+    <path d="M29 52 Q42 57 55 52" fill="none" stroke="#0c0705" stroke-width="12.5" stroke-linecap="round"/><path d="M29 52 Q42 57 55 52" fill="none" stroke="#d0565a" stroke-width="3.5" stroke-linecap="round"/><circle cx="42" cy="57" r="3.4" fill="#f2c14e" stroke="#0c0705" stroke-width="4.5"/></svg>`,
+  engineer: `<svg viewBox="0 0 84 84"><rect x="10" y="22" width="64" height="54" rx="7" fill="#6f7c86" stroke="#0c0705" stroke-width="4.5"/><rect x="18" y="30" width="48" height="34" rx="4" fill="#24313a" stroke="#0c0705" stroke-width="4.5"/>
+    <path d="M18 38 h48" stroke="#0c0705" stroke-width="4.5"/><rect x="35" y="36" width="14" height="9" rx="2" fill="#c7902c" stroke="#0c0705" stroke-width="4.5"/><path d="M42 45 v5" stroke="#0c0705" stroke-width="4.5"/>
+    <rect x="31" y="51" width="22" height="13" rx="3" fill="#9fd0ff" stroke="#0c0705" stroke-width="4.5"/><path d="M38 51 v13 M46 51 v13 M31 57.5 h22" stroke="#4f8fd6" stroke-width="1.3"/>
+    <rect x="16" y="68" width="10" height="4" rx="2" fill="#5fb37a" stroke="#0c0705" stroke-width="4.5"/><circle cx="64" cy="70" r="3" fill="#f2c14e" stroke="#0c0705" stroke-width="4.5"/><path d="M42 22 v-10 M36 12 h12" stroke="#0c0705" stroke-width="4.5" stroke-linecap="round"/></svg>`,
+  alchemist: `<svg viewBox="0 0 84 84"><path d="M22 78 l-5 4 M62 78 l5 4" stroke="#0c0705" stroke-width="4.5" stroke-linecap="round"/><path d="M12 40 h60 l-5 28 a12 12 0 0 1 -12 10 h-26 a12 12 0 0 1 -12 -10z" fill="#3b2c20" stroke="#0c0705" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M18 52 h48" stroke="#6b5440" stroke-width="4"/><ellipse cx="42" cy="40" rx="31" ry="7.5" fill="#7ad04f" stroke="#0c0705" stroke-width="4.5"/><ellipse cx="34" cy="39" rx="9" ry="2.5" fill="#b6f08a"/>
+    <circle cx="32" cy="26" r="7" fill="#9be36e" stroke="#0c0705" stroke-width="4.5"/><circle cx="50" cy="17" r="5.5" fill="#9be36e" stroke="#0c0705" stroke-width="4.5"/><circle cx="39" cy="6" r="4" fill="#9be36e" stroke="#0c0705" stroke-width="4.5"/></svg>`,
+  medic: `<svg viewBox="0 0 84 84"><path d="M30 30 v-10 a4 4 0 0 1 4 -4 h16 a4 4 0 0 1 4 4 v10" fill="none" stroke="#0c0705" stroke-width="13.5"/><path d="M30 30 v-10 a4 4 0 0 1 4 -4 h16 a4 4 0 0 1 4 4 v10" fill="none" stroke="#8a5a32" stroke-width="4.5"/>
+    <rect x="8" y="28" width="68" height="50" rx="8" fill="#f1e4c3" stroke="#0c0705" stroke-width="4.5"/><path d="M8 40 h68" stroke="#0c0705" stroke-width="4.5"/><rect x="8" y="28" width="68" height="12" rx="6" fill="#d9c7a0" stroke="#0c0705" stroke-width="4.5"/>
+    <path d="M42 72 C30 64 25 58 25 51 C25 46 29 43 33.5 43 C37 43 40 45 42 48 C44 45 47 43 50.5 43 C55 43 59 46 59 51 C59 58 54 64 42 72 Z" fill="#d0565a" stroke="#0c0705" stroke-width="4.5" stroke-linejoin="round"/><path d="M31 50 C31 47 33 46 35 46" fill="none" stroke="#f3a3a0" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  trickster: `<svg viewBox="0 0 84 84"><g transform="rotate(-16 30 50)"><rect x="12" y="22" width="34" height="50" rx="6" fill="#f1e4c3" stroke="#0c0705" stroke-width="4.5"/><path d="M29 38 l7 9 l-7 9 l-7 -9z" fill="#d0565a" stroke="#0c0705" stroke-width="4.5"/></g>
+    <g transform="rotate(14 54 48)"><rect x="38" y="20" width="34" height="50" rx="6" fill="#3d7fd0" stroke="#0c0705" stroke-width="4.5"/><rect x="43" y="25" width="24" height="40" rx="4" fill="none" stroke="#9fc4f0" stroke-width="3"/><path d="M55 36 l6 9 l-6 9 l-6 -9z" fill="#f2c14e" stroke="#0c0705" stroke-width="4.5"/></g></svg>`,
 };
 function classPropHTML(){
   const id = S && S.klass && S.klass.id, svg = id && CLASS_PROP_SVG[id];
@@ -6203,7 +6209,7 @@ function victoryStageHTML(){
   const tr = victoryTrophies().filter(x=> !worn.has(x.name)); // what the hero wears is not repeated as a trophy
   return `<div class="vic-stage" style="--rc-class:${d.color}">
     <div class="vic-rays" aria-hidden="true"></div>
-    ${d.portrait ? `<div class="vic-hero-wrap">${heroGearHTML('back')}<img class="vic-hero" src="${d.portrait}" alt="">${heroGearHTML()}${classPropHTML()}</div>` : ''}
+    ${d.portrait ? `<div class="vic-hero-wrap">${heroGearHTML('back')}<img class="vic-hero" src="${d.portrait}" alt="">${classPropHTML()}${heroGearHTML()}</div>` : ''}
     <div class="vic-plinth"><span>${(d.name || d.who).replace(/</g,'&lt;')} &middot; Depth ${d.depth}</span></div>
     <div class="vic-outcome">${d.outcome}</div>
     ${tr.length ? (()=>{ const t = (x,i)=>`<img class="vic-trophy t-${x.cat}" style="--i:${i}" src="${LOOT_ART[x.name]}" alt="${x.name}" title="${x.name}">`;

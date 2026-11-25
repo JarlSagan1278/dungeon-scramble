@@ -58,8 +58,8 @@ let chromium; try { ({ chromium } = require('playwright')); } catch (e) { ({ chr
     S.path = []; useClassAbility(zi[0]); ok(S.classAbilityUsed, 'Skill on a free zone die still converts');
     // 7. quest poster
     render(); document.querySelectorAll('#room-callout,#room-callout-scrim').forEach(n => n.remove());
-    if (S.encounter.quests && S.encounter.quests.length) { openQuestPoster(); const m = document.querySelector('.quest-poster-modal .qp-row');
-      ok(!!m && document.querySelectorAll('.quest-poster-modal .qp-row').length === S.encounter.quests.length, 'tapping the sign opens the quest poster');
+    if (S.encounter.quests && S.encounter.quests.length) { openQuestPoster(); const m = document.querySelector('.quest-poster-overlay .fo-quests-float');
+      ok(!!m && m.querySelectorAll('.fo-quest').length === S.encounter.quests.length && !m.getAttribute('onclick'), 'tapping the sign opens the quest poster (the sign itself, enlarged)');
       document.querySelectorAll('.modal-overlay').forEach(n => n.remove()); }
     // 8. one-path feats
     S.path = []; const cand = [...Array(16).keys()].filter(i => !S.tray[i].minion && currentFace(S.tray[i]).type === 'hit');
