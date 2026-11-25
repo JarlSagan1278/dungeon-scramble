@@ -365,7 +365,7 @@ let res = await page.evaluate((cfg)=>{
     if(S.screen==='gameover') return 'GAMEOVER';
     if(S.transitioning){ skipTransition(); return null; }
     if(S.lootChoice && S.lootChoice.final){ openFinalChest(); return null; }
-    if(S.lootChoice){ const arr=S.lootChoice.options.slice().sort((a,b)=>lootScore(b)-lootScore(a)); const o = cfg.lootMode==='worst'?arr[arr.length-1]:((cfg.lootMode==='random' || Math.random() < cfg.lootRandomRate)?arr[Math.floor(Math.random()*arr.length)]:arr[0]); chooseLoot(o); return null; }
+    if(S.lootChoice){ const arr=S.lootChoice.options.slice().sort((a,b)=>lootScore(b)-lootScore(a)); const o = cfg.lootMode==='worst'?arr[arr.length-1]:((cfg.lootMode==='random' || Math.random() < cfg.lootRandomRate)?arr[Math.floor(Math.random()*arr.length)]:arr[0]); (window.__offers=window.__offers||[]).push({f:S.floorIdx+1, opts:S.lootChoice.options.map(d=>d&&d.name), pick:(o&&o.name)}), chooseLoot(o); return null; }
     if(S.shrineChoice){ const walk = cfg.relicLock && S.shrineChoice.options.find(o=>/walk away/i.test(o.label)); chooseShrineOption(walk || (cfg.playerLike ? pickShrineOption(S.shrineChoice.options) : S.shrineChoice.options[Math.floor(Math.random()*S.shrineChoice.options.length)])); return null; }
     if(S.relicChoice && cfg.relicLock){ S.relicChoice=null; S.shrineResult={title:'Relic', text:'(study: declined)'}; return null; }
     if(S.relicChoice){ const o=S.relicChoice.options; chooseRelic(cfg.playerLike ? o.slice().sort((a,b)=>(RELIC_PREF[b]||5)-(RELIC_PREF[a]||5))[0] : o[Math.floor(Math.random()*o.length)]); return null; }
@@ -399,7 +399,7 @@ let res = await page.evaluate((cfg)=>{
       if(d && c){ c.die = clone(d); c.faceIdx = 0; S.usedLootNames.add(d.name); } }
     if(cfg.manLevel>1){ S.tray.forEach(c=>{ if(c.die.cat==='maneuver') c.die=clone(Object.assign({},basic('maneuver',cfg.manLevel),{level:cfg.manLevel})); }); }
     if(cfg.swapManeuver){ S.tray.forEach(c=>{ if(c.die.cat==='maneuver') c.die=clone(basic('attack',c.die.level)); }); }
-    const rec={fights:[],result:'TIMEOUT',floor:1,turns:0};
+    const rec={fights:[],result:'TIMEOUT',floor:1,turns:0}; window.__offers=[]; // Nov 25 census: loot offers and picks per run
     const log={turns:0};
     // fight tracker via wrapper around onEncounterDefeated
     let cur=null, curEnc=null, curShrine=null;
@@ -418,7 +418,7 @@ let res = await page.evaluate((cfg)=>{
     }
     if(rec.result==='GAMEOVER' && cur && !cur.done){ cur.died=true; }
     window.__end.manII += S.tray.filter(c=>c.die.cat==='maneuver'&&c.die.level>=2).length;
-    rec.floor=S.floorIdx+1; rec.turns=log.turns; rec.maxHp=S.maxHealth;
+    rec.floor=S.floorIdx+1; rec.turns=log.turns; rec.maxHp=S.maxHealth; rec.offers=window.__offers||[]; rec.relicsEnd=(S.relics||[]).map(r=>r.id||r);
     runs.push(rec);
   }
   return {runs, rev:window.__rev, camp:window.__camp, turns:window.__turns, man:Object.assign(window.__man,window.__end), tok:window.__tok||{}};
