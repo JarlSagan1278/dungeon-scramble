@@ -6,17 +6,18 @@
 //   the theme again, fading out.
 // usage (from tools/media, after trailer.js): node trailer_audio.js -> cast/trailer/soundtrack.wav; trailer_mk.py muxes it.
 const { chromium } = require('playwright'); const fs = require('fs'), path = require('path');
-const D = 'cast/trailer';
+const D = process.env.VERT ? 'cast/trailer_v' : 'cast/trailer';
+const RATE = fs.existsSync(path.join(D, 'meta.json')) ? (JSON.parse(fs.readFileSync(path.join(D, 'meta.json'))).rate || 1) : 1; // slow-motion capture
 const SCENES = ['1_title', '2_turn', '3_rule', '4_boss', '5_loot', '6_victory'];
 const END_CARD = 3;
 // scene start times in the cut (same durations trailer_mk.py uses)
 let at = 0; const starts = {}, events = [];
 for(const s of SCENES){
   const t = JSON.parse(fs.readFileSync(path.join(D, s, 'times.json'))); if(!t.length) continue;
-  const dur = t.length < 3 ? 2.5 : t[t.length-1] - t[0]; starts[s] = at;
+  const dur = t.length < 3 ? 2.5 : (t[t.length-1] - t[0])*RATE; starts[s] = at;
   const snd = fs.existsSync(path.join(D, s, 'sounds.json')) ? JSON.parse(fs.readFileSync(path.join(D, s, 'sounds.json'))) : [];
   // musicSting/musicChime come from the cue sheet below (the music needs to know about them); the rest replay as they were
-  snd.forEach(e=>{ const rel = e.t - t[0]; if(rel >= 0 && rel <= dur) events.push({ t: at + rel, fn: e.fn, args: e.args }); });
+  snd.forEach(e=>{ const rel = (e.t - t[0])*RATE; if(rel >= 0 && rel <= dur) events.push({ t: at + rel, fn: e.fn, args: e.args }); });
   at += dur;
 }
 const total = at + END_CARD;
@@ -36,13 +37,19 @@ fs.writeFileSync(path.join(D, 'cuts.json'), JSON.stringify({ starts, total }));
     // the theme straight into its melody block (no 2.5 s fade-in, no bass-only intro): a trailer opens with a hook
     const themeNow = block => { musicStart('theme','theme'); clearInterval(Music.timer); const t = off.currentTime, bl = Music.blockBeats*musicSpb();
       Music.origin = t - block*bl; Music.gain.gain.cancelScheduledValues(0); Music.gain.gain.setValueAtTime(musicVolume(), t); };
-    add(0.02, ()=> themeNow(2));
-    add(S0['2_turn'], ()=>{ musicStart('dungeon','down'); clearInterval(Music.timer); });
+    // Nov 25 (Jeremy: change the music less often, a build-up then a crescendo): one dungeon piece that only builds --
+    // the lonely bass fades in under the title, the melody joins on the first fight (the arrangement's 'loud' round is
+    // lined up to start there), the pumping tension version arrives for the rule fight, the full boss music with drums
+    // is the crescendo and carries through the loot into the win fanfare; the bass alone returns under the end card.
+    add(0.02, ()=>{ musicStart('dungeon','down'); clearInterval(Music.timer); const bl = Music.blockBeats*musicSpb(); Music.origin = S0['2_turn'] - 2*bl;
+      // the swell: soft under the title, louder at each stage, full at the boss (the arrangement adds parts on top)
+      const v = musicVolume(), G = Music.gain.gain; G.cancelScheduledValues(0); G.setValueAtTime(0.0001, 0); G.linearRampToValueAtTime(0.35*v, 0.8);
+      G.linearRampToValueAtTime(0.5*v, S0['2_turn']); G.linearRampToValueAtTime(0.7*v, S0['3_rule']); G.linearRampToValueAtTime(0.85*v, S0['4_boss'] - 0.3);
+      G.linearRampToValueAtTime(1.0*v, S0['4_boss'] + 2); });
     add(S0['3_rule'] - 0.4, ()=> musicSwitch('mid'));
     add(S0['4_boss'] - 1.2, ()=>{ musicSwitch('act'); musicSetDrums(true); }); // the fill leads into the boss on the next bar
-    add(S0['5_loot'] + 0.2, ()=> musicSwitch('down'));
     add(S0['6_victory'] + 0.05, ()=> musicSting('win'));
-    add(total - 3.2, ()=> themeNow(6));
+    add(total - 3.0, ()=>{ musicStart('dungeon','down'); clearInterval(Music.timer); });
     // the music's look-ahead scheduler, driven by the offline clock
     for(let t = 0.1; t < total; t += 0.2) add(t, ()=>{ if(Music.on) musicTick(); });
     // the game's own sound effects, as recorded

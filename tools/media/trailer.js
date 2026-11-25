@@ -3,25 +3,40 @@
 // Each scene is recorded with the CDP screencast (frames + timestamps) into cast/trailer/<scene>/; trailer_mk.py cuts and
 // joins them with short fades into docs/release/media/trailer.mp4 (git-ignored). Silent: add music in an editor if wanted.
 const L = require('./lib'); const fs = require('fs'), path = require('path');
-const DIR = 'cast/trailer'; fs.mkdirSync(DIR, { recursive: true });
+// Nov 25: VERT=1 makes the 1080x1920 vertical cut from the phone layout (432x768 at 2.5x) into cast/trailer_v.
+// Slow motion (Jeremy: the first cut looked laggy): the screencast only grabs ~12 frames a second at 1080p in the cloud
+// browser, so the game runs at a quarter speed (timers, rAF, clocks and every CSS/Web animation) while it's filmed;
+// trailer_mk.py and trailer_audio.js scale the timeline back by RATE, so the result is real speed at a smooth 30 fps.
+const VERT = !!process.env.VERT, RATE = 0.25;
+const DIR = VERT ? 'cast/trailer_v' : 'cast/trailer'; fs.mkdirSync(DIR, { recursive: true });
+fs.writeFileSync(path.join(DIR, 'meta.json'), JSON.stringify({ rate: RATE, vert: VERT }));
+const SL = ms => L.sleep(ms / RATE); // the script's own waits, in game time
+const SLOWMO = rate => { const rn = performance.now.bind(performance), t0 = rn(); performance.now = ()=> t0 + (rn()-t0)*rate;
+  const rd = Date.now, d0 = rd(); window.__realNow = rd; Date.now = ()=> d0 + (rd()-d0)*rate;
+  const st = window.setTimeout, si = window.setInterval; window.setTimeout = (f, ms, ...a)=> st(f, (ms||0)/rate, ...a); window.setInterval = (f, ms, ...a)=> si(f, (ms||0)/rate, ...a);
+  const raf = window.requestAnimationFrame.bind(window); window.requestAnimationFrame = cb => raf(ts => cb(t0 + (ts - t0)*rate)); };
+const ONLY = (process.env.ONLY||'').split(',').filter(Boolean); // re-shoot just these scenes
 async function scene(b, name, setup, act){
-  const ctx = await b.newContext({ viewport:{ width:1920, height:1080 }, deviceScaleFactor:1 });
+  if(ONLY.length && !ONLY.includes(name)) return;
+  const ctx = await b.newContext(VERT ? { viewport:{ width:432, height:768 }, deviceScaleFactor:2.5, hasTouch:true, isMobile:true } : { viewport:{ width:1920, height:1080 }, deviceScaleFactor:1 });
   const p = await ctx.newPage(); p.on('pageerror', e=>console.log('PAGEERR', name, e.message));
-  await p.addInitScript(()=>{ try{ localStorage.setItem('dungeonScrambleRollTest','1'); localStorage.setItem('dungeonScramblePC','1'); localStorage.setItem('dungeonScrambleTutorialSeen_v1','1'); }catch(e){}
+  await p.addInitScript(`window.__vert = ${VERT};`); await p.addInitScript(SLOWMO, RATE);
+  const acdp = await ctx.newCDPSession(p); await acdp.send('Animation.enable'); await acdp.send('Animation.setPlaybackRate', { playbackRate: RATE });
+  await p.addInitScript(()=>{ try{ localStorage.setItem('dungeonScrambleRollTest','1'); localStorage.setItem('dungeonScramblePC', window.__vert ? '0' : '1'); localStorage.setItem('dungeonScrambleTutorialSeen_v1','1'); }catch(e){}
     document.addEventListener('DOMContentLoaded',()=>{ const s=document.createElement('style'); s.textContent='#symbol-intro,#tip-bubble,#tip-ring,.toast{display:none!important}'; document.head.appendChild(s); }); });
-  await p.goto('file:///home/user/dungeon-scramble/dist/release/dungeon_scramble.html'); await L.sleep(1200);
+  await p.goto('file:///home/user/dungeon-scramble/dist/release/dungeon_scramble.html'); await acdp.send('Animation.setPlaybackRate', { playbackRate: RATE }); await SL(1200);
   await p.evaluate(()=>{ META.lifetime.victories=4; META.lifetime.bestFloorReached=3; META.coachSeen={armsmaster:1,guard:1,dungeoneer:1,arcanist:1}; META.relicHintSeen=Date.now(); saveMeta(); });
-  if(setup) await setup(p); await L.sleep(900);
+  if(setup) await setup(p); await SL(900);
   const dir = path.join(DIR, name); fs.rmSync(dir, { recursive:true, force:true }); fs.mkdirSync(dir, { recursive:true });
   // log every game sound call with its wall-clock time, so trailer_audio.js can replay them in sync (Nov 25)
   await p.evaluate(()=>{ window.__snd = []; window.__sndOn = false;
     ['enemySound','playStepTone','playWhoosh','playIceCrackle','playTone','playDoorCreak','playNoiseBurst','playKillImpact','playBarBend','playDiceRollSound','cubeLandClick','playMaterialClack','playRerollSound','playPlayerHitSound','playShrineFx','musicChime','musicSting'].forEach(n=>{
       const f = window[n]; if(typeof f!=='function') return;
-      window[n] = function(...a){ if(window.__sndOn && !window.__sndDepth){ try{ window.__snd.push({fn:n, t:Date.now()/1000, args:JSON.parse(JSON.stringify(a, (k,v)=> (v && typeof v==='object' && v.nodeType) ? undefined : v))}); }catch(e){} } window.__sndDepth = (window.__sndDepth||0) + 1; try{ return f.apply(this, a); } finally { window.__sndDepth--; } }; }); }); // only outer calls: a sound that plays another isn't logged twice
+      window[n] = function(...a){ if(window.__sndOn && !window.__sndDepth){ try{ window.__snd.push({fn:n, t:window.__realNow()/1000, args:JSON.parse(JSON.stringify(a, (k,v)=> (v && typeof v==='object' && v.nodeType) ? undefined : v))}); }catch(e){} } window.__sndDepth = (window.__sndDepth||0) + 1; try{ return f.apply(this, a); } finally { window.__sndDepth--; } }; }); }); // only outer calls: a sound that plays another isn't logged twice
   const frames = []; const cdp = await ctx.newCDPSession(p);
   cdp.on('Page.screencastFrame', async f=>{ fs.writeFileSync(path.join(dir, 'f'+String(frames.length).padStart(4,'0')+'.jpg'), Buffer.from(f.data,'base64')); frames.push(f.metadata.timestamp); try{ await cdp.send('Page.screencastFrameAck', { sessionId:f.sessionId }); }catch(e){} });
-  await cdp.send('Page.startScreencast', { format:'jpeg', quality:92, maxWidth:1920, maxHeight:1080 });
-  await p.evaluate(()=>{ window.__sndOn = true; }); await L.sleep(300); await act(p); await cdp.send('Page.stopScreencast');
+  await cdp.send('Page.startScreencast', VERT ? { format:'jpeg', quality:92, maxWidth:1080, maxHeight:1920 } : { format:'jpeg', quality:92, maxWidth:1920, maxHeight:1080 });
+  await p.evaluate(()=>{ window.__sndOn = true; }); await SL(300); await act(p); await cdp.send('Page.stopScreencast');
   fs.writeFileSync(path.join(dir, 'sounds.json'), JSON.stringify(await p.evaluate(()=>window.__snd)));
   fs.writeFileSync(path.join(dir, 'times.json'), JSON.stringify(frames)); console.log(name, frames.length, 'frames', frames.length ? (frames[frames.length-1]-frames[0]).toFixed(1)+'s' : '');
   await ctx.close();
@@ -42,19 +57,19 @@ const fightSetup = (fl, foe, hp, want) => async p=>{
     if(r.dmg >= want) break; await p.evaluate(()=>{ scrambleTray(true); render(); }); }
 };
 const flick = async p=>{ const lid = await p.locator('#chest-lid').boundingBox().catch(()=>null);
-  if(lid){ const x = lid.x+lid.width/2, y = lid.y+lid.height*0.7; await p.mouse.move(x,y); await p.mouse.down(); for(let k=1;k<=6;k++){ await p.mouse.move(x+k*3, y-k*28); await L.sleep(14); } await p.mouse.up(); }
+  if(lid){ const x = lid.x+lid.width/2, y = lid.y+lid.height*0.7; await p.mouse.move(x,y); await p.mouse.down(); for(let k=1;k<=6;k++){ await p.mouse.move(x+k*3, y-k*28); await SL(14); } await p.mouse.up(); }
   else await p.evaluate(()=>scrambleRoll(0,-1));
-  await L.sleep(1300); };
-const playPath = async (p, maxLen, wait)=>{ const r = await L.findPath(p, maxLen); for(const [i] of r.path){ await L.tapDie(p, i); await L.sleep(330); } await L.sleep(350); await p.click('#resolve-btn', { force:true }); await L.sleep(wait); return r; };
+  await SL(1300); };
+const playPath = async (p, maxLen, wait)=>{ const r = await L.findPath(p, maxLen); for(const [i] of r.path){ await L.tapDie(p, i); await SL(330); } await SL(350); await p.click('#resolve-btn', { force:true }); await SL(wait); return r; };
 (async()=>{
   const b = await L.chromium.launch();
-  await scene(b, '1_title', null, async p=>{ await L.sleep(2600); });
+  await scene(b, '1_title', null, async p=>{ await SL(2600); });
   await scene(b, '2_turn', fightSetup(0, 'Grafted Grifter', null, 10), async p=>{ await flick(p); await playPath(p, 6, 3600); });
   await scene(b, '3_rule', fightSetup(2, 'Anti-Euclidian Space', null, 30), async p=>{ await flick(p); await playPath(p, 6, 3400); });
   await scene(b, '4_boss', fightSetup(1, 'boss', null, 24), async p=>{ await flick(p); await playPath(p, 6, 4200); });
   await scene(b, '5_loot', async p=>{ await fightSetup(0, 'Feral Pet Rock')(p); await p.evaluate(()=>{ S.needRoll=false; render(); S.encounter.curHealth=0; onEncounterDefeated(); }); }, async p=>{
-    await L.sleep(1200); await p.evaluate(()=>{ const c=document.querySelector('.loot-chest-btn'); if(c) c.click(); }); await L.sleep(2200);
-    await p.evaluate(()=>{ const o=document.querySelector('.loot-opt'); if(o) o.click(); }); await L.sleep(900); });
-  await scene(b, '6_victory', async p=>{ await fightSetup(2, 'boss')(p); await p.evaluate(()=>{ S.needRoll=false; S.stats.turnsTaken=61; S.stats.encountersDefeated=19; S.screen='victory'; render(); }); }, async p=>{ await L.sleep(3400); });
+    await SL(1200); await p.evaluate(()=>{ const c=document.querySelector('.loot-chest-btn'); if(c) c.click(); }); await SL(2200);
+    await p.evaluate(()=>{ const o=document.querySelector('.loot-opt'); if(o) o.click(); }); await SL(900); });
+  await scene(b, '6_victory', async p=>{ await fightSetup(2, 'boss')(p); await p.evaluate(()=>{ S.needRoll=false; Object.assign(S.stats, { turnsTaken:61, encountersDefeated:19, damageDealt:842, bestTurn:57, damageBlocked:96, overkills:4, clever:6 }); try{ localStorage.setItem('dungeonScrambleShareData_v1','no'); }catch(e){} S.screen='victory'; render(); }); }, async p=>{ await SL(3400); });
   await b.close();
 })();
