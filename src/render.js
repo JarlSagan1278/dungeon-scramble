@@ -2157,7 +2157,7 @@ function renderGame(){
   { const portrait = S.portrait || { img: GNOME_PORTRAITS[0], placeholder:true };
     foPlayer = { statusHTML:`${S.playerDOT?`<span class="status-chip status-tooltip-target" title="D.O.T. ${S.playerDOT}: ${STATUS_DESC.dot}">${iconSpan('dot', S.playerDOT)} DOT</span>`:''}        ${S.playerHOT?`<span class="status-chip status-tooltip-target" title="H.O.T. ${S.playerHOT}: ${STATUS_DESC.hot}">${iconSpan('hot', S.playerHOT)} HOT</span>`:''}        ${S.playerBlock?`<span class="status-chip status-tooltip-target" title="Block ${S.playerBlock}: ${STATUS_DESC.block}">${iconSpan('block', S.playerBlock)} Block</span>`:''}        ${minionCount?`<span class="status-chip status-tooltip-target" title="Minions ${minionCount}: ${STATUS_DESC.minions}"><span class="chip-minion" aria-hidden="true"><i></i><i></i></span><b class="chip-n">${minionCount}</b></span>`:''}${S.pendingFreeBoost?`<span class="status-chip status-tooltip-target" style="background:var(--gold);color:#241c10;" title="Boost x${S.pendingFreeBoost} armed: ${STATUS_DESC.boost}">${iconSpan('boost')} Boost x${S.pendingFreeBoost} armed</span>`:''}`, fxCls:playerFx.cls, deltaHTML:playerFx.deltaHTML, hpPct, tip:playerStatusTip,
       figCls: playerFx.cls==='flash-damage'?'dmg-flash':playerFx.cls==='flash-heal'?'heal-flash':'',
-      figHTML: portrait.placeholder ? mysteryFigureHTML('width:60px; height:60px;') : `${heroGearHTML('back')}<img class="fo-img" src="${portrait.img}" alt="${S.origin.name}">${heroGearHTML()}` }; }
+      figHTML: portrait.placeholder ? mysteryFigureHTML('width:60px; height:60px;') : `${heroGearHTML('back')}<img class="fo-img" src="${portrait.img}" alt="${S.origin.name}">${heroGearHTML()}${classPropHTML()}` }; }
   const html = `
     <!--z0--><div class="panel route-float" style="margin-bottom:8px;">
       ${renderRoute()}
@@ -2364,7 +2364,7 @@ function bindTrayDice(){
           return;
         }
         const f = classFace(cell.forcedFace || currentFace(cell));
-        showFaceTooltip(rect, `<strong>${f.type==='blank' ? 'Blank' : LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</strong>${FACE_DESC[f.type]||''}`, (f.type==='blank' || !ICON_SVG[f.type]) ? null : f.type);
+        showFaceTooltip(rect, `<strong>${f.type==='blank' ? 'Blank' : LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</strong>${FACE_DESC[f.type]||''}${cell.forcedFace && cell.forcedFace.printed ? ' <i>Printed: it keeps this face for the whole fight.</i>' : ''}${(typeof petNear==='function' && petNear(idx)) ? ' <i>+1 from Pointer, right beside it.</i>' : (S.klass && S.klass.pet && S.petIdx===idx ? ' <i>Pointer is sitting here.</i>' : '')}`, (f.type==='blank' || !ICON_SVG[f.type]) ? null : f.type);
       }, 420);
     });
     ['pointerup','pointerleave','pointercancel'].forEach(evt=> node.addEventListener(evt, cancelPress));
@@ -2401,6 +2401,12 @@ function renderPathStrip(){
 // Class-ability coach (Oct 13, Jeremy): the first fight with each class explains its Skill once, in plain words,
 // placed high so the tray and its zone stay visible below it. Remembered per class in META.coachSeen.
 const ABILITY_COACH = {
+  // Nov 25: the five unlockable classes
+  medic:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the bottom row) to turn it into a Heal (1). <b>Blanks too!</b> And half of any healing past your full health becomes Block, so heal even when you are nearly full.',
+  alchemist:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the centre 2x2) to turn it into a D.O.T. (2). <b>Blanks too!</b> Every D.O.T. face you play is 1 stronger, so poison early: it ticks every turn.',
+  engineer:'Once every turn, tap <b>Skill</b>, then <b>any</b> die to copy its face, then a die in your dashed zone (the left column) to print it there. A printed die keeps that face for the <b>whole fight</b>, so build up your column turn by turn.',
+  trickster:'Once every turn, tap <b>Skill</b>, then a die in your dashed zone (the four corners), then any other die: they swap places. Pull a strong die into reach of your path, or move a Blank out of the way.',
+  ranger:'Meet <b>Pointer</b>! Your dog lands on a die each turn, and the four dice beside it get <b>+1</b>. Tap <b>Skill</b> for <b>Fetch!</b>: after your path, Pointer runs 2 more steps from its last die and uses those dice too. End your path near good dice.',
   armsmaster:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the right column) to turn it into a Hit (2). <b>Blanks too!</b> A blank in your zone is a free Hit 2 waiting. Use it every turn: it is free damage.',
   guard:'Once every turn, tap <b>Skill</b>, then any die in your dashed zone (the 2x2 square, middle right) to turn it into a Block (1). <b>Blanks too!</b> A blank in your zone becomes a Block. Use it every turn: Block stops damage before it lands.',
   dungeoneer:'Always on: your dashed zone is the left and right edges, and your path can wrap from one edge straight to the other on any row. Each wrap adds +1 damage to your next attacking die. Look for long paths that cross the sides.',
@@ -5655,7 +5661,10 @@ function pcHoverDieHTML(idx){
     : `<div class="mini-face mf-${die.cat||'loot'}${(!cell.forcedFace && i===cell.faceIdx)?' pch-cur':''}">${iconSpan(x.type, x.value)}<small>${LABEL[x.type]}${(x.value && !ICON_VALUE_SLOT.has(x.type))?' '+x.value:''}</small></div>`).join('');
   const nm = f.type==='blank' ? 'Blank' : LABEL[f.type] + ((f.value && !ICON_VALUE_SLOT.has(f.type)) ? ' '+f.value : '');
   const notes = [];
-  if(cell.forcedFace) notes.push('Changed for this turn.');
+  if(cell.forcedFace && cell.forcedFace.printed) notes.push('Printed: it keeps this face for the whole fight.'); // Nov 25: Engineer
+  else if(cell.forcedFace) notes.push('Changed for this turn.');
+  if(S.klass && S.klass.pet && S.petIdx===idx) notes.push('Pointer is sitting here.');
+  else if(typeof petNear==='function' && petNear(idx)) notes.push('+1 from Pointer, right beside it.');
   if(cell.spent) notes.push('Used this turn.');
   const k = S.path ? S.path.indexOf(idx) : -1; if(k>=0) notes.push(`Step ${k+1} of your Path.`);
   return `<div class="pch-dice"><div class="pch-head"><b>${die.name}</b>${key}</div><div class="faces-tiles">${faces}</div></div>
@@ -6127,6 +6136,32 @@ function heroGear(){
   const pick = (slot, n)=>{ const out = [], seen = new Set(); own.forEach(d=>{ if(LOOT_SLOT[d.name]===slot && !seen.has(d.name) && out.length<n){ seen.add(d.name); out.push(d); } }); return out; };
   return { back: pick('back',1)[0], ground: pick('ground',2), float: pick('float',1)[0], head: pick('head',1)[0] };
 }
+// Nov 25 (Jeremy: signature objects for the unlockable classes; the starting four stay subtle): a companion object at
+// the hero's feet, on the wall side, in fights and on the victory screen. Toy-like: chunky dark outlines, flat colours.
+const CLASS_PROP_SVG = {
+  ranger: `<svg viewBox="0 0 84 84"><path d="M58 62 C70 58 74 46 70 40" fill="none" stroke="#0c0705" stroke-width="7" stroke-linecap="round"/><path d="M58 62 C70 58 74 46 70 40" fill="none" stroke="#c98a4b" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M24 78 C20 60 26 44 42 42 C58 44 64 60 60 78 Z" fill="#c98a4b" stroke="#0c0705" stroke-width="3.5" stroke-linejoin="round"/><path d="M34 78 C33 66 36 58 42 56 C48 58 51 66 50 78 Z" fill="#f1dcb4" stroke="#0c0705" stroke-width="2.5"/>
+    <path d="M28 78 v-8 M56 78 v-8" stroke="#0c0705" stroke-width="2.5"/><ellipse cx="42" cy="28" rx="15" ry="14" fill="#c98a4b" stroke="#0c0705" stroke-width="3.5"/>
+    <path d="M28 20 C20 22 18 36 24 38 C28 39 29 30 30 25Z" fill="#5a3418" stroke="#0c0705" stroke-width="3"/><path d="M56 20 C64 22 66 36 60 38 C56 39 55 30 54 25Z" fill="#5a3418" stroke="#0c0705" stroke-width="3"/>
+    <ellipse cx="42" cy="35" rx="8" ry="6" fill="#f1dcb4" stroke="#0c0705" stroke-width="2.5"/><circle cx="36" cy="26" r="2.6" fill="#0c0705"/><circle cx="48" cy="26" r="2.6" fill="#0c0705"/><ellipse cx="42" cy="32" rx="3.4" ry="2.5" fill="#0c0705"/>
+    <path d="M30 43 Q42 49 54 43" fill="none" stroke="#d0565a" stroke-width="4" stroke-linecap="round"/><circle cx="42" cy="48" r="3" fill="#f2c14e" stroke="#0c0705" stroke-width="2"/></svg>`,
+  engineer: `<svg viewBox="0 0 84 84"><rect x="10" y="22" width="64" height="54" rx="7" fill="#6f7c86" stroke="#0c0705" stroke-width="3.5"/><rect x="18" y="30" width="48" height="34" rx="4" fill="#24313a" stroke="#0c0705" stroke-width="3"/>
+    <path d="M18 38 h48" stroke="#0c0705" stroke-width="3"/><rect x="35" y="36" width="14" height="9" rx="2" fill="#c7902c" stroke="#0c0705" stroke-width="2.5"/><path d="M42 45 v5" stroke="#0c0705" stroke-width="3"/>
+    <rect x="31" y="51" width="22" height="13" rx="3" fill="#9fd0ff" stroke="#0c0705" stroke-width="2.5"/><path d="M38 51 v13 M46 51 v13 M31 57.5 h22" stroke="#4f8fd6" stroke-width="1.3"/>
+    <rect x="16" y="68" width="10" height="4" rx="2" fill="#5fb37a" stroke="#0c0705" stroke-width="1.5"/><circle cx="64" cy="70" r="3" fill="#f2c14e" stroke="#0c0705" stroke-width="1.5"/><path d="M42 22 v-10 M36 12 h12" stroke="#0c0705" stroke-width="3.5" stroke-linecap="round"/></svg>`,
+  alchemist: `<svg viewBox="0 0 84 84"><path d="M22 78 l-5 4 M62 78 l5 4" stroke="#0c0705" stroke-width="4" stroke-linecap="round"/><path d="M12 40 h60 l-5 28 a12 12 0 0 1 -12 10 h-26 a12 12 0 0 1 -12 -10z" fill="#3b2c20" stroke="#0c0705" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M18 52 h48" stroke="#6b5440" stroke-width="2.5"/><ellipse cx="42" cy="40" rx="31" ry="7.5" fill="#7ad04f" stroke="#0c0705" stroke-width="3.5"/><ellipse cx="34" cy="39" rx="9" ry="2.5" fill="#b6f08a"/>
+    <circle cx="33" cy="28" r="4.5" fill="#9be36e" stroke="#0c0705" stroke-width="2"/><circle cx="49" cy="20" r="3.5" fill="#9be36e" stroke="#0c0705" stroke-width="2"/><circle cx="42" cy="9" r="2.5" fill="#9be36e" stroke="#0c0705" stroke-width="1.8"/></svg>`,
+  medic: `<svg viewBox="0 0 84 84"><path d="M30 30 v-10 a4 4 0 0 1 4 -4 h16 a4 4 0 0 1 4 4 v10" fill="none" stroke="#0c0705" stroke-width="7"/><path d="M30 30 v-10 a4 4 0 0 1 4 -4 h16 a4 4 0 0 1 4 4 v10" fill="none" stroke="#8a5a32" stroke-width="3"/>
+    <rect x="8" y="28" width="68" height="50" rx="8" fill="#f1e4c3" stroke="#0c0705" stroke-width="3.5"/><path d="M8 40 h68" stroke="#0c0705" stroke-width="3"/><rect x="8" y="28" width="68" height="12" rx="6" fill="#d9c7a0" stroke="#0c0705" stroke-width="3"/>
+    <path d="M42 46 v24 M30 58 h24" stroke="#0c0705" stroke-width="12" stroke-linecap="round"/><path d="M42 46 v24 M30 58 h24" stroke="#d0565a" stroke-width="7" stroke-linecap="round"/></svg>`,
+  trickster: `<svg viewBox="0 0 84 84"><g transform="rotate(-16 30 50)"><rect x="12" y="22" width="34" height="50" rx="6" fill="#f1e4c3" stroke="#0c0705" stroke-width="3.5"/><path d="M29 38 l7 9 l-7 9 l-7 -9z" fill="#d0565a" stroke="#0c0705" stroke-width="2"/></g>
+    <g transform="rotate(14 54 48)"><rect x="38" y="20" width="34" height="50" rx="6" fill="#3d7fd0" stroke="#0c0705" stroke-width="3.5"/><rect x="43" y="25" width="24" height="40" rx="4" fill="none" stroke="#9fc4f0" stroke-width="2"/><path d="M55 36 l6 9 l-6 9 l-6 -9z" fill="#f2c14e" stroke="#0c0705" stroke-width="2"/></g></svg>`,
+};
+function classPropHTML(){
+  const id = S && S.klass && S.klass.id, svg = id && CLASS_PROP_SVG[id];
+  return svg ? `<span class="class-prop cp-${id}" title="${S.klass.pet ? 'Pointer' : S.klass.name}" aria-hidden="true">${svg}</span>` : '';
+}
 // Two layers by page order: the back item before the portrait (drawn behind it), the rest after (in front).
 function heroGearHTML(part){
   if(!S) return '';
@@ -6168,7 +6203,7 @@ function victoryStageHTML(){
   const tr = victoryTrophies().filter(x=> !worn.has(x.name)); // what the hero wears is not repeated as a trophy
   return `<div class="vic-stage" style="--rc-class:${d.color}">
     <div class="vic-rays" aria-hidden="true"></div>
-    ${d.portrait ? `<div class="vic-hero-wrap">${heroGearHTML('back')}<img class="vic-hero" src="${d.portrait}" alt="">${heroGearHTML()}</div>` : ''}
+    ${d.portrait ? `<div class="vic-hero-wrap">${heroGearHTML('back')}<img class="vic-hero" src="${d.portrait}" alt="">${heroGearHTML()}${classPropHTML()}</div>` : ''}
     <div class="vic-plinth"><span>${(d.name || d.who).replace(/</g,'&lt;')} &middot; Depth ${d.depth}</span></div>
     <div class="vic-outcome">${d.outcome}</div>
     ${tr.length ? (()=>{ const t = (x,i)=>`<img class="vic-trophy t-${x.cat}" style="--i:${i}" src="${LOOT_ART[x.name]}" alt="${x.name}" title="${x.name}">`;

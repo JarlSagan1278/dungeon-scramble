@@ -5,7 +5,7 @@
  * Loads the built dist/dungeon_scramble.html in a headless browser and
  * drives real games via the game's own in-page functions (newGame,
  * toggleSelect, skipTransition, etc.) with a simple random-but-legal bot,
- * once for each of the 5 Origin/Class combos listed in main() (one per
+ * once for each of the 10 Origin/Class combos listed in main() (one per
  * origin, plus the Debug class; not full coverage). Reports
  * VICTORY / GAMEOVER / TIMEOUT / ERROR for each run.
  *
@@ -103,6 +103,13 @@ const TICK_FN = () => {
     else if ((S.rerollTokens||0) > 0 && Math.random() < 0.4) { armTrayAct('reroll', null, true); }
     for (let k = 0; k < 6 && S.trayAct; k++) toggleSelect(Math.floor(Math.random() * 16));
     if (S.trayAct) cancelTrayAct();
+    // Nov 25: class Skills too (every class: conversions, Print, Sleight of Hand, Fetch), before the path or part-way
+    // through it (a random die, sometimes one already in the path, which must be refused)
+    const skill = () => { if (S.classAbilityUsed || !(S.klass.convertTo || S.klass.skill)) return;
+      useClassAbility(S.path.length && Math.random() < 0.3 ? S.path[Math.floor(Math.random() * S.path.length)] : Math.floor(Math.random() * 16));
+      for (let k = 0; k < 6 && S.trayAct; k++) toggleSelect(Math.floor(Math.random() * 16));
+      if (S.trayAct) cancelTrayAct(); };
+    if (Math.random() < 0.5) skill();
     if ((S.swapLog||[]).length && Math.random() < 0.3) clearPathAll();
     const maxLen = 1 + Math.floor(Math.random() * 4);
     let steps = 0;
@@ -115,6 +122,7 @@ const TICK_FN = () => {
       // an armed Swap/Reroll face (tapped as the first die) takes the next tap(s)
       for (let k = 0; k < 6 && S.trayAct; k++) toggleSelect(Math.floor(Math.random() * 16));
       if (S.trayAct) cancelTrayAct();
+      if (Math.random() < 0.15) skill();
     }
     endTurnButton();
     return { done: false, note: 'turn' };
@@ -178,6 +186,11 @@ async function main() {
     ['gnome', 'armsmaster'],
     ['halfling', 'dungeoneer'],
     ['pixie', 'arcanist'],
+    ['dwarf', 'medic'],      // Nov 25: the five unlockable classes
+    ['gnome', 'trickster'],
+    ['halfling', 'ranger'],
+    ['pixie', 'alchemist'],
+    ['dwarf', 'engineer'],
     ['dwarf', 'debug'],
   ];
 
