@@ -359,6 +359,8 @@ const CLASSES = [
     zone:(r,c)=> c===0, skill:'print'},
   {id:'trickster', name:'Trickster', color:'#3d7fd0', proto:true, ability:'Once per turn, Sleight of Hand: tap a die in your zone (the four corners), then any other die: they trade places.',
     zone:(r,c)=> (r===0||r===3) && (c===0||c===3), skill:'sleight'},
+  {id:'ranger', name:'Ranger', color:'#6f8f2f', proto:true, ability:'Your dog Pointer bounds out with the dice and lands on one: the four dice beside it get +1. Once per turn, Fetch!: after your path, Pointer runs 2 more steps from its last die and uses those dice too.',
+    zone:(r,c)=> false, pet:true, skill:'fetch'},
   {id:'debug', name:'Debug', color:'#9aa3ab', ability:'No class ability. Starting tray is a random assortment of every die type in the game, for testing.',
     zone:(r,c)=> false, debug:true},
 ];

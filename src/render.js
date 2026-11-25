@@ -1767,9 +1767,9 @@ function renderDie(cell, idx){
   })();
   const foeSt = (typeof foeRuleState==='function') ? foeRuleState() : null;
   const foeNull = !!(foeSt && foeSt.rule==='null' && !cell.minion && (f.type===foeSt.nullType || (foeSt.nullType==='dot' && f.type==='leech')));
-  return `<div class="die ${dieTypeCls} ${foeNull?'foe-nulled':''} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${strongGlint?'glint-strong':''} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${boostReachCls} ${resolveCls} ${minionClearCls} ${comboActiveCls} ${trayActCls}"
+  return `<div class="die ${dieTypeCls} ${(typeof petNear==='function' && petNear(idx))?'pet-aura':''} ${foeNull?'foe-nulled':''} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${zoneCls} ${shakeCls} ${strongGlint?'glint-strong':''} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${boostReachCls} ${resolveCls} ${minionClearCls} ${comboActiveCls} ${trayActCls}"
             data-idx="${idx}" title="${isLastMove?'Click to undo this move':(cell.minion?'Minion die':(taReady?`Tap to ${LABEL[trayActFaceAt(idx)]}`:cell.die.name))}" ${shakeDelay}>
-            ${num?`<div class="pathnum">${num}</div>`:''}
+            ${num?`<div class="pathnum">${num}</div>`:''}${S.klass && S.klass.pet && S.petIdx===idx ? '<i class="pet-token" title="Pointer: the dice beside it get +1"></i>' : ''}
             ${boostReachCls==='boost-yes'?`<span class="boost-reach-chip" aria-hidden="true">${iconSpan('boost')}</span>`:''}
             ${cell.minion?`<div class="minion-eyes" aria-hidden="true" style="${minionEyeStyle(idx)}"><i class="minion-eye"></i><i class="minion-eye"></i></div>`:''}
             ${(cell.forcedFace || boostTargetCls) ? `<div class="corner-badges">
@@ -2257,6 +2257,7 @@ function renderGame(){
   const abilityBtn = document.getElementById('ability-btn');
   if(abilityBtn) abilityBtn.onclick = ()=>{
     if(S.transitioning || S.classAbilityUsed || S.needRoll) return;
+    if(S.klass.skill==='fetch'){ playTone('skillUse'); useClassAbility(-1); return; } // Ranger: Fetch needs no target
     abilityArmed = !abilityArmed; // tap again to back out before picking a die
     playTone(abilityArmed ? 'skillArm' : 'skillDisarm');
     if(abilityArmed) logMsg('sys', `Tap any die in your zone to convert it, even a blank.`);

@@ -352,6 +352,7 @@ let res = await page.evaluate((cfg)=>{
   function useAbility(){
     if(!cfg.playerLike || cfg.noAbility || S.classAbilityUsed) return;
     // Nov 25 prototypes: two-tap Skills. Try a handful of (source, target) pairs, keep the one whose best path is worth most.
+    if(S.klass.skill==='fetch'){ if(S.path.length || true){ useClassAbility(-1); (window.__tok=window.__tok||{}).ability=(window.__tok.ability||0)+1; } return; } // Ranger: always Fetch
     if(S.klass.skill){ const base = pathValue(bestPath(Math.ceil(cfg.skill/3))||[]); let best=null, bv=base+0.5;
       const ok = i=>{ const c=S.tray[i]; return c && !c.minion && !c.spent && !c.forcedFace; };
       const val = f=> f.type==='hit'||f.type==='combo' ? 3*(f.value||1) : f.type==='boost' ? 4 : f.type==='dot'||f.type==='heal'||f.type==='block' ? 2*(f.value||1) : f.type==='blank' ? 0 : 1;

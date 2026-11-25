@@ -47,7 +47,7 @@ const RUN_FIELDS = [
   // you
   'health','maxHealth','playerDOT','playerHOT','playerBlock','tray','backPocket','relics','path','classAbilityUsed','freezeNext','_lastBlow','_fightTaken','_fightBlocked',
   'nullifyTokens','freezeTokens','swapTokens','rerollTokens','boostTokenCharges','boostTokenValue','pendingFreeBoost','swapLog','trayAct',
-  'needRoll','_pendingMinions','_reveals','committedTurn','_lw',
+  'needRoll','_pendingMinions','_reveals','committedTurn','_lw','petIdx','fetchArmed',
   // choices waiting on you (a shrine choice holds functions: maybeAutosave never saves while one is open)
   'lootChoice','pendingLootDie','relicChoice','shrineChoice','shrineResult','forkChoice','forkPick',
   // camp and route bookkeeping
@@ -1529,6 +1529,7 @@ function scrambleTray(gate){
   S.classAbilityUsed = false;
   abilityArmed = false;
   S.justScrambled = true; S.needRoll = false;
+  if(S.klass && S.klass.pet){ S.petIdx = rand(16); S.fetchArmed = false; } // Ranger (Nov 25): Pointer lands with the dice
   // a turn's opening roll waits for the flick (the guided first turn's ready-made Path does not)
   if(gate && rollGateOn() && !(S.guide && (S.guide.stage==='pending' || S.guide.stage==='t1'))){ S.needRoll = true; S.justScrambled = false; return; }
   if(typeof playDiceRollSound==='function') playDiceRollSound();
@@ -1788,7 +1789,7 @@ function clearPathAll(){
   restoreReveals(0);
   restoreAbilityReveal();
   S.tray.forEach(c=>{ if(!(c.forcedFace && c.forcedFace.fromAct)) delete c.forcedFace; }); // a used Reroll die keeps its after-use face (rerolls stay)
-  S.classAbilityUsed = false;
+  S.classAbilityUsed = false; S.fetchArmed = false;
   abilityArmed = false;
   undoTraySwaps();
   S.trayAct = null;
@@ -1798,6 +1799,7 @@ function useClassAbility(idx){
   if(S.classAbilityUsed) return;
   // Nov 25 prototypes: two-tap Skills. Print (Engineer): first any die (the face to copy), then a zone die. Sleight of Hand
   // (Trickster): first a zone die, then any die, and they swap. Both go through the tray-action flow (S.trayAct).
+  if(S.klass.skill==='fetch'){ S.fetchArmed = true; S.classAbilityUsed = true; teleLog('class_ability', {klass:S.klass.id, turn:S.turnNumber, floor:S.floorIdx+1}); logMsg('sys', 'Fetch! Pointer will run 2 more steps from the end of your path.'); fastTrayRender(); return; }
   if(S.klass.skill==='print'){ const c = S.tray[idx]; if(!c || c.minion || c.spent || S.path.includes(idx)) return; const f = currentFace(c); if(!f || f.type==='blank') return;
     S.trayAct = {kind:'print', src:idx, token:false, first:null, skill:true, face:clone(f)}; logMsg('sys', 'Print: now tap a die in your zone to copy that face onto it.'); fastTrayRender(); return; }
   if(S.klass.skill==='sleight'){ if(!inZone(idx)) return; const c = S.tray[idx]; if(!c || c.minion || c.spent || S.path.includes(idx)) return;
@@ -1865,8 +1867,23 @@ function buildComboRipple(path){
 // its real face. Previews never use this, so a path can't scout covered dice.
 function pathFaceForIdx(idx){
   const cell = S.tray[idx];
-  if(S._resolvingPath && cell.minion && !cell.forcedFace) return classFace(cell.die.faces[cell.faceIdx]);
-  return classFace(getFaceForIdx(idx));
+  if(S._resolvingPath && cell.minion && !cell.forcedFace) return petFace(idx, classFace(cell.die.faces[cell.faceIdx]));
+  return petFace(idx, classFace(getFaceForIdx(idx)));
+}
+// Ranger (Nov 25): the four dice beside Pointer get +1 on any face with a number (not Boost, a multiplier).
+function petNear(idx){ if(!S || !S.klass || !S.klass.pet || S.petIdx==null) return false; const a = trayRC(idx), b = trayRC(S.petIdx); return Math.abs(a.r-b.r) + Math.abs(a.c-b.c) === 1; }
+function petFace(idx, f){ if(f && f.value && f.type!=='boost' && petNear(idx)) return Object.assign({}, f, {value: f.value + 1}); return f; }
+// Fetch!: Pointer runs 2 straight steps from the path's last die onto the best dice it can reach (not used, no Minion, not blank).
+function petFetchSteps(path){
+  if(!path.length) return [];
+  const score = i=>{ const f = pathFaceForIdx(i); return f.type==='blank' ? -1 : ({hit:3, combo:4, dot:2, heal:2, block:2, leech:2, hot:1, boost:3, freeze:2, nullify:1})[f.type]*(f.value||1) || 0.5; };
+  const out = []; let at = path[path.length-1];
+  for(let k=0; k<2; k++){
+    const {r,c} = trayRC(at); const opts = [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].filter(([a,b])=>inBounds(a,b)).map(([a,b])=>trayIdx(a,b))
+      .filter(i=>!path.includes(i) && !out.includes(i) && !S.tray[i].minion && !S.tray[i].spent && score(i)>0).sort((a,b)=>score(b)-score(a));
+    if(!opts.length) break; out.push(opts[0]); at = opts[0];
+  }
+  return out;
 }
 // Class passives on face values (Oct 16, Jeremy): the Arcanist's Boosts are 1 stronger (x2 counts as x3). Applied where the
 // path is computed (pathFaceForIdx) and where the tray draws a die, so what you see is what you get.
@@ -2254,6 +2271,8 @@ function endTurnButton(){
   // Nov 12 (Jeremy: lock the turn in at Go): save the board with the committed path before it plays out. Nothing is
   // saved while a turn plays, so closing the game mid-turn used to resume before Go and let you play the turn again
   // differently; now Continue finishes this same path (resumeCommittedTurn).
+  if(S.fetchArmed && S.path.length){ const f = petFetchSteps(S.path); if(f.length){ S.path = S.path.concat(f); logMsg('sys', `Fetch! Pointer runs ${f.length} more step${f.length>1?'s':''}.`); } } // Ranger
+  S.fetchArmed = false;
   S.committedTurn = { path: S.path.slice(), lw: S._lw || null };
   saveGame();
   delete S.committedTurn;
