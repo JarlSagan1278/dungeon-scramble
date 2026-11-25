@@ -1788,7 +1788,7 @@ function clearPathAll(){
   S.path=[];
   restoreReveals(0);
   restoreAbilityReveal();
-  S.tray.forEach(c=>{ if(!(c.forcedFace && c.forcedFace.fromAct)) delete c.forcedFace; }); // a used Reroll die keeps its after-use face (rerolls stay)
+  S.tray.forEach(c=>{ if(!(c.forcedFace && (c.forcedFace.fromAct || c.forcedFace.kept))) delete c.forcedFace; }); // a used Reroll die keeps its after-use face (rerolls stay); earlier prints stay
   S.classAbilityUsed = false; S.fetchArmed = false;
   abilityArmed = false;
   undoTraySwaps();
@@ -2518,7 +2518,7 @@ function endTurn(){
   if(S.guide && S.guide.stage==='t1') S.guide.stage = 't2';
   S.path = [];
   S.classAbilityUsed = false;
-  S.tray.forEach(c=>delete c.forcedFace);
+  S.tray.forEach(c=>{ if(c.forcedFace && c.forcedFace.printed){ c.forcedFace.kept = true; return; } delete c.forcedFace; }); // Engineer (Nov 25): a printed face stays for the rest of the fight
   const pm = S._pendingMinions||0;
   scrambleTray(true);
   placePendingMinions(pm);

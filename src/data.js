@@ -355,7 +355,7 @@ const CLASSES = [
     zone:(r,c)=> (r===1||r===2) && (c===1||c===2), convertTo:{type:'dot', value:2}, dotPlus:1},
   {id:'medic', name:'Field Medic', color:'#d0565a', proto:true, ability:'Once per turn, turn any die in your zone (the bottom row), even a Blank, into a Heal (2). Healing past your full health becomes Block.',
     zone:(r,c)=> r===3, convertTo:{type:'heal', value:2}, overhealBlock:true},
-  {id:'engineer', name:'Engineer', color:'#c7902c', proto:true, ability:'Once per turn, Print: tap any die in your Tray, then a die in your zone (the left column): the zone die becomes a copy of that face.',
+  {id:'engineer', name:'Engineer', color:'#c7902c', proto:true, ability:'Once per turn, Print: tap any die in your Tray, then a die in your zone (the left column): the zone die becomes a copy of that face, and keeps it for the rest of the fight.',
     zone:(r,c)=> c===0, skill:'print'},
   {id:'trickster', name:'Trickster', color:'#3d7fd0', proto:true, ability:'Once per turn, Sleight of Hand: tap a die in your zone (the four corners), then any other die: they trade places.',
     zone:(r,c)=> (r===0||r===3) && (c===0||c===3), skill:'sleight'},
