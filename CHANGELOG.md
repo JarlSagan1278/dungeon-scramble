@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- New players: if your first runs show one-die paths while a longer one was possible, a one-time tip shows how to grow your Path.
+- Worn gear: the Charge-Atlatl and Leeching Lance no longer poke past the left edge of narrow phones.
+
 ## 1.42.172 (Nov 25, 2026)
 - The secret Additive Inverse die has its own look: a violet void with a magic pulse running backwards, and every few seconds it flips to its negative.
 
