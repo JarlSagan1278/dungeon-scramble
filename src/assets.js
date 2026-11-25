@@ -393,7 +393,7 @@ const LOOT_HILT_UP = { 'Dagger': 140, 'Hidden Estoc': 20 };
 const LOOT_GEAR_TWEAK = {
   'Tarot Deck': { size:.7, out:.15 },
   'Winged Boots': { out:.15 },
-  'Dagger': { size:1.45, out:.2 }, 'Charge-Atlatl': { size:1.35, out:.14 }, 'Leeching Lance': { size:1.4, out:.14 }, 'Axiom of Choice': { size:1.3, out:.04, rot:0 }, // thin back items that hid behind hair and hoods
+  'Dagger': { size:1.45, out:.2 }, 'Charge-Atlatl': { size:1.35, out:.08 }, 'Leeching Lance': { size:1.4, out:.1 }, 'Axiom of Choice': { size:1.3, out:.04, rot:0 }, // thin back items that hid behind hair and hoods
   'Drill Shield': { size:.8 }, // overlapped the head
   'Grappling Set': { out:.12 }, // its rope crossed the hero's hand
   'Genetic Drifter': { board:true }, // lies under the hero's feet like a skateboard (Jeremy)
