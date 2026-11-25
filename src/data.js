@@ -5,7 +5,7 @@
 // tweak/fix like a wording or layout change, minor (x.Y.0) for a new
 // feature, major (X.0.0) for a breaking/full redesign. Shown in Settings
 // so there's always a quick way to tell whether two builds differ.
-const GAME_VERSION = '1.42.166';
+const GAME_VERSION = '1.42.167';
 // Build flags (Oct 21, release prep). build.js replaces this line: `node build.js` = tester build (both false),
 // `--release` = store/public build (no Debug unlock), `--demo` = free Floor-1-only build (also release).
 var BUILD = { demo:false, release:false, app:false, steam:false };
@@ -357,7 +357,7 @@ const CLASSES = [
 function lootSet(list, tier){ return list.map(([name,fs])=>({name, faces:faces(fs), cat:tier})); }
 
 const ALLOY = lootSet([
-  ['Greathammer', ['Hit2','Hit2','Combo2','blank','blank','blank']],
+  ['Greathammer', ['Hit2','Hit2','Combo2','Block2','blank','blank']], // Nov 25 (census): one blank each became a real face on Greathammer, Greaterhammer, Longsword, Grappling Set; a Fumble on Humor-inverter became Heal 2,
   ['Spiked Shield', ['Hit2','Block2','Block2','Nullify','blank','blank']],
   ['Buckler', ['Combo1','Combo1','Block1','Block1','Nullify','blank']],
   ['Whip', ['Combo2','Combo1','Combo1','Pivot','Hit1','blank']], // Nov 23: buffed (bot study: runs holding it won 5-8 points less)
@@ -370,25 +370,25 @@ const ALLOY = lootSet([
   ['Greataxe', ['Hit2','Hit2','DOT2','blank','blank','blank']],
   ['Claymore', ['Hit2','Hit2','Hit2','Combo2','Fumble1','blank']],
   ['Rapier', ['Hit1','Hit1','Hit1','Hit1','Combo1','Dodge']],
-  ['Longsword', ['Hit1','Hit1','Hit1','Combo2','blank','blank']],
+  ['Longsword', ['Hit1','Hit1','Hit1','Combo2','Hit2','blank']],
   ['Crossbow', ['Hit2','Hit2','Boost1','Dodge','Block1','blank']],
   ['Blunderbuss', ['Hit2','Hit2','Boost2','Fumble1','Leap','Hit2']], // Nov 23: buffed (bot study: runs holding it won 5-8 points less)
   ['Ironskin Draught', ['HOT1','HOT1','Block1','Block2','blank','blank']],
   ['Acid Potion', ['Hit1','Hit2','DOT2','DOT2','Fumble1','blank']],
-  ['Grappling Set', ['Combo2','Dodge','Dodge','Leap','Leap','blank']],
+  ['Grappling Set', ['Combo2','Dodge','Dodge','Leap','Leap','Combo2']],
   ['Medsack', ['Heal1','Heal2','Heal2','Heal2','blank','blank']],
 ], 'alloy');
 
 const GILDED = lootSet([
   ['Hidden Estoc', ['Hit2','Hit2','Hit2','Hit2','Combo1','Leap']],
-  ['Greaterhammer', ['Hit3','Hit3','Hit3','Combo2','blank','blank']],
+  ['Greaterhammer', ['Hit3','Hit3','Hit3','Combo2','Combo2','blank']],
   ['Hataxe', ['Hit2','DOT2','Block3','Block3','blank','blank']],
   ['Triage Turret', ['Hit2','Boost2','DOT2','Heal2','Heal2','blank']],
   ['Eye-Frame', ['Combo2','Combo2','Dodge','Reroll','Leap','Leap']],
   ["Drafter's Draught", ['Boost2','Boost2','Boost2','Freeze','Nullify','blank']],
   ['Thorned Bulwark', ['Hit1','Hit1','Block3','Block3','Block3','blank']],
   ['Cool Whip', ['Hit1','Combo2','Combo1','Combo1','Swap','blank']],
-  ['Humor-inverter', ['Fumble1','Fumble1','HOT2','HOT2','HOT2','blank']],
+  ['Humor-inverter', ['Fumble1','Heal2','HOT2','HOT2','HOT2','blank']],
   ['Winged Boots', ['Combo3','Dodge','Leap','Pivot','Nullify','Boost1']],
   ['Drill Shield', ['Hit2','Hit2','Block3','Block3','Nullify','blank']],
   ['Maximum Capacitor', ['Fumble1','Leap','Boost2','Boost3','Boost3','blank']],
@@ -529,7 +529,7 @@ const FLOOR2_BOSSES = [
 const FLOOR3_ENEMIES = [
   enc('Morel Dilemma','Enemy',18,{dmg:6,minion:2,hot:1,flavor:'A fungal species that has stumped, and subsequently eaten, philosophers for generations.'}),
   enc('Chimeric Sludge','Enemy',25,{dmg:7,hot:2,quests:['12 damage: 4 maneuvers','10 damage: route antipodal'],flavor:'Biological slag, made up of countless individual chimeras.'}),
-  enc('Gnome Chomper','Enemy',28,{rule:'bounty',dmg:8,quests:['6 damage: 3 maneuvers','10 damage: route running start'],flavor:'"The Gnomish Chempire is the leading zealot state!"'}),
+  enc('Gnome Chomper','Enemy',32,{rule:'bounty',dmg:8,quests:['6 damage: 3 maneuvers','10 damage: route running start'],flavor:'"The Gnomish Chempire is the leading zealot state!"'}),
   // v1.39.0: replaces Parasite Seer (its art was a cropped copy of another gnome); Jeremy's idea, same slot and stats.
   enc('Gnomeowners Association','Enemy',20,{dmg:5,shield:3,flavor:'"Only good and gracious hosts are allowed in this neighborhood."'}),
   enc('Gestalt Network','Enemy',20,{dmg:5,dot:2,flavor:'"You will join us. Our population is mushrooming."'}),
@@ -634,8 +634,8 @@ const HEAVY_EVERY = {elite:3, deadly:2};
 // path counter while you plan, and calls out when it bites. Names are Claude's placeholders (blue in the names sheet).
 const ASYMPTOTE_CAP = 16; // Asymptote (foe rule): the most path damage it takes in one turn
 const FOE_RULES = {
-  null:   { name:'Null Hypothesis', short:t=>`immune to <b>${t.nullLabel}</b>`, text:t=>`Immune to <b>${t.nullLabel}</b> this turn.`, tip:'Each turn one face type (Combo, then D.O.T., alternating) deals no damage to it. Route around it.' },
-  parity: { name:'Odd Permutation', short:t=>`<b>${t.weak==='even'?'Even':'Odd'}</b> paths ×1.5`, text:t=>`<b>${t.weak==='even'?'Even':'Odd'}</b>-length paths deal &times;1.5 this turn; ${t.weak==='even'?'odd':'even'} &times;0.75.`, tip:'It flips each turn: count your path. The right parity deals 50% more, the wrong one 25% less.' },
+  null:   { name:'Null Hypothesis', short:t=>`no <b>${t.nullLabel}</b>, then ${t.nextLabel}`, text:t=>`Immune to <b>${t.nullLabel}</b> this turn, <b>${t.nextLabel}</b> next turn.`, tip:'Each turn one face type (Combo, then D.O.T., alternating) deals no damage to it. Route around it.' },
+  parity: { name:'Odd Permutation', short:t=>`<b>${t.weak==='even'?'Even':'Odd'}</b> paths ×1.25`, text:t=>`<b>${t.weak==='even'?'Even':'Odd'}</b>-length paths deal &times;1.25 this turn; ${t.weak==='even'?'odd':'even'} &times;0.75.`, tip:'It flips each turn: count your path. The right parity deals 25% more, the wrong one 25% less.' },
   // Nov 25 (Jeremy picked 4, 5, 6 of six ideas: rules that press on whole builds): turtling, diagonal routes, burst vs D.O.T.
   zerosum:   { name:'Zero-Sum Game', short:()=>`<b>Block</b> heals it`, text:()=>`Block you gain this turn <b>heals it</b> twice as much.`, tip:'Every point of Block you gain heals it 2. Hit hard instead of hiding.' },
   pythag:    { name:'Pythagorean Theorem', phoneName:'Pythagoras', short:()=>`<b>diagonals</b> &times;1.5`, text:()=>`Dice you reach by a <b>diagonal</b> step deal &times;1.5.`, tip:'Step onto a die diagonally (a Sidestep, a Pivot, the Arcanist\'s X) and it deals 50% more to this foe.' },

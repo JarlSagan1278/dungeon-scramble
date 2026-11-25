@@ -14,7 +14,7 @@ Drafted Oct 21, 2026 from build 1.41.76, text revised Oct 23 to match the press 
 | Shrines | 32 (11 / 11 / 10) | `FLOORn_SHRINES` |
 | Loot dice | 56 (20 Alloy, 20 Gilded, 16 Magic) + 6 basic dice | `ALLOY`, `GILDED`, `MAGIC`, `BASIC_DICE` |
 | Relics | 27 (4 of them origin relics earned by winning) | `RELICS` |
-| Depth | 10 modifiers; max depth 27 if every rank is taken (shown as Depth 0 to 27) | `DEPTH_MODS` |
+| Depth | 10 modifiers; max depth 28 if every rank is taken (shown as Depth 0 to 28; Rationing rank 2 costs 2 since 1.42.167) | `DEPTH_MODS` |
 
 ## App name (max 30)
 

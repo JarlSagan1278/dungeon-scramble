@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.42.167 (Nov 25, 2026)
+- Null Hypothesis shows next turn's immunity too ("Immune to Combo this turn, D.O.T. next turn").
+- Odd Permutation: the right parity deals x1.25 (was x1.5). Gnome Chomper health 28 -> 32.
+- Loot: Greathammer (a blank became Block 2), Greaterhammer (a blank became Combo 2), Longsword (a blank became Hit 2), Grappling Set (its blank became Combo 2), Humor-inverter (a Fumble became Heal 2).
+- Depth: Rationing Rations rank 2 (camp rest heals nothing) costs 2 Depth (was 1); the highest Depth is now 28.
+
 ## 1.42.166 (Nov 25, 2026)
 - New achievements: Rule Breaker (beat every foe that follows a rule), Daily Conqueror (win a scored Daily Dungeon), Creature of Habit (a 30-day Daily streak).
 

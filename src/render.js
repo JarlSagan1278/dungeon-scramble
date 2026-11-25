@@ -2059,7 +2059,7 @@ function pathCounterHTML(){
   for(let k=0;k<extras.length;k++) extras[k] = `<span class="pcf-x">${extras[k]}</span>`; // Nov 11: one element per effect (layout options)
   // Foe rules on the counter (Nov 24): the parity this path has, or the bounty it would collect
   { const st = (typeof foeRuleState==='function') ? foeRuleState() : null;
-    if(st && st.rule==='parity'){ const even = S.path.length % 2 === 0, good = even === (st.weak==='even'); extras.push(`<span class="pcf-rule ${good?'good':'bad'}">${even?'Even':'Odd'} &times;${good?'1.5':'0.75'}</span>`); }
+    if(st && st.rule==='parity'){ const even = S.path.length % 2 === 0, good = even === (st.weak==='even'); extras.push(`<span class="pcf-rule ${good?'good':'bad'}">${even?'Even':'Odd'} &times;${good?'1.25':'0.75'}</span>`); }
     if(st && st.rule==='bounty'){ let live = false; try{ const ctx = questCtxFromEffects(preview); live = (S.encounter.quests||[]).some((q,i)=> !S.encounter.questsDone[i] && questEval(parseQuestSpec(q).cond, ctx).done); }catch(err){}
       if(live) extras.push(`<span class="pcf-rule good">Bounty &times;2</span>`); }
     if(st && st.rule==='zerosum' && preview.blockGain>0) extras.push(`<span class="pcf-rule bad">Heals it +${Math.round(preview.blockGain*2)}</span>`);
@@ -6875,7 +6875,7 @@ const TIP_TEXT = {
   // Nov 4 (Jeremy): quests were hard to understand. Name this fight's own quest and reward so the lesson is concrete.
   // Nov 25: the first meeting with each foe rule points at its plaque
   rule_null: ()=>'This foe tests a <b>Null Hypothesis</b>: one face type does <b>no damage</b> to it this turn (marked on your dice). It changes every turn, so route around it.',
-  rule_parity: ()=>'<b>Odd Permutation</b>: count your path! The right length (odd or even) deals <b>50% more</b>, the wrong one 25% less. It flips every turn; the counter shows which you have.',
+  rule_parity: ()=>'<b>Odd Permutation</b>: count your path! The right length (odd or even) deals <b>25% more</b>, the wrong one 25% less. It flips every turn; the counter shows which you have.',
   rule_zerosum: ()=>'<b>Zero-Sum Game</b>: every point of <b>Block</b> you gain this turn heals this foe 2. Hit hard instead of hiding.',
   rule_pythag: ()=>'<b>Pythagorean Theorem</b>: dice you step onto <b>diagonally</b> deal 50% more to this foe. Sidesteps, Pivots and the Arcanist\'s X shine here.',
   rule_asymptote: ()=>`<b>Asymptote</b>: your path deals it at most <b>${ASYMPTOTE_CAP}</b> a turn, however big. <b>D.O.T.</b> ticks ignore the limit, so stack it.`,

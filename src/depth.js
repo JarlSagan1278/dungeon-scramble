@@ -17,7 +17,7 @@ const BASE_HP_MUL = [1.05, 1.9, 2.2]; // Nov 24 (Jeremy: a bit harder): +5% Floo
 // Rationing rank 2 2 -> 1 depth (~9 points for 2 depth). The rest stay: modest unevenness is part of the fun (Jeremy).
 const DEPTH_MODS = [
   { id:'foes',  name:'Tougher Scuffs', max:4, costs:[1,1,1,1], desc:r=>`Enemies and bosses have +${r*15}% HP.` },
-  { id:'rest',  name:'Rationing Rations', max:2, costs:[1,1], desc:r=> r===2 ? 'Camp rest heals nothing.' : 'Camp rest heals half as much.' },
+  { id:'rest',  name:'Rationing Rations', max:2, costs:[1,2], /* Nov 25 (census): rank 2 (no camp heal) was the ladder's biggest 1-point drop; costs 2 */ desc:r=> r===2 ? 'Camp rest heals nothing.' : 'Camp rest heals half as much.' },
   { id:'frail', name:'Clumsy',         max:3, costs:[1,1,2], desc:r=>`Start with ${r*4} less max HP.` },
   { id:'swarm', name:'Swarming',       max:2, costs:[1,2], desc:r=>`Minion spawns place ${r} extra die${r>1?'s':''}.` },
   { id:'slim',  name:'Burden of Choice', max:1, costs:[1], desc:r=> 'Overkills add no loot option, and every loot reward offers one fewer die.' },

@@ -1877,7 +1877,8 @@ const NULL_CYCLE = ['combo','dot']; // Nov 25: never Hit (a Hit turn blanked mos
 function foeRuleState(e){
   e = e || (S && S.encounter); if(!e || !e.rule) return null;
   const n = e.turnsActed||0;
-  if(e.rule==='null'){ const t = NULL_CYCLE[n % NULL_CYCLE.length]; return { rule:'null', nullType:t, nullLabel: t==='dot' ? 'D.O.T.' : LABEL[t] }; }
+  if(e.rule==='null'){ const t = NULL_CYCLE[n % NULL_CYCLE.length], u = NULL_CYCLE[(n+1) % NULL_CYCLE.length], lab = x=> x==='dot' ? 'D.O.T.' : LABEL[x];
+    return { rule:'null', nullType:t, nullLabel: lab(t), nextLabel: lab(u) }; } // Nov 25 (census): next turn's immunity shows too, so a player can plan ahead
   if(e.rule==='parity') return { rule:'parity', weak: n % 2 === 0 ? 'even' : 'odd' };
   if(e.rule==='bounty') return { rule:'bounty' };
   if(e.rule==='zerosum' || e.rule==='pythag' || e.rule==='asymptote') return { rule:e.rule };
@@ -1886,7 +1887,7 @@ function foeRuleState(e){
 function foeRuleMul(type, len){
   const st = foeRuleState(); if(!st || !/^(hit|combo|dot|leech)$/.test(type)) return 1;
   if(st.rule==='null') return (type===st.nullType || (st.nullType==='dot' && type==='leech')) ? 0 : 1;
-  if(st.rule==='parity') return ((len % 2 === 0) === (st.weak==='even')) ? 1.5 : 0.75;
+  if(st.rule==='parity') return ((len % 2 === 0) === (st.weak==='even')) ? 1.25 : 0.75; // Nov 25 (census): x1.5 made it easier than plain foes
   return 1;
 }
 function computePathEffects(path){
