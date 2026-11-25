@@ -2042,7 +2042,7 @@ function healPlayer(n){
   const over = S.health + n - S.maxHealth;
   S.health = cap(S.health+n, S.maxHealth);
   if(over>0 && hasRelic('overflow_chalice')){ S.playerBlock += over; fireRelic('overflow_chalice','+'+over+' Block'); }
-  if(over>0 && S.klass && S.klass.overhealBlock){ S.playerBlock += over; logMsg('sys', `Field Medic: ${over} extra healing becomes Block.`); } // Nov 25
+  if(over>1 && S.klass && S.klass.overhealBlock){ const b = Math.floor(over/2); S.playerBlock += b; logMsg('sys', `Field Medic: ${b} Block from extra healing.`); } // Nov 25: half the extra healing (all of it made the Medic win 95% for experts)
 }
 // Strength in Mooks (grave_tally, v1.36.0): each Minion the player clears gives 1 Block.
 function graveTally(n){ if(n>0 && hasRelic('grave_tally')){ S.playerBlock += n; fireRelic('grave_tally','+'+n+' Block'); } }

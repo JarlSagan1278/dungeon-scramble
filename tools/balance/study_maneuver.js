@@ -236,6 +236,7 @@ let res = await page.evaluate((cfg)=>{
   const dieScore = d => cfg.lootV2 ? dieScoreV2(d) : dieScoreV1(d);
   const lootScore = o => cfg.lootV2 ? dieScore(o) : dieScore(o) + (o.cat==='attack'?0.2:0);
   function pathValue(path){
+    if(S.fetchArmed && path.length && typeof petFetchSteps==='function') path = path.concat(petFetchSteps(path)); // Ranger: plan where the path ends for Fetch
     const ef = computePathEffects(path);
     const e = S.encounter;
     const missing = S.maxHealth - S.health;

@@ -353,7 +353,7 @@ const CLASSES = [
   // (proto) until Jeremy approves them. skill:'print' / 'sleight' are two-tap Skills run through the tray-action flow.
   {id:'alchemist', name:'Alchemist', color:'#4f9a3a', proto:true, ability:'Once per turn, turn any die in your zone (the centre 2x2), even a Blank, into a D.O.T. (2). Every D.O.T. face you play is 1 stronger.',
     zone:(r,c)=> (r===1||r===2) && (c===1||c===2), convertTo:{type:'dot', value:2}, dotPlus:1},
-  {id:'medic', name:'Field Medic', color:'#d0565a', proto:true, ability:'Once per turn, turn any die in your zone (the bottom row), even a Blank, into a Heal (2). Healing past your full health becomes Block.',
+  {id:'medic', name:'Field Medic', color:'#d0565a', proto:true, ability:'Once per turn, turn any die in your zone (the bottom row), even a Blank, into a Heal (2). Half of any healing past your full health becomes Block.',
     zone:(r,c)=> r===3, convertTo:{type:'heal', value:2}, overhealBlock:true},
   {id:'engineer', name:'Engineer', color:'#c7902c', proto:true, ability:'Once per turn, Print: tap any die in your Tray, then a die in your zone (the left column): the zone die becomes a copy of that face, and keeps it for the rest of the fight.',
     zone:(r,c)=> c===0, skill:'print'},
