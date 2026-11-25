@@ -88,6 +88,12 @@ const TICK_FN = () => {
     else if ((S.rerollTokens||0) > 0 && Math.random() < 0.4) { armTrayAct('reroll', null, true); }
     for (let k = 0; k < 6 && S.trayAct; k++) toggleSelect(Math.floor(Math.random() * 16));
     if (S.trayAct) cancelTrayAct();
+    // Nov 25: class Skills (every class: conversions, Print, Sleight of Hand, Fetch), before the path, sometimes aimed at a path die
+    if (!S.classAbilityUsed && (S.klass.convertTo || S.klass.skill) && Math.random() < 0.5) {
+      useClassAbility(S.path.length && Math.random() < 0.3 ? S.path[0] : Math.floor(Math.random() * 16));
+      for (let k = 0; k < 6 && S.trayAct; k++) toggleSelect(Math.floor(Math.random() * 16));
+      if (S.trayAct) cancelTrayAct();
+    }
     if ((S.swapLog||[]).length && Math.random() < 0.3) clearPathAll();
     const maxLen = 1 + Math.floor(Math.random() * 4);
     let steps = 0;
