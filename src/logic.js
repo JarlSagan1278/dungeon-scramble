@@ -548,6 +548,9 @@ function loadMeta(){
       coachSeen: (parsed.coachSeen && typeof parsed.coachSeen==='object') ? parsed.coachSeen : {},
       renown: Math.max(0, +parsed.renown||0),
       daily: (parsed.daily && typeof parsed.daily==='object') ? parsed.daily : {},
+      // Nov 27: these two were dropped on load, so the first-relic hint came back every time the game was reopened
+      relicHintSeen: +parsed.relicHintSeen || 0,
+      lootHelpShown: +parsed.lootHelpShown || 0,
     };
   } catch(e){ return { lifetime: {...DEFAULT_LIFETIME}, achievements: {}, favoriteBoons: [], relicsFound: [] }; }
 }

@@ -1032,7 +1032,7 @@ function renderTitle(){
           <div class="title-btn-col">
             ${continueBtn}
             <button class="${saved?'':'primary'}" id="title-newrun-btn">${saved?'Start New Run':'New Run'}</button>
-            ${(()=>{ if(BUILD.app && !hasFullGame()) return ''; const t = dailyToday(), r = dailyResult(t.key); // Daily Dungeon (Nov 23)
+            ${(()=>{ if(BUILD.app && !hasFullGame()) return ''; if(!((META.lifetime && META.lifetime.runsPlayed) > 0)) return ''; /* Nov 27 (Jeremy): not before a device's first run (its one scored try would go to a newcomer) */ const t = dailyToday(), r = dailyResult(t.key); // Daily Dungeon (Nov 23)
               return r ? `<div class="title-daily-row"><button class="title-daily-btn done" id="title-daily-btn" title="Share today's result">Daily #${t.n}: ${r.outcome==='victory'?'Conquered':r.outcome==='demo'?'Cleared':'Floor '+r.floor}${dailyStreak()>1?` &middot; ${dailyStreak()}-day streak`:''} &middot; Share</button><button class="title-daily-btn practice" id="title-daily-practice" title="Play today's dungeon again for practice (your shared result stays)">Practice</button></div>`
                        : `<button class="title-daily-btn" id="title-daily-btn" title="Today's dungeon is the same for everyone: one try">Daily Dungeon #${t.n}${dailyStreak()>0?` <small>&middot; keep your ${dailyStreak()}-day streak</small>`:''}</button>`; })()}
             <div class="title-links">
@@ -1851,7 +1851,8 @@ function renderEncounterCard(e, mode){
       const more = Math.floor(hp + thr) + 1 - d;
       killHint = {state:'kill', text:`Lethal${more<=3?` \u00b7 +${more} for Overkill`:''}`};
     }
-    else if(d > 0 && hp - d > 0 && hp - d <= 3) killHint = {state:'close', text:`${Math.ceil(hp-d)} short!`};
+    // Nov 27 (Jeremy): not during the guided first turn, whose planned path stops 1 short on purpose (the lid lesson comes next)
+    else if(d > 0 && hp - d > 0 && hp - d <= 3 && !(S.guide && S.guide.stage==='t1')) killHint = {state:'close', text:`${Math.ceil(hp-d)} short!`};
   }
   const fx = healthFX(curHealthClamped, e._lastHealth);
   e._lastHealth = curHealthClamped;
@@ -4600,7 +4601,7 @@ function renderLootModal(){
           ${lootPreviewTileHTML(opt, `loot-${i}`, art)}
           <div class="faces-tiles">${opt.faces.map(f=>f.type==='blank'
             ? '<div class="mini-face mf-blank"></div>'
-            : `<div class="mini-face mf-${opt.cat}" title="${LABEL[f.type]}${f.value?' '+f.value:''}">${iconSpan(f.type, f.value)}<small>${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</small></div>`).join('')}</div>
+            : `<div class="mini-face mf-${opt.cat}" title="${LABEL[f.type]}${f.value?' '+f.value:''}: ${(FACE_DESC[f.type]||'').replace(/"/g,'&quot;')}">${iconSpan(f.type, f.value)}<small>${LABEL[f.type]}${(f.value && !ICON_VALUE_SLOT.has(f.type))?' '+f.value:''}</small></div>`).join('')}</div>
         </div>`);
       card.onclick = ()=>{
         if(locked) return;
@@ -4609,6 +4610,11 @@ function renderLootModal(){
       };
       container.appendChild(card);
     });
+    // Nov 27 (Jeremy): the first few loot screens on a device say how to read a face and what the dots on a die mean
+    if(!fin && (META.lootHelpShown||0) < 3){
+      META.lootHelpShown = (META.lootHelpShown||0) + 1; saveMeta();
+      body.insertAdjacentHTML('beforeend', `<div class="loot-help">Hold any face to read what it does. The dots on a die: collect ${BOON_COPIES_NEEDED} copies across your runs and you can start a run with it.</div>`);
+    }
   }
 
   if(S.lootChoice.opened){ reveal(false); return; }
@@ -7001,7 +7007,14 @@ function updateGuide(){
   if(!b){
     b = document.createElement('div'); b.id = 'guide-bubble'; b.className = 'guide-bubble';
     b.innerHTML = '<div class="guide-text"></div><span class="guide-skip" role="button" tabindex="0">Skip tutorial</span>';
-    b.querySelector('.guide-skip').onclick = guideSkip;
+    // Nov 27 (Jeremy): skipping asks once; the players who skipped did worst (one-die paths for whole fights)
+    const sk = b.querySelector('.guide-skip');
+    sk.onclick = ()=>{
+      if(sk.dataset.armed){ guideSkip(); return; }
+      sk.dataset.armed = '1'; sk.classList.add('armed');
+      sk.innerHTML = 'This fight teaches paths in about a minute. <u>Skip anyway</u>';
+      clearTimeout(sk._t); sk._t = setTimeout(()=>{ if(!sk.isConnected) return; delete sk.dataset.armed; sk.classList.remove('armed'); sk.textContent = 'Skip tutorial'; }, 5000);
+    };
     document.body.appendChild(b);
   }
   if(!r){ r = document.createElement('div'); r.id = 'guide-ring'; r.className = 'guide-ring'; document.body.appendChild(r); }

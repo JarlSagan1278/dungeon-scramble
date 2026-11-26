@@ -4152,3 +4152,8 @@ body.pc .modal-overlay.hero-sheet-overlay.modal-closing .modal.hero-sheet{ anima
 @keyframes hs-slide-in{ from{ transform:translateX(-110%); } to{ transform:translateX(0); } }
 @keyframes hs-slide-out{ from{ transform:translateX(0); } to{ transform:translateX(-110%); } }
 .reduced-motion .hero-sheet, .reduced-motion .modal-overlay.hero-sheet-overlay .modal.hero-sheet{ animation:none !important; }
+
+/* Nov 27 (Jeremy): first loot screens: how to read a face, what the dots mean */
+.loot-help{ margin:10px 6px 2px; font-size:12.5px; line-height:1.35; color:#e8dcb6; text-align:center; }
+.guide-bubble .guide-skip.armed{ text-decoration:none; color:#5a3a1a; }
+.guide-bubble .guide-skip.armed u{ color:#a03a2a; font-weight:700; }
