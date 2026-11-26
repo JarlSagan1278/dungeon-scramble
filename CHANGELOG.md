@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.42.173 (Nov 26, 2026)
 - New players: if your first runs show one-die paths while a longer one was possible, a one-time tip shows how to grow your Path.
 - Worn gear: the Charge-Atlatl and Leeching Lance no longer poke past the left edge of narrow phones.
 - Little things to touch: torches flare, vines rustle, Pointer wags, the class objects react, the campfire sparks, achievement coins spin. The class objects have a paper grain.
