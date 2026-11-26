@@ -274,6 +274,7 @@ function render(){
   if(typeof musicUpdate==='function') musicUpdate(); // start/stop the music for this screen
   if(typeof applyDiceFinish==='function') applyDiceFinish();
   document.body.classList.remove('cog-arch');
+  if(!S || S.screen!=='game') document.body.classList.remove('hs-dock'); // the hero sheet docks beside fights only
   // only screens without the room floor drop its class: removing and re-adding it on the game screen restyled the whole
   // page on every path tap (Oct 12)
   { const a = document.getElementById('app'); if(a && !(S && (S.screen==='game' || S.screen==='shrine'))) a.classList.remove('has-room-floor'); }
@@ -4750,11 +4751,11 @@ function relicStripHTML(){
   return `<div class="relic-strip" title="Tap to see your relics">${S.relics.map(id=>relicBadgeHTML(relicById(id))).join('')}</div>`;
 }
 function attachRelicStrip(){
-  document.querySelectorAll('.relic-strip').forEach(n=>{ n.onclick = openRunRelicsModal; });
+  document.querySelectorAll('.relic-strip').forEach(n=>{ n.onclick = n.closest('.fo-player') ? openHeroSheet : openRunRelicsModal; });
   // The fight's gem column stops above the HP bar; extra gems wrap into a second column.
   const col = document.querySelector('.fo-player > .relic-strip'), hp = col && col.parentNode.querySelector('.fo-hpwrap');
   if(col && hp){ const h = hp.getBoundingClientRect().top - col.getBoundingClientRect().top - 4; if(h > 40) col.style.setProperty('--relic-col-h', h+'px'); }
-  if(col) maybeRelicHint(col);
+  if(col && !heroSheetDocked()) maybeRelicHint(col);
   consumeRelicPulses();
 }
 // First relic ever (Oct 31, Jeremy, weak spots R2): the column glows once and a chip says what it is. Once per device.
@@ -4792,11 +4793,12 @@ function consumeRelicPulses(){
       }, i*120);
       return;
     }
-    if(!document.querySelector(`.relic-strip [data-relic="${r.id}"]`)) return;
+    const gemSel = heroSheetDocked() ? `#hero-sheet [data-relic="${r.id}"]` : `.relic-strip [data-relic="${r.id}"]`;
+    if(!document.querySelector(gemSel)) return;
     setTimeout(()=>{
       // Effects live in a body-level fixed layer, not inside the badge: the board
       // re-renders every beat of a turn and would wipe anything attached to it.
-      const b = document.querySelector(`.relic-strip [data-relic="${r.id}"]`);
+      const b = document.querySelector(gemSel);
       if(!b) return;
       const rc = b.getBoundingClientRect();
       const fx = document.createElement('div');
@@ -4823,6 +4825,50 @@ function relicRowHTML(r, locked, isNew){
   return `<div class="relic-row">${relicBadgeHTML(r)}<div><div class="relic-name">${r.name}${isNew?' <span class="new-tag">NEW!</span>':''}${r.origin?` <span class="relic-origin-tag">${ORIGINS.find(o=>o.id===r.origin).name} relic</span>`:''}</div><div class="relic-desc">${r.desc}</div></div></div>`;
 }
 
+// Hero sheet (Nov 26, Jeremy: "build both, use the relics sign to open it"). PC layout only: the hero, the class ability,
+// every relic with its full text, the Back Pocket and the Guild Rank in one dark-brown panel. On a window with spare width
+// beside the fight it stays open on the left (body.hs-dock, pcFitFight decides); otherwise the Relics sign (also Tab, and
+// a controller's left bumper) slides it in over the fight. On the phone the Relics sign still opens the relic display case.
+function heroSheetHTML(){
+  const relics = (S.relics||[]).map(id=>relicById(id)).filter(Boolean);
+  const renown = META.renown||0, k = Math.max(0, rankIndexFor(renown)), rk = RANKS[k], nx = RANKS[k+1];
+  const pct = nx ? Math.max(0, Math.min(100, Math.round(100*(renown - rk.at)/(nx.at - rk.at)))) : 100;
+  const por = S.portrait && !S.portrait.placeholder ? `<img class="hs-por" src="${S.portrait.img}" alt="">` : `<span class="hs-por">${mysteryFigureHTML('width:100%;height:100%;')}</span>`;
+  const dep = depthLabel(currentDepth());
+  const pocket = S.backPocket.length
+    ? `<div class="camp-dice-grid hs-pocket">${S.backPocket.map(d=>`<div class="die dietype-${d.cat} camp-die-tile" title="${d.name}"><span class="camp-die-label">${d.name.replace(/^Maneuver\b/,'Mvr').replace(/^Attack\b/,'Atk')}</span></div>`).join('')}</div><small class="hs-note">Saves you once from 0 Health (spends the whole Pocket).</small>`
+    : `<small class="hs-note">Empty: no safety net until a die lands here.</small>`;
+  return `<div class="hs-head">${por}<div><div class="hs-name">${S.origin.name} ${S.klass.name}</div><div class="hs-sub">Floor ${S.floorIdx+1}${dep ? ' &middot; Depth '+dep : ''}</div></div></div>
+    <div class="hs-sec"><div class="hs-h">${S.klass.name}</div><p>${S.klass.ability}</p></div>
+    <div class="hs-sec hs-relics"><div class="hs-h">Relics <span>${relics.length}</span></div>${relics.length ? relics.map(r=>`<div class="hs-relic">${relicBadgeHTML(r)}<div><b>${r.name}</b><small>${r.desc}</small></div></div>`).join('') : '<small class="hs-note">None yet. Relic Shrines offer a choice of three.</small>'}</div>
+    <div class="hs-sec"><div class="hs-h">Back Pocket <span>${S.backPocket.length}</span></div>${pocket}</div>
+    <div class="hs-sec"><div class="hs-h">Guild Rank</div><div class="hs-rk">${rankBadgeHTML(k)}<div><b>${rk.name}</b><div class="hs-bar"><i style="width:${pct}%"></i></div><small>${renown} renown${nx ? ' &middot; '+nx.name+' at '+nx.at : ''}</small></div></div></div>`;
+}
+function heroSheetDocked(){ return pcMode() && document.body.classList.contains('hs-dock') && !!document.querySelector('#app > #enc-panel'); }
+// The docked sheet lives on <body> (like the stamp), so turn playback and path taps never touch it; placed from the fight's
+// measured panels after every draw (pcHoverSync)
+function heroSheetSync(){
+  let n = document.getElementById('hero-sheet');
+  const tray = S && S.screen==='game' && heroSheetDocked() ? document.querySelector('#app > .tray-panel') : null, route = tray && document.querySelector('#app > .route-float');
+  if(!tray || !route){ if(n) n.hidden = true; return; }
+  if(!n){ n = document.createElement('aside'); n.id = 'hero-sheet'; n.className = 'hero-sheet'; document.body.appendChild(n); }
+  const html = heroSheetHTML(); if(n._html !== html){ n._html = html; n.innerHTML = html; }
+  const zs = parseFloat(document.body.style.getPropertyValue('--hs-z')) || 1, gap = parseFloat(document.body.style.getPropertyValue('--pc-gap')) || 32;
+  // a screen-entry animation still moving the panels (transforms show in measured positions): place again once it ends
+  if(!heroSheetSync._wait){ const moving = document.getAnimations().filter(a=> a.playState==='running' && a.effect && a.effect.getTiming().iterations!==Infinity && a.effect.target && a.effect.target.contains && (a.effect.target.contains(tray) || a.effect.target.contains(route)));
+    if(moving.length){ heroSheetSync._wait = true; Promise.all(moving.map(a=>a.finished.catch(()=>{}))).then(()=>{ heroSheetSync._wait = false; heroSheetSync(); }); } }
+  const t = tray.getBoundingClientRect(), r = route.getBoundingClientRect(), top = Math.min(t.top, r.top), bot = t.bottom;
+  n.hidden = false; n.style.zoom = zs; // offsets are in the sheet's own (zoomed) pixels
+  n.style.left = ((r.left - gap) / zs - 340) + 'px'; n.style.top = (top / zs) + 'px'; n.style.height = ((bot - top) / zs) + 'px';
+}
+function openHeroSheet(){
+  if(!pcMode()) return openRunRelicsModal();
+  if(heroSheetDocked()){ const n = document.getElementById('hero-sheet'); if(n){ n.classList.remove('hs-pulse'); void n.offsetWidth; n.classList.add('hs-pulse'); } return; }
+  const ov = document.querySelector('.hero-sheet-overlay'); if(ov){ closeModal(ov); return; }
+  const overlay = el(`<div class="modal-overlay hero-sheet-overlay"><div class="modal hero-sheet">${heroSheetHTML()}</div></div>`);
+  overlay.onclick = ev=>{ if(ev.target===overlay) closeModal(overlay); };
+  openModal(overlay);
+}
 function openRunRelicsModal(){
   // Oct 31 (Jeremy, R1): a display case -- big gems, name in the title font, two per row.
   const rows = (S.relics||[]).map(id=>{ const r = relicById(id); return `<div class="relic-case-card">${relicBadgeHTML(r, 'relic-badge-lg')}<b>${r.name}</b><span>${r.desc}</span></div>`; }).join('');
@@ -5643,8 +5689,12 @@ function pcFitFight(){
   const zt = Math.min((H - 2*pad - foot) / hTray, (W - 48 - gap) / (379 * (1 + k)));
   const zr = zt * k;
   const st = document.body.style, set = (n, v)=>{ if(st.getPropertyValue(n) !== v) st.setProperty(n, v); };
+  // the hero sheet docks on the left only when it fits beside the fight at the fight's full size (Nov 26)
+  const zs = Math.max(0.8, Math.min(1.6, H / 1080)), hsW = 340 * zs, fightW = 379 * (zt + zr) + gap, dock = W - 48 - fightW >= hsW + gap;
+  document.body.classList.toggle('hs-dock', dock); set('--hs-z', zs.toFixed(3)); set('--hs-shift', dock ? Math.round(hsW + gap) + 'px' : '0px');
   set('--pc-zt', zt.toFixed(3)); set('--pc-zr', zr.toFixed(3)); set('--pc-zroute', zr.toFixed(3));
   set('--pc-pad', pad+'px'); set('--pc-gap', gap+'px'); set('--pc-foot', foot+'px'); set('--pc-zh', Math.max(0.8, Math.min(1.75, (foot - 12)/80)).toFixed(3)); // the footer strip is foot - 8 tall, a die's caption ~80 px at zoom 1 // a die's caption is ~80 px tall at zoom 1
+  if(document.getElementById('hero-sheet') || dock) requestAnimationFrame(heroSheetSync); // after the new zooms are laid out
 }
 // Nov 14 (Steam Deck: only the touchscreen worked): say what controller, if any, the browser reports, so a player can
 // tell a game problem from a browser/Steam setting. The browser only lists a pad after one of its buttons is pressed.
@@ -5734,8 +5784,8 @@ function pcHoverRender(){
     const t = String(pcHoverTip).replace(/</g,'&lt;'), m = /^([^:.]{2,40}): (.+)$/s.exec(t);
     html = m ? `<div class="pch-main"><div class="pch-head"><b>${m[1]}</b></div><div class="pch-text">${m[2]}</div></div>` : `<div class="pch-main"><div class="pch-text">${t}</div></div>`; }
   if(!html) html = `<div class="pch-main pch-idle"><div class="pch-text">Point at a die, a monster's move or a relic to read it. ${document.body.classList.contains('pad')
-    ? `Controller: <b>D-pad</b> or stick moves the cursor, ${padGlyph('A')} picks (hold it on a Hold button), ${padGlyph('B')} steps back, ${padGlyph('X')} is Skill, ${padGlyph('Y')} is Go.`
-    : 'Keys: <b>1 2 3 4 / Q W E R / A S D F / Z X C V</b> pick dice, <b>Enter</b> is Go, <b>Backspace</b> is Clear. Or use the <b>arrow keys</b> and <b>Space</b>; <b>Esc</b> steps back.'}</div></div>`;
+    ? `Controller: <b>D-pad</b> or stick moves the cursor, ${padGlyph('A')} picks (hold it on a Hold button), ${padGlyph('B')} steps back, ${padGlyph('X')} is Skill, ${padGlyph('Y')} is Go${heroSheetDocked() ? '' : ', <b>LB</b> opens your hero sheet'}.`
+    : 'Keys: <b>1 2 3 4 / Q W E R / A S D F / Z X C V</b> pick dice, <b>Enter</b> is Go, <b>Backspace</b> is Clear. Or use the <b>arrow keys</b> and <b>Space</b>; <b>Esc</b> steps back' + (heroSheetDocked() ? '.' : '; <b>Tab</b> opens your hero sheet.')}</div></div>`;
   if(inn.innerHTML !== html) inn.innerHTML = html;
 }
 // Sits under the room, as wide as it; hidden when PC mode is off or the screen has no room.
@@ -5752,7 +5802,7 @@ function pcGearReset(){
   g.style.setProperty('right', ((window.innerWidth - r.right + 14)/z).toFixed(1)+'px', 'important');
 }
 function pcHoverSync(){
-  pcGearReset();
+  pcGearReset(); heroSheetSync();
   const n = document.getElementById('pc-hover'); if(!n && !pcMode()) return;
   const el = pcHoverEl(), room = pcMode() ? document.querySelector('#app > #enc-panel') : null, tray = room && document.querySelector('#app > .tray-panel');
   if(!room || !tray){ el.hidden = true; if(el.parentNode !== document.body) document.body.appendChild(el); return; }

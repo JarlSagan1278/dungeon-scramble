@@ -4186,3 +4186,44 @@ body.calm .class-prop, body.calm .class-prop *{ animation-play-state:paused !imp
 .camp-fire-wrap{ cursor:pointer; }
 body.old-text .touch-bit.tb-heart{ -webkit-text-stroke:0; text-shadow:0 0 0 #0c0705, 1px 1px 0 #0c0705, -1px -1px 0 #0c0705, 1px -1px 0 #0c0705, -1px 1px 0 #0c0705; }
 .class-prop svg{ filter:url(#fx-grain); } /* Nov 26: paper grain that keeps black outlines black (multiply) */
+
+/* ==== Hero sheet (Nov 26, PC only; heroSheetHTML in render.js): docked on the left of a wide window (body.hs-dock),
+   otherwise slid in over the fight from the Relics sign. Dark brown menu surface. */
+body.pc.hs-dock #app:has(> #enc-panel){ padding-left:calc(24px + var(--hs-shift, 0px)); }
+body.pc.hs-dock .fo-player > .relic-strip{ visibility:hidden; pointer-events:none; } /* the sheet lists them */
+.hero-sheet{ box-sizing:border-box; width:340px; background:var(--b2); border:3px solid var(--line); border-radius:20px; filter:drop-shadow(0 6px 0 var(--line));
+  padding:16px 16px 14px; color:var(--cream); font-family:var(--font-ui); display:flex; flex-direction:column; gap:12px; text-align:left; }
+aside.hero-sheet{ position:fixed; z-index:2; overflow:hidden; }
+aside.hero-sheet[hidden]{ display:none; }
+aside.hero-sheet.hs-pulse{ animation:hs-pulse .5s ease-out; }
+@keyframes hs-pulse{ 0%{ transform:translateX(0); } 30%{ transform:translateX(6px); } 100%{ transform:translateX(0); } }
+.hero-sheet .hs-head{ display:flex; gap:12px; align-items:center; padding-right:30px; }
+.hero-sheet .hs-por{ flex:none; width:76px; height:76px; box-sizing:border-box; border:3px solid var(--line); border-radius:12px; background:var(--b4); object-fit:cover; overflow:hidden; display:block; }
+.hero-sheet .hs-name{ font:400 21px/1.1 var(--font-display); color:#fff1d6; -webkit-text-stroke:3px var(--line); paint-order:stroke fill; }
+body.old-text .hero-sheet .hs-name{ -webkit-text-stroke:0; text-shadow:0 0 2px var(--line), 0 0 2px var(--line), 0 2px 0 var(--line); }
+.hero-sheet .hs-sub{ font-size:14px; color:#c9b48a; margin-top:4px; }
+.hero-sheet .hs-sec{ background:var(--b1); border:2px solid var(--line); border-radius:12px; padding:8px 10px 9px; }
+.hero-sheet .hs-sec p{ margin:0; font-size:13.5px; line-height:1.3; }
+.hero-sheet .hs-h{ font:400 14px var(--font-display); letter-spacing:.08em; text-transform:uppercase; color:var(--gold); margin-bottom:6px; display:flex; justify-content:space-between; }
+.hero-sheet .hs-h span{ color:#c9b48a; }
+.hero-sheet .hs-relics{ flex:1 1 auto; min-height:0; overflow-y:auto; }
+.hero-sheet .hs-relic{ display:flex; gap:9px; align-items:flex-start; margin:5px 0; }
+.hero-sheet .hs-relic .relic-badge{ flex:none; width:22px; height:22px; cursor:default; }
+.hero-sheet .hs-relic b{ display:block; font-size:15px; color:#fff1d6; }
+.hero-sheet .hs-relic small{ display:block; font-size:13.5px; line-height:1.25; color:#d8c9a0; }
+.hero-sheet .hs-pocket{ grid-template-columns:repeat(auto-fill, 58px); }
+.hero-sheet .hs-pocket .camp-die-label{ font-size:9px !important; white-space:nowrap !important; }
+.hero-sheet .hs-note{ display:block; font-size:12.5px; color:#c9b48a; margin-top:6px; }
+.hero-sheet .hs-rk{ display:flex; gap:10px; align-items:center; }
+.hero-sheet .hs-rk > div{ flex:1; }
+.hero-sheet .hs-rk .rank-sym{ width:40px; height:40px; font-size:20px; }
+.hero-sheet .hs-rk b{ font-size:16px; color:#fff1d6; }
+.hero-sheet .hs-rk small{ font-size:12.5px; color:#c9b48a; }
+.hero-sheet .hs-bar{ height:10px; border:2px solid var(--line); border-radius:6px; background:var(--b0); margin:4px 0 3px; overflow:hidden; }
+.hero-sheet .hs-bar i{ display:block; height:100%; background:linear-gradient(#ffe08a,#d4a640); }
+body.pc .modal-overlay.hero-sheet-overlay{ zoom:var(--hs-z, 1); justify-content:flex-start; align-items:stretch; padding:calc(var(--pc-pad, 16px) / var(--hs-z, 1)) 18px; background:rgba(12,7,5,.55); }
+body.pc .modal-overlay.hero-sheet-overlay .modal.hero-sheet{ max-width:340px; max-height:none !important; padding:16px 16px 14px; overflow:hidden; animation:hs-slide-in .2s ease-out; }
+body.pc .modal-overlay.hero-sheet-overlay.modal-closing .modal.hero-sheet{ animation:hs-slide-out .14s ease-in forwards; }
+@keyframes hs-slide-in{ from{ transform:translateX(-110%); } to{ transform:translateX(0); } }
+@keyframes hs-slide-out{ from{ transform:translateX(0); } to{ transform:translateX(-110%); } }
+.reduced-motion .hero-sheet, .reduced-motion .modal-overlay.hero-sheet-overlay .modal.hero-sheet{ animation:none !important; }

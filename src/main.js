@@ -342,6 +342,7 @@ function pcBack(){
   if(S.trayAct || !S.path.length){ const b = document.getElementById('clear-path-btn'); if(b && (S.trayAct)) b.click(); return; }
   const last = document.querySelector(`#tray > .die[data-idx="${S.path[S.path.length-1]}"]`); if(last) last.click(); // step back one
 }
+function pcHeroSheetKey(){ if(!pcMode() || !S || S.screen!=='game' || document.querySelector('.modal-overlay:not(.hero-sheet-overlay), .coach-overlay') || typeof openHeroSheet!=='function') return false; openHeroSheet(); return true; }
 function pcQuick(id){ if(!pcMode() || pcLayer()) return; const b = document.getElementById(id); if(b && !b.classList.contains('disabled')) b.click(); }
 function pcGo(){ if(!pcMode() || pcLayer() || !S || S.screen!=='game') return; if(S.needRoll){ try{ scrambleRoll(0, -1); }catch(e){} return; } pcQuick('resolve-btn'); }
 
@@ -358,6 +359,7 @@ document.addEventListener('keydown', ev=>{
   if(dir){ pcMove(dir[0], dir[1]); ev.preventDefault(); return; }
   if(k===' ' || k==='Spacebar'){ if(!ev.repeat) pcDown(); ev.preventDefault(); return; }
   if(k==='Escape'){ pcBack(); ev.preventDefault(); return; }
+  if(k==='Tab' && !ev.altKey && !ev.ctrlKey){ if(pcHeroSheetKey()) ev.preventDefault(); return; } // Nov 26: the hero sheet
   // Enter stays Go in a fight (the older handler above); on every other screen it presses what the cursor is on
   if(k==='Enter' && pcCurOn && (pcLayer() || !S || S.screen!=='game')){ if(!ev.repeat){ pcDown(); pcUp(); } ev.preventDefault(); ev.stopImmediatePropagation(); }
 }, true);
@@ -375,7 +377,7 @@ function pcPadPoll(){
     if(!pcPadSeen){ pcPadSeen = true; document.body.classList.add('pad'); try{ pcHoverRender(); }catch(e){} }
     const b = i=> !!(gp.buttons[i] && (gp.buttons[i].pressed || gp.buttons[i].value > 0.5));
     const edge = (i, down, up)=>{ const now = b(i), was = !!pcPad.prev[i]; if(now && !was && down) down(); if(!now && was && up) up(); pcPad.prev[i] = now; };
-    edge(0, pcDown, pcUp); edge(1, pcBack); edge(2, ()=>pcQuick('ability-btn')); edge(3, pcGo); edge(9, pcGo);
+    edge(0, pcDown, pcUp); edge(1, pcBack); edge(2, ()=>pcQuick('ability-btn')); edge(3, pcGo); edge(9, pcGo); edge(4, pcHeroSheetKey);
     edge(8, ()=>{ const s = document.getElementById('settings-btn'); if(s && !pcLayer()) s.click(); });
     const ax = gp.axes || [], x = (b(15)?1:0) - (b(14)?1:0) || (Math.abs(ax[0]||0) > 0.55 ? Math.sign(ax[0]) : 0), y = (b(13)?1:0) - (b(12)?1:0) || (Math.abs(ax[1]||0) > 0.55 ? Math.sign(ax[1]) : 0);
     const dir = x ? (x>0?'R':'L') : y ? (y>0?'D':'U') : null, now = performance.now();

@@ -135,6 +135,21 @@ const FIGHT = () => { META.lifetime.victories = 3; META.coachSeen = { armsmaster
   const def = await p.evaluate(() => { localStorage.removeItem('dungeonScramblePC'); Object.defineProperty(navigator, 'webdriver', { get: () => false }); return pcWanted(); });
   out.push((!sw.pc && sw.kept === '0' && def ? 'ok   ' : 'FAIL ') + `Settings > Wide-screen layout turns it off and remembers; with no setting a player's browser gets it (${JSON.stringify({ ...sw, def })})`);
   await p.close();
+  // Hero sheet (Nov 26): docked beside the fight on a wide window (no overlap, same height as the fight, gems column hidden);
+  // on 16:9 the Relics sign slides it in, Esc closes it, Tab opens it
+  p = await open(2560, 1080, true); await p.evaluate(FIGHT); await p.evaluate(() => { grantRelic('whetstone', { silent: true }); render(); }); await p.waitForTimeout(900);
+  const hd = await p.evaluate(() => { const n = document.getElementById('hero-sheet'), s = n && !n.hidden && n.getBoundingClientRect(), ro = document.querySelector('#app > .route-float').getBoundingClientRect(), tr = document.querySelector('#app > .tray-panel').getBoundingClientRect();
+    return { dock: document.body.classList.contains('hs-dock'), shown: !!s, clear: s && s.right <= ro.left - 8 && s.left >= 8, top: s && Math.abs(s.top - Math.min(ro.top, tr.top)) < 2, bottom: s && Math.abs(s.bottom - tr.bottom) < 2, relic: !!(n && n.querySelector('[data-relic="whetstone"]')), gems: getComputedStyle(document.querySelector('.fo-player > .relic-strip')).visibility }; });
+  out.push((hd.dock && hd.shown && hd.clear && hd.top && hd.bottom && hd.relic && hd.gems === 'hidden' ? 'ok   ' : 'FAIL ') + `Hero sheet docks beside the fight on a wide window, lined up with it (${JSON.stringify(hd)})`);
+  await p.close();
+  p = await open(1920, 1080, true); await p.evaluate(FIGHT); await p.evaluate(() => { grantRelic('whetstone', { silent: true }); render(); }); await p.waitForTimeout(700);
+  const dk = await p.evaluate(() => document.body.classList.contains('hs-dock'));
+  await p.click('.fo-player > .relic-strip'); await p.waitForTimeout(400);
+  const o1 = await p.evaluate(() => !!document.querySelector('.hero-sheet-overlay [data-relic="whetstone"]'));
+  await p.keyboard.press('Escape'); await p.waitForTimeout(400); const o2 = await p.evaluate(() => !document.querySelector('.hero-sheet-overlay'));
+  await p.keyboard.press('Tab'); await p.waitForTimeout(400); const o3 = await p.evaluate(() => !!document.querySelector('.hero-sheet-overlay'));
+  out.push((!dk && o1 && o2 && o3 ? 'ok   ' : 'FAIL ') + `Hero sheet on 16:9: the Relics sign slides it in, Esc closes, Tab opens (${JSON.stringify({ dk, o1, o2, o3 })})`);
+  await p.close();
   out.forEach(l => console.log(l));
   if (errors.length) console.log('FAIL page errors: ' + errors.slice(0, 3).join(' | '));
   await browser.close();
