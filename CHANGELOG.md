@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.42.174 (Nov 27, 2026)
 - New players: the guided first turn no longer flashes a red "1 short!"; tapping Skip tutorial asks once; on the first loot screens a note says how to read a face and what the dots on a die mean, and holding a loot face now says what it does; the Daily Dungeon appears after your first run.
 - The "Your relics" hint now shows once per device (it came back every time the game was reopened).
 - Faster fight redraws on slow phones (one layout pass instead of two); old unused code and styles removed.
