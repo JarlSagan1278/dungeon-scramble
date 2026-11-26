@@ -1,6 +1,6 @@
 # Dungeon Scramble — TODO
 
-Updated Nov 25, 2026 (build 1.42.172). Nov 24-25 shipped: foe rules (6 + a secret), Daily guard rail, five unlockable
+Updated Nov 26, 2026 (build 1.42.173; Nov 26 shipped: PC hero sheet, touch rewards, chain hint, accessibility and text passes; PC layout prototypes were tried and dropped, see decisions/look_and_feel.md). Nov 24-25 shipped: foe rules (6 + a secret), Daily guard rail, five unlockable
 classes with signature objects (Pointer the schnauzer, printer, cauldron, field kit, deck), the Additive Inverse Easter
 egg, tiered achievements (35), the Wanted poster pop-up, boss wind-up tip, text audit, idle-work cap, Steam achievement
 wiring. Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PROJECT_CONTEXT.md`); study results in
@@ -10,7 +10,7 @@ wiring. Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PR
 1. **Onboarding for tutorial skippers (Nov 25 play-data read, STUDY_FINDINGS "Real first runs: how new players
    start"):** the two newcomers who skipped the guided fight did worst (single-die paths for a whole fight; a quit with
    0 turns). Proposed: a one-time "chain the dice" nudge when a first-runs player presses Go with a one-die path while a
-   longer one is on offer. Built Nov 25 (not live yet); watch whether skippers' path lengths grow.
+   longer one is on offer. Live since 1.42.173 (Nov 26); watch whether skippers' path lengths grow.
 2. **Google Play closed test:** 12 testers for 14 days (posts out); the Friday workflow uploads new versions. Then
    create the `full_game` product (~Dec 5), License testing + a test purchase on Jeremy's phone, then production.
 3. **Keep reading the play data** (sheet `1W1TyynfdWTlxMqzr7TJOTZKMY6sOPBVPfXVd41kcGSM`; records in Drive folder
