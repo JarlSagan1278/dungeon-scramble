@@ -295,11 +295,14 @@ function render(){
   placeVs._inRender = true;
   try{ renderGame(); } finally { placeVs._inRender = false; }
   pcFitFight();
-  syncChestArt();
   // Nov 4 (speed pass): measure everything first, write after -- the chips are fitted while the layout placeVs already
   // forced is still clean, the arch decoration measures before it writes, and the VS mark's position is applied last.
+  // Nov 27: the chest art is measured with the other reads and drawn after the arch (drawing it first dirtied the layout,
+  // so the next measurement forced a second full layout, ~10% of a fight redraw). A chip shift is only a transform.
   fitFoChips();
+  const chestM = measureChestArt();
   decorateArch();
+  syncChestArt(chestM);
   flushVs();
   lockQuestSign();
   maybeAutosave();
@@ -948,19 +951,26 @@ function chestArtSVGs(W, H, F0x, F1x, F0y, F1y){
   o += `<rect x="${W/2-12}" y="${FT+3}" width="24" height="16" rx="3" fill="url(#caSt)" ${O}/>${rivet(W/2-7,FT+7.5)}${rivet(W/2+7,FT+7.5)}`;
   return { defs, under:u, over:o, FT };
 }
-function syncChestArt(){
-  document.querySelectorAll('.tray-wrap.tray-wrap-full').forEach(w=>{
-    const tr = w.querySelector(':scope > .tray'); if(!tr) return;
-    const W = w.offsetWidth, H = w.offsetHeight, bl = w.clientLeft, bt = w.clientTop - 3; // 3 px below the frame (Jeremy)
-    if(!W || !H) return;
-    const F0x = bl + tr.offsetLeft, F1x = F0x + tr.offsetWidth, F0y = w.clientTop + tr.offsetTop, F1y = F0y + tr.offsetHeight;
+// Nov 27 (speed): measuring and drawing are split so render() can take these measurements with the other reads, before
+// any write; called with no argument it measures for itself (shrine screen).
+function measureChestArt(){
+  return [...document.querySelectorAll('.tray-wrap.tray-wrap-full')].map(w=>{
+    const tr = w.querySelector(':scope > .tray'); if(!tr) return null;
+    return { w, tr, W:w.offsetWidth, H:w.offsetHeight, bl:w.clientLeft, ct:w.clientTop, tl:tr.offsetLeft, tt:tr.offsetTop, tw:tr.offsetWidth, th:tr.offsetHeight, tcl:tr.clientLeft, tct:tr.clientTop };
+  }).filter(Boolean);
+}
+function syncChestArt(measured){
+  (measured || measureChestArt()).forEach(m=>{
+    const { w, tr, W, H, bl } = m, bt = m.ct - 3; // 3 px below the frame (Jeremy)
+    if(!W || !H || !w.isConnected) return;
+    const F0x = bl + m.tl, F1x = F0x + m.tw, F0y = m.ct + m.tt, F1y = F0y + m.th;
     const key = [W,H,F0x,F1x,F0y,F1y].join(',');
     if(w.dataset.chestKey === key && w.querySelector(':scope > .ca-over') && tr.querySelector(':scope > .ca-under')) return;
     w.querySelectorAll('.chest-art').forEach(n=> n.remove());
     const a = chestArtSVGs(W, H, F0x, F1x, F0y, F1y);
     // each layer gets its own gradient ids: a hidden layer's (display:none, under the lid) would otherwise be the one url(#id) finds, and paint nothing
     const svg = (cls, z, inner, left, top, extra)=> `<svg class="chest-art ${cls}" data-morph-keep aria-hidden="true" viewBox="-6 -6 ${W+12} ${H+50}" style="left:${left}px;top:${top}px;width:${W+12}px;height:${H+50}px;z-index:${z};${extra||''}">${(a.defs+inner).replace(/id="ca/g, `id="${cls}`).replace(/url\(#ca/g, `url(#${cls}`)}</svg>`;
-    const tx = -tr.offsetLeft - tr.clientLeft, ty = -tr.offsetTop - tr.clientTop;
+    const tx = -m.tl - m.tcl, ty = -m.tt - m.tct;
     // at the END of #tray: the dice must stay its first children (PC key caps use :nth-child, fast redraws compare them)
     tr.insertAdjacentHTML('beforeend', svg('ca-under', 0, a.under, -6-bl+tx, -6-bt+ty)
       + `<div class="chest-art ca-grain-in" data-morph-keep style="left:${tx-bl}px;top:${ty-bt-2}px;width:${W}px;height:${a.FT+2}px"></div>`);
@@ -1517,16 +1527,6 @@ function forkDoorHTML(d, i){
 const FORK_ZOOM = 0.7;
 function forkMid(){ const a = (pcMode() && document.querySelector('#app > #enc-panel')) || document.getElementById('app'); const r = a ? a.getBoundingClientRect() : {top:0,height:window.innerHeight};
   return Math.max(110, Math.min(window.innerHeight-110, r.top + r.height/2)); }
-// PC layout: doors (the room door, the fork's two) stand in the room, not in the middle of the window over the tray
-function pcRoomCenterX(){ const r = pcMode() && document.querySelector('#app > #enc-panel'); if(!r) return null; const b = r.getBoundingClientRect(); return b.left + b.width/2; }
-// Nov 14 (Jeremy: the doors should be centered on the combat panel): the doors are re-centered on the route + room panel
-// after every draw and resize (they were placed once, before the layout settled)
-function pcCombatCenter(){
-  if(!pcMode()) return null;
-  const ro = document.querySelector('#app > .route-float'), rm = document.querySelector('#app > #enc-panel'); if(!rm) return null;
-  const a = rm.getBoundingClientRect(), t = ro ? ro.getBoundingClientRect().top : a.top;
-  return { x: a.left + a.width/2, y: (t + a.bottom)/2 };
-}
 function pcPlaceDoors(){
   if(!pcMode()) return;
   // Nov 14 (Jeremy, Deck screenshot): the door stands in the room's own archway, centered on the room picture and sized to fit
@@ -2760,7 +2760,6 @@ function ensureFxStack(){
 // heals, blocks...) slash across the doorway scene, tilted toward whoever they happened to; everything
 // else (equips, relics, upgrades) gets its own smaller gold ribbon higher up, so the two never share a slot.
 // Both overlay the scene, so they can't change the screen height. ----
-const RB_NOTICE_RE = /^(Equipped|Relic|Upgraded|Swapped|Rested|— Floor|Mandated Lunch Break|Not enough|Locked|Debug|Origin|Unlock|Debug)|joins your tray/i;
 function showToast(text, kind){
   // Plain damage/heal numbers are already shown by the floating numbers + health bars; skip the redundant message.
   if(/^Path dealt|hits you for|takes \d+ D\.O\.T\. damage|You take \d+ D\.O\.T\. damage|You recover \d+ from H\.O\.T\.|heals \d+\./i.test(text)) return;
@@ -4818,11 +4817,6 @@ function consumeRelicPulses(){
     }, i*120);
     if(!played){ played = true; if(typeof playTone==='function') playTone('relicProc'); }
   });
-}
-
-function relicRowHTML(r, locked, isNew){
-  if(locked) return `<div class="relic-row relic-row-locked"><span class="relic-badge relic-locked">?</span><div><div class="relic-name">???</div><div class="hint" style="margin:0;">${r.origin?`Win a run as a ${ORIGINS.find(o=>o.id===r.origin).name} to earn this.`:'Not found yet. Look for Relic Shrines.'}</div></div></div>`;
-  return `<div class="relic-row">${relicBadgeHTML(r)}<div><div class="relic-name">${r.name}${isNew?' <span class="new-tag">NEW!</span>':''}${r.origin?` <span class="relic-origin-tag">${ORIGINS.find(o=>o.id===r.origin).name} relic</span>`:''}</div><div class="relic-desc">${r.desc}</div></div></div>`;
 }
 
 // Hero sheet (Nov 26, Jeremy: "build both, use the relics sign to open it"). PC layout only: the hero, the class ability,

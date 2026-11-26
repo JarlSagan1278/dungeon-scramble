@@ -161,7 +161,7 @@
 
   /* Route tracker */
   .route-wrap{ position:relative; }
-  .route{ display:flex; margin-bottom:0; }
+
   .mascot-wrap{ position:absolute; transform: translateX(-78%); transition: left 0.6s ease; pointer-events:none; z-index:2; display:flex; flex-direction:column; align-items:center; }
   .mascot-marker{ display:block; width:auto; filter: drop-shadow(1px 2px 0 rgba(0,0,0,0.4)); }
 
@@ -169,15 +169,6 @@
      util-rail, nudged left so it slightly overlaps the tray-wrap panel's
      own edge/border -- but the tray-wrap's border+padding (12px) keeps it
      clear of the actual die tiles inside. */
-  .route .node{ flex:1; display:flex; align-items:center; justify-content:center; position:relative;
-    padding:6px 2px; font-size:32px; background:var(--floor1); border-right:2px solid rgba(0,0,0,0.25); color: var(--ink); }
-  .route .node:last-child{ border-right:none; }
-  .route .node.floor1{ background:var(--floor1); }
-  .route .node.floor2{ background:var(--floor2); }
-  .route .node.floor3{ background:var(--floor3); color:#f5eaff; }
-  .route .node.done{ filter: brightness(0.6) saturate(0.7); }
-  .route .node.current{ filter: brightness(1.15); box-shadow:inset 0 0 0 3px #fff; z-index:1; }
-  .route .node.route-tooltip-target{ cursor:help; }
 
   /* Tray */
   /* Each die keeps a 44px floor (roughly a comfortable touch target) no
@@ -320,7 +311,7 @@
      (see render.js), so the panel hugs the tray instead of reserving a
      tall empty gutter below it. Margin only appears once there's a chip
      to separate from the tray above it. */
-  .round-badge{ display:inline-block; margin:0 0 4px 4px; background:var(--stone); border:2px solid var(--line); border-radius:var(--r-md); padding:1px 8px; font-size:10px; font-weight:800; color:var(--parchment-dim); }
+
   /* Lives in .tray-float-wrap now (render.js), a plain unclipped wrapper
      around .tray-wrap, so growing past the tray's own corner -- overlapping
      the dice underneath it -- is the point rather than something to avoid.
@@ -638,12 +629,7 @@
      inherited from #fx-stack, so it never blocks a tap. Auto-removed by JS
      after its animation finishes. */
   #kill-callout{ display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; }
-  .kill-callout-line{
-    letter-spacing:1.5px; text-transform:uppercase;
-    opacity:0; transform:scale(0.6); animation: kill-callout-pop 1.3s cubic-bezier(.22,1.4,.36,1) forwards; }
-  .kill-callout-line.boss{ font-size:30px; color:var(--gold); }
-  .kill-callout-line.overkill{ font-size:22px; color:#ff8a3d; -webkit-text-stroke:1px #241c10; }
-  .kill-callout-line.sub{ animation-delay:0.18s; }
+
   @keyframes kill-callout-pop{
     0%{ opacity:0; transform:scale(0.5); }
     18%{ opacity:1; transform:scale(1.12); }
@@ -651,7 +637,6 @@
     72%{ opacity:1; transform:scale(1); }
     100%{ opacity:0; transform:scale(1.05); }
   }
-  .reduced-motion .kill-callout-line{ animation:none; opacity:1; transform:scale(1); transition:opacity 1s ease 0.4s; }
 
   /* Room callout: a banner naming whatever's just been stepped into. Now
      lives in the shared #fx-stack (above) -- the gap between the enemy
@@ -670,15 +655,7 @@
   .room-callout-box{ background:rgba(10,7,5,0.93); border:3px solid var(--line);
     box-shadow:0 8px 28px rgba(0,0,0,0.6); border-radius:14px; padding:20px 30px; display:flex; flex-direction:column; gap:6px; max-width:92%; min-width:260px;
     transform:translateY(-10px); animation: room-callout-slide 0.4s cubic-bezier(.22,1,.36,1) forwards; }
-  .room-callout-line{
-    letter-spacing:1.5px; }
-  .room-callout-line.intro{ font-size:18px; color:var(--gold); }
-  .room-callout-line.intro.boss{ color:#ff8a3d; }
-  .room-callout-line.name{ font-size:27px; color:var(--cream); }
-  .room-callout-line.name.boss{ font-size:32px; color:#ff8a3d; }
-  .room-callout-line.sub{ font-size:18px; color:var(--gold); }
-  .room-callout-line.hint{ font-size:12px; text-transform:none; letter-spacing:0; font-weight:600;
-    color:var(--parchment-dim); margin-top:6px; }
+
   @keyframes room-callout-fade{ from{ opacity:0; } to{ opacity:1; } }
   @keyframes room-callout-slide{ from{ transform:translateY(-10px); } to{ transform:translateY(0); } }
   .reduced-motion #room-callout{ animation:none; opacity:1; }
@@ -749,10 +726,7 @@
 
   /* Achievements modal (reuses .run-history-* row text styles above) + the
      inline "New Achievement!" callout box on the post-run screens. */
-  .achv-row{ display:flex; align-items:center; gap:10px; background:var(--panel2); border:1px solid var(--line); border-radius:var(--r-md); padding:7px 10px; }
-  .achv-row.locked{ opacity:0.5; }
-  .achv-row-icon{ font-size:18px; flex:0 0 auto; }
-  .achv-row-main{ flex:1 1 auto; min-width:0; }
+
   .achv-unlock-box{ background:var(--panel2); border:1px solid var(--gold); border-radius:var(--r-md); padding:10px 12px; margin:10px 0; text-align:left; }
   .achv-unlock-title{ font-weight:800; color:var(--gold); font-size:13px; margin-bottom:6px; text-align:center; text-transform:uppercase; letter-spacing:0.4px; }
   .achv-unlock-row{ display:flex; align-items:center; gap:10px; padding:4px 0; }
@@ -812,15 +786,8 @@
      space itself; title-content centers that compact block in whatever
      room is left below the art. */
 
-  .compendium-tier{ margin-bottom:14px; text-align:left; }
-  .compendium-list{ display:flex; flex-direction:column; gap:5px; max-height:220px; overflow-y:auto; margin-top:6px; }
-  .compendium-row{ display:flex; align-items:center; gap:10px; background:var(--panel2); border:1px solid var(--line); border-radius:var(--r-md); padding:5px 8px; }
-  .compendium-thumb{ width:34px; height:34px; object-fit:contain; flex:0 0 auto; }
-  .compendium-thumb-placeholder{ border-radius:5px; opacity:0.4; background:var(--stone); display:flex; align-items:center; justify-content:center; font-size:15px; }
-  .compendium-row-locked{ opacity:0.6; }
-  .compendium-row-locked .compendium-thumb-placeholder{ opacity:0.7; }
   .compendium-faces.hint{ margin:0; font-size:11px; }
-  .compendium-main{ flex:1 1 auto; min-width:0; }
+
   .compendium-faces{ display:flex; gap:4px; flex-wrap:wrap; opacity:0.85; }
   .compendium-faces .icon-svg{ width:13px; height:13px; }
 
@@ -890,8 +857,6 @@
 .relic-badge.relic-locked{ background:var(--stone); color:var(--parchment-dim); box-shadow:none; }
 .relic-badge-lg{ width:40px; height:40px; font-size:14px; }
 .relic-strip{ display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; cursor:pointer; }
-.relic-row{ display:flex; gap:10px; align-items:center; padding:7px 4px; border-bottom:2px solid var(--line); text-align:left; }
-.relic-row-locked{ opacity:0.7; }
 .relic-name{ font-weight:800; color:var(--cream); font-size:13px; }
 .relic-desc{ font-size:12px; color:var(--parchment); }
 .relic-origin-tag{ font-size:10px; font-weight:700; color:#c9a8f0; margin-left:4px; }
@@ -1022,9 +987,9 @@
   .util-btn.rail-go span, .util-btn.rail-clear span, .util-btn.rail-ability span{ font-size:10px; }
 
   /* ===== Fonts: Metamorphous for titles/names/banners, MedievalSharp for buttons, numbers, chips and dice labels ===== */
-  h1,h2,h3,.enc-name-txt,.origin-showcase-name,.class-showcase-name,.kill-callout-line,.room-callout-line,.floor-card-num,.floor-card-name,.char-name-input,.camp-section-title{ font-family:var(--font-display) !important; font-weight:400; }
+  h1,h2,h3,.enc-name-txt,.origin-showcase-name,.class-showcase-name,.floor-card-num,.floor-card-name,.char-name-input,.camp-section-title{ font-family:var(--font-display) !important; font-weight:400; }
   body{ font-family: 'Alegreya',Georgia,'Iowan Old Style',serif !important; }
-  button,.util-btn,.pcf-num,.status-chip,.face-val,.face-word,.name-tag-svg text,.mini-face small,.kill-hint,.new-tag,.round-badge,.boss-cycle-item,.class-tab-btn{ font-family:var(--font-ui) !important; }
+  button,.util-btn,.pcf-num,.status-chip,.face-val,.face-word,.name-tag-svg text,.mini-face small,.kill-hint,.new-tag,.boss-cycle-item,.class-tab-btn{ font-family:var(--font-ui) !important; }
 
   /* ===== Round 5 tweaks ===== */
 
@@ -1087,7 +1052,6 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 
 .fo-enemy .fo-quest{ display:block; }
 
-.modal-lead{ text-align:center; }
 .util-btn, .util-btn span{ text-align:center; }
 .util-btn.rail-ability span{ line-height:1.1; width:100%; display:block; }
 
@@ -1286,10 +1250,6 @@ img, svg{ -webkit-touch-callout:none; -webkit-user-drag:none; }
 #room-callout .room-callout-box.boss, #room-callout:has(.intro.boss) .room-callout-box{
   background:linear-gradient(180deg, rgba(255,200,160,.10), transparent 40%),
     linear-gradient(90deg, #2a0906, #6b1a12 18%, #6b1a12 82%, #2a0906) !important; }
-#room-callout .room-callout-line{ text-shadow:0 2px 0 rgba(0,0,0,.65); }
-#room-callout .room-callout-line.name.boss, #room-callout .room-callout-line.intro.boss{ color:#ffd9a0 !important; }
-#room-callout .room-callout-line.name{ color:#fff1d6; }
-#room-callout .room-callout-line.hint{ color:#d8c3a0; }
 
 #floor-card .floor-card-box{ position:relative; width:min(92vw,372px); padding:20px 34px 18px; background:linear-gradient(180deg, rgba(255,255,255,.07), transparent 40%), linear-gradient(90deg,var(--b1),var(--b2) 18%,var(--b2) 82%,var(--b1));
   clip-path:polygon(0 0,100% 0,calc(100% - 18px) 50%,100% 100%,0 100%,18px 50%); filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)); }
@@ -1432,8 +1392,7 @@ body.is-resolving .lethal-tag, body.is-resolving .die .face-val .icon-svg, body.
 .boss-cycle-row .boss-cycle-item.enemy-action-badge.next:not(:only-child){ box-shadow:inset 0 0 0 1.5px #f4ead0, inset 0 0 0 3px rgba(12,7,5,.9), 0 0 8px 1px rgba(235,220,185,.4), 0 2px 0 rgba(0,0,0,.6) !important; }
 
 /* ======== Room tracker v2 (1.32.55): little arched doorways floating in the dark ======== */
-.route{ border:0 !important; box-shadow:none !important; border-radius:0 !important; overflow:visible !important; gap:5px; padding:0 4px; }
-.route .node.rt-door{ background:transparent !important; border:0 !important; padding:0 !important; filter:none !important; box-shadow:none !important; }
+
 .rt-arch{ display:flex; align-items:center; justify-content:center; width:100%; max-width:46px; height:40px; font-style:normal; box-sizing:border-box;
   border-radius:22px 22px 2px 2px; background:linear-gradient(#1a120c,#0c0705); border:2px solid #5a4630; border-bottom-width:3px; color:#7a6347; font-size:18px; font-weight:800; font-family:Georgia,serif; }
 .rt-arch .icon, .rt-arch svg{ width:20px; height:20px; opacity:.75; }
@@ -1561,9 +1520,6 @@ body{ -webkit-tap-highlight-color:transparent; }
 .symbol-intro-kicker{ font-family:var(--font-ui); font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--parchment-dim); }
 
 /* ⓘ info dot: explanatory text lives in a hover / tap bubble instead of inline copy */
-.info-dot{ display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; margin-left:4px; vertical-align:middle;
-  border:1.5px solid var(--b6); border-radius:50%; color:var(--parchment-dim); font:italic 700 11px/1 Georgia,serif; cursor:help; user-select:none; -webkit-tap-highlight-color:transparent; }
-.info-dot:hover,.info-dot:focus{ color:var(--gold); border-color:var(--gold); outline:none; }
 
 html,body{ overflow-x:clip; }
 /* Dice that an upgrade would consume, lit while its button is hovered */
@@ -1620,9 +1576,6 @@ html,body{ overflow-x:clip; }
 .reduced-motion .die-sheen::before, .reduced-motion .die-sheen::after{ animation:none !important; opacity:0 !important; }
 
 /* Kill callouts ("Boss Defeated" etc.): heavy dark outline drawn behind the fill so the letters stay crisp on any background */
-.kill-callout-line{ paint-order:stroke fill; -webkit-text-stroke:6px #120a04 !important; stroke-linejoin:round;
-  text-shadow:0 3px 0 #120a04, 0 0 12px rgba(0,0,0,.9), 0 0 26px rgba(0,0,0,.7) !important; }
-.kill-callout-line.boss{ -webkit-text-stroke:7px #120a04 !important; }
 
 /* armed zone: ~1s twitch burst, ~4s rest (5s cycle) */
 @keyframes zoneTwitch{
@@ -1815,7 +1768,6 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 /* 4. a little wear on the chest's iron (the shine animation does the rest) */
 
 /* 5. the route bar's doorways are paper too */
-.route .node.rt-door > svg, .route .node.rt-door > .rt-arch{ filter:url(#fx-paper); }
 
 /* Oct 16: the baked floor (see bakedFloorCanvas in render.js) replaces the 3D .rf-plane */
 #room-floor .rf-canvas{ position:absolute; left:0; top:0; width:100%; height:100%; display:block; }
@@ -1830,8 +1782,6 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
   50%{ transform:scale(.97) translate(-3px,1px) rotate(-2.5deg); } 60%{ transform:scale(.97) translate(3px,-2px) rotate(3deg); }
   70%{ transform:scale(.98) translate(-4px,2px) rotate(-3.5deg); } 80%{ transform:scale(.98) translate(4px,-2px) rotate(4deg); }
   90%{ transform:scale(.99) translate(-5px,2px) rotate(-5deg); } 100%{ transform:scale(1) translate(5px,-3px) rotate(5deg); } }
-
-.round-badge .rb-floor{ color:#f1d58a; font-weight:900; margin-right:3px; }
 
 /* Relic gem pop (Oct 16): a copy of the gem swells and wobbles over the real one when the relic acts. */
 .relic-fx .relic-badge.relic-gem-pop{ position:absolute; margin:0; transform-origin:50% 55%; animation:relic-gem-pop .62s cubic-bezier(.3,1.4,.5,1) forwards; }
@@ -1986,8 +1936,6 @@ body:has(.modal-overlay) .settings-btn-floating{ visibility:hidden; }
 .chest-lid .strap{ position:absolute; top:-4px; bottom:6px; width:15px; z-index:1; background:var(--rivet) center/100% 22px repeat-y, var(--steel); border:2.2px solid #0c0705; }
 .chest-lid .strap.s1{ left:18%; } .chest-lid .strap.s2{ right:18%; }
 .chest-lid .rim{ position:absolute; left:-3px; right:-3px; bottom:-3px; height:13px; z-index:1; background:var(--rivet) 6px 50%/26px 100% repeat-x, var(--steel); border:2.2px solid #0c0705; border-radius:0 0 7px 7px; }
-.lid-plate{ position:relative; z-index:2; padding:5px 14px; border-radius:10px; background:#3b2414; border:3px solid var(--b0); box-shadow:inset 0 2px 0 rgba(255,220,160,.15),0 3px 0 var(--b0); }
-.lid-plate span{ font:400 19px var(--font-display); color:#f1e2c4; letter-spacing:.5px; text-shadow:0 2px 0 #1a0f07; white-space:nowrap; }
 
 @keyframes lid-rattle{ 0%{ transform:rotate(-.8deg) translateY(1px); } 100%{ transform:rotate(.8deg) translateY(-2px); } }
 .chest-lid.lid-fly{ position:fixed; z-index:9000; pointer-events:none; translate:none; margin:0; }
@@ -2048,7 +1996,6 @@ body{ font-variant-numeric: lining-nums; }
 
 .symbol-intro-text{ font-size:13.5px; }
 .symbol-intro-kicker{ font-size:10.5px; }
-.round-badge{ font-size:13px; }
 
 /* Buttons (Jeremy, Oct 28: B3): every button keeps its own color and gets a chunky toy bevel: a light top edge and a
    dark bottom lip. Buttons with their own glow or shape (class rules) keep theirs. */
@@ -2194,9 +2141,7 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 .settings-toggle-row input[type=range]::-moz-range-track{ height:8px; border-radius:7px; border:2px solid var(--line); background:#2a1d13; }
 .settings-toggle-row input[type=range]::-moz-range-progress{ height:8px; border-radius:7px; border:2px solid var(--line); background:#ffc93c; }
 .settings-toggle-row input[type=range]::-moz-range-thumb{ width:18px; height:18px; border-radius:50%; background:#e9d7ae; border:2px solid var(--line); box-shadow:0 2px 0 var(--line); }
-.info-dot{ width:18px; height:18px; border:2px solid var(--line); background:#e9d7ae; color:#3a2410; font:italic 800 12px/1 var(--font-ui);
-  box-shadow:inset 0 2px 0 rgba(255,255,255,.55), 0 2px 0 var(--line); }
-.info-dot:hover, .info-dot:focus{ color:#3a2410; background:#ffd75e; border-color:var(--line); }
+
 .face-tooltip{ border-width:3px; box-shadow:0 4px 0 var(--line), 0 4px 14px rgba(0,0,0,.45); }
 .swap-item .swap-count-badge, .camp-stack-badge{ border-width:2px; }
 .settings-pair > .settings-toggle-row{ gap:6px; padding-left:8px; padding-right:8px; } .settings-pair > .settings-toggle-row > span{ white-space:nowrap; }
@@ -2271,7 +2216,7 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 .action-note .an-t{ font-family:var(--font-display); font-size:20px; line-height:1.05; color:#7a1f14; }
 .action-note .an-t b{ font-family:var(--font-display); font-size:25px; color:#3a2410; margin-left:5px; }
 .action-note .an-w{ margin-top:2px; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#8a5a2b; }
-.action-note .an-q{ margin-top:8px; font-size:14px; line-height:1.3; font-style:italic; }
+
 .action-note .an-b{ margin-top:6px; font-size:12.5px; line-height:1.3; color:#6b4a2a; }
 /* No more (i) dots: a label holding a note gets a dotted underline and is itself the thing you tap. */
 span:has(> .info-tap), label:has(> .info-tap){ text-decoration:underline dotted 2px; text-decoration-color:rgba(233,215,174,.55); text-underline-offset:4px; cursor:help; }
@@ -2453,8 +2398,7 @@ button.end-details-btn:hover:not(:disabled){ background:#5a3e28; }
 .fc-arch{ width:220px; height:250px; }
 .fc-hole{ position:relative; width:100%; height:100%; box-sizing:border-box; border:3px solid var(--line); border-bottom:none; border-radius:94px 94px 0 0; overflow:hidden;
   background:radial-gradient(ellipse at 50% 85%, #3a2614 0%, #140c07 55%, #080503 100%); }
-.fc-step{ position:absolute; left:calc(14% + var(--i)*7%); right:calc(14% + var(--i)*7%); bottom:calc(var(--i)*17px); height:17px; box-sizing:border-box;
-  border:2.5px solid var(--line); background:linear-gradient(180deg, hsl(210 4% calc(60% - var(--i)*9%)), hsl(210 4% calc(48% - var(--i)*9%))); box-shadow:inset 0 2px 0 rgba(255,255,255,.25); }
+
 .fc-torch{ position:absolute; top:112px; width:9px; height:20px; background:#5e3a1c; border:2px solid var(--line); border-radius:2px; }
 .fc-torch.l{ left:22px; } .fc-torch.r{ right:22px; }
 .fc-torch::before{ content:''; position:absolute; left:50%; top:-15px; width:14px; height:17px; margin-left:-7px; border-radius:50% 50% 45% 45%; background:radial-gradient(circle at 50% 70%, #fff3b0, #ffb43c 55%, #e0603a); box-shadow:0 0 16px 6px rgba(255,170,60,.45); animation:fc-flicker .5s ease-in-out infinite alternate; }
@@ -2520,18 +2464,16 @@ button.end-details-btn:hover:not(:disabled){ background:#5a3e28; }
 /* Oct 31: drawn star instead of the ✦ character (achievement rows, the class-converted die badge) */
 .achv-unlock-icon .mark-svg{ width:18px; height:18px; color:var(--gold); }
 
-.boon-note b{ font-weight:800; color:#7a1f14; }
-
 /* Oct 31 (Jeremy): the Floor card text looked blurry: the old banner's dark text-shadow doubled the letters on the
    light stone and parchment, and the tablet's 1-degree tilt softened them. Crisp, flat text now. */
 #floor-card .fc-tablet, #floor-card .fc-name{ text-shadow:none !important; -webkit-text-stroke:0 !important; }
 #floor-card .fc-tablet{ transform:none !important; }
 
 /* Oct 31 (Jeremy): the floor label takes its floor's loot die color: Floor I Alloy (steel), II Gilded (gold), III Magic (purple) */
-.tray-head .round-badge .rb-floor.rb-alloy, #floor-card .fc-tablet.rb-alloy{ background:var(--paper-tile) repeat, linear-gradient(180deg,#b6bec5,#8a939b) !important; color:#1a1410 !important; }
-.tray-head .round-badge .rb-floor.rb-gilded, #floor-card .fc-tablet.rb-gilded{ background:var(--paper-tile) repeat, linear-gradient(180deg,#e6c86e,#c49a3c) !important; color:#241c10 !important; }
-.tray-head .round-badge .rb-floor.rb-magic, #floor-card .fc-tablet.rb-magic{ background:var(--paper-tile) repeat, linear-gradient(180deg,#a47ac8,#7a4fa0) !important; color:#f5eaff !important; }
-.tray-head .round-badge .rb-floor[class*="rb-"], #floor-card .fc-tablet[class*="rb-"]{ background-size:110px 110px, auto !important; background-blend-mode:soft-light, normal !important; }
+#floor-card .fc-tablet.rb-alloy{ background:var(--paper-tile) repeat, linear-gradient(180deg,#b6bec5,#8a939b) !important; color:#1a1410 !important; }
+#floor-card .fc-tablet.rb-gilded{ background:var(--paper-tile) repeat, linear-gradient(180deg,#e6c86e,#c49a3c) !important; color:#241c10 !important; }
+#floor-card .fc-tablet.rb-magic{ background:var(--paper-tile) repeat, linear-gradient(180deg,#a47ac8,#7a4fa0) !important; color:#f5eaff !important; }
+#floor-card .fc-tablet[class*="rb-"]{ background-size:110px 110px, auto !important; background-blend-mode:soft-light, normal !important; }
 
 /* ==== Title screen (title-): every top-level rule for it, merged Nov 12 by tools/css/merge.py (polish roadmap A3).
    Was 32 rules spread through this file; each value's history is in git. Edit here, not further up. ==== */
@@ -2549,7 +2491,7 @@ button.end-details-btn:hover:not(:disabled){ background:#5a3e28; }
 .title-links button{ font-size:14px !important; padding:12px 2px !important; }
 /* Title fits with every class's depth badge (Jeremy's feedback, Oct 30) */
 .title-badges{ display:flex; justify-content:center; gap:12px; margin:8px 0 0 !important; }
-.title-credit{ text-align:center; color:var(--parchment-dim,#bfa983); font-style:italic; font-size:13.5px; line-height:1.4; margin:18px 0 0; margin-top:10px !important; }
+
 /* Oct 31 (Jeremy: the title screen scrolled a little): the shared --screen-h has a 720px floor for the game card, but a phone browser with its address bar can be shorter than 720 + the 16px margins. The title fills the real height. */
 .wrap:has(.title-screen-fill){ min-height:0 !important; }
 #app:has(.title-screen-fill){ min-height:0 !important; }
@@ -2564,7 +2506,7 @@ button.end-details-btn:hover:not(:disabled){ background:#5a3e28; }
 /* Oct 31 (Jeremy): the shrine's boon is pinned between the two portraits, on the same paper notice as a fight's quests */
 .shrine-boon-float{ width:118px; }
 .shrine-boon-float .fo-quests{ font-size:10px !important; }
-.shrine-boon-float .boon-b, .shrine-boon-float b{ font-weight:800; color:#7a1f14; }
+.shrine-boon-float b{ font-weight:800; color:#7a1f14; }
 /* Impact frames on a kill (Nov 4): frame A = ink negative of the room, frame B = stark black-and-cream with speed lines */
 /* Kill impact frame (Nov 4 redo): a held two-tone comic panel over the doorway, then an ease-out (see impactFrames) */
 .impact-frame{ position:fixed; z-index:40; pointer-events:none; overflow:hidden; opacity:1;
@@ -2594,32 +2536,26 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .fo-quests-label .q-yes{ color:#2d6a2f; }
 
 /* Forks in the road (Nov 4): the two-door screen and the route bar's stacked pairs */
-.route .node.rt-fork{ display:flex; align-items:center; justify-content:center; }
+
 .rt-pair{ display:flex; flex-direction:column; gap:2px; width:100%; height:100%; align-items:center; justify-content:center; }
 .rt-pair i{ display:flex; align-items:center; justify-content:center; width:80%; height:46%; border:2px solid var(--line); border-radius:9px 9px 3px 3px; font:800 8.5px/1 var(--font-ui); letter-spacing:.02em; color:#d9c39a; background:#2a1d13; font-style:normal; }
 .rt-pair i.el{ background:#5a2018; color:#ffb3a3; } .rt-pair i.sh{ background:#1f3a4a; color:#a9e1ff; } .rt-pair i.tr{ background:#4a3a14; color:#ffe08a; }
-.route .node.rt-fork.done{ opacity:.5; }
-.fork-screen{ display:flex; flex-direction:column; gap:10px; min-height:calc(100dvh - 16px); max-height:var(--screen-h, 769px); }
-.fork-hall{ border:3px solid var(--line) !important; border-radius:16px; box-shadow:0 4px 0 var(--line); flex:1 1 auto; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:18px 8px 20px;
-  background:radial-gradient(ellipse at 50% 38%, rgba(255,170,80,.16), transparent 62%), var(--brown-dark); }
-.fork-title{ margin:0; font-size:30px; color:var(--gold); text-shadow:0 2px 0 var(--line); }
-.fork-sub{ margin:0 0 10px; font-size:13.5px; color:#c9b48e; text-align:center; }
+
 .fork-doors{ display:flex; justify-content:center; gap:10px; width:100%; }
 .fork-door{ cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:10px; flex:1 1 0; min-width:0; -webkit-tap-highlight-color:transparent; outline:none; }
 .fork-door .rc-door{ zoom:.64; animation:none; }
 .fork-door .rc-tap{ display:none; }
-.fork-note{ display:block; width:100%; box-sizing:border-box; text-align:center; font:600 13px/1.3 var(--font-ui); color:#f2e4c8; background:#2a1b10; border:2px solid var(--line); border-radius:10px; padding:7px 6px; box-shadow:0 3px 0 var(--line); }
-.fork-note b{ color:var(--gold); }
+
 .fork-door:hover .rc-door, .fork-door:focus-visible .rc-door{ filter:drop-shadow(0 0 10px rgba(255,215,106,.55)); }
 .fork-door.opening .rc-leaf{ transform:rotateY(-82deg); transition:transform .32s ease; }
 .fork-door.passed{ opacity:.45; transition:opacity .2s ease; }
-.fork-foot{ margin:12px 0 0; font-size:13px; color:#c9b48e; }
+
 .reduced-motion .fork-door.opening .rc-leaf{ transition:none; }
 
 .deeper-tag{ position:absolute; left:50%; top:-11px; transform:translateX(-50%); z-index:3; white-space:nowrap; font:800 10px/1 var(--font-ui); letter-spacing:.08em; text-transform:uppercase; color:#241c10; background:var(--loot-tier-color, #ffd76a); border:2px solid var(--line); border-radius:999px; padding:3px 8px; box-shadow:0 2px 0 var(--line); }
 
 /* Nov 4 (Jeremy): the fork's doors float on their own, like the loot chest: no panel, no text, a gentle bob */
-.fork-hall{ background:none !important; border:none !important; box-shadow:none !important; padding:0 !important; }
+
 .fork-doors{ gap:14px; align-items:center; }
 .fork-door .rc-door{ zoom:.7; filter:drop-shadow(0 14px 14px rgba(0,0,0,.6)); }
 .fork-door:hover .rc-door, .fork-door:focus-visible .rc-door{ filter:drop-shadow(0 14px 14px rgba(0,0,0,.6)) drop-shadow(0 0 12px rgba(255,215,106,.55)); }
@@ -3053,9 +2989,7 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 .tray-panel .skip-turn-btn{ top:1px; right:-68px; width:62px; height:36px; padding:0; border-radius:12px; font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; background:#3d6fa3; color:#f4ead2; z-index:7; box-shadow:inset 0 3px 0 rgba(255,255,255,.30), inset 0 -4px 0 rgba(0,0,0,.28); filter:drop-shadow(0 3px 0 var(--line)); }
 .tray-panel .skip-turn-btn:active{ box-shadow:inset 0 2px 0 rgba(255,255,255,.18), inset 0 -2px 0 rgba(0,0,0,.28); filter:drop-shadow(0 1px 0 var(--line)); }
 /* Round badge matches the height of the action coins beside it / Round badge: muted slate so it reads apart from the brown panel without competing with Go / Skill / 22: round bubble in dark brown with light-brown text; the floor number stays gold / Oct 31 (Jeremy, R1): the floor/round badge is a two-part tag: "Floor II" on a stone tab, "Round 3" on parchment. A chip, so 2px outlines; both halves carry the paper texture like the rest of the art. */
-.tray-head .round-badge{ margin:0; flex:0 0 auto; box-sizing:border-box; border-color:var(--line) !important; white-space:nowrap; color:var(--parchment-dim) !important; display:inline-flex !important; align-items:stretch !important; height:30px; padding:0 !important; gap:0 !important; overflow:hidden; border:2px solid var(--line) !important; border-radius:9px !important; box-shadow:0 3px 0 var(--line) !important; background:none !important; font-size:12.5px !important; }
-.tray-head .round-badge .rb-floor{ display:flex; align-items:center; margin:0 !important; padding:0 8px; border-right:2px solid var(--line); background:var(--paper-tile) repeat, linear-gradient(180deg,#b9bec3,#8a8f94); background-size:110px 110px, auto; background-blend-mode:soft-light, normal; color:#2a2522 !important; font:400 13px var(--font-display) !important; box-shadow:inset 0 2px 0 rgba(255,255,255,.35); }
-.tray-head .round-badge .rb-round{ display:flex; align-items:center; padding:0 9px; background:var(--paper-tile) repeat, #f3e3bf; background-size:110px 110px, auto; background-blend-mode:soft-light, normal; color:#3a2410; font-weight:800; }
+
 /* path coins: a slot per coin, 26px apart when there's room, shrinking toward 6px as the path grows; the 30px coin overflows its slot so later coins overlap earlier ones. The strip leaves 80px on the right for the path total. */
 .tray-panel .path-strip{ flex:1 1 0; min-width:0; margin-right:80px; }
 .path-slot{ position:relative; flex:0 1 26px; min-width:6px; height:30px; overflow:visible; }
@@ -3208,7 +3142,6 @@ button.cf-go-train:hover:not(:disabled){ background:#9a6fc2; }
 /* ==== Shrine (shrine-, so-): every top-level rule for it, merged Nov 12 by tools/css/merge.py (polish roadmap A3).
    Was 71 rules spread through this file; each value's history is in git. Edit here, not further up. ==== */
 /* v1.36.0: shrine ritual */
-#room-callout .room-callout-line.intro.shrine{ color:#cfe9ff !important; font-style:italic; }
 
 /* ==== Fight face-off (fo-, enc-): every top-level rule for it, merged Nov 12 by tools/css/merge.py (polish roadmap A3).
    Was 205 rules spread through this file; each value's history is in git. Edit here, not further up. ==== */
@@ -3413,8 +3346,7 @@ body.hit-stop .fo-enemy .fo-fig{ filter:brightness(2.4) saturate(.35); }
 /* Enemy statuses sit under the name like the hero's; "Every turn" labels the action badges / Oct 31 (Jeremy): the enemy turn label never wraps (Phase 2 used to push the chips onto the tray) */
 .fo-turnlabel{ font-family:var(--font-ui); letter-spacing:1.4px; text-transform:uppercase; color:#e8cf9a; opacity:.85; margin-top:1px; line-height:1; display:flex; align-items:center; gap:5px; font-size:10px; white-space:nowrap; }
 /* S2: the shrine's boon line is a small parchment note pinned under the shrine (same footprint as the old box) */
-.fo-shrine .fo-enemy .fo-quests.boon-note{ display:block !important; position:relative; max-width:170px; margin:4px auto 0 !important; padding:6px 10px 5px !important; border-radius:4px !important; background:var(--paper-tile) repeat, #f3e3bf !important; background-size:110px 110px, auto !important; background-blend-mode:soft-light, normal; color:#3a2410 !important; border:3px solid var(--line); box-shadow:0 4px 0 var(--line); transform:rotate(1.5deg); font:400 13px/1.3 var(--font-ui) !important; text-align:center; text-shadow:none !important; }
-.fo-shrine .fo-enemy .fo-quests.boon-note::before{ content:''; position:absolute; top:-7px; left:50%; width:12px; height:12px; margin-left:-6px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#ff9a7a,#b02a1c 70%); border:2px solid var(--line); }
+
 /* Nov 8 (playtest: "never sure whether the D.O.T. was on me or the enemy"): status chips take their owner's color. Yours are blue, the monster's are deep red, whatever the status is. 2px toy outline. */
 .fo-player .fo-buffs .status-chip{ background:linear-gradient(160deg,#4f86c6,#2d5a93) !important; color:#eef5ff !important; border:2px solid #0c0705 !important; box-shadow:0 2px 0 #0c0705; }
 .fo-enemy .fo-buffs .status-chip{ background:linear-gradient(160deg,#c0453a,#7e2219) !important; color:#fff0e8 !important; border:2px solid #0c0705 !important; box-shadow:0 2px 0 #0c0705; }
@@ -3497,24 +3429,18 @@ body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
 /* Oct 13: Codex / Records tabbed windows and the Bestiary */
 .codex-tabs{ display:flex; gap:4px; justify-content:center; margin:0 0 8px; flex-wrap:wrap; }
 .codex-body{ max-height:min(62vh,520px); overflow-y:auto; text-align:left; }
-.bst-row{ display:flex; gap:8px; align-items:flex-start; padding:6px 4px; border-bottom:1px solid rgba(255,255,255,.08); }
-.bst-art{ width:54px; height:54px; object-fit:contain; flex:0 0 54px; }
-.bst-art.bst-unknown{ filter:brightness(0) drop-shadow(0 0 1px rgba(255,255,255,.35)); opacity:.55; }
-.bst-art.bst-noart{ display:flex; align-items:center; justify-content:center; font-size:24px; opacity:.4; }
-.bst-main{ flex:1; min-width:0; }
-.bst-sub{ font-size:11px; margin:1px 0 2px; }
+
 .bst-moves{ font-size:12px; margin:2px 0; }
-.bst-flavor{ font-size:12px; font-style:italic; opacity:.8; margin-top:2px; }
-.bst-tally{ font-size:11px; margin-top:3px; opacity:.85; }
+
 .bst-lost{ color:#ff9a8a; }
-.bst-row.locked .run-history-who{ opacity:.5; }
+
 .codex-tabs .codex-tab:nth-child(1){ background:#a65c35; }
 .codex-tabs .codex-tab:nth-child(2){ background:#547a35; }
 .codex-tabs .codex-tab:nth-child(3){ background:#4f6aa6; }
 .codex-tabs .codex-tab:nth-child(4){ background:#8a5aa0; }
 .codex-tabs .codex-tab{ padding:5px 10px; font-size:13px; min-height:0; opacity:.75; color:#fff3dc; }
 /* 25: one scroll area per Codex / Records tab (no scrolling list inside the scrolling window) */
-.codex-body .compendium-list, .codex-body .run-history-list{ max-height:none; overflow:visible; }
+.codex-body .run-history-list{ max-height:none; overflow:visible; }
 /* Bestiary: each monster's quests in the fight's own wording and reward icons */
 .bst-quests{ display:inline-flex; flex-direction:column; gap:2px; margin:5px 0 3px; padding:3px 7px 4px; min-width:160px; max-width:100%; background:var(--paper); color:var(--ink); border:2px solid var(--line); border-radius:6px; }
 .bst-quests-head{ font-family:var(--font-display); color:#7a1f14; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; line-height:1.2; }
@@ -3527,7 +3453,7 @@ body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
 .codex-modal.codex-book{ background:radial-gradient(ellipse at 30% 20%, #f4e6c4, #e6d2a6 70%, #d9c08e) !important; color:#3a2410; box-shadow:inset 0 0 0 3px #b8955a, inset 0 0 30px rgba(120,80,30,.35), 0 6px 0 var(--line) !important; }
 .codex-book h2{ color:#5a2e10 !important; text-shadow:none !important; }
 .codex-book .codex-body, .codex-book .codex-body .run-history-who, .codex-book .codex-body .relic-desc{ color:#3a2410; }
-.codex-book .codex-body .hint, .codex-book .codex-body .bst-sub{ color:#6b4a26 !important; }
+.codex-book .codex-body .hint{ color:#6b4a26 !important; }
 .cx-page .bst-quests{ margin:8px auto 0; display:inline-block; text-align:left; }
 .codex-book .bst-lost{ color:#a8302a !important; font-weight:700; }
 /* Nov 12 Codex polish: Bestiary quest rewards look like the wall poster's red badges (they were gold-on-brown blobs), and a monster's every-turn actions read as icon + number chips */
@@ -3855,7 +3781,6 @@ html body .pc-cur, html body #tray > .die.pc-cur{ outline:4px solid var(--gold) 
 /* Chrome before 123 (body.old-text, main.js): no paint-order on page text, so outlined text uses a shadow ring instead of a stroke */
 body.old-text .fo-hpwrap .bar-num, body.old-text .fo-hpwrap .delta-float, body.old-text .turn-total span{ -webkit-text-stroke:0 !important; text-shadow:-1.5px 0px 0 #1b0f06, 1.5px 0px 0 #1b0f06, 0px -1.5px 0 #1b0f06, 0px 1.5px 0 #1b0f06, -1.0499999999999998px -1.0499999999999998px 0 #1b0f06, 1.0499999999999998px -1.0499999999999998px 0 #1b0f06, -1.0499999999999998px 1.0499999999999998px 0 #1b0f06, 1.0499999999999998px 1.0499999999999998px 0 #1b0f06 !important; }
 body.old-text .turn-total b{ -webkit-text-stroke:0 !important; text-shadow:-2.5px 0px 0 #0c0705, 2.5px 0px 0 #0c0705, 0px -2.5px 0 #0c0705, 0px 2.5px 0 #0c0705, -1.75px -1.75px 0 #0c0705, 1.75px -1.75px 0 #0c0705, -1.75px 1.75px 0 #0c0705, 1.75px 1.75px 0 #0c0705, 0 4px 0 #0c0705, 0 0 18px rgba(255,140,40,.55) !important; }
-body.old-text .kill-callout-line{ -webkit-text-stroke:0 !important; text-shadow:-3px 0px 0 #120a04, 3px 0px 0 #120a04, 0px -3px 0 #120a04, 0px 3px 0 #120a04, -2.0999999999999996px -2.0999999999999996px 0 #120a04, 2.0999999999999996px -2.0999999999999996px 0 #120a04, -2.0999999999999996px 2.0999999999999996px 0 #120a04, 2.0999999999999996px 2.0999999999999996px 0 #120a04, 0 3px 0 #120a04, 0 0 12px rgba(0,0,0,.9) !important; }
 
 /* the cursor on a tray die: a ring on top of the box (pcDieRing, main.js); the die's own outline is off */
 html body #tray > .die.pc-cur{ outline:none !important; }
@@ -3878,7 +3803,7 @@ html body #tray > .die.zone-cell:not(.in-path){ box-shadow:0 0 0 3px color-mix(i
 /* Nov 14 (Jeremy: a scrollbar flashed in the loot window): a box that scrolls up and down is also allowed to scroll
    sideways by browsers, so a card's bounce or wiggle poking a few px past its side flashed a horizontal scrollbar. None
    of these boxes scrolls sideways. */
-.modal, .run-history-list, .compendium-list, .depth-body, .end-details, .log-journal, .swap-list, .codex-body, .codex-page-pane, .log, .modal-overlay{ overflow-x:hidden !important; }
+.modal, .run-history-list, .depth-body, .end-details, .log-journal, .swap-list, .codex-body, .codex-page-pane, .log, .modal-overlay{ overflow-x:hidden !important; }
 /* ...and two boxes whose entrance/wiggle animations briefly overflowed them up and down: the keep-a-die list never scrolls;
    the loot window still scrolls on a very small screen, without showing a bar */
 .defeat-keep .swap-list{ overflow:visible !important; }
