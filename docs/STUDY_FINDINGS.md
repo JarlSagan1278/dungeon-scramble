@@ -489,6 +489,7 @@ Golem Lemma 7 -> 6, or Summon Golems 2 -> 1 at Depth 0.
 
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.
+- **Nov 26, 2026:** itch API: 89 views all time (+9 in the week). Shared runs from non-testers, Nov 19-26: 15 runs from 5 new players (all first-time devices; Play app builds 1.42.149-1.42.164): one 0 for 7 (deaths on Floors 1-2, the Rogue Golemancer twice), one 2 wins in 5 runs (49-minute wins), one quit at the first fight, one stopped mid-Floor 2 (Rogue Technician), one beat the Golemancer and is mid-run on Floor 2. Strangers all time: 6 (below the ~10 for a funnel run). None has played a build with the wind-up or chain tips yet (they reach Play with Friday's upload).
 
 ## Outside look: what a new player may chafe against (Nov 27, 2026, build 1.42.173)
 A fresh phone (390x844, nothing saved, the real flick and guided fight) played from the title through the first fight,
