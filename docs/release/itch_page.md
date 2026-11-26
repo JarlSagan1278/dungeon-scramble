@@ -58,6 +58,52 @@ Made by Jeremy and Katlynn Friedman. https://dungeonscramble.com · contact@dung
 If the Guild Rank and Daily Dungeon ship, add after "Play your way": *Every run earns renown toward a permanent rank with a starting gift at each step, and the Daily Dungeon is the same dungeon for everyone each day, with a result to share.*
 
 
+## Page refresh (Nov 27, 2026, build 1.42.174: paste over the Nov 23 text; new screenshots and cover)
+
+**Cover image:** `docs/release/media/itch_cover.gif` (630x500, animated; made by `tools/media/itch_cover*.js/py`).
+
+**Screenshots** (Edit game > Screenshots; delete the old ones, upload in this order; `node build.js --release &&
+node tools/media/itch_shots.js` remakes them in `docs/release/media/itch/`):
+1. `1_path.png`: a 7-dice path for 22 damage (Ranger, Pointer's +1s on the dice beside him)
+2. `2_boss_next_move.png`: a boss announcing its wind-up hit for next turn
+3. `3_foe_rule.png`: a foe with a rule (Odd Permutation: even-length paths deal x1.25)
+4. `4_loot.png`: an Overkill chest, three new dice to choose from
+5. `5_camp.png`: camp: rest or train, organize your dice
+6. `6_pc.png`: the PC layout (mouse, keyboard or controller)
+
+**Short description / tagline:** Draw one path through sixteen dice. A roguelike for phone and PC. Free demo: two floors.
+
+> **Every turn, sixteen dice. You draw one path.** Each die you step on acts, in order: hits, blocks, heals, Combos that
+> grow with their neighbors, Boosts that multiply the next die. Leap, Sidestep and Pivot faces bend where the path can go,
+> so a so-so roll can still become a monster-flattening turn if you find the right route.
+>
+> **You always know what's coming.** Every foe shows its next move, and bosses warn you a turn before their big hit, so
+> each turn is a small puzzle: block it, freeze it, or win first.
+>
+> **Some foes break the rules.** One only takes full damage from even-length paths, one turns your Block into its healing,
+> one caps your damage. Wanted posters pay extra for a stylish kill.
+>
+> **Build your dice.** Win loot dice and swap them into your tray, combine three at camp into a stronger one, find relics,
+> and keep a Back Pocket of spares that can save you once from defeat. Your loot shows up on your hero.
+>
+> **The free demo is the first two floors:** four origins and four classes to start, with more classes to unlock as you
+> play (including a Ranger and his schnauzer, Pointer), a Guild Rank that grows with every run, achievements, and a
+> Daily Dungeon that's the same for everyone each day.
+>
+> **Play your way:** on a phone held upright, or on a computer with mouse, keyboard or a controller (Steam Deck too).
+>
+> The full game adds Floor 3, the Big Bosses and Magic loot. It's coming to Android, iPhone and PC.
+>
+> Your progress is saved in your browser. If you choose to share play data at the end of a run, it helps us balance the
+> game. Privacy policy: https://dungeonscramble.com/privacy
+>
+> Made from the board game we designed together. https://dungeonscramble.com · contact@dungeonscramble.com
+>
+> Jeremy and Katlynn
+
+**Tags:** keep the current ten (roguelike, roguelite, dice, turn-based, strategy, puzzle, dungeon-crawler, fantasy,
+singleplayer, mobile).
+
 ## After it goes public
 
 - Add the itch.io link to the press kit and home page (`docs/release/presskit.html`, `tools/site.js`), rebuild the site, upload.
