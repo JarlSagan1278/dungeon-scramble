@@ -26,8 +26,7 @@ wiring. Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PR
 - **Redraw the remaining AI-assisted art** (pixie portraits, the remaining original loot) to shrink the disclosure.
 - **Steam:** pay the app fee; with the app ID: Steamworks achievements (list + icons from
   `tools/media/steam_achievements.js`), Steam Cloud, store page (draft `release/steam_page.md`, capsules ready).
-- **Design calls:** Dylan's bigger ideas (Perfect Kill reward, a Sniper class, leaderboards); Armsmaster red Skill vs
-  red Clear (options shown Oct 15).
+- **Design calls:** Dylan's bigger ideas (Perfect Kill reward, a Sniper class, leaderboards).
 - **Dylan's "anv" screenshot** (the Minion tip renders "any" correctly here).
 
 ## Next for Claude
