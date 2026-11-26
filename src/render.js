@@ -1055,7 +1055,7 @@ function renderTitle(){
       const go = ()=>{ resetSetupPortraitPreviews(); startDaily(practice); };
       if(!saved) return go();
       // a saved run would be replaced: ask first, like New Run does
-      const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
+      const overlay = el(`<div class="modal-overlay"><div class="modal guild-note" style="text-align:center;">
           <h2>${practice ? 'Practice the Daily?' : 'Start the Daily?'}</h2>
           <p>Your saved run (${saved.originName} ${saved.className}, Floor ${saved.floorIdx+1}) will be lost.</p>
           <div class="small-btn-row" style="justify-content:center;"><button id="daily-cancel">Keep Saved Run</button><button class="danger" id="daily-go">Start the Daily</button></div>
@@ -1068,7 +1068,7 @@ function renderTitle(){
   document.getElementById('title-newrun-btn').onclick = ()=>{
     if(!saved && guideWanted()){ resetSetupPortraitPreviews(); newGame('dwarf', 'armsmaster'); return; } // quick start: first run picks Dwarf Armsmaster
     if(!saved){ resetSetupPortraitPreviews(); preGameScreen='setup'; render(); return; }
-    const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
+    const overlay = el(`<div class="modal-overlay"><div class="modal guild-note" style="text-align:center;">
         <h2>Start a New Run?</h2>
         <p>Your saved run (${saved.originName} ${saved.className}, Floor ${saved.floorIdx+1}) will be lost.</p>
         <div class="small-btn-row" style="justify-content:center;">
@@ -1323,7 +1323,7 @@ function renderSetup(){
       const c = el(`<button type="button" class="class-tab-btn origin-tab-${o.id} ${o.id===chosenOrigin?'selected':''} ${previewing?'previewing':''} ${unlocked?'':'locked'}">${unlocked?'':lockSVG(10)+' '}${o.name}</button>`);
       c.onclick = ()=>{
         previewedOriginId = o.id;
-        if(unlocked){ chosenOrigin = o.id; } else showLockHint(o.name, ORIGIN_UNLOCK_HINT[o.id]||'Locked.');
+        if(unlocked){ chosenOrigin = o.id; } else showLockHint(o.name, ORIGIN_UNLOCK_HINT[o.id]||'Locked.', c.getBoundingClientRect());
         renderOriginTabs();
         renderOriginShowcaseNow();
         checkReady();
@@ -1360,7 +1360,7 @@ function renderSetup(){
       const c = el(`<button type="button" class="class-tab-btn ${k.id===chosenClass?'selected':''} ${previewing?'previewing':''} ${unlocked?'':'locked'} ${CLASS_UNLOCKS[k.id]?'class-tab-new':''}" style="--class-color:${k.color}">${unlocked?'':lockSVG(10)+' '}${k.name}</button>`);
       c.onclick = ()=>{
         previewedClassId = k.id;
-        if(unlocked) chosenClass = k.id; else showLockHint(k.name, CLASS_UNLOCKS[k.id].hint);
+        if(unlocked) chosenClass = k.id; else showLockHint(k.name, CLASS_UNLOCKS[k.id].hint, c.getBoundingClientRect());
         renderClassTabs();
         renderClassShowcaseNow();
         checkReady();
@@ -2087,13 +2087,14 @@ function pathCounterHTML(){
 
 function tokensRowHTML(){
   const btns = [];
-  if(S.nullifyTokens>0) btns.push(`<button id="use-nullify-token">${iconSpan('nullify')} Use Nullify Token <span class="token-count">${S.nullifyTokens}</span></button>`);
-  if(S.freezeTokens>0) btns.push(`<button id="use-freeze-token">${iconSpan('freeze')} Use Freeze Token <span class="token-count">${S.freezeTokens}</span></button>`);
-  if((S.swapTokens||0)>0) btns.push(`<button id="use-swap-token">${iconSpan('swap')} Use Swap Token <span class="token-count">${S.swapTokens}</span></button>`);
-  if((S.rerollTokens||0)>0) btns.push(`<button id="use-reroll-token">${iconSpan('reroll')} Use Reroll Token <span class="token-count">${S.rerollTokens}</span></button>`);
-  if(S.boostTokenCharges>0) btns.push(`<button id="use-boost-token" ${S.pendingFreeBoost?'disabled':''}>${iconSpan('boost')} Use x${S.boostTokenValue} Boost Token <span class="token-count">${S.boostTokenCharges}</span></button>`);
+  if(S.nullifyTokens>0) btns.push(`<button id="use-nullify-token" class="token-coin tc-nullify" title="Use a Nullify token">${iconSpan('nullify')}<small>Nullify</small><span class="token-count">${S.nullifyTokens}</span></button>`);
+  if(S.freezeTokens>0) btns.push(`<button id="use-freeze-token" class="token-coin tc-freeze" title="Use a Freeze token">${iconSpan('freeze')}<small>Freeze</small><span class="token-count">${S.freezeTokens}</span></button>`);
+  if((S.swapTokens||0)>0) btns.push(`<button id="use-swap-token" class="token-coin tc-swap" title="Use a Swap token">${iconSpan('swap')}<small>Swap</small><span class="token-count">${S.swapTokens}</span></button>`);
+  if((S.rerollTokens||0)>0) btns.push(`<button id="use-reroll-token" class="token-coin tc-reroll" title="Use a Reroll token">${iconSpan('reroll')}<small>Reroll</small><span class="token-count">${S.rerollTokens}</span></button>`);
+  if(S.boostTokenCharges>0) btns.push(`<button id="use-boost-token" class="token-coin tc-boost" title="Use a x${S.boostTokenValue} Boost token" ${S.pendingFreeBoost?'disabled':''}>${iconSpan('boost')}<small>Boost x${S.boostTokenValue}</small><span class="token-count">${S.boostTokenCharges}</span></button>`);
   if(!btns.length) return '';
-  return `<div class="small-btn-row" style="margin-top:0; flex-direction:column;">${btns.join('')}</div>`;
+  // Nov 27 (app-like audit): the tokens are coins spilled out of the pouch; each coin is still the same button (same id)
+  return `<div class="token-pouch"><div class="token-coins">${btns.join('')}</div><p class="hint">Tap a coin to use it.</p></div>`;
 }
 
 function openTokensModal(){
@@ -2825,7 +2826,18 @@ function headlineParts(text){
 let HEADLINE_Q = [];
 // Nov 25 (Jeremy: lock hints stayed around and stacked, so it wasn't clear which applied to which): a lock hint names
 // the thing and replaces any lock hint showing or waiting, instead of queueing behind it.
-function showLockHint(name, hint){
+// Nov 27 (app-like audit): with the tapped button's rect, the hint is a paper tag tied to it (a goal, not an error bar)
+function showLockHint(name, hint, rect){
+  if(rect){
+    document.querySelectorAll('.lock-tag').forEach(n=>n.remove());
+    const tag = el(`<div class="lock-tag" role="status"><i class="lt-hole"></i><b>${name}</b><span>${String(hint).replace(/\.$/,'')}</span></div>`);
+    document.body.appendChild(tag);
+    const w = tag.offsetWidth, x = Math.max(6, Math.min(window.innerWidth - w - 6, rect.left + rect.width/2 - w/2));
+    tag.style.left = x + 'px'; tag.style.top = (rect.bottom + 8) + 'px'; tag.style.setProperty('--tx', (rect.left + rect.width/2 - x) + 'px');
+    const words = (name + ' ' + hint).split(/\s+/).length;
+    clearTimeout(showLockHint._t); showLockHint._t = setTimeout(()=>{ tag.classList.add('lt-out'); setTimeout(()=>tag.remove(), 250); }, Math.min(5000, 1400 + 300*words));
+    return;
+  }
   HEADLINE_Q = HEADLINE_Q.filter(q=> !q.lock);
   const cur = document.getElementById('headline-strip');
   if(cur && cur.dataset.lock){ cur.remove(); }
@@ -4049,7 +4061,7 @@ function canFullscreen(){ if(desktopApp()) return true; try{ return !!(document.
 function toggleFullscreen(){ const d = desktopApp(); if(d){ d.toggleFullscreen(); return; } try{ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>{}); }catch(e){} }
 function openSettingsModal(){
   const inRun = !!S;
-  const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center; max-width:340px;">
+  const overlay = el(`<div class="modal-overlay"><div class="modal settings-journal" style="text-align:center; max-width:340px;">
       <button class="modal-x-btn" id="settings-x-btn" title="Close">✕</button>
       <h2 style="margin-top:0;">Settings</h2>
       ${inRun ? `<p class="hint">${S.origin.name} ${S.klass.name} · Floor ${S.floorIdx+1}</p>` : ''}
@@ -4074,6 +4086,7 @@ function openSettingsModal(){
         ${BUILD.release ? settingsTileHTML('settings-credits-btn', 'btn-credits', 'Credits', 'credits') : settingsTileHTML('settings-export-data-btn', 'btn-export', 'Export Data', 'export', 'Export Play Data')}
       </div>
       <div class="settings-danger-row">
+        <button id="settings-backup-btn" class="settings-backup-btn">Back up progress</button>
         ${inRun ? '<button id="settings-restart-btn" class="danger">Abandon Run</button>' : ''}
         <button id="settings-reset-progress-btn" class="danger-outline">Reset Progress</button>
       </div>
@@ -4087,6 +4100,7 @@ function openSettingsModal(){
   const logBtn = overlay.querySelector('#settings-log-btn');
   if(logBtn) logBtn.onclick = ()=>{ close(); openInfoModal('Log', logViewHTML()); const j = document.getElementById('log-journal'); if(j) j.scrollTop = j.scrollHeight; };
   overlay.querySelector('#settings-how-to-play-btn').onclick = ()=>{ close(); openTutorialModal(0); };
+  overlay.querySelector('#settings-backup-btn').onclick = ()=>{ close(); const o = openInfoModal('Back Up Progress', backupPanelHTML()); wireBackupPanel(o.querySelector('#info-modal-body')); }; // Nov 27: moved here from Records
   overlay.querySelector('#settings-codex-btn').onclick = ()=>{ close(); openCodexModal(); };
   overlay.querySelector('#settings-records-btn').onclick = ()=>{ close(); openRecordsModal(); };
   { const ex = overlay.querySelector('#settings-export-data-btn'); if(ex) ex.onclick = ()=>{ close(); openExportDataModal(); }; }
@@ -4109,7 +4123,7 @@ function openSettingsModal(){
   const restartBtn = overlay.querySelector('#settings-restart-btn');
   if(restartBtn) restartBtn.onclick = ()=>{
     close();
-    const confirmOverlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
+    const confirmOverlay = el(`<div class="modal-overlay"><div class="modal guild-note" style="text-align:center;">
         <h2>Abandon Run?</h2>
         <p>Your current run (Floor ${S.floorIdx+1}, ${S.health}/${S.maxHealth} HP) will be lost.</p>
         <div class="small-btn-row" style="justify-content:center;">
@@ -4129,7 +4143,7 @@ function openSettingsModal(){
   // sound/reduced-motion prefs and the tutorial-seen flag survive it.
   overlay.querySelector('#settings-reset-progress-btn').onclick = ()=>{
     close();
-    const confirmOverlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
+    const confirmOverlay = el(`<div class="modal-overlay"><div class="modal guild-note gn-contract" style="text-align:center;">
         <h2>Reset Progress?</h2>
         <p>This permanently erases your lifetime stats, Achievements, Dice Compendium discoveries, and Run History. Locked Origins and Starting Boon tiers go back to locked. Sound and motion settings are kept.${inRun ? ' Your current run will also be lost.' : ''}</p>
         <div class="small-btn-row" style="justify-content:center;">
@@ -4244,10 +4258,10 @@ function achievementsHTML(){
 }
 // Records (Oct 13): Run History + Achievements in one tabbed window (shorter settings menu).
 function openRecordsModal(tab){
-  const overlay = el(`<div class="modal-overlay"><div class="modal codex-modal" style="text-align:center; max-width:400px;">
+  const overlay = el(`<div class="modal-overlay"><div class="modal codex-modal records-ledger" style="text-align:center; max-width:400px;">
       <button class="modal-x-btn" id="records-x-btn" title="Close">✕</button>
       <h2 style="margin-top:0;">Records</h2>
-      <div class="codex-tabs"><button class="codex-tab" data-tab="rank">Rank</button><button class="codex-tab" data-tab="history">Run History</button><button class="codex-tab" data-tab="achievements">Achievements</button><button class="codex-tab" data-tab="backup">Backup</button></div>
+      <div class="codex-tabs"><button class="codex-tab" data-tab="rank">Rank</button><button class="codex-tab" data-tab="history">Run History</button><button class="codex-tab" data-tab="achievements">Achievements</button></div>
       <div class="codex-body" id="records-body"></div>
     </div></div>`);
   openModal(overlay);
@@ -5608,7 +5622,7 @@ function campfireChoiceHTML(){
 function confirmCampfire(kind, go){
   if(S.campChoice || S.campFireOut || isBaseCamp()) return go();
   const rest = kind==='rest';
-  const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
+  const overlay = el(`<div class="modal-overlay"><div class="modal guild-note" style="text-align:center;">
       <h2>${rest ? 'Rest here?' : 'Train here?'}</h2>
       <p>${rest ? "The campfire gives one: if you Rest, you can't combine dice at this Camp." : "The campfire gives one: if you Train (combine dice), you can't Rest at this Camp."}</p>
       <div class="small-btn-row" style="justify-content:center;">
@@ -5629,7 +5643,7 @@ function pocketLeftAfterUpgrade(cat, level){
   return S.backPocket.length - bpUsed - Math.max(0, trayUsed - 1) + (trayUsed===0 ? 1 : 0); // a Pocket-only combine puts the new die in the Pocket
 }
 function confirmEmptyPocket(go){
-  const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
+  const overlay = el(`<div class="modal-overlay"><div class="modal guild-note" style="text-align:center;">
       <h2>Empty your Back Pocket?</h2>
       <p>This combine uses your last spare dice, so you'll have <b>no safety net</b> if you fall to 0 Health, until a new die lands in your Pocket.</p>
       <div class="small-btn-row" style="justify-content:center;"><button id="ep-cancel">Keep my safety net</button><button class="danger" id="ep-go">Combine anyway</button></div>
@@ -5976,7 +5990,7 @@ function renderCamp(){
   syncCampHeal();
   document.getElementById('leave-btn').onclick = ()=>{
     if(baseCamp || S.campChoice || S.campFireOut){ campLeave(); return; } // Oct 16 (Jeremy): only ask when the fire is still unused
-    const overlay = el(`<div class="modal-overlay"><div class="modal" style="text-align:center;">
+    const overlay = el(`<div class="modal-overlay"><div class="modal guild-note" style="text-align:center;">
         <h2>Break Camp?</h2>
         <p>${S.campRested ? "You can't come back to upgrade dice until the next Camp." : "You haven't used the campfire (Rest or Train). Leave without it?"}</p>
         <div class="small-btn-row" style="justify-content:center;">
@@ -6488,10 +6502,10 @@ function maybeShareAskMidRun(){
     if(S.screen!=='game' && S.screen!=='camp' && S.screen!=='shrine') return;
     if(S.pendingLootDie || S.lootChoice || S.forkChoice || S.transitioning || document.querySelector('.modal-overlay, #room-callout, #room-callout-scrim, #floor-card, .coach-overlay, #symbol-intro')){ /* wait for the next room's banner and any other pop-up */ clearTimeout(maybeShareAskMidRun._t); maybeShareAskMidRun._t = setTimeout(maybeShareAskMidRun, 800); return; }
     S.tele.shareAsked = true;
-    const overlay = el(`<div class="modal-overlay share-ask-modal"><div class="modal" style="text-align:center; max-width:320px;">
-        <h2 style="margin-top:0;">Help balance the game?</h2>
-        <p style="text-align:left;">Share how your runs go (rooms, dice, what beat you) so we can tune the fights. A random id for this device, its screen size and any error messages are sent; no names or personal info. You can turn it off in Settings.</p>
-        <div class="small-btn-row" style="justify-content:center;"><button class="primary" id="share-mid-yes">Yes, share</button><button id="share-mid-no">No thanks</button></div>
+    const overlay = el(`<div class="modal-overlay share-ask-modal"><div class="modal guild-note" style="text-align:center; max-width:320px;">
+        <h2 style="margin-top:0;">The Guild asks</h2>
+        <p style="text-align:left;">May we keep a record of your runs (rooms, dice, what beat you), to balance the dungeon? A random id for this device, its screen size and any error messages are sent; no names or personal info. You can turn it off in Settings.</p>
+        <div class="small-btn-row" style="justify-content:center;"><button class="primary" id="share-mid-yes">Yes</button><button id="share-mid-no">No</button></div>
       </div></div>`);
     openUniqueOverlay('shareask', overlay);
     const answer = on=>{ teleLog('share_ask', {at:'midrun', on}); setShareData(on, null); closeModal(overlay, ()=>{ if(on) sendLiveRun('consent'); if(typeof saveGame==='function') saveGame(); }); };

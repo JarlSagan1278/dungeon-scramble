@@ -33,7 +33,7 @@ const ITEMS = [
   ['face_tooltip', FIGHT + "showFaceTooltip(document.querySelector('#tray > .die').getBoundingClientRect(), '<strong>Hit 1</strong>'+FACE_DESC.hit);"],
   ['toast', FIGHT + "showToast('Copied: paste it anywhere');", { wait: 400 }],
   ['toast_good', FIGHT + "showToast('Nicely done! Long-press any die to see what its face does.', 'good');", { wait: 400 }],
-  ['lock_hint', TITLE + "preGameScreen='setup'; render(); showLockHint('Field Medic', 'Play 10 runs to unlock.');", { wait: 500 }],
+  ['lock_hint', TITLE + "preGameScreen='setup'; render(); showLockHint('Field Medic', 'Play 10 runs to unlock.', [...document.querySelectorAll('.class-tab-btn')].find(b=>/Field Medic/.test(b.textContent)).getBoundingClientRect());", { wait: 500 }],
   ['relic_choice', FIGHT + "S.relicChoice={ name:'Relic Shrine', options:RELICS.filter(r=>!r.origin).slice(0,3).map(r=>r.id), left:1 }; render();"],
   ['shrine_choice', FIGHT + "S.shrineChoice={ name:'Half-Full Fountain', options:[{label:'Drink: heal 6'},{label:'Toss a coin: a Reroll token'},{label:'Gaze into your reflection'}].map(o=>({label:o.label, action:()=>{}})) }; render();"],
   ['equip_swap', FIGHT + "S.pendingLootDie=clone(ALLOY[2]); render();"],

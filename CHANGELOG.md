@@ -3,6 +3,7 @@
 ## Unreleased
 - Your biggest turn on a little board: the end screen's run card and the shared card image show the dice as they stood, with your path drawn over them, lighting up step by step (runs played from this version on).
 - End screen: Details is a leather ledger with a bookmark, and the play-data question is a guild note pinned to the wall with wax-seal answers.
+- Less app, more dungeon: every "are you sure?" is a pinned guild note with wax-seal answers (Reset Progress a torn contract); Settings is a page of your journal with brass levers; notices are pinned paper slips; a locked class shows a tag tied to its button; Records has ribbon bookmarks (Backup moved to Settings); tokens are coins you tap.
 - A run now starts with a beat: the Floor I stair card, then the first door; the room lights up and your hero walks in.
 
 ## 1.42.174 (Nov 27, 2026)
