@@ -1,4 +1,4 @@
-  :root{ --b0:#0c0705; --b1:#1c1109; --b2:#33200f; --b3:#4c3119; --b4:#74502d; --b5:#8d6139; --b6:#b8844a; 
+  :root{ --b0:#0c0705; --b1:#1c1109; --b2:#33200f; --b3:#4c3119; --b4:#74502d; --b5:#8d6139; --b6:#986d3d; 
     --bg: var(--b1);
     --panel: var(--b2);
     --panel2: var(--b3);
@@ -10,9 +10,9 @@
     --red: #b33b3b;
     --red-dim: #6e2b2b;
     --cream: #e4d7ad;
-    --blue: #4a7a9e;
+    --blue: #467396;
     --purple: #8a5fb0;
-    --green: #4a8a5c;
+    --green: #417a51;
     --danger: #c0392b;
     --floor1: #8f8570;
     --floor2: #d4af52;
@@ -523,7 +523,7 @@
      die's own color with the dark outline (box-shadow pairs: fill on top of a 1.5px-spread outline), slightly darker
      the further back they sit. 1-3 layers by count (stk-1..3); margins leave room for the layers and the badge. */
   .camp-die-tile.stacked{ z-index:1; --sk:#e4d7ad; --sk1:color-mix(in srgb, var(--sk) 88%, #000); --sk2:color-mix(in srgb, var(--sk) 76%, #000); --sk3:color-mix(in srgb, var(--sk) 64%, #000); }
-  .camp-die-tile.dietype-attack{ --sk:#d8323a; } .camp-die-tile.dietype-maneuver{ --sk:#ffe9a8; } .camp-die-tile.dietype-origin{ --sk:#4a8a5c; }
+  .camp-die-tile.dietype-attack{ --sk:#d23038; } .camp-die-tile.dietype-maneuver{ --sk:#ffe9a8; } .camp-die-tile.dietype-origin{ --sk:#417a51; }
   .camp-die-tile.dietype-alloy{ --sk:#9aa3ab; } .camp-die-tile.dietype-gilded{ --sk:#d4af52; } .camp-die-tile.dietype-magic{ --sk:#8a5fb0; }
   .camp-die-tile.stacked{ --st:3px; }
   .camp-pocket .camp-die-tile.stacked{ --st:2px; } /* small Back Pocket tiles: tighter layers so the die keeps its size */
@@ -977,7 +977,7 @@
   .mini-face{ display:flex; flex-direction:column; align-items:center; justify-content:center; width:40px; height:40px; border-radius:var(--r-sm);
     border:2px solid var(--line); box-shadow:0 2px 0 var(--line); line-height:1; color:#241c10; }
   .mini-face small{ font-size:8px; font-weight:900; margin-top:2px; white-space:nowrap; }
-  .mf-attack{ background:#d8323a; color:#fff3e6; } .mf-maneuver{ background:#ffe9a8; } .mf-origin{ background:#4a8a5c; color:#eafbea; }
+  .mf-attack{ background:#d23038; color:#fff3e6; } .mf-maneuver{ background:#ffe9a8; } .mf-origin{ background:#417a51; color:#eafbea; }
   .mf-alloy{ background:#9aa3ab; } .mf-gilded{ background:#d9a93a; } .mf-magic{ background:#9a6ad0; color:#fff; }
   .mini-face.mf-blank{ background:var(--b4); opacity:.45; box-shadow:none; border-style:dashed; }
   /* Light backdrop so dark icons read on every die color. */
@@ -1517,7 +1517,7 @@ body{ -webkit-tap-highlight-color:transparent; }
 .depth-pm:disabled{ opacity:.35; }
 .depth-toggle-text{ display:flex; flex-direction:column; flex:1; min-width:0; line-height:1.15; }
 .depth-toggle-title{ font-family:var(--font-display); font-size:13px; letter-spacing:2.5px; text-transform:uppercase; color:var(--gold); text-shadow:0 2px 0 #0c0705; }
-.depth-toggle-sub{ font-size:11.5px; font-weight:700; color:var(--parchment-dim); }
+.depth-toggle-sub{ font-size:11.5px; font-weight:700; color:#fff1d6; } /* Nov 25 accessibility: parchment-dim on the light brown card was 3.4:1 */
 .depth-chevron{ flex:none; color:var(--gold); display:flex; transition:transform .2s; }
 .depth-body{ background:var(--b5); border:2px solid var(--line); border-radius:var(--r-lg); padding:8px; display:flex; flex-direction:column; gap:6px; }
 .depth-body[hidden]{ display:none; }
@@ -1862,11 +1862,11 @@ body.is-resolving .util-btn.pulse::after{ animation:none; }
 
 /* ---- Oct 17 design fixes (audit Part 2, items 1, 3, 4, 5) ---- */
 /* Each menu button its own color; the same color means the same place everywhere (title, Settings, Codex tabs) */
-button.btn-codex{ background:#5f8a3c; color:#fff3dc; }
+button.btn-codex{ background:#547a35; color:#fff3dc; }
 button.btn-records{ background:#4f6aa6; color:#fff3dc; }
 button.btn-howto{ background:#8a5aa0; color:#fff3dc; }
-button.btn-log{ background:#b5653a; color:#fff3dc; }
-button.btn-export{ background:#2f7f7a; color:#fff3dc; }
+button.btn-log{ background:#a65c35; color:#fff3dc; }
+button.btn-export{ background:#2d7b76; color:#fff3dc; }
 button.btn-backup{ background:#9a7b2c; color:#fff3dc; } /* Oct 21: Back Up Progress */
 button.btn-codex:hover:not(:disabled){ background:#6e9c48; }
 button.btn-records:hover:not(:disabled){ background:#5d79b8; }
@@ -1913,7 +1913,7 @@ textarea.paper-input:focus{ box-shadow:0 0 0 2px var(--gold); }
 body:has(.modal-overlay) .settings-btn-floating{ visibility:hidden; }
 /* 17: Key tiles drawn like tray dice: same colors, 3px outline (support faces in the Gilded gold) */
 .key-item{ border:3px solid var(--line); box-shadow:inset 0 3px 0 rgba(255,255,255,.3); filter:drop-shadow(0 3px 0 var(--line)); margin-bottom:3px; }
-.key-item.blk-attack{ background:#d8323a; } .key-item.blk-maneuver{ background:#ffe9a8; } .key-item.blk-support{ background:#d4af52; }
+.key-item.blk-attack{ background:#d23038; } .key-item.blk-maneuver{ background:#ffe9a8; } .key-item.blk-support{ background:#d4af52; }
 .key-item.blk-attack .key-icon, .key-item.blk-attack .key-label{ color:#fff3e6; }
 .key-item.blk-maneuver .key-icon, .key-item.blk-maneuver .key-label, .key-item.blk-support .key-icon, .key-item.blk-support .key-label{ color:#241c10; }
 .key-item .key-label{ font-weight:900; }
@@ -2088,7 +2088,7 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 .upg-die{ width:24px; height:24px; border-radius:6px; border:2px solid var(--line); display:inline-flex; align-items:center; justify-content:center; flex:none;
   font-size:11px; font-weight:800; box-shadow:inset 0 2px 0 rgba(255,255,255,.3); }
 .upg-die.upg-die-big{ width:34px; height:34px; font-size:14px; }
-.upg-attack .upg-die{ background:#f25c54; color:#fff; }
+.upg-attack .upg-die{ background:#c84c45; color:#fff; }
 .upg-maneuver .upg-die{ background:#fbe6b0; color:#3a2200; }
 .upg-arrow{ font-size:18px; margin:0 3px; opacity:.85; }
 .upg-own{ margin-left:auto; font-size:12.5px; opacity:.85; white-space:nowrap; }
@@ -2125,8 +2125,8 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 .cx-name{ font-size:12px; font-weight:700; line-height:1.15; color:#3a2410; overflow-wrap:anywhere; }
 .cx-card.locked .cx-name{ opacity:.6; }
 .cx-tag{ display:inline-block; font-size:10.5px; padding:0 6px; border-radius:6px; color:#fff; font-weight:700; }
-.t-easy{ background:#4c8a3c; } .t-standard{ background:#b08a1e; } .t-elite{ background:#c4612a; } .t-deadly{ background:#a8302a; } .t-boss{ background:#6a3c9a; }
-.t-origin{ background:#2f6f6a; } .t-alloy{ background:#7a858e; } .t-gilded{ background:#b08a1e; } .t-magic{ background:#7a45b0; } .t-shrine{ background:#2f6a8a; }
+.t-easy{ background:#488439; } .t-standard{ background:#927218; } .t-elite{ background:#ba5c27; } .t-deadly{ background:#a8302a; } .t-boss{ background:#6a3c9a; }
+.t-origin{ background:#2f6f6a; } .t-alloy{ background:#7a858e; } .t-gilded{ background:#927218; } .t-magic{ background:#7a45b0; } .t-shrine{ background:#2f6a8a; }
 .cx-new{ position:absolute; top:-6px; right:-4px; }
 .cx-page{ text-align:center; padding:2px 6px 8px; }
 .cx-page .cx-back{ display:block; margin:0 0 6px; padding:4px 12px; font-size:13px; background:#8a6a44; color:#fff3dc; }
@@ -2183,7 +2183,7 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
   border:2px solid var(--line); border-radius:12px; background:#2a1d13; box-shadow:inset 0 3px 4px rgba(0,0,0,.5); transition:background .15s; }
 .settings-toggle-row input[type=checkbox]::before{ content:""; position:absolute; top:1px; left:1px; width:16px; height:16px; box-sizing:border-box; border-radius:50%;
   background:#e9d7ae; border:2px solid var(--line); box-shadow:inset 0 2px 0 rgba(255,255,255,.55), 0 1px 0 var(--line); transition:transform .15s; }
-.settings-toggle-row input[type=checkbox]:checked{ background:#5f8a3c; }
+.settings-toggle-row input[type=checkbox]:checked{ background:#547a35; }
 .settings-toggle-row input[type=checkbox]:checked::before{ transform:translateX(18px); }
 .settings-toggle-row input[type=checkbox]:focus-visible, .settings-toggle-row input[type=range]:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
 .settings-toggle-row.settings-slider-row input[type=range]{ -webkit-appearance:none; appearance:none; background:transparent; height:24px; margin:0; cursor:pointer; }
@@ -2217,7 +2217,7 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 .src-chip{ position:fixed; z-index:60; display:flex; align-items:center; gap:6px; padding:4px 11px 4px 5px; border-radius:999px; pointer-events:none;
   background:#ffd75e; color:#241c10; border:3px solid var(--line); box-shadow:inset 0 2px 0 rgba(255,255,255,.5), 0 3px 0 var(--line);
   font:800 15px var(--font-ui); white-space:nowrap; animation:sc-in .22s cubic-bezier(.2,1.4,.4,1) both; }
-.src-chip .sc-ic{ display:inline-flex; width:22px; height:22px; border-radius:50%; background:#5f8a3c; color:#fff; align-items:center; justify-content:center;
+.src-chip .sc-ic{ display:inline-flex; width:22px; height:22px; border-radius:50%; background:#547a35; color:#fff; align-items:center; justify-content:center;
   font-style:normal; border:2px solid var(--line); font-size:13px; }
 .src-chip .sc-ic .icon-svg{ width:14px; height:14px; }
 .src-chip.sc-out{ animation:sc-out .26s ease-in both; }
@@ -2230,7 +2230,7 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 .hl-strip b{ color:#ffd75e; font-weight:800; }
 .hl-strip .hl-ic{ flex:none; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-style:normal; font-weight:800;
   border:2px solid var(--line); color:#fff; background:#c99a2e; }
-.hl-good .hl-ic{ background:#5f8a3c; } .hl-bad .hl-ic{ background:#b8443a; } .hl-bad b{ color:#ff8a7a; }
+.hl-good .hl-ic{ background:#547a35; } .hl-bad .hl-ic{ background:#b8443a; } .hl-bad b{ color:#ff8a7a; }
 .hl-strip.hl-out{ animation:hl-out .22s ease-in both; }
 @keyframes hl-in{ from{ transform:translateY(-10px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes hl-out{ to{ transform:translateY(-10px); opacity:0; } }
@@ -2265,7 +2265,7 @@ button.danger-outline{ box-shadow: inset 0 0 0 2px #d24a3e, inset 0 3px 0 rgba(2
 .action-note.an-below .an-tail{ bottom:auto; top:-12px; transform:rotate(225deg); }
 .action-note.an-below::before{ display:none; }
 .action-note .an-h{ display:flex; align-items:center; gap:8px; }
-.action-note .an-ic{ flex:0 0 auto; width:42px; height:42px; border-radius:10px; background:#c9473a; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; color:#fff7e6; box-shadow:inset 0 -3px 0 rgba(0,0,0,.25); }
+.action-note .an-ic{ flex:0 0 auto; width:42px; height:42px; border-radius:10px; background:#c64639; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; color:#fff7e6; box-shadow:inset 0 -3px 0 rgba(0,0,0,.25); }
 .action-note.an-status .an-ic{ background:#5b4a7a; }
 .action-note .an-ic .icon-svg{ width:30px; height:30px; color:#fff7e6; }
 .action-note .an-t{ font-family:var(--font-display); font-size:20px; line-height:1.05; color:#7a1f14; }
@@ -2723,7 +2723,7 @@ body.is-resolving .die.trayact-nudge, .reduced-motion .die.trayact-nudge{ animat
 .fo-quests-float{ position:absolute; text-align:center; pointer-events:auto; z-index:0 !important; left:50%; top:18px; transform-origin:50% 0; clip-path:none !important; animation:none !important; filter:url(#fx-paper-soft) drop-shadow(0 3px 2px rgba(0,0,0,.55)) !important; background:none !important; box-shadow:none !important; border:3px solid transparent !important; border-radius:0 !important; --nr:58%; --nb:27%; --qcut-outer:polygon(0 0,100% 0,100% calc(var(--nr) - 3.5px),calc(100% - 5.5px) var(--nr),100% calc(var(--nr) + 3.5px),100% 100%,calc(var(--nb) + 3.5px) 100%,var(--nb) calc(100% - 5.5px),calc(var(--nb) - 3.5px) 100%,0 100%); --qcut-inner:polygon(3px 3px,calc(100% - 3px) 3px,calc(100% - 3px) calc(var(--nr) - 7px),calc(100% - 10px) var(--nr),calc(100% - 3px) calc(var(--nr) + 7px),calc(100% - 3px) calc(100% - 3px),calc(var(--nb) + 7px) calc(100% - 3px),var(--nb) calc(100% - 10px),calc(var(--nb) - 7px) calc(100% - 3px),3px calc(100% - 3px)); width:126px; padding:6px 7px 6px !important; transform:translateX(calc(-63% + var(--qdx, 0px))) translateY(var(--qdy, 0px)) rotate(-2.2deg) scale(var(--qfit, 1)) !important; }
 .fo-quests-float .q-cond{ flex:1 1 auto; min-width:0; font-weight:700; letter-spacing:-.1px; text-align:left; font-size:10px !important; white-space:nowrap; text-wrap:nowrap; line-height:1.15; }
 .fo-quests-float .q-reward b{ font-family:var(--font-ui); font-size:10px !important; }
-.fo-quests-float .q-reward{ flex:0 0 auto; display:inline-flex; align-items:center; gap:1px; font-weight:900; line-height:1; font-size:9px; margin-left:auto; justify-content:center; min-width:0; background:#c9473a !important; color:#fff7e6 !important; border:2px solid #3a2410; border-radius:999px !important; box-shadow:0 2px 0 #3a2410 !important; padding:0 4px 0 1px !important; }
+.fo-quests-float .q-reward{ flex:0 0 auto; display:inline-flex; align-items:center; gap:1px; font-weight:900; line-height:1; font-size:9px; margin-left:auto; justify-content:center; min-width:0; background:#c64639 !important; color:#fff7e6 !important; border:2px solid #3a2410; border-radius:999px !important; box-shadow:0 2px 0 #3a2410 !important; padding:0 4px 0 1px !important; }
 .fo-quests-float .fo-quest.q-row{ display:flex; align-items:center; text-align:left; gap:2px; width:100%; padding:1px 0; }
 .fo-quests-float .fo-quests-label{ display:flex; align-items:center; justify-content:center; line-height:1.1; margin-bottom:3px !important; white-space:nowrap; font-size:8.5px !important; letter-spacing:.3px !important; gap:3px; }
 .fo-quests-float .fo-quest.q-live-done .q-cond{ color:#17501b; font-weight:800; }
@@ -2898,7 +2898,7 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 
 /* ==== Dice (.die, .zone-cell): every top-level rule for it, merged Nov 12 by tools/css/merge.py (polish roadmap A3).
    Was 81 rules spread through this file; each value's history is in git. Edit here, not further up. ==== */
-.die.dietype-origin{ background:#4a8a5c; color:#eafbea; }
+.die.dietype-origin{ background:#417a51; color:#eafbea; }
 .die.dietype-alloy{ background:#9aa3ab; color:#1a1410; }
 .die.dietype-gilded{ background:#d4af52; color:#241c10; }
 .die.dietype-magic{ background:#8a5fb0; color:#f5eaff; }
@@ -2935,7 +2935,7 @@ body:has(.loot-overlay) #enc-panel :is(.fo-name, .fo-hpwrap, .fo-turnlabel, .fo-
 .die.undoable{ box-shadow:0 0 0 3px #e05a5a, 0 0 10px 2px rgba(224,90,90,0.6) !important; cursor:pointer; }
 .die.resolving{ animation:die-resolve-pulse 0.32s ease-out; z-index:2; }
 .reduced-motion .die.resolving{ animation:none; }
-.die.dietype-attack{ color:#fff3e6; background:#d8323a !important; } /* Nov 25 (color-blind check, Jeremy picked A): a deeper red than the old #ff5b5b, so red-green color-blind players still see attack dice darker than the cream maneuver dice */
+.die.dietype-attack{ color:#fff3e6; background:#d23038 !important; } /* Nov 25 (color-blind check, Jeremy picked A): a deeper red than the old #ff5b5b, so red-green color-blind players still see attack dice darker than the cream maneuver dice */
 .die.dietype-maneuver{ color:#241c10; background:#ffe9a8 !important; }
 .die .name-tag-svg text{ fill:currentColor; font-family:inherit; opacity:.95 !important; font-weight:900 !important; paint-order:stroke; stroke:rgba(0,0,0,.35); stroke-width:.6px; }
 .die .face-val{ font-size:clamp(18px, 10.5cqw, 34px); line-height:1; }
@@ -3508,8 +3508,8 @@ body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
 .bst-tally{ font-size:11px; margin-top:3px; opacity:.85; }
 .bst-lost{ color:#ff9a8a; }
 .bst-row.locked .run-history-who{ opacity:.5; }
-.codex-tabs .codex-tab:nth-child(1){ background:#b5653a; }
-.codex-tabs .codex-tab:nth-child(2){ background:#5f8a3c; }
+.codex-tabs .codex-tab:nth-child(1){ background:#a65c35; }
+.codex-tabs .codex-tab:nth-child(2){ background:#547a35; }
 .codex-tabs .codex-tab:nth-child(3){ background:#4f6aa6; }
 .codex-tabs .codex-tab:nth-child(4){ background:#8a5aa0; }
 .codex-tabs .codex-tab{ padding:5px 10px; font-size:13px; min-height:0; opacity:.75; color:#fff3dc; }
@@ -3531,7 +3531,7 @@ body:has(#room-callout) .shrine-act{ opacity:0; pointer-events:none; }
 .cx-page .bst-quests{ margin:8px auto 0; display:inline-block; text-align:left; }
 .codex-book .bst-lost{ color:#a8302a !important; font-weight:700; }
 /* Nov 12 Codex polish: Bestiary quest rewards look like the wall poster's red badges (they were gold-on-brown blobs), and a monster's every-turn actions read as icon + number chips */
-.bst-quest .q-reward{ display:inline-flex; align-items:center; gap:1px; border-radius:9px; font-weight:900; line-height:1; background:#c9473a !important; color:#fff7e6 !important; padding:1px 5px 1px 2px !important; font-size:11px !important; border:2px solid #3a2410; box-shadow:0 1px 0 #3a2410; }
+.bst-quest .q-reward{ display:inline-flex; align-items:center; gap:1px; border-radius:9px; font-weight:900; line-height:1; background:#c64639 !important; color:#fff7e6 !important; padding:1px 5px 1px 2px !important; font-size:11px !important; border:2px solid #3a2410; box-shadow:0 1px 0 #3a2410; }
 .bst-quest .q-reward .icon-svg{ color:#fff7e6 !important; width:12px; height:12px; }
 .bst-moves .bst-act{ display:inline-flex; align-items:center; gap:3px; margin:0 3px; padding:1px 7px 1px 4px; border:2px solid #3a2410; border-radius:999px; background:#f3e3bf; color:#3a2410; font-size:12px; }
 .bst-moves .bst-act .icon-svg{ width:14px; height:14px; }
@@ -4166,3 +4166,14 @@ body.pc .setup-panel > #start-btn{ margin-bottom:0 !important; }
 body.calm .class-prop, body.calm .class-prop *{ animation-play-state:paused !important; }
 /* Nov 25 (Jeremy, option 1): with a class object by the wall, the left-foot ground item slides in toward the feet so the two sit side by side */
 .hero-gear.has-prop .hg-gl{ left:13%; }
+
+/* Nov 25 (accessibility audit, WCAG AA): the selected Codex tab keeps light text on its own color (dark text on orange was 3.9:1) */
+.codex-tabs .codex-tab.on{ color:#fff3dc; }
+/* Nov 25 (accessibility audit): bigger invisible tap areas for small controls (at least ~40 px), same look; and the loot
+   chest's turning rays hold still with Reduced motion */
+:where(.info-tap, .depth-pm, .upgrade-preview-btn, .codex-tabs .codex-tab, .setup-back-btn){ position:relative; } /* zero specificity: only where nothing else positions them */
+.settings-btn-floating::after, .depth-pm::after, .portrait-reroll::after{ content:''; position:absolute; inset:-8px; border-radius:50%; }
+.info-tap::after{ content:''; position:absolute; inset:-11px; border-radius:50%; }
+.upgrade-preview-btn::after{ content:''; position:absolute; inset:-2px -7px; }
+.codex-tabs .codex-tab::after, .setup-back-btn::after{ content:''; position:absolute; inset:-6px -2px; }
+.reduced-motion .loot-modal.loot-modal-chest .loot-chest-btn::before{ animation:none !important; }

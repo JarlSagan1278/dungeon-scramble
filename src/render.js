@@ -1245,7 +1245,7 @@ function renderSetup(){
       <button id="setup-back-btn" class="setup-back-btn" title="Back to title"><svg viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><path d="M7.5 1.5 3 6l4.5 4.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Back</button>
 
       <div class="setup-name-row">
-        <input id="char-name-input" class="char-name-input" type="text" maxlength="24" placeholder="New Character" autocomplete="off">
+        <input id="char-name-input" class="char-name-input" type="text" maxlength="24" placeholder="New Character" aria-label="Character name" autocomplete="off">
         <svg class="char-name-pencil" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
       </div>
 
@@ -4614,7 +4614,7 @@ function pickLootOption(overlay, container, chosenCard, opt){
 // etched on the table says which relic. Glyphs are 24x24 stroke drawings. No art files needed.
 const RELIC_FAM = {
   offense:{c:'#c94a3a', d:'#7a241b', l:'#f28b74', pts:[[50,6],[94,86],[6,86]], cy:60, gs:1.15},
-  defense:{c:'#4a7a9e', d:'#22405a', l:'#9cc6e6', pts:[[14,8],[86,8],[94,16],[94,84],[86,92],[14,92],[6,84],[6,16]]},
+  defense:{c:'#467396', d:'#22405a', l:'#9cc6e6', pts:[[14,8],[86,8],[94,16],[94,84],[86,92],[14,92],[6,84],[6,16]]},
   path:   {c:'#4a8a5c', d:'#1f4a2b', l:'#9fd8a8', pts:[[50,4],[92,27],[92,73],[50,96],[8,73],[8,27]]},
   loot:   {c:'#d4a017', d:'#7a5a08', l:'#ffe08a', pts:null},
   origin: {c:'#8a5fb0', d:'#47296a', l:'#d4b3f2', pts:[[50,4],[80,26],[92,52],[50,96],[8,52],[20,26]]},
