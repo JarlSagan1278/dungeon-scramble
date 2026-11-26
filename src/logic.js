@@ -2474,7 +2474,10 @@ function finishPlayerPath(path, effects){
   { const tt = Math.round(S.resolveTotal||0);
     if(tt > (S.stats.bestTurn||0)){ S.stats.bestTurn = tt; S.stats.bestTurnFoe = e.name;
       // Nov 23: the dice of the biggest turn, shown back in the end-screen Highlights ("this was your move")
-      try{ S.stats.bestTurnPath = path.map(i=>{ const c = S.tray[i], f = (c && (c.forcedFace || currentFace(c))) || {type:'blank'}; return { c: (c && c.die && c.die.cat) || 'attack', t: f.type, v: f.value||0 }; }).slice(0, 12); }catch(err){} } }
+      try{ S.stats.bestTurnPath = path.map(i=>{ const c = S.tray[i], f = (c && (c.forcedFace || currentFace(c))) || {type:'blank'}; return { c: (c && c.die && c.die.cat) || 'attack', t: f.type, v: f.value||0, i }; }).slice(0, 12);
+        // Nov 27 (Jeremy): the whole tray as it stood, so the end screen and the share card can redraw the turn on a board
+        S.stats.bestTurnTray = S.tray.map((c, i)=>{ if(c.minion) return { m:1 }; const f = (path.includes(i) && (c.forcedFace || currentFace(c))) || currentFace(c) || {type:'blank'}; return { c: (c.die && c.die.cat) || 'attack', t: f.type, v: f.value||0 }; });
+      }catch(err){} } }
   if(hasRelic('bloodletter')){ const n = Math.floor((S.resolveTotal||0)/6); if(n>0){ healPlayer(n); fireRelic('bloodletter','+'+n+' HP'); } }
   if(e.curHealth<=0){ S.transitioning=false; onEncounterDefeated(); return; }
   // Near-miss: the swing left the foe barely standing. Name the exact number

@@ -3106,6 +3106,16 @@ function bossDropIn(){
     if(typeof screenShake==='function') screenShake('small');
   }, 330);
 }
+// The first room of a run (Nov 27): the room starts dark, the torches flare one after the other, the hero walks in.
+function runStartWalkIn(){
+  if(PREFS.reducedMotion) return;
+  const arch = document.querySelector('#enc-panel .fo-arch'); if(!arch) return;
+  arch.insertAdjacentHTML('beforeend', '<div class="run-dark" aria-hidden="true"></div>');
+  document.body.classList.add('run-walkin');
+  if(typeof playTone==='function') setTimeout(()=>{ try{ playTone('uiTick'); }catch(e){} }, 380);
+  clearTimeout(runStartWalkIn._t);
+  runStartWalkIn._t = setTimeout(()=>{ document.body.classList.remove('run-walkin'); document.querySelectorAll('.run-dark').forEach(n=>n.remove()); try{ updateGuide(); }catch(e){} }, 1500);
+}
 function showRoomCallout(fx, onDismiss){
   const old = document.getElementById('room-callout');
   if(old && old.parentNode) old.parentNode.removeChild(old);
@@ -3118,6 +3128,11 @@ function showRoomCallout(fx, onDismiss){
   const kind = fx.boss ? fx.type : (tierWord || fx.type);
   const kindCls = fx.boss ? 'k-boss' : ({Elite:'k-elite', Deadly:'k-deadly', Trap:'k-trap', Shrine:'k-shrine'})[kind] || 'k-enemy';
   const seamless = !!(S && S._forkSeamless); if(S) S._forkSeamless = false; // came from a fork: this door is the one just chosen
+  // Nov 27 (Jeremy picked it): the first room of a run gets a beat first -- the Floor I stair card, then the door, then
+  // the room lights up and the hero walks in (runStartWalkIn). Once per run (a resumed save doesn't replay it).
+  const runStart = !!(S && S.screen==='game' && S.floorIdx===0 && !(S.stats && (S.stats.encountersDefeated || S.stats.shrinesVisited)) && !S.turnNumber
+    && S.tele && showRoomCallout._runStart !== S.tele.runId);
+  if(runStart){ showRoomCallout._runStart = S.tele.runId; showFloorCard(1, FLOORS[0].name || ''); }
   const node = el(`<div id="room-callout" class="${fx.boss?'rc-boss':''}${seamless?' rc-seamless':''}">
       <div class="rc-door ${kindCls}">
         <div class="rc-arch"><div class="rc-leaf"><i class="rc-band b1"></i><i class="rc-band b2"></i>${fx.boss?'<i class="rc-plate p1"></i><i class="rc-plate p2"></i>':''}${fx.boss ? '<svg class="rc-ring rc-skull" viewBox="0 0 40 52" aria-hidden="true"><path d="M20 4c-9 0-15 6-15 14 0 5 2 8 5 10v6h20v-6c3-2 5-5 5-10 0-8-6-14-15-14z" fill="#d9cfc0" stroke="#120b07" stroke-width="3"/><circle cx="14" cy="19" r="4" fill="#120b07"/><circle cx="26" cy="19" r="4" fill="#120b07"/><path d="M18 27l2-4 2 4z" fill="#120b07"/><path d="M15 34v-4M20 34v-4M25 34v-4" stroke="#120b07" stroke-width="2"/><path d="M20 36c-8 0-11 5-11 9 0 4 3 6 11 6s11-2 11-6c0-4-3-9-11-9" fill="none" stroke="#120b07" stroke-width="6"/><path d="M20 36c-8 0-11 5-11 9 0 4 3 6 11 6s11-2 11-6c0-4-3-9-11-9" fill="none" stroke="#8d98a2" stroke-width="2.6"/></svg>' : '<svg class="rc-ring" viewBox="0 0 30 46" aria-hidden="true"><rect x="7" y="2" width="16" height="42" rx="5" fill="#5a646d" stroke="#120b07" stroke-width="2.5"/><circle cx="15" cy="7" r="1.4" fill="#120b07"/><circle cx="15" cy="39" r="1.4" fill="#120b07"/><circle cx="15" cy="17" r="8.5" fill="#d6b25a" stroke="#120b07" stroke-width="2.5"/><circle cx="12.5" cy="14.5" r="2.6" fill="#fff1b8"/><path d="M15 26.5a2.6 2.6 0 0 1 1.3 4.9l1 4.6h-4.6l1-4.6a2.6 2.6 0 0 1 1.3-4.9z" fill="#120b07"/></svg>'}</div></div>
@@ -3143,6 +3158,7 @@ function showRoomCallout(fx, onDismiss){
     // rebuilding the panel no longer removes it along with it -- remove it
     // explicitly before handing off, and skip the fade-out in that case.
     playDoorCreak(!!fx.boss);
+    if(runStart) runStartWalkIn();
     if(onDismiss){ if(node.parentNode) node.parentNode.removeChild(node); onDismiss(); return; }
     node.classList.add('dismissing');
     setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, 140); // Nov 4 (Jeremy): no door swing, a quick fade
@@ -3152,7 +3168,7 @@ function showRoomCallout(fx, onDismiss){
   // Nov 25 (Jeremy, feel audit: ~25 extra taps a run): the door opens on its own after a beat; a tap opens it sooner.
   // Off for webdriver (tests click it) unless localStorage dungeonScrambleDoorTest is set.
   let auto = true; try{ if(navigator.webdriver && !localStorage.getItem('dungeonScrambleDoorTest')) auto = false; }catch(e){}
-  if(auto){ const ms = fx.boss ? 1900 : seamless ? 700 : 1200;
+  if(auto){ const ms = (fx.boss ? 1900 : seamless ? 700 : 1200) + (runStart ? (PREFS.reducedMotion ? 1100 : 1700) : 0); // the stair card first
     setTimeout(()=>{ if(node.isConnected && !node.classList.contains('dismissing') && scrim.isConnected) dismiss(); }, ms); }
 }
 
@@ -6057,6 +6073,25 @@ function animateSummary(){
   setTimeout(()=>{ if(typeof playTone==='function') playTone('tally', 4); }, 350 + chips.length*260 + 200);
 }
 
+// Nov 27 (Jeremy picked it): the biggest turn redrawn on a little 4x4 board -- the dice as they stood, the path drawn
+// over them, lighting up step by step once when the screen opens (still with Reduced motion), then the damage.
+function bestTurnBoardHTML(st){
+  const tray = st && st.bestTurnTray, path = (st && st.bestTurnPath || []).filter(x=> typeof x.i==='number');
+  if(!tray || tray.length!==16 || !path.length) return '';
+  const step = new Map(path.map((x,k)=>[x.i, k]));
+  const cells = tray.map((x,i)=>{
+    const k = step.has(i) ? step.get(i) : -1;
+    if(x.m) return `<span class="bt-cell bt-minion"></span>`;
+    const c = RC_DIE_COLORS[x.c]||RC_DIE_COLORS.alloy, face = x.t==='blank' ? '' : iconSpan(x.t, x.v, true);
+    return `<span class="bt-cell${k>=0?' bt-on':''}" style="background:${c[0]};color:${c[1]};${k>=0?`--k:${k}`:''}">${face}${k>=0?`<b class="bt-n">${k+1}</b>`:''}</span>`;
+  }).join('');
+  // the path line, in cell units (each cell 1 x 1, centers at .5)
+  const pts = path.map(x=>`${(x.i%4)+.5},${Math.floor(x.i/4)+.5}`).join(' ');
+  const n = path.length, dur = (n*0.22 + 0.3).toFixed(2);
+  return `<div class="bt-wrap" style="--bt-n:${n}"><div class="bt-board">${cells}
+      <svg class="bt-line" viewBox="0 0 4 4" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts}" pathLength="1" style="animation-duration:${dur}s"/></svg></div>
+    <div class="bt-dmg" style="animation-delay:${dur}s"><b>${st.bestTurn}</b><small>damage</small></div></div>`;
+}
 // Highlight reel for the run-end screen: the best moments of the run, with a
 // gold "New best!" tag where it beat the player's lifetime record.
 function runHighlightsHTML(){
@@ -6131,7 +6166,7 @@ function runCardHTML(outcome){
       </div>
     </div>
     <div class="rc-stats">${d.stats.map(([k,v])=>`<div class="rc-stat"><b>${v}</b><small>${k}</small></div>`).join('')}</div>
-    <div class="rc-dice">${d.dice.map(x=>{ const c = RC_DIE_COLORS[x.cat]||RC_DIE_COLORS.alloy; return `<span class="rc-die" title="${x.name}" style="background:${c[0]};color:${c[1]}">${x.type==='blank'?'':iconSpan(x.type, x.value, true)}</span>`; }).join('')}</div>
+    ${bestTurnBoardHTML(S.stats) ? `<div class="rc-best"><div class="rc-best-k">Biggest turn${S.stats.bestTurnFoe ? ` <small>vs ${nbHyphen(S.stats.bestTurnFoe)}</small>` : ''}</div>${bestTurnBoardHTML(S.stats)}</div>` : `<div class="rc-dice">${d.dice.map(x=>{ const c = RC_DIE_COLORS[x.cat]||RC_DIE_COLORS.alloy; return `<span class="rc-die" title="${x.name}" style="background:${c[0]};color:${c[1]}">${x.type==='blank'?'':iconSpan(x.type, x.value, true)}</span>`; }).join('')}</div>`}
     ${d.relics.length ? `<div class="rc-relics">${d.relics.map(r=>relicBadgeHTML(r,'rc-gem')).join('')}</div>` : ''}
     <div class="rc-foot">Dungeon Scramble v${GAME_VERSION}</div>
   </div>`;
@@ -6179,7 +6214,8 @@ async function rcScene(g, X, Y, W, H, outcome){
 async function saveRunCard(outcome){
   const d = runCardData(outcome);
   const W = 540, pad = 28, dieS = 52, gap = 10, cols = 4, SC = 190; // SC: the scene's height
-  const H = 300 + SC + 4*(dieS+gap) + (d.relics.length ? 70 : 0) + 30;
+  const bt = S.stats && S.stats.bestTurnTray && S.stats.bestTurnTray.length===16 && (S.stats.bestTurnPath||[]).some(x=>typeof x.i==='number') ? S.stats : null; // Nov 27: the biggest turn's board replaces the final tray
+  const H = 300 + SC + 4*(dieS+gap) + (d.relics.length ? 70 : 0) + 30 + (bt ? 30 : 0);
   const cv = document.createElement('canvas'); cv.width = W*2; cv.height = H*2;
   const g = cv.getContext('2d'); g.scale(2,2);
   const rr = (x,y,w,h,r)=>{ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); };
@@ -6196,12 +6232,29 @@ async function saveRunCard(outcome){
   d.stats.forEach(([k,v],i)=>{ const x = pad+8+i*sw; rr(x+3,166+SC,sw-6,64,12); g.fillStyle = '#2a1c10'; g.fill();
     g.textAlign = 'center'; g.fillStyle = '#ffd76a'; g.font = 'bold 26px Alegreya, Georgia, serif'; g.fillText(String(v), x+sw/2, 200+SC);
     g.fillStyle = '#e9dcc4'; g.font = '13px Alegreya, Georgia, serif'; g.fillText(k, x+sw/2, 220+SC); g.textAlign = 'left'; });
-  const gx = (W - (cols*dieS + (cols-1)*gap))/2, gy = 252+SC;
+  const gx = (W - (cols*dieS + (cols-1)*gap))/2, gy = 252+SC + (bt ? 30 : 0);
+  if(bt){
+    // the biggest turn: the tray as it stood, the path's dice bright and numbered, the path drawn over them
+    g.textAlign = 'center'; g.fillStyle = '#e9dcc4'; g.font = 'bold 15px Alegreya, Georgia, serif';
+    g.fillText(`BIGGEST TURN: ${bt.bestTurn} DAMAGE${bt.bestTurnFoe ? ' vs ' + bt.bestTurnFoe : ''}`, W/2, gy - 12, W-2*pad); g.textAlign = 'left';
+    const tray = bt.bestTurnTray, path = bt.bestTurnPath.filter(x=>typeof x.i==='number'), step = new Map(path.map((x,k)=>[x.i,k]));
+    const icons = await Promise.all(tray.map(x=>{ if(x.m) return null; const c = RC_DIE_COLORS[x.c]||RC_DIE_COLORS.alloy; return rcSvgImg(x.t==='blank'?'':(ICON_SVG[x.t]||''), c[1]); }));
+    const at = i=>[gx+(i%cols)*(dieS+gap), gy+Math.floor(i/cols)*(dieS+gap)];
+    tray.forEach((x,i)=>{ const [X,Y] = at(i), on = step.has(i), c = x.m ? ['#3b2a1d','#3b2a1d'] : (RC_DIE_COLORS[x.c]||RC_DIE_COLORS.alloy);
+      g.globalAlpha = on ? 1 : .32; rr(X,Y,dieS,dieS,10); g.fillStyle = c[0]; g.fill(); g.lineWidth = 3; g.strokeStyle = '#0c0705'; g.stroke();
+      if(icons[i]) g.drawImage(icons[i], X+10, Y+8, dieS-20, dieS-20); g.globalAlpha = 1;
+      if(on){ rr(X-2,Y-2,dieS+4,dieS+4,12); g.lineWidth = 3; g.strokeStyle = '#ffd75e'; g.stroke(); } });
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    [[10,'#0c0705'],[5,'#ffc83a']].forEach(([lw,col])=>{ g.beginPath(); path.forEach((x,k)=>{ const [X,Y] = at(x.i); (k?g.lineTo:g.moveTo).call(g, X+dieS/2, Y+dieS/2); }); g.lineWidth = lw; g.strokeStyle = col; g.stroke(); });
+    path.forEach((x,k)=>{ const [X,Y] = at(x.i); g.beginPath(); g.arc(X+4, Y+4, 10, 0, Math.PI*2); g.fillStyle = '#ffd75e'; g.fill(); g.lineWidth = 2.5; g.strokeStyle = '#0c0705'; g.stroke();
+      g.fillStyle = '#241c10'; g.font = 'bold 12px Alegreya, Georgia, serif'; g.textAlign = 'center'; g.fillText(String(k+1), X+4, Y+8); g.textAlign = 'left'; });
+  } else {
   const icons = await Promise.all(d.dice.map(x=>{ const c = RC_DIE_COLORS[x.cat]||RC_DIE_COLORS.alloy; return rcSvgImg(x.type==='blank'?'':(ICON_SVG[x.type]||''), c[1]); }));
   d.dice.forEach((x,i)=>{ const c = RC_DIE_COLORS[x.cat]||RC_DIE_COLORS.alloy, X = gx+(i%cols)*(dieS+gap), Y = gy+Math.floor(i/cols)*(dieS+gap);
     rr(X,Y,dieS,dieS,10); g.fillStyle = c[0]; g.fill(); g.lineWidth = 3; g.strokeStyle = '#0c0705'; g.stroke();
     if(icons[i]) g.drawImage(icons[i], X+10, Y+8, dieS-20, dieS-20);
     if(x.value && x.type!=='blank'){ g.fillStyle = c[1]; g.font = 'bold 13px Alegreya, Georgia, serif'; g.textAlign = 'right'; g.fillText(String(x.value), X+dieS-5, Y+dieS-5); g.textAlign = 'left'; } });
+  }
   if(d.relics.length){
     const gems = await Promise.all(d.relics.map(r=>rcSvgImg(relicGemSVG(r), '#fff')));
     const gs = 40, ry = gy + 4*(dieS+gap) + 12, rx0 = (W - (d.relics.length*(gs+6)-6))/2;
@@ -6974,7 +7027,7 @@ function updateGuide(){
     else { guideFinish('won'); GUIDE_TOAST_PENDING = true; return; }
   }
   const tray = document.getElementById('tray');
-  if(!tray || S.transitioning || document.querySelector('.modal-overlay') || document.getElementById('room-callout') || document.getElementById('room-callout-scrim')) return hide();
+  if(!tray || S.transitioning || document.body.classList.contains('run-walkin') || document.querySelector('.modal-overlay') || document.getElementById('room-callout') || document.getElementById('room-callout-scrim')) return hide(); // Nov 27: after the run-start walk-in
   let text = '', target = null;
   if(S.guide.stage==='t1'){
     const n = Math.min(S.path.length, GUIDE_TEXT.t1.length - 1);

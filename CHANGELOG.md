@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- Your biggest turn on a little board: the end screen's run card and the shared card image show the dice as they stood, with your path drawn over them, lighting up step by step (runs played from this version on).
+- A run now starts with a beat: the Floor I stair card, then the first door; the room lights up and your hero walks in.
+
 ## 1.42.174 (Nov 27, 2026)
 - New players: the guided first turn no longer flashes a red "1 short!"; tapping Skip tutorial asks once; on the first loot screens a note says how to read a face and what the dots on a die mean, and holding a loot face now says what it does; the Daily Dungeon appears after your first run.
 - The "Your relics" hint now shows once per device (it came back every time the game was reopened).
