@@ -12,7 +12,12 @@ with open(d + '/list.txt', 'w') as f:
     f.write(f"file 'f{idx[-1]:04d}.jpg'\n")
 M = '/home/user/dungeon-scramble/docs/release/media/'; os.makedirs(M, exist_ok=True)
 L = ['ffmpeg', '-loglevel', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', d + '/list.txt']
-CROP = 'crop=970:770:290:20,'  # the foe and the dice (the hero side is cut so the dice read at itch's 315x250)
-subprocess.run(L + ['-vf', 'fps=30,' + CROP + 'scale=630:500:flags=lanczos,format=yuv420p', '-c:v', 'libx264', '-crf', '18', '-preset', 'slow', '-movflags', '+faststart', M + 'itch_cover.mp4'], check=True)
-subprocess.run(L + ['-vf', 'fps=12,' + CROP + 'scale=630:500:flags=lanczos,split[a][b];[a]palettegen=max_colors=160:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=3:diff_mode=rectangle', '-loop', '0', M + 'itch_cover.gif'], check=True)
+# Nov 27 (Jeremy: the wide crop was awkward): the phone clip (route to the bottom of the dice) stands on the right of the
+# backdrop from itch_cover_bg.js (cover art + pitch on the left), in a 3 px black frame like the game's cards
+BG = d + '/bg.png'
+CLIP = 'crop=iw:trunc(ih*0.955/2)*2:0:0,scale=-2:950:flags=lanczos,pad=iw+12:ih+12:6:6:color=0x0c0705'  # route to the bottom of the dice
+COMP = f'[0:v]fps={{fps}},{CLIP}[c];[1:v][c]overlay=x=W-w-26:y=(H-h)/2:shortest=1,scale=630:500:flags=lanczos'
+L2 = L + ['-loop', '1', '-i', BG]
+subprocess.run(L2 + ['-filter_complex', COMP.format(fps=30) + ',format=yuv420p', '-c:v', 'libx264', '-crf', '18', '-preset', 'slow', '-movflags', '+faststart', M + 'itch_cover.mp4'], check=True)
+subprocess.run(L2 + ['-filter_complex', COMP.format(fps=12) + ',split[a][b];[a]palettegen=max_colors=160:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=3:diff_mode=rectangle', '-loop', '0', M + 'itch_cover.gif'], check=True)
 for e in ('.mp4', '.gif'): print('itch_cover' + e, os.path.getsize(M + 'itch_cover' + e) // 1024, 'KB')
