@@ -6474,9 +6474,9 @@ function summaryStatsHTML(){
 function shareDataAskHTML(){
   if(!PLAYDATA_URL || shareDataPref()) return '';
   return `<div class="share-ask share-ask-line" id="share-ask">
-      <span>Share your runs to help balance the game? ${infoDot('Sends how this run and your future runs go (rooms, dice, what beat you), with a random id for this device, its screen size and any error messages. No names or personal info. You can turn it off in Settings.')}</span>
-      <button class="primary" onclick="shareDataAnswer(true)">Yes</button><button onclick="shareDataAnswer(false)">No</button>
-    </div>`;
+      <span>The Guild asks: may we keep a record of your runs, to balance the dungeon? ${infoDot('Sends how this run and your future runs go (rooms, dice, what beat you), with a random id for this device, its screen size and any error messages. No names or personal info. You can turn it off in Settings.')}</span>
+      <button class="primary sa-seal" onclick="shareDataAnswer(true)">Yes</button><button class="sa-seal sa-no" onclick="shareDataAnswer(false)">No</button>
+    </div>`; // Nov 27 (Jeremy picked A): a pinned guild note with wax-seal answers (styles: "End screen: ledger and guild note")
 }
 // Nov 9 (Jeremy): the same question once mid-run, after the first loot pick, so players who quit before a run ends can
 // still be counted (the end-of-run ask only ever reached players who finished a run). Yes covers this run (sent live,
