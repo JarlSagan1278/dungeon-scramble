@@ -51,5 +51,3 @@ wiring. Done work lives in `CHANGELOG.md`; decisions in `decisions/` (index: `PR
 - **Relic look polish:** a bracelet view in the relic list, sockets that grow with depth.
 - **Replay tool** for the tray/path telemetry. **A conversion relic** (e.g. 1 damage per Shield gained).
 - **Co-op multiplayer** (lowest priority): https://claude.ai/code/artifact/1a2e8cb1-5527-400c-b4a2-defff09d6323
-- **Free print-and-play edition** (below the PC version; `npm run rulebook`) for the BGG solo contest
-  (see `release/first_players.md`).
