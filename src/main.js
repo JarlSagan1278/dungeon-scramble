@@ -88,6 +88,13 @@ document.addEventListener('keydown', (ev)=>{
       <feBlend in="l" in2="SourceGraphic" mode="soft-light" result="b"/>
       <feComposite in="b" in2="SourceGraphic" operator="in"/>
     </filter>
+    <!-- Nov 26: grain for drawn objects (class objects): multiply only darkens, so black outlines stay black -->
+    <filter id="fx-grain" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="11" result="n"/>
+      <feComponentTransfer in="n" result="g"><feFuncR type="linear" slope="0.42" intercept="0.72"/><feFuncG type="linear" slope="0.42" intercept="0.72"/><feFuncB type="linear" slope="0.42" intercept="0.72"/><feFuncA type="linear" slope="0" intercept="1"/></feComponentTransfer>
+      <feBlend in="g" in2="SourceGraphic" mode="multiply" result="b"/>
+      <feComposite in="b" in2="SourceGraphic" operator="in"/>
+    </filter>
     <filter id="fx-paper-soft" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
       <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="4" result="n"/>
       <feDiffuseLighting in="n" surfaceScale="0.55" lighting-color="#d6d6d6" result="l"><feDistantLight azimuth="225" elevation="60"/></feDiffuseLighting>

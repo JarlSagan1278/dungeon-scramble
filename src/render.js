@@ -2599,6 +2599,59 @@ function pokeAnim(el, kind){
   const jerk = [ {translate:'0 0',rotate:'0deg'}, {translate:'5px -2px',rotate:'4deg',offset:.12}, {translate:'-6px 1px',rotate:'-5deg',offset:.26}, {translate:'4px -1px',rotate:'3deg',offset:.42}, {translate:'-3px 0',rotate:'-2deg',offset:.58}, {translate:'2px 0',rotate:'1deg',offset:.75}, {translate:'0 0',rotate:'0deg'} ];
   try{ el.animate(kind==='jerk'?jerk:shake, kind==='jerk' ? {duration:420, easing:'steps(7,end)'} : {duration:450, easing:'ease'}); }catch(e){}
 }
+// Touch rewards (Nov 26, Jeremy: lots of little things to touch, like the portraits that wiggle, without hurting what the
+// screen says): only decoration reacts -- torches, the vines, the class objects, Pointer, the campfire, achievement coins.
+// Short (under ~0.7 s), a few small particles and a quiet sound; nothing during turn playback or under a pop-up; Reduced
+// motion keeps only the sound. Never on dice, buttons or anything that changes the game.
+function touchSprinkle(x, y, palette, n, spread, shape){
+  if(PREFS.reducedMotion) return;
+  for(let i=0;i<(n||5);i++){
+    const d = document.createElement('div'); d.className = 'touch-bit' + (shape ? ' tb-'+shape : '');
+    d.style.left = x+'px'; d.style.top = y+'px'; d.style.background = shape==='heart' ? 'none' : palette[i % palette.length]; if(shape==='heart') d.style.color = palette[i % palette.length];
+    if(shape==='heart') d.textContent = '\u2665';
+    document.body.appendChild(d);
+    const a = (shape==='leaf' ? Math.PI/2 : -Math.PI/2) + (Math.random()-.5)*(shape==='leaf' ? 1.2 : 1.9), dist = (spread||26)*(0.6+Math.random()*0.6);
+    const dx = Math.cos(a)*dist, dy = Math.sin(a)*dist;
+    try{ d.animate([{ transform:'translate(-50%,-50%) scale(1) rotate(0deg)', opacity:1 }, { transform:`translate(calc(-50% + ${dx.toFixed(0)}px), calc(-50% + ${dy.toFixed(0)}px)) scale(.4) rotate(${shape==='leaf'?(Math.random()*240-120).toFixed(0):0}deg)`, opacity:0 }],
+      { duration: shape==='leaf' ? 900 : 600, easing:'cubic-bezier(.2,.7,.4,1)' }).onfinish = ()=> d.remove(); }catch(e){ d.remove(); }
+  }
+}
+// a soft fire crackle from filtered noise (no game sound means 'fire'; 'fuse' is the camp's dice fusing)
+function touchCrackle(){ try{ if(!PREFS.sound) return; const ctx = getAudioCtx(); if(!ctx) return; const t0 = ctx.currentTime;
+  for(let i=0;i<4;i++) playNoiseBurst(ctx, t0 + i*0.045 + Math.random()*0.03, 0.035, 0.06, 'bandpass', 1800 + Math.random()*1600, 1.2); }catch(e){} }
+function touchWiggle(el, frames, ms){ if(!el || !el.animate || PREFS.reducedMotion) return; try{ el.animate(frames, { duration:ms||500, easing:'ease-out' }); }catch(e){} }
+let _touchAt = 0;
+function touchReward(ev){
+  if(!S || S.transitioning || document.querySelector('.modal-overlay, .coach-overlay')) return false;
+  const t = ev.target; if(!t || !t.closest) return false;
+  const now = performance.now(); if(now - _touchAt < 180) return false; // no machine-gunning
+  const snd = k=>{ try{ playTone(k); }catch(e){} };
+  const x = ev.clientX, y = ev.clientY;
+  // the class objects (and Pointer)
+  const cp = t.closest('.class-prop');
+  if(cp){ _touchAt = now; const id = (cp.className.match(/cp-([a-z]+)/)||[])[1];
+    if(id==='ranger'){ touchWiggle(cp, [{rotate:'0deg'},{rotate:'-7deg'},{rotate:'6deg'},{rotate:'-4deg'},{rotate:'0deg'}], 520); touchSprinkle(x, y-10, ['#ff7a8a','#ffb3bd'], 3, 30, 'heart'); snd('whistle'); }
+    else if(id==='alchemist'){ touchWiggle(cp, [{scale:'1'},{scale:'1.08 .92'},{scale:'.96 1.05'},{scale:'1'}], 420); touchSprinkle(x, y-8, ['#9be36e','#c9f7a8','#7ad04f'], 6, 30); snd('glass'); }
+    else if(id==='engineer'){ touchWiggle(cp, [{translate:'0 0'},{translate:'-2px 0'},{translate:'2px 0'},{translate:'-1px 0'},{translate:'0 0'}], 380); touchSprinkle(x, y-12, ['#9fd0ff','#c7902c'], 3, 34); snd('woodKnock'); }
+    else if(id==='medic'){ touchWiggle(cp, [{translate:'0 0'},{translate:'0 -7px'},{translate:'0 0'},{translate:'0 -2px'},{translate:'0 0'}], 460); touchSprinkle(x, y-10, ['#d0565a','#f3a3a0'], 3, 28, 'heart'); snd('woodKnock'); }
+    else if(id==='trickster'){ touchWiggle(cp, [{rotate:'0deg'},{rotate:'-10deg'},{rotate:'8deg'},{rotate:'0deg'}], 480); touchSprinkle(x, y-8, ['#f2c14e','#3d7fd0'], 4, 26); snd('glass'); }
+    return true; }
+  // the campfire at camp: a burst of sparks
+  const fire = t.closest('.camp-fire-wrap');
+  if(fire){ _touchAt = now; const g = fire.querySelector('.campfire-glow'); touchWiggle(g || fire, [{scale:'1'},{scale:'1.18'},{scale:'1'}], 600); touchSprinkle(x, y-6, ['#ffb347','#ffd76a','#ff7a3a'], 7, 44); touchCrackle(); return true; }
+  // achievement coins spin
+  const coin = t.closest('.achv-coin'); if(coin){ touchWiggle(coin, [{transform:'rotateY(0deg)'},{transform:'rotateY(360deg)'}], 600); snd('glint'); return false; } // the medal still shows its text
+  if(S.screen!=='game' && S.screen!=='shrine') return false;
+  const arch = t.closest('.fo-arch'); if(!arch || t.closest('button, .die, .status-chip, .fo-hpwrap, .fo-fig, .fo-quests-float, .foe-rule, .fo-chips')) return false;
+  // torches: a tap near one makes it flare
+  for(const tor of arch.querySelectorAll('.fo-torch')){ const r = tor.getBoundingClientRect(), cx = r.left + r.width/2, cy = r.top + r.height/2;
+    if(Math.hypot(x - cx, y - cy) < 26){ _touchAt = now; touchWiggle(tor, [{scale:'1'},{scale:'1.6'},{scale:'1'}], 520); touchSprinkle(cx, cy - 6, ['#ffb347','#ffd76a','#ff7a3a'], 5, 30); touchCrackle(); return true; } }
+  // the vines at the arch's shoulders rustle and drop a leaf
+  const ar = arch.getBoundingClientRect(), fx = (x - ar.left) / ar.width, fy = (y - ar.top) / ar.height;
+  if(fy < 0.55 && (fx < 0.2 || fx > 0.8)){ const v = arch.querySelector('.fo-vines'); _touchAt = now;
+    touchWiggle(v, [{translate:'0 0'},{translate:'2px 1px'},{translate:'-2px 0'},{translate:'1px 0'},{translate:'0 0'}], 520); touchSprinkle(x, y, ['#4a7430','#6f9a46','#8cbf5a'], 2, 40, 'leaf'); return true; } // silent: a rustle needs no sound
+  return false;
+}
 // Poke the portraits: the hero gives a little shake; the enemy shows its flavor text for a few seconds.
 document.addEventListener('click', ev=>{
   const hero = ev.target && ev.target.closest ? ev.target.closest('.camp-hero') : null;
@@ -2608,6 +2661,7 @@ document.addEventListener('click', ev=>{
   if(S && S.screen==='game' && ev.target && ev.target.closest && !ev.target.closest('.fo-quests-float, button, .die, .status-chip, .fo-hpwrap, .modal-overlay')){
     const qs = document.querySelector('#enc-panel .fo-quests-float:not(.shrine-boon-float)');
     if(qs){ const r = qs.getBoundingClientRect(); if(ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom){ openQuestPoster(); return; } } }
+  if(touchReward(ev)) return; // Nov 26: torches, vines, class objects, campfire, coins
   const fig = ev.target && ev.target.closest ? ev.target.closest('.fo-arch .fo-fig') : null;
   if(!fig || !S || (S.screen!=='game' && S.screen!=='shrine')) return; // shrines too (Jeremy, Oct 16)
   if(fig.closest('.fo-player')){
@@ -6153,7 +6207,7 @@ const CLASS_PROP_SVG = {
     <rect x="16" y="68" width="10" height="4" rx="2" fill="#5fb37a" stroke="#0c0705" stroke-width="4.5"/><circle cx="64" cy="70" r="3" fill="#f2c14e" stroke="#0c0705" stroke-width="4.5"/><path d="M42 22 v-10 M36 12 h12" stroke="#0c0705" stroke-width="4.5" stroke-linecap="round"/></svg>`,
   alchemist: `<svg viewBox="0 0 84 84"><path d="M22 78 l-5 4 M62 78 l5 4" stroke="#0c0705" stroke-width="4.5" stroke-linecap="round"/><path d="M12 40 h60 l-5 28 a12 12 0 0 1 -12 10 h-26 a12 12 0 0 1 -12 -10z" fill="#3b2c20" stroke="#0c0705" stroke-width="4.5" stroke-linejoin="round"/>
     <path d="M18 52 h48" stroke="#6b5440" stroke-width="4"/><ellipse cx="42" cy="40" rx="31" ry="7.5" fill="#7ad04f" stroke="#0c0705" stroke-width="4.5"/><ellipse cx="34" cy="39" rx="9" ry="2.5" fill="#b6f08a"/>
-    <circle cx="32" cy="26" r="7" fill="#9be36e" stroke="#0c0705" stroke-width="4.5"/><circle cx="50" cy="17" r="5.5" fill="#9be36e" stroke="#0c0705" stroke-width="4.5"/><circle cx="39" cy="6" r="4" fill="#9be36e" stroke="#0c0705" stroke-width="4.5"/></svg>`,
+    <circle cx="32" cy="26" r="7" fill="#c6f59f" stroke="#0c0705" stroke-width="4.5"/><circle cx="50" cy="17" r="5.5" fill="#c6f59f" stroke="#0c0705" stroke-width="4.5"/><circle cx="39" cy="6" r="4" fill="#c6f59f" stroke="#0c0705" stroke-width="4.5"/></svg>`,
   medic: `<svg viewBox="0 0 84 84"><path d="M30 30 v-10 a4 4 0 0 1 4 -4 h16 a4 4 0 0 1 4 4 v10" fill="none" stroke="#0c0705" stroke-width="13.5"/><path d="M30 30 v-10 a4 4 0 0 1 4 -4 h16 a4 4 0 0 1 4 4 v10" fill="none" stroke="#8a5a32" stroke-width="4.5"/>
     <rect x="8" y="28" width="68" height="50" rx="8" fill="#f1e4c3" stroke="#0c0705" stroke-width="4.5"/><path d="M8 40 h68" stroke="#0c0705" stroke-width="4.5"/><rect x="8" y="28" width="68" height="12" rx="6" fill="#d9c7a0" stroke="#0c0705" stroke-width="4.5"/>
     <path d="M42 72 C30 64 25 58 25 51 C25 46 29 43 33.5 43 C37 43 40 45 42 48 C44 45 47 43 50.5 43 C55 43 59 46 59 51 C59 58 54 64 42 72 Z" fill="#d0565a" stroke="#0c0705" stroke-width="4.5" stroke-linejoin="round"/><path d="M31 50 C31 47 33 46 35 46" fill="none" stroke="#f3a3a0" stroke-width="2.5" stroke-linecap="round"/></svg>`,

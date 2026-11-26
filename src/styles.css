@@ -4177,3 +4177,12 @@ body.calm .class-prop, body.calm .class-prop *{ animation-play-state:paused !imp
 .upgrade-preview-btn::after{ content:''; position:absolute; inset:-2px -7px; }
 .codex-tabs .codex-tab::after, .setup-back-btn::after{ content:''; position:absolute; inset:-6px -2px; }
 .reduced-motion .loot-modal.loot-modal-chest .loot-chest-btn::before{ animation:none !important; }
+
+/* ==== Touch rewards (Nov 26): little particles for decoration taps; the class objects take taps */
+.touch-bit{ position:fixed; z-index:60; width:6px; height:6px; border-radius:50%; pointer-events:none; box-shadow:0 0 0 1.5px rgba(12,7,5,.55); }
+.touch-bit.tb-leaf{ width:8px; height:5px; border-radius:60% 0 60% 0; }
+.touch-bit.tb-heart{ width:auto; height:auto; box-shadow:none; font:700 19px/1 var(--font-ui); -webkit-text-stroke:2px #0c0705; paint-order:stroke fill; }
+.class-prop{ pointer-events:auto !important; cursor:pointer; }
+.camp-fire-wrap{ cursor:pointer; }
+body.old-text .touch-bit.tb-heart{ -webkit-text-stroke:0; text-shadow:0 0 0 #0c0705, 1px 1px 0 #0c0705, -1px -1px 0 #0c0705, 1px -1px 0 #0c0705, -1px 1px 0 #0c0705; }
+.class-prop svg{ filter:url(#fx-grain); } /* Nov 26: paper grain that keeps black outlines black (multiply) */
