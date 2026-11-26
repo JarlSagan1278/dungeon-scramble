@@ -4317,3 +4317,10 @@ body.run-walkin #enc-panel .fo-player .fo-fig{ animation:run-walk 1.1s cubic-bez
 .settings-backup-btn{ flex:0 1 auto; margin:0; background:none !important; border:none !important; box-shadow:none !important; filter:none !important; padding:4px 8px !important;
   color:#5a3a1a !important; text-decoration:underline; font:italic 14px var(--font-ui) !important; min-height:0 !important; }
 body:not(:has(.settings-journal)) .settings-backup-btn{ color:#e8dcb6 !important; }
+
+/* ==== Next moves (Nov 27, Jeremy: new players couldn't tell which dice they can step to): once a path has started, every
+   die it can go to next gets a gold ring, so the moves are marked directly, not only by dimming the rest. Outline, not
+   box-shadow or filter: dice already use both, and outlines repaint reliably on Safari. */
+#tray > .die.reach{ outline:3px solid #ffd75e; outline-offset:1px; z-index:1; }
+#tray > .die.reach.zone-cell{ outline:3px solid #ffd75e !important; outline-offset:1px !important; }
+#tray > .die.reach::selection{ background:none; }

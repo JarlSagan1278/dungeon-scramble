@@ -1,6 +1,7 @@
 # Changelog
 
-## Unreleased
+## 1.42.175 (Nov 27, 2026)
+- Once a path starts, every die it can step to next gets a gold ring, so the possible moves are marked.
 - iPhone: after tapping a die, the dice you can't reach now darken again (Safari skipped the redraw, so every die looked tappable).
 - Your biggest turn on a little board: the end screen's run card and the shared card image show the dice as they stood, with your path drawn over them, lighting up step by step (runs played from this version on).
 - End screen: Details is a leather ledger with a bookmark, and the play-data question is a guild note pinned to the wall with wax-seal answers.
