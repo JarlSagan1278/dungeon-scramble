@@ -489,3 +489,27 @@ Golem Lemma 7 -> 6, or Summon Golems 2 -> 1 at Depth 0.
 
 ## Weekly players
 - **Nov 21, 2026 (baseline):** itch API: 80 views all time (published Oct 24). The API gives views only, not browser plays; plays still come from the itch dashboard. Strangers who shared a run, all time: 1.
+
+## Outside look: what a new player may chafe against (Nov 27, 2026, build 1.42.173)
+A fresh phone (390x844, nothing saved, the real flick and guided fight) played from the title through the first fight,
+loot and equip, plus the camp, shrine, foe-rule and boss screens, read as a stranger would. With the play data so far.
+1. **Rolling takes a gesture every turn.** The lid must be flicked or double-tapped before each turn's dice (about 50
+   times a run). Charming at first; the Settings switch to turn it off is hard to find. Options: a single tap opens the
+   lid, or the first tap on the covered tray opens it.
+2. **The guided fight ends turn 1 with a red "1 SHORT!"** The planned path deals 6 to the 7-health Bunny (on purpose,
+   so turn 2 can teach the lid and the next move), but the red tag reads as a mistake right when the bubble says "tap Go".
+3. **Skip tutorial sits in every guided bubble.** The players who skipped did worst (single-die paths for whole fights).
+   Option: skipping asks once ("The first fight teaches paths in about a minute. Skip anyway?").
+4. **Many words in the first ten minutes:** Sidestep, Leap, Pivot, Boost, Combo, H.O.T., D.O.T., Nullify, Fumble, Reroll,
+   Block, Shield, Minion, Skill zone, Pocket / Back Pocket, Relic, Wanted, Overkill, Exact!. Most get a one-time tip
+   when they first matter, but the first loot screen already shows Nullify, Reroll and H.O.T. with no explanation, and
+   the three small pips on each loot die (3 copies unlock it as a starting die) say nothing.
+5. **Every loot pick asks which die to give up.** Good depth, but a decision per fight; Suggest helps.
+6. **A new player can spend the Daily Dungeon's one scored try on their very first run** (it sits on the title next to
+   New Run).
+7. **After the first run the setup screen shows seven locks** (two origins, five classes). Fine as goals; worth
+   watching that it reads as "more to earn", not "most is closed".
+8. Small: the guided bubbles cover the hero's name and health on phones; the first bubble calls the cream Maneuver dice
+   "white".
+Not a problem: turn playback (about 2.7 s for a 3-die path), the door and loot-chest taps (feel like rewards), the
+guided fight itself when followed.
