@@ -3760,7 +3760,10 @@ svg.chest-art{ overflow:visible; filter:url(#fx-worn); }
 .ca-grain-in{ z-index:1; }
 .ca-grain{ z-index:4; }
 .ca-grain-in, .ca-grain{ background:var(--paper-tile) repeat; background-size:110px 110px; mix-blend-mode:soft-light; opacity:.9; }
-.tray-wrap .tray > .die.used{ opacity:1; filter:brightness(.42) saturate(.7) drop-shadow(0 3px 0 #0c0705); }
+.tray-wrap .tray > .die.used{ opacity:.62; filter:brightness(.62) saturate(.7) drop-shadow(0 3px 0 #0c0705); }
+/* Nov 27 (Jeremy, iPhone screenshot: after a tap no dice dimmed, so the reachable Combo didn't stand out): Safari can skip
+   repainting a filter change on a die that has its own layer (the idle twitch animates transform). The dim is now opacity
+   plus filter: opacity always repaints there, and together they match the old brightness(.42) on the dark chest floor. */
 #tray:has(.in-path) .die.minion.used{ opacity:1; }
 .tray-wrap .chest-lock{ bottom:-16px; z-index:6; }
 .tray-wrap .chest-lid{ left:-5px; right:-5px; top:-23px; bottom:20px; z-index:5; border-bottom-width:2px; box-shadow:inset 0 3px 0 rgba(255,225,170,.18), 0 3px 4px rgba(0,0,0,.4); }
