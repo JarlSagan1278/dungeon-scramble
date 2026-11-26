@@ -4321,6 +4321,6 @@ body:not(:has(.settings-journal)) .settings-backup-btn{ color:#e8dcb6 !important
 /* ==== Next moves (Nov 27, Jeremy: new players couldn't tell which dice they can step to): once a path has started, every
    die it can go to next gets a gold ring, so the moves are marked directly, not only by dimming the rest. Outline, not
    box-shadow or filter: dice already use both, and outlines repaint reliably on Safari. */
-#tray > .die.reach{ outline:3px solid #ffd75e; outline-offset:1px; z-index:1; }
-#tray > .die.reach.zone-cell{ outline:3px solid #ffd75e !important; outline-offset:1px !important; }
-#tray > .die.reach::selection{ background:none; }
+.reach-layer{ position:absolute; inset:0; pointer-events:none; z-index:4; }
+.reach-ring{ position:absolute; margin:-4px; padding:1px; border:3px solid #ffd75e; border-radius:11px; box-sizing:content-box; box-shadow:0 0 8px rgba(255,215,94,.55); }
+body.is-resolving .reach-layer{ display:none; }

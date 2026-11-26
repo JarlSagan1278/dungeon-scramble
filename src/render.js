@@ -2339,7 +2339,21 @@ function patchGameDOM(html){
   return true;
 }
 // Tray dice: long-press shows the face, a tap builds the path. Shared by renderGame() and renderPathOnly().
+// Nov 27 (Jeremy, iPhone: the gold "next move" rings only showed on the Skill-zone dice): Safari doesn't repaint a die
+// whose only change is its class unless something else redraws it (the zone dice twitch, so they did). The rings are
+// drawn as a fresh layer over the tray after every tray redraw instead: new elements are always painted.
+function syncReachLayer(){
+  const tray = document.getElementById('tray'); if(!tray) return;
+  const wrap = tray.parentElement; if(!wrap) return;
+  wrap.querySelectorAll(':scope > .reach-layer').forEach(n=>n.remove());
+  const dice = [...tray.querySelectorAll(':scope > .die.reach')];
+  if(!dice.length) return;
+  const ox = tray.offsetLeft + tray.clientLeft, oy = tray.offsetTop + tray.clientTop; // the tray's content box inside the wrap
+  const rings = dice.map(d=>`<i class="reach-ring" style="left:${ox + d.offsetLeft}px;top:${oy + d.offsetTop}px;width:${d.offsetWidth}px;height:${d.offsetHeight}px"></i>`).join('');
+  wrap.insertAdjacentHTML('beforeend', `<div class="reach-layer" data-morph-keep aria-hidden="true">${rings}</div>`);
+}
 function bindTrayDice(){
+  requestAnimationFrame(syncReachLayer);
   [...document.getElementById('tray').children].forEach(node=>{
     if(node._dsBound) return; node._dsBound = true; // a die kept by a playback redraw already has its handlers
     const idx = parseInt(node.dataset.idx);

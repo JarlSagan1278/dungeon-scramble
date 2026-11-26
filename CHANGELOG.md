@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.42.176 (Nov 27, 2026)
+- iPhone: the gold rings on the dice a path can step to now show on every die (Safari only redrew the Skill-zone dice); they're drawn as their own layer over the tray.
+
 ## 1.42.175 (Nov 27, 2026)
 - Once a path starts, every die it can step to next gets a gold ring, so the possible moves are marked.
 - iPhone: after tapping a die, the dice you can't reach now darken again (Safari skipped the redraw, so every die looked tappable).
