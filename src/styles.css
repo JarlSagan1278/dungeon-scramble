@@ -3760,7 +3760,7 @@ svg.chest-art{ overflow:visible; filter:url(#fx-worn); }
 .ca-grain-in{ z-index:1; }
 .ca-grain{ z-index:4; }
 .ca-grain-in, .ca-grain{ background:var(--paper-tile) repeat; background-size:110px 110px; mix-blend-mode:soft-light; opacity:.9; }
-.tray-wrap .tray > .die.used{ opacity:.62; filter:brightness(.62) saturate(.7) drop-shadow(0 3px 0 #0c0705); }
+.tray-wrap .tray > .die.used{ opacity:1; filter:brightness(.42) saturate(.7) drop-shadow(0 3px 0 #0c0705); } /* solid: see-through dice showed their neighbors' shadows (Jeremy, Nov 27); path dimming is the reach layer */
 /* Nov 27 (Jeremy, iPhone screenshot: after a tap no dice dimmed, so the reachable Combo didn't stand out): Safari can skip
    repainting a filter change on a die that has its own layer (the idle twitch animates transform). The dim is now opacity
    plus filter: opacity always repaints there, and together they match the old brightness(.42) on the dark chest floor. */
@@ -4219,9 +4219,6 @@ body.run-walkin #enc-panel .fo-player .fo-fig{ animation:run-walk 1.1s cubic-bez
   background:radial-gradient(circle at 35% 30%,#e8e8e8,#7d7d7d 60%,#3b3b3b); border:2px solid var(--line); }
 .end-screen #share-ask::before{ left:14px; } .end-screen #share-ask::after{ right:14px; }
 .end-screen #share-ask > span{ color:#2b1d14 !important; font-style:italic; text-decoration-color:#7a1f14 !important; border-color:#7a1f14 !important; }
-.end-screen #share-ask .sa-seal{ flex:none; border-radius:50% !important; width:48px; height:48px; padding:0 !important; font:400 14px var(--font-display) !important; color:#ffe9c4 !important; }
-.end-screen #share-ask .sa-seal.primary{ background:radial-gradient(circle at 40% 35%,#e04a3a,#9e2416) !important; }
-.end-screen #share-ask .sa-seal.sa-no{ background:radial-gradient(circle at 40% 35%,#a07b52,#6b4a2c) !important; }
 
 /* ==== Guild note (Nov 27, app-like audit): every confirm is a parchment note pinned with two tacks, its answers wax
    seals (the end screen's play-data note, as a pop-up). Reset Progress is a torn contract. The modal-x stays. */
@@ -4235,19 +4232,11 @@ body.run-walkin #enc-panel .fo-player .fo-fig{ animation:run-walk 1.1s cubic-bez
 .modal.guild-note p{ color:#2b1d14 !important; font-style:italic; line-height:1.4; }
 .modal.guild-note p b{ color:#7a1f14; }
 .modal.guild-note .small-btn-row{ gap:14px !important; margin-top:12px; }
-.modal.guild-note .small-btn-row button{ min-height:48px; padding:8px 18px !important; border-radius:46% 54% 50% 50% / 55% 50% 50% 45% !important; font:400 14px var(--font-display) !important;
-  color:#ffe9c4 !important; background:radial-gradient(circle at 40% 35%,#a07b52,#6b4a2c) !important; box-shadow:inset 0 0 0 3px rgba(0,0,0,.18); }
-.modal.guild-note .small-btn-row button:last-child{ background:radial-gradient(circle at 40% 35%,#e04a3a,#9e2416) !important; }
-.modal.guild-note .small-btn-row button.cf-go-rest{ background:radial-gradient(circle at 40% 35%,#5fa463,#2e6b3a) !important; }
-.modal.guild-note .small-btn-row button.cf-go-train{ background:radial-gradient(circle at 40% 35%,#9a6ad0,#5b3a8a) !important; }
 .modal.guild-note .small-btn-row button:first-child{ order:0; }
 .modal.guild-note .modal-x-btn{ top:-12px !important; right:-12px !important; }
 .modal.guild-note.gn-contract{ transform:rotate(.5deg); clip-path:polygon(0 0,100% 0,100% 96%,94% 100%,86% 97%,77% 100%,66% 97%,55% 100%,44% 97%,33% 100%,22% 97%,11% 100%,0 97%); padding-bottom:26px !important; }
 .modal.guild-note.gn-contract::before, .modal.guild-note.gn-contract::after{ top:6px; }
 .modal.guild-note.gn-contract .modal-x-btn{ top:4px !important; right:4px !important; }
-.share-ask-modal .modal.guild-note .small-btn-row button{ width:56px; height:56px; padding:0 !important; border-radius:50% !important; }
-.share-ask-modal .modal.guild-note .small-btn-row button.primary{ order:2; background:radial-gradient(circle at 40% 35%,#e04a3a,#9e2416) !important; }
-.share-ask-modal .modal.guild-note .small-btn-row button:not(.primary){ order:1; background:radial-gradient(circle at 40% 35%,#a07b52,#6b4a2c) !important; }
 
 /* ==== Settings journal (Nov 27, app-like audit): a page of the adventurer's journal (parchment, ruled lines, a binding on
    the left); switches are brass levers in a wooden slot, volume a brass knob in a carved groove; the shortcuts are
@@ -4306,14 +4295,9 @@ body.run-walkin #enc-panel .fo-player .fo-fig{ animation:run-walk 1.1s cubic-bez
 .records-ledger .codex-tabs .codex-tab.on{ padding-bottom:15px !important; opacity:1; }
 .token-pouch{ text-align:center; }
 .token-coins{ display:flex; flex-wrap:wrap; justify-content:center; gap:14px; padding:8px 4px 2px; }
-.token-coin{ position:relative; width:82px; height:82px; border-radius:50% !important; padding:0 !important; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
-  background:radial-gradient(circle at 38% 32%, #fff1b0, #e0b04a 45%, #a7791f 80%) !important; color:#3a2410 !important; border:3px solid var(--line) !important;
-  box-shadow:inset 0 0 0 5px rgba(255,241,176,.35), inset 0 0 0 7px rgba(90,58,20,.35) !important; font:800 11px var(--font-ui) !important; }
-.token-coin .icon-svg{ width:30px; height:30px; }
-.token-coin small{ font-size:11px; }
-.token-coin .token-count{ position:absolute; right:-4px; top:-4px; min-width:22px; height:22px; border-radius:11px; background:#7a1f14; color:#fff1d6; border:2px solid var(--line); font:800 12px/18px var(--font-ui); }
-.token-coin.tc-swap{ background:radial-gradient(circle at 38% 32%, #e8f2ff, #a9bdd0 45%, #6d8296 80%) !important; }
-.token-coin.tc-reroll{ background:radial-gradient(circle at 38% 32%, #f4e6ff, #b89ad6 45%, #7a5aa0 80%) !important; }
+.token-coin{ position:relative; display:flex; flex-direction:column; align-items:center; gap:2px; min-width:96px; padding:8px 12px !important; }
+.token-coin .icon-svg{ width:26px; height:26px; }
+.token-coin .token-count{ position:absolute; right:-6px; top:-6px; min-width:20px; height:20px; border-radius:10px; background:#7a1f14; color:#fff1d6; border:2px solid var(--line); font:800 11px/16px var(--font-ui); margin:0; padding:0 4px; }
 .settings-backup-btn{ flex:0 1 auto; margin:0; background:none !important; border:none !important; box-shadow:none !important; filter:none !important; padding:4px 8px !important;
   color:#5a3a1a !important; text-decoration:underline; font:italic 14px var(--font-ui) !important; min-height:0 !important; }
 body:not(:has(.settings-journal)) .settings-backup-btn{ color:#e8dcb6 !important; }
@@ -4324,3 +4308,5 @@ body:not(:has(.settings-journal)) .settings-backup-btn{ color:#e8dcb6 !important
 .reach-layer{ position:absolute; inset:0; pointer-events:none; z-index:4; }
 .reach-ring{ position:absolute; margin:-4px; padding:1px; border:3px solid #ffd75e; border-radius:11px; box-sizing:content-box; box-shadow:0 0 8px rgba(255,215,94,.55); }
 body.is-resolving .reach-layer{ display:none; }
+.reach-dim{ position:absolute; border-radius:9px; background:rgba(12,7,5,.6); }
+.tray-wrap .tray > .die.used.dim-l{ opacity:1; filter:drop-shadow(0 3px 0 #0c0705); } /* darkened by the layer instead */

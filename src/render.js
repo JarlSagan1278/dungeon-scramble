@@ -1777,7 +1777,7 @@ function renderDie(cell, idx){
   })();
   const foeSt = (typeof foeRuleState==='function') ? foeRuleState() : null;
   const foeNull = !!(foeSt && foeSt.rule==='null' && !cell.minion && (f.type===foeSt.nullType || (foeSt.nullType==='dot' && f.type==='leech')));
-  return `<div class="die ${dieTypeCls} ${(typeof petNear==='function' && petNear(idx))?'pet-aura':''} ${cell.forcedFace && cell.forcedFace.printed ? 'printed' : ''} ${foeNull?'foe-nulled':''} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${(!ta && selectable && !inPath && S.path.length && !cell.minion) ? 'reach' : ''} ${zoneCls} ${shakeCls} ${strongGlint?'glint-strong':''} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${boostReachCls} ${resolveCls} ${minionClearCls} ${comboActiveCls} ${trayActCls}"
+  return `<div class="die ${dieTypeCls} ${(typeof petNear==='function' && petNear(idx))?'pet-aura':''} ${cell.forcedFace && cell.forcedFace.printed ? 'printed' : ''} ${foeNull?'foe-nulled':''} ${isBlank?'blank':''} ${inPath?'in-path':''} ${isLastMove?'undoable':''} ${clickable?'selectable':'used'} ${(!ta && selectable && !inPath && S.path.length && !cell.minion) ? 'reach' : ''} ${(!ta && !clickable && !inPath && S.path.length && !S.transitioning && !isBlank && !cell.minion) ? 'dim-l' : ''} ${zoneCls} ${shakeCls} ${strongGlint?'glint-strong':''} ${rippleCls} ${convertCls} ${forcedCls} ${boostTargetCls} ${boostReachCls} ${resolveCls} ${minionClearCls} ${comboActiveCls} ${trayActCls}"
             data-idx="${idx}" title="${isLastMove?'Click to undo this move':(cell.minion?'Minion die':(taReady?`Tap to ${LABEL[trayActFaceAt(idx)]}`:cell.die.name))}" ${shakeDelay}>
             ${num?`<div class="pathnum">${num}</div>`:''}${S.klass && S.klass.pet && S.petIdx===idx ? '<svg class="pet-token" viewBox="0 0 40 40" aria-label="Pointer"><g transform="translate(20 20.5) scale(0.62) translate(-42 -33)"><path d="M28 17 L16 24 L25 33 Z" fill="#5d636b" stroke="#0c0705" stroke-width="4.8" stroke-linejoin="round"/><path d="M56 17 L68 24 L59 33 Z" fill="#5d636b" stroke="#0c0705" stroke-width="4.8" stroke-linejoin="round"/><path d="M26 23 C26 15 32 12 42 12 C52 12 58 15 58 23 L58 37 C58 45 55 51 50 53 L46 51 L42 54 L38 51 L34 53 C29 51 26 45 26 37 Z" fill="#8f949a" stroke="#0c0705" stroke-width="4.8" stroke-linejoin="round"/><path d="M30.5 31 C30.5 42 33 49 35 50.5 L38 48.5 L42 51.5 L46 48.5 L49 50.5 C51 49 53.5 42 53.5 31 C49 34 35 34 30.5 31 Z" fill="#e3e6e9"/><path d="M42 35 L42 47" stroke="#a3a9af" stroke-width="2.2" stroke-linecap="round"/><path d="M28 21 C32 15 38 16 41 20 L38 23 C35 21 31 21 28 23 Z" fill="#eef0f2"/><path d="M56 21 C52 15 46 16 43 20 L46 23 C49 21 53 21 56 23 Z" fill="#eef0f2"/><circle cx="35" cy="26.5" r="2.7" fill="#0c0705"/><circle cx="49" cy="26.5" r="2.7" fill="#0c0705"/><ellipse cx="42" cy="32" rx="5" ry="3.6" fill="#0c0705"/></g></svg>' : ''}
             ${boostReachCls==='boost-yes'?`<span class="boost-reach-chip" aria-hidden="true">${iconSpan('boost')}</span>`:''}
@@ -2094,7 +2094,7 @@ function tokensRowHTML(){
   if(S.boostTokenCharges>0) btns.push(`<button id="use-boost-token" class="token-coin tc-boost" title="Use a x${S.boostTokenValue} Boost token" ${S.pendingFreeBoost?'disabled':''}>${iconSpan('boost')}<small>Boost x${S.boostTokenValue}</small><span class="token-count">${S.boostTokenCharges}</span></button>`);
   if(!btns.length) return '';
   // Nov 27 (app-like audit): the tokens are coins spilled out of the pouch; each coin is still the same button (same id)
-  return `<div class="token-pouch"><div class="token-coins">${btns.join('')}</div><p class="hint">Tap a coin to use it.</p></div>`;
+  return `<div class="token-pouch"><div class="token-coins">${btns.join('')}</div><p class="hint">Tap a token to use it.</p></div>`;
 }
 
 function openTokensModal(){
@@ -2346,11 +2346,14 @@ function syncReachLayer(){
   const tray = document.getElementById('tray'); if(!tray) return;
   const wrap = tray.parentElement; if(!wrap) return;
   wrap.querySelectorAll(':scope > .reach-layer').forEach(n=>n.remove());
-  const dice = [...tray.querySelectorAll(':scope > .die.reach')];
+  const dice = [...tray.querySelectorAll(':scope > .die.reach, :scope > .die.dim-l')];
   if(!dice.length) return;
   const ox = tray.offsetLeft + tray.clientLeft, oy = tray.offsetTop + tray.clientTop; // the tray's content box inside the wrap
-  const rings = dice.map(d=>`<i class="reach-ring" style="left:${ox + d.offsetLeft}px;top:${oy + d.offsetTop}px;width:${d.offsetWidth}px;height:${d.offsetHeight}px"></i>`).join('');
-  wrap.insertAdjacentHTML('beforeend', `<div class="reach-layer" data-morph-keep aria-hidden="true">${rings}</div>`);
+  // Nov 27 (Jeremy: "fix the dimming too"): the dice the path can't reach are darkened by this layer as well (.dim-l turns
+  // their own CSS dim off, so Chrome doesn't darken them twice)
+  const box = (d, cls)=>`<i class="${cls}" style="left:${ox + d.offsetLeft}px;top:${oy + d.offsetTop}px;width:${d.offsetWidth}px;height:${d.offsetHeight}px"></i>`;
+  const html = dice.map(d=> box(d, d.classList.contains('reach') ? 'reach-ring' : 'reach-dim')).join('');
+  wrap.insertAdjacentHTML('beforeend', `<div class="reach-layer" data-morph-keep aria-hidden="true">${html}</div>`);
 }
 function bindTrayDice(){
   requestAnimationFrame(syncReachLayer);

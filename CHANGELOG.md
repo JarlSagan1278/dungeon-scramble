@@ -1,7 +1,9 @@
 # Changelog
 
 ## 1.42.176 (Nov 27, 2026)
-- iPhone: the gold rings on the dice a path can step to now show on every die (Safari only redrew the Skill-zone dice); they're drawn as their own layer over the tray.
+- iPhone: the gold rings on the dice a path can step to, and the darkening of the ones it can't, now show on every die (Safari only redrew some dice); both are drawn as their own layer over the tray.
+- Dimmed dice are solid again (they had turned see-through and showed their neighbors' shadows).
+- The guild notes use the game's normal buttons (the round seal buttons didn't match).
 
 ## 1.42.175 (Nov 27, 2026)
 - Once a path starts, every die it can step to next gets a gold ring, so the possible moves are marked.
