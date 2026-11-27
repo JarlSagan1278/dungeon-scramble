@@ -514,3 +514,14 @@ loot and equip, plus the camp, shrine, foe-rule and boss screens, read as a stra
    "white".
 Not a problem: turn playback (about 2.7 s for a 3-die path), the door and loot-chest taps (feel like rewards), the
 guided fight itself when followed.
+
+## Interaction fuzzing (Nov 27, 2026; tools/tests/fuzz_ui.js and tools/bugsearch.js)
+- `fuzz_ui.js` plays real runs on a phone with random taps (dice, buttons, menus, doors, loot, camp), double taps, taps
+  during playback, reloads mid-turn and phone/PC resizes, checking after every action: the dice drawn tappable match the
+  rules, the path is legal, the next-move rings match the reachable dice, health in range, one pop-up at a time, no
+  NaN/undefined on screen, no stuck playback, no script errors. About 9,000 actions so far (WEBKIT=1 for the iPhone path).
+- Found and fixed: game pop-ups (Victory chest, equip, shrine/relic choices) opened behind a menu opened during the last
+  hit; they now wait for the menu to close. A one-off case of missing rings (not reproducible): the rings are now drawn
+  synchronously as well as on the next frame.
+- `bugsearch.js` (QUICK=1 FLICK=1, 24 games): clean apart from a back gear item crossing the left edge during the big-hit
+  screen shake (7 px for half a second, clipped by the arch anyway; not a bug).

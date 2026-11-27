@@ -2294,10 +2294,14 @@ function renderGame(){
   rollPathCounter();
   killHintFx();
   attachRelicStrip();
-  if(S.lootChoice) renderLootModal();
-  if(S.shrineChoice) renderShrineChoiceModal();
-  if(S.relicChoice) renderRelicChoiceModal();
-  if(S.pendingLootDie) renderSwapModal();
+  // Nov 27 (fuzzer: the Victory chest opened behind a Codex the player had open during the last hit): the game's own
+  // pop-ups wait while a menu is open (Settings, Codex, Records, an info window) and open when it closes (closeModal)
+  if(!document.querySelector('.menu-overlay:not(.modal-closing)')){
+    if(S.lootChoice) renderLootModal();
+    if(S.shrineChoice) renderShrineChoiceModal();
+    if(S.relicChoice) renderRelicChoiceModal();
+    if(S.pendingLootDie) renderSwapModal();
+  }
 }
 
 // Turn playback fast path (Nov 4, speed pass): a turn redraws the screen ~7 times (one per die, then the enemy's
@@ -2370,7 +2374,7 @@ function syncReachLayer(){
   wrap.insertAdjacentHTML('beforeend', `<div class="reach-layer" data-morph-keep aria-hidden="true">${html}</div>`);
 }
 function bindTrayDice(){
-  requestAnimationFrame(syncReachLayer);
+  syncReachLayer(); requestAnimationFrame(syncReachLayer); // now, and again once the frame's layout settles (Nov 27: the fuzzer once caught the rings missing)
   [...document.getElementById('tray').children].forEach(node=>{
     if(node._dsBound) return; node._dsBound = true; // a die kept by a playback redraw already has its handlers
     const idx = parseInt(node.dataset.idx);
@@ -4134,7 +4138,7 @@ function openSettingsModal(){
       ${desktopApp() ? '<button id="settings-quit-btn" class="settings-quit-btn">Quit Game</button>' : ''}
       <p class="hint" style="margin:10px 0 0;">v${GAME_VERSION}</p>
     </div></div>`);
-  openModal(overlay);
+  overlay.classList.add('menu-overlay'); openModal(overlay);
   const close = ()=> closeModal(overlay);
   overlay.querySelector('#settings-x-btn').onclick = close;
   { const q = overlay.querySelector('#settings-quit-btn'); if(q) q.onclick = ()=> desktopApp().quit(); } // the run in progress is already saved (Continue)
@@ -4240,7 +4244,7 @@ function openTutorialModal(stepIdx){
         <button class="primary" id="tutorial-next-btn">${stepIdx<n-1?'Next':'Got it'}</button>
       </div>
     </div></div>`);
-  openUniqueOverlay('tutorial', overlay);
+  overlay.classList.add('menu-overlay'); openUniqueOverlay('tutorial', overlay);
   const closeAndAdvance = (next)=>{
     closeModal(overlay, ()=>{ if(next!=null) openTutorialModal(next); });
   };
@@ -4305,7 +4309,7 @@ function openRecordsModal(tab){
       <div class="codex-tabs"><button class="codex-tab" data-tab="rank">Rank</button><button class="codex-tab" data-tab="history">Run History</button><button class="codex-tab" data-tab="achievements">Achievements</button></div>
       <div class="codex-body" id="records-body"></div>
     </div></div>`);
-  openModal(overlay);
+  overlay.classList.add('menu-overlay'); openModal(overlay);
   const body = overlay.querySelector('#records-body');
   const show = t=>{
     overlay.querySelectorAll('.codex-tab').forEach(b=>b.classList.toggle('on', b.dataset.tab===t));
@@ -4373,7 +4377,7 @@ function openInfoModal(title, bodyHTML){
       <h2>${title}</h2>
       <div id="info-modal-body">${bodyHTML}</div>
     </div></div>`);
-  openModal(overlay);
+  overlay.classList.add('menu-overlay'); openModal(overlay);
   overlay.querySelector('#close-info-modal').onclick = ()=> closeModal(overlay);
   overlay.onclick = (ev)=>{ if(ev.target===overlay) closeModal(overlay); };
   return overlay;
@@ -4515,6 +4519,9 @@ function closeModal(overlay, after){
     done = true;
     if(overlay.parentNode) overlay.parentNode.removeChild(overlay);
     if(after) after();
+    // a game pop-up held back by this menu (render) opens now
+    if(overlay.classList.contains('menu-overlay') && !after && typeof S!=='undefined' && S && S.screen==='game' && (S.lootChoice || S.shrineChoice || S.relicChoice || S.pendingLootDie)
+       && !document.querySelector('.modal-overlay:not(.modal-closing)')) render();
   };
   overlay.addEventListener('animationend', finish, { once:true });
   setTimeout(finish, 200);
@@ -5043,7 +5050,7 @@ function openCodexModal(tab){
       <div class="codex-tabs">${CODEX_TABS.map(([id,l])=>`<button class="codex-tab" data-tab="${id}">${l}</button>`).join('')}</div>
       <div class="codex-spread"><div class="codex-body" id="codex-body"></div><div class="codex-page-pane" id="codex-page" aria-live="polite"></div></div>
     </div></div>`);
-  openModal(overlay);
+  overlay.classList.add('menu-overlay'); openModal(overlay);
   const body = overlay.querySelector('#codex-body'), pane = overlay.querySelector('#codex-page');
   // PC layout (Nov 14): an open book: the list stays on the left page, the chosen entry reads on the right page (the phone
   // swaps the list for the entry and back)
@@ -6645,7 +6652,7 @@ function openExportDataModal(){
       <p class="hint" id="export-status" style="min-height:1.2em;"></p>
       <textarea id="export-text" class="paper-input" readonly style="display:none; width:100%; height:110px; font-size:10px;"></textarea>
     </div></div>`);
-  openModal(overlay);
+  overlay.classList.add('menu-overlay'); openModal(overlay);
   const close = ()=> closeModal(overlay);
   overlay.querySelector('#export-x-btn').onclick = close;
   overlay.querySelector('#export-close-btn').onclick = close;
