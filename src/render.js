@@ -2949,12 +2949,18 @@ function showFloorCard(num, _name){
     st += `<rect x="${W/2-hw}" y="${mid}" width="${hw*2}" height="${bot-mid}" fill="hsl(30 6% ${l-22}%)" stroke="#120b07" stroke-width="3" stroke-linejoin="round"/>`;
   });
   const steps = `<svg class="fc-stairs" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${st}</svg>`;
+  // Nov 27 (Jeremy): the first time a device reaches Floor II or III, the card says the loot got better (once per floor)
+  let note = '';
+  if(num >= 2 && FLOORS[num-1] && !(META.floorNotes||[]).includes(num)){
+    const tier = FLOORS[num-1].lootName; META.floorNotes = [...(META.floorNotes||[]), num]; saveMeta();
+    note = `<div class="fc-note rb-${tier.toLowerCase()}">Deeper now: <b>${tier}</b> dice drop here</div>`;
+  }
   const node = el(`<div id="floor-card"><div class="floor-card-box fc-scene" aria-label="Floor ${num}: ${FLOOR_TITLES[num-1]||''}">
       <div class="rc-arch fc-arch"><div class="fc-hole">${steps}<i class="fc-torch l"></i><i class="fc-torch r"></i></div></div>
-      <div class="fc-sign"><div class="floor-card-num fc-tablet rb-${(FLOORS[num-1]&&FLOORS[num-1].lootName||'Alloy').toLowerCase()}">Floor ${ROMAN[num]||num}</div><div class="floor-card-name fc-name">${FLOOR_TITLES[num-1]||''}</div></div>
+      <div class="fc-sign"><div class="floor-card-num fc-tablet rb-${(FLOORS[num-1]&&FLOORS[num-1].lootName||'Alloy').toLowerCase()}">Floor ${ROMAN[num]||num}</div><div class="floor-card-name fc-name">${FLOOR_TITLES[num-1]||''}</div>${note}</div>
     </div></div>`);
   document.body.appendChild(node);
-  setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, PREFS.reducedMotion ? 1100 : 1700);
+  setTimeout(()=>{ if(node.parentNode) node.parentNode.removeChild(node); }, (PREFS.reducedMotion ? 1100 : 1700) + (note ? 1600 : 0));
 }
 
 // Soft tick on every button press (not Go / loot cards, which have their own sounds).
@@ -6483,7 +6489,37 @@ function renownHTML(compact){
     <div class="renown-next">${nx ? `${hi - g.after} to ${nx.name}: ${nx.text}` : 'Highest rank reached.'}</div>${S.screen==='victory' ? `<div class="renown-next renown-climb">Next challenge: Depth ${depthLabel(currentDepth())+1} earns &times;${(1 + RENOWN.depthMul*(depthLabel(currentDepth())+1)).toFixed(2)} renown.</div>` : ''}${ups}</div>`;
 }
 // A rank-up is an event: a chime and a sparkle burst on the renown box, once per run (Nov 23)
+// Nov 27 (Jeremy: "rank-ups and class unlocks as moments"): before the end screen settles, each one gets its own card over
+// it: a rank-up is a guild certificate with the rank's seal stamped on; a new class slides its signature object onto a
+// card. One after another, a tap (or a few seconds) moves on. Off for webdriver unless localStorage dungeonScrambleMomentTest.
+function endMoments(){
+  if(!S || S._momentsDone) return; S._momentsDone = true;
+  try{ if(navigator.webdriver && !localStorage.getItem('dungeonScrambleMomentTest')) return; }catch(e){}
+  const q = [];
+  const g = S.renownGain;
+  if(g && g.ranksUp && g.ranksUp.length){ const name = g.ranksUp[g.ranksUp.length-1], k = RANKS.findIndex(r=>r.name===name), r = RANKS[k];
+    q.push(`<div class="mo-card mo-rank"><div class="mo-kicker">The Guild of Adventurers</div><div class="mo-title">Rank up</div>
+      <div class="mo-name">${name}</div><div class="mo-seal" aria-hidden="true"><span>${k+1}</span></div>
+      ${r && r.text ? `<div class="mo-text">${r.text}</div>` : ''}${g.ranksUp.length>1 ? `<div class="mo-sub">${g.ranksUp.length} ranks this run</div>` : ''}</div>`); }
+  (S.newClasses||[]).forEach(id=>{ const c = CLASSES.find(x=>x.id===id); if(!c) return;
+    q.push(`<div class="mo-card mo-class" style="--class-color:${c.color}"><div class="mo-kicker">New class unlocked</div>
+      <div class="mo-prop" aria-hidden="true">${CLASS_PROP_SVG[id]||''}</div><div class="mo-name">${c.name}</div>
+      <div class="mo-text">${c.ability}</div><div class="mo-sub">Pick it on the character screen.</div></div>`); });
+  if(!q.length) return;
+  const next = ()=>{
+    document.querySelectorAll('.moment-overlay').forEach(n=>n.remove());
+    const html = q.shift(); if(!html) return;
+    const ov = el(`<div class="moment-overlay" role="dialog" aria-live="polite">${html}<div class="mo-tap">Tap to continue</div></div>`);
+    document.body.appendChild(ov);
+    try{ playTone(html.includes('mo-rank') ? 'floorUp' : 'relicProc'); }catch(e){}
+    if(html.includes('mo-rank') && !PREFS.reducedMotion) setTimeout(()=>{ try{ playTone('woodKnock'); vibrate(30); }catch(e){} }, 520); // the seal lands
+    let done = false; const go = ()=>{ if(done) return; done = true; ov.classList.add('mo-out'); setTimeout(next, 220); };
+    ov.onclick = go; setTimeout(go, 5200);
+  };
+  setTimeout(next, 900);
+}
 function rankUpFx(){
+  endMoments();
   if(!S || !S.renownGain || !S.renownGain.ranksUp.length || S._rankFxDone) return; S._rankFxDone = true;
   setTimeout(()=>{ try{ if(typeof playTone==='function') playTone('floorUp');
     if(typeof spawnParticleBurstAtEl==='function' && document.querySelector('.renown-box:not([hidden])')) spawnParticleBurstAtEl('.renown-box', ['#ffd76a','#9affa0','#fff5d6']); }catch(e){} }, 1100);

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- Rank-ups and new classes are moments: a guild certificate with the rank's seal stamped on, or the new class's object sliding onto its card, before the end screen.
+- The first time you reach Floor II or III, the Floor card says what loot drops there (Gilded, then Magic).
+
 ## 1.42.177 (Nov 27, 2026)
 - iPhone: Swap and Reroll targets, the Skill's zone highlight, Boost hints, Combo glows, Pointer's +1 tags and path step numbers now redraw reliably (Safari could skip redrawing a die whose only change was its look).
 

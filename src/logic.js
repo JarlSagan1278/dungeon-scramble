@@ -67,7 +67,7 @@ const SCREEN_FIELDS = [
   // open panels
   'organizeSelection','_pocketOpen',
   // end-of-run screens (never autosaved: the save is cleared when a run ends)
-  'gameOverRecorded','carryoverOptions','carryoverChosenName','depthResult','newAchievements','newClasses','newBoonDice','newOriginRelic','personalBests','renownGain','_rankFxDone',
+  'gameOverRecorded','carryoverOptions','carryoverChosenName','depthResult','newAchievements','newClasses','newBoonDice','newOriginRelic','personalBests','renownGain','_rankFxDone','_momentsDone',
 ];
 const RUN_FIELD_SET = new Set(RUN_FIELDS), SCREEN_FIELD_SET = new Set(SCREEN_FIELDS);
 function unclassifiedStateFields(st){ return Object.keys(st||{}).filter(k=>!RUN_FIELD_SET.has(k) && !SCREEN_FIELD_SET.has(k)); }
@@ -551,6 +551,7 @@ function loadMeta(){
       // Nov 27: these two were dropped on load, so the first-relic hint came back every time the game was reopened
       relicHintSeen: +parsed.relicHintSeen || 0,
       lootHelpShown: +parsed.lootHelpShown || 0,
+      floorNotes: Array.isArray(parsed.floorNotes) ? parsed.floorNotes : [],
     };
   } catch(e){ return { lifetime: {...DEFAULT_LIFETIME}, achievements: {}, favoriteBoons: [], relicsFound: [] }; }
 }
