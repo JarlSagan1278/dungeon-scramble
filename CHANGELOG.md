@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.42.178 (Nov 27, 2026)
 - If you open a menu (Settings, Codex, Records, an info window) while a turn plays out, the Victory chest, equip screen or a shrine or relic choice now waits and opens when you close it (they used to open behind the menu).
 - The next-move rings are drawn straight away after every tray redraw (once, they could go missing).
 - Rank-ups and new classes are moments: a guild certificate with the rank's seal stamped on, or the new class's object sliding onto its card, before the end screen.

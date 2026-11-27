@@ -63,6 +63,7 @@ jobs:
           releaseFiles: app/android/app/build/outputs/bundle/release/app-release.aab
           track: ${{ github.event.inputs.track || 'alpha' }}
           status: completed
+          whatsNewDirectory: app/play-whatsnew  # Nov 27: the notes testers see with this version (whatsnew-en-US, 500 characters max)
       - name: No Play key yet
         if: steps.gate.outputs.go == 'yes' && env.PLAY_JSON == ''
         run: echo "PLAY_SERVICE_ACCOUNT_JSON is not set; built the bundle, skipped the upload."
