@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.42.177 (Nov 27, 2026)
 - iPhone: Swap and Reroll targets, the Skill's zone highlight, Boost hints, Combo glows, Pointer's +1 tags and path step numbers now redraw reliably (Safari could skip redrawing a die whose only change was its look).
 
 ## 1.42.176 (Nov 27, 2026)
