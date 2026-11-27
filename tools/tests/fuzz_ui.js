@@ -59,7 +59,7 @@ const CHECK = () => {
         if (!c.length) return null;
         const e = c[Math.floor(r * c.length)];
         const id = e.id || (e.dataset && e.dataset.idx != null ? 'die' + e.dataset.idx : '') || String(e.className).split(' ')[0];
-        e.setAttribute('data-fz', '1'); return id + ':' + (e.innerText || '').trim().slice(0, 18).replace(/\s+/g, ' ');
+        e.setAttribute('data-fzr', '1'); return id + ':' + (e.innerText || '').trim().slice(0, 18).replace(/\s+/g, ' ');
       }, rnd());
       const roll = rnd();
       try {
@@ -80,7 +80,7 @@ const CHECK = () => {
             const any = q('button.primary'); if (any) { any.setAttribute('data-fz', '1'); return 'play: ' + (any.id || 'primary'); }
             return null; }, rnd());
           if (mv === 'flick') { hist.push('flick lid'); await p.evaluate(() => scrambleRoll(0, -1)); }
-          else if (mv) { hist.push(mv); await p.click('[data-fz="1"]', { force: true, timeout: 1500 }).catch(() => {}); await p.evaluate(() => document.querySelectorAll('[data-fz]').forEach(n => n.removeAttribute('data-fz'))).catch(() => {}); }
+          else if (mv) { hist.push(mv); await p.click('[data-fz="1"]', { force: true, timeout: 1500 }).catch(() => {}); await p.evaluate(() => document.querySelectorAll('[data-fz],[data-fzr]').forEach(n => { n.removeAttribute('data-fz'); n.removeAttribute('data-fzr'); })).catch(() => {}); }
           else hist.push('wait');
         }
         else if (roll < 0.48) { hist.push('RELOAD'); await p.reload(); await p.waitForTimeout(1200); }
@@ -88,9 +88,9 @@ const CHECK = () => {
         else if (roll < 0.53 && await p.evaluate(() => !!(S && S.needRoll))) { hist.push('flick lid'); await p.evaluate(() => scrambleRoll(0, -1)); }
         else if (act) {
           const dbl = roll < 0.60; hist.push((dbl ? 'DOUBLE ' : '') + act);
-          await p.click('[data-fz="1"]', { force: true, timeout: 1500 }).catch(() => {});
-          if (dbl) await p.click('[data-fz="1"]', { force: true, timeout: 800 }).catch(() => {});
-          await p.evaluate(() => document.querySelectorAll('[data-fz]').forEach(n => n.removeAttribute('data-fz'))).catch(() => {});
+          await p.click('[data-fzr="1"]', { force: true, timeout: 1500 }).catch(() => {});
+          if (dbl) await p.click('[data-fzr="1"]', { force: true, timeout: 800 }).catch(() => {});
+          await p.evaluate(() => document.querySelectorAll('[data-fz],[data-fzr]').forEach(n => { n.removeAttribute('data-fz'); n.removeAttribute('data-fzr'); })).catch(() => {});
         } else { hist.push('wait'); }
       } catch (e) { hist.push('ERR ' + e.message.split('\n')[0]); }
       await p.waitForTimeout(rnd() < 0.7 ? 120 : 700); // sometimes during playback, sometimes after it settles
@@ -101,6 +101,7 @@ const CHECK = () => {
       if (errs.length) { found.push('JS error: ' + errs.splice(0).join(' | ').slice(0, 200)); }
       const scr = await p.evaluate(() => S ? `${S.screen} F${S.floorIdx + 1} R${S.routeStep}` : 'title').catch(() => '?');
       if (scr !== lastScreen) lastScreen = scr;
+      if (process.env.TRACE && (s % 10 === 0 || /Go/.test(hist[hist.length-1]||''))) console.log(s, scr, hist.slice(-4).join(' -> '), await p.evaluate(() => S ? JSON.stringify({ p: S.path, tr: S.transitioning, nr: S.needRoll, hp: S.encounter && S.encounter.curHealth, ta: S.trayAct && S.trayAct.kind, armed: typeof abilityArmed!=='undefined' && abilityArmed, guide: S.guide && S.guide.stage, go: (document.getElementById('resolve-btn')||{}).className, enc: S.encounter && S.encounter.name, turn: S.turnNumber, ov: [...document.querySelectorAll('.modal-overlay,.moment-overlay,#room-callout,.loot-overlay')].map(n => n.className || n.id) }) : '').catch(() => ''));
       for (const f of found) { const key = f.replace(/\d+/g, '#'); if (!problems.some(x => x.key === key)) { problems.push({ key, f, game: g, step: s, where: scr, seed, last: hist.slice(-8) }); console.log(`PROBLEM g${g} s${s} [${scr}]: ${f}\n   after: ${hist.slice(-6).join(' -> ')}`); } }
       // a stuck turn: still transitioning after a long wait
       if (s % 50 === 49) { const stuck = await p.evaluate(async () => { if (!S || !S.transitioning) return false; await new Promise(r => setTimeout(r, 6000)); return !!S.transitioning; }).catch(() => false);
