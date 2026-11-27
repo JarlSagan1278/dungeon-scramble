@@ -2342,6 +2342,20 @@ function patchGameDOM(html){
 // Nov 27 (Jeremy, iPhone: the gold "next move" rings only showed on the Skill-zone dice): Safari doesn't repaint a die
 // whose only change is its class unless something else redraws it (the zone dice twitch, so they did). The rings are
 // drawn as a fresh layer over the tray after every tray redraw instead: new elements are always painted.
+// Nov 27 (iPhone): after an in-place tray redraw, a die whose class changed (or every die, when the tray's own armed state
+// changed) is swapped for a fresh copy of itself: Safari may not repaint an element whose only change is its class, and a
+// new element is always painted. bindTrayDice() wires the copies (handlers live on the element, not in the markup).
+// Only on Apple's WebKit (every iPhone browser, Mac Safari): elsewhere the kept elements keep their animations in step.
+// localStorage dungeonScrambleWebkitTest turns it on for tests.
+const WEBKIT_REPAINT = (()=>{ try{ return /Apple/.test(navigator.vendor||'') || !!localStorage.getItem('dungeonScrambleWebkitTest'); }catch(e){ return false; } })();
+function refreshChangedDice(tray, before, trayClsBefore){
+  if(!WEBKIT_REPAINT) return;
+  const all = tray.className !== trayClsBefore;
+  [...tray.children].forEach((d, i)=>{
+    if(!d.classList.contains('die')) return;
+    if(all || before[i] !== d.className){ const c = d.cloneNode(true); d.replaceWith(c); }
+  });
+}
 function syncReachLayer(){
   const tray = document.getElementById('tray'); if(!tray) return;
   const wrap = tray.parentElement; if(!wrap) return;
@@ -2475,11 +2489,13 @@ function renderTrayFast(){
      || S.tray.filter(c=>c.minion).length !== renderGame._minions
      || `${S.swapTokens||0}|${S.rerollTokens||0}` !== renderGame._tok) return render();
   hideFaceTooltip();
+  const before = [...tray.children].map(d=>d.className), trayCls = tray.className;
   tray.classList.toggle('ability-armed', abilityArmed);
   tray.classList.toggle('trayact-armed', !!S.trayAct);
   // Nov 12 (one redraw path): in place, like path taps. The one-shot flourish classes (just-swapped/rerolled/converted)
   // are in the markup for this redraw only, so they're added fresh to the kept die and their animation plays.
   const dice = S.tray.map((c,i)=>renderDie(c,i)); morphHTML(tray, dice.join('')); renderGame._dice = dice.map(zoneNorm);
+  refreshChangedDice(tray, before, trayCls);
   bindTrayDice();
   renderPathStrip();
   const ab = document.getElementById('ability-btn');
@@ -2503,7 +2519,9 @@ function renderPathOnly(){
   hideFaceTooltip();
   // Nov 12 (one redraw path): the dice update in place, so a die the tap didn't change keeps its element, handlers and
   // running animations; the playback redraw's per-die cache stays valid (it used to be dropped, forcing a full tray rebuild)
+  const before = [...tray.children].map(d=>d.className), trayCls = tray.className;
   const dice = S.tray.map((c,i)=>renderDie(c,i)); morphHTML(tray, dice.join('')); renderGame._dice = dice.map(zoneNorm);
+  refreshChangedDice(tray, before, trayCls);
   bindTrayDice();
   renderPathStrip();
   refreshPathBits(); // the counter is still rebuilt on purpose: its pop-in replays on every tap

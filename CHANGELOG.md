@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- iPhone: Swap and Reroll targets, the Skill's zone highlight, Boost hints, Combo glows, Pointer's +1 tags and path step numbers now redraw reliably (Safari could skip redrawing a die whose only change was its look).
+
 ## 1.42.176 (Nov 27, 2026)
 - iPhone: the gold rings on the dice a path can step to, and the darkening of the ones it can't, now show on every die (Safari only redrew some dice); both are drawn as their own layer over the tray.
 - Dimmed dice are solid again (they had turned see-through and showed their neighbors' shadows).
