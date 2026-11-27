@@ -49,13 +49,13 @@ const CHECK = () => {
       localStorage.setItem('dungeonScrambleTutorialSeen_v1', '1'); localStorage.setItem('dungeonScrambleDoorTest', '1'); if (wk) localStorage.setItem('dungeonScrambleWebkitTest', '1'); } catch (e) {} }, !!process.env.WEBKIT);
     await p.goto('http://127.0.0.1:8771/index.html'); await p.waitForTimeout(1500);
     await p.evaluate(() => { META.renown = 600; META.lifetime.runsPlayed = 12; saveMeta(); render(); });
-    const hist = []; let lastScreen = '';
+    const hist = []; let lastScreen = ''; const seen = new Set(); let deepest = 0;
     for (let s = 0; s < STEPS; s++) {
       const act = await p.evaluate((r) => {
         const vis = el => { const q = el.getBoundingClientRect(); return q.width > 0 && q.height > 0 && q.bottom > 0 && q.top < innerHeight && getComputedStyle(el).visibility !== 'hidden'; };
         const top = document.querySelector('.modal-overlay:not(.modal-closing)') || document.querySelector('.moment-overlay') || document.querySelector('#room-callout') || document.querySelector('.loot-overlay') || document;
         let c = [...top.querySelectorAll('button, [onclick], #tray > .die, .loot-opt, .loot-chest-btn, #chest-lid, .rc-door, .camp-die-tile, .die')].filter(vis);
-        c = c.filter(e => !/reset-progress|confirm-reset-go|settings-quit|export|backup|title-history|copy/i.test((e.id || '') + ' ' + e.className)); // never wipe progress or leave
+        c = c.filter(e => !/reset-progress|confirm-reset-go|settings-quit|export|backup|title-history|copy|settings-restart|confirm-restart-go|title-newrun-go|daily/i.test((e.id || '') + ' ' + e.className)); // never wipe progress or leave
         if (!c.length) return null;
         const e = c[Math.floor(r * c.length)];
         const id = e.id || (e.dataset && e.dataset.idx != null ? 'die' + e.dataset.idx : '') || String(e.className).split(' ')[0];
@@ -83,7 +83,7 @@ const CHECK = () => {
           else if (mv) { hist.push(mv); await p.click('[data-fz="1"]', { force: true, timeout: 1500 }).catch(() => {}); await p.evaluate(() => document.querySelectorAll('[data-fz],[data-fzr]').forEach(n => { n.removeAttribute('data-fz'); n.removeAttribute('data-fzr'); })).catch(() => {}); }
           else hist.push('wait');
         }
-        else if (roll < 0.48) { hist.push('RELOAD'); await p.reload(); await p.waitForTimeout(1200); }
+        else if (roll < 0.465) { hist.push('RELOAD'); await p.reload(); await p.waitForTimeout(1200); }
         else if (roll < 0.50) { hist.push('PC/phone resize'); await p.setViewportSize({ width: 1375, height: 947 }); await p.waitForTimeout(400); await p.setViewportSize({ width: 395, height: 769 }); await p.waitForTimeout(300); }
         else if (roll < 0.53 && await p.evaluate(() => !!(S && S.needRoll))) { hist.push('flick lid'); await p.evaluate(() => scrambleRoll(0, -1)); }
         else if (act) {
@@ -100,14 +100,14 @@ const CHECK = () => {
       let found = []; try { found = await p.evaluate(CHECK); } catch (e) { found = []; }
       if (errs.length) { found.push('JS error: ' + errs.splice(0).join(' | ').slice(0, 200)); }
       const scr = await p.evaluate(() => S ? `${S.screen} F${S.floorIdx + 1} R${S.routeStep}` : 'title').catch(() => '?');
-      if (scr !== lastScreen) lastScreen = scr;
+      if (scr !== lastScreen) lastScreen = scr; seen.add(scr.split(' ')[0]); { const m = scr.match(/F(\d+) R(\d+)/); if (m) deepest = Math.max(deepest, (+m[1]) * 100 + (+m[2])); }
       if (process.env.TRACE && (s % 10 === 0 || /Go/.test(hist[hist.length-1]||''))) console.log(s, scr, hist.slice(-4).join(' -> '), await p.evaluate(() => S ? JSON.stringify({ p: S.path, tr: S.transitioning, nr: S.needRoll, hp: S.encounter && S.encounter.curHealth, ta: S.trayAct && S.trayAct.kind, armed: typeof abilityArmed!=='undefined' && abilityArmed, guide: S.guide && S.guide.stage, go: (document.getElementById('resolve-btn')||{}).className, enc: S.encounter && S.encounter.name, turn: S.turnNumber, ov: [...document.querySelectorAll('.modal-overlay,.moment-overlay,#room-callout,.loot-overlay')].map(n => n.className || n.id) }) : '').catch(() => ''));
       for (const f of found) { const key = f.replace(/\d+/g, '#'); if (!problems.some(x => x.key === key)) { problems.push({ key, f, game: g, step: s, where: scr, seed, last: hist.slice(-8) }); console.log(`PROBLEM g${g} s${s} [${scr}]: ${f}\n   after: ${hist.slice(-6).join(' -> ')}`); } }
       // a stuck turn: still transitioning after a long wait
       if (s % 50 === 49) { const stuck = await p.evaluate(async () => { if (!S || !S.transitioning) return false; await new Promise(r => setTimeout(r, 6000)); return !!S.transitioning; }).catch(() => false);
         if (stuck) { const f = 'turn playback stuck for 6 s'; if (!problems.some(x => x.f === f)) { problems.push({ f, game: g, step: s, where: scr, last: hist.slice(-8) }); console.log(`PROBLEM g${g} s${s} [${scr}]: ${f}\n   after: ${hist.slice(-6).join(' -> ')}`); } } }
     }
-    console.log(`game ${g}: ${STEPS} actions, reached ${lastScreen}`);
+    console.log(`game ${g}: ${STEPS} actions, deepest F${Math.floor(deepest / 100)} R${deepest % 100}, screens: ${[...seen].join(' ')}`);
     await ctx.close();
   }
   await b.close(); srv.close();
